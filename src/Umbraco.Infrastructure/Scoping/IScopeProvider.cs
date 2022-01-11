@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Core.Scoping
         /// </summary>
         /// <param name="isolationLevel">The transaction isolation level.</param>
         /// <param name="repositoryCacheMode">The repositories cache mode.</param>
-        /// <param name="eventDispatcher">An optional events dispatcher.</param>
         /// <param name="scopedNotificationPublisher">An optional notification publisher.</param>
         /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
         /// <param name="callContext">A value indicating whether this scope should always be registered in the call context.</param>
@@ -35,7 +34,6 @@ namespace Umbraco.Cms.Core.Scoping
         IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
@@ -47,7 +45,6 @@ namespace Umbraco.Cms.Core.Scoping
         /// <returns>A detached scope.</returns>
         /// <param name="isolationLevel">The transaction isolation level.</param>
         /// <param name="repositoryCacheMode">The repositories cache mode.</param>
-        /// <param name="eventDispatcher">An optional events dispatcher.</param>
         /// <param name="scopedNotificationPublisher">An option notification publisher.</param>
         /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
         /// <remarks>
@@ -58,7 +55,6 @@ namespace Umbraco.Cms.Core.Scoping
         IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null);
 

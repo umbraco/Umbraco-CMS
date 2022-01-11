@@ -39,7 +39,6 @@ namespace Umbraco.Cms.Core.Scoping
         private IUmbracoDatabase _database;
 
         private bool _disposed;
-        private IEventDispatcher _eventDispatcher;
         private ICompletable _fscope;
 
         private IsolatedCaches _isolatedCaches;
@@ -68,7 +67,6 @@ namespace Umbraco.Cms.Core.Scoping
             bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
@@ -83,7 +81,6 @@ namespace Umbraco.Cms.Core.Scoping
 
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
-            _eventDispatcher = eventDispatcher;
             _notificationPublisher = notificationPublisher;
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
@@ -141,12 +138,6 @@ namespace Umbraco.Cms.Core.Scoping
                         nameof(repositoryCacheMode));
                 }
 
-                // cannot specify a dispatcher!
-                if (_eventDispatcher != null)
-                {
-                    throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
-                }
-
                 // Only the outermost scope can specify the notification publisher
                 if (_notificationPublisher != null)
                 {
@@ -187,13 +178,12 @@ namespace Umbraco.Cms.Core.Scoping
             IScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
             : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, null,
-                scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher,
+                scopeContext, detachable, isolationLevel, repositoryCacheMode, 
                 scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
         {
         }
@@ -209,13 +199,12 @@ namespace Umbraco.Cms.Core.Scoping
             Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
             : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, parent,
-                null, false, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher,
+                null, false, isolationLevel, repositoryCacheMode, notificationPublisher,
                 scopeFileSystems, callContext, autoComplete)
         {
         }
@@ -452,21 +441,6 @@ namespace Umbraco.Cms.Core.Scoping
                 // it'd need to be captured by the controller
                 //
                 // + rename // EventMessages = ServiceMessages or something
-            }
-        }
-
-        /// <inheritdoc />
-        public IEventDispatcher Events
-        {
-            get
-            {
-                EnsureNotDisposed();
-                if (ParentScope != null)
-                {
-                    return ParentScope.Events;
-                }
-
-                return _eventDispatcher ??= new QueuingEventDispatcher(_mediaFileManager);
             }
         }
 
@@ -857,7 +831,6 @@ namespace Umbraco.Cms.Core.Scoping
                 // deal with events
                 if (onException == false)
                 {
-                    _eventDispatcher?.ScopeExit(completed);
                     _notificationPublisher?.ScopeExit(completed);
                 }
             }, () =>

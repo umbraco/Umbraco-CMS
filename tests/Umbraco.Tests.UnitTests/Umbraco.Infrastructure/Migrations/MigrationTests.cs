@@ -28,7 +28,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             public IScope CreateScope(
                 IsolationLevel isolationLevel = IsolationLevel.Unspecified,
                 RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-                IEventDispatcher eventDispatcher = null,
                 IScopedNotificationPublisher notificationPublisher = null,
                 bool? scopeFileSystems = null,
                 bool callContext = false,
@@ -37,7 +36,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             public IScope CreateDetachedScope(
                 IsolationLevel isolationLevel = IsolationLevel.Unspecified,
                 RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-                IEventDispatcher eventDispatcher = null,
                 IScopedNotificationPublisher notificationPublisher = null,
                 bool? scopeFileSystems = null) => throw new NotImplementedException();
 

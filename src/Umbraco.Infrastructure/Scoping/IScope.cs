@@ -26,11 +26,6 @@ namespace Umbraco.Cms.Core.Scoping
         EventMessages Messages { get; }
 
         /// <summary>
-        /// Gets the scope event dispatcher.
-        /// </summary>
-        IEventDispatcher Events { get; }
-
-        /// <summary>
         /// Gets the scope notification publisher
         /// </summary>
         IScopedNotificationPublisher Notifications { get; }
