@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Plugins" />
     <Folder Include="Views" />
   </ItemGroup>
 

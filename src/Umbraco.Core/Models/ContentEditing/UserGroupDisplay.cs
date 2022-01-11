@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -27,5 +27,8 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "assignedPermissions")]
         public IEnumerable<AssignedContentPermissions> AssignedPermissions { get; set; }
+
+        [DataMember(Name = "apps")]
+        public IEnumerable<ContentApp> ContentApps { get; set; }
     }
 }

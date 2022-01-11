@@ -1,0 +1,12 @@
+{
+    "contentApps": [
+        {
+            "name": "Test",
+            "alias": "test",
+            "weight": 0,
+            "icon": "icon-calculator",
+            "view": "~/App_Plugins/Test/test.html",
+            "show": ["+userGroup/*"]
+        }
+    ]
+}

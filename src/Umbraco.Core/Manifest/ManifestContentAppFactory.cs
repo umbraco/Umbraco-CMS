@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -69,6 +69,10 @@ namespace Umbraco.Cms.Core.Manifest
                 case IContentType contentType:
                     partA = "contentType";
                     partB = contentType.Alias;
+                    break;
+                case IUserGroup userGroup:
+                    partA = "userGroup";
+                    partB = userGroup.Alias;
                     break;
 
                 default:

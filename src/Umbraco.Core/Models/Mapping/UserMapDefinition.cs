@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -31,10 +31,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly MediaFileManager _mediaFileManager;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly CommonMapper _commonMapper;
 
         public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
             AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
-            IImageUrlGenerator imageUrlGenerator)
+            IImageUrlGenerator imageUrlGenerator, CommonMapper commonMapper)
         {
             _sectionService = sectionService;
             _entityService = entityService;
@@ -46,6 +47,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _mediaFileManager = mediaFileManager;
             _shortStringHelper = shortStringHelper;
             _imageUrlGenerator = imageUrlGenerator;
+            _commonMapper = commonMapper;
         }
 
         public void DefineMaps(IUmbracoMapper mapper)
@@ -276,6 +278,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             target.AssignedPermissions = allAssignedPermissions;
+            target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
         }
 
         // Umbraco.Code.MapAll -Notifications -Udi -Icon -IsCurrentUser -Trashed -ResetPasswordValue
