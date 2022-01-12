@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
-    [Obsolete("This class is obsolete, as this does not configure your Maximum request length")]
+    [Obsolete("This class is obsolete, as this does not configure your Maximum request length, see https://our.umbraco.com/documentation/Reference/V9-Config/MaximumUploadSizeSettings/ for information about configuring maximum request length")]
     public class ConfigureIISServerOptions : IConfigureOptions<IISServerOptions>
     {
         private readonly IOptions<RuntimeSettings> _runtimeSettings;
