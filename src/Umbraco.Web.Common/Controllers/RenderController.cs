@@ -54,6 +54,24 @@ namespace Umbraco.Cms.Web.Common.Controllers
         public virtual IActionResult Index() => CurrentTemplate(new ContentModel(CurrentPage));
 
         /// <summary>
+        /// Gets an action result based on the template name found in the route values and a model.
+        /// If the template found in the route values doesn't physically exist, Umbraco not found result is returned.
+        /// </summary>
+        /// <typeparam name="T">The type of the model.</typeparam>
+        /// <param name="model">The model.</param>
+        /// <returns>The action result.</returns>
+        protected override IActionResult CurrentTemplate<T>(T model)
+        {
+            if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
+            {
+                // no physical template file was found
+                return new PublishedContentNotFoundResult(UmbracoContext);
+            }
+
+            return View(UmbracoRouteValues.TemplateName, model);
+        }
+
+        /// <summary>
         /// Before the controller executes we will handle redirects and not founds
         /// </summary>
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -123,6 +141,6 @@ namespace Umbraco.Cms.Web.Common.Controllers
             {
                 return new PublishedContentNotFoundResult(UmbracoContext);
             }
-        }        
+        }
     }
 }
