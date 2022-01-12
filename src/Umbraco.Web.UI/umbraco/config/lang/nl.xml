@@ -1794,7 +1794,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="memberRoles">Rollen</key>
     <key alias="memberTypes">Ledentypes</key>
     <key alias="documentTypes">Documenttypes</key>
-    <key alias="relationTypes">RelatieTypen</key>
+    <key alias="relationTypes">RelatieTypes</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="partialViews">Partial Views</key>
