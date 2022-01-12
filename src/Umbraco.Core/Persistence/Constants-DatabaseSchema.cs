@@ -56,6 +56,8 @@ namespace Umbraco.Cms.Core
                 public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
                 public const string ExternalLogin = TableNamePrefix + "ExternalLogin";
                 public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
+                public const string ExternalLoginWithKey = TableNamePrefix + "ExternalLoginWithKey";
+                public const string ExternalLoginTokenWithKey = TableNamePrefix + "ExternalLoginTokenWithKey";
 
                 public const string Macro = /*TableNamePrefix*/ "cms" + "Macro";
                 public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";

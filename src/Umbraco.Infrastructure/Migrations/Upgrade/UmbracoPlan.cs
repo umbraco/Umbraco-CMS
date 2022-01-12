@@ -15,6 +15,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -269,6 +270,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<AddUserGroup2NodeTable>("{0571C395-8F0B-44E9-8E3F-47BDD08D817B}");
             To<AddDefaultForNotificationsToggle>("{AD3D3B7F-8E74-45A4-85DB-7FFAD57F9243}");
             To<MovePackageXMLToDb>("{A2F22F17-5870-4179-8A8D-2362AA4A0A5F}");
+
+
+            // TO 9.3.0
+            To<AddExternalLoginWithKeys>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
+
         }
     }
 }

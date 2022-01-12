@@ -30,6 +30,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IDomainRepository, DomainRepository>();
             builder.Services.AddUnique<IEntityRepository, EntityRepository>();
             builder.Services.AddUnique<IExternalLoginRepository, ExternalLoginRepository>();
+            builder.Services.AddUnique<IExternalLoginWithKeyRepository, ExternalLoginWithKeyRepository>();
             builder.Services.AddUnique<ILanguageRepository, LanguageRepository>();
             builder.Services.AddUnique<IMacroRepository, MacroRepository>();
             builder.Services.AddUnique<IMediaRepository, MediaRepository>();

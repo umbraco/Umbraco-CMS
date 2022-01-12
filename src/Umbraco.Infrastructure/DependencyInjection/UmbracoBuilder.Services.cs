@@ -65,6 +65,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();
             builder.Services.AddUnique<INotificationService, NotificationService>();
             builder.Services.AddUnique<IExternalLoginService, ExternalLoginService>();
+            builder.Services.AddUnique<IExternalLoginWithKeyService, ExternalLoginWithKeyService>();
             builder.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
             builder.Services.AddUnique<IConsentService, ConsentService>();
             builder.Services.AddTransient(SourcesFactory);
