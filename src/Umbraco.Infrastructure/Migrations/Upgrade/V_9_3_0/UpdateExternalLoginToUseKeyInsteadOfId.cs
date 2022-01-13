@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0
 {
@@ -33,8 +35,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0
                 //special trick to add the column without constraints and return the sql to add them later
                 AddColumn<ExternalLoginDto>("userOrMemberKey", out var sqls);
 
-                //populate the new columns with the userId as a Guid. Same method as IntExtensions.ToGuid.
-                Execute.Sql($"UPDATE {ExternalLoginDto.TableName} SET userOrMemberKey = CAST(CONVERT(char(8), CONVERT(BINARY(4), userId), 2) + '-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)").Do();
+
+                if (DatabaseType.IsSqlCe())
+                {
+                    var userIds = Database.Fetch<int>(Sql().Select("userId").From<ExternalLoginDto>());
+
+                    foreach (int userId in userIds)
+                    {
+                        Execute.Sql($"UPDATE {ExternalLoginDto.TableName} SET userOrMemberKey = '{userId.ToGuid()}' WHERE userId = {userId}").Do();
+                    }
+                }
+                else
+                {
+                    //populate the new columns with the userId as a Guid. Same method as IntExtensions.ToGuid.
+                    Execute.Sql($"UPDATE {ExternalLoginDto.TableName} SET userOrMemberKey = CAST(CONVERT(char(8), CONVERT(BINARY(4), userId), 2) + '-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)").Do();
+
+                }
 
                 //now apply constraints (NOT NULL) to new table
                 foreach (var sql in sqls) Execute.Sql(sql).Do();
