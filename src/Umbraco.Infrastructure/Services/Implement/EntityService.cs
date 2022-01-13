@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -398,13 +398,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var sql = scope.SqlContext.Sql()
-                    .Select<NodeDto>(x => x.NodeObjectType)
-                    .From<NodeDto>()
-                    .Where<NodeDto>(x => x.NodeId == id);
-
-                var guid = scope.Database.ExecuteScalar<Guid>(sql);
-                return ObjectTypes.GetUmbracoObjectType(guid);
+                return _entityRepository.GetObjectType(id);
             }
         }
 
@@ -413,13 +407,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var sql = scope.SqlContext.Sql()
-                    .Select<NodeDto>(x => x.NodeObjectType)
-                    .From<NodeDto>()
-                    .Where<NodeDto>(x => x.UniqueId == key);
-
-                var guid = scope.Database.ExecuteScalar<Guid>(sql);
-                return ObjectTypes.GetUmbracoObjectType(guid);
+                return _entityRepository.GetObjectType(key);
             }
         }
 
@@ -483,36 +471,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public int ReserveId(Guid key)
         {
-            NodeDto node;
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                var sql = scope.SqlContext.Sql()
-                    .Select<NodeDto>()
-                    .From<NodeDto>()
-                    .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation);
-
-                node = scope.Database.SingleOrDefault<NodeDto>(sql);
-                if (node != null)
-                    throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
-
-                node = new NodeDto
-                {
-                    UniqueId = key,
-                    Text = "RESERVED.ID",
-                    NodeObjectType = Cms.Core.Constants.ObjectTypes.IdReservation,
-
-                    CreateDate = DateTime.Now,
-                    UserId = null,
-                    ParentId = -1,
-                    Level = 1,
-                    Path = "-1",
-                    SortOrder = 0,
-                    Trashed = false
-                };
-                scope.Database.Insert(node);
-                scope.Complete();
+                return _entityRepository.ReserveId(key);
             }
-            return node.NodeId;
         }
     }
 }

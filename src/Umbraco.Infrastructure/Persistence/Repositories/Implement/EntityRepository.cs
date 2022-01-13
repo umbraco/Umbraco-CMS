@@ -251,6 +251,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
         }
 
+        public int ReserveId(Guid key)
+        {
+            NodeDto node;
+
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation);
+
+            node = Database.SingleOrDefault<NodeDto>(sql);
+            if (node != null)
+                throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
+
+            node = new NodeDto
+            {
+                UniqueId = key,
+                Text = "RESERVED.ID",
+                NodeObjectType = Cms.Core.Constants.ObjectTypes.IdReservation,
+
+                CreateDate = DateTime.Now,
+                UserId = null,
+                ParentId = -1,
+                Level = 1,
+                Path = "-1",
+                SortOrder = 0,
+                Trashed = false
+            };
+            Database.Insert(node);
+
+            return node.NodeId;
+        }
+
         public bool Exists(Guid key)
         {
             var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);

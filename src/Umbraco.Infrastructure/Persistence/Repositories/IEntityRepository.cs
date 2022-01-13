@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NPoco;
 using Umbraco.Cms.Core.Models;
@@ -36,6 +36,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 
         UmbracoObjectTypes GetObjectType(int id);
         UmbracoObjectTypes GetObjectType(Guid key);
+        int ReserveId(Guid key);
 
         IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids);
         IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys);
