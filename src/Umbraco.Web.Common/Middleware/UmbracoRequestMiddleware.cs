@@ -19,7 +19,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Extensions;
