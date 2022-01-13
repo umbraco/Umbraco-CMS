@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Exceptions
         /// <remarks>
         /// This object should be serializable to prevent a <see cref="SerializationException" /> to be thrown.
         /// </remarks>
-        public T Operation { get; private set; }
+        public T? Operation { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataOperationException{T}" /> class.
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Exceptions
         protected DataOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            Operation = (T)Enum.Parse(typeof(T), info.GetString(nameof(Operation)));
+            Operation = (T)Enum.Parse(typeof(T), info.GetString(nameof(Operation)) ?? string.Empty);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Exceptions
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue(nameof(Operation), Enum.GetName(typeof(T), Operation));
+            info.AddValue(nameof(Operation), Operation is not null ? Enum.GetName(typeof(T), Operation) : string.Empty);
 
             base.GetObjectData(info, context);
         }

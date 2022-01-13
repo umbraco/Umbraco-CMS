@@ -38,14 +38,14 @@ namespace Umbraco.Cms.Core.Events
         /// </summary>
         public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
 
-        public bool Equals(RecycleBinEventArgs other)
+        public bool Equals(RecycleBinEventArgs? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && NodeObjectType.Equals(other.NodeObjectType) && RecycleBinEmptiedSuccessfully == other.RecycleBinEmptiedSuccessfully;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

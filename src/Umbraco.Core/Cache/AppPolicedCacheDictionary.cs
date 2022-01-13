@@ -37,8 +37,8 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Tries to get a cache.
         /// </summary>
-        protected Attempt<IAppPolicyCache> Get(TKey key)
-            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache>();
+        protected Attempt<IAppPolicyCache?> Get(TKey key)
+            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache?>();
 
         /// <summary>
         /// Removes a cache.

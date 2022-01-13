@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Editors
         /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
         /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
         /// <returns></returns>
-        public Attempt<string> IsAuthorized(IUser currentUser,
+        public Attempt<string?> IsAuthorized(IUser currentUser,
             IUser savingUser,
             IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds,
             IEnumerable<string> userGroupAliases)
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Editors
             // c) an admin can manage any group or section access
 
             if (currentIsAdmin)
-                return Attempt<string>.Succeed();
+                return Attempt<string?>.Succeed();
 
             if (userGroupAliases != null)
             {
@@ -117,10 +117,10 @@ namespace Umbraco.Cms.Core.Editors
                 }
             }
 
-            return Attempt<string>.Succeed();
+            return Attempt<string?>.Succeed();
         }
 
-        private Attempt<string> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
+        private Attempt<string?> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
         {
             if (startContentIds != null)
             {
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Core.Editors
                 }
             }
 
-            return Attempt<string>.Succeed();
+            return Attempt<string?>.Succeed();
         }
     }
 }

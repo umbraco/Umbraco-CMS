@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Events
         /// <param name="args">The event data.</param>
         /// <param name="name">The optional name of the event.</param>
         /// <remarks>See general remarks on the interface.</remarks>
-        void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string? name = null);
+        void Dispatch<TArgs>(EventHandler<TArgs?> eventHandler, object sender, TArgs args, string? name = null);
 
         /// <summary>
         /// Dispatches an event.
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Events
         /// <param name="args">The event data.</param>
         /// <param name="name">The optional name of the event.</param>
         /// <remarks>See general remarks on the interface.</remarks>
-        void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? name = null);
+        void Dispatch<TSender, TArgs>(TypedEventHandler<TSender?, TArgs> eventHandler, TSender sender, TArgs args, string? name = null);
 
         /// <summary>
         /// Notifies the dispatcher that the scope is exiting.

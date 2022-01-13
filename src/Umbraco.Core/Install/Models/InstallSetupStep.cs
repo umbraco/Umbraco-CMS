@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Install.Models
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public abstract Task<InstallSetupResult> ExecuteAsync(T model);
+        public abstract Task<InstallSetupResult?> ExecuteAsync(T model);
 
         /// <summary>
         /// Determines if this step needs to execute based on the current state of the application and/or install process
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Install.Models
         /// The view model used to render the view, by default is null but can be populated
         /// </summary>
         [DataMember(Name = "model")]
-        public virtual object ViewModel { get; private set; }
+        public virtual object? ViewModel { get; private set; }
 
         [DataMember(Name = "description")]
         public string Description { get; private set; }

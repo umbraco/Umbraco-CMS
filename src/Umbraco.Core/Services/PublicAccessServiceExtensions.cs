@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class PublicAccessServiceExtensions
     {
-        public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string oldRolename, string newRolename)
+        public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string? oldRolename, string newRolename)
         {
             var hasChange = false;
             if (oldRolename == newRolename) return false;

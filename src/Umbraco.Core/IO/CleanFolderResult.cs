@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.IO
 
         public CleanFolderResultStatus Status { get; private set; }
 
-        public IReadOnlyCollection<Error> Errors { get; private set; }
+        public IReadOnlyCollection<Error>? Errors { get; private set; }
 
         public static CleanFolderResult Success()
         {

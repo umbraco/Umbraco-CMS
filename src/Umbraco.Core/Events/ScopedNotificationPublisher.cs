@@ -50,7 +50,12 @@ namespace Umbraco.Cms.Core.Events
                 return false;
             }
 
-            await _eventAggregator.PublishAsync(notification);
+            var task = _eventAggregator.PublishAsync(notification);
+            if (task is not null)
+            {
+                await task;
+            }
+
             return notification.Cancel;
         }
 

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Composing
     /// </summary>
     public interface ITypeFinder
     {
-        Type GetTypeByName(string name);
+        Type? GetTypeByName(string name);
 
         /// <summary>
         /// Return a list of found local Assemblies that Umbraco should scan for type finding

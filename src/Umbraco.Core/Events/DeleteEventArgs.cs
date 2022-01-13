@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Returns all entities that were deleted during the operation
         /// </summary>
-        public IEnumerable<TEntity> DeletedEntities
+        public IEnumerable<TEntity>? DeletedEntities
         {
             get => EventObject;
             set => EventObject = value;
@@ -108,14 +108,14 @@ namespace Umbraco.Cms.Core.Events
         /// </summary>
         public List<string> MediaFilesToDelete { get; private set; }
 
-        public bool Equals(DeleteEventArgs<TEntity> other)
+        public bool Equals(DeleteEventArgs<TEntity>? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && MediaFilesToDelete.SequenceEqual(other.MediaFilesToDelete);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -166,14 +166,14 @@ namespace Umbraco.Cms.Core.Events
         /// </summary>
         public int Id { get; private set; }
 
-        public bool Equals(DeleteEventArgs other)
+        public bool Equals(DeleteEventArgs? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

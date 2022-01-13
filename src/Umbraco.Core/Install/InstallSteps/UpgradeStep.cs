@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
             _runtimeState = runtimeState;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(object model) => Task.FromResult<InstallSetupResult>(null);
+        public override Task<InstallSetupResult?> ExecuteAsync(object model) => Task.FromResult<InstallSetupResult?>(null);
 
         public override object ViewModel
         {
@@ -39,8 +39,8 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
 
                 var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
                 var newState = FormatGuidState(_runtimeState.FinalMigrationState);
-                var newVersion = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
-                var oldVersion = new SemVersion(_umbracoVersion.SemanticVersion.Major, 0, 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
+                var newVersion = _umbracoVersion.SemanticVersion?.ToSemanticStringWithoutBuild();
+                var oldVersion = new SemVersion(_umbracoVersion.SemanticVersion?.Major ?? 0, 0, 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
 
                 var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={oldVersion}&to={newVersion}&notes=1";
 

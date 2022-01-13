@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Composing
         private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private static readonly ConcurrentDictionary<string, Type> s_typeNamesCache = new ConcurrentDictionary<string, Type>();
+        private static readonly ConcurrentDictionary<string, Type?> s_typeNamesCache = new ConcurrentDictionary<string, Type?>();
 
         private readonly ITypeFinderConfig? _typeFinderConfig;
         // used for benchmark tests
@@ -62,13 +62,13 @@ namespace Umbraco.Cms.Core.Composing
             var name = a.GetName().Name; // simple name of the assembly
             return AssembliesAcceptingLoadExceptions.Any(pattern =>
             {
-                if (pattern.Length > name.Length)
+                if (pattern.Length > name?.Length)
                     return false; // pattern longer than name
-                if (pattern.Length == name.Length)
+                if (pattern.Length == name?.Length)
                     return pattern.InvariantEquals(name); // same length, must be identical
                 if (pattern[pattern.Length] != '.')
                     return false; // pattern is shorter than name, must end with dot
-                return name.StartsWith(pattern); // and name must start with pattern
+                return name?.StartsWith(pattern) ?? false; // and name must start with pattern
             });
         }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Composing
             return GetAllAssemblies()
                 .Where(x => excludeFromResults.Contains(x) == false
                             && x.GlobalAssemblyCache == false
-                            && exclusionFilter.Any(f => x.FullName.StartsWith(f)) == false);
+                            && exclusionFilter.Any(f => x.FullName?.StartsWith(f) ?? false) == false);
         }
 
         // TODO: Kill this
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Core.Composing
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual Type GetTypeByName(string name)
+        public virtual Type? GetTypeByName(string name)
         {
 
             //NOTE: This will not find types in dynamic assemblies unless those assemblies are already loaded
@@ -332,7 +332,7 @@ namespace Umbraco.Cms.Core.Composing
                         && x.GetCustomAttributes(attributeType, false).Any())); // marked with the attribute
                 }
 
-                if (assembly != attributeType.Assembly && assemblyTypes.Where(attributeType.IsAssignableFrom).Any() == false)
+                if (assembly != attributeType.Assembly && assemblyTypes?.Where(attributeType.IsAssignableFrom).Any() == false)
                     continue;
 
                 if (QueryWithReferencingAssemblies)
@@ -407,7 +407,7 @@ namespace Umbraco.Cms.Core.Composing
                         && (additionalFilter == null || additionalFilter(x)))); // filter
                 }
 
-                if (assembly != baseType.Assembly && assemblyTypes.All(x => x.IsSealed))
+                if (assembly != baseType.Assembly && (assemblyTypes?.All(x => x.IsSealed) ?? false))
                     continue;
 
                 if (QueryWithReferencingAssemblies)
@@ -462,7 +462,7 @@ namespace Umbraco.Cms.Core.Composing
                 // log a warning, and return what we can
                 lock (_notifiedLoadExceptionAssemblies)
                 {
-                    if (_notifiedLoadExceptionAssemblies.Contains(a.FullName) == false)
+                    if (a.FullName is not null && _notifiedLoadExceptionAssemblies.Contains(a.FullName) == false)
                     {
                         _notifiedLoadExceptionAssemblies.Add(a.FullName);
                         _logger.LogWarning(ex, "Could not load all types from {TypeName}.", a.GetName().Name);

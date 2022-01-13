@@ -337,7 +337,7 @@ namespace Umbraco.Cms.Core.Composing
         {
             foreach (Type type in types)
             {
-                ConstructorInfo ctor = type.GetConstructor(Array.Empty<Type>());
+                ConstructorInfo? ctor = type.GetConstructor(Array.Empty<Type>());
 
                 if (ctor == null)
                 {

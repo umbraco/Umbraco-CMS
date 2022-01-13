@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 
         public HealthCheckNotificationVerbosity Verbosity { get; protected set; }
 
-        public IDictionary<string, string> Settings { get; }
+        public IDictionary<string, string>? Settings { get; }
 
         protected bool ShouldSend(HealthCheckResults results)
         {

@@ -22,21 +22,21 @@ namespace Umbraco.Cms.Core.IO
 
 
         // wrappers for shadow support
-        private ShadowWrapper _macroPartialFileSystem;
-        private ShadowWrapper _partialViewsFileSystem;
-        private ShadowWrapper _stylesheetsFileSystem;
-        private ShadowWrapper _scriptsFileSystem;
-        private ShadowWrapper _mvcViewsFileSystem;
+        private ShadowWrapper? _macroPartialFileSystem;
+        private ShadowWrapper? _partialViewsFileSystem;
+        private ShadowWrapper? _stylesheetsFileSystem;
+        private ShadowWrapper? _scriptsFileSystem;
+        private ShadowWrapper? _mvcViewsFileSystem;
 
         // well-known file systems lazy initialization
         private object _wkfsLock = new object();
         private bool _wkfsInitialized;
-        private object _wkfsObject; // unused
+        private object? _wkfsObject; // unused
 
         // shadow support
         private readonly List<ShadowWrapper> _shadowWrappers = new List<ShadowWrapper>();
         private readonly object _shadowLocker = new object();
-        private static string _shadowCurrentId; // static - unique!!
+        private static string? _shadowCurrentId; // static - unique!!
         #region Constructor
 
         // DI wants a public ctor
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.IO
         /// Used be Scope provider to take control over the filesystems, should never be used for anything else.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Func<bool> IsScoped { get; set; } = () => false;
+        public Func<bool?>? IsScoped { get; set; } = () => false;
 
         #endregion
 
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the macro partials filesystem.
         /// </summary>
-        public IFileSystem MacroPartialsFileSystem
+        public IFileSystem? MacroPartialsFileSystem
         {
             get
             {
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the partial views filesystem.
         /// </summary>
-        public IFileSystem PartialViewsFileSystem
+        public IFileSystem? PartialViewsFileSystem
         {
             get
             {
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the stylesheets filesystem.
         /// </summary>
-        public IFileSystem StylesheetsFileSystem
+        public IFileSystem? StylesheetsFileSystem
         {
             get
             {
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the scripts filesystem.
         /// </summary>
-        public IFileSystem ScriptsFileSystem
+        public IFileSystem? ScriptsFileSystem
         {
             get
             {
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the MVC views filesystem.
         /// </summary>
-        public IFileSystem MvcViewsFileSystem
+        public IFileSystem? MvcViewsFileSystem
         {
             get
             {
@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Core.IO
 
         // need to return something to LazyInitializer.EnsureInitialized
         // but it does not really matter what we return - here, null
-        private object CreateWellKnownFileSystems()
+        private object? CreateWellKnownFileSystems()
         {
             var logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
 
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped());
+                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped?.Invoke());
                 if (_shadowCurrentId != null)
                 {
                     wrapper.Shadow(_shadowCurrentId);

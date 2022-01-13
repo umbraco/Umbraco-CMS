@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
         /// <inheritdoc />
         public string GetDeleteDirectory(MediaFileManager fileManager, string filepath)
         {
-            return Path.GetDirectoryName(filepath);
+            return Path.GetDirectoryName(filepath)!;
         }
     }
 }

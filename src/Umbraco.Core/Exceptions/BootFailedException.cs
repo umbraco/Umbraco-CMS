@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Exceptions
             // would that be the correct way to do it?
             //ExceptionDispatchInfo.Capture(bootFailedException).Throw();
 
-            Exception e = bootFailedException;
+            Exception? e = bootFailedException;
             var m = new StringBuilder();
             m.Append(DefaultMessage);
             while (e != null)

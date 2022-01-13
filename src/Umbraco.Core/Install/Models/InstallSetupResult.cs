@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Install.Models
         {
         }
 
-        public InstallSetupResult(IDictionary<string, object> savedStepData, string view, object viewModel = null)
+        public InstallSetupResult(IDictionary<string, object> savedStepData, string view, object? viewModel = null)
         {
             ViewModel = viewModel;
             SavedStepData = savedStepData;
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Install.Models
             SavedStepData = savedStepData;
         }
 
-        public InstallSetupResult(string view, object viewModel = null)
+        public InstallSetupResult(string view, object? viewModel = null)
         {
             ViewModel = viewModel;
             View = view;
@@ -32,16 +32,16 @@ namespace Umbraco.Cms.Core.Install.Models
         /// <summary>
         /// Data that is persisted to the installation file which can be used from other installation steps
         /// </summary>
-        public IDictionary<string, object> SavedStepData { get; private set; }
+        public IDictionary<string, object>? SavedStepData { get; private set; }
 
         /// <summary>
         /// The UI view to show when this step executes, by default no views are shown for the completion of a step unless explicitly specified.
         /// </summary>
-        public string View { get; private set; }
+        public string? View { get; private set; }
 
         /// <summary>
         /// The view model to return to the UI if this step is returning a view (optional)
         /// </summary>
-        public object ViewModel { get; private set; }
+        public object? ViewModel { get; private set; }
     }
 }

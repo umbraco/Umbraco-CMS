@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Install
                     }
                     //save the file
                     var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    Directory.CreateDirectory(Path.GetDirectoryName(file)!);
                     File.WriteAllText(file, serialized);
                 }
             }
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.Install
 
                     //save the correct file
                     var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    Directory.CreateDirectory(Path.GetDirectoryName(file)!);
                     File.WriteAllText(file, serialized);
                 }
             }

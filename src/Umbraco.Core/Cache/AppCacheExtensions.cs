@@ -31,13 +31,13 @@ namespace Umbraco.Extensions
             provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
         }
 
-        public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
+        public static IEnumerable<T?> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
         {
             var result = provider.SearchByKey(keyStartsWith);
             return result.Select(x => x.TryConvertTo<T>().Result);
         }
 
-        public static IEnumerable<T> GetCacheItemsByKeyExpression<T>(this IAppCache provider, string regexString)
+        public static IEnumerable<T?> GetCacheItemsByKeyExpression<T>(this IAppCache provider, string regexString)
         {
             var result = provider.SearchByRegex(regexString);
             return result.Select(x => x.TryConvertTo<T>().Result);

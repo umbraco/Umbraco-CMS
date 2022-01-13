@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.HealthChecks
                 .Replace("</em>", "*");
         }
 
-        public Dictionary<string, IEnumerable<HealthCheckStatus>> GetResultsForStatus(StatusResultType resultType)
+        public Dictionary<string, IEnumerable<HealthCheckStatus>>? GetResultsForStatus(StatusResultType resultType)
         {
             switch (resultType)
             {

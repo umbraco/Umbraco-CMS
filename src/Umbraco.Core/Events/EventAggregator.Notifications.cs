@@ -16,30 +16,30 @@ namespace Umbraco.Cms.Core.Events
     /// </content>
     public partial class EventAggregator : IEventAggregator
     {
-        private static readonly ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper> s_notificationAsyncHandlers
-            = new ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper>();
+        private static readonly ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper?> s_notificationAsyncHandlers
+            = new ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper?>();
 
-        private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper> s_notificationHandlers
-            = new ConcurrentDictionary<Type, NotificationHandlerWrapper>();
+        private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper?> s_notificationHandlers
+            = new ConcurrentDictionary<Type, NotificationHandlerWrapper?>();
 
-        private Task PublishNotificationAsync(INotification notification, CancellationToken cancellationToken = default)
+        private Task? PublishNotificationAsync(INotification notification, CancellationToken cancellationToken = default)
         {
             Type notificationType = notification.GetType();
-            NotificationAsyncHandlerWrapper asyncHandler = s_notificationAsyncHandlers.GetOrAdd(
+            NotificationAsyncHandlerWrapper? asyncHandler = s_notificationAsyncHandlers.GetOrAdd(
                 notificationType,
-                t => (NotificationAsyncHandlerWrapper)Activator.CreateInstance(typeof(NotificationAsyncHandlerWrapperImpl<>).MakeGenericType(notificationType)));
+                t => (NotificationAsyncHandlerWrapper?)Activator.CreateInstance(typeof(NotificationAsyncHandlerWrapperImpl<>).MakeGenericType(notificationType)));
 
-            return asyncHandler.HandleAsync(notification, cancellationToken, _serviceFactory, PublishCoreAsync);
+            return asyncHandler?.HandleAsync(notification, cancellationToken, _serviceFactory, PublishCoreAsync);
         }
 
         private void PublishNotification(INotification notification)
         {
             Type notificationType = notification.GetType();
-            NotificationHandlerWrapper asyncHandler = s_notificationHandlers.GetOrAdd(
+            NotificationHandlerWrapper? asyncHandler = s_notificationHandlers.GetOrAdd(
                 notificationType,
-                t => (NotificationHandlerWrapper)Activator.CreateInstance(typeof(NotificationHandlerWrapperImpl<>).MakeGenericType(notificationType)));
+                t => (NotificationHandlerWrapper?)Activator.CreateInstance(typeof(NotificationHandlerWrapperImpl<>).MakeGenericType(notificationType)));
 
-            asyncHandler.Handle(notification, _serviceFactory, PublishCore);
+            asyncHandler?.Handle(notification, _serviceFactory, PublishCore);
         }
 
         private async Task PublishCoreAsync(

@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         {
             Type typeOfBuilder = typeof(TBuilder);
 
-            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder o))
+            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder? o))
             {
                 return (TBuilder)o;
             }
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton(Profiler);
 
             // Register as singleton to allow injection everywhere.
-            Services.AddSingleton<ServiceFactory>(p => p.GetService);
+            Services.AddSingleton<ServiceFactory>(p => p.GetService!);
             Services.AddSingleton<IEventAggregator, EventAggregator>();
 
             Services.AddLazySupport();

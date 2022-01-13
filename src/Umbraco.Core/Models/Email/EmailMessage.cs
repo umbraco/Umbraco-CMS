@@ -6,32 +6,32 @@ namespace Umbraco.Cms.Core.Models.Email
 {
     public class EmailMessage
     {
-        public string From { get; }
+        public string? From { get; }
 
-        public string[] To { get; }
+        public string?[] To { get; }
 
-        public string[] Cc { get; }
+        public string[]? Cc { get; }
 
-        public string[] Bcc { get; }
+        public string[]? Bcc { get; }
 
-        public string[] ReplyTo { get; }
+        public string[]? ReplyTo { get; }
 
-        public string Subject { get; }
+        public string? Subject { get; }
 
-        public string Body { get; }
+        public string? Body { get; }
 
         public bool IsBodyHtml { get; }
 
-        public IList<EmailMessageAttachment> Attachments { get; }
+        public IList<EmailMessageAttachment>? Attachments { get; }
 
         public bool HasAttachments => Attachments != null && Attachments.Count > 0;
 
-        public EmailMessage(string from, string to, string subject, string body, bool isBodyHtml)
+        public EmailMessage(string? from, string? to, string? subject, string? body, bool isBodyHtml)
             : this(from, new[] { to }, null, null, null, subject, body, isBodyHtml, null)
         {
         }
 
-        public EmailMessage(string from, string[] to, string[] cc, string[] bcc, string[] replyTo, string subject, string body, bool isBodyHtml, IEnumerable<EmailMessageAttachment> attachments)
+        public EmailMessage(string? from, string?[] to, string[]? cc, string[]? bcc, string[]? replyTo, string? subject, string? body, bool isBodyHtml, IEnumerable<EmailMessageAttachment>? attachments)
         {
             ArgumentIsNotNullOrEmpty(to, nameof(to));
             ArgumentIsNotNullOrEmpty(subject, nameof(subject));
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Models.Email
             Attachments = attachments?.ToList();
         }
 
-        private static void ArgumentIsNotNullOrEmpty(string arg, string argName)
+        private static void ArgumentIsNotNullOrEmpty(string? arg, string argName)
         {
             if (arg == null)
             {
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Models.Email
             }
         }
 
-        private static void ArgumentIsNotNullOrEmpty(string[] arg, string argName)
+        private static void ArgumentIsNotNullOrEmpty(string?[]? arg, string argName)
         {
             if (arg == null)
             {

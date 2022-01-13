@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.IO
                     var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
                     if (!directory.IsNullOrWhiteSpace())
                     {
-                        FileSystem.DeleteDirectory(directory, true);
+                        FileSystem.DeleteDirectory(directory!, true);
                     }
                 }
                 catch (Exception e)
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.IO
                 return null;
             }
 
-            Stream stream = FileSystem.OpenFile(mediaFilePath!);
+            Stream? stream = FileSystem.OpenFile(mediaFilePath!);
             if (stream != null)
             {
                 return stream;

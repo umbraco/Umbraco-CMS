@@ -60,9 +60,13 @@ namespace Umbraco.Extensions
 
         public static void CopyFile(this IFileSystem fs, string path, string newPath)
         {
-            using (var stream = fs.OpenFile(path))
+            using (Stream? stream = fs.OpenFile(path))
             {
-                fs.AddFile(newPath, stream);
+                if (stream is not null)
+                {
+                    fs.AddFile(newPath, stream);
+                }
+
             }
         }
 

@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.IO
         /// <returns>
         /// <see cref="Stream"/>.
         /// </returns>
-        Stream OpenFile(string path);
+        Stream? OpenFile(string path);
 
         /// <summary>
         /// Deletes the specified file.

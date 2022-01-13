@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Core.Configuration
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        Version Version { get; }
+        Version? Version { get; }
 
         /// <summary>
         /// Gets the semantic version comments of the Umbraco code.
         /// </summary>
-        string Comment { get; }
+        string? Comment { get; }
 
         /// <summary>
         /// Gets the assembly version of the Umbraco code.
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
-        Version AssemblyVersion { get; }
+        Version? AssemblyVersion { get; }
 
         /// <summary>
         /// Gets the assembly file version of the Umbraco code.
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// <remarks>
         /// <para>The assembly version is the value of the <see cref="AssemblyFileVersionAttribute"/>.</para>
         /// </remarks>
-        Version AssemblyFileVersion { get; }
+        Version? AssemblyFileVersion { get; }
 
         /// <summary>
         /// Gets the semantic version of the Umbraco code.
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// <para>The semantic version is the value of the <see cref="AssemblyInformationalVersionAttribute"/>.</para>
         /// <para>It is the full version of Umbraco, including comments.</para>
         /// </remarks>
-        SemVersion SemanticVersion { get; }
+        SemVersion? SemanticVersion { get; }
 
     }
 }

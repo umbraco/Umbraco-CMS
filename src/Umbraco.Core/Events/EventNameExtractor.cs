@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Events
         /// <returns>
         /// null if not found or an ambiguous match
         /// </returns>
-        public static Attempt<EventNameExtractorResult> FindEvent(Type senderType, Type argsType, Func<string, bool> exclude)
+        public static Attempt<EventNameExtractorResult?> FindEvent(Type senderType, Type argsType, Func<string, bool> exclude)
         {
             var events = FindEvents(senderType, argsType, exclude);
 
@@ -61,15 +61,15 @@ namespace Umbraco.Cms.Core.Events
                     return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                         //we can only look for events handlers with generic types because that is the only
                         // way that we can try to find a matching event based on the arg type passed in
-                        .Where(x => x.EventHandlerType.IsGenericType)
-                        .Select(x => new EventInfoArgs(x, x.EventHandlerType.GetGenericArguments()))
+                        .Where(x => x.EventHandlerType?.IsGenericType ?? false)
+                        .Select(x => new EventInfoArgs(x, x.EventHandlerType!.GetGenericArguments()))
                         //we are only looking for event handlers that have more than one generic argument
                         .Where(x =>
                         {
                             if (x.GenericArgs.Length == 1) return true;
 
                             //special case for our own TypedEventHandler
-                            if (x.EventInfo.EventHandlerType.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>) && x.GenericArgs.Length == 2)
+                            if (x.EventInfo.EventHandlerType?.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>) && x.GenericArgs.Length == 2)
                             {
                                 return true;
                             }
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.Events
                         return true;
 
                     //special case for our own TypedEventHandler
-                    if (x.EventInfo.EventHandlerType.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>)
+                    if (x.EventInfo.EventHandlerType?.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>)
                         && x.GenericArgs.Length == 2
                         && x.GenericArgs[1] == tuple.Item2)
                     {
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Events
         /// <returns>
         /// null if not found or an ambiguous match
         /// </returns>
-        public static Attempt<EventNameExtractorResult> FindEvent(object sender, object args, Func<string, bool> exclude)
+        public static Attempt<EventNameExtractorResult?> FindEvent(object sender, object args, Func<string, bool> exclude)
         {
             return FindEvent(sender.GetType(), args.GetType(), exclude);
         }

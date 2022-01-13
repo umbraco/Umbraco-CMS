@@ -36,26 +36,26 @@ namespace Umbraco.Cms.Core.Logging
             Profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
         }
 
-        public DisposableTimer TraceDuration<T>(string startMessage, object[] startMessageArgs = null)
+        public DisposableTimer TraceDuration<T>(string startMessage, object[]? startMessageArgs = null)
             => TraceDuration<T>(startMessage, "Completed.", startMessageArgs: startMessageArgs);
 
-        public DisposableTimer TraceDuration<T>(string startMessage, string completeMessage, string failMessage = null, object[] startMessageArgs = null, object[] endMessageArgs = null, object[] failMessageArgs = null)
+        public DisposableTimer TraceDuration<T>(string startMessage, string completeMessage, string? failMessage = null, object[]? startMessageArgs = null, object[]? endMessageArgs = null, object[]? failMessageArgs = null)
             => new DisposableTimer(Logger, LogLevel.Information, Profiler, typeof(T), startMessage, completeMessage, failMessage, startMessageArgs, endMessageArgs, failMessageArgs);
 
-        public DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null, object[] startMessageArgs = null, object[] endMessageArgs = null, object[] failMessageArgs = null)
+        public DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage, string? failMessage = null, object[]? startMessageArgs = null, object[]? endMessageArgs = null, object[]? failMessageArgs = null)
             => new DisposableTimer(Logger, LogLevel.Information, Profiler, loggerType, startMessage, completeMessage, failMessage, startMessageArgs, endMessageArgs, failMessageArgs);
 
-        public DisposableTimer DebugDuration<T>(string startMessage, object[] startMessageArgs = null)
+        public DisposableTimer? DebugDuration<T>(string startMessage, object[]? startMessageArgs = null)
             => Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? DebugDuration<T>(startMessage, "Completed.", startMessageArgs: startMessageArgs)
                 : null;
 
-        public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0, object[] startMessageArgs = null, object[] endMessageArgs = null, object[] failMessageArgs = null)
+        public DisposableTimer? DebugDuration<T>(string startMessage, string completeMessage, string? failMessage = null, int thresholdMilliseconds = 0, object[]? startMessageArgs = null, object[]? endMessageArgs = null, object[]? failMessageArgs = null)
             => Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, typeof(T), startMessage, completeMessage, failMessage, startMessageArgs, endMessageArgs, failMessageArgs, thresholdMilliseconds)
                 : null;
 
-        public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0, object[] startMessageArgs = null, object[] endMessageArgs = null, object[] failMessageArgs = null)
+        public DisposableTimer? DebugDuration(Type loggerType, string startMessage, string completeMessage, string? failMessage = null, int thresholdMilliseconds = 0, object[]? startMessageArgs = null, object[]? endMessageArgs = null, object[]? failMessageArgs = null)
             => Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, loggerType, startMessage, completeMessage, failMessage, startMessageArgs, endMessageArgs, failMessageArgs, thresholdMilliseconds)
                 : null;

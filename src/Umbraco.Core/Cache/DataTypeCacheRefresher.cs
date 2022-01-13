@@ -64,9 +64,9 @@ namespace Umbraco.Cms.Core.Cache
             {
                 _idKeyMap.ClearCache(payload.Id);
 
-                if (dataTypeCache.Success)
+                if (dataTypeCache.Success.HasValue && dataTypeCache.Success.Value)
                 {
-                    dataTypeCache.Result.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
+                    dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
                 }
             }
 

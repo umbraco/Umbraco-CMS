@@ -40,8 +40,8 @@ namespace Umbraco.Core.Collections
             return obj!;
         }
 
-        public T? PeekStack() => _linkedList.First.Value;
+        public T? PeekStack() => _linkedList.First is not null ? _linkedList.First.Value : default;
 
-        public T? PeekQueue() => _linkedList.Last.Value;
+        public T? PeekQueue() => _linkedList.Last is not null ? _linkedList.Last.Value : default;
     }
 }

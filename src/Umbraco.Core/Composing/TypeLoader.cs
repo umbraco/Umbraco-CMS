@@ -244,17 +244,17 @@ namespace Umbraco.Cms.Core.Composing
         private const int FileDeleteTimeout = 4000; // milliseconds
 
         // internal for tests
-        public Attempt<IEnumerable<string>> TryGetCached(Type? baseType, Type? attributeType)
+        public Attempt<IEnumerable<string>?> TryGetCached(Type? baseType, Type? attributeType)
         {
             var cache =
                 _runtimeCache.GetCacheItem(CacheKey, ReadCacheSafe, TimeSpan.FromSeconds(ListFileCacheDuration))!;
 
             cache.TryGetValue(
-                (baseType == null ? string.Empty : baseType.FullName, attributeType == null ? string.Empty : attributeType.FullName),
-                out IEnumerable<string> types);
+                (baseType == null ? string.Empty : baseType.FullName ?? string.Empty, attributeType == null ? string.Empty : attributeType.FullName ?? string.Empty),
+                out IEnumerable<string>? types);
 
             return types == null
-                ? Attempt<IEnumerable<string>>.Fail()
+                ? Attempt<IEnumerable<string>?>.Fail()
                 : Attempt.Succeed(types);
         }
 
@@ -406,7 +406,7 @@ namespace Umbraco.Cms.Core.Composing
         // internal for tests
         internal void UpdateCache()
         {
-            void TimerRelease(object o)
+            void TimerRelease(object? o)
             {
                 lock (_timerLock)
                 {
@@ -780,7 +780,7 @@ namespace Umbraco.Cms.Core.Composing
                 else
                 {
                     // successfully retrieved types from the file cache: load
-                    foreach (var type in cacheResult.Result)
+                    foreach (var type in cacheResult.Result!)
                     {
                         var resolvedType = TypeFinder.GetTypeByName(type);
                         if (resolvedType != null)

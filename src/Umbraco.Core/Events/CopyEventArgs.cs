@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// The original entity
         /// </summary>
-        public TEntity Original
+        public TEntity? Original
         {
             get { return EventObject; }
         }
@@ -47,14 +47,14 @@ namespace Umbraco.Cms.Core.Events
 
         public bool RelateToOriginal { get; set; }
 
-        public bool Equals(CopyEventArgs<TEntity> other)
+        public bool Equals(CopyEventArgs<TEntity>? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && EqualityComparer<TEntity>.Default.Equals(Copy, other.Copy) && ParentId == other.ParentId && RelateToOriginal == other.RelateToOriginal;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -67,7 +67,11 @@ namespace Umbraco.Cms.Core.Events
             unchecked
             {
                 int hashCode = base.GetHashCode();
-                hashCode = (hashCode * 397) ^ EqualityComparer<TEntity>.Default.GetHashCode(Copy);
+                if (Copy is not null)
+                {
+                    hashCode = (hashCode * 397) ^ EqualityComparer<TEntity>.Default.GetHashCode(Copy);
+                }
+
                 hashCode = (hashCode * 397) ^ ParentId;
                 hashCode = (hashCode * 397) ^ RelateToOriginal.GetHashCode();
                 return hashCode;

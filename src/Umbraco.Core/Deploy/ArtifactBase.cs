@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Deploy
         public IEnumerable<ArtifactDependency>? Dependencies
         {
             get => _dependencies;
-            set => _dependencies = value.OrderBy(x => x.Udi);
+            set => _dependencies = value?.OrderBy(x => x.Udi);
         }
 
         #endregion

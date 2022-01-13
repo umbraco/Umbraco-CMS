@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
         };
 
         /// <inheritdoc/>
-        public override string CurrentValue => _contentSettings.CurrentValue.Notifications.Email;
+        public override string CurrentValue => _contentSettings.CurrentValue.Notifications.Email ?? string.Empty;
 
         /// <inheritdoc/>
         public override string CheckSuccessMessage =>

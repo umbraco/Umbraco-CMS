@@ -58,9 +58,12 @@ namespace Umbraco.Cms.Core.Configuration.Grid
                         var resourceStream = assembly.GetManifestResourceStream(
                                 "Umbraco.Cms.Core.EmbeddedResources.Grid.grid.editors.config.js");
 
-                        using var reader = new StreamReader(resourceStream, Encoding.UTF8);
-                        var sourceString = reader.ReadToEnd();
-                        editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
+                        if (resourceStream is not null)
+                        {
+                            using var reader = new StreamReader(resourceStream, Encoding.UTF8);
+                            var sourceString = reader.ReadToEnd();
+                            editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
+                        }
                     }
 
                     // add manifest editors, skip duplicates

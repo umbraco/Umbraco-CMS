@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Core.Collections
     /// <typeparam name="TKey">The type of the keys.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
     public class TopoGraph<TKey, TItem> : TopoGraph
+    where TKey : notnull
     {
         private readonly Func<TItem, TKey> _getKey;
         private readonly Func<TItem, IEnumerable<TKey>?> _getDependencies;
@@ -122,7 +123,7 @@ namespace Umbraco.Cms.Core.Collections
         {
             foreach (var key in keys)
             {
-                TItem value;
+                TItem? value;
                 if (_items.TryGetValue(key, out value))
                     yield return value;
                 else if (throwOnMissing)

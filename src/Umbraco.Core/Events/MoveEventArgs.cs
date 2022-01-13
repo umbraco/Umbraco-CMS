@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Events
 {
     public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<MoveEventArgs<TEntity>>
     {
-        private IEnumerable<MoveEventInfo<TEntity>> _moveInfoCollection;
+        private IEnumerable<MoveEventInfo<TEntity>>? _moveInfoCollection;
 
         /// <summary>
         /// Constructor accepting a collection of MoveEventInfo objects
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Events
         public MoveEventArgs(bool canCancel, EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
             : base(default, canCancel, eventMessages)
         {
-            if (moveInfo.FirstOrDefault() == null)
+            if (moveInfo.FirstOrDefault() is null)
             {
                 throw new ArgumentException("moveInfo argument must contain at least one item");
             }
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Events
         public MoveEventArgs(EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
             : base(default, eventMessages)
         {
-            if (moveInfo.FirstOrDefault() == null)
+            if (moveInfo.FirstOrDefault() is null)
             {
                 throw new ArgumentException("moveInfo argument must contain at least one item");
             }
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Events
         public MoveEventArgs(bool canCancel, params MoveEventInfo<TEntity>[] moveInfo)
             : base(default, canCancel)
         {
-            if (moveInfo.FirstOrDefault() == null)
+            if (moveInfo.FirstOrDefault() is null)
             {
                 throw new ArgumentException("moveInfo argument must contain at least one item");
             }
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Events
         public MoveEventArgs(params MoveEventInfo<TEntity>[] moveInfo)
             : base(default)
         {
-            if (moveInfo.FirstOrDefault() == null)
+            if (moveInfo.FirstOrDefault() is null)
             {
                 throw new ArgumentException("moveInfo argument must contain at least one item");
             }
@@ -92,13 +92,13 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Gets all MoveEventInfo objects used to create the object
         /// </summary>
-        public IEnumerable<MoveEventInfo<TEntity>> MoveInfoCollection
+        public IEnumerable<MoveEventInfo<TEntity>>? MoveInfoCollection
         {
             get { return _moveInfoCollection; }
             set
             {
-                var first = value.FirstOrDefault();
-                if (first == null)
+                var first = value?.FirstOrDefault();
+                if (first is null)
                 {
                     throw new InvalidOperationException("MoveInfoCollection must have at least one item");
                 }
@@ -110,14 +110,14 @@ namespace Umbraco.Cms.Core.Events
             }
         }
 
-        public bool Equals(MoveEventArgs<TEntity> other)
+        public bool Equals(MoveEventArgs<TEntity>? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && MoveInfoCollection.Equals(other.MoveInfoCollection);
+            return base.Equals(other) && (MoveInfoCollection?.Equals(other.MoveInfoCollection) ?? false);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -129,7 +129,12 @@ namespace Umbraco.Cms.Core.Events
         {
             unchecked
             {
-                return (base.GetHashCode() * 397) ^ MoveInfoCollection.GetHashCode();
+                if (MoveInfoCollection is not null)
+                {
+                    return (base.GetHashCode() * 397) ^ MoveInfoCollection.GetHashCode();
+                }
+
+                return base.GetHashCode() * 397;
             }
         }
 

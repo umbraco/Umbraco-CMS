@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets the name of the content app.
         /// </summary>
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets the unique alias of the content app.
@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// <para>Must be a valid javascript identifier, ie no spaces etc.</para>
         /// </remarks>
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         /// <summary>
         /// Gets or sets the weight of the content app.
@@ -45,19 +45,19 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// <para>Must be a valid helveticons class name (see http://hlvticons.ch/).</para>
         /// </remarks>
         [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets the view for rendering the content app.
         /// </summary>
         [DataMember(Name = "view")]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         /// <summary>
         /// The view model specific to this app
         /// </summary>
         [DataMember(Name = "viewModel")]
-        public object ViewModel { get; set; }
+        public object? ViewModel { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the app is active.
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets or sets the content app badge.
         /// </summary>
         [DataMember(Name = "badge")]
-        public ContentAppBadge Badge { get; set; }
+        public ContentAppBadge? Badge { get; set; }
     }
 }
 

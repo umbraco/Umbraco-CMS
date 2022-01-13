@@ -112,6 +112,6 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Returns all entities that were saved during the operation
         /// </summary>
-        public IEnumerable<TEntity> SavedEntities => EventObject;
+        public IEnumerable<TEntity>? SavedEntities => EventObject;
     }
 }

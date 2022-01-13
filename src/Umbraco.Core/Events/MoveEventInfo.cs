@@ -16,14 +16,14 @@ namespace Umbraco.Cms.Core.Events
         public string OriginalPath { get; set; }
         public int NewParentId { get; set; }
 
-        public bool Equals(MoveEventInfo<TEntity> other)
+        public bool Equals(MoveEventInfo<TEntity>? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return EqualityComparer<TEntity>.Default.Equals(Entity, other.Entity) && NewParentId == other.NewParentId && string.Equals(OriginalPath, other.OriginalPath);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Events
         {
             unchecked
             {
-                var hashCode = EqualityComparer<TEntity>.Default.GetHashCode(Entity);
+                var hashCode = Entity is not null ? EqualityComparer<TEntity>.Default.GetHashCode(Entity) : base.GetHashCode();
                 hashCode = (hashCode * 397) ^ NewParentId;
                 hashCode = (hashCode * 397) ^ OriginalPath.GetHashCode();
                 return hashCode;

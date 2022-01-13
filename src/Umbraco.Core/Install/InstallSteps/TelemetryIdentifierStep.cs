@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
             _configManipulator = configManipulator;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(object model)
+        public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             // Generate GUID
             var telemetrySiteIdentifier = Guid.NewGuid();
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
                 _logger.LogError(ex, "Couldn't update config files with a telemetry site identifier");
             }
 
-            return Task.FromResult<InstallSetupResult>(null);
+            return Task.FromResult<InstallSetupResult?>(null);
         }
 
         public override bool RequiresExecution(object model)

@@ -42,10 +42,14 @@ namespace Umbraco.Cms.Core.ContentApps
 
             foreach (var app in apps)
             {
-                if (aliases.Contains(app!.Alias))
-                    (dups ?? (dups = new List<string>())).Add(app.Alias);
-                else
-                    aliases.Add(app.Alias);
+                if (app.Alias is not null)
+                {
+
+                    if (aliases.Contains(app.Alias))
+                        (dups ?? (dups = new List<string>())).Add(app.Alias);
+                    else
+                        aliases.Add(app.Alias);
+                }
             }
 
             if (dups != null)

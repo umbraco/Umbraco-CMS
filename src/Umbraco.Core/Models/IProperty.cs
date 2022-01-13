@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Sets a value.
         /// </summary>
-        void SetValue(object value, string? culture = null, string? segment = null);
+        void SetValue(object? value, string? culture = null, string? segment = null);
 
         int PropertyTypeId { get; }
         void PublishValues(string culture = "*", string segment = "*");

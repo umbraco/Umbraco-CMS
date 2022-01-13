@@ -13,14 +13,14 @@ namespace Umbraco.Cms.Core.Macros
         /// <summary>
         /// The Macro Name
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The Macro Alias
         /// </summary>
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
-        public string MacroSource { get; set; }
+        public string? MacroSource { get; set; }
 
         public int CacheDuration { get; set; }
 
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Macros
 
         public bool RenderInEditor { get; set; }
 
-        public string CacheIdentifier { get; set; }
+        public string? CacheIdentifier { get; set; }
 
         public List<MacroPropertyModel> Properties { get; } = new List<MacroPropertyModel>();
 

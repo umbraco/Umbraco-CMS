@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Events
                 globalSettings.OnChange(x => _globalSettings = x);
             }
 
-            public void Notify(IAction action, params IContent[] entities)
+            public void Notify(IAction? action, params IContent[] entities)
             {
                 var user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Events
                 SendNotification(user, entities, action, _hostingEnvironment.ApplicationMainUrl);
             }
 
-            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
+            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction? action, Uri siteUri)
             {
                 if (sender == null)
                     throw new ArgumentNullException(nameof(sender));
@@ -185,8 +185,8 @@ namespace Umbraco.Cms.Core.Events
                     _notificationService.SendNotifications(
                         sender,
                         contentVariantGroup,
-                        action.Letter.ToString(CultureInfo.InvariantCulture),
-                        _textService.Localize("actions", action.Alias),
+                        action?.Letter.ToString(CultureInfo.InvariantCulture),
+                        _textService.Localize("actions", action?.Alias),
                         siteUri,
                         ((IUser user, NotificationEmailSubjectParams subject) x)
                             => _textService.Localize(

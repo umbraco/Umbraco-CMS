@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Tries to get a cache.
         /// </summary>
-        public Attempt<IAppPolicyCache> Get<T>()
+        public Attempt<IAppPolicyCache?> Get<T>()
             => Get(typeof(T));
 
         /// <summary>

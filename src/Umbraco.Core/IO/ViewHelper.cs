@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.IO
         }
 
         public bool ViewExists(ITemplate t) => _viewFileSystem.FileExists(ViewPath(t.Alias));
-    
+
 
         public string GetFileContents(ITemplate t)
         {
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.IO
 
             if (_viewFileSystem.FileExists(path))
             {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)!))
                 {
                     viewContent = tr.ReadToEnd();
                     tr.Close();
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.IO
             }
             else
             {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)!))
                 {
                     viewContent = tr.ReadToEnd();
                     tr.Close();
@@ -69,8 +69,8 @@ namespace Umbraco.Cms.Core.IO
         }
 
         [Obsolete("Inject IDefaultViewContentProvider instead")]
-        public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null,
-            string modelNamespace = null, string modelNamespaceAlias = null)
+        public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null,
+            string? modelNamespace = null, string? modelNamespaceAlias = null)
         {
             var viewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
             return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace,
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.IO
             return design;
         }
 
-        public string UpdateViewFile(ITemplate t, string currentAlias = null)
+        public string UpdateViewFile(ITemplate t, string? currentAlias = null)
         {
             var path = ViewPath(t.Alias);
 
