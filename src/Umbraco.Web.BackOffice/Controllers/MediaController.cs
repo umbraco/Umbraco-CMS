@@ -776,7 +776,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var mediaType = string.Empty;
             var mediaTypes = _mediaTypeService.GetAll().ToList();
 
-            if (parentId.HasValue && parentId != -1)
+
+            //Check if we have a parent folder before checking it's permissions.
+            if (parentId.HasValue && parentId != Constants.System.Root)
             {
                 var mediaFolderItem = _mediaService.GetById(parentId.Value);
                 var mediaFolderType =
@@ -784,18 +786,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 if (mediaFolderType != null)
                 {
+                    var allowedContentTypesCount = 0;
+                    IMediaType mediaTypeItem = null;
                     foreach (var allowedContentType in mediaFolderType.AllowedContentTypes)
                     {
-                        var mediaTypeItem = _mediaTypeService.Get(allowedContentType.Id.Value);
-                        var fileProperty =
-                            mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x =>
-                                x.Alias == Constants.Conventions.Media.File);
+                        mediaTypeItem = _mediaTypeService.Get(allowedContentType.Id.Value);
+                        var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
 
                         if (fileProperty != null)
                         {
-                            mediaType = mediaTypeItem.Alias;
-                            continue;
+                            allowedContentTypesCount++;
                         }
+                    }
+
+                    //Only set the permission-based mediaType if we only allow 1 specific file under this parent.
+                    if (allowedContentTypesCount == 1 && mediaTypeItem != null)
+                    {
+                        mediaType = mediaTypeItem.Alias;
                     }
                 }
             }
