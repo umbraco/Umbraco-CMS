@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
     /// <para>Returns <see cref="IEntitySlim"/> objects, i.e. lightweight representation of entities.</para>
     /// </remarks>
-    internal class EntityRepository : RepositoryBase, IEntityRepository
+    internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     {
         public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
             : base(scopeAccessor, appCaches)

@@ -26,9 +26,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
-        private readonly IEntityRepository _entityRepository;
+        private readonly IEntityRepositoryExtended _entityRepository;
 
-        public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepository entityRepository)
+        public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepositoryExtended entityRepository)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
