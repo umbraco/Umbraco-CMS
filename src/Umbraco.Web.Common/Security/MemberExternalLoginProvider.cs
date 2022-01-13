@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 namespace Umbraco.Cms.Web.Common.Security
 {
     /// <summary>
-    /// An external login (OAuth) provider for the back office
+    /// An external login (OAuth) provider for the members
     /// </summary>
     public class MemberExternalLoginProvider : IEquatable<MemberExternalLoginProvider>
     {

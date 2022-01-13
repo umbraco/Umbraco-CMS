@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Web.Common.Security;
 using SecurityConstants = Umbraco.Cms.Core.Constants.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
@@ -30,35 +29,45 @@ namespace Umbraco.Cms.Web.Common.Security
             DefaultIsApproved = defaultIsApproved;
             DefaultMemberTypeAlias = defaultMemberTypeAlias;
             _defaultCulture = defaultCulture;
-
             DefaultMemberGroups = defaultMemberGroups ?? Array.Empty<string>();
-
         }
 
         /// <summary>
-        /// A callback executed during account auto-linking and before the user is persisted
+        ///     A callback executed during account auto-linking and before the user is persisted
         /// </summary>
         [IgnoreDataMember]
         public Action<MemberIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
         /// <summary>
-        /// A callback executed during every time a user authenticates using an external login.
-        /// returns a boolean indicating if sign in should continue or not.
+        ///     A callback executed during every time a user authenticates using an external login.
+        ///     returns a boolean indicating if sign in should continue or not.
         /// </summary>
         [IgnoreDataMember]
         public Func<MemberIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether flag indicating if logging in with the external provider should auto-link/create a local user
+        ///     Gets a value indicating whether flag indicating if logging in with the external provider should auto-link/create a
+        ///     local user
         /// </summary>
         public bool AutoLinkExternalAccount { get; }
 
+        /// <summary>
+        ///     Gets the member type alias that auto linked members are created as
+        /// </summary>
         public string DefaultMemberTypeAlias { get; }
+
+        /// <summary>
+        /// Gets the IsApproved value for auto linked members.
+        /// </summary>
         public bool DefaultIsApproved { get; }
+
+        /// <summary>
+        /// Gets the default member groups to add the user in.
+        /// </summary>
         public IEnumerable<string> DefaultMemberGroups { get; }
 
         /// <summary>
-        /// The default Culture to use for auto-linking users
+        ///     The default Culture to use for auto-linking users
         /// </summary>
         // TODO: Should we use IDefaultCultureAccessor here instead?
         public string GetUserAutoLinkCulture(GlobalSettings globalSettings) =>

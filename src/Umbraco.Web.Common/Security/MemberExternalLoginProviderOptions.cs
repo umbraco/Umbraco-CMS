@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Web.Common.Security
 {
     /// <summary>
-    /// Options used to configure back office external login providers
+    /// Options used to configure member external login providers
     /// </summary>
     public class MemberExternalLoginProviderOptions
     {
