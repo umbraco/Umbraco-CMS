@@ -773,6 +773,34 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
+            var mediaType = string.Empty;
+            var mediaTypes = _mediaTypeService.GetAll().ToList();
+
+            if (parentId.HasValue && parentId != -1)
+            {
+                var mediaFolderItem = _mediaService.GetById(parentId.Value);
+                var mediaFolderType =
+                    mediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
+
+                if (mediaFolderType != null)
+                {
+                    foreach (var allowedContentType in mediaFolderType.AllowedContentTypes)
+                    {
+                        var mediaTypeItem = _mediaTypeService.Get(allowedContentType.Id.Value);
+                        var fileProperty =
+                            mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x =>
+                                x.Alias == Constants.Conventions.Media.File);
+
+                        if (fileProperty != null)
+                        {
+                            mediaType = mediaTypeItem.Alias;
+                            continue;
+                        }
+                    }
+                }
+            }
+
+
             //get the files
             foreach (var formFile in file)
             {
@@ -782,44 +810,46 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 if (_contentSettings.IsFileAllowedForUpload(ext))
                 {
-                    var mediaType = Constants.Conventions.MediaTypes.File;
-
-                    if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
+                    if (string.IsNullOrEmpty(mediaType))
                     {
-                        var mediaTypes = _mediaTypeService.GetAll();
-                        // Look up MediaTypes
-                        foreach (var mediaTypeItem in mediaTypes)
-                        {
-                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
-                            if (fileProperty != null)
-                            {
-                                var dataTypeKey = fileProperty.DataTypeKey;
-                                var dataType = _dataTypeService.GetDataType(dataTypeKey);
+                        mediaType = Constants.Conventions.MediaTypes.File;
 
-                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig)
+                        if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
+                        {
+                            // Look up MediaTypes
+                            foreach (var mediaTypeItem in mediaTypes)
+                            {
+                                var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                                if (fileProperty != null)
                                 {
-                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
-                                    if (fileExtensions != null)
+                                    var dataTypeKey = fileProperty.DataTypeKey;
+                                    var dataType = _dataTypeService.GetDataType(dataTypeKey);
+
+                                    if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig)
                                     {
-                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                        var fileExtensions = fileExtensionsConfig.FileExtensions;
+                                        if (fileExtensions != null)
                                         {
-                                            mediaType = mediaTypeItem.Alias;
-                                            break;
+                                            if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                            {
+                                                mediaType = mediaTypeItem.Alias;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        // If media type is still File then let's check if it's an image.
-                        if (mediaType == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
-                        {
-                            mediaType = Constants.Conventions.MediaTypes.Image;
+                            // If media type is still File then let's check if it's an image.
+                            if (mediaType == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
+                            {
+                                mediaType = Constants.Conventions.MediaTypes.Image;
+                            }
                         }
-                    }
-                    else
-                    {
-                        mediaType = contentTypeAlias;
+                        else
+                        {
+                            mediaType = contentTypeAlias;
+                        }
                     }
 
                     var mediaItemName = fileName.ToFriendlyName();
