@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             var whereParam = sqlSyntax.GetStringColumnWildcardComparison(
                 sqlSyntax.GetQuotedColumnName("key"),
                 0,
-                Querying.TextColumnType.NVarchar);
+                TextColumnType.NVarchar);
 
             var sql = database.SqlContext.Sql()
                 .Select<KeyValueDto>()

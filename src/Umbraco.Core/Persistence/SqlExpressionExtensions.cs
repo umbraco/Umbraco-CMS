@@ -3,12 +3,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.Querying
+namespace Umbraco.Cms.Core.Persistence
 {
     /// <summary>
     /// String extension methods used specifically to translate into SQL
     /// </summary>
-    internal static class SqlExpressionExtensions
+    public static class SqlExpressionExtensions
     {
         /// <summary>
         /// Indicates whether two nullable values are equal, substituting a fallback value for nulls.
