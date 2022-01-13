@@ -682,6 +682,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound("The passed id doesn't exist");
             }
 
+            //Check parent permissions if we aren't creating a folder in the root directory
+            if (parentId != Constants.System.Root)
+            {
+                var mediaTypes = _mediaTypeService.GetAll().ToList();
+                var mediaFolderItem = _mediaService.GetById(parentId.Value);
+                var mediaFolderType =
+                    mediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
+
+                var allowDefaultFolder = false;
+                if (mediaFolderType != null)
+                {
+                    allowDefaultFolder = mediaFolderType.AllowedContentTypes.Any(x => x.Alias == Constants.Conventions.MediaTypes.Folder);
+                }
+
+                if (!allowDefaultFolder)
+                {
+                    var tempFiles = new PostedFiles();
+
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedFileType"),
+                        NotificationStyle.Warning));
+                    return Ok(tempFiles);
+                }
+            }
+
             var f = _mediaService.CreateMedia(folder.Name, parentId.Value, Constants.Conventions.MediaTypes.Folder);
             _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
@@ -735,7 +761,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     IMedia folderMediaItem;
 
                     //if uploading directly to media root and not a subfolder
-                    if (parentId == -1)
+                    if (parentId == Constants.System.Root)
                     {
                         //look for matching folder
                         folderMediaItem =
