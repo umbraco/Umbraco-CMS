@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
 
             // notify for unattended install
-            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification());
+            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
             DetermineRuntimeLevel();
 
             if (!State.UmbracoCanBoot())
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
-            await _eventAggregator.PublishAsync(unattendedUpgradeNotification);
+            await _eventAggregator.PublishAsync(unattendedUpgradeNotification, cancellationToken);
             switch (unattendedUpgradeNotification.UnattendedUpgradeResult)
             {
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors:
@@ -206,6 +206,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     {
                         throw new InvalidOperationException($"Unattended upgrade result was {RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered");
                     }
+
                     // we cannot continue here, the exception will be rethrown by BootFailedMiddelware
                     return;
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete:
