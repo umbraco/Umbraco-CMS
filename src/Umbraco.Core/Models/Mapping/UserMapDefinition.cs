@@ -300,7 +300,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
             target.LastPasswordChangeDate = source.LastPasswordChangeDate;
             target.Name = source.Name;
-            target.Navigation = CreateUserEditorNavigation();
+            target.Navigation = _commonMapper.GetContentAppsForEntity(source);
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
@@ -409,21 +409,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
             startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems));
             return startNodes;
-        }
-
-        private IEnumerable<EditorNavigation> CreateUserEditorNavigation()
-        {
-            return new[]
-            {
-                new EditorNavigation
-                {
-                    Active = true,
-                    Alias = "details",
-                    Icon = "icon-umb-users",
-                    Name = _textService.Localize("general","user"),
-                    View = "views/users/views/user/details.html"
-                }
-            };
         }
 
         private static int GetIntId(object id)

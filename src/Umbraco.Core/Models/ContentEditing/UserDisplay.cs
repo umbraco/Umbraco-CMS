@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -17,12 +17,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
             AvailableCultures = new Dictionary<string, string>();
             StartContentIds = new List<EntityBasic>();
             StartMediaIds = new List<EntityBasic>();
-            Navigation = new List<EditorNavigation>();
+            Navigation = new List<ContentApp>();
         }
 
         [DataMember(Name = "navigation")]
         [ReadOnly(true)]
-        public IEnumerable<EditorNavigation> Navigation { get; set; }
+        public IEnumerable<ContentApp> Navigation { get; set; }
 
         /// <summary>
         /// Gets the available cultures (i.e. to populate a drop down)

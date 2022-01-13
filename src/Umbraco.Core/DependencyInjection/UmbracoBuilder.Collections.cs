@@ -46,7 +46,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
                 .Append<ContentTypeTemplatesContentAppFactory>()
-                .Append<UserGroupEditorContentAppFactory>();
+                .Append<UserGroupEditorContentAppFactory>()
+                .Append<UserEditorContentAppFactory>();
 
             // all built-in finders in the correct order,
             // devs can then modify this list on application startup

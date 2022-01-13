@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.ContentApps
 {
-    public class UserGroupEditorContentAppFactory : IContentAppFactory
+    public class UserEditorContentAppFactory : IContentAppFactory
     {
         internal const int Weight = -100;
 
@@ -14,13 +16,13 @@ namespace Umbraco.Cms.Core.ContentApps
         {
             switch (source)
             {
-                case IUserGroup _:
+                case IUser _:
                     return _app ?? (_app = new ContentApp()
                     {
-                        Alias = "umbUserGroup",
+                        Alias = "umbUser",
                         Name = "Detail",
-                        Icon = Constants.Icons.UserGroup,
-                        View = "views/users/apps/groups/content/content.html",
+                        Icon = Constants.Icons.User,
+                        View = "views/users/views/user/details.html",
                         Weight = Weight
                     });
                 default:
