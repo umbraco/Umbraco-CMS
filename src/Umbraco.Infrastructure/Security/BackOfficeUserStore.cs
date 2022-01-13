@@ -216,13 +216,14 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IUser found = _userService.GetUserById(UserIdToInt(user.Id));
+            var userId = UserIdToInt(user.Id);
+            IUser found = _userService.GetUserById(userId);
             if (found != null)
             {
                 _userService.Delete(found);
             }
 
-            _externalLoginService.DeleteUserLogins(user.Id.ToGuid());
+            _externalLoginService.DeleteUserLogins(userId.ToGuid());
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -440,7 +441,7 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user != null)
             {
-                var userId = user.Id.ToGuid();
+                var userId = UserIdToInt(user.Id).ToGuid();
                 user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(userId)));
                 user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(userId)));
             }

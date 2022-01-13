@@ -273,7 +273,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
 
             // TO 9.3.0
-            To<AddExternalLoginWithKeys>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
+            To<UpdateExternalLoginToUseKeyInsteadOfId>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
 
         }
     }

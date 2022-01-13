@@ -16,13 +16,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
-        // TODO: This is completely missing a FK!!? ... IIRC that is because we want to change this to a GUID
-        // to support both members and users for external logins and that will not have any referential integrity
-        // This should be part of the members task for enabling external logins.
-
-        [Column("userId")]
+        [Column("userOrMemberKey")]
         [Index(IndexTypes.NonClustered)]
-        public int UserId { get; set; }
+        public Guid UserOrMemberKey { get; set; }
 
         /// <summary>
         /// Used to store the name of the provider (i.e. Facebook, Google)
@@ -30,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("loginProvider")]
         [Length(400)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userId", Name = "IX_" + TableName + "_LoginProvider")]
+        [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userOrMemberKey", Name = "IX_" + TableName + "_LoginProvider")]
         public string LoginProvider { get; set; }
 
         /// <summary>

@@ -19,26 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             DefineMap<IdentityUserToken, ExternalLoginTokenDto>(nameof(IdentityUserToken.Name), nameof(ExternalLoginTokenDto.Name));
             DefineMap<IdentityUserToken, ExternalLoginTokenDto>(nameof(IdentityUserToken.Value), nameof(ExternalLoginTokenDto.Value));
             // separate table
-            DefineMap<IdentityUserToken, ExternalLoginDto>(nameof(IdentityUserToken.UserId), nameof(ExternalLoginDto.UserId));
-        }
-    }
-
-    [MapperFor(typeof(IIdentityUserToken))]
-    [MapperFor(typeof(IdentityUserToken))]
-    public sealed class ExternalLoginTokenWithKeyMapper : BaseMapper
-    {
-        public ExternalLoginTokenWithKeyMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
-            : base(sqlContext, maps)
-        { }
-
-        protected override void DefineMaps()
-        {
-            DefineMap<IdentityUserToken, ExternalLoginTokenWithKeyDto>(nameof(IdentityUserToken.Id), nameof(ExternalLoginTokenWithKeyDto.Id));
-            DefineMap<IdentityUserToken, ExternalLoginTokenWithKeyDto>(nameof(IdentityUserToken.CreateDate), nameof(ExternalLoginTokenWithKeyDto.CreateDate));
-            DefineMap<IdentityUserToken, ExternalLoginTokenWithKeyDto>(nameof(IdentityUserToken.Name), nameof(ExternalLoginTokenWithKeyDto.Name));
-            DefineMap<IdentityUserToken, ExternalLoginTokenWithKeyDto>(nameof(IdentityUserToken.Value), nameof(ExternalLoginTokenWithKeyDto.Value));
-            // separate table
-            DefineMap<IdentityUserToken, ExternalLoginWithKeyDto>(nameof(IdentityUserToken.Key), nameof(ExternalLoginWithKeyDto.UserOrMemberKey));
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.Key), nameof(ExternalLoginDto.UserOrMemberKey));
         }
     }
 }

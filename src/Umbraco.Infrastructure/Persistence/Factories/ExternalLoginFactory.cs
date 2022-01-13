@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
     {
         public static IIdentityUserToken BuildEntity(ExternalLoginTokenDto dto)
         {
-            var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserId.ToString(CultureInfo.InvariantCulture), dto.CreateDate);
+            var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserOrMemberKey.ToString(), dto.CreateDate);
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
         public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
-            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId.ToString(CultureInfo.InvariantCulture), dto.CreateDate)
+            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserOrMemberKey.ToString(), dto.CreateDate)
             {
                 UserData = dto.UserData
             };
@@ -36,19 +36,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = int.Parse(entity.UserId, CultureInfo.InvariantCulture), // TODO: This is temp until we change the ext logins to use GUIDs
+                UserOrMemberKey = entity.Key,
                 UserData = entity.UserData
             };
 
             return dto;
         }
 
-        public static ExternalLoginDto BuildDto(int userId, IExternalLogin entity, int? id = null)
+        public static ExternalLoginDto BuildDto(Guid userOrMemberKey, IExternalLogin entity, int? id = null)
         {
             var dto = new ExternalLoginDto
             {
                 Id = id ?? default,
-                UserId = userId,
+                UserOrMemberKey = userOrMemberKey,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
                 UserData = entity.UserData,

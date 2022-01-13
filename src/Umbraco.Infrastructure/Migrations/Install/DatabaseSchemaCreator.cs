@@ -60,8 +60,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(CacheInstructionDto),
             typeof(ExternalLoginDto),
             typeof(ExternalLoginTokenDto),
-            typeof(ExternalLoginWithKeyDto),
-            typeof(ExternalLoginTokenWithKeyDto),
             typeof(RedirectUrlDto),
             typeof(LockDto),
             typeof(UserGroupDto),

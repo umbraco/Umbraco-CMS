@@ -50,10 +50,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             Add<TemplateMapper>();
             Add<UmbracoEntityMapper>();
             Add<UserMapper>();
-           // Add<ExternalLoginMapper>();
-            Add<ExternalLoginWithKeyMapper>();
-            //Add<ExternalLoginTokenMapper>();
-            Add<ExternalLoginTokenWithKeyMapper>();
+            Add<ExternalLoginMapper>();
+            Add<ExternalLoginTokenMapper>();
             Add<UserGroupMapper>();
             Add<AuditEntryMapper>();
             Add<ConsentMapper>();

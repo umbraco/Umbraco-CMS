@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ExternalLoginWithKeyServiceTests : UmbracoIntegrationTest
+    public class ExternalLoginServiceTests : UmbracoIntegrationTest
     {
         private IUserService UserService => GetRequiredService<IUserService>();
 
@@ -38,14 +38,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 // insert duplicates manuall
                 scope.Database.Insert(new ExternalLoginDto
                 {
-                    UserId = user.Id,
+                    UserOrMemberKey = user.Key,
                     LoginProvider = "test1",
                     ProviderKey = providerKey,
                     CreateDate = latest
                 });
                 scope.Database.Insert(new ExternalLoginDto
                 {
-                    UserId = user.Id,
+                    UserOrMemberKey = user.Key,
                     LoginProvider = "test1",
                     ProviderKey = providerKey,
                     CreateDate = oldest
