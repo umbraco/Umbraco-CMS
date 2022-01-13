@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -29,8 +30,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
             builder.Services.AddUnique<IDomainRepository, DomainRepository>();
             builder.Services.AddUnique<IEntityRepository, EntityRepository>();
-            builder.Services.AddUnique<IExternalLoginRepository, ExternalLoginRepository>();
-            builder.Services.AddUnique<IExternalLoginWithKeyRepository, ExternalLoginRepository>();
+            builder.Services.AddUnique<ExternalLoginRepository>();
+            builder.Services.AddUnique<IExternalLoginRepository>(factory => factory.GetRequiredService<ExternalLoginRepository>());
+            builder.Services.AddUnique<IExternalLoginWithKeyRepository>(factory => factory.GetRequiredService<ExternalLoginRepository>());
             builder.Services.AddUnique<ILanguageRepository, LanguageRepository>();
             builder.Services.AddUnique<IMacroRepository, MacroRepository>();
             builder.Services.AddUnique<IMediaRepository, MediaRepository>();
