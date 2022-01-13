@@ -809,7 +809,7 @@ namespace Umbraco.Cms.Core.Scoping
                 completed = false;
             }
 
-            TryFinally(() =>
+            void HandleScopedFileSystems()
             {
                 if (_scopeFileSystem == true)
                 {
@@ -821,14 +821,17 @@ namespace Umbraco.Cms.Core.Scoping
                     _fscope.Dispose();
                     _fscope = null;
                 }
-            }, () =>
+            }
+
+            void HandleScopedNotifications()
             {
-                // deal with events
                 if (onException == false)
                 {
                     _notificationPublisher?.ScopeExit(completed);
                 }
-            }, () =>
+            }
+
+            void HandleScopeContext()
             {
                 // if *we* created it, then get rid of it
                 if (_scopeProvider.AmbientContext == Context)
@@ -843,7 +846,9 @@ namespace Umbraco.Cms.Core.Scoping
                         _scopeProvider.PopAmbientScopeContext();
                     }
                 }
-            }, () =>
+            }
+
+            void HandleDetachedScopes()
             {
                 if (Detachable)
                 {
@@ -865,25 +870,35 @@ namespace Umbraco.Cms.Core.Scoping
                     OrigScope = null;
                     OrigContext = null;
                 }
-            });
+            }
+
+            TryFinally(
+                HandleScopedFileSystems,
+                HandleScopedNotifications,
+                HandleScopeContext,
+                HandleDetachedScopes
+            );
         }
 
-        private static void TryFinally(params Action[] actions) => TryFinally(0, actions);
-
-        private static void TryFinally(int index, Action[] actions)
+        private static void TryFinally(params Action[] actions)
         {
-            if (index == actions.Length)
+            var exceptions = new List<Exception>();
+
+            foreach (Action action in actions)
             {
-                return;
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
 
-            try
+            if (exceptions.Any())
             {
-                actions[index]();
-            }
-            finally
-            {
-                TryFinally(index + 1, actions);
+                throw new AggregateException(exceptions);
             }
         }
 
