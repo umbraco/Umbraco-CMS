@@ -126,6 +126,8 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public static JsonSerializerSettings ConfigurationJsonSettings { get; } = new JsonSerializerSettings
         {
+            Formatting = Formatting.None,
+            NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new ConfigurationCustomContractResolver(),
             Converters = new List<JsonConverter>(new[]{new FuzzyBooleanConverter()})
         };

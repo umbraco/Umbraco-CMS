@@ -68,11 +68,13 @@ namespace Umbraco.Core.Models
                 switch (storageType)
                 {
                     case TagsStorageType.Csv:
-                        property.SetValue(string.Join(delimiter.ToString(), currentTags.Union(trimmedTags)), culture); // csv string
+                        property.SetValue(string.Join(delimiter.ToString(), currentTags.Union(trimmedTags)).NullOrWhiteSpaceAsNull(), culture); // csv string
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray()), culture); // json array
+                        var updatedTags = currentTags.Union(trimmedTags).ToArray();
+                        var updatedValue = updatedTags.Length == 0 ? null : JsonConvert.SerializeObject(updatedTags, Formatting.None);
+                        property.SetValue(updatedValue, culture); // json array
                         break;
                 }
             }
@@ -81,11 +83,12 @@ namespace Umbraco.Core.Models
                 switch (storageType)
                 {
                     case TagsStorageType.Csv:
-                        property.SetValue(string.Join(delimiter.ToString(), trimmedTags), culture); // csv string
+                        property.SetValue(string.Join(delimiter.ToString(), trimmedTags).NullOrWhiteSpaceAsNull(), culture); // csv string
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(trimmedTags), culture); // json array
+                        var updatedValue = trimmedTags.Length == 0 ? null : JsonConvert.SerializeObject(trimmedTags, Formatting.None);
+                        property.SetValue(updatedValue, culture); // json array
                         break;
                 }
             }
@@ -121,11 +124,13 @@ namespace Umbraco.Core.Models
             switch (storageType)
             {
                 case TagsStorageType.Csv:
-                    property.SetValue(string.Join(delimiter.ToString(), currentTags.Except(trimmedTags)), culture); // csv string
+                    property.SetValue(string.Join(delimiter.ToString(), currentTags.Except(trimmedTags)).NullOrWhiteSpaceAsNull(), culture); // csv string
                     break;
 
                 case TagsStorageType.Json:
-                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray()), culture); // json array
+                    var updatedTags = currentTags.Except(trimmedTags).ToArray();
+                    var updatedValue = updatedTags.Length == 0 ? null : JsonConvert.SerializeObject(updatedTags, Formatting.None);
+                    property.SetValue(updatedValue, culture); // json array
                     break;
             }
         }
@@ -157,7 +162,7 @@ namespace Umbraco.Core.Models
                 case TagsStorageType.Json:
                     try
                     {
-                        return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString().Trim());
+                        return JsonConvert.DeserializeObject<string[]>(value).Select(x => x.Trim());
                     }
                     catch (JsonException)
                     {

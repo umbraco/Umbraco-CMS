@@ -1,16 +1,14 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Media;
 
@@ -170,7 +168,7 @@ namespace Umbraco.Web.PropertyEditors
                     var sourcePath = _mediaFileSystem.GetRelativePath(src);
                     var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
                     jo["src"] = _mediaFileSystem.GetUrl(copyPath);
-                    args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
+                    args.Copy.SetValue(property.Alias, jo.ToString(Formatting.None), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
@@ -241,17 +239,12 @@ namespace Umbraco.Web.PropertyEditors
                             // it can happen when an image is uploaded via the folder browser, in which case
                             // the property value will be the file source eg '/media/23454/hello.jpg' and we
                             // are fixing that anomaly here - does not make any sense at all but... bah...
-
-                            var dt = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-                            var config = dt?.ConfigurationAs<ImageCropperConfiguration>();
                             src = svalue;
-                            var json = new
-                            {
-                                src = svalue,
-                                crops = config == null ? Array.Empty<ImageCropperConfiguration.Crop>() : config.Crops
-                            };
 
-                            property.SetValue(JsonConvert.SerializeObject(json), pvalue.Culture, pvalue.Segment);
+                            property.SetValue(JsonConvert.SerializeObject(new
+                            {
+                                src = svalue
+                            }, Formatting.None), pvalue.Culture, pvalue.Segment);
                         }
                         else
                         {

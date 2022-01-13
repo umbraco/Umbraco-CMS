@@ -103,7 +103,7 @@ namespace Umbraco.Web.PropertyEditors
                 var rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
                 if (rows.Count == 0)
-                    return string.Empty;
+                    return null;
 
                 foreach (var row in rows.ToList())
                 {
@@ -134,7 +134,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                return JsonConvert.SerializeObject(rows).ToXmlString<string>();
+                return JsonConvert.SerializeObject(rows, Formatting.None).ToXmlString<string>();
             }
 
             #endregion
@@ -229,7 +229,7 @@ namespace Umbraco.Web.PropertyEditors
                 var rows = _nestedContentValues.GetPropertyValues(editorValue.Value);
 
                 if (rows.Count == 0)
-                    return string.Empty;
+                    return null;
 
                 foreach (var row in rows.ToList())
                 {
@@ -254,8 +254,9 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 // return json
-                return JsonConvert.SerializeObject(rows);
+                return JsonConvert.SerializeObject(rows, Formatting.None);
             }
+
             #endregion
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
