@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Extensions
 {
@@ -42,7 +43,7 @@ namespace Umbraco.Extensions
             // TODO: Gotta wonder how much this does actually improve perf? It's a lot of weird code to make this happen so hope it's worth it
             builder.Services.AddUnique<IIdKeyMap>(factory =>
             {
-                var idkSvc = new IdKeyMap(factory.GetRequiredService<IScopeProvider>());
+                var idkSvc = new IdKeyMap(factory.GetRequiredService<IScopeProvider>(), factory.GetRequiredService<IScopeAccessor>());
                 if (factory.GetRequiredService<IPublishedSnapshotService>() is PublishedSnapshotService publishedSnapshotService)
                 {
                     idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id), uid => publishedSnapshotService.GetDocumentId(uid));

@@ -36,14 +36,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 // insert duplicates manuall
-                scope.Database.Insert(new ExternalLoginDto
+                ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
                 {
                     UserId = user.Id,
                     LoginProvider = "test1",
                     ProviderKey = providerKey,
                     CreateDate = latest
                 });
-                scope.Database.Insert(new ExternalLoginDto
+                ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
                 {
                     UserId = user.Id,
                     LoginProvider = "test1",

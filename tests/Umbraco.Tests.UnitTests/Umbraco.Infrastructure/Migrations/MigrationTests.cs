@@ -10,20 +10,22 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class MigrationTests
     {
-        public class TestScopeProvider : IScopeProvider
+        public class TestScopeProvider : IScopeProvider, IScopeAccessor
         {
-            private readonly IScope _scope;
+            private readonly IDatabaseScope _scope;
 
-            public TestScopeProvider(IScope scope) => _scope = scope;
+            public TestScopeProvider(IDatabaseScope scope) => _scope = scope;
 
             public IScope CreateScope(
                 IsolationLevel isolationLevel = IsolationLevel.Unspecified,
@@ -44,6 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             public IScope DetachScope() => throw new NotImplementedException();
 
             public IScopeContext Context { get; set; }
+            public IQuery<T> CreateQuery<T>() => SqlContext.Query<T>();
 
             public ISqlContext SqlContext { get; set; }
 
@@ -54,6 +57,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             }
             public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
 #endif
+            public IDatabaseScope AmbientScope => _scope;
         }
 
         private class TestPlan : MigrationPlan

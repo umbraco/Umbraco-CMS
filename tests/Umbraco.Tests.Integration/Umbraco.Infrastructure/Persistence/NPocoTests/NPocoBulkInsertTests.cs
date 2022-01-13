@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 // Still no what we want, but look above.
-                IUmbracoDatabase dbSqlServer = scope.Database;
+                IUmbracoDatabase dbSqlServer = ScopeAccessor.AmbientScope.Database;
 
                 // drop the table
                 dbSqlServer.Execute("DROP TABLE [umbracoServer]");
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             {
                 using (IScope scope = ScopeProvider.CreateScope())
                 {
-                    scope.Database.BulkInsertRecords(servers);
+                    ScopeAccessor.AmbientScope.Database.BulkInsertRecords(servers);
                     scope.Complete();
                 }
             }
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             // Assert
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+                Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
             }
         }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             {
                 using (IScope scope = ScopeProvider.CreateScope())
                 {
-                    scope.Database.BulkInsertRecords(servers);
+                    ScopeAccessor.AmbientScope.Database.BulkInsertRecords(servers);
 
                     // Don't call complete here - the transaction will be rolled back.
                 }
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             // Assert
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
+                Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
             }
         }
 
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             IDbCommand[] commands;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                commands = scope.Database.GenerateBulkInsertCommands(servers.ToArray());
+                commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
                 scope.Complete();
             }
 
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             IDbCommand[] commands;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                commands = scope.Database.GenerateBulkInsertCommands(servers.ToArray());
+                commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
                 scope.Complete();
             }
 

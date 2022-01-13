@@ -333,7 +333,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int roleId;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                roleId = scope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
+                roleId = ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
                 scope.Complete();
             }
 
@@ -346,8 +346,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
-                scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
+                ScopeAccessor.AmbientScope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
+                ScopeAccessor.AmbientScope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
                 scope.Complete();
             }
 
@@ -1281,7 +1281,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             List<PropertyDataDto> colResult;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                colResult = scope.Database.Fetch<PropertyDataDto>(sql);
+                colResult = ScopeAccessor.AmbientScope.Database.Fetch<PropertyDataDto>(sql);
                 scope.Complete();
             }
 

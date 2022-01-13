@@ -1,7 +1,6 @@
 using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Core.Scoping
 {
@@ -10,16 +9,6 @@ namespace Umbraco.Cms.Core.Scoping
     /// </summary>
     public interface IScope : IDisposable, IInstanceIdentifiable
     {
-        /// <summary>
-        /// Gets the scope database.
-        /// </summary>
-        IUmbracoDatabase Database { get; }
-
-        /// <summary>
-        /// Gets the Sql context.
-        /// </summary>
-        ISqlContext SqlContext { get; }
-
         /// <summary>
         /// Gets the scope notification publisher
         /// </summary>

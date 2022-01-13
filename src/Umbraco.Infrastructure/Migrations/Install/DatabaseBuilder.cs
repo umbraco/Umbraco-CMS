@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install
@@ -21,6 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IScopeAccessor _scopeAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly IKeyValueService _keyValueService;
         private readonly ILogger<DatabaseBuilder> _logger;
@@ -38,6 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </summary>
         public DatabaseBuilder(
             IScopeProvider scopeProvider,
+            IScopeAccessor scopeAccessor,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtimeState,
             ILoggerFactory loggerFactory,
@@ -50,6 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             _scopeProvider = scopeProvider;
+            _scopeAccessor = scopeAccessor;
             _databaseFactory = databaseFactory;
             _runtimeState = runtimeState;
             _logger = loggerFactory.CreateLogger<DatabaseBuilder>();
@@ -113,17 +117,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             using (var scope = _scopeProvider.CreateScope())
             {
                 // look for the super user with default password
-                var sql = scope.Database.SqlContext.Sql()
+                var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
                     .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
-                var result = scope.Database.ExecuteScalar<int>(sql);
+                var result = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)
                 {
                     // found only 1 user == the default user with default password
                     // however this always exists on uCloud, also need to check if there are other users too
-                    result = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    result = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
                     has = result != 1;
                 }
                 scope.Complete();
@@ -135,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                return scope.Database.IsUmbracoInstalled();
+                return _scopeAccessor.AmbientScope.Database.IsUmbracoInstalled();
             }
         }
 
@@ -336,7 +340,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            _databaseSchemaValidationResult = scope.Database.ValidateSchema();
+            _databaseSchemaValidationResult = _scopeAccessor.AmbientScope.Database.ValidateSchema();
 
             scope.Complete();
 
@@ -372,7 +376,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 _logger.LogInformation("Database configuration status: Started");
 
-                var database = scope.Database;
+                var database = _scopeAccessor.AmbientScope.Database;
 
                 var message = string.Empty;
 

@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     0,
                     11,
                     out long total,
-                    provider.SqlContext.Query<IMedia>()
+                    provider.CreateQuery<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
                 Assert.AreEqual(11, result.Count());
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     1,
                     11,
                     out total,
-                    provider.SqlContext.Query<IMedia>()
+                    provider.CreateQuery<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
                 Assert.AreEqual(9, result.Count());

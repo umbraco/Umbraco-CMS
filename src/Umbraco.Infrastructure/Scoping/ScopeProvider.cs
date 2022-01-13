@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 #if DEBUG_SCOPES
 using System.Linq;
@@ -286,10 +287,10 @@ namespace Umbraco.Cms.Core.Scoping
 
         #region Ambient Scope
 
-        IScope IScopeAccessor.AmbientScope => AmbientScope;
+        IDatabaseScope IScopeAccessor.AmbientScope => AmbientScope;
 
         /// <summary>
-        /// Get or set the Ambient (Current) <see cref="Scope"/> for the current execution context.
+        /// Gets or set the Ambient (Current) <see cref="Scope"/> for the current execution context.
         /// </summary>
         /// <remarks>
         /// The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
