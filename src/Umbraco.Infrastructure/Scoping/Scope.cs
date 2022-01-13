@@ -41,7 +41,6 @@ namespace Umbraco.Cms.Core.Scoping
         private ICompletable _fscope;
 
         private IsolatedCaches _isolatedCaches;
-        private EventMessages _messages;
         private IScopedNotificationPublisher _notificationPublisher;
 
         private StackQueue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
@@ -205,6 +204,7 @@ namespace Umbraco.Cms.Core.Scoping
         }
 
         internal Dictionary<Guid, Dictionary<int, int>> ReadLocks => _readLocksDictionary;
+
         internal Dictionary<Guid, Dictionary<int, int>> WriteLocks => _writeLocksDictionary;
 
         // a value indicating whether to force call-context
@@ -292,15 +292,6 @@ namespace Umbraco.Cms.Core.Scoping
                 }
 
                 return ParentScope.DatabaseOrNull;
-            }
-        }
-
-        public EventMessages MessagesOrNull
-        {
-            get
-            {
-                EnsureNotDisposed();
-                return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
             }
         }
 
@@ -414,28 +405,6 @@ namespace Umbraco.Cms.Core.Scoping
                     _database = null;
                     throw;
                 }
-            }
-        }
-
-        /// <inheritdoc />
-        public EventMessages Messages
-        {
-            get
-            {
-                EnsureNotDisposed();
-                if (ParentScope != null)
-                {
-                    return ParentScope.Messages;
-                }
-
-                return _messages ??= new EventMessages();
-
-                // TODO: event messages?
-                // this may be a problem: the messages collection will be cleared at the end of the scope
-                // how shall we process it in controllers etc? if we don't want the global factory from v7?
-                // it'd need to be captured by the controller
-                //
-                // + rename // EventMessages = ServiceMessages or something
             }
         }
 

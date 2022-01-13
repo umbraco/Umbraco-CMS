@@ -21,11 +21,6 @@ namespace Umbraco.Cms.Core.Scoping
         ISqlContext SqlContext { get; }
 
         /// <summary>
-        /// Gets the scope event messages.
-        /// </summary>
-        EventMessages Messages { get; }
-
-        /// <summary>
         /// Gets the scope notification publisher
         /// </summary>
         IScopedNotificationPublisher Notifications { get; }
@@ -74,6 +69,7 @@ namespace Umbraco.Cms.Core.Scoping
         void ReadLock(TimeSpan timeout, int lockId);
 
         void EagerWriteLock(params int[] lockIds);
+
         void EagerWriteLock(TimeSpan timeout, int lockId);
 
         void EagerReadLock(TimeSpan timeout, int lockId);
