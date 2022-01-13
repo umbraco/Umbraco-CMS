@@ -68,7 +68,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddLogging();
 
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();
             builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
