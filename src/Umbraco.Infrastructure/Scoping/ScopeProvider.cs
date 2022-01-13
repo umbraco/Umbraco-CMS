@@ -35,12 +35,18 @@ namespace Umbraco.Cms.Core.Scoping
         private static readonly string s_contextItemKey = typeof(ScopeProvider).FullName;
         private readonly IEventAggregator _eventAggregator;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptionsMonitor<CoreDebugSettings> coreDebugSettings, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache, IEventAggregator eventAggregator)
+        public ScopeProvider(
+            IUmbracoDatabaseFactory databaseFactory,
+            FileSystems fileSystems,
+            IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
+            ILoggerFactory loggerFactory,
+            IRequestCache requestCache,
+            IEventAggregator eventAggregator)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _coreDebugSettings = coreDebugSettings.CurrentValue;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<ScopeProvider>();
             _loggerFactory = loggerFactory;
             _requestCache = requestCache;
             _eventAggregator = eventAggregator;

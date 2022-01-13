@@ -61,7 +61,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 databaseFactory.Object,
                 fileSystems,
                 new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
-                loggerFactory.CreateLogger<ScopeProvider>(),
                 loggerFactory,
                 Mock.Of<IRequestCache>(),
                 Mock.Of<IEventAggregator>());
