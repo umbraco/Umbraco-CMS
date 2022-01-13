@@ -94,7 +94,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
                 new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
-                mediaFileManager,
                 loggerFactory.CreateLogger<ScopeProvider>(),
                 loggerFactory,
                 Mock.Of<IRequestCache>(),

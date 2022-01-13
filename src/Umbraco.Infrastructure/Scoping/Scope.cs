@@ -29,7 +29,6 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly IsolationLevel _isolationLevel;
         private readonly object _lockQueueLocker = new();
         private readonly ILogger<Scope> _logger;
-        private readonly MediaFileManager _mediaFileManager;
         private readonly RepositoryCacheMode _repositoryCacheMode;
         private readonly bool? _scopeFileSystem;
 
@@ -58,7 +57,6 @@ namespace Umbraco.Cms.Core.Scoping
         private Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -74,7 +72,6 @@ namespace Umbraco.Cms.Core.Scoping
         {
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
-            _mediaFileManager = mediaFileManager;
             _eventAggregator = eventAggregator;
             _logger = logger;
             Context = scopeContext;
@@ -170,7 +167,6 @@ namespace Umbraco.Cms.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -182,7 +178,7 @@ namespace Umbraco.Cms.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, null,
+            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, null,
                 scopeContext, detachable, isolationLevel, repositoryCacheMode, 
                 scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
         {
@@ -192,7 +188,6 @@ namespace Umbraco.Cms.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -203,7 +198,7 @@ namespace Umbraco.Cms.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, parent,
+            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, parent,
                 null, false, isolationLevel, repositoryCacheMode, notificationPublisher,
                 scopeFileSystems, callContext, autoComplete)
         {
