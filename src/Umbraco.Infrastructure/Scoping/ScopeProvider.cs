@@ -11,6 +11,7 @@ using Umbraco.Extensions;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 #if DEBUG_SCOPES
 using System.Linq;
@@ -59,6 +60,8 @@ namespace Umbraco.Cms.Core.Scoping
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
         public ISqlContext SqlContext => DatabaseFactory.SqlContext;
+
+        public IQuery<T> CreateQuery<T>() => SqlContext.Query<T>();
 
         #region Context
 

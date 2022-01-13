@@ -1,5 +1,6 @@
 using System.Data;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 #if DEBUG_SCOPES
@@ -86,6 +87,8 @@ namespace Umbraco.Cms.Core.Scoping
         /// Gets the sql context.
         /// </summary>
         ISqlContext SqlContext { get; }
+
+        IQuery<T> CreateQuery<T>();
 
 #if DEBUG_SCOPES
 

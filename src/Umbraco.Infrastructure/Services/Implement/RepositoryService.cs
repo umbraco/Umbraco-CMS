@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -12,7 +12,9 @@ namespace Umbraco.Cms.Core.Services.Implement
     public abstract class RepositoryService : IService
     {
         protected IEventMessagesFactory EventMessagesFactory { get; }
+
         protected IScopeProvider ScopeProvider { get; }
+
         protected ILoggerFactory LoggerFactory { get; }
 
         protected RepositoryService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
@@ -22,6 +24,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
-        protected IQuery<T> Query<T>() => ScopeProvider.SqlContext.Query<T>();
+        protected IQuery<T> Query<T>() => ScopeProvider.CreateQuery<T>();
     }
 }
