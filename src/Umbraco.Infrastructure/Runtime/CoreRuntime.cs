@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -16,12 +18,13 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
+    /// <inheritdoc />
     public class CoreRuntime : IRuntime
     {
-        private readonly ILogger<CoreRuntime> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ComponentCollection _components;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
@@ -32,14 +35,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly ILogger<CoreRuntime> _logger;
         private CancellationToken _cancellationToken;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
+        /// Initializes a new instance of the <see cref="CoreRuntime" /> class.
         /// </summary>
         public CoreRuntime(
-            ILoggerFactory loggerFactory,
             IRuntimeState state,
+            ILoggerFactory loggerFactory,
             ComponentCollection components,
             IApplicationShutdownRegistry applicationShutdownRegistry,
             IProfilingLogger profilingLogger,
@@ -48,9 +53,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IEventAggregator eventAggregator,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IHostApplicationLifetime hostApplicationLifetime)
         {
             State = state;
+
             _loggerFactory = loggerFactory;
             _components = components;
             _applicationShutdownRegistry = applicationShutdownRegistry;
@@ -61,6 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;
             _serviceProvider = serviceProvider;
+            _hostApplicationLifetime = hostApplicationLifetime;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
 
@@ -76,23 +84,49 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IUmbracoDatabaseFactory databaseFactory,
             IEventAggregator eventAggregator,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion
-            ):this(
-            loggerFactory,
-            state,
-            components,
-            applicationShutdownRegistry,
-            profilingLogger,
-            mainDom,
-            databaseFactory,
-            eventAggregator,
-            hostingEnvironment,
-            umbracoVersion,
-            null
-            )
-        {
+            IUmbracoVersion umbracoVersion,
+            IServiceProvider serviceProvider)
+            : this(
+                state,
+                loggerFactory,
+                components,
+                applicationShutdownRegistry,
+                profilingLogger,
+                mainDom,
+                databaseFactory,
+                eventAggregator,
+                hostingEnvironment,
+                umbracoVersion,
+                serviceProvider,
+                serviceProvider?.GetRequiredService<IHostApplicationLifetime>())
+        { }
 
-        }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete]
+        public CoreRuntime(
+            ILoggerFactory loggerFactory,
+            IRuntimeState state,
+            ComponentCollection components,
+            IApplicationShutdownRegistry applicationShutdownRegistry,
+            IProfilingLogger profilingLogger,
+            IMainDom mainDom,
+            IUmbracoDatabaseFactory databaseFactory,
+            IEventAggregator eventAggregator,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoVersion umbracoVersion)
+            : this(
+                loggerFactory,
+                state,
+                components,
+                applicationShutdownRegistry,
+                profilingLogger,
+                mainDom,
+                databaseFactory,
+                eventAggregator,
+                hostingEnvironment,
+                umbracoVersion,
+                null)
+        { }
 
         /// <summary>
         /// Gets the state of the Umbraco runtime.
@@ -103,13 +137,17 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public async Task RestartAsync()
         {
             await StopAsync(_cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppedNotification(), _cancellationToken);
             await StartAsync(_cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartedNotification(), _cancellationToken);
         }
 
         /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
+
             StaticApplicationLogging.Initialize(_loggerFactory);
             StaticServiceProvider.Instance = _serviceProvider;
 
@@ -129,6 +167,13 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                 _logger.LogError(exception, msg);
             };
+
+            // Add application started and stopped notifications (only on initial startup, not restarts)
+            if (_hostApplicationLifetime.ApplicationStarted.IsCancellationRequested == false)
+            {
+                _hostApplicationLifetime.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification()));
+                _hostApplicationLifetime.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification()));
+            }
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
