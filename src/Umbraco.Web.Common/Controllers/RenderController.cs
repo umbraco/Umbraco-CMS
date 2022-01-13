@@ -55,11 +55,13 @@ namespace Umbraco.Cms.Web.Common.Controllers
 
         /// <summary>
         /// Gets an action result based on the template name found in the route values and a model.
-        /// If the template found in the route values doesn't physically exist, Umbraco not found result is returned.
         /// </summary>
         /// <typeparam name="T">The type of the model.</typeparam>
         /// <param name="model">The model.</param>
         /// <returns>The action result.</returns>
+        /// <remarks>
+        /// If the template found in the route values doesn't physically exist, Umbraco not found result is returned.
+        /// </remarks>
         protected override IActionResult CurrentTemplate<T>(T model)
         {
             if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
