@@ -165,6 +165,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
                 menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true);
+                menu.Items.Add<ActionCopy>(LocalizedTextService, hasSeparator: true, opensDialog: true);
             }
 
             return menu;

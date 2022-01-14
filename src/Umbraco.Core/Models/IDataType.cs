@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Models
@@ -34,5 +34,7 @@ namespace Umbraco.Cms.Core.Models
         /// return a Dictionary{string, object} but could return a typed object e.g. MyEditor.Configuration.</para>
         /// </remarks>
         object Configuration { get; set; }
+
+        IDataType DeepCloneWithResetIdentities();
     }
 }

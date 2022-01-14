@@ -88,5 +88,6 @@ namespace Umbraco.Cms.Core.Services
         IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
         Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);
+        Attempt<OperationResult<MoveOperationStatusType, IDataType>> Copy(IDataType copying, int containerId);
     }
 }

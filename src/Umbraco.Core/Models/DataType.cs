@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
@@ -191,6 +191,14 @@ namespace Umbraco.Cms.Core.Models
                     }
                 });
             }
+        }
+
+        public IDataType DeepCloneWithResetIdentities()
+        {
+            var clone = (DataType)DeepClone();
+            clone.Key = Guid.Empty;
+            clone.ResetIdentity();
+            return clone;
         }
     }
 }
