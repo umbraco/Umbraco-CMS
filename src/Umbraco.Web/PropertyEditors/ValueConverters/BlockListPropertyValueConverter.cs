@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
+            => PropertyCacheLevel.Elements;
 
         /// <inheritdoc />
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
