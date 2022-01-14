@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
-using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -33,47 +32,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register the special idk map
             builder.Services.AddUnique<IIdKeyMap, IdKeyMap>();
 
-            // register the services
-            builder.Services.AddUnique<IPropertyValidationService, PropertyValidationService>();
-            builder.Services.AddUnique<IKeyValueService, KeyValueService>();
-            builder.Services.AddUnique<IPublicAccessService, PublicAccessService>();
-            builder.Services.AddUnique<IDomainService, DomainService>();
             builder.Services.AddUnique<IAuditService, AuditService>();
             builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
             builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
-            builder.Services.AddUnique<ITagService, TagService>();
-            builder.Services.AddUnique<IContentService, ContentService>();
-            builder.Services.AddUnique<IContentVersionService, ContentVersionService>();
-            builder.Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
-            builder.Services.AddUnique<IUserService, UserService>();
-            builder.Services.AddUnique<IMemberService, MemberService>();
-            builder.Services.AddUnique<IMediaService, MediaService>();
-            builder.Services.AddUnique<IContentTypeService, ContentTypeService>();
-            builder.Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
-            builder.Services.AddUnique<IMediaTypeService, MediaTypeService>();
             builder.Services.AddUnique<IDataTypeService, DataTypeService>();
-            builder.Services.AddUnique<IFileService, FileService>();
-            builder.Services.AddUnique<ILocalizationService, LocalizationService>();
             builder.Services.AddUnique<IPackagingService, PackagingService>();
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
-            builder.Services.AddUnique<IEntityService, EntityService>();
-            builder.Services.AddUnique<IRelationService, RelationService>();
-            builder.Services.AddUnique<IMacroService, MacroService>();
-            builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
-            builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();
-            builder.Services.AddUnique<INotificationService, NotificationService>();
-            builder.Services.AddUnique<IExternalLoginService, ExternalLoginService>();
-            builder.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
-            builder.Services.AddUnique<IConsentService, ConsentService>();
             builder.Services.AddTransient(SourcesFactory);
-            builder.Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
-                factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
-                factory.GetRequiredService<ILogger<LocalizedTextService>>()));
-
-            builder.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
-
-            builder.Services.AddSingleton<ConflictingPackageData>();
-            builder.Services.AddSingleton<CompiledPackageXmlParser>();
             builder.Services.AddUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
             builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();

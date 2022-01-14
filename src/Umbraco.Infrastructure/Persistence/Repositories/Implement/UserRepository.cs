@@ -911,7 +911,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return sql;
         }
 
-        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        public IEnumerable<IUser> GetNextUsers(int id, int count)
         {
             var idsQuery = SqlContext.Sql()
                 .Select<UserDto>(x => x.Id)

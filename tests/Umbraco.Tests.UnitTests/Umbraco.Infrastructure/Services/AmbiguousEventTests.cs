@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
