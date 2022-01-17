@@ -12,7 +12,12 @@ namespace Umbraco.Web.WebApi
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = HttpContext.Current.IsDebuggingEnabled ? IncludeErrorDetailPolicy.Always : IncludeErrorDetailPolicy.Default;
+            if (HttpContext.Current?.IsDebuggingEnabled ?? false)
+            {
+                actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+            }
+
+            actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Default;
         }
     }
 }
