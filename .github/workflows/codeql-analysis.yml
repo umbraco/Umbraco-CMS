@@ -2,7 +2,7 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: ['*/dev','*/contrib', '*/feature/**']
+    branches: ['*/dev','*/contrib']
   pull_request:
     # The branches below must be a subset of the branches above
     branches: ['*/dev','*/contrib']
@@ -26,3 +26,5 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+      with:
+        config-file: ./.github/config/codeql-config.yml
