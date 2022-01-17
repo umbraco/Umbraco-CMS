@@ -22,7 +22,7 @@ jobs:
       with:
         config-file: ./.github/config/codeql-config.yml
 
-    - name: build
+    - name: Build
       run: dotnet build umbraco-netcore-only.sln # also runs npm build
 
     - name: Perform CodeQL Analysis
