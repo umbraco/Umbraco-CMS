@@ -13,6 +13,25 @@
     <Rule Id="SA1413" Action="None" />
     <Rule Id="SA1611" Action="None" />
     <Rule Id="SA1615" Action="None" />
-    <Rule Id="SA1629" Action="None" />
+    <Rule Id="SA1629" Action="None" />    
+    <Rule Id="SA1633" Action="None" /> <!-- FileMustHaveHeader -->
+
+    <Rule Id="SA1503" Action="Info" /> <!-- BracesMustNotBeOmitted -->
+    <Rule Id="SA1516" Action="Info" /> <!-- ElementsMustBeSeparatedByBlankLine -->
+    <Rule Id="SA1201" Action="Info" /> <!-- ElementsMustAppearInTheCorrectOrder -->
+    <Rule Id="SA1124" Action="Info" /> <!-- DoNotUseRegions -->
+    <Rule Id="SA1507" Action="Info" /> <!-- CodeMustNotContainMultipleBlankLinesInARow -->
+    <Rule Id="SA1117" Action="Info" /> <!-- ParametersMustBeOnSameLineOrSeparateLines -->
+
+    <Rule Id="SA1005" Action="Info" /> <!-- SingleLineCommentsMustBeginWithSingleSpace -->
+    <Rule Id="SA1512" Action="Info" /> <!-- SingleLineCommentsMustNotBeFollowedByBlankLine -->
+    <Rule Id="SA1515" Action="Info" /> <!-- SingleLineCommentMustBePrecededByBlankLine -->
+
+
+    <Rule Id="SA1508" Action="Info" /> <!-- ClosingBracesMustNotBePrecededByBlankLine -->
+    <Rule Id="SA1513" Action="Info" /> <!-- ClosingBraceMustBeFollowedByBlankLine -->
+
+    <Rule Id="SA1009" Action="Info" /><!-- ClosingParenthesisMustBeSpacedCorrectly -->
+
   </Rules>
 </RuleSet>
