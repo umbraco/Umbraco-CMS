@@ -19,12 +19,12 @@ jobs:
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
-              
+      with:
+        config-file: ./.github/config/codeql-config.yml
+
     - run: |
         echo "Run Umbraco-CMS build"
         pwsh -command .\build\build.ps1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
-      with:
-        config-file: ./.github/config/codeql-config.yml
