@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
-            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);            
+            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
             // now we need to do some public access checks
             umbracoRouteValues = await _publicAccessRequestHandler.RewriteForPublishedContentAccessAsync(httpContext, umbracoRouteValues);
@@ -202,8 +202,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             }
 
             // if it is a POST/GET then a value must be in the request
-            if (!httpContext.Request.Query.TryGetValue("ufprt", out StringValues encodedVal)
-                && (!httpContext.Request.HasFormContentType || !httpContext.Request.Form.TryGetValue("ufprt", out encodedVal)))
+            if ((!httpContext.Request.HasFormContentType || !httpContext.Request.Form.TryGetValue("ufprt", out StringValues encodedVal))
+                && !httpContext.Request.Query.TryGetValue("ufprt", out encodedVal))
             {
                 return null;
             }

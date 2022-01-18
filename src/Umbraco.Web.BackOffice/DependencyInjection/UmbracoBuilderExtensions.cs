@@ -82,12 +82,12 @@ namespace Umbraco.Extensions
         {
             builder.Services.AddSingleton<KeepAliveMiddleware>();
             builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
-            builder.Services.AddUnique<ServerVariablesParser>();
-            builder.Services.AddUnique<InstallAreaRoutes>();
-            builder.Services.AddUnique<BackOfficeAreaRoutes>();
-            builder.Services.AddUnique<PreviewRoutes>();
+            builder.Services.AddSingleton<ServerVariablesParser>();
+            builder.Services.AddSingleton<InstallAreaRoutes>();
+            builder.Services.AddSingleton<BackOfficeAreaRoutes>();
+            builder.Services.AddSingleton<PreviewRoutes>();
             builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
-            builder.Services.AddUnique<BackOfficeServerVariables>();
+            builder.Services.AddSingleton<BackOfficeServerVariables>();
             builder.Services.AddScoped<BackOfficeSessionIdValidator>();
             builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
@@ -115,7 +115,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<IIconService, IconService>();
             builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
-            builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
+            builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
 
             return builder;
         }
