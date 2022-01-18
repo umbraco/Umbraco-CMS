@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -208,11 +209,13 @@ namespace Umbraco.Cms.Web.Website.Controllers
         public async Task<IActionResult> ExternalLinkLoginCallback(string returnUrl)
         {
             MemberIdentityUser user = await _memberManager.GetUserAsync(User);
+
+            var errors = new List<string>();
             if (user == null)
             {
                 // ... this should really not happen
-                TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
-                return RedirectToLocal(returnUrl);
+                errors.Add("Local user does not exist");
+                return CurrentUmbracoPage();
             }
 
             ExternalLoginInfo info =
@@ -221,9 +224,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
             if (info == null)
             {
                 //Add error and redirect for it to be displayed
-                TempData[ViewDataExtensions.TokenExternalSignInError] =
-                    new[] { "An error occurred, could not get external login info" };
-                return RedirectToLocal(returnUrl);
+                errors.Add( "An error occurred, could not get external login info");
+                return CurrentUmbracoPage();
             }
 
             IdentityResult addLoginResult = await _memberManager.AddLoginAsync(user, info);
@@ -236,8 +238,13 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
 
             //Add errors and redirect for it to be displayed
-            TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
-            return RedirectToLocal(returnUrl);
+            errors.AddRange(addLoginResult.Errors.Select(x => x.Description));
+
+            ViewData.SetExternalSignInProviderErrors(
+                new BackOfficeExternalLoginProviderErrors(
+                    info?.LoginProvider,
+                    errors));
+            return CurrentUmbracoPage();
         }
 
         private IActionResult RedirectToLocal(string returnUrl) =>
