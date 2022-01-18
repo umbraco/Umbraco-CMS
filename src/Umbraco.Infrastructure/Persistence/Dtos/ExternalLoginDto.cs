@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int Id { get; set; }
 
         [Obsolete("This only exists to ensure you can upgrade using external logins from umbraco version where this was used to the new where it is not used")]
-        [Column("userId")]
+        [ResultColumn("userId")]
         public int? UserId { get; set; }
 
         [Column("userOrMemberKey")]
