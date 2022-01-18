@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             if (user == null)
             {
                 // ... this should really not happen
-                errors.Add("Local user does not exist"); ;
+                errors.Add("Local user does not exist");
             }
             else
             {
