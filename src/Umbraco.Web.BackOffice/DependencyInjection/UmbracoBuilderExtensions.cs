@@ -114,6 +114,7 @@ namespace Umbraco.Extensions
             });
 
             builder.Services.AddUnique<IIconService, IconService>();
+            builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
             builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
 
             return builder;

@@ -13,23 +13,25 @@ namespace Umbraco.Cms.Core.DependencyInjection
     public static partial class UmbracoBuilderExtensions
     {
 
-        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder)
+        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>> configure = null)
             where TOptions : class
         {
             var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
-
             if (umbracoOptionsAttribute is null)
             {
-                throw new ArgumentException("typeof(TOptions) do not have the UmbracoOptionsAttribute");
+                throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
             }
 
-
-            builder.Services.AddOptions<TOptions>()
-                .Bind(builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
-                    o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
+            var optionsBuilder = builder.Services.AddOptions<TOptions>()
+                .Bind(
+                    builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
+                    o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties
+                )
                 .ValidateDataAnnotations();
 
-             return builder;
+            configure?.Invoke(optionsBuilder);
+
+            return builder;
         }
 
         /// <summary>
@@ -52,7 +54,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<ContentSettings>()
                 .AddUmbracoOptions<CoreDebugSettings>()
                 .AddUmbracoOptions<ExceptionFilterSettings>()
-                .AddUmbracoOptions<GlobalSettings>()
+                .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
+                {
+                    if (string.IsNullOrEmpty(options.UmbracoMediaPhysicalRootPath))
+                    {
+                        options.UmbracoMediaPhysicalRootPath = options.UmbracoMediaPath;
+                    }
+                }))
                 .AddUmbracoOptions<HealthChecksSettings>()
                 .AddUmbracoOptions<HostingSettings>()
                 .AddUmbracoOptions<ImagingSettings>()
