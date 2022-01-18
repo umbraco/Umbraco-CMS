@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <param name="template">The view name.</param>
         protected bool EnsurePhsyicalViewExists(string template)
         {
-            if (string.IsNullOrEmpty(template))
+            if (string.IsNullOrWhiteSpace(template))
             {
                 string docTypeAlias = UmbracoRouteValues.PublishedRequest.PublishedContent.ContentType.Alias;
                 _logger.LogWarning("No physical template file was found for document type with alias {Alias}", docTypeAlias);
