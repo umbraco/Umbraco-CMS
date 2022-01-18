@@ -8,18 +8,18 @@ namespace Umbraco.Cms.Infrastructure.Security
     /// <summary>
     /// Deletes the external logins for the deleted members. This cannot be handled by the database as there is not foreign keys.
     /// </summary>
-    public class DeleteExternalLoginsOnMemberDeletingHandler : INotificationHandler<MemberDeletingNotification>
+    public class DeleteExternalLoginsOnMemberDeletedHandler : INotificationHandler<MemberDeletedNotification>
     {
         private readonly IExternalLoginWithKeyService _externalLoginWithKeyService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteExternalLoginsOnMemberDeletingHandler"/> class.
         /// </summary>
-        public DeleteExternalLoginsOnMemberDeletingHandler(IExternalLoginWithKeyService externalLoginWithKeyService)
+        public DeleteExternalLoginsOnMemberDeletedHandler(IExternalLoginWithKeyService externalLoginWithKeyService)
             => _externalLoginWithKeyService = externalLoginWithKeyService;
 
         /// <inheritdoc/>
-        public void Handle(MemberDeletingNotification notification)
+        public void Handle(MemberDeletedNotification notification)
         {
             foreach (IMember member in notification.DeletedEntities)
             {

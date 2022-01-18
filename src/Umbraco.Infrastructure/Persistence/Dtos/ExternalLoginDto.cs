@@ -16,6 +16,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
+        [Obsolete("This only exists to ensure you can upgrade using external logins from umbraco version where this was used to the new where it is not used")]
+        [Column("userId")]
+        public int? UserId { get; set; }
+
         [Column("userOrMemberKey")]
         [Index(IndexTypes.NonClustered)]
         public Guid UserOrMemberKey { get; set; }

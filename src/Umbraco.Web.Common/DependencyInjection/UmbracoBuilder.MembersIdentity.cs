@@ -63,7 +63,7 @@ namespace Umbraco.Extensions
                 .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
 
 
-            builder.AddNotificationHandler<MemberDeletingNotification, DeleteExternalLoginsOnMemberDeletingHandler>();
+            builder.AddNotificationHandler<MemberDeletedNotification, DeleteExternalLoginsOnMemberDeletedHandler>();
             services.ConfigureOptions<ConfigureMemberIdentityOptions>();
 
             services.AddScoped<IMemberUserStore>(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
