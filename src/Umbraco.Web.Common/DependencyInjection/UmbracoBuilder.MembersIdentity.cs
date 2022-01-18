@@ -51,7 +51,8 @@ namespace Umbraco.Extensions
                     factory.GetRequiredService<IScopeProvider>(),
                     factory.GetRequiredService<IdentityErrorDescriber>(),
                     factory.GetRequiredService<IPublishedSnapshotAccessor>(),
-                    factory.GetRequiredService<IExternalLoginWithKeyService>()
+                    factory.GetRequiredService<IExternalLoginWithKeyService>(),
+                    factory.GetRequiredService<ITwoFactorLoginService>()
                 ))
                 .AddRoleStore<MemberRoleStore>()
                 .AddRoleManager<IMemberRoleManager, MemberRoleManager>()

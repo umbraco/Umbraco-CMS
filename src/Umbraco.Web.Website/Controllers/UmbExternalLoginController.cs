@@ -3,12 +3,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -26,9 +27,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
     public class UmbExternalLoginController : SurfaceController
     {
         private readonly IMemberManager _memberManager;
+        private readonly ILogger<UmbExternalLoginController> _logger;
         private readonly IMemberSignInManagerExternalLogins _memberSignInManager;
 
         public UmbExternalLoginController(
+            ILogger<UmbExternalLoginController> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory,
             ServiceContext services,
@@ -45,6 +48,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 profilingLogger,
                 publishedUrlProvider)
         {
+            _logger = logger;
             _memberSignInManager = memberSignInManager;
             _memberManager = memberManager;
         }
@@ -107,14 +111,13 @@ namespace Umbraco.Cms.Web.Website.Controllers
                             $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
                     }
 
-                    // create a with information to display a custom two factor send code view
-                    var verifyResponse =
-                        new ObjectResult(new { userId = attemptedUser.Id })
-                        {
-                            StatusCode = StatusCodes.Status402PaymentRequired
-                        };
+                    ViewData.SetTwoFactorInformation(new Verify2FACodeModel()
+                    {
+                        Provider = loginInfo.LoginProvider,
+                    });
 
-                    return verifyResponse;
+                    return CurrentUmbracoPage();
+
                 }
 
                 if (result == SignInResult.LockedOut)

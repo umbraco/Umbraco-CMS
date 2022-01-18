@@ -62,30 +62,6 @@ namespace Umbraco.Cms.Web.Common.Security
         protected override string TwoFactorRememberMeAuthenticationType => IdentityConstants.TwoFactorRememberMeScheme;
 
         /// <inheritdoc />
-        public override Task<MemberIdentityUser> GetTwoFactorAuthenticationUserAsync()
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task<bool> IsTwoFactorClientRememberedAsync(MemberIdentityUser user)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task RememberTwoFactorClientAsync(MemberIdentityUser user)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task ForgetTwoFactorClientAsync()
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
         public override async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
         {
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422

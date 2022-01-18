@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Serialization;
@@ -16,6 +17,7 @@ namespace Umbraco.Extensions
         public const string TokenUmbracoVersion = "UmbracoVersion";
         public const string TokenExternalSignInError = "ExternalSignInError";
         public const string TokenPasswordResetCode = "PasswordResetCode";
+        public const string TokenTwoFactorRequired = "TwoFactorRequired";
 
         public static bool FromTempData(this ViewDataDictionary viewData, ITempDataDictionary tempData, string token)
         {
@@ -134,6 +136,17 @@ namespace Umbraco.Extensions
         public static void SetPasswordResetCode(this ViewDataDictionary viewData, string value)
         {
             viewData[TokenPasswordResetCode] = value;
+        }
+
+        public static void SetTwoFactorInformation(this ViewDataDictionary viewData, Verify2FACodeModel model)
+        {
+            viewData[TokenTwoFactorRequired] = model;
+        }
+
+        public static bool TryGetTwoFactorInformation(this ViewDataDictionary viewData, out Verify2FACodeModel model)
+        {
+            model = (Verify2FACodeModel)viewData[TokenTwoFactorRequired];
+            return model is not null;
         }
     }
 }

@@ -47,6 +47,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                 {
                     o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
+                .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
+                {
+                    o.Cookie.Name = IdentityConstants.TwoFactorRememberMeScheme;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 });
             IServiceProvider serviceProvider = serviceProviderFactory.CreateServiceProvider(serviceCollection);
             var httpContextFactory = new DefaultHttpContextFactory(serviceProvider);
