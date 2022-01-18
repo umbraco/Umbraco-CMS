@@ -209,40 +209,43 @@ namespace Umbraco.Cms.Web.Website.Controllers
         public async Task<IActionResult> ExternalLinkLoginCallback(string returnUrl)
         {
             MemberIdentityUser user = await _memberManager.GetUserAsync(User);
-
+            string loginProvider = null;
             var errors = new List<string>();
             if (user == null)
             {
                 // ... this should really not happen
-                errors.Add("Local user does not exist");
-                return CurrentUmbracoPage();
+                errors.Add("Local user does not exist"); ;
             }
-
-            ExternalLoginInfo info =
-                await _memberSignInManager.GetExternalLoginInfoAsync(await _memberManager.GetUserIdAsync(user));
-
-            if (info == null)
+            else
             {
-                //Add error and redirect for it to be displayed
-                errors.Add( "An error occurred, could not get external login info");
-                return CurrentUmbracoPage();
+                ExternalLoginInfo info =
+                    await _memberSignInManager.GetExternalLoginInfoAsync(await _memberManager.GetUserIdAsync(user));
+
+                if (info == null)
+                {
+                    //Add error and redirect for it to be displayed
+                    errors.Add( "An error occurred, could not get external login info");
+                }
+                else
+                {
+                    loginProvider = info.LoginProvider;
+                    IdentityResult addLoginResult = await _memberManager.AddLoginAsync(user, info);
+                    if (addLoginResult.Succeeded)
+                    {
+                        // Update any authentication tokens if succeeded
+                        await _memberSignInManager.UpdateExternalAuthenticationTokensAsync(info);
+
+                        return RedirectToLocal(returnUrl);
+                    }
+
+                    //Add errors and redirect for it to be displayed
+                    errors.AddRange(addLoginResult.Errors.Select(x => x.Description));
+                }
             }
-
-            IdentityResult addLoginResult = await _memberManager.AddLoginAsync(user, info);
-            if (addLoginResult.Succeeded)
-            {
-                // Update any authentication tokens if succeeded
-                await _memberSignInManager.UpdateExternalAuthenticationTokensAsync(info);
-
-                return RedirectToLocal(returnUrl);
-            }
-
-            //Add errors and redirect for it to be displayed
-            errors.AddRange(addLoginResult.Errors.Select(x => x.Description));
 
             ViewData.SetExternalSignInProviderErrors(
                 new BackOfficeExternalLoginProviderErrors(
-                    info?.LoginProvider,
+                    loginProvider,
                     errors));
             return CurrentUmbracoPage();
         }
