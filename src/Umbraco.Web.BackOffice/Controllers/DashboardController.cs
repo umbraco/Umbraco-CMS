@@ -82,12 +82,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (!IsAllowedUrl(baseUrl))
             {
-                var errorMsg = $"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}";
-                _logger.LogError(errorMsg);
+                _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}");
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
                 // Hacking the response - can't set the HttpContext.Response.Body, so instead returning the error as JSON
-                var errorJson = JsonConvert.SerializeObject(new { Error = errorMsg });
+                var errorJson = JsonConvert.SerializeObject(new { Error = "Dashboard source not permitted" });
                 return JObject.Parse(errorJson);
             }
 
@@ -136,9 +135,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (!IsAllowedUrl(baseUrl))
             {
-                var errorMsg = $"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}";
-                _logger.LogError(errorMsg);
-                return BadRequest(errorMsg);
+                _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}");
+                return BadRequest("Dashboard source not permitted");
             }
 
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
@@ -183,9 +181,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (!IsAllowedUrl(url))
             {
-                var errorMsg = $"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {url}";
-                _logger.LogError(errorMsg);
-                return BadRequest(errorMsg);
+                _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {url}");
+                return BadRequest("Dashboard source not permitted");
             }
 
             // This is used in place of the old feedproxy.config
