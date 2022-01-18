@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -66,31 +66,42 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
-            // get the current path
+            // Get the current path
             var currentPath = string.Empty;
             try
             {
                 var svalue = currentValue as string;
                 var currentJson = string.IsNullOrWhiteSpace(svalue) ? null : JObject.Parse(svalue);
-                if (currentJson != null && currentJson["src"] != null)
-                    currentPath = currentJson["src"].Value<string>();
+                if (currentJson != null && currentJson.TryGetValue("src", out var src))
+                {
+                    currentPath = src.Value<string>();
+                }
             }
             catch (Exception ex)
             {
-                // for some reason the value is invalid so continue as if there was no value there
+                // For some reason the value is invalid, so continue as if there was no value there
                 _logger.Warn<ImageCropperPropertyValueEditor>(ex, "Could not parse current db value to a JObject.");
             }
+
             if (string.IsNullOrWhiteSpace(currentPath) == false)
                 currentPath = _mediaFileSystem.GetRelativePath(currentPath);
 
-            // get the new json and path
-            JObject editorJson = null;
+            // Get the new JSON and file path
             var editorFile = string.Empty;
-            if (editorValue.Value != null)
+            if (editorValue.Value is JObject editorJson)
             {
-                editorJson = editorValue.Value as JObject;
-                if (editorJson != null && editorJson["src"] != null)
+                // Populate current file
+                if (editorJson["src"] != null)
+                {
                     editorFile = editorJson["src"].Value<string>();
+                }
+
+                // Clean up redundant/default data
+                ImageCropperValue.Prune(editorJson);
+            }
+            else
+            {
+                editorJson = null;
             }
 
             // ensure we have the required guids
@@ -118,7 +129,7 @@ namespace Umbraco.Web.PropertyEditors
                     return null; // clear
                 }
 
-                return editorJson?.ToString(); // unchanged
+                return editorJson?.ToString(Formatting.None); // unchanged
             }
 
             // process the file
@@ -135,7 +146,8 @@ namespace Umbraco.Web.PropertyEditors
             // update json and return
             if (editorJson == null) return null;
             editorJson["src"] = filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
-            return editorJson.ToString();
+
+            return editorJson.ToString(Formatting.None);
         }
 
         private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
@@ -160,7 +172,6 @@ namespace Umbraco.Web.PropertyEditors
             return filepath;
         }
 
-
         public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
@@ -179,6 +190,10 @@ namespace Umbraco.Web.PropertyEditors
             {
                 src = val,
                 crops = crops
+            }, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.None,
+                NullValueHandling = NullValueHandling.Ignore
             });
         }
     }

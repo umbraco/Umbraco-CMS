@@ -20,9 +20,10 @@ namespace Umbraco.Core.Serialization
             {
                 return reader.Value;
             }
+
             // Load JObject from stream
             JObject jObject = JObject.Load(reader);
-            return jObject.ToString();
+            return jObject.ToString(Formatting.None);
         }
 
         public override bool CanConvert(Type objectType)

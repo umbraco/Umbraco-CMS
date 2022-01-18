@@ -130,7 +130,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (id >= nextId) nextId = id + 1;
 
                 var label = item.Property("label")?.Value?.Value<string>();
-                value = JsonConvert.SerializeObject(new { value, label });
+                value = JsonConvert.SerializeObject(new { value, label }, Formatting.None);
 
                 output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
             }
