@@ -16,5 +16,11 @@
         /// </summary>
         /// <value>The URL path.</value>
         string ContentDashboardPath { get; }
+
+        /// <summary>
+        /// Gets the allowed addresses to retrieve data for the content dashboard.
+        /// </summary>
+        /// <value>The URLs.</value>
+        string ContentDashboardUrlAllowlist { get; }
     }
 }
