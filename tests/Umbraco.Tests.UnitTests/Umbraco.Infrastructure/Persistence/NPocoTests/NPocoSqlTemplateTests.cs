@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTe
         public void SqlTemplateArgs()
         {
             var mappers = new NPoco.MapperCollection { new NullableDateMapper() };
-            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
+            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(), mappers);
 
             var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, factory);
             var sqlTemplates = new SqlTemplates(sqlContext);
