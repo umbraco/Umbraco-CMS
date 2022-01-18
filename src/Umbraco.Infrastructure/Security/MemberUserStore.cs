@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Security
 
         }
 
-        [Obsolete("Use ctor with all IExternalLoginWithKeyService param")]
+        [Obsolete("Use ctor with IExternalLoginWithKeyService param")]
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
