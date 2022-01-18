@@ -27,6 +27,7 @@
 import {Command} from 'umbraco-cypress-testhelpers';
 import {Chainable} from './chainable';
 import { JsonHelper } from 'umbraco-cypress-testhelpers';
+require('cy-verify-downloads').addCustomCommand();
 new Chainable();
 new Command().registerCypressCommands();
 
