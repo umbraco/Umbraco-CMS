@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

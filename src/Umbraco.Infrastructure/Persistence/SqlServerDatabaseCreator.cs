@@ -1,6 +1,6 @@
 using System;
-using System.Data.SqlClient;
 using System.IO;
+using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
