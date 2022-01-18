@@ -16,8 +16,10 @@ namespace Umbraco.Web.WebApi
             {
                 actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             }
-
-            actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Default;
+            else
+            {
+                actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Default;
+            }
         }
     }
 }
