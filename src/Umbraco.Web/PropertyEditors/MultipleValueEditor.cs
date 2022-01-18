@@ -49,14 +49,18 @@ namespace Umbraco.Web.PropertyEditors
         public override object FromEditor(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
         {
             var json = editorValue.Value as JArray;
-            if (json == null)
+            if (json == null || json.HasValues == false)
             {
                 return null;
             }
 
             var values = json.Select(item => item.Value<string>()).ToArray();
+            if (values.Length == 0)
+            {
+                return null;
+            }
 
-            return JsonConvert.SerializeObject(values);
+            return JsonConvert.SerializeObject(values, Formatting.None);
         }
     }
 }

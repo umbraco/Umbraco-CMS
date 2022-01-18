@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 var asArray = editorValue.Value as JArray;
-                if (asArray == null)
+                if (asArray == null || asArray.HasValues == false)
                 {
                     return null;
                 }

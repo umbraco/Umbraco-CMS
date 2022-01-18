@@ -123,22 +123,26 @@ namespace Umbraco.Web.PropertyEditors
 
         private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new JsonSerializerSettings
         {
+            Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore
         };
 
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             var value = editorValue.Value?.ToString();
-
             if (string.IsNullOrEmpty(value))
             {
-                return string.Empty;
+                return null;
             }
 
             try
             {
+                var links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
+                if (links.Count == 0)
+                    return null;
+
                 return JsonConvert.SerializeObject(
-                    from link in JsonConvert.DeserializeObject<List<LinkDisplay>>(value)
+                    from link in links
                     select new MultiUrlPickerValueEditor.LinkDto
                     {
                         Name = link.Name,
@@ -146,8 +150,8 @@ namespace Umbraco.Web.PropertyEditors
                         Target = link.Target,
                         Udi = link.Udi,
                         Url = link.Udi == null ? link.Url : null, // only save the URL for external links
-                    }, LinkDisplayJsonSerializerSettings
-                    );
+                    },
+                    LinkDisplayJsonSerializerSettings);
             }
             catch (Exception ex)
             {
