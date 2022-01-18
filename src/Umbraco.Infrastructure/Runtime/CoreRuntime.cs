@@ -136,14 +136,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// <inheritdoc/>
         public async Task RestartAsync()
         {
-            await StopAsync(_cancellationToken);
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppedNotification(), _cancellationToken);
-            await StartAsync(_cancellationToken);
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStartedNotification(), _cancellationToken);
+            await StopAsync(_cancellationToken, true);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppedNotification(true), _cancellationToken);
+            await StartAsync(_cancellationToken, true);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartedNotification(true), _cancellationToken);
         }
 
         /// <inheritdoc/>
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken) => await StartAsync(cancellationToken, false);
+
+        private async Task StartAsync(CancellationToken cancellationToken, bool isRestarting)
         {
             // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
@@ -224,13 +226,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // create & initialize the components
             _components.Initialize();
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        /// <inheritdoc/>
+        public async Task StopAsync(CancellationToken cancellationToken) => await StopAsync(cancellationToken, false);
+
+        private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
         {
             _components.Terminate();
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(), cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
             StaticApplicationLogging.Initialize(null);
         }
 
