@@ -10,7 +10,7 @@ on:
 jobs:
   CodeQL-Build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -22,9 +22,8 @@ jobs:
       with:
         config-file: ./.github/config/codeql-config.yml
 
-    - run: |
-        echo "Run Umbraco-CMS build"
-        pwsh -command .\build\build.ps1
+    - name: Build
+      run: dotnet build umbraco-netcore-only.sln # also runs npm build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
