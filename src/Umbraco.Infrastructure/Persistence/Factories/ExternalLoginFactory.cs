@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
@@ -18,7 +19,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
         public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
-            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserOrMemberKey.ToString(), dto.CreateDate)
+
+            //If there exists a UserId - this means the database is still not migrated. E.g on the upgrade state.
+            //At this point we have to manually set the key, to ensure external logins can be used to upgrade
+            var key = dto.UserId.HasValue ? dto.UserId.Value.ToGuid().ToString() : dto.UserOrMemberKey.ToString();
+
+            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, key, dto.CreateDate)
             {
                 UserData = dto.UserData
             };
