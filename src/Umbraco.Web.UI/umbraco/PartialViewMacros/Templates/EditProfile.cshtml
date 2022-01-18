@@ -1,7 +1,4 @@
 @inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
-
-@using Umbraco.Cms.Core
-@using Umbraco.Cms.Core.Security
 @using Umbraco.Cms.Core.Services
 @using Umbraco.Cms.Web.Common.Security
 @using Umbraco.Cms.Web.Website.Controllers
@@ -10,7 +7,9 @@
 @inject MemberModelBuilderFactory memberModelBuilderFactory;
 @inject IMemberExternalLoginProviders memberExternalLoginProviders
 @inject IExternalLoginWithKeyService externalLoginWithKeyService
+@inject ITwoFactorLoginService twoFactorLoginService
 @{
+
     // Build a profile model to edit
     var profileModel = await memberModelBuilderFactory
         .CreateProfileModel()
@@ -127,4 +126,37 @@
             }
         }
     }
+    // Show all two factor providers
+    var providerNames = twoFactorLoginService.GetAllProviderNames();
+    if (providerNames.Any())
+    {
+        <div asp-validation-summary="All" class="text-danger"></div>
+        foreach (var providerName in providerNames)
+        {
+            var twoFactorLoginSetupInfo = await twoFactorLoginService.GetSetupInfoAsync(profileModel.Key, providerName);
+
+            if (twoFactorLoginSetupInfo is not null)
+            {
+                @using (Html.BeginUmbracoForm<UmbTwoFactorLoginController>(nameof(UmbTwoFactorLoginController.ValidateAndSaveSetup)))
+                {
+                    <h3>Setup @providerName</h3>
+                    <img src="@twoFactorLoginSetupInfo.QrCodeUrl"/>
+                    <p>Scan the code above with your authenticator app <br /> and enter the resulting code here to validate:</p>
+                    <input type="hidden" name="providerName" value="@providerName"  />
+                    <input type="hidden" name="secret" value="@twoFactorLoginSetupInfo.Secret"  />
+                    <input type="text" name="code"  />
+                    <button type="submit">Validate & save</button>
+                }
+
+            }else
+            {
+                @using (Html.BeginUmbracoForm<UmbTwoFactorLoginController>(nameof(UmbTwoFactorLoginController.Disable)))
+                {
+                    <input type="hidden" name="providerName" value="@providerName"/>
+                    <button type="submit">Disable @providerName</button>
+                }
+            }
+        }
+    }
+
 }
