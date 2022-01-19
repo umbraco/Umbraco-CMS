@@ -82,7 +82,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<BasicAuthSettings>()
                 .AddUmbracoOptions<RuntimeMinificationSettings>()
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
-                .AddUmbracoOptions<PackageMigrationSettings>();
+                .AddUmbracoOptions<PackageMigrationSettings>()
+                .AddUmbracoOptions<ContentDashboardSettings>();
 
             return builder;
         }
