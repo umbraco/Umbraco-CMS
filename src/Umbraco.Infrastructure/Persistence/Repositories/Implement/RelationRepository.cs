@@ -172,6 +172,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         {
+            return GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
+        {
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
             // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
@@ -184,10 +189,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 sql.Where<RelationDto>(rel => rel.ChildId == childId);
                 sql.Where<RelationDto, NodeDto>((rel, node) => rel.ParentId == childId || node.NodeId != childId);
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
+            });
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildIds(int[] childIds, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
+        {
+            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
+            {
+                SqlJoinRelations(sql);
+
+                sql.WhereIn<RelationDto>(rel => rel.ChildId, childIds);
+                sql.WhereAny(s => s.WhereIn<RelationDto>(rel => rel.ParentId, childIds), s => s.WhereNotIn<NodeDto>(node => node.NodeId, childIds));
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
             });
         }
 
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        {
+            return GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
         {
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
@@ -201,6 +232,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 sql.Where<RelationDto>(rel => rel.ParentId == parentId);
                 sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == parentId || node.NodeId != parentId);
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
             });
         }
 
