@@ -378,6 +378,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "previewHubUrl", _previewRoutes.GetPreviewHubRoute()
                         },
+                        {
+                            "trackedReferencesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TrackedReferencesController>(
+                                controller => controller.GetPagedReferences(0, string.Empty, 1, 1))
+                        }
                     }
                 },
                 {
