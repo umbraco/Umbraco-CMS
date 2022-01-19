@@ -173,8 +173,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Add application started and stopped notifications (only on initial startup, not restarts)
             if (_hostApplicationLifetime.ApplicationStarted.IsCancellationRequested == false)
             {
-                _hostApplicationLifetime.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification()));
-                _hostApplicationLifetime.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification()));
+                _hostApplicationLifetime.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
+                _hostApplicationLifetime.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
             }
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
