@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -293,18 +293,44 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
+            return GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, new string[0], entityTypes);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
+        {
+            var relationTypeIds = GetRelationTypeIdsFromAliases(relationTypes);
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
+                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
+            }
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildIds(int[] ids, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
+        {
+            var relationTypeIds = GetRelationTypeIdsFromAliases(relationTypes);
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _relationRepository.GetPagedParentEntitiesByChildIds(ids, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
+            return GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, new string[0], entityTypes);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
+        {
+            var relationTypeIds = GetRelationTypeIdsFromAliases(relationTypes);
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
+                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
@@ -588,6 +614,26 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
             }
             return relations;
+        }
+
+        private int[] GetRelationTypeIdsFromAliases(string[] aliases)
+        {
+            var relationTypeIds = new List<int>();
+
+            if (aliases != null && aliases.Any())
+            {
+                foreach (var relType in aliases)
+                {
+                    var relationType = GetRelationTypeByAlias(relType);
+
+                    if (relationType != null)
+                    {
+                        relationTypeIds.Add(relationType.Id);
+                    }
+                }
+            }
+
+            return relationTypeIds.ToArray();
         }
 
         private void Audit(AuditType type, int userId, int objectId, string message = null)
