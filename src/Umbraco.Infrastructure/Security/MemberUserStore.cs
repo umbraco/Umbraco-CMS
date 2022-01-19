@@ -6,12 +6,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
@@ -26,6 +28,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly IUmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IExternalLoginWithKeyService _externalLoginService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberUserStore"/> class for the members identity store
@@ -34,18 +37,48 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="mapper">The mapper for properties</param>
         /// <param name="scopeProvider">The scope provider</param>
         /// <param name="describer">The error describer</param>
+        /// <param name="externalLoginService">The external login service</param>
+        [ActivatorUtilitiesConstructor]
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
             IScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IExternalLoginWithKeyService externalLoginService
+            )
             : base(describer)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _externalLoginService = externalLoginService;
+        }
+
+        [Obsolete("Use ctor with IExternalLoginWithKeyService param")]
+        public MemberUserStore(
+            IMemberService memberService,
+            IUmbracoMapper mapper,
+            IScopeProvider scopeProvider,
+            IdentityErrorDescriber describer,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IExternalLoginService externalLoginService)
+            : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>())
+        {
+
+        }
+
+        [Obsolete("Use ctor with IExternalLoginWithKeyService param")]
+        public MemberUserStore(
+            IMemberService memberService,
+            IUmbracoMapper mapper,
+            IScopeProvider scopeProvider,
+            IdentityErrorDescriber describer,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor)
+            : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>())
+        {
+
         }
 
         /// <inheritdoc />
@@ -83,18 +116,29 @@ namespace Umbraco.Cms.Core.Security
                 user.Id = UserIdToString(memberEntity.Id);
                 user.Key = memberEntity.Key;
 
-                // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-                // var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
-                // TODO: confirm re externallogins implementation
-                //if (isLoginsPropertyDirty)
-                //{
-                //    _externalLoginService.Save(
-                //        user.Id,
-                //        user.Logins.Select(x => new ExternalLogin(
-                //            x.LoginProvider,
-                //            x.ProviderKey,
-                //            x.UserData)));
-                //}
+                // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
+                var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
+
+                if (isLoginsPropertyDirty)
+                {
+                    _externalLoginService.Save(
+                        memberEntity.Key,
+                        user.Logins.Select(x => new ExternalLogin(
+                            x.LoginProvider,
+                            x.ProviderKey,
+                            x.UserData)));
+                }
+
+                if (isTokensPropertyDirty)
+                {
+                    _externalLoginService.Save(
+                        memberEntity.Key,
+                        user.LoginTokens.Select(x => new ExternalLoginToken(
+                            x.LoginProvider,
+                            x.Name,
+                            x.Value)));
+                }
 
 
                 return Task.FromResult(IdentityResult.Success);
@@ -142,17 +186,15 @@ namespace Umbraco.Cms.Core.Security
                         _memberService.SetLastLogin(found.Username, DateTime.Now);
                     }
 
-                    // TODO: when to implement external login service?
-
-                    //if (isLoginsPropertyDirty)
-                    //{
-                    //    _externalLoginService.Save(
-                    //        found.Id,
-                    //        user.Logins.Select(x => new ExternalLogin(
-                    //            x.LoginProvider,
-                    //            x.ProviderKey,
-                    //            x.UserData)));
-                    //}
+                    if (isLoginsPropertyDirty)
+                    {
+                        _externalLoginService.Save(
+                            found.Key,
+                            user.Logins.Select(x => new ExternalLogin(
+                                x.LoginProvider,
+                                x.ProviderKey,
+                                x.UserData)));
+                    }
                 }
 
                 return Task.FromResult(IdentityResult.Success);
@@ -181,8 +223,7 @@ namespace Umbraco.Cms.Core.Security
                     _memberService.Delete(found);
                 }
 
-                // TODO: when to implement external login service?
-                //_externalLoginService.DeleteUserLogins(UserIdToInt(user.Id));
+                _externalLoginService.DeleteUserLogins(user.Key);
 
                 return Task.FromResult(IdentityResult.Success);
             }
@@ -203,7 +244,8 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            IMember user = _memberService.GetById(UserIdToInt(userId));
+
+            IMember user = Guid.TryParse(userId, out var key) ? _memberService.GetByKey(key) : _memberService.GetById(UserIdToInt(userId));
             if (user == null)
             {
                 return Task.FromResult((MemberIdentityUser)null);
@@ -375,10 +417,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(providerKey));
             }
 
-            var logins = new List<IIdentityUserLogin>();
-
-            // TODO: external login needed
-            //_externalLoginService.Find(loginProvider, providerKey).ToList();
+            var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
             if (logins.Count == 0)
             {
                 return Task.FromResult((IdentityUserLogin<string>)null);
@@ -492,8 +531,8 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user != null)
             {
-                //TODO: implement
-                //user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetAll(UserIdToInt(user.Id))));
+                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(user.Key)));
+                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
             }
 
             return user;

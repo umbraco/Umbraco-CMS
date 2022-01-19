@@ -1,29 +1,31 @@
 using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.Website.Security
 {
     /// <summary>
     /// Custom <see cref="AuthenticationBuilder"/> used to associate external logins with umbraco external login options
     /// </summary>
-    public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
+    public class MemberAuthenticationBuilder : AuthenticationBuilder
     {
-        private readonly Action<BackOfficeExternalLoginProviderOptions> _loginProviderOptions;
+        private readonly Action<MemberExternalLoginProviderOptions> _loginProviderOptions;
 
-        public BackOfficeAuthenticationBuilder(
+        public MemberAuthenticationBuilder(
             IServiceCollection services,
-            Action<BackOfficeExternalLoginProviderOptions> loginProviderOptions = null)
+            Action<MemberExternalLoginProviderOptions> loginProviderOptions = null)
             : base(services)
             => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
-        public string SchemeForBackOffice(string scheme)
-            =>  scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
+        public string SchemeForMembers(string scheme)
+            =>  scheme?.EnsureStartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix);
 
         /// <summary>
         /// Overridden to track the final authenticationScheme being registered for the external login
@@ -37,37 +39,35 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme, string displayName, Action<TOptions> configureOptions)
         {
             // Validate that the prefix is set
-            if (!authenticationScheme.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
+            if (!authenticationScheme.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix))
             {
-                throw new InvalidOperationException($"The {nameof(authenticationScheme)} is not prefixed with {Constants.Security.BackOfficeExternalAuthenticationTypePrefix}. The scheme must be created with a call to the method {nameof(SchemeForBackOffice)}");
+                throw new InvalidOperationException($"The {nameof(authenticationScheme)} is not prefixed with {Constants.Security.BackOfficeExternalAuthenticationTypePrefix}. The scheme must be created with a call to the method {nameof(SchemeForMembers)}");
             }
 
             // add our login provider to the container along with a custom options configuration
             Services.Configure(authenticationScheme, _loginProviderOptions);
             base.Services.AddSingleton(services =>
             {
-                return new BackOfficeExternalLoginProvider(
+                return new MemberExternalLoginProvider(
                         authenticationScheme,
-                        services.GetRequiredService<IOptionsMonitor<BackOfficeExternalLoginProviderOptions>>());
+                        services.GetRequiredService<IOptionsMonitor<MemberExternalLoginProviderOptions>>());
             });
-            Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureBackOfficeScheme<TOptions>>());
+            Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureMemberScheme<TOptions>>());
 
             return base.AddRemoteScheme<TOptions, THandler>(authenticationScheme, displayName, configureOptions);
         }
 
-        // TODO: We could override and throw NotImplementedException for other methods?
-
-        // Ensures that the sign in scheme is always the Umbraco back office external type
-        private class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions> where TOptions : RemoteAuthenticationOptions
+       // Ensures that the sign in scheme is always the Umbraco member external type
+        private class EnsureMemberScheme<TOptions> : IPostConfigureOptions<TOptions> where TOptions : RemoteAuthenticationOptions
         {
             public void PostConfigure(string name, TOptions options)
             {
-                if (!name.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
+                if (!name.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix))
                 {
                     return;
                 }
 
-                options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
+                options.SignInScheme = IdentityConstants.ExternalScheme;
             }
         }
     }
