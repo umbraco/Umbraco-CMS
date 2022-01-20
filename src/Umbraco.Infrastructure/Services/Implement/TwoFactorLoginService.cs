@@ -13,16 +13,16 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly ITwoFactorLoginRepository _twoFactorLoginRepository;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IDictionary<string, ITwoFactorSetupGenerator> _twoFactorSetupGenerators;
+        private readonly IDictionary<string, ITwoFactorProvider> _twoFactorSetupGenerators;
 
         public TwoFactorLoginService(
             ITwoFactorLoginRepository twoFactorLoginRepository,
             IScopeProvider scopeProvider,
-            IEnumerable<ITwoFactorSetupGenerator> twoFactorSetupGenerators)
+            IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators)
         {
             _twoFactorLoginRepository = twoFactorLoginRepository;
             _scopeProvider = scopeProvider;
-            _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x=>x.ProviderName);
+            _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x=>x.GetType().Name);
         }
 
         public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
@@ -30,6 +30,14 @@ namespace Umbraco.Cms.Core.Services
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey);
         }
+
+        public async Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey)
+        {
+            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
+                .Select(x => x.ProviderName).ToArray();
+        }
+
 
         public async Task<bool> IsTwoFactorEnabledAsync(Guid userOrMemberKey)
         {
@@ -43,27 +51,24 @@ namespace Umbraco.Cms.Core.Services
             return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).FirstOrDefault(x=>x.ProviderName == providerName && x.Confirmed == true)?.Secret;
         }
 
-        public async Task<TwoFactorLoginSetupInfo> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
+        public async Task<object> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
         {
             var secret = await GetSecretForUserAndConfirmedProviderAsync(userOrMemberKey, providerName);
 
             //Dont allow to generate a new secrets if user already has one
             if (!string.IsNullOrEmpty(secret))
             {
-                return null;
+                return default;
             }
 
             secret = GenerateSecret();
 
-            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorSetupGenerator generator))
+            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider generator))
             {
                 throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
             }
 
-
-            var qrCodeUrl = await generator.GetSetupQrCodeUrlAsync(userOrMemberKey, secret);
-
-            return new TwoFactorLoginSetupInfo(secret, qrCodeUrl);
+            return await generator.GetSetupDataAsync(userOrMemberKey, secret);
         }
 
         public IEnumerable<string> GetAllProviderNames() => _twoFactorSetupGenerators.Keys;
@@ -74,14 +79,14 @@ namespace Umbraco.Cms.Core.Services
 
         }
 
-        public bool ValidateTwoFactorPIN(string providerName, string secret, string code)
+        public bool ValidateTwoFactorSetup(string providerName, string secret, string code)
         {
-            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorSetupGenerator generator))
+            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider generator))
             {
                 throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
             }
 
-            return generator.ValidateTwoFactorPIN(secret, code);
+            return generator.ValidateTwoFactorSetup(secret, code);
         }
 
         public Task SaveAsync(TwoFactorLogin twoFactorLogin)
@@ -91,6 +96,7 @@ namespace Umbraco.Cms.Core.Services
 
             return Task.CompletedTask;
         }
+
 
         /// <summary>
         /// Generates a new random unique secret.

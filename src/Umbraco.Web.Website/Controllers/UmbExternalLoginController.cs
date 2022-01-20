@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
     public class UmbExternalLoginController : SurfaceController
     {
         private readonly IMemberManager _memberManager;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly ILogger<UmbExternalLoginController> _logger;
         private readonly IMemberSignInManagerExternalLogins _memberSignInManager;
 
@@ -40,7 +41,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
             IMemberSignInManagerExternalLogins memberSignInManager,
-            IMemberManager memberManager)
+            IMemberManager memberManager,
+            ITwoFactorLoginService twoFactorLoginService)
             : base(
                 umbracoContextAccessor,
                 databaseFactory,
@@ -52,6 +54,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             _logger = logger;
             _memberSignInManager = memberSignInManager;
             _memberManager = memberManager;
+            _twoFactorLoginService = twoFactorLoginService;
         }
 
         /// <summary>
@@ -112,10 +115,9 @@ namespace Umbraco.Cms.Web.Website.Controllers
                             $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
                     }
 
-                    ViewData.SetTwoFactorInformation(new Verify2FACodeModel()
-                    {
-                        Provider = loginInfo.LoginProvider,
-                    });
+
+                    var providerNames = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(attemptedUser.Key);
+                    ViewData.SetTwoFactorProviderNames(providerNames);
 
                     return CurrentUmbracoPage();
 

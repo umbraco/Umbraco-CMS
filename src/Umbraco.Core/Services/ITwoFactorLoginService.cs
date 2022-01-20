@@ -15,13 +15,14 @@ namespace Umbraco.Cms.Core.Services
         Task<bool> IsTwoFactorEnabledAsync(Guid userKey);
         Task<string> GetSecretForUserAndConfirmedProviderAsync(Guid userKey, string providerName);
 
-        Task<TwoFactorLoginSetupInfo> GetSetupInfoAsync(Guid userOrMemberKey, string providerName);
+        Task<object> GetSetupInfoAsync(Guid userOrMemberKey, string providerName);
+
         IEnumerable<string> GetAllProviderNames();
         Task<bool> DisableAsync(Guid userOrMemberKey, string providerName);
 
-        bool ValidateTwoFactorPIN(string providerName, string secret, string code);
+        bool ValidateTwoFactorSetup(string providerName, string secret, string code);
         Task SaveAsync(TwoFactorLogin twoFactorLogin);
+        Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey);
     }
-
 
 }

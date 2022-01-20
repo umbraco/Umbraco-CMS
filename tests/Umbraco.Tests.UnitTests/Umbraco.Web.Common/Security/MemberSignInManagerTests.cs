@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -71,7 +72,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                     _mockLogger.Object,
                     Mock.Of<IAuthenticationSchemeProvider>(),
                     Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
-                    Mock.Of<IMemberExternalLoginProviders>()
+                    Mock.Of<IMemberExternalLoginProviders>(),
+                    Mock.Of<IEventAggregator>()
                     );
         }
         private static Mock<MemberManager> MockMemberManager()

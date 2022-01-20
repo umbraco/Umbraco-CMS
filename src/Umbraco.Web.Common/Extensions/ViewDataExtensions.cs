@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -138,15 +139,15 @@ namespace Umbraco.Extensions
             viewData[TokenPasswordResetCode] = value;
         }
 
-        public static void SetTwoFactorInformation(this ViewDataDictionary viewData, Verify2FACodeModel model)
+        public static void SetTwoFactorProviderNames(this ViewDataDictionary viewData, IEnumerable<string> providerNames)
         {
-            viewData[TokenTwoFactorRequired] = model;
+            viewData[TokenTwoFactorRequired] = providerNames;
         }
 
-        public static bool TryGetTwoFactorInformation(this ViewDataDictionary viewData, out Verify2FACodeModel model)
+        public static bool TryGetTwoFactorProviderNames(this ViewDataDictionary viewData, out IEnumerable<string> providerNames)
         {
-            model = (Verify2FACodeModel)viewData[TokenTwoFactorRequired];
-            return model is not null;
+            providerNames = viewData[TokenTwoFactorRequired] as IEnumerable<string>;
+            return providerNames is not null;
         }
     }
 }

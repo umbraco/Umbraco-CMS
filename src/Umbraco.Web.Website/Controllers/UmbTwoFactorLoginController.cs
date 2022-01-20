@@ -77,15 +77,15 @@ namespace Umbraco.Cms.Web.Website.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model, string returnUrl = null)
         {
+            var user = await _memberSignInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                _logger.LogWarning("PostVerify2FACode :: No verified member found, returning 404");
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
-                var user = await _memberSignInManager.GetTwoFactorAuthenticationUserAsync();
-                if (user == null)
-                {
-                    _logger.LogWarning("PostVerify2FACode :: No verified member found, returning 404");
-                    return NotFound();
-                }
-
                 var result = await _memberSignInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
                 if (result.Succeeded)
                 {
@@ -107,10 +107,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
 
             //We need to set this, to ensure we show the 2fa login page
-            ViewData.SetTwoFactorInformation(new Verify2FACodeModel()
-            {
-                Provider = model.Provider,
-            });
+            var providerNames = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key);
+            ViewData.SetTwoFactorProviderNames(providerNames);
             return CurrentUmbracoPage();
         }
 
@@ -119,7 +117,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         {
             var member = await _memberManager.GetCurrentMemberAsync();
 
-            var isValid = _twoFactorLoginService.ValidateTwoFactorPIN(providerName, secret, code);
+            var isValid = _twoFactorLoginService.ValidateTwoFactorSetup(providerName, secret, code);
 
             if (isValid == false)
             {
