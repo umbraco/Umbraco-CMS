@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">管理主机名</key>
+    <key alias="assigndomain">管理主机名</key>
     <key alias="auditTrail">跟踪审计</key>
     <key alias="browse">浏览节点</key>
     <key alias="changeDocType">改变文档类型</key>

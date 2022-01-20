@@ -28,8 +28,10 @@ import {Command} from 'umbraco-cypress-testhelpers';
 import {Chainable} from './chainable';
 import { JsonHelper } from 'umbraco-cypress-testhelpers';
 import 'cypress-file-upload';
+require('cy-verify-downloads').addCustomCommand();
 new Chainable();
 new Command().registerCypressCommands();
+
 Cypress.Commands.add('umbracoCreateLanguage', (culture, isMandatory = false, fallbackLanguageId = 1) => {
 
     var langData =

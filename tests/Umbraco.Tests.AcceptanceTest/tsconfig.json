@@ -15,6 +15,7 @@
 
         "types": [
             "cypress",
+            "cy-verify-downloads",
             "cypress-file-upload"
         ],
         "lib": [
