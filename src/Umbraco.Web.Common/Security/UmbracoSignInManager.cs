@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
@@ -365,7 +363,6 @@ namespace Umbraco.Cms.Web.Common.Security
                     // Store the userId for use after two factor check
                     var userId = await UserManager.GetUserIdAsync(user);
                     await Context.SignInAsync(TwoFactorAuthenticationType, StoreTwoFactorInfo(userId, loginProvider));
-
                     return SignInResult.TwoFactorRequired;
                 }
             }
