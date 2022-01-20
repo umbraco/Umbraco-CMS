@@ -1,21 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.Validators
+namespace Umbraco.Cms.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates that the value is not null or empty (if it is a string)
     /// </summary>
-    internal sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
+    public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
     {
         private readonly ILocalizedTextService _textService;
-
-        public RequiredValidator() : this(Current.Services.TextService)
-        {
-        }
-
+        const string ValueCannotBeNull = "Value cannot be null";
+        const string ValueCannotBeEmpty = "Value cannot be empty";
         public RequiredValidator(ILocalizedTextService textService)
         {
             _textService = textService;
@@ -35,7 +32,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
         {
             if (value == null)
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), new[] { "value" });
+                yield return new ValidationResult(_textService?.Localize("validation", "invalidNull") ?? ValueCannotBeNull, new[] {"value"});
                 yield break;
             }
 
@@ -43,7 +40,8 @@ namespace Umbraco.Core.PropertyEditors.Validators
             {
                 if (value.ToString().DetectIsEmptyJson())
                 {
-                    yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
+
+                    yield return new ValidationResult(_textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
                 }
 
                 yield break;
@@ -51,7 +49,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
 
             if (value.ToString().IsNullOrWhiteSpace())
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
+                yield return new ValidationResult(_textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
             }
         }
     }

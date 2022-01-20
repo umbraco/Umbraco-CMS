@@ -108,7 +108,7 @@
                             $location.search('invite', null);
                         }),
                     //get the membership provider config for password policies
-                    authResource.getMembershipProviderConfig().then(function (data) {
+                    authResource.getPasswordConfig(0).then(function (data) {
                         vm.invitedUserPasswordModel.passwordPolicies = data;
 
                         //localize the text

@@ -1,21 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
-    /// <summary>
-    /// Represents an <see cref="IPublishedElement"/> type.
-    /// </summary>
-    /// <remarks>Instances implementing the <see cref="IPublishedContentType"/> interface should be
-    /// immutable, ie if the content type changes, then a new instance needs to be created.</remarks>
-    public interface IPublishedContentType2 : IPublishedContentType
-    {
-        /// <summary>
-        /// Gets the unique key for the content type.
-        /// </summary>
-        Guid Key { get; }
-    }
-
     /// <summary>
     /// Represents an <see cref="IPublishedElement"/> type.
     /// </summary>
@@ -23,6 +10,11 @@ namespace Umbraco.Core.Models.PublishedContent
     /// immutable, ie if the content type changes, then a new instance needs to be created.</remarks>
     public interface IPublishedContentType
     {
+        /// <summary>
+        /// Gets the unique key for the content type.
+        /// </summary>
+        Guid Key { get; }
+
         /// <summary>
         /// Gets the content type identifier.
         /// </summary>

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents an audited event.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class AuditEntry : EntityBase, IAuditEntry
+    public class AuditEntry : EntityBase, IAuditEntry
     {
         private int _performingUserId;
         private string _performingDetails;

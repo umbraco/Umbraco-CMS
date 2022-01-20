@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Provides a base class for collections of types.
@@ -35,7 +37,11 @@ namespace Umbraco.Core.Composing
 
         public TBuilder Add(IEnumerable<Type> types)
         {
-            foreach (var type in types) Add(type);
+            foreach (var type in types)
+            {
+                Add(type);
+            }
+
             return This;
         }
 
@@ -51,14 +57,13 @@ namespace Umbraco.Core.Composing
             return This;
         }
 
-        public TCollection CreateCollection(IFactory factory)
-        {
-            return factory.CreateInstance<TCollection>(_types);
-        }
+        public TCollection CreateCollection(IServiceProvider factory)
+            => factory.CreateInstance<TCollection>(CreateItemsFactory());
 
-        public void RegisterWith(IRegister register)
-        {
-            register.Register(CreateCollection, Lifetime.Singleton);
-        }
+        public void RegisterWith(IServiceCollection services)
+            => services.Add(new ServiceDescriptor(typeof(TCollection), CreateCollection, ServiceLifetime.Singleton));
+
+        // used to resolve a Func<IEnumerable<TItem>> parameter
+        private Func<IEnumerable<Type>> CreateItemsFactory() => () => _types;
     }
 }

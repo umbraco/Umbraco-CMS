@@ -1,0 +1,2407 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="tr" intName="Turkish" localName="Türkçe" lcid="" culture="tr-TR">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assigndomain">Kültür ve Ana Bilgisayar Adları</key>
+    <key alias="auditTrail">Denetim Yolu</key>
+    <key alias="browse">Düğüme Göz At</key>
+    <key alias="changeDocType">Belge Türünü Değiştir</key>
+    <key alias="copy">Kopyala</key>
+    <key alias="create">Oluştur</key>
+    <key alias="export">Dışa Aktar</key>
+    <key alias="createPackage">Paket Oluştur</key>
+    <key alias="createGroup">Grup oluştur</key>
+    <key alias="delete">Sil</key>
+    <key alias="disable">Devre Dışı Bırak</key>
+    <key alias="editSettings">Ayarları düzenle</key>
+    <key alias="emptyRecycleBin">Geri dönüşüm kutusunu boşalt</key>
+    <key alias="enable">Etkinleştir</key>
+    <key alias="exportDocumentType">Belge Türünü Dışa Aktar</key>
+    <key alias="importDocumentType">Belge Türünü İçe Aktar</key>
+    <key alias="importPackage">Paketi İçe Aktar</key>
+    <key alias="liveEdit">Kanvas'ta Düzenle</key>
+    <key alias="logout">Çıkış</key>
+    <key alias="move">Taşı</key>
+    <key alias="notify">Bildirimler</key>
+    <key alias="protect">Genel erişim</key>
+    <key alias="publish">Yayımla</key>
+    <key alias="unpublish">Yayından Kaldır</key>
+    <key alias="refreshNode">Yeniden Yükle</key>
+    <key alias="republish">Tüm siteyi yeniden yayınla</key>
+    <key alias="remove">Kaldır</key>
+    <key alias="rename" version="7.3.0">Yeniden adlandır</key>
+    <key alias="restore" version="7.3.0">Geri Yükle</key>
+    <key alias="chooseWhereToCopy">Nereye kopyalayacağınızı seçin</key>
+    <key alias="chooseWhereToMove">Taşınacağınız yeri seçin</key>
+    <key alias="toInTheTreeStructureBelow">aşağıdaki ağaç yapısına</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Seçili öğelerin nereye kopyalanacağını seçin</key>
+    <key alias="infiniteEditorChooseWhereToMove">Seçili öğelerin nereye taşınacağını seçin</key>
+    <key alias="wasMovedTo">konumuna taşındı,</key>
+    <key alias="wasCopiedTo">kopyalandı,</key>
+    <key alias="wasDeleted">silindi,</key>
+    <key alias="rights">İzinler</key>
+    <key alias="rollback">Geri al</key>
+    <key alias="sendtopublish">Yayınlamak İçin Gönder</key>
+    <key alias="sendToTranslate">Çeviriye Gönder</key>
+    <key alias="setGroup">Grup ayarla</key>
+    <key alias="sort">Sırala</key>
+    <key alias="translate">Çevir</key>
+    <key alias="update">Güncelle</key>
+    <key alias="setPermissions">İzinleri ayarlayın</key>
+    <key alias="unlock">Kilidi Aç</key>
+    <key alias="createblueprint">İçerik Şablonu Oluşturun</key>
+    <key alias="resendInvite">Daveti Yeniden Gönder</key>
+  </area>
+  <area alias="actionCategories">
+    <key alias="content">İçerik</key>
+    <key alias="administration">Yönetim</key>
+    <key alias="structure">Yapı</key>
+    <key alias="other">Diğer</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key alias="assignDomain">Kültür ve ana bilgisayar adları atamak için erişime izin ver</key>
+    <key alias="auditTrail">Bir düğümün geçmiş günlüğünü görüntülemek için erişime izin ver</key>
+    <key alias="browse">Bir düğümü görüntülemek için erişime izin verin</key>
+    <key alias="changeDocType">Bir düğüm için belge türünü değiştirmek üzere erişime izin ver</key>
+    <key alias="copy">Bir düğümü kopyalamak için erişime izin ver</key>
+    <key alias="create">Düğüm oluşturmak için erişime izin verin</key>
+    <key alias="delete">Düğümleri silmek için erişime izin ver</key>
+    <key alias="move">Bir düğümü taşımak için erişime izin ver</key>
+    <key alias="protect">Erişime, bir düğüm için genel erişimi ayarlama ve değiştirme izni verme</key>
+    <key alias="publish">Bir düğüm yayınlamak için erişime izin verin</key>
+    <key alias="unpublish">Bir düğümü yayından kaldırmak için erişime izin ver</key>
+    <key alias="rights">Bir düğüm için izinleri değiştirmek üzere erişime izin ver</key>
+    <key alias="rollback">Bir düğümü önceki bir duruma geri döndürmek için erişime izin ver</key>
+    <key alias="sendtopublish">Yayınlamadan önce onay için bir düğüm gönderme erişimine izin ver</key>
+    <key alias="sendToTranslate">Çeviri için bir düğüm gönderme erişimine izin ver</key>
+    <key alias="sort">Düğümler için sıralama düzenini değiştirmek için erişime izin ver</key>
+    <key alias="translate">Bir düğümü çevirmek için erişime izin ver</key>
+    <key alias="update">Bir düğümü kaydetme erişimine izin ver</key>
+    <key alias="createblueprint">İçerik Şablonu oluşturma erişimine izin verin</key>
+  </area>
+  <area alias="apps">
+    <key alias="umbContent">İçerik</key>
+    <key alias="umbInfo">Bilgi</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="permissionDenied">İzin reddedildi.</key>
+    <key alias="addNew">Yeni Alan Ekle</key>
+    <key alias="remove">kaldır</key>
+    <key alias="invalidNode">Geçersiz düğüm.</key>
+    <key alias="invalidDomain">Bir veya daha fazla alanın biçimi geçersiz.</key>
+    <key alias="duplicateDomain">Etki alanı zaten atanmış.</key>
+    <key alias="language">Dil</key>
+    <key alias="domain">Alan</key>
+    <key alias="domainCreated">Yeni '%0%' etki alanı oluşturuldu</key>
+    <key alias="domainDeleted">'%0%' alan adı silindi</key>
+    <key alias="domainExists">'%0%' etki alanı zaten atanmış</key>
+    <key alias="domainUpdated">'%0%' etki alanı güncellendi</key>
+    <key alias="orEdit">Mevcut Etki Alanlarını Düzenle</key>
+    <key alias="domainHelpWithVariants">
+      <![CDATA[Geçerli alan adları: "example.com", "www.example.com", "example.com:8080" veya "https://www.example.com/".
+     Ayrıca, alanlardaki tek seviyeli yollar da desteklenir, örn. "example.com/tr" veya "/en".]]>
+    </key>
+    <key alias="inherit">Devral</key>
+    <key alias="setLanguage">Kültür</key>
+    <key alias="setLanguageHelp">
+      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br />
+        aşağıdaki alan da geçerli değilse geçerli düğüme.]]>
+    </key>
+    <key alias="setDomains">Alanlar</key>
+  </area>
+  <area alias="buttons">
+    <key alias="clearSelection">Seçimi temizle</key>
+    <key alias="select">Seç</key>
+    <key alias="somethingElse">Başka bir şey yapın</key>
+    <key alias="bold">Kalın</key>
+    <key alias="deindent">Paragraf Girintisini İptal Et</key>
+    <key alias="formFieldInsert">Form alanı ekle</key>
+    <key alias="graphicHeadline">Grafik başlığı ekle</key>
+    <key alias="htmlEdit">Html'yi Düzenle</key>
+    <key alias="indent">Paragrafı Girintile</key>
+    <key alias="italic">İtalik</key>
+    <key alias="justifyCenter">Ortala</key>
+    <key alias="justifyLeft">Sola Yasla</key>
+    <key alias="justifyRight">Sağa Yasla</key>
+    <key alias="linkInsert">Bağlantı Ekle</key>
+    <key alias="linkLocal">Yerel bağlantı ekle (bağlantı)</key>
+    <key alias="listBullet">Madde İşareti Listesi</key>
+    <key alias="listNumeric">Sayısal Liste</key>
+    <key alias="macroInsert">Makro ekle</key>
+    <key alias="pictureInsert">Resim ekle</key>
+    <key alias="publishAndClose">Yayınlayın ve kapatın</key>
+    <key alias="publishDescendants">Nesillerle yayınlayın</key>
+    <key alias="relations">İlişkileri düzenle</key>
+    <key alias="returnToList">Listeye dön</key>
+    <key alias="save">Kaydet</key>
+    <key alias="saveAndClose">Kaydet ve kapat</key>
+    <key alias="saveAndPublish">Kaydet ve yayınla</key>
+    <key alias="saveToPublish">Kaydet ve onaya gönder</key>
+    <key alias="saveListView">Liste görünümünü kaydet</key>
+    <key alias="schedulePublish">Planla</key>
+    <key alias="saveAndPreview">Kaydet ve önizle</key>
+    <key alias="showPageDisabled">Atanmış şablon olmadığından önizleme devre dışı bırakıldı</key>
+    <key alias="styleChoose">Stil seçin</key>
+    <key alias="styleShow">Stilleri göster</key>
+    <key alias="tableInsert">Tablo ekle</key>
+    <key alias="saveAndGenerateModels">Modelleri kaydedin ve oluşturun</key>
+    <key alias="undo">Geri Al</key>
+    <key alias="redo">Yeniden yap</key>
+    <key alias="deleteTag">Etiketi sil</key>
+    <key alias="confirmActionCancel">İptal</key>
+    <key alias="confirmActionConfirm">Onayla</key>
+    <key alias="morePublishingOptions">Daha fazla yayınlama seçeneği</key>
+    <key alias="submitChanges">Gönder</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">Görüntüleniyor</key>
+    <key alias="delete">İçerik silindi</key>
+    <key alias="unpublish">Yayınlanmamış içerik</key>
+    <key alias="publish">Kaydedilen ve Yayınlanan İçerik</key>
+    <key alias="publishvariant">Diller için kaydedilen ve yayınlanan içerik: %0%</key>
+    <key alias="save">İçerik kaydedildi</key>
+    <key alias="savevariant">Diller için kaydedilen içerik: %0%</key>
+    <key alias="move">İçerik taşındı</key>
+    <key alias="copy">İçerik kopyalandı</key>
+    <key alias="rollback">İçerik geri alındı ​​</key>
+    <key alias="sendtopublish">Yayınlanmak için gönderilen içerik</key>
+    <key alias="sendtopublishvariant">Diller için yayınlanmak üzere gönderilen içerik: %0%</key>
+    <key alias="sort">Kullanıcı tarafından gerçekleştirilen alt öğeleri sıralama</key>
+    <key alias="custom">%0%</key>
+    <key alias="smallCopy">Kopyala</key>
+    <key alias="smallPublish">Yayınla</key>
+    <key alias="smallPublishVariant">Yayınla</key>
+    <key alias="smallMove">Taşı</key>
+    <key alias="smallSave">Kaydet</key>
+    <key alias="smallSaveVariant">Kaydet</key>
+    <key alias="smallDelete">Sil</key>
+    <key alias="smallUnpublish">Yayından Kaldır</key>
+    <key alias="smallRollBack">Geri Al</key>
+    <key alias="smallSendToPublish">Yayınlamak İçin Gönder</key>
+    <key alias="smallSendToPublishVariant">Yayınlamak İçin Gönder</key>
+    <key alias="smallSort">Sırala</key>
+    <key alias="smallCustom">Özel</key>
+    <key alias="historyIncludingVariants">Geçmiş (tüm varyantlar)</key>
+  </area>
+  <area alias="codefile">
+    <key alias="createFolderIllegalChars">Klasör adı geçersiz karakterler içeremez.</key>
+    <key alias="deleteItemFailed">Öğe silinemedi: %0%</key>
+  </area>
+  <area alias="content">
+    <key alias="isPublished" version="7.2">Yayınlandı</key>
+    <key alias="about">Bu sayfa hakkında</key>
+    <key alias="alias">Takma ad</key>
+    <key alias="alternativeTextHelp">(resmi telefonda nasıl tarif edersiniz)</key>
+    <key alias="alternativeUrls">Alternatif Bağlantılar</key>
+    <key alias="clickToEdit">Bu öğeyi düzenlemek için tıklayın</key>
+    <key alias="createBy">Oluşturan</key>
+    <key alias="createByDesc" version="7.0">Orijinal yazar</key>
+    <key alias="updatedBy" version="7.0">Güncelleyen</key>
+    <key alias="createDate">Oluşturuldu</key>
+    <key alias="createDateDesc" version="7.0">Bu belgenin oluşturulduğu tarih / saat</key>
+    <key alias="documentType">Belge Türü</key>
+    <key alias="editing">Düzenle</key>
+    <key alias="expireDate">Kaldır</key>
+    <key alias="itemChanged">Bu öğe yayınlandıktan sonra değiştirildi</key>
+    <key alias="itemNotPublished">Bu öğe yayınlanmadı</key>
+    <key alias="lastPublished">Son yayınlanan</key>
+    <key alias="noItemsToShow">Gösterilecek öğe yok</key>
+    <key alias="listViewNoItems" version="7.1.5">Listede gösterilecek öğe yok.</key>
+    <key alias="listViewNoContent">Hiçbir içerik eklenmedi</key>
+    <key alias="listViewNoMembers">Üye eklenmedi</key>
+    <key alias="mediatype">Medya Türü</key>
+    <key alias="mediaLinks">Medya öğelerine bağlantı</key>
+    <key alias="membergroup">Üye Grubu</key>
+    <key alias="memberrole">Rol</key>
+    <key alias="membertype">Üye Türü</key>
+    <key alias="noChanges">Hiçbir değişiklik yapılmadı</key>
+    <key alias="noDate">Tarih seçilmedi</key>
+    <key alias="nodeName">Sayfa başlığı</key>
+    <key alias="noMediaLink">Bu medya öğesinin bağlantısı yok</key>
+    <key alias="otherElements">Özellikler</key>
+    <key alias="parentNotPublished">Bu belge yayınlandı, ancak '%0%' üst öğesi yayından kaldırıldığı için görünmüyor</key>
+    <key alias="parentCultureNotPublished">Bu kültür yayınlandı, ancak '%0%' üst öğe üzerinde yayınlanmadığı için görünmüyor</key>
+    <key alias="parentNotPublishedAnomaly">Bu belge yayınlandı, ancak önbellekte yok</key>
+    <key alias="getUrlException">URL alınamadı</key>
+    <key alias="routeError">Bu belge yayınlandı, ancak url'si %0% içeriğiyle çakışacak</key>
+    <key alias="routeErrorCannotRoute">Bu belge yayınlandı, ancak url'si yönlendirilemez</key>
+    <key alias="publish">Yayınla</key>
+    <key alias="published">Yayınlandı</key>
+    <key alias="publishedPendingChanges">Yayınlandı (bekleyen değişiklikler)</key>
+    <key alias="publishStatus">Yayın Durumu</key>
+    <key alias="publishDescendantsHelp"><![CDATA[<strong>%0%</strong> ve altındaki tüm içerik öğelerini yayınlayın ve böylece içeriğini herkese açık hale getirin.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Altında aynı türdeki varyantları ve varyantları yayınlayın ve böylece içeriklerini herkese açık hale getirin.]]></key>
+    <key alias="releaseDate">Yayınla</key>
+    <key alias="unpublishDate">Yayından kaldır</key>
+    <key alias="removeDate">Tarihi Temizle</key>
+    <key alias="setDate">Tarihi ayarla</key>
+    <key alias="sortDone">Sıralayıcı güncellendi</key>
+    <key alias="sortHelp">Düğümleri sıralamak için, düğümleri sürükleyin veya sütun başlıklarından birine tıklayın. Seçerken "shift" veya "kontrol" tuşunu basılı tutarak birden fazla düğüm seçebilirsiniz</key>
+    <key alias="statistics">İstatistikler</key>
+    <key alias="titleOptional">Başlık (isteğe bağlı)</key>
+    <key alias="altTextOptional">Alternatif metin (isteğe bağlı)</key>
+    <key alias="type">Tür</key>
+    <key alias="unpublish">Yayından Kaldır</key>
+    <key alias="unpublished">Yayınlanmadı</key>
+    <key alias="updateDate">Son düzenleme</key>
+    <key alias="updateDateDesc" version="7.0">Bu belgenin düzenlendiği tarih / saat</key>
+    <key alias="uploadClear">Dosyaları kaldırın</key>
+    <key alias="uploadClearImageContext">Resmi medya öğesinden kaldırmak için burayı tıklayın</key>
+    <key alias="uploadClearFileContext">Dosyayı medya öğesinden kaldırmak için burayı tıklayın</key>
+    <key alias="urls">Belgeye bağlantı</key>
+    <key alias="memberof">Grup(lar) ın üyesi</key>
+    <key alias="notmemberof">Grup(lar) ın üyesi değil</key>
+    <key alias="childItems" version="7.0">Alt öğeler</key>
+    <key alias="target" version="7.0">Hedef</key>
+    <key alias="scheduledPublishServerTime">Bu, sunucuda şu zamana çevrilir:</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_ blank">Ne bu ne anlama geliyor? </a>]]></key>
+    <key alias="nestedContentDeleteItem">Bu öğeyi silmek istediğinizden emin misiniz?</key>
+    <key alias="nestedContentEditorNotSupported">%0% özelliği,%1% düzenleyiciyi kullanıyor ve bu, Yuvalanmış İçerik tarafından desteklenmiyor.</key>
+    <key alias="nestedContentDeleteAllItems">Tüm öğeleri silmek istediğinizden emin misiniz?</key>
+    <key alias="nestedContentNoContentTypes">Bu özellik için hiçbir içerik türü yapılandırılmadı.</key>
+    <key alias="nestedContentAddElementType">Öğe türü ekle</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Öğe türünü seçin</key>
+    <key alias="nestedContentGroupHelpText">Özelliklerinin görüntülenmesi gereken grubu seçin. Boş bırakılırsa, eleman türündeki ilk grup kullanılacaktır.</key>
+    <key alias="nestedContentTemplateHelpTextPart1">Adını her bir öğeyle karşılaştırmak için açısal bir ifade girin. kullanın </key>
+    <key alias="nestedContentTemplateHelpTextPart2">öğe dizinini görüntülemek için</key>
+    <key alias="addTextBox">Başka bir metin kutusu ekle</key>
+    <key alias="removeTextBox">Bu metin kutusunu kaldırın</key>
+    <key alias="contentRoot">İçerik Kökü</key>
+    <key alias="includeUnpublished">Yayınlanmamış içerik öğelerini dahil edin.</key>
+    <key alias="isSensitiveValue">Bu değer gizlidir. Bu değeri görüntülemek için erişime ihtiyacınız varsa, lütfen web sitesi yöneticinizle iletişime geçin.</key>
+    <key alias="isSensitiveValue_short">Bu değer gizlidir.</key>
+    <key alias="languagesToPublish">Hangi dilleri yayınlamak istersiniz?</key>
+    <key alias="languagesToSendForApproval">Onay için hangi dilleri göndermek istersiniz?</key>
+    <key alias="languagesToSchedule">Hangi dilleri planlamak istersiniz?</key>
+    <key alias="languagesToUnpublish">Yayından kaldırılacak dilleri seçin. Zorunlu bir dilin yayından kaldırılması tüm dilleri yayından kaldırır.</key>
+    <key alias="variantsWillBeSaved">Tüm yeni varyantlar kaydedilecektir.</key>
+    <key alias="variantsToPublish">Hangi çeşitleri yayınlamak istersiniz?</key>
+    <key alias="variantsToSave">Hangi değişkenlerin kaydedileceğini seçin.</key>
+    <key alias="publishRequiresVariants">Yayınlamanın gerçekleşmesi için aşağıdaki varyantlar gereklidir:</key>
+    <key alias="notReadyToPublish">Yayınlamaya hazır değiliz</key>
+    <key alias="readyToPublish">Yayınlamaya hazır mısınız?</key>
+    <key alias="readyToSave">Kaydetmeye Hazır mısınız?</key>
+    <key alias="sendForApproval">Onaya gönder</key>
+    <key alias="schedulePublishHelp">İçerik öğesini yayınlamak ve / veya yayından kaldırmak için tarih ve saati seçin.</key>
+    <key alias="createEmpty">Yeni oluştur</key>
+    <key alias="createFromClipboard">Panodan yapıştır</key>
+    <key alias="nodeIsInTrash">Bu öğe Geri Dönüşüm Kutusu'nda</key>
+  </area>
+  <area alias="blueprints">
+    <key alias="createBlueprintFrom"><![CDATA[<em>%0%</em> den yeni bir İçerik Şablonu oluşturun]]></key>
+    <key alias="blankBlueprint">Boş</key>
+    <key alias="selectBlueprint">Bir İçerik Şablonu Seçin</key>
+    <key alias="createdBlueprintHeading">İçerik Şablonu oluşturuldu</key>
+    <key alias="createdBlueprintMessage">'%0%' üzerinden bir İçerik Şablonu oluşturuldu</key>
+    <key alias="duplicateBlueprintMessage">Aynı ada sahip başka bir İçerik Şablonu zaten var</key>
+    <key alias="blueprintDescription">İçerik Şablonu, bir düzenleyicinin yeni içerik oluşturmak için temel olarak kullanmak üzere seçebileceği önceden tanımlanmış içeriktir</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">Yüklemek için tıklayın</key>
+    <key alias="orClickHereToUpload">veya dosyaları seçmek için burayı tıklayın</key>
+    <key alias="disallowedFileType">Bu dosya yüklenemiyor, onaylanmış bir dosya türüne sahip değil</key>
+    <key alias="maxFileSize">Maksimum dosya boyutu</key>
+    <key alias="mediaRoot">Medya kökü</key>
+    <key alias="createFolderFailed">%0% üst kimliği altında klasör oluşturulamadı</key>
+    <key alias="renameFolderFailed">%0% kimliğine sahip klasör yeniden adlandırılamadı</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Dosyalarınızı alana sürükleyip bırakın</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Yeni üye oluştur</key>
+    <key alias="allMembers">Tüm Üyeler</key>
+    <key alias="memberGroupNoProperties">Üye gruplarının düzenlenecek ek özellikleri yoktur.</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">Yeni %0% 'i nerede oluşturmak istiyorsunuz</key>
+    <key alias="createUnder">Altında bir öğe oluşturun</key>
+    <key alias="createContentBlueprint">İçerik şablonu yapmak istediğiniz belge türünü seçin</key>
+    <key alias="enterFolderName">Bir klasör adı girin</key>
+    <key alias="updateData">Bir tür ve başlık seçin</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[Burada içerik oluşturmak için uygun belge türü yok. Bunları <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde oluşturmanız gerekir.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">İçerik ağacında seçilen sayfa, altında herhangi bir sayfanın oluşturulmasına izin vermiyor.</key>
+    <key alias="noDocumentTypesEditPermissions">Bu belge türü için izinleri düzenleyin</key>
+    <key alias="noDocumentTypesCreateNew">Yeni bir belge türü oluşturun</key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>İzinler</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">Ağaçtaki seçili ortam, altında başka bir ortamın oluşturulmasına izin vermiyor.</key>
+    <key alias="noMediaTypesEditPermissions">Bu medya türü için izinleri düzenleyin</key>
+    <key alias="documentTypeWithoutTemplate">Şablonsuz Belge Türü</key>
+    <key alias="newFolder">Yeni klasör</key>
+    <key alias="newDataType">Yeni veri türü</key>
+    <key alias="newJavascriptFile">Yeni JavaScript dosyası</key>
+    <key alias="newEmptyPartialView">Yeni boş kısmi görünüm</key>
+    <key alias="newPartialViewMacro">Yeni kısmi görünüm makrosu</key>
+    <key alias="newPartialViewFromSnippet">Ön bilgiden yeni kısmi görünüm</key>
+    <key alias="newPartialViewMacroFromSnippet">Snippet'ten yeni kısmi görünüm makrosu</key>
+    <key alias="newPartialViewMacroNoMacro">Yeni kısmi görünüm makrosu (makrosuz)</key>
+    <key alias="newStyleSheetFile">Yeni stil sayfası dosyası</key>
+    <key alias="newRteStyleSheetFile">Yeni Zengin Metin Düzenleyicisi stil sayfası dosyası</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">Web sitenize göz atın</key>
+    <key alias="dontShowAgain">- Gizle</key>
+    <key alias="nothinghappens">Umbraco açılmıyorsa, bu siteden pop-up'lara izin vermeniz gerekebilir</key>
+    <key alias="openinnew">yeni bir pencerede açıldı</key>
+    <key alias="restart">Yeniden Başlat</key>
+    <key alias="visit">Ziyaret edin</key>
+    <key alias="welcome">Hoş geldiniz</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Kal</key>
+    <key alias="discardChanges">Değişiklikleri sil</key>
+    <key alias="unsavedChanges">Kaydedilmemiş değişiklikleriniz var</key>
+    <key alias="unsavedChangesWarning">Bu sayfadan ayrılmak istediğinizden emin misiniz? - kaydedilmemiş değişiklikleriniz var</key>
+    <key alias="confirmListViewPublish">Yayınlama, seçili öğelerin sitede görünür olmasını sağlar.</key>
+    <key alias="confirmListViewUnpublish">Yayından kaldırıldığında, seçili öğeler ve bunların tüm alt öğeleri siteden kaldırılır.</key>
+    <key alias="confirmUnpublish">Yayından kaldırıldığında bu sayfa ve tüm soyundan gelenler siteden kaldırılır.</key>
+    <key alias="doctypeChangeWarning">Kaydedilmemiş değişiklikleriniz var. Belge Türünde değişiklik yapmak değişiklikleri geçersiz kılacaktır.</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">Bitti</key>
+    <key alias="deletedItem">%0% öğe silindi</key>
+    <key alias="deletedItems">%0% öğe silindi</key>
+    <key alias="deletedItemOfItem">%1% öğeden %0% silindi</key>
+    <key alias="deletedItemOfItems">%1% öğeden %0% silindi</key>
+    <key alias="publishedItem">%0% öğe yayınlandı</key>
+    <key alias="publishedItems">%0% öğe yayınlandı</key>
+    <key alias="publishedItemOfItem">%1% öğeden %0% yayınlandı</key>
+    <key alias="publishedItemOfItems">%1% öğeden %0% yayınlandı</key>
+    <key alias="unpublishedItem">Yayınlanmamış %0% öğe</key>
+    <key alias="unpublishedItems">Yayınlanmamış %0% öğe</key>
+    <key alias="unpublishedItemOfItem">Yayınlanmamış%1% öğeden %0%</key>
+    <key alias="unpublishedItemOfItems">Yayınlanmamış%1% öğeden %0%</key>
+    <key alias="movedItem">%0% öğe taşındı</key>
+    <key alias="movedItems">%0% öğe taşındı</key>
+    <key alias="movedItemOfItem">%0%,%1% öğeden taşındı</key>
+    <key alias="movedItemOfItems">%1% öğeden %0% oranında taşındı</key>
+    <key alias="copiedItem">%0% öğe kopyalandı</key>
+    <key alias="copiedItems">%0% öğe kopyalandı</key>
+    <key alias="copiedItemOfItem">%1% öğeden %0% kopyalandı</key>
+    <key alias="copiedItemOfItems">%1% öğeden %0% kopyalandı</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Bağlantı başlığı</key>
+    <key alias="urlLinkPicker">Bağlantı</key>
+    <key alias="anchorLinkPicker">Bağlayıcı / sorgu dizesi</key>
+    <key alias="anchorInsert">Ad</key>
+    <key alias="assignDomain">Ana bilgisayar adlarını yönet</key>
+    <key alias="closeThisWindow">Bu pencereyi kapat</key>
+    <key alias="confirmdelete">Silmek istediğinizden emin misiniz</key>
+    <key alias="confirmdisable">Devre dışı bırakmak istediğinizden emin misiniz</key>
+    <key alias="confirmremove">Kaldırmak istediğinizden emin misiniz</key>
+    <key alias="confirmremoveusageof"><![CDATA[<b>%0%</b> kullanımını kaldırmak istediğinizden emin misiniz?]]></key>
+    <key alias="confirmlogout">Emin misiniz?</key>
+    <key alias="confirmSure">Emin misiniz?</key>
+    <key alias="cut">Kes</key>
+    <key alias="editdictionary">Sözlük Öğesini Düzenle</key>
+    <key alias="editlanguage">Dili Düzenle</key>
+    <key alias="editSelectedMedia">Seçili medyayı düzenle</key>
+    <key alias="insertAnchor">Yerel bağlantı ekle</key>
+    <key alias="insertCharacter">Karakter ekle</key>
+    <key alias="insertgraphicheadline">Grafik başlığı ekle</key>
+    <key alias="insertimage">Resim ekle</key>
+    <key alias="insertlink">Link ekle</key>
+    <key alias="insertMacro">Makro eklemek için tıklayın</key>
+    <key alias="inserttable">Tablo ekle</key>
+    <key alias="languagedeletewarning">Bu, dili silecek</key>
+    <key alias="languageChangeWarning">Bir dil için kültürü değiştirmek pahalı bir işlem olabilir ve içerik önbelleğinin ve dizinlerin yeniden oluşturulmasına neden olabilir</key>
+    <key alias="lastEdited">Son Düzenleme</key>
+    <key alias="link">Bağlantı</key>
+    <key alias="linkinternal">Dahili bağlantı:</key>
+    <key alias="linklocaltip">Yerel bağlantıları kullanırken, bağlantının önüne "#" ekleyin</key>
+    <key alias="linknewwindow">Yeni pencerede açılsın mı?</key>
+    <key alias="macroDoesNotHaveProperties">Bu makro düzenleyebileceğiniz herhangi bir özellik içermiyor</key>
+    <key alias="paste">Yapıştır</key>
+    <key alias="permissionsEdit">için izinleri düzenle</key>
+    <key alias="permissionsSet">için izinleri ayarlayın</key>
+    <key alias="permissionsSetForGroup">%1% kullanıcı grubu için %0% için izinleri ayarla</key>
+    <key alias="permissionsHelp">İzinlerini ayarlamak istediğiniz kullanıcı gruplarını seçin</key>
+    <key alias="recycleBinDeleting">Geri dönüşüm kutusundaki öğeler artık siliniyor. Lütfen bu işlem yapılırken bu pencereyi kapatmayın</key>
+    <key alias="recycleBinIsEmpty">Geri dönüşüm kutusu artık boş</key>
+    <key alias="recycleBinWarning">Öğeler geri dönüşüm kutusundan silindiğinde sonsuza kadar kaybolacaklar</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_ blank' href='http: //regexlib.com'> regexlib.com </a> 'un web hizmeti şu anda bazı sorunlar yaşıyor ve biz üzerinde kontrol yok. Bu rahatsızlıktan dolayı çok üzgünüz.]]></key>
+    <key alias="regexSearchHelp">Bir form alanına doğrulama eklemek için normal ifade arayın. Örnek: 'e-posta,'posta kodu','URL'</key>
+    <key alias="removeMacro">Makroyu Kaldır</key>
+    <key alias="requiredField">Gerekli Alan</key>
+    <key alias="sitereindexed">Site yeniden dizine eklendi</key>
+    <key alias="siterepublished">Web sitesi önbelleği yenilendi. Tüm yayın içeriği artık güncel. Yayınlanmamış içeriğin tamamı hâlâ yayınlanmamış olsa da</key>
+    <key alias="siterepublishHelp">Web sitesi önbelleği yenilenecek. Yayınlanan tüm içerik güncellenecek, yayınlanmamış içerik ise yayınlanmayacak.</key>
+    <key alias="tableColumns">Sütun sayısı</key>
+    <key alias="tableRows">Satır sayısı</key>
+    <key alias="thumbnailimageclickfororiginal">Tam boyutta görmek için resmi tıklayın</key>
+    <key alias="treepicker">Öğe seçin</key>
+    <key alias="viewCacheItem">Önbellek Öğesini Görüntüle</key>
+    <key alias="relateToOriginalLabel">Orijinalle ilişkilendir</key>
+    <key alias="includeDescendants">Torunları dahil et</key>
+    <key alias="theFriendliestCommunity">En arkadaş canlısı topluluk</key>
+    <key alias="linkToPage">Sayfaya bağla</key>
+    <key alias="openInNewWindow">Bağlı belgeyi yeni bir pencerede veya sekmede açar</key>
+    <key alias="linkToMedia">Medyaya bağlantı</key>
+    <key alias="selectContentStartNode">İçerik başlangıç ​​düğümünü seçin</key>
+    <key alias="selectMedia">Medya seçin</key>
+    <key alias="selectMediaType">Ortam türünü seçin</key>
+    <key alias="selectIcon">Simge seçin</key>
+    <key alias="selectItem">Öğeyi seçin</key>
+    <key alias="selectLink">Bağlantı seçin</key>
+    <key alias="selectMacro">Makro seçin</key>
+    <key alias="selectContent">İçerik seçin</key>
+    <key alias="selectContentType">İçerik türünü seçin</key>
+    <key alias="selectMediaStartNode">Medya başlangıç ​​düğümünü seçin</key>
+    <key alias="selectMember">Üye seç</key>
+    <key alias="selectMemberGroup">Üye grubu seçin</key>
+    <key alias="selectMemberType">Üye türünü seçin</key>
+    <key alias="selectNode">Düğüm seçin</key>
+    <key alias="selectSections">Bölümleri seçin</key>
+    <key alias="selectUser">Kullanıcı seçin</key>
+    <key alias="selectUsers">Kullanıcıları seçin</key>
+    <key alias="noIconsFound">​​Simge bulunamadı</key>
+    <key alias="noMacroParams">Bu makro için parametre yok</key>
+    <key alias="noMacros">Eklenecek makro yok</key>
+    <key alias="externalLoginProviders">Harici giriş sağlayıcıları</key>
+    <key alias="exceptionDetail">İstisna Ayrıntıları</key>
+    <key alias="stacktrace">Yığın İzleme</key>
+    <key alias="innerException">İç İstisna</key>
+    <key alias="linkYour">Bağlayın</key>
+    <key alias="unLinkYour">Bağlantınızı kaldırın</key>
+    <key alias="account">hesap</key>
+    <key alias="selectEditor">Düzenleyici seçin</key>
+    <key alias="selectSnippet">Snippet seçin</key>
+    <key alias="variantdeletewarning">Bu, düğümü ve tüm dillerini silecektir. Yalnızca bir dili silmek istiyorsanız, bunun yerine düğümü o dilde yayından kaldırmalısınız.</key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Bu, <b>%0%</b> kullanıcısını kaldıracaktır.]]></key>
+    <key alias="userremovewarning"><![CDATA[Bu, <b>%0% </b> kullanıcısını <b>%1%</b> grubundan kaldıracak]]></key>
+    <key alias="yesRemove">Evet, kaldır</key>
+  </area>
+  <area alias="dictionary">
+    <key alias="noItems">Sözlük öğesi yok.</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description">
+      <![CDATA[
+      Aşağıdaki sözlük öğesi '<em>%0%</em>' için farklı dil sürümlerini düzenleyin
+   ]]>
+    </key>
+    <key alias="displayName">Kültür Adı</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      '%0%' anahtarı zaten var.
+   ]]>
+    </key>
+    <key alias="overviewTitle">Sözlüğe genel bakış</key>
+  </area>
+  <area alias="examineManagement">
+    <key alias="configuredSearchers">Yapılandırılmış Arayıcılar</key>
+    <key alias="configuredSearchersDescription">Yapılandırılmış herhangi bir Searcher için özellikleri ve araçları gösterir (yani, çoklu dizin arayıcı gibi)</key>
+    <key alias="fieldValues">Alan değerleri</key>
+    <key alias="healthStatus">Sağlık durumu</key>
+    <key alias="healthStatusDescription">Dizinin sağlık durumu ve okunabiliyorsa</key>
+    <key alias="indexers">Dizin oluşturucular</key>
+    <key alias="indexInfo">Dizin bilgisi</key>
+    <key alias="indexInfoDescription">Dizinin özelliklerini listeler</key>
+    <key alias="manageIndexes">İnceleme dizinlerini yönetin</key>
+    <key alias="manageIndexesDescription">Her dizinin ayrıntılarını görüntülemenizi sağlar ve dizinleri yönetmek için bazı araçlar sağlar</key>
+    <key alias="rebuildIndex">Dizini yeniden oluştur</key>
+    <key alias="rebuildIndexWarning">
+      <![CDATA[
+      Bu, dizinin yeniden oluşturulmasına neden olacaktır. <br />
+      Sitenizde ne kadar içerik olduğuna bağlı olarak bu biraz zaman alabilir. <br />
+      Yüksek web sitesi trafiğinin olduğu zamanlarda veya editörler içeriği düzenlerken bir dizinin yeniden oluşturulması önerilmez.
+     ]]>
+    </key>
+    <key alias="searchers">Arayanlar</key>
+    <key alias="searchDescription">Dizini arayın ve sonuçları görüntüleyin</key>
+    <key alias="tools">Araçlar</key>
+    <key alias="toolsDescription">Dizini yönetmek için araçlar</key>
+    <key alias="fields">alanlar</key>
+    <key alias="indexCannotRead">Dizin okunamıyor ve yeniden oluşturulması gerekecek</key>
+    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için Umbraco günlüğünü kontrol edin</key>
+    <key alias="indexCannotRebuild">Bu dizin, atanmış olmadığı için yeniden oluşturulamaz</key>
+    <key alias="iIndexPopulator">IIndexPopulator</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">Kullanıcı adınızı girin</key>
+    <key alias="password">Şifrenizi girin</key>
+    <key alias="confirmPassword">Şifrenizi onaylayın</key>
+    <key alias="nameentity">%0% olarak adlandırın ...</key>
+    <key alias="entername">Bir ad girin ...</key>
+    <key alias="enteremail">Bir e-posta girin ...</key>
+    <key alias="enterusername">Bir kullanıcı adı girin ...</key>
+    <key alias="label">Etiket ...</key>
+    <key alias="enterDescription">Bir açıklama girin ...</key>
+    <key alias="search">Aramak için yazın ...</key>
+    <key alias="filter">Filtrelemek için yazın ...</key>
+    <key alias="enterTags">Etiket eklemek için yazın (her etiketten sonra enter tuşuna basın) ...</key>
+    <key alias="email">E-postanızı girin</key>
+    <key alias="enterMessage">Bir mesaj girin ...</key>
+    <key alias="usernameHint">Kullanıcı adınız genellikle e-postanızdır</key>
+    <key alias="anchor"># değer veya? anahtar=değer</key>
+    <key alias="enterAlias">Takma ad girin ...</key>
+    <key alias="generatingAlias">Takma ad oluşturuluyor ...</key>
+    <key alias="a11yCreateItem">Öğe oluştur</key>
+    <key alias="a11yCreate">Oluştur</key>
+    <key alias="a11yEdit">Düzenle</key>
+    <key alias="a11yName">Ad</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="createListView" version="7.2">Özel liste görünümü oluştur</key>
+    <key alias="removeListView" version="7.2">Özel liste görünümünü kaldır</key>
+    <key alias="aliasAlreadyExists">Bu takma ada sahip bir içerik türü, medya türü veya üye türü zaten var</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">Yeniden adlandırıldı</key>
+    <key alias="enterNewFolderName">Buraya yeni bir klasör adı girin</key>
+    <key alias="folderWasRenamed">%0%,%1% olarak yeniden adlandırıldı</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">Ön değer ekle</key>
+    <key alias="dataBaseDatatype">Veritabanı veri türü</key>
+    <key alias="guid">Özellik düzenleyici GUID</key>
+    <key alias="renderControl">Mülk düzenleyici</key>
+    <key alias="rteButtons">Düğmeler</key>
+    <key alias="rteEnableAdvancedSettings">için gelişmiş ayarları etkinleştir</key>
+    <key alias="rteEnableContextMenu">Bağlam menüsünü etkinleştir</key>
+    <key alias="rteMaximumDefaultImgSize">Eklenen resimlerin maksimum varsayılan boyutu</key>
+    <key alias="rteRelatedStylesheets">İlgili stil sayfaları</key>
+    <key alias="rteShowLabel">Etiketi göster</key>
+    <key alias="rteWidthAndHeight">Genişlik ve yükseklik</key>
+    <key alias="selectFolder">Taşınacak klasörü seçin</key>
+    <key alias="inTheTree">aşağıdaki ağaç yapısına</key>
+    <key alias="wasMoved">altına taşındı</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">Verileriniz kaydedildi, ancak bu sayfayı yayınlamadan önce düzeltmeniz gereken bazı hatalar var:</key>
+    <key alias="errorChangingProviderPassword">Mevcut üyelik sağlayıcısı, şifre değiştirmeyi desteklemiyor (EnablePasswordRetrieval'in doğru olması gerekiyor)</key>
+    <key alias="errorExistsWithoutTab">%0% zaten var</key>
+    <key alias="errorHeader">Hatalar vardı:</key>
+    <key alias="errorHeaderWithoutTab">Hatalar vardı:</key>
+    <key alias="errorInPasswordFormat">Parola minimum %0% karakter uzunluğunda olmalı ve en az%1% alfa olmayan sayısal karakter (ler) içermelidir</key>
+    <key alias="errorIntegerWithoutTab">%0% tam sayı olmalıdır</key>
+    <key alias="errorMandatory">%1% sekmesindeki %0% alanı zorunludur</key>
+    <key alias="errorMandatoryWithoutTab">%0% zorunlu bir alandır</key>
+    <key alias="errorRegExp">%1% konumunda %0% doğru biçimde değil</key>
+    <key alias="errorRegExpWithoutTab">%0% doğru biçimde değil</key>
+  </area>
+  <area alias="errors">
+    <key alias="receivedErrorFromServer">Sunucudan bir hata aldı</key>
+    <key alias="dissallowedMediaType">Belirtilen dosya türüne yönetici tarafından izin verilmedi</key>
+    <key alias="codemirroriewarning">NOT! CodeMirror yapılandırma ile etkinleştirilmiş olsa da, yeterince kararlı olmadığı için Internet Explorer'da devre dışı bırakılmıştır.</key>
+    <key alias="contentTypeAliasAndNameNotNull">Lütfen yeni özellik türünde hem takma adı hem de adı girin!</key>
+    <key alias="filePermissionsError">Belirli bir dosya veya klasöre okuma/yazma erişiminde sorun var</key>
+    <key alias="macroErrorLoadingPartialView">Kısmi Görünüm komut dosyası yüklenirken hata oluştu (dosya: %0%)</key>
+    <key alias="missingTitle">Lütfen bir başlık girin</key>
+    <key alias="missingType">Lütfen bir tür seçin</key>
+    <key alias="pictureResizeBiggerThanOrg">Resmi orijinal boyutundan daha büyük yapmak üzeresiniz. Devam etmek istediğinizden emin misiniz?</key>
+    <key alias="startNodeDoesNotExists">Başlangıç ​​düğümü silindi, lütfen yöneticinizle iletişime geçin</key>
+    <key alias="stylesMustMarkBeforeSelect">Lütfen stili değiştirmeden önce içeriği işaretleyin</key>
+    <key alias="stylesNoStylesOnPage">Etkin stil yok</key>
+    <key alias="tableColMergeLeft">Lütfen imleci birleştirmek istediğiniz iki hücrenin soluna yerleştirin</key>
+    <key alias="tableSplitNotSplittable">Birleştirilmemiş bir hücreyi bölemezsiniz.</key>
+    <key alias="propertyHasErrors">Bu özellik geçersiz</key>
+  </area>
+  <area alias="general">
+    <key alias="about">Hakkında</key>
+    <key alias="action">İşlem</key>
+    <key alias="actions">İşlemler</key>
+    <key alias="add">Ekle</key>
+    <key alias="alias">Takma reklam</key>
+    <key alias="all">Tümü</key>
+    <key alias="areyousure">Emin misiniz?</key>
+    <key alias="back">Geri</key>
+    <key alias="backToOverview">Genel bakışa dön</key>
+    <key alias="border">Kenarlık</key>
+    <key alias="cancel">İptal</key>
+    <key alias="cellMargin">Hücre kenar boşluğu</key>
+    <key alias="choose">Seçin</key>
+    <key alias="clear">Temizle</key>
+    <key alias="close">Kapat</key>
+    <key alias="closewindow">Pencereyi Kapat</key>
+    <key alias="comment">Yorum</key>
+    <key alias="confirm">Onayla</key>
+    <key alias="constrain">Sınırla</key>
+    <key alias="constrainProportions">Oranları sınırlayın</key>
+    <key alias="content">İçerik</key>
+    <key alias="continue">Devam et</key>
+    <key alias="copy">Kopyala</key>
+    <key alias="create">Oluştur</key>
+    <key alias="database">Veritabanı</key>
+    <key alias="date">Tarih</key>
+    <key alias="default">Varsayılan</key>
+    <key alias="delete">Sil</key>
+    <key alias="deleted">Silindi</key>
+    <key alias="deleting">Siliniyor ...</key>
+    <key alias="design">Tasarım</key>
+    <key alias="dictionary">Sözlük</key>
+    <key alias="dimensions">Boyutlar</key>
+    <key alias="discard">Sil</key>
+    <key alias="down">Aşağı</key>
+    <key alias="download">İndir</key>
+    <key alias="edit">Düzenle</key>
+    <key alias="edited">Düzenlendi</key>
+    <key alias="elements">Öğeler</key>
+    <key alias="email">E-posta</key>
+    <key alias="error">Hata</key>
+    <key alias="field">Alan</key>
+    <key alias="findDocument">Bul</key>
+    <key alias="first">İlk</key>
+    <key alias="focalPoint">Odak noktası</key>
+    <key alias="general">Genel</key>
+    <key alias="groups">Gruplar</key>
+    <key alias="group">Grup</key>
+    <key alias="height">Yükseklik</key>
+    <key alias="help">Yardım</key>
+    <key alias="hide">Gizle</key>
+    <key alias="history">Geçmiş</key>
+    <key alias="icon">Simge</key>
+    <key alias="id">Kimlik</key>
+    <key alias="import">İçe Aktar</key>
+    <key alias="excludeFromSubFolders">Yalnızca bu klasörü ara</key>
+    <key alias="info">Bilgi</key>
+    <key alias="innerMargin">İç kenar boşluğu</key>
+    <key alias="insert">Ekle</key>
+    <key alias="install">Yükle</key>
+    <key alias="invalid">Geçersiz</key>
+    <key alias="justify">Yasla</key>
+    <key alias="label">Etiket</key>
+    <key alias="language">Dil</key>
+    <key alias="last">Son</key>
+    <key alias="layout">Düzen</key>
+    <key alias="links">Bağlantılar</key>
+    <key alias="loading">Yükleniyor</key>
+    <key alias="locked">Kilitli</key>
+    <key alias="login">Giriş</key>
+    <key alias="logoff">Oturumu kapat</key>
+    <key alias="logout">Çıkış</key>
+    <key alias="macro">Makro</key>
+    <key alias="mandatory">Zorunlu</key>
+    <key alias="message">Mesaj</key>
+    <key alias="move">Taşı</key>
+    <key alias="name">Ad</key>
+    <key alias="new">Yeni</key>
+    <key alias="next">Sonraki</key>
+    <key alias="no">Hayır</key>
+    <key alias="of">arasında</key>
+    <key alias="off">Kapalı</key>
+    <key alias="ok">Tamam</key>
+    <key alias="open">Aç</key>
+    <key alias="options">Seçenekler</key>
+    <key alias="on">Açık</key>
+    <key alias="or">veya</key>
+    <key alias="orderBy">Sıralama ölçütü</key>
+    <key alias="password">Şifre</key>
+    <key alias="path">Yol</key>
+    <key alias="pleasewait">Bir dakika lütfen ...</key>
+    <key alias="previous">Önceki</key>
+    <key alias="properties">Özellikler</key>
+    <key alias="rebuild">Yeniden Oluştur</key>
+    <key alias="reciept">Form verilerini almak için e-posta</key>
+    <key alias="recycleBin">Geri Dönüşüm Kutusu</key>
+    <key alias="recycleBinEmpty">Geri dönüşüm kutunuz boş</key>
+    <key alias="reload">Yeniden yükle</key>
+    <key alias="remaining">Kalan</key>
+    <key alias="remove">Kaldır</key>
+    <key alias="rename">Yeniden adlandır</key>
+    <key alias="renew">Yenile</key>
+    <key alias="required" version="7.0">Gerekli</key>
+    <key alias="retrieve">Al</key>
+    <key alias="retry">Yeniden dene</key>
+    <key alias="rights">daha</key>
+    <key alias="scheduledPublishing">Planlanmış Yayınlama</key>
+    <key alias="search">Ara</key>
+    <key alias="searchNoResult">Üzgünüz, aradığınızı bulamıyoruz.</key>
+    <key alias="noItemsInList">Hiçbir öğe eklenmedi</key>
+    <key alias="server">Sunucu</key>
+    <key alias="settings">Ayarlar</key>
+    <key alias="show">Göster</key>
+    <key alias="showPageOnSend">Sayfayı Gönderildiğinde Göster</key>
+    <key alias="size">Boyut</key>
+    <key alias="sort">Sırala</key>
+    <key alias="status">Durum</key>
+    <key alias="submit">Gönder</key>
+    <key alias="success">Başarılı</key>
+    <key alias="type">Tür</key>
+    <key alias="typeToSearch">Aramak için yazın ...</key>
+    <key alias="under">altında</key>
+    <key alias="up">Yukarı</key>
+    <key alias="update">Güncelle</key>
+    <key alias="upgrade">Yükselt</key>
+    <key alias="upload">Yükle</key>
+    <key alias="url">URL</key>
+    <key alias="user">Kullanıcı</key>
+    <key alias="username">Kullanıcı adı</key>
+    <key alias="value">Değer</key>
+    <key alias="view">Görüntüle</key>
+    <key alias="welcome">Hoş geldiniz ...</key>
+    <key alias="width">Genişlik</key>
+    <key alias="yes">Evet</key>
+    <key alias="folder">Klasör</key>
+    <key alias="searchResults">Arama sonuçları</key>
+    <key alias="reorder">Yeniden sırala</key>
+    <key alias="reorderDone">Yeniden sıralamayı tamamladım</key>
+    <key alias="preview">Önizleme</key>
+    <key alias="changePassword">Şifreyi değiştir</key>
+    <key alias="to">için</key>
+    <key alias="listView">Liste görünümü</key>
+    <key alias="saving">Kaydediliyor ...</key>
+    <key alias="current">mevcut</key>
+    <key alias="embed">Göm</key>
+    <key alias="selected">seçildi</key>
+    <key alias="other">Diğer</key>
+    <key alias="articles">Makaleler</key>
+    <key alias="videos">Videolar</key>
+  </area>
+  <area alias="colors">
+    <key alias="blue">Mavi</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addGroup">Grup ekle</key>
+    <key alias="addProperty">Mülk ekle</key>
+    <key alias="addEditor">Düzenleyici ekle</key>
+    <key alias="addTemplate">Şablon ekle</key>
+    <key alias="addChildNode">Alt düğüm ekle</key>
+    <key alias="addChild">Çocuk ekle</key>
+    <key alias="editDataType">Veri türünü düzenle</key>
+    <key alias="navigateSections">Bölümlere git</key>
+    <key alias="shortcut">Kısayollar</key>
+    <key alias="showShortcuts">kısayolları göster</key>
+    <key alias="toggleListView">Liste görünümünü değiştir</key>
+    <key alias="toggleAllowAsRoot">Kök olarak izin ver arasında geçiş yap</key>
+    <key alias="commentLine">Yorum / Yorum kaldırma satırları</key>
+    <key alias="removeLine">Satırı kaldır</key>
+    <key alias="copyLineUp">Satırları Yukarı Kopyala</key>
+    <key alias="copyLineDown">Satırları Aşağı Kopyala</key>
+    <key alias="moveLineUp">Satırları Yukarı Taşı</key>
+    <key alias="moveLineDown">Satırları Aşağı Taşı</key>
+    <key alias="generalHeader">Genel</key>
+    <key alias="editorHeader">Düzenleyici</key>
+    <key alias="toggleAllowCultureVariants">Kültür varyantlarına izin ver </key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">Arka plan rengi</key>
+    <key alias="bold">Kalın</key>
+    <key alias="color">Metin rengi</key>
+    <key alias="font">Yazı Tipi</key>
+    <key alias="text">Metin</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">Sayfa</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">Yükleyici veritabanına bağlanamıyor.</key>
+    <key alias="databaseFound">​​Veritabanınız bulundu ve tanımlandı</key>
+    <key alias="databaseHeader">Veritabanı yapılandırması</key>
+    <key alias="databaseInstall">
+      <![CDATA[
+      Umbraco %0% veritabanını yüklemek için <strong>kur</strong> düğmesine basın
+    ]]>
+    </key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% artık veritabanınıza kopyalandı. Devam etmek için <strong>İleri</strong>'ye basın.]]></key>
+    <key alias="databaseText">
+      <![CDATA[Bu adımı tamamlamak için, veritabanı sunucunuzla ilgili bazı bilgileri bilmeniz gerekir ("bağlantı dizesi"). <br />
+        Lütfen gerekirse ISS'niz ile iletişime geçin.
+        Yerel bir makineye veya sunucuya kurulum yapıyorsanız, sistem yöneticinizden bilgi almanız gerekebilir.]]>
+    </key>
+    <key alias="databaseUpgrade">
+      <![CDATA[
+      <p>
+      Veritabanınızı Umbraco %0% sürümüne yükseltmek için <strong> yükselt </strong> düğmesine basın </p>
+      <p>
+      Endişelenmeyin - hiçbir içerik silinmeyecek ve daha sonra her şey çalışmaya devam edecek!
+      </p>
+      ]]>
+    </key>
+    <key alias="databaseUpgradeDone">
+      <![CDATA[Veritabanınız son sürüme %0% yükseltildi. <br /> için <strong> İleri </strong> 'ye basın
+      ilerlemek. ]]>
+    </key>
+    <key alias="databaseUpToDate"><![CDATA[Mevcut veritabanınız güncel !. Yapılandırma sihirbazına devam etmek için <strong> ileri </strong> 'yi tıklayın]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong> Varsayılan kullanıcıların şifresinin değiştirilmesi gerekiyor! </strong>]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong> Varsayılan kullanıcı devre dışı bırakıldı veya Umbraco'ya erişimi yok! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <b> İleri </b> 'yi tıklayın.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong> Varsayılan kullanıcının şifresi kurulumdan bu yana başarıyla değiştirildi! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <strong> İleri </strong> 'yi tıklayın.]]></key>
+    <key alias="defaultUserPasswordChanged">Şifre değiştirildi!</key>
+    <key alias="greatStart">Harika bir başlangıç ​​yapın, tanıtım videolarımızı izleyin</key>
+    <key alias="None">Henüz yüklenmedi.</key>
+    <key alias="permissionsAffectedFolders">Etkilenen dosyalar ve klasörler</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Umbraco için izinlerin ayarlanmasıyla ilgili daha fazla bilgiyi burada bulabilirsiniz</key>
+    <key alias="permissionsAffectedFoldersText">Aşağıdaki dosyalara / klasörlere ASP.NET değiştirme izinleri vermeniz gerekiyor</key>
+    <key alias="permissionsAlmostPerfect">
+      <![CDATA[<strong> İzin ayarlarınız neredeyse mükemmel! </strong> <br /> <br />
+        Umbraco'yu sorunsuz bir şekilde çalıştırabilirsiniz, ancak Umbraco'dan tam olarak yararlanmanız için önerilen paketleri kuramazsınız.]]>
+    </key>
+    <key alias="permissionsHowtoResolve">Nasıl Çözümlenir</key>
+    <key alias="permissionsHowtoResolveLink">Metin sürümünü okumak için burayı tıklayın</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Umbraco için klasör izinlerinin ayarlanmasıyla ilgili <strong> eğitim videosunu </strong> izleyin veya metin sürümünü okuyun.]]></key>
+    <key alias="permissionsMaybeAnIssue">
+      <![CDATA[<strong> İzin ayarlarınız bir sorun olabilir! </strong>
+      <br/> <br />
+      Umbraco'yu sorunsuz bir şekilde çalıştırabilirsiniz, ancak Umbraco'dan tam olarak yararlanmanız için önerilen klasörler oluşturamaz veya paketleri yükleyemezsiniz.]]>
+    </key>
+    <key alias="permissionsNotReady">
+      <![CDATA[<strong> İzin ayarlarınız Umbraco için hazır değil! </strong>
+          <br /> <br />
+          Umbraco'yu çalıştırmak için izin ayarlarınızı güncellemeniz gerekir.]]>
+    </key>
+    <key alias="permissionsPerfect">
+      <![CDATA[<strong> İzin ayarlarınız mükemmel! </strong> <br /> <br />
+              Umbraco'yu çalıştırmaya ve paketleri kurmaya hazırsınız!]]>
+    </key>
+    <key alias="permissionsResolveFolderIssues">Klasör sorununu çözme</key>
+    <key alias="permissionsResolveFolderIssuesLink">ASP.NET ile ilgili sorunlar ve klasör oluşturma hakkında daha fazla bilgi için bu bağlantıyı izleyin</key>
+    <key alias="permissionsSettingUpPermissions">Klasör izinlerini ayarlama</key>
+    <key alias="permissionsText">
+      <![CDATA[
+      Resimler ve PDF'ler gibi dosyaları depolamak için Umbraco'nun belirli dizinlere yazma / değiştirme erişimine ihtiyacı vardır.
+      Ayrıca, web sitenizin performansını artırmak için geçici verileri (aka: önbellek) depolar.
+    ]]>
+    </key>
+    <key alias="runwayFromScratch">Sıfırdan başlamak istiyorum</key>
+    <key alias="runwayFromScratchText">
+      <![CDATA[
+        Web siteniz şu anda tamamen boş, bu nedenle sıfırdan başlamak ve kendi belge türlerinizi ve şablonlarınızı oluşturmak istiyorsanız bu mükemmel.
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">nasıl yapılacağını öğrenin </a>)
+        Yine de Runway'i daha sonra kurmayı seçebilirsiniz. Lütfen Geliştirici bölümüne gidin ve Paketleri seçin.
+      ]]>
+    </key>
+    <key alias="runwayHeader">Temiz bir Umbraco platformu kurdunuz. Bundan sonra ne yapmak istiyorsunuz?</key>
+    <key alias="runwayInstalled">Runway yüklendi</key>
+    <key alias="runwayInstalledText">
+      <![CDATA[
+      Temeliniz yerinde. Üzerine yüklemek istediğiniz modülleri seçin. <br />
+      Bu, önerilen modüller listemizdir, yüklemek istediklerinizi işaretleyin veya <a href="#" onclick="toggleModules (); return false;" id="toggleModuleList">modüllerin tam listesi </a>
+      ]]>
+    </key>
+    <key alias="runwayOnlyProUsers">Yalnızca deneyimli kullanıcılar için önerilir</key>
+    <key alias="runwaySimpleSite">Basit bir web sitesiyle başlamak istiyorum</key>
+    <key alias="runwaySimpleSiteText">
+      <![CDATA[
+      <p>
+      "Runway", bazı temel belge türlerini ve şablonlarını sunan basit bir web sitesidir. Yükleyici sizin için otomatik olarak Runway kurabilir,
+        ancak kolayca düzenleyebilir, genişletebilir veya kaldırabilirsiniz. Bu gerekli değildir ve Umbraco'yu onsuz mükemmel bir şekilde kullanabilirsiniz. Ancak,
+        Runway, her zamankinden daha hızlı başlamanız için en iyi uygulamalara dayalı kolay bir temel sunar.
+        Runway'i kurmayı seçerseniz, Runway sayfalarınızı geliştirmek için isteğe bağlı olarak Pist Modülleri adı verilen temel yapı bloklarını seçebilirsiniz.
+        </p>
+        <small>
+        <em> Runway'e Dahildir: </em> Ana sayfa, Başlarken sayfası, Modülleri Takma sayfası. <br />
+        <em> İsteğe Bağlı Modüller: </em> Üst Gezinme, Site Haritası, İletişim, Galeri.
+        </small>
+      ]]>
+    </key>
+    <key alias="runwayWhatIsRunway">Runway Nedir</key>
+    <key alias="step1">Adım 1/5 Lisansı kabul edin</key>
+    <key alias="step2">Adım 2/5: Veritabanı yapılandırması</key>
+    <key alias="step3">Adım 3/5: Dosya İzinlerini Doğrulama</key>
+    <key alias="step4">4. Adım: Umbraco güvenliğini kontrol edin</key>
+    <key alias="step5">Adım 5/5: Umbraco başlamanıza hazır</key>
+    <key alias="thankYou">Umbraco'yu seçtiğiniz için teşekkür ederiz</key>
+    <key alias="theEndBrowseSite">
+      <![CDATA[<h3> Yeni sitenize göz atın </h3>
+Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bakmıyorsunuz.]]>
+    </key>
+    <key alias="theEndFurtherHelp">
+      <![CDATA[<h3> Daha fazla yardım ve bilgi </h3>
+Ödüllü topluluğumuzdan yardım alın, belgelere göz atın veya basit bir sitenin nasıl oluşturulacağı, paketlerin nasıl kullanılacağı ve Umbraco terminolojisine yönelik hızlı bir kılavuzla ilgili bazı ücretsiz videolar izleyin]]>
+    </key>
+    <key alias="theEndHeader">Umbraco %0% yüklendi ve kullanıma hazır</key>
+    <key alias="theEndInstallSuccess">
+      <![CDATA[Aşağıdaki "Umbraco'yu Başlat" düğmesini tıklayarak <strong> anında başlayabilirsiniz </strong>. <br /> <strong> Umbraco'da yeniyseniz </strong>,
+başlangıç ​​sayfalarımızda birçok kaynak bulabilirsiniz.]]>
+    </key>
+    <key alias="theEndOpenUmbraco">
+      <![CDATA[<h3> Umbraco’yu Başlat </h3>
+Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemeye başlayın, şablonları ve stil sayfalarını güncelleyin veya yeni işlevler ekleyin]]>
+    </key>
+    <key alias="Unavailable">Veritabanına bağlantı başarısız oldu.</key>
+    <key alias="Version3">Umbraco Sürüm 3</key>
+    <key alias="Version4">Umbraco Sürüm 4</key>
+    <key alias="watch">İzle</key>
+    <key alias="welcomeIntro">
+      <![CDATA[Bu sihirbaz, yeni bir yükleme veya sürüm 3.0'dan yükseltme için <strong> Umbraco %0% </strong> 'u yapılandırma sürecinde size yol gösterecektir.
+                                <br /> <br />
+                                Sihirbazı başlatmak için <strong> "ileri" </strong> seçeneğine basın.]]>
+    </key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">Kültür Kodu</key>
+    <key alias="displayName">Kültür Adı</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">Boştaydınız ve çıkış otomatik olarak içinde gerçekleşecek</key>
+    <key alias="renewSession">Çalışmanızı kaydetmek için şimdi yenileyin</key>
+  </area>
+  <area alias="login">
+    <key alias="greeting0">Mutlu Pazarlar</key>
+    <key alias="greeting1">Mutlu manik Pazartesi</key>
+    <key alias="greeting2">Mutlu salı günleri</key>
+    <key alias="greeting3">Harika Çarşamba Günleri</key>
+    <key alias="greeting4">Mutlu, gök gürültülü Perşembe</key>
+    <key alias="greeting5">Mutlu Cuma Günü</key>
+    <key alias="greeting6">Mutlu Yıllar</key>
+    <key alias="instruction">Aşağıda oturum açın</key>
+    <key alias="signInWith">ile oturum açın</key>
+    <key alias="timeout">Oturum zaman aşımına uğradı</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align: right;">&copy; 2015 - %0% <br /> <a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com </a> </p>]]></key>
+    <key alias="forgottenPassword">Şifrenizi mi unuttunuz?</key>
+    <key alias="forgottenPasswordInstruction">Parolanızı sıfırlamak için bir bağlantıyla belirtilen adrese bir e-posta gönderilecektir</key>
+    <key alias="requestPasswordResetConfirmation">Kayıtlarımızla eşleşirse, şifre sıfırlama talimatlarını içeren bir e-posta, belirtilen adrese gönderilecektir</key>
+    <key alias="showPassword">Şifreyi göster</key>
+    <key alias="hidePassword">Şifreyi gizle</key>
+    <key alias="returnToLogin">Giriş formuna dön</key>
+    <key alias="setPasswordInstruction">Lütfen yeni bir şifre girin</key>
+    <key alias="setPasswordConfirmation">Şifreniz güncellendi</key>
+    <key alias="resetCodeExpired">Tıkladığınız bağlantı geçersiz veya süresi dolmuş</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Şifreyi Sıfırla</key>
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Şifre sıfırlama istendi
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Umbraco arka ofisinde oturum açmak için kullanıcı adınız: <strong>%0%</strong>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																<tbody>
+																	<tr>
+																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				Şifrenizi sıfırlamak için bu bağlantıyı tıklayın
+																			</a>
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</p>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Bağlantıya tıklayamazsanız, bu URL'yi kopyalayıp tarayıcı pencerenize yapıştırın:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+  ]]>
+    </key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">Dashboard</key>
+    <key alias="sections">Bölümler</key>
+    <key alias="tree">İçerik</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">Yukarıdaki sayfayı seçin ...</key>
+    <key alias="copyDone">%0%,%1% konumuna kopyalandı</key>
+    <key alias="copyTo">%0% belgesinin aşağıya kopyalanacağı yeri seçin</key>
+    <key alias="moveDone">%0%,%1% konumuna taşındı</key>
+    <key alias="moveTo">%0% belgesinin aşağıya taşınacağı yeri seçin</key>
+    <key alias="nodeSelected">, yeni içeriğinizin kökü olarak seçildi, aşağıdaki 'tamam'ı tıklayın.</key>
+    <key alias="noNodeSelected">Henüz düğüm seçilmedi, lütfen 'tamam'ı tıklamadan önce yukarıdaki listeden bir düğüm seçin</key>
+    <key alias="notAllowedByContentType">Geçerli düğüme, türü nedeniyle seçilen düğüm altında izin verilmiyor</key>
+    <key alias="notAllowedByPath">Geçerli düğüm, alt sayfalarından birine taşınamaz</key>
+    <key alias="notAllowedAtRoot">Geçerli düğüm kökte bulunamaz</key>
+    <key alias="notValid">1 veya daha fazla alt belge üzerinde yetersiz izniniz olduğundan işleme izin verilmiyor.</key>
+    <key alias="relateToOriginal">Kopyalanan öğeleri orijinalle ilişkilendir</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]> için bildiriminizi seçin</key>
+    <key alias="notificationsSavedFor">için bildirim ayarları kaydedildi</key>
+    <key alias="mailBody">
+      <![CDATA[
+      Merhaba %0%
+
+      Bu, '%1%' görevinin size bildirilmesi için otomatik bir postadır.
+      '%2%' sayfasında gerçekleştirildi
+      '%3%' kullanıcısı tarafından
+
+      Düzenlemek için http://%4%/#/content/content/edit/%5% adresine gidin.
+
+      %6%
+
+      İyi günler!
+
+      Umbraco robotundan teşekkürler
+    ]]>
+    </key>
+    <key alias="mailBodyVariantSummary">Aşağıdaki diller %0% değiştirildi</key>
+    <key alias="mailBodyHtml">
+      <![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+        <body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Merhaba %0%,
+														</h1>
+                                                        <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+                                                            Bu, <strong>'%1%'</strong> görevinin <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> sayfasında <strong>'%3%'</strong> kullanıcısı tarafından gerçekleştirildiğini size bildirmek için otomatik bir postadır.
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
+																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>DÜZENLE</a> </td> </tr></tbody></table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<h3>Güncelleme Özeti:</h3>
+															%6%
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															İyi günler dilerim!<br /><br />
+															Umbraco robotundan teşekkürler
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	]]>
+    </key>
+    <key alias="mailBodyVariantHtmlSummary">
+      <![CDATA[<p> Aşağıdaki diller değiştirildi: </p>
+       %0%
+    ]]>
+    </key>
+    <key alias="mailSubject">[ %0%]%1% ile ilgili bildirim%2% üzerinde gerçekleştirildi</key>
+    <key alias="notifications">Bildirimler</key>
+  </area>
+  <area alias="packager">
+    <key alias="actions">İşlemler</key>
+    <key alias="created">Oluşturuldu</key>
+    <key alias="createPackage">Paket oluştur</key>
+    <key alias="chooseLocalPackageText">
+      <![CDATA[
+      Gözat düğmesine tıklayarak ve paketi bularak makinenizden Paketi seçin. <br/>
+      Umbraco paketleri genellikle ".umb" veya ".zip" uzantısına sahiptir.
+      ]]>
+    </key>
+    <key alias="deletewarning">Bu, paketi silecek</key>
+    <key alias="includeAllChildNodes">Tüm alt düğümleri dahil et</key>
+    <key alias="installed">Yüklendi</key>
+    <key alias="installedPackages">Yüklü paketler</key>
+    <key alias="noConfigurationView">Bu pakette yapılandırma görünümü yok</key>
+    <key alias="noPackagesCreated">Henüz paket oluşturulmadı</key>
+    <key alias="noPackages">Kurulu paketiniz yok</key>
+    <key alias="noPackagesDescription"><![CDATA[Kurulu paketiniz yok. Makinenizden seçerek yerel bir paket kurun veya ekranınızın sağ üst kısmındaki <strong>'Paketler'</strong> simgesini kullanarak mevcut paketlere göz atın]]></key>
+    <key alias="packageContent">Paket İçeriği</key>
+    <key alias="packageLicense">Lisans</key>
+    <key alias="packageSearch">Paket arayın</key>
+    <key alias="packageSearchResults">Sonuçlar</key>
+    <key alias="packageNoResults">için hiçbir şey bulamadık</key>
+    <key alias="packageNoResultsDescription">Lütfen başka bir paket aramayı deneyin veya kategorilere göz atın</key>
+    <key alias="packagesPopular">Popüler</key>
+    <key alias="packagesNew">Yeni sürümler</key>
+    <key alias="packageHas">vardır</key>
+    <key alias="packageKarmaPoints">karma noktaları</key>
+    <key alias="packageInfo">Bilgi</key>
+    <key alias="packageOwner">Sahip</key>
+    <key alias="packageContrib">Katkıda bulunanlar</key>
+    <key alias="packageCreated">Oluşturuldu</key>
+    <key alias="packageCurrentVersion">Mevcut sürüm</key>
+    <key alias="packageNetVersion">. NET sürümü</key>
+    <key alias="packageDownloads">İndirmeler</key>
+    <key alias="packageLikes">Beğeniler</key>
+    <key alias="packageCompatibility">Uyumluluk</key>
+    <key alias="packageCompatibilityDescription">Bu paket, topluluk üyeleri tarafından bildirildiği üzere aşağıdaki Umbraco sürümleriyle uyumludur. % 100'ün altında rapor edilen sürümler için tam uyumluluk garanti edilemez</key>
+    <key alias="packageExternalSources">Harici kaynaklar</key>
+    <key alias="packageAuthor">Yazar</key>
+    <key alias="packageDocumentation">Belgeler</key>
+    <key alias="packageMetaData">Meta verilerini paketle</key>
+    <key alias="packageName">Paket adı</key>
+    <key alias="packageNoItemsHeader">Paket herhangi bir öğe içermiyor</key>
+    <key alias="packageNoItemsText">
+      <![CDATA[Bu paket dosyası kaldırılacak hiçbir öğe içermiyor.<br /><br/>
+      Aşağıdaki "Paketi kaldır"'ı tıklayarak bunu sistemden güvenle kaldırabilirsiniz.]]>
+    </key>
+    <key alias="packageOptions">Paket seçenekleri</key>
+    <key alias="packageReadme">Paketi beni oku</key>
+    <key alias="packageRepository">Paket deposu</key>
+    <key alias="packageUninstallConfirm">Paketi kaldırmayı onayla</key>
+    <key alias="packageUninstalledHeader">Paket kaldırıldı</key>
+    <key alias="packageUninstalledText">Paket başarıyla kaldırıldı</key>
+    <key alias="packageUninstallHeader">Paketi kaldır</key>
+    <key alias="packageUninstallText">
+      <![CDATA[Şu anda aşağıda, kaldırmak istemediğiniz öğelerin seçimini kaldırabilirsiniz. "Kaldırmayı onayla" yı tıkladığınızda işaretlenen tüm öğeler kaldırılacaktır. <br />
+      <span style="color: Red; font-weight: bold;">Uyarı:</span> kaldırdığınız öğelere bağlı olarak herhangi bir belge, ortam vb. çalışmayı durdurur ve sistem kararsızlığına neden olabilir,
+      bu yüzden dikkatli bir şekilde kaldırın. Şüpheniz varsa, paket yazarıyla iletişime geçin.]]>
+    </key>
+    <key alias="packageVersion">Paket versiyonu</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">Tam biçimlendirmeyle yapıştırın (Önerilmez)</key>
+    <key alias="errorMessage">Yapıştırmaya çalıştığınız metin özel karakterler veya biçimlendirme içeriyor. Bunun nedeni Microsoft Word'den metin kopyalanması olabilir. Umbraco, özel karakterleri veya biçimlendirmeyi otomatik olarak kaldırabilir, böylece yapıştırılan içerik web için daha uygun olacaktır.</key>
+    <key alias="removeAll">Hiçbir biçimlendirme olmadan ham metin olarak yapıştırın</key>
+    <key alias="removeSpecialFormattering">Yapıştır, ancak biçimlendirmeyi kaldırın (Önerilir)</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paGroups">Grup tabanlı koruma</key>
+    <key alias="paGroupsHelp">Belirli üye gruplarının tüm üyelerine erişim vermek istiyorsanız</key>
+    <key alias="paGroupsNoGroups">Grup tabanlı kimlik doğrulamasını kullanmadan önce bir üye grubu oluşturmanız gerekir</key>
+    <key alias="paErrorPage">Hata Sayfası</key>
+    <key alias="paErrorPageHelp">Kişiler oturum açtığında ancak erişimi olmadığında kullanılır</key>
+    <key alias="paHowWould"><![CDATA[Sayfaya erişimi nasıl kısıtlayacağınızı seçin <strong>%0%</strong>]]></key>
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> artık korumalı]]></key>
+    <key alias="paIsRemoved"><![CDATA[Koruma, <strong>%0%</strong>]]> sayfasından kaldırılmıştır.</key>
+    <key alias="paLoginPage">Giriş Sayfası</key>
+    <key alias="paLoginPageHelp">Giriş formunu içeren sayfayı seçin</key>
+    <key alias="paRemoveProtection">Korumayı kaldır ...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Korumayı <strong>%0%</strong> sayfasından kaldırmak istediğinizden emin misiniz?]]></key>
+    <key alias="paSelectPages">Giriş formu ve hata mesajları içeren sayfaları seçin</key>
+    <key alias="paSelectGroups"><![CDATA[<strong>%0%</strong> sayfasına erişimi olan grupları seçin]]></key>
+    <key alias="paSelectMembers"><![CDATA[<strong>%0%</strong> sayfasına erişimi olan üyeleri seçin]]></key>
+    <key alias="paMembers">Belirli üyelerin korunması</key>
+    <key alias="paMembersHelp">Belirli üyelere erişim vermek istiyorsanız</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease">
+      <![CDATA[
+     %0%, öğenin yayınlanması planlandığından yayınlanamadı.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedExpired">
+      <![CDATA[
+      Öğenin süresi dolduğu için %0% yayınlanamadı.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[
+     %0%, şu özellikler nedeniyle yayınlanamadı:%1% doğrulama kurallarını geçemedi.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByEvent">
+      <![CDATA[
+     %0% yayınlanamadı, 3. taraf eklenti işlemi iptal etti.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByParent">
+      <![CDATA[
+      Bir üst sayfa yayınlanmadığı için %0% yayınlanamaz.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByMissingName"><![CDATA[ %0%, adı eksik olduğu için yayınlanamaz.]]></key>
+    <key alias="includeUnpublished">Yayınlanmamış alt sayfaları dahil et</key>
+    <key alias="inProgress">Yayınlanıyor - lütfen bekleyin ...</key>
+    <key alias="inProgressCounter">%1% sayfadan %0% yayınlandı ...</key>
+    <key alias="nodePublish">%0% yayınlandı</key>
+    <key alias="nodePublishAll">%0% ve alt sayfalar yayınlandı</key>
+    <key alias="publishAll">%0% ve tüm alt sayfalarını yayınlayın</key>
+    <key alias="publishHelp">
+      <![CDATA[<strong>%0%</strong> yayınlamak ve böylece içeriğini herkese açık hale getirmek için <em>Yayınla</em>'yı tıklayın. <br/><br />
+      Aşağıdaki <em>Yayınlanmamış alt sayfaları ekle</em> 'yi işaretleyerek bu sayfayı ve tüm alt sayfalarını yayınlayabilirsiniz.
+      ]]>
+    </key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">Onaylanmış herhangi bir renk yapılandırmadınız</key>
+  </area>
+  <area alias="contentPicker">
+    <key alias="allowedItemTypes">Yalnızca şu türdeki öğeleri seçebilirsiniz: %0%</key>
+    <key alias="pickedTrashedItem">Şu anda silinmiş veya geri dönüşüm kutusunda bulunan bir içerik öğesini seçtiniz</key>
+    <key alias="pickedTrashedItems">Şu anda silinmiş veya geri dönüşüm kutusunda bulunan içerik öğelerini seçtiniz</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="deletedItem">Silinen öğe</key>
+    <key alias="pickedTrashedItem">Şu anda silinmiş veya geri dönüşüm kutusunda bulunan bir medya öğesini seçtiniz</key>
+    <key alias="pickedTrashedItems">Şu anda silinmiş veya geri dönüşüm kutusunda bulunan medya öğelerini seçtiniz</key>
+    <key alias="trashed">Çöp kutusuna gönderildi</key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="enterExternal">harici bağlantı girin</key>
+    <key alias="chooseInternal">dahili sayfayı seç</key>
+    <key alias="caption">Başlık</key>
+    <key alias="link">Bağlantı</key>
+    <key alias="newWindow">Yeni pencerede aç</key>
+    <key alias="captionPlaceholder">ekran başlığını girin</key>
+    <key alias="externalLinkPlaceholder">Bağlantıyı girin</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Kırpmayı sıfırla</key>
+    <key alias="updateEditCrop">Bitti</key>
+    <key alias="undoEditCrop">Düzenlemeleri geri alın</key>
+    <key alias="customCrop">Kullanıcı tanımlı</key>
+  </area>
+  <area alias="rollback">
+    <key alias="changes">Değişiklikler</key>
+    <key alias="created">Oluşturuldu</key>
+    <key alias="currentVersion">Mevcut sürüm</key>
+    <key alias="diffHelp"><![CDATA[Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>]]></key>
+    <key alias="documentRolledBack">Belge geri alındı ​​</key>
+    <key alias="headline">Mevcut sürümle karşılaştırmak için bir sürüm seçin</key>
+    <key alias="htmlHelp">Bu, seçilen sürümü HTML olarak görüntüler, 2 sürüm arasındaki farkı aynı anda görmek isterseniz, fark görünümünü kullanın</key>
+    <key alias="rollbackTo">Geri alın</key>
+    <key alias="selectVersion">Sürüm seçin</key>
+    <key alias="view">Görüntüle</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">Komut dosyasını düzenle</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">Konsiyerj</key>
+    <key alias="content">İçerik</key>
+    <key alias="courier">Kurye</key>
+    <key alias="developer">Geliştirici</key>
+    <key alias="forms">Formlar</key>
+    <key alias="help" version="7.0">Yardım</key>
+    <key alias="installer">Umbraco Yapılandırma Sihirbazı</key>
+    <key alias="media">Medya</key>
+    <key alias="member">Üyeler</key>
+    <key alias="newsletters">Bültenler</key>
+    <key alias="packages">Paketler</key>
+    <key alias="settings">Ayarlar</key>
+    <key alias="statistics">İstatistikler</key>
+    <key alias="translation">Çeviri</key>
+    <key alias="users">Kullanıcılar</key>
+  </area>
+  <area alias="help">
+    <key alias="tours">Turlar</key>
+    <key alias="theBestUmbracoVideoTutorials">En iyi Umbraco video eğitimleri</key>
+    <key alias="umbracoForum">our.umbraco.com adresini ziyaret edin</key>
+    <key alias="umbracoTv">umbraco.tv'yi ziyaret edin</key>
+  </area>
+  <area alias="settings">
+    <key alias="defaulttemplate">Varsayılan şablon</key>
+    <key alias="importDocumentTypeHelp">
+      Bir belge türünü içe aktarmak için, "Gözat" düğmesini tıklayarak bilgisayarınızda ".udt" dosyasını bulun ve "İçe Aktar" ı tıklayın (sonraki ekranda onay vermeniz istenir) </key>
+    <key alias="newtabname">Yeni Sekme Başlığı</key>
+    <key alias="nodetype">Düğüm türü</key>
+    <key alias="objecttype">Tür</key>
+    <key alias="stylesheet">Stil Sayfası</key>
+    <key alias="script">Komut Dosyası</key>
+    <key alias="tab">Sekme</key>
+    <key alias="tabname">Sekme Başlığı</key>
+    <key alias="tabs">Sekmeler</key>
+    <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
+    <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
+    <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
+    <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
+    <key alias="addIcon">Simge ekle</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortOrder">Sıralama düzeni</key>
+    <key alias="sortCreationDate">Oluşturma tarihi</key>
+    <key alias="sortDone">Sıralama tamamlandı.</key>
+    <key alias="sortHelp">Nasıl düzenleneceklerini ayarlamak için farklı öğeleri aşağı veya yukarı sürükleyin. Veya tüm öğe koleksiyonunu sıralamak için sütun başlıklarını tıklayın</key>
+    <key alias="sortPleaseWait"><![CDATA[Lütfen bekleyin. Öğeler sıralanıyor, bu biraz zaman alabilir.]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="validationFailedHeader">Doğrulama</key>
+    <key alias="validationFailedMessage">Öğe kaydedilmeden önce doğrulama hataları düzeltilmelidir</key>
+    <key alias="operationFailedHeader">Başarısız</key>
+    <key alias="operationSavedHeader">Kaydedildi</key>
+    <key alias="invalidUserPermissionsText">Yetersiz kullanıcı izni, işlemi tamamlayamadı</key>
+    <key alias="operationCancelledHeader">İptal Edildi</key>
+    <key alias="operationCancelledText">İşlem, üçüncü taraf bir eklenti tarafından iptal edildi</key>
+    <key alias="contentPublishedFailedByEvent">Yayınlama, üçüncü taraf bir eklenti tarafından iptal edildi</key>
+    <key alias="contentTypeDublicatePropertyType">Mülk türü zaten var</key>
+    <key alias="contentTypePropertyTypeCreated">Mülk türü oluşturuldu</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Ad: %0% <br /> DataType:%1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">Mülk türü silindi</key>
+    <key alias="contentTypeSavedHeader">Belge Türü kaydedildi</key>
+    <key alias="contentTypeTabCreated">Sekme oluşturuldu</key>
+    <key alias="contentTypeTabDeleted">Sekme silindi</key>
+    <key alias="contentTypeTabDeletedText">Şu kimliğe sahip sekme: %0% silindi</key>
+    <key alias="cssErrorHeader">Stil sayfası kaydedilmedi</key>
+    <key alias="cssSavedHeader">Stil sayfası kaydedildi</key>
+    <key alias="cssSavedText">Stil sayfası hatasız kaydedildi</key>
+    <key alias="dataTypeSaved">Veri türü kaydedildi</key>
+    <key alias="dictionaryItemSaved">Sözlük öğesi kaydedildi</key>
+    <key alias="editContentPublishedFailedByParent">Üst sayfa yayınlanmadığı için yayınlama başarısız oldu</key>
+    <key alias="editContentPublishedHeader">İçerik yayınlandı</key>
+    <key alias="editContentPublishedText">ve web sitesinde görünür</key>
+    <key alias="editContentSavedHeader">İçerik kaydedildi</key>
+    <key alias="editContentSavedText">Değişiklikleri görünür kılmak için yayınlamayı unutmayın</key>
+    <key alias="editContentSendToPublish">Onay İçin Gönderildi</key>
+    <key alias="editContentSendToPublishText">Değişiklikler onay için gönderildi</key>
+    <key alias="editMediaSaved">Medya kaydedildi</key>
+    <key alias="editMediaSavedText">Medya hatasız kaydedildi</key>
+    <key alias="editMemberSaved">Üye kaydedildi</key>
+    <key alias="editStylesheetPropertySaved">Stil Sayfası Özelliği Kaydedildi</key>
+    <key alias="editStylesheetSaved">Stil Sayfası kaydedildi</key>
+    <key alias="editTemplateSaved">Şablon kaydedildi</key>
+    <key alias="editUserError">Kullanıcı kaydedilirken hata oluştu (günlüğü kontrol edin)</key>
+    <key alias="editUserSaved">Kullanıcı Kaydedildi</key>
+    <key alias="editUserTypeSaved">Kullanıcı türü kaydedildi</key>
+    <key alias="editUserGroupSaved">Kullanıcı grubu kaydedildi</key>
+    <key alias="editCulturesAndHostnamesSaved">Kaydedilen kültürler ve ana bilgisayar adları</key>
+    <key alias="editCulturesAndHostnamesError">Kültürleri ve ana bilgisayar adlarını kaydetme hatası</key>
+    <key alias="fileErrorHeader">Dosya kaydedilmedi</key>
+    <key alias="fileErrorText">dosyası kaydedilemedi. Lütfen dosya izinlerini kontrol edin</key>
+    <key alias="fileSavedHeader">Dosya kaydedildi</key>
+    <key alias="fileSavedText">Dosya hatasız kaydedildi</key>
+    <key alias="languageSaved">Dil kaydedildi</key>
+    <key alias="mediaTypeSavedHeader">Medya Türü kaydedildi</key>
+    <key alias="memberTypeSavedHeader">Üye Türü kaydedildi</key>
+    <key alias="memberGroupSavedHeader">Üye Grubu kaydedildi</key>
+    <key alias="templateErrorHeader">Şablon kaydedilmedi</key>
+    <key alias="templateErrorText">Lütfen aynı takma ada sahip 2 şablonunuz olmadığından emin olun</key>
+    <key alias="templateSavedHeader">Şablon kaydedildi</key>
+    <key alias="templateSavedText">Şablon hatasız kaydedildi!</key>
+    <key alias="contentUnpublished">Yayınlanmamış içerik</key>
+    <key alias="partialViewSavedHeader">Kısmi görünüm kaydedildi</key>
+    <key alias="partialViewSavedText">Kısmi görünüm, herhangi bir hata olmadan kaydedildi!</key>
+    <key alias="partialViewErrorHeader">Kısmi görünüm kaydedilmedi</key>
+    <key alias="partialViewErrorText">Dosyayı kaydederken bir hata oluştu.</key>
+    <key alias="permissionsSavedFor">için kaydedilen izinler</key>
+    <key alias="deleteUserGroupsSuccess">%0% kullanıcı grubu silindi</key>
+    <key alias="deleteUserGroupSuccess">%0% silindi</key>
+    <key alias="enableUsersSuccess">%0% kullanıcı etkinleştirildi</key>
+    <key alias="disableUsersSuccess">%0% kullanıcı devre dışı bırakıldı</key>
+    <key alias="enableUserSuccess">%0% artık etkinleştirildi</key>
+    <key alias="disableUserSuccess">%0% artık devre dışı</key>
+    <key alias="setUserGroupOnUsersSuccess">Kullanıcı grupları ayarlandı</key>
+    <key alias="unlockUsersSuccess">%0% kullanıcının kilidi kaldırıldı</key>
+    <key alias="unlockUserSuccess">%0% artık kilitli</key>
+    <key alias="memberExportedSuccess">Üye dosyaya aktarıldı</key>
+    <key alias="memberExportedError">Üyeyi dışa aktarırken bir hata oluştu</key>
+    <key alias="deleteUserSuccess">Kullanıcı %0% silindi</key>
+    <key alias="resendInviteHeader">Kullanıcıyı davet et</key>
+    <key alias="resendInviteSuccess">Davet %0% 'a yeniden gönderildi</key>
+    <key alias="documentTypeExportedSuccess">Belge türü dosyaya aktarıldı</key>
+    <key alias="documentTypeExportedError">Belge türü dışa aktarılırken bir hata oluştu</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="addRule">Stil ekle</key>
+    <key alias="editRule">Stili düzenle</key>
+    <key alias="editorRules">Zengin metin düzenleyici stilleri</key>
+    <key alias="editorRulesHelp">Bu stil sayfası için zengin metin düzenleyicide bulunması gereken stilleri tanımlayın</key>
+    <key alias="editstylesheet">Stil sayfasını düzenle</key>
+    <key alias="editstylesheetproperty">Stil sayfası özelliğini düzenle</key>
+    <key alias="nameHelp">Düzenleyici stili seçicide görüntülenen ad</key>
+    <key alias="preview">Önizleme</key>
+    <key alias="previewHelp">Zengin metin düzenleyicide metin nasıl görünecek.</key>
+    <key alias="selector">Seçici</key>
+    <key alias="selectorHelp">CSS sözdizimini kullanır, ör. "h1" veya ".redHeader"</key>
+    <key alias="styles">Stiller</key>
+    <key alias="stylesHelp">Zengin metin düzenleyicide uygulanması gereken CSS, ör. "color: red;"</key>
+    <key alias="tabCode">Kod</key>
+    <key alias="tabRules">Düzenleyici</key>
+  </area>
+  <area alias="template">
+    <key alias="deleteByIdFailed">%0% kimliğine sahip şablon silinemedi</key>
+    <key alias="edittemplate">Şablonu düzenle</key>
+    <key alias="insertSections">Bölümler</key>
+    <key alias="insertContentArea">İçerik alanı ekle</key>
+    <key alias="insertContentAreaPlaceHolder">İçerik alanı yer tutucusu ekle</key>
+    <key alias="insert">Ekle</key>
+    <key alias="insertDesc">Şablonunuza ne ekleyeceğinizi seçin</key>
+    <key alias="insertDictionaryItem">Sözlük öğesi</key>
+    <key alias="insertDictionaryItemDesc">Sözlük öğesi, çevrilebilir bir metin parçası için yer tutucudur ve çok dilli web siteleri için tasarımlar oluşturmayı kolaylaştırır.</key>
+    <key alias="insertMacro">Makro</key>
+    <key alias="insertMacroDesc">
+      Makro, yapılandırılabilir bir bileşendir ve aşağıdakiler için idealdir:
+      parametreler sağlama seçeneğine ihtiyaç duyduğunuz tasarımınızın yeniden kullanılabilir parçaları,
+      galeriler, formlar ve listeler gibi.
+    </key>
+    <key alias="insertPageField">Değer</key>
+    <key alias="insertPageFieldDesc">Geçerli sayfadaki adlandırılmış bir alanın değerini, değeri değiştirme veya alternatif değerlere geri dönüş seçenekleri ile birlikte görüntüler.</key>
+    <key alias="insertPartialView">Kısmi görünüm</key>
+    <key alias="insertPartialViewDesc">
+      Kısmi görünüm, başka bir şablonun içinde oluşturulabilen ayrı bir şablon dosyasıdır.
+      şablonu, işaretlemeyi yeniden kullanmak veya karmaşık şablonları ayrı dosyalara ayırmak için harikadır.
+    </key>
+    <key alias="mastertemplate">Ana şablon</key>
+    <key alias="noMaster">Ana yok</key>
+    <key alias="renderBody">Alt şablonu oluştur</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+     Ekleyerek bir alt şablonun içeriğini işler
+     <code>@RenderBody()</code> yer tutucusu.
+      ]]>
+    </key>
+    <key alias="defineSection">Adlandırılmış bir bölüm tanımlayın</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         Şablonunuzun bir bölümünü, içine sararak adlandırılmış bir bölüm olarak tanımlar
+          <code>@section { ... }</code>. Bu bir
+          <code>@RenderSection</code> kullanarak bu şablonun üst öğesinin belirli bir alanı.
+      ]]>
+    </key>
+    <key alias="renderSection">Adlandırılmış bir bölüm oluşturun</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Bir <code>@RenderSection(ad)</code> yer tutucusu ekleyerek bir alt şablonun adlandırılmış alanını oluşturur.
+      Bu, karşılık gelen bir <code>@section [ad] {...}</code> tanımına sarılmış bir alt şablon alanını oluşturur.
+      ]]>
+    </key>
+    <key alias="sectionName">Bölüm Adı</key>
+    <key alias="sectionMandatory">Bölüm zorunludur</key>
+    <key alias="sectionMandatoryDesc"><![CDATA[
+      Zorunlu ise, alt şablon bir <code>@section</code> tanımı içermelidir, aksi takdirde bir hata gösterilir.
+    ]]></key>
+    <key alias="queryBuilder">Sorgu oluşturucu</key>
+    <key alias="itemsReturned">öğe iade edildi,</key>
+    <key alias="iWant">istiyorum</key>
+    <key alias="allContent">tüm içerik</key>
+    <key alias="contentOfType">"%0%" türünde içerik</key>
+    <key alias="from">dan</key>
+    <key alias="websiteRoot">web sitem</key>
+    <key alias="where">nerede</key>
+    <key alias="and">ve</key>
+    <key alias="is">=</key>
+    <key alias="isNot">değil</key>
+    <key alias="before">önce</key>
+    <key alias="beforeIncDate">önce (seçilen tarih dahil)</key>
+    <key alias="after">sonra</key>
+    <key alias="afterIncDate">sonra (seçilen tarih dahil)</key>
+    <key alias="equals">şuna eşittir</key>
+    <key alias="doesNotEqual">eşit değildir</key>
+    <key alias="contains">içerir</key>
+    <key alias="doesNotContain">içermez</key>
+    <key alias="greaterThan">büyüktür</key>
+    <key alias="greaterThanEqual">büyük veya eşittir</key>
+    <key alias="lessThan">küçüktür</key>
+    <key alias="lessThanEqual">küçüktür veya eşittir</key>
+    <key alias="id">kimlik</key>
+    <key alias="name">Ad</key>
+    <key alias="createdDate">Oluşturulma Tarihi</key>
+    <key alias="lastUpdatedDate">Son Güncelleme Tarihi</key>
+    <key alias="orderBy">sırala</key>
+    <key alias="ascending">artan</key>
+    <key alias="descending">azalan</key>
+    <key alias="template">Şablon</key>
+  </area>
+  <area alias="grid">
+    <key alias="media">Resim</key>
+    <key alias="macro">Makro</key>
+    <key alias="insertControl">İçerik türünü seçin</key>
+    <key alias="chooseLayout">Bir düzen seçin</key>
+    <key alias="addRows">Satır ekle</key>
+    <key alias="addElement">İçerik ekle</key>
+    <key alias="dropElement">İçeriği bırak</key>
+    <key alias="settingsApplied">Ayarlar uygulandı</key>
+    <key alias="contentNotAllowed">Bu içeriğe burada izin verilmiyor</key>
+    <key alias="contentAllowed">Bu içeriğe burada izin verilir</key>
+    <key alias="clickToEmbed">Yerleştirmek için tıklayın</key>
+    <key alias="clickToInsertImage">Resim eklemek için tıklayın</key>
+    <key alias="placeholderWriteHere">Buraya yazın ...</key>
+    <key alias="gridLayouts">Izgara Düzenleri</key>
+    <key alias="gridLayoutsDetail">Düzenler, ızgara düzenleyicinin genel çalışma alanıdır, genellikle yalnızca bir veya iki farklı düzene ihtiyacınız vardır</key>
+    <key alias="addGridLayout">Izgara Düzeni Ekle</key>
+    <key alias="editGridLayout">Izgara Düzenini Düzenle</key>
+    <key alias="addGridLayoutDetail">Sütun genişliklerini ayarlayarak ve ek bölümler ekleyerek düzeni ayarlayın</key>
+    <key alias="rowConfigurations">Satır yapılandırmaları</key>
+    <key alias="rowConfigurationsDetail">Satırlar, yatay olarak düzenlenmiş önceden tanımlanmış hücrelerdir</key>
+    <key alias="addRowConfiguration">Satır yapılandırması ekle</key>
+    <key alias="editRowConfiguration">Satır yapılandırmasını düzenle</key>
+    <key alias="addRowConfigurationDetail">Hücre genişliklerini ayarlayarak ve ilave hücreler ekleyerek satırı ayarlayın</key>
+    <key alias="columns">Sütunlar</key>
+    <key alias="columnsDetails">Izgara düzenindeki toplam birleşik sütun sayısı</key>
+    <key alias="settings">Ayarlar</key>
+    <key alias="settingsDetails">Hangi ayarları düzenleyicilerin değiştirebileceğini yapılandırın</key>
+    <key alias="styles">Stiller</key>
+    <key alias="stylesDetails">Stil editörlerinin neleri değiştirebileceğini yapılandırma</key>
+    <key alias="allowAllEditors">Tüm düzenleyicilere izin ver</key>
+    <key alias="allowAllRowConfigurations">Tüm satır yapılandırmalarına izin ver</key>
+    <key alias="maxItems">Maksimum öğe</key>
+    <key alias="maxItemsDescription">Boş bırakın veya sınırsız için 0 olarak ayarlayın</key>
+    <key alias="setAsDefault">Varsayılan olarak ayarla</key>
+    <key alias="chooseExtra">Fazladan birini seçin</key>
+    <key alias="chooseDefault">Varsayılanı seçin</key>
+    <key alias="areAdded">eklendi</key>
+    <key alias="youAreDeleting">Satır yapılandırmasını siliyorsunuz</key>
+    <key alias="deletingARow">
+      Bir satır yapılandırma adının silinmesi, bu yapılandırmaya dayalı mevcut herhangi bir içerik için veri kaybına neden olur.
+    </key>
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="compositions">Kompozisyonlar</key>
+    <key alias="group">Grup</key>
+    <key alias="noGroups">Hiçbir grup eklemediniz</key>
+    <key alias="addGroup">Grup ekle</key>
+    <key alias="inheritedFrom">devralındı ​​</key>
+    <key alias="addProperty">Mülk ekle</key>
+    <key alias="requiredLabel">Gerekli etiket</key>
+    <key alias="enableListViewHeading">Liste görünümünü etkinleştir</key>
+    <key alias="enableListViewDescription">İçerik öğesini, alt öğelerinin sıralanabilir ve aranabilir bir listesini gösterecek şekilde yapılandırır, alt öğeler ağaçta gösterilmez</key>
+    <key alias="allowedTemplatesHeading">İzin Verilen Şablonlar</key>
+    <key alias="allowedTemplatesDescription">Bu tür içerik üzerinde hangi şablon düzenleyicilerinin kullanmasına izin verileceğini seçin</key>
+    <key alias="allowAsRootHeading">Kök olarak izin ver</key>
+    <key alias="allowAsRootDescription">Düzenleyicilerin, içerik ağacının kök dizininde bu türden içerik oluşturmasına izin verin.</key>
+    <key alias="childNodesHeading">İzin verilen alt düğüm türleri</key>
+    <key alias="childNodesDescription">Belirtilen türlerdeki içeriğin, bu tür içeriğin altında oluşturulmasına izin verin.</key>
+    <key alias="chooseChildNode">Alt düğümü seçin</key>
+    <key alias="compositionsDescription">Mevcut bir belge türünden sekmeleri ve özellikleri devralın. Mevcut belge türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.</key>
+    <key alias="compositionInUse">Bu içerik türü bir bestede kullanıldığından kendi başına oluşturulamaz.</key>
+    <key alias="noAvailableCompositions">Beste olarak kullanılabilecek içerik türü yok.</key>
+    <key alias="compositionRemoveWarning">Bir kompozisyonun kaldırılması, ilişkili tüm özellik verilerini silecektir. Belge türünü kaydettikten sonra geri dönüş yoktur.</key>
+    <key alias="availableEditors">Yeni oluştur</key>
+    <key alias="reuse">Mevcut olanı kullan</key>
+    <key alias="editorSettings">Düzenleyici ayarları</key>
+    <key alias="configuration">Yapılandırma</key>
+    <key alias="yesDelete">Evet, sil</key>
+    <key alias="movedUnderneath">altına taşındı</key>
+    <key alias="copiedUnderneath">altına kopyalandı</key>
+    <key alias="folderToMove">Taşınacak klasörü seçin</key>
+    <key alias="folderToCopy">Kopyalanacak klasörü seçin</key>
+    <key alias="structureBelow">aşağıdaki ağaç yapısına</key>
+    <key alias="allDocumentTypes">Tüm Belge türleri</key>
+    <key alias="allDocuments">Tüm Belgeler</key>
+    <key alias="allMediaItems">Tüm medya öğeleri</key>
+    <key alias="usingThisDocument">bu belge türünün kullanılması kalıcı olarak silinecektir, lütfen bunları da silmek istediğinizi onaylayın.</key>
+    <key alias="usingThisMedia">bu medya türünün kullanılması kalıcı olarak silinecek, lütfen bunları da silmek istediğinizi onaylayın.</key>
+    <key alias="usingThisMember">bu üye türünün kullanılması kalıcı olarak silinecek, lütfen bunları da silmek istediğinizi onaylayın</key>
+    <key alias="andAllDocuments">ve bu türü kullanan tüm belgeler</key>
+    <key alias="andAllMediaItems">ve bu türü kullanan tüm medya öğeleri</key>
+    <key alias="andAllMembers">ve bu türü kullanan tüm üyeler</key>
+    <key alias="memberCanEdit">Üye düzenleyebilir</key>
+    <key alias="memberCanEditDescription">Bu özellik değerinin üye tarafından profil sayfasında düzenlenmesine izin ver</key>
+    <key alias="isSensitiveData">Hassas verilerdir</key>
+    <key alias="isSensitiveDataDescription">Bu özellik değerini, hassas bilgileri görüntüleme erişimi olmayan içerik düzenleyicilerinden gizleyin</key>
+    <key alias="showOnMemberProfile">Üye profilinde göster</key>
+    <key alias="showOnMemberProfileDescription">Bu özellik değerinin üye profil sayfasında görüntülenmesine izin ver</key>
+    <key alias="tabHasNoSortOrder">sekmesinde sıralama düzeni yok</key>
+    <key alias="compositionUsageHeading">Bu beste nerede kullanılıyor?</key>
+    <key alias="compositionUsageSpecification">Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:</key>
+    <key alias="cultureVariantHeading">Kültüre göre değişikliklere izin ver</key>
+    <key alias="segmentVariantHeading">Segmentasyona izin ver</key>
+    <key alias="cultureVariantLabel">Kültüre göre değişiklik yapın</key>
+    <key alias="segmentVariantLabel">Segmentlere göre değişiklik yapın</key>
+    <key alias="cultureVariantDescription">Düzenleyenlerin farklı dillerde içerik oluşturmasına izin ver.</key>
+    <key alias="segmentVariantDescription">Editörlerin bu içeriğin segmentlerini oluşturmasına izin ver.</key>
+    <key alias="allowVaryByCulture">Kültüre göre değişiklik yapmaya izin ver</key>
+    <key alias="allowVaryBySegment">Segmentasyona izin ver</key>
+    <key alias="elementType">Öğe türü</key>
+    <key alias="elementHeading">Bir Öğe türüdür</key>
+    <key alias="elementDescription">Bir Öğe türü, ağaçta değil, örneğin Yuvalanmış İçerikte kullanılmak üzere tasarlanmıştır.</key>
+    <key alias="elementCannotToggle">Bir belge türü, bir veya daha fazla içerik öğesi oluşturmak için kullanıldıktan sonra Öğe türü olarak değiştirilemez.</key>
+    <key alias="elementDoesNotSupport">Bu, bir Öğe türü için geçerli değildir</key>
+    <key alias="propertyHasChanges">Bu özellikte değişiklikler yaptınız. Onları atmak istediğinizden emin misiniz?</key>
+  </area>
+  <area alias="languages">
+    <key alias="addLanguage">Dil ekle</key>
+    <key alias="mandatoryLanguage">Zorunlu dil</key>
+    <key alias="mandatoryLanguageHelp">Düğüm yayınlanmadan önce bu dildeki özelliklerin doldurulması gerekir.</key>
+    <key alias="defaultLanguage">Varsayılan dil</key>
+    <key alias="defaultLanguageHelp">Bir Umbraco sitesinde yalnızca bir varsayılan dil ayarı olabilir.</key>
+    <key alias="changingDefaultLanguageWarning">Varsayılan dili değiştirmek, varsayılan içeriğin kaybolmasına neden olabilir.</key>
+    <key alias="fallsbackToLabel">Geri döner</key>
+    <key alias="noFallbackLanguageOption">Geri dönüş dili yok</key>
+    <key alias="fallbackLanguageDescription">Çok dilli içeriğin, istenen dilde yoksa başka bir dile geri dönmesine izin vermek için, buradan seçin.</key>
+    <key alias="fallbackLanguage">Geri dönüş dili</key>
+    <key alias="none">yok</key>
+  </area>
+  <area alias="macro">
+    <key alias="addParameter">Parametre ekle</key>
+    <key alias="editParameter">Parametreyi düzenle</key>
+    <key alias="enterMacroName">Makro adını girin</key>
+    <key alias="parameters">Parametreler</key>
+    <key alias="parametersDescription">Bu makroyu kullanırken mevcut olması gereken parametreleri tanımlayın.</key>
+    <key alias="selectViewFile">Kısmi görünüm makro dosyasını seçin</key>
+  </area>
+  <area alias="modelsBuilder">
+    <key alias="buildingModels">Model oluşturma</key>
+    <key alias="waitingMessage">bu biraz zaman alabilir, endişelenmeyin</key>
+    <key alias="modelsGenerated">Oluşturulan modeller</key>
+    <key alias="modelsGeneratedError">Modeller oluşturulamadı</key>
+    <key alias="modelsExceptionInUlog">Model oluşturma başarısız oldu, U günlüğünde istisnaya bakın</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="addDefaultValue">Varsayılan değer ekle</key>
+    <key alias="defaultValue">Varsayılan değer</key>
+    <key alias="alternativeField">Yedek alanı</key>
+    <key alias="alternativeText">Varsayılan değer</key>
+    <key alias="casing">Kasa</key>
+    <key alias="encoding">Kodlama</key>
+    <key alias="chooseField">Alan seçin</key>
+    <key alias="convertLineBreaks">Satır sonlarını dönüştür</key>
+    <key alias="convertLineBreaksHelp">Satır sonlarını 'br' html etiketiyle değiştirir</key>
+    <key alias="customFields">Özel Alanlar</key>
+    <key alias="dateOnly">Yalnızca tarih</key>
+    <key alias="formatAsDate">Tarih olarak biçimlendir</key>
+    <key alias="htmlEncode">HTML kodlama</key>
+    <key alias="htmlEncodeHelp">Özel karakterleri HTML eşdeğerleriyle değiştirir.</key>
+    <key alias="insertedAfter">Alan değerinden sonra eklenecek</key>
+    <key alias="insertedBefore">Alan değerinden önce eklenecek</key>
+    <key alias="lowercase">Küçük harf</key>
+    <key alias="none">Yok</key>
+    <key alias="outputSample">Çıktı örneği</key>
+    <key alias="postContent">Alanın sonrasına ekle</key>
+    <key alias="preContent">Alanın önüne ekle</key>
+    <key alias="recursive">Özyinelemeli</key>
+    <key alias="recursiveDescr">Evet, yinelemeli yap</key>
+    <key alias="standardFields">Standart Alanlar</key>
+    <key alias="uppercase">Büyük harf</key>
+    <key alias="urlEncode">URL kodlama</key>
+    <key alias="urlEncodeHelp">URL'lerdeki özel karakterleri biçimlendirecek</key>
+    <key alias="usedIfAllEmpty">Yalnızca yukarıdaki alan değerleri boş olduğunda kullanılacaktır</key>
+    <key alias="usedIfEmpty">Bu alan yalnızca birincil alan boşsa kullanılacaktır</key>
+    <key alias="withTime">Tarih ve saat</key>
+  </area>
+  <area alias="translation">
+    <key alias="details">Çeviri ayrıntıları</key>
+    <key alias="DownloadXmlDTD">XML DTD'yi İndir</key>
+    <key alias="fields">Alanlar</key>
+    <key alias="includeSubpages">Alt sayfaları dahil et</key>
+    <key alias="mailBody">
+      <![CDATA[
+      Merhaba %0%
+
+      Bu, '%1%' belgesinin size bildirilmesi için otomatik bir postadır.
+      %2% tarafından '%5%' e çevrilmesi istendi.
+
+      Düzenlemek için http://%3%/translation/details.aspx?id=%4% adresine gidin.
+
+      Veya çeviri görevlerinize genel bir bakış için Umbraco'da oturum açın
+      http://%3%
+
+      İyi günler!
+
+      Umbraco robotdan teşekkürler
+      ]]>
+    </key>
+    <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
+    <key alias="pageHasBeenSendToTranslation">'%0%' sayfası çeviriye gönderildi</key>
+    <key alias="sendToTranslate">'%0%' sayfasını çeviriye gönder</key>
+    <key alias="totalWords">Toplam kelime</key>
+    <key alias="translateTo">Şu dile çevir</key>
+    <key alias="translationDone">Çeviri tamamlandı.</key>
+    <key alias="translationDoneHelp">Aşağıya tıklayarak yeni çevirdiğiniz sayfaların önizlemesini yapabilirsiniz. Orijinal sayfa bulunursa, 2 sayfanın bir karşılaştırmasını alacaksınız.</key>
+    <key alias="translationFailed">Çeviri başarısız oldu, XML dosyası bozulmuş olabilir</key>
+    <key alias="translationOptions">Çeviri seçenekleri</key>
+    <key alias="translator">Çevirmen</key>
+    <key alias="uploadTranslationXml">Çeviri XML'sini yükle</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="content">İçerik</key>
+    <key alias="contentBlueprints">İçerik Şablonları</key>
+    <key alias="media">Medya</key>
+    <key alias="cacheBrowser">Önbellek Tarayıcısı</key>
+    <key alias="contentRecycleBin">Geri Dönüşüm Kutusu</key>
+    <key alias="createdPackages">Oluşturulan paketler</key>
+    <key alias="dataTypes">Veri Türleri</key>
+    <key alias="dictionary">Sözlük</key>
+    <key alias="installedPackages">Yüklü paketler</key>
+    <key alias="installSkin">Dış görünümü yükleyin</key>
+    <key alias="installStarterKit">Başlangıç ​​kitini yükleyin</key>
+    <key alias="languages">Diller</key>
+    <key alias="localPackage">Yerel paketi yükle</key>
+    <key alias="macros">Makrolar</key>
+    <key alias="mediaTypes">Medya Türleri</key>
+    <key alias="member">Üyeler</key>
+    <key alias="memberGroups">Üye Grupları</key>
+    <key alias="memberRoles">Üye Rolleri</key>
+    <key alias="memberTypes">Üye Türleri</key>
+    <key alias="documentTypes">Belge Türleri</key>
+    <key alias="relationTypes">İlişki Türleri</key>
+    <key alias="packager">Paketler</key>
+    <key alias="packages">Paketler</key>
+    <key alias="partialViews">Kısmi Görünümler</key>
+    <key alias="partialViewMacros">Makro Dosyalarını Kısmi Görüntüle</key>
+    <key alias="repositories">Depodan yükle</key>
+    <key alias="runway">Runway'i Kur</key>
+    <key alias="runwayModules">Runway modülleri</key>
+    <key alias="scripting">Komut Dosyası Dosyaları</key>
+    <key alias="scripts">Komut Dosyaları</key>
+    <key alias="stylesheets">Stil Sayfaları</key>
+    <key alias="templates">Şablonlar</key>
+    <key alias="logViewer">Günlük Görüntüleyici</key>
+    <key alias="users">Kullanıcılar</key>
+    <key alias="settingsGroup">Ayarlar</key>
+    <key alias="templatingGroup">Şablon Oluşturma</key>
+    <key alias="thirdPartyGroup">Üçüncü Taraf</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">Yeni güncelleme hazır</key>
+    <key alias="updateDownloadText">%0% hazır, indirmek için burayı tıklayın</key>
+    <key alias="updateNoServer">Sunucuyla bağlantı yok</key>
+    <key alias="updateNoServerError">Güncelleme için hata denetimi. Daha fazla bilgi için lütfen izleme yığınını inceleyin</key>
+  </area>
+  <area alias="user">
+    <key alias="access">Erişim</key>
+    <key alias="accessHelp">Atanan gruplara ve başlangıç ​​düğümlerine bağlı olarak, kullanıcının aşağıdaki düğümlere erişimi vardır</key>
+    <key alias="assignAccess">Erişim ata</key>
+    <key alias="administrators">Yönetici</key>
+    <key alias="categoryField">Kategori alanı</key>
+    <key alias="createDate">Kullanıcı oluşturuldu</key>
+    <key alias="changePassword">Şifrenizi değiştirin</key>
+    <key alias="changePhoto">Fotoğrafı değiştir</key>
+    <key alias="newPassword">Yeni şifre</key>
+    <key alias="noLockouts">kilitlenmedi</key>
+    <key alias="noPasswordChange">Şifre değiştirilmedi</key>
+    <key alias="confirmNewPassword">Yeni şifreyi onaylayın</key>
+    <key alias="changePasswordDescription">Aşağıdaki formu doldurarak ve 'Şifreyi Değiştir' düğmesini tıklayarak Umbraco Arka Ofisine erişim şifrenizi değiştirebilirsiniz</key>
+    <key alias="contentChannel">İçerik Kanalı</key>
+    <key alias="createAnotherUser">Başka bir kullanıcı oluşturun</key>
+    <key alias="createUserHelp">Umbraco'ya erişim sağlamak için yeni kullanıcılar oluşturun. Yeni bir kullanıcı oluşturulduğunda, kullanıcıyla paylaşabileceğiniz bir şifre oluşturulacaktır.</key>
+    <key alias="descriptionField">Açıklama alanı</key>
+    <key alias="disabled">Kullanıcıyı Devre Dışı Bırak</key>
+    <key alias="documentType">Belge Türü</key>
+    <key alias="editors">Düzenleyici</key>
+    <key alias="excerptField">Alıntı alanı</key>
+    <key alias="failedPasswordAttempts">Başarısız giriş denemeleri</key>
+    <key alias="goToProfile">Kullanıcı profiline gidin</key>
+    <key alias="groupsHelp">Erişim ve izinler atamak için gruplar ekleyin</key>
+    <key alias="inviteAnotherUser">Başka bir kullanıcıyı davet edin</key>
+    <key alias="inviteUserHelp">Yeni kullanıcıları Umbraco'ya erişim vermeleri için davet edin. Kullanıcıya, Umbraco'da nasıl oturum açılacağına dair bilgiler içeren bir davet e-postası gönderilecektir. Davetler 72 saat sürer.</key>
+    <key alias="language">Dil</key>
+    <key alias="languageHelp">Menülerde ve iletişim kutularında göreceğiniz dili ayarlayın</key>
+    <key alias="lastLockoutDate">Son kilitlenme tarihi</key>
+    <key alias="lastLogin">Son giriş</key>
+    <key alias="lastPasswordChangeDate">Parola son değiştirildi</key>
+    <key alias="loginname">Kullanıcı Adı</key>
+    <key alias="mediastartnode">Medya başlangıç ​​düğümü</key>
+    <key alias="mediastartnodehelp">Medya kitaplığını belirli bir başlangıç ​​düğümüyle sınırlayın</key>
+    <key alias="mediastartnodes">Medya başlangıç ​​düğümleri</key>
+    <key alias="mediastartnodeshelp">Medya kitaplığını belirli başlangıç ​​düğümleriyle sınırlayın</key>
+    <key alias="modules">Bölümler</key>
+    <key alias="noConsole">Umbraco Erişimini Devre Dışı Bırak</key>
+    <key alias="noLogin">henüz giriş yapmadı</key>
+    <key alias="oldPassword">Eski şifre</key>
+    <key alias="password">Şifre</key>
+    <key alias="resetPassword">Şifreyi sıfırla</key>
+    <key alias="passwordChanged">Şifreniz değiştirildi!</key>
+    <key alias="passwordChangedGeneric">Şifre değiştirildi</key>
+    <key alias="passwordConfirm">Lütfen yeni şifreyi onaylayın</key>
+    <key alias="passwordEnterNew">Yeni şifrenizi girin</key>
+    <key alias="passwordIsBlank">Yeni şifreniz boş olamaz!</key>
+    <key alias="passwordCurrent">Mevcut şifre</key>
+    <key alias="passwordInvalid">Geçersiz mevcut şifre</key>
+    <key alias="passwordIsDifferent">Yeni parola ile onaylanan parola arasında bir fark vardı. Lütfen tekrar deneyin!</key>
+    <key alias="passwordMismatch">Onaylanan şifre yeni şifreyle eşleşmiyor!</key>
+    <key alias="permissionReplaceChildren">Alt düğüm izinlerini değiştirin</key>
+    <key alias="permissionSelectedPages">Şu anda sayfaların izinlerini değiştiriyorsunuz:</key>
+    <key alias="permissionSelectPages">İzinlerini değiştirmek için sayfaları seçin</key>
+    <key alias="removePhoto">Fotoğrafı kaldır</key>
+    <key alias="permissionsDefault">Varsayılan izinler</key>
+    <key alias="permissionsGranular">Ayrıntılı izinler</key>
+    <key alias="permissionsGranularHelp">Belirli düğümler için izinleri ayarlayın</key>
+    <key alias="profile">Profil</key>
+    <key alias="searchAllChildren">Tüm çocukları ara</key>
+    <key alias="sectionsHelp">Kullanıcılara erişim vermek için bölümler ekleyin</key>
+    <key alias="selectUserGroups">Kullanıcı gruplarını seçin</key>
+    <key alias="noStartNode">Seçili başlangıç ​​düğümü yok</key>
+    <key alias="noStartNodes">Seçili başlangıç ​​düğümü yok</key>
+    <key alias="startnode">İçerik başlangıç ​​düğümü</key>
+    <key alias="startnodehelp">İçerik ağacını belirli bir başlangıç ​​düğümüyle sınırlayın</key>
+    <key alias="startnodes">İçerik başlangıç ​​düğümleri</key>
+    <key alias="startnodeshelp">İçerik ağacını belirli başlangıç ​​düğümleriyle sınırlayın</key>
+    <key alias="updateDate">Kullanıcının son güncellenme tarihi</key>
+    <key alias="userCreated">oluşturuldu</key>
+    <key alias="userCreatedSuccessHelp">Yeni kullanıcı başarıyla oluşturuldu. Umbraco'da oturum açmak için aşağıdaki şifreyi kullanın.</key>
+    <key alias="userManagement">Kullanıcı yönetimi</key>
+    <key alias="username">Ad</key>
+    <key alias="userPermissions">Kullanıcı izinleri</key>
+    <key alias="usergroup">Kullanıcı grubu</key>
+    <key alias="userInvited">davet edildi</key>
+    <key alias="userInvitedSuccessHelp">Yeni kullanıcıya, Umbraco'da nasıl oturum açılacağına ilişkin ayrıntıları içeren bir davetiye gönderildi.</key>
+    <key alias="userinviteWelcomeMessage">Merhabalar, Umbraco'ya hoş geldiniz! Sadece 1 dakika içinde hazır olacaksınız, sadece bir şifre belirlemeniz ve avatarınız için bir resim eklemeniz gerekiyor.</key>
+    <key alias="userinviteExpiredMessage">Umbraco'ya hoş geldiniz! Maalesef davetinizin süresi doldu. Lütfen yöneticinizle iletişime geçin ve yeniden göndermesini isteyin.</key>
+    <key alias="userinviteAvatarMessage">Kendi fotoğrafınızı yüklemek, diğer kullanıcıların sizi tanımasını kolaylaştıracaktır. Fotoğrafınızı yüklemek için yukarıdaki daireyi tıklayın.</key>
+    <key alias="writer">Yazar</key>
+    <key alias="change">Değiştir</key>
+    <key alias="yourProfile" version="7.0">Profiliniz</key>
+    <key alias="yourHistory" version="7.0">Yakın geçmişiniz</key>
+    <key alias="sessionExpires" version="7.0">Oturum sona eriyor</key>
+    <key alias="inviteUser">Kullanıcıyı davet et</key>
+    <key alias="createUser">Kullanıcı oluştur</key>
+    <key alias="sendInvite">Davet gönder</key>
+    <key alias="backToUsers">Kullanıcılara dön</key>
+    <key alias="inviteEmailCopySubject">Umbraco: Davet</key>
+    <key alias="inviteEmailCopyFormat">
+      <![CDATA[
+    <html>
+    <head>
+        <meta name='viewport' content='width=device-width'>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+    </head>
+    <body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+        <style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+        <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+            <tr>
+                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+                    <table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                        <tr>
+                            <td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+                                <!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+                                <div> </div>
+                                <!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+                            </td>
+                            <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+            <tr>
+                <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+                <td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+                    <div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+                        <br>
+                        <table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+                            <tr>
+                                <td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+                                    <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+                                        <tr>
+                                            <td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+                                                <h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+                                                    Merhaba %0%,
+                                                </h1>
+                                                <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+                                                    <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> tarafından Umbraco Arka Ofisine davet edildiniz.
+                                                </p>
+                                                <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+                                                    <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> tarafından gönderilen mesaj:
+                                                    <br/>
+                                                    <em>%2%</em>
+                                                </p>
+                                                <table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+                                                                <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+                                                                                <a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+                                                                                    Daveti Kabul Etmek İçin Bu Bağlantıyı Tıklayın
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Bağlantıya tıklayamazsanız, bu URL'yi kopyalayıp tarayıcı pencerenize yapıştırın:</p>
+                                                    <table border='0' cellpadding='0' cellspacing='0'>
+                                                        <tr>
+                                                            <td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+                                                                <font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+                                                                    <a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+                                                                </font>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <br><br><br>
+                    </div>
+                </td>
+                <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+            </tr>
+        </table>
+    </body>
+</html>]]>
+    </key>
+    <key alias="defaultInvitationMessage">Davetiye yeniden gönderiliyor ...</key>
+    <key alias="deleteUser">Kullanıcıyı Sil</key>
+    <key alias="deleteUserConfirmation">Bu kullanıcı hesabını silmek istediğinizden emin misiniz?</key>
+    <key alias="stateAll">Tümü</key>
+    <key alias="stateActive">Etkin</key>
+    <key alias="stateDisabled">Devre Dışı</key>
+    <key alias="stateLockedOut">Kilitlendi</key>
+    <key alias="stateInvited">Davet edildi</key>
+    <key alias="stateInactive">Etkin Değil</key>
+    <key alias="sortNameAscending">Ad (AZ)</key>
+    <key alias="sortNameDescending">Ad (ZA)</key>
+    <key alias="sortCreateDateAscending">En yeni</key>
+    <key alias="sortCreateDateDescending">En eski</key>
+    <key alias="sortLastLoginDateDescending">Son giriş</key>
+    <key alias="noUserGroupsAdded">Hiçbir kullanıcı grubu eklenmedi</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">Doğrulama</key>
+    <key alias="noValidation">Doğrulama yok</key>
+    <key alias="validateAsEmail">E-posta adresi olarak doğrula</key>
+    <key alias="validateAsNumber">Sayı olarak doğrula</key>
+    <key alias="validateAsUrl">URL olarak doğrula</key>
+    <key alias="enterCustomValidation">... veya özel bir doğrulama girin</key>
+    <key alias="fieldIsMandatory">Alan zorunludur</key>
+    <key alias="mandatoryMessage">Özel bir doğrulama hata mesajı girin (isteğe bağlı)</key>
+    <key alias="validationRegExp">Bir normal ifade girin</key>
+    <key alias="validationRegExpMessage">Özel bir doğrulama hata mesajı girin (isteğe bağlı)</key>
+    <key alias="minCount">En az eklemeniz gerekiyor</key>
+    <key alias="maxCount">Yalnızca sahip olabilirsiniz</key>
+    <key alias="addUpTo">En fazla ekle</key>
+    <key alias="items">öğeler</key>
+    <key alias="urls">url(ler)</key>
+    <key alias="urlsSelected">url(ler) seçildi</key>
+    <key alias="itemsSelected">öğe seçildi</key>
+    <key alias="invalidDate">Geçersiz tarih</key>
+    <key alias="invalidNumber">Sayı değil</key>
+    <key alias="invalidEmail">Geçersiz e-posta</key>
+    <key alias="customValidation">Özel doğrulama</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% giriş, <strong>%1% </strong> daha fazla gerektirir.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maksimum %0% giriş, <strong>%1% </strong> çok fazla.]]></key>
+  </area>
+  <area alias="healthcheck">
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">Değer, önerilen değere ayarlandı: '%0%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">'%3%' yapılandırma dosyasında '%2%' için '%1%' değeri bekleniyordu, ancak '%0%' bulundu.</key>
+    <key alias="checkErrorMessageUnexpectedValue">'%3%' yapılandırma dosyasında '%2%' için beklenmeyen '%0%' değeri bulundu.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="macroErrorModeCheckSuccessMessage">Makro Hatalar '%0%' olarak ayarlandı.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors, makrolarda herhangi bir hata olması durumunda sitenizdeki bazı veya tüm sayfaların tamamen yüklenmesini önleyecek olan '%0%' olarak ayarlanmıştır. Bunu düzeltmek, değeri "%1%" olarak ayarlayacaktır.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="httpsCheckValidCertificate">Web sitenizin sertifikası geçerlidir.</key>
+    <key alias="httpsCheckInvalidCertificate">Sertifika doğrulama hatası: '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Web sitenizin SSL sertifikasının süresi doldu.</key>
+    <key alias="httpsCheckExpiringCertificate">Web sitenizin SSL sertifikasının süresi %0% gün içinde doluyor.</key>
+    <key alias="healthCheckInvalidUrl">URL %0% - '%1%' pinglenirken hata oluştu</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">Şu anda HTTPS şemasını kullanarak siteyi %0% görüntülüyorsunuz.</key>
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="compilationDebugCheckSuccessMessage">Hata ayıklama derleme modu devre dışı.</key>
+    <key alias="compilationDebugCheckErrorMessage">Hata ayıklama derleme modu şu anda etkin. Yayınlanmadan önce bu ayarı devre dışı bırakmanız önerilir.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="clickJackingCheckHeaderFound">​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]></key>
+    <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]></key>
+    <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
+    <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
+    <key alias="checkGroup">Grubu kontrol et</key>
+    <key alias="helpText">
+      <![CDATA[
+        <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.
+        Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
+        ]]>
+    </key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">URL izleyiciyi devre dışı bırakın</key>
+    <key alias="enableUrlTracker">URL izleyiciyi etkinleştir</key>
+    <key alias="originalUrl">Orijinal URL</key>
+    <key alias="redirectedTo">Yönlendirildi</key>
+    <key alias="redirectUrlManagement">URL Yönetimini Yeniden Yönlendir</key>
+    <key alias="panelInformation">Aşağıdaki URL'ler bu içerik öğesine yönlendiriyor:</key>
+    <key alias="noRedirects">Yönlendirme yapılmadı</key>
+    <key alias="noRedirectsDescription">Yayınlanan bir sayfa yeniden adlandırıldığında veya taşındığında, yeni sayfaya otomatik olarak bir yönlendirme yapılır.</key>
+    <key alias="redirectRemoved">Yönlendirme URL'si kaldırıldı.</key>
+    <key alias="redirectRemoveError">Yönlendirme URL'sini kaldırma hatası.</key>
+    <key alias="redirectRemoveWarning">Bu, yönlendirmeyi kaldırır</key>
+    <key alias="confirmDisable">URL izleyiciyi devre dışı bırakmak istediğinizden emin misiniz?</key>
+    <key alias="disabledConfirm">URL izleyici artık devre dışı bırakıldı.</key>
+    <key alias="disableError">URL izleyici devre dışı bırakılırken hata oluştu, günlük dosyanızda daha fazla bilgi bulunabilir.</key>
+    <key alias="enabledConfirm">URL izleyici artık etkinleştirildi.</key>
+    <key alias="enableError">URL izleyici etkinleştirilirken hata oluştu, günlük dosyanızda daha fazla bilgi bulunabilir.</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">Aralarından seçim yapabileceğiniz Sözlük öğesi yok</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left"><![CDATA[<strong>%0% </strong> karakter kaldı.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maksimum %0% karakter, <strong>%1% </strong> çok fazla.]]></key>
+  </area>
+  <area alias="recycleBin">
+    <key alias="contentTrashed">Çöp kutusuna gönderilmiş içerik: {0} Şu kimliğe sahip orijinal ana içerikle ilgili: {1}</key>
+    <key alias="mediaTrashed">Şu kimliğe sahip çöp kutusuna gönderilen medya: {0} Şu kimliğe sahip orijinal ana medya öğesiyle ilgili: {1}</key>
+    <key alias="itemCannotBeRestored">Bu öğe otomatik olarak geri yüklenemez</key>
+    <key alias="itemCannotBeRestoredHelpText">Bu öğenin otomatik olarak geri yüklenebileceği bir yer yok. Aşağıdaki ağacı kullanarak öğeyi manuel olarak taşıyabilirsiniz.</key>
+    <key alias="wasRestored">altında geri yüklendi ,</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">Yön</key>
+    <key alias="parentToChild">Ebeveynden alt öğeye</key>
+    <key alias="bidirectional">Çift yönlü</key>
+    <key alias="parent">Üst</key>
+    <key alias="child">Çocuk</key>
+    <key alias="count">Sayım</key>
+    <key alias="relations">İlişkiler</key>
+    <key alias="created">Oluşturuldu</key>
+    <key alias="comment">Yorum</key>
+    <key alias="name">Adı</key>
+    <key alias="noRelations">Bu ilişki türü için ilişki yok.</key>
+    <key alias="tabRelationType">İlişki Türü</key>
+    <key alias="tabRelations">İlişkiler</key>
+  </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Başlarken</key>
+    <key alias="contentRedirectManager">Yeniden Yönlendirme URL Yönetimi</key>
+    <key alias="mediaFolderBrowser">İçerik</key>
+    <key alias="settingsWelcome">Hoş Geldiniz</key>
+    <key alias="settingsExamine">Yönetimi İnceleyin</key>
+    <key alias="settingsPublishedStatus">Yayınlanma Durumu</key>
+    <key alias="settingsModelsBuilder">Model Oluşturucu</key>
+    <key alias="settingsHealthCheck">Durum Kontrolü</key>
+    <key alias="settingsProfiler">Profil oluşturma</key>
+    <key alias="memberIntro">Başlarken</key>
+    <key alias="formsInstall">Umbraco Formlarını Yükleyin</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Geri dön</key>
+    <key alias="activeListLayout">Etkin düzen:</key>
+    <key alias="jumpTo">Git</key>
+    <key alias="group">grup</key>
+    <key alias="passed">geçti</key>
+    <key alias="warning">uyarı</key>
+    <key alias="failed">başarısız oldu</key>
+    <key alias="suggestion">öneri</key>
+    <key alias="checkPassed">Kontrol geçti</key>
+    <key alias="checkFailed">Kontrol başarısız oldu</key>
+    <key alias="openBackofficeSearch">Arka ofis aramasını aç</key>
+    <key alias="openCloseBackofficeHelp">Backoffice yardımını Aç / Kapat</key>
+    <key alias="openCloseBackofficeProfileOptions">Profil seçeneklerinizi açın / kapatın</key>
+    <key alias="assignDomainDescription">%0% için Kurulum Kültürü ve Ana Bilgisayar Adları</key>
+    <key alias="createDescription">%0% altında yeni düğüm oluştur</key>
+    <key alias="protectDescription">%0% üzerinde genel erişim kurun</key>
+    <key alias="rightsDescription">%0% için Kurulum İzinleri</key>
+    <key alias="sortDescription">%0% için sıralama düzenini değiştir</key>
+    <key alias="createblueprintDescription">%0% temelinde İçerik Şablonu oluşturun</key>
+    <key alias="openContextMenu">için bağlam menüsünü aç</key>
+    <key alias="currentLanguage">Mevcut dil</key>
+    <key alias="switchLanguage">Dili değiştir</key>
+    <key alias="createNewFolder">Yeni klasör oluştur</key>
+    <key alias="newPartialView">Kısmi Görünüm</key>
+    <key alias="newPartialViewMacro">Kısmi Görünüm Makrosu</key>
+    <key alias="newMember">Üye</key>
+    <key alias="newDataType">Veri türü</key>
+    <key alias="redirectDashboardSearchLabel">Yönlendirme kontrol panelinde ara</key>
+    <key alias="userGroupSearchLabel">Kullanıcı grubu bölümünde ara</key>
+    <key alias="userSearchLabel">Kullanıcılar bölümünde ara</key>
+    <key alias="createItem">Öğe oluştur</key>
+    <key alias="create">Oluştur</key>
+    <key alias="edit">Düzenle</key>
+    <key alias="name">Reklam</key>
+    <key alias="addNewRow">Yeni satır ekle</key>
+    <key alias="tabExpand">Diğer seçenekleri görüntüleyin</key>
+    <key alias="hasTranslation">Çeviri var</key>
+    <key alias="noTranslation">Eksik çeviri</key>
+    <key alias="dictionaryListCaption">Sözlük öğeleri</key>
+  </area>
+  <area alias="references">
+    <key alias="tabName">Referanslar</key>
+    <key alias="DataTypeNoReferences">Bu Veri Türünde referans yok.</key>
+    <key alias="labelUsedByDocumentTypes">Belge Türlerinde Kullanılır</key>
+    <key alias="labelUsedByMediaTypes">Medya Türlerinde Kullanılır</key>
+    <key alias="labelUsedByMemberTypes">Üye Türlerinde Kullanılır</key>
+    <key alias="usedByProperties">Kullanan</key>
+    <key alias="labelUsedByDocuments">Belgelerde Kullanıldı</key>
+    <key alias="labelUsedByMembers">Üyelerde Kullanıldı</key>
+    <key alias="labelUsedByMedia">Medyada Kullanıldı</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="deleteSavedSearch">Kaydedilmiş Aramayı Sil</key>
+    <key alias="logLevels">Günlük Düzeyleri</key>
+    <key alias="selectAllLogLevelFilters">Hepsini seç</key>
+    <key alias="deselectAllLogLevelFilters">Tüm seçimleri kaldır</key>
+    <key alias="savedSearches">Kaydedilmiş Aramalar</key>
+    <key alias="saveSearch">Aramayı Kaydet</key>
+    <key alias="saveSearchDescription">Arama sorgunuz için kolay bir ad girin</key>
+    <key alias="filterSearch">Aramayı Filtrele</key>
+    <key alias="totalItems">Toplam Öğeler</key>
+    <key alias="timestamp">Zaman damgası</key>
+    <key alias="level">Seviye</key>
+    <key alias="machine">Makine</key>
+    <key alias="message">Mesaj</key>
+    <key alias="exception">İstisna</key>
+    <key alias="properties">Özellikler</key>
+    <key alias="searchWithGoogle">Google ile Ara</key>
+    <key alias="searchThisMessageWithGoogle">Bu mesajı Google ile ara</key>
+    <key alias="searchWithBing">Bing ile Ara</key>
+    <key alias="searchThisMessageWithBing">Bu iletiyi Bing ile ara</key>
+    <key alias="searchOurUmbraco">Umbraco'yu Arayın</key>
+    <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Bu iletiyi Umbraco forumlarımızda ve belgelerimizde arayın</key>
+    <key alias="searchOurUmbracoWithGoogle">Google ile Umbraco'muzda arama yapın</key>
+    <key alias="searchOurUmbracoForumsUsingGoogle">Umbraco forumlarımızda Google'ı kullanarak arama yapın</key>
+    <key alias="searchUmbracoSource">Umbraco Kaynağını Ara</key>
+    <key alias="searchWithinUmbracoSourceCodeOnGithub">Github'da Umbraco kaynak kodu içinde arama</key>
+    <key alias="searchUmbracoIssues">Umbraco Sorunlarını Ara</key>
+    <key alias="searchUmbracoIssuesOnGithub">Github'da Umbraco Sorunlarını Ara</key>
+    <key alias="deleteThisSearch">Bu aramayı sil</key>
+    <key alias="findLogsWithRequestId">İstek Kimliği Olan Günlükleri Bul</key>
+    <key alias="findLogsWithNamespace">Ad Alanına Sahip Günlükleri Bul</key>
+    <key alias="findLogsWithMachineName">Makine Adına Sahip Günlükleri Bul</key>
+    <key alias="open">Aç</key>
+  </area>
+  <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">%0% Kopyala</key>
+    <key alias="labelForArrayOfItemsFrom">%0%, %1%'den</key>
+    <key alias="labelForRemoveAllEntries">Tüm öğeleri kaldır</key>
+    <key alias="labelForClearClipboard">Panoyu temizle</key>
+  </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">Mülk Eylemlerini Aç</key>
+    <key alias="tooltipForPropertyActionsMenuClose">Özellik Eylemlerini Kapat</key>
+  </area>
+  <area alias="nuCache">
+    <key alias="refreshStatus">Durumu yenile</key>
+    <key alias="memoryCache">Bellek Önbelleği</key>
+    <key alias="memoryCacheDescription">
+      <![CDATA[
+            Bu düğme, bellek içi önbelleği veritabanından tamamen yeniden yükleyerek yeniden yüklemenizi sağlar.
+    önbellek (ancak bu veritabanı önbelleğini yeniden oluşturmaz). Bu nispeten hızlıdır.
+    Bazı olaylardan sonra önbelleğin düzgün şekilde yenilenmediğini düşündüğünüzde kullanın.
+    küçük bir Umbraco sorununu gösterecek olan & mdash;
+    (not: bir LB ortamındaki tüm sunucularda yeniden yüklemeyi tetikler).
+    ]]>
+    </key>
+    <key alias="reload">Yeniden yükle</key>
+    <key alias="databaseCache">Veritabanı Önbelleği</key>
+    <key alias="databaseCacheDescription">
+      <![CDATA[
+    Bu düğme, veritabanı önbelleğini, yani cmsContentNu tablosunun içeriğini yeniden oluşturmanıza olanak sağlar.
+    <strong> Yeniden oluşturmak pahalı olabilir. </strong>
+    Yeniden yükleme yeterli olmadığında ve veritabanı önbelleğinin yüklenmediğini düşündüğünüzde kullanın.
+    uygun şekilde oluşturulmuş&mdash; bu bazı kritik Umbraco sorunlarına işaret eder.
+    ]]>
+    </key>
+    <key alias="rebuild">Yeniden Oluştur</key>
+    <key alias="internals">Dahili</key>
+    <key alias="internalsDescription">
+      <![CDATA[
+    Bu düğme, bir NuCache anlık görüntü koleksiyonunu tetiklemenizi sağlar (bir fullCLR GC çalıştırdıktan sonra).
+    Bunun ne anlama geldiğini bilmiyorsanız, muhtemelen kullanmanız <em>gerekmez</em>.
+    ]]>
+    </key>
+    <key alias="collect">Topla</key>
+    <key alias="publishedCacheStatus">Yayınlanmış Önbellek Durumu</key>
+    <key alias="caches">Önbellekler</key>
+  </area>
+  <area alias="profiling">
+    <key alias="performanceProfiling">Performans profili oluşturma</key>
+    <key alias="performanceProfilingDescription">
+      <![CDATA[
+            <p>
+                Umbraco şu anda hata ayıklama modunda çalışıyor. Bu, sayfaları işlerken performansı değerlendirmek için yerleşik performans profilleyicisini kullanabileceğiniz anlamına gelir.
+            </p>
+            <p>
+                Profil oluşturucuyu belirli bir sayfa oluşturma için etkinleştirmek istiyorsanız, sayfayı talep ederken sorgu dizesine <b> umbDebug=true </b> eklemeniz yeterlidir.
+            </p>
+            <p>
+                Profilcinin tüm sayfa görüntülemeleri için varsayılan olarak etkinleştirilmesini istiyorsanız, aşağıdaki geçişi kullanabilirsiniz.
+                Tarayıcınızda, profil oluşturucuyu otomatik olarak etkinleştiren bir çerez ayarlayacaktır.
+                Başka bir deyişle, profil oluşturucu yalnızca <i>tarayıcınızda</i> varsayılan olarak etkin olacaktır - diğer herkesin değil.
+            </p>
+    ]]>
+    </key>
+    <key alias="activateByDefault">Profil oluşturucuyu varsayılan olarak etkinleştirin</key>
+    <key alias="reminder">Kolay hatırlatma</key>
+  </area>
+  <area alias="settingsDashboardVideos">
+    <key alias="trainingHeadline">Umbraco eğitim videolarının saatleri yalnızca bir tıklama uzaklıkta</key>
+    <key alias="trainingDescription">
+      <![CDATA[
+            <p> Umbraco'da ustalaşmak mı istiyorsunuz? Umbraco'nun kullanımıyla ilgili bu videolardan birini izleyerek en iyi uygulamaları öğrenmek için birkaç dakikanızı ayırın. Daha da fazla Umbraco videosu için <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv </a> adresini ziyaret edin </p>
+        ]]>
+    </key>
+    <key alias="getStarted">Başlamak için</key>
+  </area>
+  <area alias="settingsDashboard">
+    <key alias="start">Buradan başlayın</key>
+    <key alias="startDescription">Bu bölüm, Umbraco siteniz için yapı taşlarını içerir. Ayarlar bölümündeki öğelerle çalışma hakkında daha fazla bilgi edinmek için aşağıdaki bağlantıları izleyin</key>
+    <key alias="more">Daha fazla bilgi edinin</key>
+    <key alias="bulletPointOne">
+      <![CDATA[
+        Ayarlar <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco'nun Dokümantasyon bölümünde </a>
+    ]]>
+    </key>
+    <key alias="bulletPointTwo">
+      <![CDATA[
+        <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Topluluk Forumu</a>'nda bir soru sorun
+    ]]>
+    </key>
+    <key alias="bulletPointThree">
+      <![CDATA[
+        <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">Eğitici videolarımızı</a> izleyin (bazıları ücretsiz, bazıları abonelik gerektirir)
+    ]]>
+    </key>
+    <key alias="bulletPointFour">
+      <![CDATA[
+        <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">Üretkenliği artıran araçlarımız ve ticari desteğimiz </a> hakkında bilgi edinin
+    ]]>
+    </key>
+    <key alias="bulletPointFive">
+      <![CDATA[
+        Gerçek hayattaki <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">eğitim ve sertifika </a> fırsatları hakkında bilgi edinin
+    ]]>
+    </key>
+  </area>
+  <area alias="startupDashboard">
+    <key alias="fallbackHeadline">Dost Canlısı CMS'e Hoş Geldiniz</key>
+    <key alias="fallbackDescription">Umbraco'yu seçtiğiniz için teşekkür ederiz - bunun güzel bir şeyin başlangıcı olabileceğini düşünüyoruz. İlk başta bunaltıcı gibi görünse de, öğrenme eğrisini olabildiğince sorunsuz ve hızlı hale getirmek için çok şey yaptık.</key>
+  </area>
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">Umbraco Formları</key>
+    <key alias="formsDescription">Sezgisel bir sürükle ve bırak arayüzü kullanarak formlar oluşturun. E-postalar gönderen basit iletişim formlarından CRM sistemleriyle entegre olan gelişmiş anketlere kadar. Müşterileriniz buna bayılacak!</key>
+  </area>
+  <area alias="blockEditor">
+    <key alias="headlineCreateBlock">Yeni blok oluştur</key>
+    <key alias="headlineAddSettingsElementType">Bir ayarlar bölümü ekleyin</key>
+    <key alias="headlineAddCustomView">Görünümü seçin</key>
+    <key alias="headlineAddCustomStylesheet">Stil sayfasını seçin</key>
+    <key alias="headlineAddThumbnail">Küçük resim seçin</key>
+    <key alias="labelcreateNewElementType">Yeni oluştur</key>
+    <key alias="labelCustomStylesheet">Özel stil sayfası</key>
+    <key alias="addCustomStylesheet">Stil sayfası ekle</key>
+    <key alias="headlineEditorAppearance">Düzenleyici görünümü</key>
+    <key alias="headlineDataModels">Veri modelleri</key>
+    <key alias="headlineCatalogueAppearance">Katalog görünümü</key>
+    <key alias="labelBackgroundColor">Arka plan rengi</key>
+    <key alias="labelIconColor">Simge rengi</key>
+    <key alias="labelContentElementType">İçerik modeli</key>
+    <key alias="labelLabelTemplate">Etiket</key>
+    <key alias="labelCustomView">Özel görünüm</key>
+    <key alias="labelSettingsElementType">Ayarlar modeli</key>
+    <key alias="labelEditorSize">Yer paylaşımı düzenleyici boyutu</key>
+    <key alias="addCustomView">Özel görünüm ekle</key>
+    <key alias="addSettingsElementType">Ayarları ekle</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[<strong>%0%</strong> içeriğini silmek istediğinizden emin misiniz?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[<strong>%0%</strong> blok yapılandırmasını silmek istediğinizden emin misiniz?]]></key>
+    <key alias="confirmDeleteBlockTypeNotice">Bu bloğun içeriği hala mevcut olacak, bu içeriğin düzenlenmesi artık kullanılamayacak ve desteklenmeyen içerik olarak gösterilecek.</key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA['%0%' Konfigürasyonu]]></key>
+    <key alias="thumbnail">Küçük Resim</key>
+    <key alias="addThumbnail">Küçük resim ekle</key>
+    <key alias="tabCreateEmpty">Boş oluştur</key>
+    <key alias="tabClipboard">Pano</key>
+    <key alias="tabBlockSettings">Ayarlar</key>
+    <key alias="headlineAdvanced">Gelişmiş</key>
+    <key alias="forceHideContentEditor">İçerik düzenleyiciyi gizlemeye zorla</key>
+    <key alias="blockHasChanges">Bu içerikte değişiklikler yaptınız. Onları atmak istediğinizden emin misiniz?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Oluşturma iptal edilsin mi?</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Oluşturmayı iptal etmek istediğinizden emin misiniz.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Hata!</key>
+    <key alias="elementTypeDoesNotExistDescription">Bu bloğun ElementType'ı artık mevcut değil</key>
+    <key alias="propertyEditorNotSupported">'%0%' özelliği, bloklarda desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">İçerik Şablonları Nedir?</key>
+    <key alias="whatDescription">İçerik Şablonları, yeni bir içerik düğümü oluştururken seçilebilen önceden tanımlanmış içeriklerdir.</key>
+    <key alias="createHeadline">Nasıl İçerik Şablonu oluşturabilirim?</key>
+    <key alias="createDescription">
+      <![CDATA[
+            <p> İçerik Şablonu oluşturmanın iki yolu vardır: </p>
+            <ul>
+                <li> Bir içerik düğümünü sağ tıklayın ve yeni bir İçerik Şablonu oluşturmak için "İçerik Şablonu Oluştur" u seçin. </li>
+                <li> Ayarlar bölümündeki İçerik Şablonları ağacını sağ tıklayın ve İçerik Şablonu oluşturmak istediğiniz Belge Türünü seçin. </li>
+            </ul>
+            <p> Bir ad verildiğinde, editörler İçerik Şablonunu yeni sayfalarının temeli olarak kullanmaya başlayabilir. </p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">İçerik Şablonlarını nasıl yönetirim?</key>
+    <key alias="manageDescription">Ayarlar bölümündeki "İçerik Şablonları" ağacından İçerik Şablonlarını düzenleyebilir ve silebilirsiniz. İçerik Şablonunun dayandığı Belge Türünü genişletin ve düzenlemek veya silmek için tıklayın.</key>
+  </area>
+</language>

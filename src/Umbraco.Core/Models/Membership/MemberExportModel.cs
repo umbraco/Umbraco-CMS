@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
-    internal class MemberExportModel
+    public class MemberExportModel
     {
         public int Id { get; set; }
         public Guid Key { get; set; }

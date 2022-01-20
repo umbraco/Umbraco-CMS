@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Exceptions
+namespace Umbraco.Cms.Core.Exceptions
 {
     /// <summary>
     /// An exception that is thrown if an unattended installation occurs.

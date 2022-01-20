@@ -190,7 +190,7 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            
+
             if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
@@ -241,7 +241,7 @@
 
             dialog.pasteItems = [];
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
             _.each(entriesForPaste, function (entry) {
                 dialog.pasteItems.push({
                     date: entry.date,
@@ -522,93 +522,115 @@
         ];
 
         // Initialize
-        var scaffoldsLoaded = 0;
         vm.scaffolds = [];
-        _.each(model.config.contentTypes, function (contentType) {
-            contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
+
+        contentResource.getScaffolds(-20, contentTypeAliases).then(function (scaffolds){
+            // Loop through all the content types
+            _.each(model.config.contentTypes, function (contentType){
+                // Get the scaffold from the result
+                var scaffold = scaffolds[contentType.ncAlias];
+
                 // make sure it's an element type before allowing the user to create new ones
                 if (scaffold.isElement) {
                     // remove all tabs except the specified tab
                     var tabs = scaffold.variants[0].tabs;
                     var tab = _.find(tabs, function (tab) {
-                        return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
+                        return tab.id !== 0 && (tab.label.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
                     });
                     scaffold.variants[0].tabs = [];
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        tab.properties.forEach(function (property) {
+                        tab.properties.forEach(
+                            function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
                                     property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
                                 }
-                            });
+                            }
+                        );
                     }
+
+                    // Ensure Culture Data for Complex Validation.
+                    ensureCultureData(scaffold);
 
                     // Store the scaffold object
                     vm.scaffolds.push(scaffold);
                 }
-
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
-            }, function (error) {
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
             });
+
+            // Initialize once all scaffolds have been loaded
+            initNestedContent();
         });
 
-        var initIfAllScaffoldsHaveLoaded = function () {
-            // Initialize when all scaffolds have loaded
-            if (model.config.contentTypes.length === scaffoldsLoaded) {
-                // Because we're loading the scaffolds async one at a time, we need to
-                // sort them explicitly according to the sort order defined by the data type.
-                contentTypeAliases = [];
-                _.each(model.config.contentTypes, function (contentType) {
-                    contentTypeAliases.push(contentType.ncAlias);
-                });
-                vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
-                    return contentTypeAliases.indexOf(s.contentTypeAlias);
-                });
+        /**
+         * Ensure that the containing content variant language and current property culture is transferred along
+         * to the scaffolded content object representing this block.
+         * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
+         * @param {any} content
+         */
+         function ensureCultureData(content) {
 
-                // Convert stored nodes
-                if (model.value) {
-                    for (var i = 0; i < model.value.length; i++) {
-                        var item = model.value[i];
-                        var scaffold = getScaffold(item.ncContentTypeAlias);
-                        if (scaffold == null) {
-                            // No such scaffold - the content type might have been deleted. We need to skip it.
-                            continue;
-                        }
-                        createNode(scaffold, item);
-                    }
-                }
+            if (!content || !vm.umbVariantContent || !vm.umbProperty) return;
 
-                // Enforce min items if we only have one scaffold type
-                var modelWasChanged = false;
-                if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                    for (var i = vm.nodes.length; i < model.config.minItems; i++) {
-                        addNode(vm.scaffolds[0].contentTypeAlias);
-                    }
-                    modelWasChanged = true;
-                }
-
-                // If there is only one item, set it as current node
-                if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
-                    setCurrentNode(vm.nodes[0], false);
-                }
-
-                validate();
-
-                vm.inited = true;
-
-                if (modelWasChanged) {
-                    updateModel();
-                }
-
-                updatePropertyActionStates();
-                checkAbilityToPasteContent();
+            if (vm.umbVariantContent.editor.content.language) {
+                // set the scaffolded content's language to the language of the current editor
+                content.language = vm.umbVariantContent.editor.content.language;
             }
+            // currently we only ever deal with invariant content for blocks so there's only one
+            content.variants[0].tabs.forEach(tab => {
+                tab.properties.forEach(prop => {
+                    // set the scaffolded property to the culture of the containing property
+                    prop.culture = vm.umbProperty.property.culture;
+                });
+            });
+        }
+
+        var initNestedContent = function () {
+            // Initialize when all scaffolds have loaded
+            // Sort the scaffold explicitly according to the sort order defined by the data type.
+            vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
+                return contentTypeAliases.indexOf(s.contentTypeAlias);
+            });
+
+            // Convert stored nodes
+            if (model.value) {
+                for (var i = 0; i < model.value.length; i++) {
+                    var item = model.value[i];
+                    var scaffold = getScaffold(item.ncContentTypeAlias);
+                    if (scaffold == null) {
+                        // No such scaffold - the content type might have been deleted. We need to skip it.
+                        continue;
+                    }
+                    createNode(scaffold, item);
+                }
+            }
+
+            // Enforce min items if we only have one scaffold type
+            var modelWasChanged = false;
+            if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
+                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                    addNode(vm.scaffolds[0].contentTypeAlias);
+                }
+                modelWasChanged = true;
+            }
+
+            // If there is only one item, set it as current node
+            if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+                setCurrentNode(vm.nodes[0], false);
+            }
+
+            validate();
+
+            vm.inited = true;
+
+            if (modelWasChanged) {
+                updateModel();
+            }
+
+            updatePropertyActionStates();
+            checkAbilityToPasteContent();
         }
 
         function extendPropertyWithNCData(prop) {

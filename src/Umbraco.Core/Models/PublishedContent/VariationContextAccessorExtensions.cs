@@ -1,4 +1,10 @@
-﻿namespace Umbraco.Core.Models.PublishedContent
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+
+namespace Umbraco.Extensions
 {
     public static class VariationContextAccessorExtensions
     {
@@ -14,7 +20,10 @@
 
             // use context values
             var publishedVariationContext = variationContextAccessor?.VariationContext;
-            if (culture == null) culture = variations.VariesByCulture() ? publishedVariationContext?.Culture : "";
+            if (culture == null)
+            {
+                culture = variations.VariesByCulture() ? publishedVariationContext?.Culture : "";
+            }
 
             if (segment == null)
             {

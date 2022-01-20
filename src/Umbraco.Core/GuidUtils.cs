@@ -2,12 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Utility methods for the <see cref="Guid"/> struct.
     /// </summary>
-    internal static class GuidUtils
+    public static class GuidUtils
     {
         /// <summary>
         /// Combines two guid instances utilizing an exclusive disjunction.

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Dictionary Item

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Media
+﻿namespace Umbraco.Cms.Core.Media
 {
     public class OEmbedResult
     {

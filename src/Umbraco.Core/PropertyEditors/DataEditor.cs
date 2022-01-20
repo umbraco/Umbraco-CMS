@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Newtonsoft.Json;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a data editor.
@@ -16,19 +17,19 @@ namespace Umbraco.Core.PropertyEditors
     /// </remarks>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "(),nq}")]
     [HideFromTypeFinder]
+    [DataContract]
     public class DataEditor : IDataEditor
     {
         private IDictionary<string, object> _defaultConfiguration;
-        private IDataValueEditor _reusableEditor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
-        public DataEditor(ILogger logger, EditorType type = EditorType.PropertyValue)
+        public DataEditor(IDataValueEditorFactory dataValueEditorFactory, EditorType type = EditorType.PropertyValue)
         {
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // defaults
+            DataValueEditorFactory = dataValueEditorFactory;
             Type = type;
             Icon = Constants.Icons.PropertyEditor;
             Group = Constants.PropertyEditors.Groups.Common;
@@ -50,33 +51,30 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         protected DataEditorAttribute Attribute { get; }
 
-        /// <summary>
-        /// Gets a logger.
-        /// </summary>
-        protected ILogger Logger { get; }
+        /// <inheritdoc />
+        [DataMember(Name = "alias", IsRequired = true)]
+        public string Alias { get; set; }
+
+        protected IDataValueEditorFactory DataValueEditorFactory { get; }
 
         /// <inheritdoc />
-        [JsonProperty("alias", Required = Required.Always)]
-        public string Alias { get; internal set; }
-
-        /// <inheritdoc />
-        [JsonIgnore]
+        [IgnoreDataMember]
         public EditorType Type { get; }
 
         /// <inheritdoc />
-        [JsonProperty("name", Required = Required.Always)]
+        [DataMember(Name = "name", IsRequired = true)]
         public string Name { get; internal set; }
 
         /// <inheritdoc />
-        [JsonProperty("icon")]
+        [DataMember(Name = "icon")]
         public string Icon { get; internal set; }
 
         /// <inheritdoc />
-        [JsonProperty("group")]
+        [DataMember(Name = "group")]
         public string Group { get; internal set; }
 
         /// <inheritdoc />
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsDeprecated { get; }
 
         /// <inheritdoc />
@@ -91,8 +89,7 @@ namespace Umbraco.Core.PropertyEditors
         /// simple enough for now.</para>
         /// </remarks>
         // TODO: point of that one? shouldn't we always configure?
-        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? (_reusableEditor ?? (_reusableEditor = CreateValueEditor()));
-
+        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? CreateValueEditor();
 
         /// <inheritdoc />
         /// <remarks>
@@ -123,7 +120,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an explicit value editor.
         /// </summary>
         /// <remarks>Used for manifest data editors.</remarks>
-        [JsonProperty("editor")]
+        [DataMember(Name = "editor")]
         public IDataValueEditor ExplicitValueEditor { get; set; }
 
         /// <inheritdoc />
@@ -141,11 +138,11 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an explicit configuration editor.
         /// </summary>
         /// <remarks>Used for manifest data editors.</remarks>
-        [JsonProperty("config")]
+        [DataMember(Name = "config")]
         public IConfigurationEditor ExplicitConfigurationEditor { get; set; }
 
         /// <inheritdoc />
-        [JsonProperty("defaultConfig")]
+        [DataMember(Name = "defaultConfig")]
         public IDictionary<string, object> DefaultConfiguration
         {
             // for property value editors, get the ConfigurationEditor.DefaultConfiguration
@@ -167,7 +164,7 @@ namespace Umbraco.Core.PropertyEditors
             if (Attribute == null)
                 throw new InvalidOperationException($"The editor is not attributed with {nameof(DataEditorAttribute)}");
 
-            return new DataValueEditor(Attribute);
+            return DataValueEditorFactory.Create<DataValueEditor>(Attribute);
         }
 
         /// <summary>

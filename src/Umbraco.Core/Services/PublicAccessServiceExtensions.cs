@@ -1,17 +1,21 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
-using Umbraco.Core.Models;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for the IPublicAccessService
     /// </summary>
     public static class PublicAccessServiceExtensions
     {
-
         public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string oldRolename, string newRolename)
         {
             var hasChange = false;
@@ -53,11 +57,6 @@ namespace Umbraco.Core.Services
             return HasAccess(entry, username, currentMemberRoles);
         }
 
-        public static bool HasAccess(this IPublicAccessService publicAccessService, string path, MembershipUser member, RoleProvider roleProvider)
-        {
-            return publicAccessService.HasAccess(path, member.UserName, roleProvider.GetRolesForUser);
-        }
-
         /// <summary>
         /// Checks if the member with the specified username has access to the path which is also based on the passed in roles for the member
         /// </summary>
@@ -66,7 +65,7 @@ namespace Umbraco.Core.Services
         /// <param name="username"></param>
         /// <param name="rolesCallback">A callback to retrieve the roles for this member</param>
         /// <returns></returns>
-        public static bool HasAccess(this IPublicAccessService publicAccessService, string path, string username, Func<string, IEnumerable<string>> rolesCallback)
+        public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, string path, string username, Func<Task<IEnumerable<string>>> rolesCallback)
         {
             if (rolesCallback == null) throw new ArgumentNullException("roles");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
@@ -75,13 +74,28 @@ namespace Umbraco.Core.Services
             var entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
             if (entry == null) return true;
 
-            var roles = rolesCallback(username);
+            var roles = await rolesCallback();
 
             return HasAccess(entry, username, roles);
         }
 
         private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles)
         {
+            if (entry is null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException($"'{nameof(username)}' cannot be null or empty.", nameof(username));
+            }
+
+            if (roles is null)
+            {
+                throw new ArgumentNullException(nameof(roles));
+            }
+
             return entry.Rules.Any(x =>
                 (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType && username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase))
                 || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))

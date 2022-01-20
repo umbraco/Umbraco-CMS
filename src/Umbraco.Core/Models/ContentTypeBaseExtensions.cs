@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extensions methods for <see cref="IContentTypeBase"/>.
@@ -27,7 +26,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        internal static bool WasPropertyTypeVariationChanged(this IContentTypeBase contentType)
+        public static bool WasPropertyTypeVariationChanged(this IContentTypeBase contentType)
         {
             return contentType.WasPropertyTypeVariationChanged(out var _);
         }
@@ -44,16 +43,13 @@ namespace Umbraco.Core.Models
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.PropertyTypes.Any(propertyType =>
             {
-                if (!(propertyType is IRememberBeingDirty dirtyProperty))
-                    throw new Exception("oops");
-
                 // skip new properties
                 // TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
-                var isNewProperty = dirtyProperty.WasPropertyDirty("Id");
+                var isNewProperty = propertyType.WasPropertyDirty("Id");
                 if (isNewProperty) return false;
 
                 // variation change?
-                var dirty = dirtyProperty.WasPropertyDirty("Variations");
+                var dirty = propertyType.WasPropertyDirty("Variations");
                 if (dirty)
                     a.Add(propertyType.Alias);
 

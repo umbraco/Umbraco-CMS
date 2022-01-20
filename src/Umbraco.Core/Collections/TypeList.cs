@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     /// <summary>
     /// Represents a list of types.
     /// </summary>
     /// <remarks>Types in the list are, or derive from, or implement, the base type.</remarks>
     /// <typeparam name="TBase">The base type.</typeparam>
-    internal class TypeList<TBase>
+    public class TypeList<TBase>
     {
         private readonly List<Type> _list = new List<Type>();
 

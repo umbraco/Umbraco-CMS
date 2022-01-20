@@ -129,7 +129,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
          *    });
          * </pre>
          * 
-         * @param {Int} contentTypeId id of the content item to retrive allowed child types for
+         * @param {Int} contentTypeId id of the content item to retrieve allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -674,6 +674,15 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                         "HasContentNodes",
                         [{ id: id }])),
                 'Failed to retrieve indication for whether content type with id ' + id + ' has associated content nodes');
+        },
+
+        allowsCultureVariation: function () {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentTypeApiBaseUrl",
+                "AllowsCultureVariation")),
+            'Failed to retrieve variant content types');
         }
     };
 }

@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Script file
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Script : File
+    public class Script : File, IScript
     {
         public Script(string path)
             : this(path, (Func<File, string>) null)
         { }
 
-        internal Script(string path, Func<File, string> getFileContent)
+        public Script(string path, Func<File, string> getFileContent)
             : base(path, getFileContent)
         { }
 
@@ -26,9 +24,6 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// Overrides the default Entity identity check.
         /// </remarks>
-        public override bool HasIdentity
-        {
-            get { return string.IsNullOrEmpty(Path) == false; }
-        }
+        public override bool HasIdentity => string.IsNullOrEmpty(Path) == false;
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Umbraco.Core.CodeAnnotations
+namespace Umbraco.Cms.Core.CodeAnnotations
 {
     /// <summary>
     /// Attribute to associate a GUID string and Type with an UmbracoObjectType Enum value
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    internal class UmbracoObjectTypeAttribute : Attribute
+    public class UmbracoObjectTypeAttribute : Attribute
     {
         public UmbracoObjectTypeAttribute(string objectId)
         {

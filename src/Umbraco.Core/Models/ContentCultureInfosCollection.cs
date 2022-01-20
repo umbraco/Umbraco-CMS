@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// The culture names of a content's variants

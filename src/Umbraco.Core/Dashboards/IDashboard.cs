@@ -1,12 +1,11 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
 
-namespace Umbraco.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     /// <summary>
     /// Represents a dashboard.
     /// </summary>
-    public interface IDashboard : IDashboardSlim, IDiscoverable
+    public interface IDashboard : IDashboardSlim
     {
         /// <summary>
         /// Gets the aliases of sections/applications where this dashboard appears.

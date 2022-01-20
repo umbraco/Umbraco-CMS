@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     //
     // we cannot implement strongly-typed content by inheriting from some sort
@@ -18,18 +19,22 @@ namespace Umbraco.Core.Models.PublishedContent
     /// Provides an abstract base class for <c>IPublishedContent</c> implementations that
     /// wrap and extend another <c>IPublishedContent</c>.
     /// </summary>
+    [DebuggerDisplay("{Id}: {Name} ({ContentType?.Alias})")]
     public abstract class PublishedContentWrapped : IPublishedContent
     {
         private readonly IPublishedContent _content;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="PublishedContentWrapped"/> class
         /// with an <c>IPublishedContent</c> instance to wrap.
         /// </summary>
         /// <param name="content">The content to wrap.</param>
-        protected PublishedContentWrapped(IPublishedContent content)
+        /// <param name="publishedValueFallback">The published value fallback.</param>
+        protected PublishedContentWrapped(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
         {
             _content = content;
+            _publishedValueFallback = publishedValueFallback;
         }
 
         /// <summary>
@@ -79,23 +84,13 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual int CreatorId => _content.CreatorId;
 
         /// <inheritdoc />
-        public virtual string CreatorName => _content.CreatorName;
-
-        /// <inheritdoc />
         public virtual DateTime CreateDate => _content.CreateDate;
 
         /// <inheritdoc />
         public virtual int WriterId => _content.WriterId;
 
         /// <inheritdoc />
-        public virtual string WriterName => _content.WriterName;
-
-        /// <inheritdoc />
         public virtual DateTime UpdateDate => _content.UpdateDate;
-
-        /// <inheritdoc />
-        [Obsolete("Use the Url() extension instead")]
-        public virtual string Url => _content.Url;
 
         /// <inheritdoc />
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;

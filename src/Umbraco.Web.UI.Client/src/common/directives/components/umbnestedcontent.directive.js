@@ -15,7 +15,7 @@
             var selectedTab = $scope.model.variants[0].tabs[0];
 
             if ($scope.tabAlias) {
-                angular.forEach($scope.model.variants[0].tabs, function (tab) {
+                Utilities.forEach($scope.model.variants[0].tabs, tab => {
                     if (tab.alias.toLowerCase() === $scope.tabAlias.toLowerCase()) {
                         selectedTab = tab;
                         return;
@@ -33,20 +33,19 @@
                     $scope.$broadcast("formSubmitting", { scope: $scope });
 
                     // Sync the values back
-                    angular.forEach($scope.ngModel.variants[0].tabs, function (tab) {
+                    Utilities.forEach($scope.ngModel.variants[0].tabs, tab => {
                         if (tab.alias.toLowerCase() === selectedTab.alias.toLowerCase()) {
 
-                            var localPropsMap = selectedTab.properties.reduce(function (map, obj) {
+                            var localPropsMap = selectedTab.properties.reduce((map, obj) => {
                                 map[obj.alias] = obj;
                                 return map;
                             }, {});
 
-                            angular.forEach(tab.properties, function (prop) {
+                            Utilities.forEach(tab.properties, prop => {
                                 if (localPropsMap.hasOwnProperty(prop.alias)) {
                                     prop.value = localPropsMap[prop.alias].value;
                                 }
                             });
-
                         }
                     });
                     

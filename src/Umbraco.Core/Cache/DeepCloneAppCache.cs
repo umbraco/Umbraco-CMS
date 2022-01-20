@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Caching;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> by wrapping an inner other <see cref="IAppPolicyCache"/>
     /// instance, and ensuring that all inserts and returns are deep cloned copies of the cache item,
     /// when the item is deep-cloneable.
     /// </summary>
-    internal class DeepCloneAppCache : IAppPolicyCache
+    public class DeepCloneAppCache : IAppPolicyCache, IDisposable
     {
+        private bool _disposedValue;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DeepCloneAppCache"/> class.
         /// </summary>
@@ -30,7 +32,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the inner cache.
         /// </summary>
-        public IAppPolicyCache InnerCache { get; }
+        private IAppPolicyCache InnerCache { get; }
 
         /// <inheritdoc />
         public object Get(string key)
@@ -44,7 +46,7 @@ namespace Umbraco.Core.Cache
         {
             var cached = InnerCache.Get(key, () =>
             {
-                var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value);
@@ -67,32 +69,32 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, string[] dependentFiles = null)
         {
             var cached = InnerCache.Get(key, () =>
             {
-                var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
-                return value == null ? null : CheckCloneableAndTracksChanges(value); 
+                return value == null ? null : CheckCloneableAndTracksChanges(value);
 
                 // clone / reset to go into the cache
-            }, timeout, isSliding, priority, removedCallback, dependentFiles);
+            }, timeout, isSliding, dependentFiles);
 
             // clone / reset to go into the cache
             return CheckCloneableAndTracksChanges(cached);
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
         {
             InnerCache.Insert(key, () =>
             {
-                var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value);
-            }, timeout, isSliding, priority, removedCallback, dependentFiles);
+            }, timeout, isSliding, dependentFiles);
         }
 
         /// <inheritdoc />
@@ -108,9 +110,9 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public void ClearOfType(string typeName)
+        public void ClearOfType(Type type)
         {
-            InnerCache.ClearOfType(typeName);
+            InnerCache.ClearOfType(type);
         }
 
         /// <inheritdoc />
@@ -152,6 +154,25 @@ namespace Umbraco.Core.Cache
             }
 
             return input;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    InnerCache.DisposeIfDisposable();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

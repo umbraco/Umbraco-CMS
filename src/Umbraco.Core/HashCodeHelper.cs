@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Borrowed from http://stackoverflow.com/a/2575444/694494
     /// </summary>
-    internal static class HashCodeHelper
+    public static class HashCodeHelper
     {
         public static int GetHashCode<T1, T2>(T1 arg1, T2 arg2)
         {

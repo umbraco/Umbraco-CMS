@@ -54,8 +54,8 @@
 
                 localizationService.localizeMany(keys)
                     .then(function (data) {
-                        [labels.deleted, 
-                        labels.unpublished, 
+                        [labels.deleted,
+                        labels.unpublished,
                         labels.published,
                         labels.publishedPendingChanges,
                         labels.notCreated,
@@ -97,7 +97,7 @@
 
                 // Declare a fallback URL for the <umb-node-preview/> directive
                 if (scope.documentType !== null) {
-                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                    scope.previewOpenUrl = '#/settings/documentTypes/edit/' + scope.documentType.id;
                 }
 
                 var activeApp = _.find(scope.node.apps, (a) => a.active);
@@ -206,11 +206,11 @@
                 scope.loadingAuditTrail = true;
 
                 logResource.getPagedEntityLog(scope.auditTrailOptions)
-                    .then(function (data) {
+                    .then(data => {
 
                         // get current backoffice user and format dates
-                        userService.getCurrentUser().then(function (currentUser) {
-                            angular.forEach(data.items, function (item) {
+                        userService.getCurrentUser().then(currentUser => {
+                            Utilities.forEach(data.items, item => {
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
@@ -232,12 +232,12 @@
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
                 //check if Redirect URL Management is enabled
-                redirectUrlsResource.getEnableState().then(function (response) {
+                redirectUrlsResource.getEnableState().then(response => {
                     scope.urlTrackerDisabled = response.enabled !== true;
                     if (scope.urlTrackerDisabled === false) {
 
                         redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
-                            .then(function (data) {
+                            .then(data => {
                                 scope.redirectUrls = data.searchResults;
                                 scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
                                 scope.loadingRedirectUrls = false;
@@ -250,7 +250,7 @@
             }
 
             function setAuditTrailLogTypeColor(auditTrail) {
-                angular.forEach(auditTrail, function (item) {
+                Utilities.forEach(auditTrail, item => {
 
                     switch (item.logType) {
                         case "Save":
@@ -304,7 +304,7 @@
 
             function formatDatesToLocal() {
                 // get current backoffice user and format dates
-                userService.getCurrentUser().then(function (currentUser) {
+                userService.getCurrentUser().then(currentUser => {
                     scope.currentVariant.createDateFormatted = dateHelper.getLocalDate(scope.currentVariant.createDate, currentUser.locale, 'LLL');
                     scope.currentVariant.releaseDateFormatted = dateHelper.getLocalDate(scope.currentVariant.releaseDate, currentUser.locale, 'LLL');
                     scope.currentVariant.expireDateFormatted = dateHelper.getLocalDate(scope.currentVariant.expireDate, currentUser.locale, 'LLL');

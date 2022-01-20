@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Cms.Core.Logging
 {
     /// <summary>
     /// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
@@ -15,13 +16,24 @@ namespace Umbraco.Core.Logging
         private readonly IDisposable _profilerStep;
         private readonly string _endMessage;
         private string _failMessage;
+        private readonly object[] _endMessageArgs;
+        private readonly object[] _failMessageArgs;
         private Exception _failException;
         private bool _failed;
         private readonly string _timingId;
 
         // internal - created by profiling logger
-        internal DisposableTimer(ILogger logger, LogLevel level, IProfiler profiler, Type loggerType,
-            string startMessage, string endMessage, string failMessage = null,
+        internal DisposableTimer(
+            ILogger logger,
+            LogLevel level,
+            IProfiler profiler,
+            Type loggerType,
+            string startMessage,
+            string endMessage,
+            string failMessage = null,
+            object[] startMessageArgs = null,
+            object[] endMessageArgs = null,
+            object[] failMessageArgs = null,
             int thresholdMilliseconds = 0)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -29,6 +41,8 @@ namespace Umbraco.Core.Logging
             _loggerType = loggerType ?? throw new ArgumentNullException(nameof(loggerType));
             _endMessage = endMessage;
             _failMessage = failMessage;
+            _endMessageArgs = endMessageArgs;
+            _failMessageArgs = failMessageArgs;
             _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
             _timingId = Guid.NewGuid().ToString("N").Substring(0, 7); // keep it short-ish
 
@@ -37,10 +51,30 @@ namespace Umbraco.Core.Logging
                 switch (_level)
                 {
                     case LogLevel.Debug:
-                        logger.Debug<string,string>(loggerType, "{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        if (startMessageArgs == null)
+                        {
+                            logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        }
+                        else
+                        {
+                            var args = new object[startMessageArgs.Length + 1];
+                            startMessageArgs.CopyTo(args, 0);
+                            args[startMessageArgs.Length] = _timingId;
+                            logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                        }
                         break;
                     case LogLevel.Information:
-                        logger.Info<string, string>(loggerType, "{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        if (startMessageArgs == null)
+                        {
+                            logger.LogInformation("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        }
+                        else
+                        {
+                            var args = new object[startMessageArgs.Length + 1];
+                            startMessageArgs.CopyTo(args, 0);
+                            args[startMessageArgs.Length] = _timingId;
+                            logger.LogInformation(startMessage + " [Timing {TimingId}]", args);
+                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(level));
@@ -80,23 +114,59 @@ namespace Umbraco.Core.Logging
 
             if ((Stopwatch.ElapsedMilliseconds >= _thresholdMilliseconds || _failed)
                 && _loggerType != null && _logger != null
-                && (_endMessage.IsNullOrWhiteSpace() == false || _failed))
+                && (string.IsNullOrWhiteSpace(_endMessage) == false || _failed))
             {
                 if (_failed)
                 {
-                    _logger.Error<string,long,string>(_loggerType, _failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                    if (_failMessageArgs is null)
+                    {
+                        _logger.LogError(_failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                    }
+                    else
+                    {
+                        var args = new object[_failMessageArgs.Length + 2];
+                        _failMessageArgs.CopyTo(args, 0);
+                        args[_failMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
+                        args[_failMessageArgs.Length] = _timingId;
+                        _logger.LogError(_failException, _failMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                    }
                 }
-                else switch (_level)
+                else
                 {
-                    case LogLevel.Debug:
-                        _logger.Debug<string,long,string>(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
-                        break;
-                    case LogLevel.Information:
-                        _logger.Info<string, long, string>(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
-                        break;
-                    // filtered in the ctor
-                    //default:
-                    //    throw new Exception();
+                    switch (_level)
+                    {
+                        case LogLevel.Debug:
+                            if (_endMessageArgs == null)
+                            {
+                                _logger.LogDebug("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                            }
+                            else
+                            {
+                                var args = new object[_endMessageArgs.Length + 2];
+                                _endMessageArgs.CopyTo(args, 0);
+                                args[args.Length - 1] = Stopwatch.ElapsedMilliseconds;
+                                args[args.Length] = _timingId;
+                                _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                            }
+                            break;
+                        case LogLevel.Information:
+                            if (_endMessageArgs == null)
+                            {
+                                _logger.LogInformation("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                            }
+                            else
+                            {
+                                var args = new object[_endMessageArgs.Length + 2];
+                                _endMessageArgs.CopyTo(args, 0);
+                                args[_endMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
+                                args[_endMessageArgs.Length] = _timingId;
+                                _logger.LogInformation(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                            }
+                            break;
+                            // filtered in the ctor
+                            //default:
+                            //    throw new Exception();
+                    }
                 }
             }
         }

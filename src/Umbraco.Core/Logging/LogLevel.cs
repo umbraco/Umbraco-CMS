@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Logging
+﻿namespace Umbraco.Cms.Core.Logging
 {
     /// <summary>
     /// Specifies the level of a log event.

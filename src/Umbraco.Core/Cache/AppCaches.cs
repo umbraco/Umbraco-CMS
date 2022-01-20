@@ -1,36 +1,21 @@
 ﻿using System;
-using System.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Represents the application caches.
     /// </summary>
-    public class AppCaches
+    public class AppCaches : IDisposable
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
-        /// </summary>
-        public AppCaches()
-            : this(HttpRuntime.Cache)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
-        /// </summary>
-        public AppCaches(System.Web.Caching.Cache cache)
-            : this(
-                new WebCachingAppCache(cache),
-                new HttpRequestAppCache(),
-                new IsolatedCaches(t => new ObjectCacheAppCache()))
-        { }
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppCaches"/> with cache providers.
         /// </summary>
         public AppCaches(
             IAppPolicyCache runtimeCache,
-            IAppCache requestCache,
+            IRequestCache requestCache,
             IsolatedCaches isolatedCaches)
         {
             RuntimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
@@ -63,7 +48,7 @@ namespace Umbraco.Core.Cache
         /// <para>The per-request caches works on top of the current HttpContext items.</para>
         /// <para>Outside a web environment, the behavior of that cache is unspecified.</para>
         /// </remarks>
-        public IAppCache RequestCache { get; }
+        public IRequestCache RequestCache { get; }
 
         /// <summary>
         /// Gets the runtime cache.
@@ -82,5 +67,34 @@ namespace Umbraco.Core.Cache
         /// search through all keys on a global scale.</para>
         /// </remarks>
         public IsolatedCaches IsolatedCaches { get; }
+
+        public static AppCaches Create(IRequestCache requestCache)
+        {
+            return new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                requestCache,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    RuntimeCache.DisposeIfDisposable();
+                    RequestCache.DisposeIfDisposable();
+                    IsolatedCaches.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+        }
     }
 }

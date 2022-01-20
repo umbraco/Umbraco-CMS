@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Umbraco.Core.Exceptions
+namespace Umbraco.Cms.Core.Exceptions
 {
     /// <summary>
     /// An exception that is thrown if the Umbraco application cannot boot.
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Exceptions
         /// Rethrows a captured <see cref="BootFailedException" />.
         /// </summary>
         /// <param name="bootFailedException">The boot failed exception.</param>
-        /// <exception cref="Umbraco.Core.Exceptions.BootFailedException">
+        /// <exception cref="BootFailedException">
         /// </exception>
         /// <remarks>
         /// The exception can be null, in which case a default message is used.

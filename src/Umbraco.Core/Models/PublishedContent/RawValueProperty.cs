@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <inheritdoc />
     /// <summary>
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <para>Does not support variations: the ctor throws if the property type
     /// supports variations.</para>
     /// </remarks>
-    internal class RawValueProperty : PublishedPropertyBase
+    public class RawValueProperty : PublishedPropertyBase
     {
         private readonly object _sourceValue; //the value in the db
         private readonly Lazy<object> _objectValue;

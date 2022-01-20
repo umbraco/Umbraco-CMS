@@ -1,8 +1,7 @@
-﻿using System;
-using Semver;
-using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public interface IMigrationEntry : IEntity, IRememberBeingDirty
     {

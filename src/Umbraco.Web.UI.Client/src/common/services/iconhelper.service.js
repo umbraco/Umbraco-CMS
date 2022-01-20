@@ -96,12 +96,12 @@ function iconHelper($http, $q, $sce, $timeout) {
     let resourceLoadStatus = "none";
 
     /**
-     * This is the same approach as use for loading the localized text json 
+     * This is the same approach as use for loading the localized text json
      * We don't want multiple requests for the icon collection, so need to track
      * the current request state, and resolve the queued requests once the icons arrive
-     * Subsequent requests are returned immediately as the icons are cached into 
+     * Subsequent requests are returned immediately as the icons are cached into
      */
-    function init() {       
+    function init() {
         const deferred = $q.defer();
 
         if (resourceLoadStatus === "loaded") {
@@ -120,7 +120,7 @@ function iconHelper($http, $q, $sce, $timeout) {
             .then(function (response) {
                 resourceLoadStatus = "loaded";
 
-                for (const [key, value] of Object.entries(response.data.Data)) {
+                for (const [key, value] of Object.entries(response.data)) {
                     iconCache.push({name: key, svgString: $sce.trustAsHtml(value)})
                 }
 
@@ -138,7 +138,7 @@ function iconHelper($http, $q, $sce, $timeout) {
                 }
             });
 
-        return deferred.promise;    
+        return deferred.promise;
     }
 
     return {
@@ -304,7 +304,7 @@ function iconHelper($http, $q, $sce, $timeout) {
 
          /** Returns the cached icon or undefined */
         _getIconFromCache: iconName => iconCache.find(icon => icon.name === iconName)
-        
+
     };
 }
 angular.module('umbraco.services').factory('iconHelper', iconHelper);

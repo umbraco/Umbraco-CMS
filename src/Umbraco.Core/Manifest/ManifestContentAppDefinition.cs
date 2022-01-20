@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.IO;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     // contentApps: [
     //   {
@@ -64,11 +63,7 @@ namespace Umbraco.Core.Manifest
         /// Gets or sets the view for rendering the content app.
         /// </summary>
         [DataMember(Name = "view")]
-        public string View
-        {
-            get => _view;
-            set => _view = IOHelper.ResolveVirtualUrl(value);
-        }
+        public string View { get; set; }
 
         /// <summary>
         /// Gets or sets the list of 'show' conditions for the content app.

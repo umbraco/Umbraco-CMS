@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents a published property type.
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedPropertyType"/> class are immutable, ie
     /// if the property type changes, then a new class needs to be created.</remarks>
+    [DebuggerDisplay("{Alias} ({EditorAlias})")]
     public class PublishedPropertyType : IPublishedPropertyType
     {
         private readonly IPublishedModelFactory _publishedModelFactory;
@@ -30,7 +32,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
-        public PublishedPropertyType(IPublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+        public PublishedPropertyType(IPublishedContentType contentType, IPropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
             : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));

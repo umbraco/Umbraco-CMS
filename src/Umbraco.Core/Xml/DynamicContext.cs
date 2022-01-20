@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using System.Xml.Xsl;
 using System.Xml.XPath;
+using System.Xml.Xsl;
 
 // source: mvpxml.codeplex.com
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// Provides the evaluation context for fast execution and custom

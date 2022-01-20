@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IMemberGroupService : IService
     {
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Services
         IMemberGroup GetById(Guid id);
         IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids);
         IMemberGroup GetByName(string name);
-        void Save(IMemberGroup memberGroup, bool raiseEvents = true);
+        void Save(IMemberGroup memberGroup);
         void Delete(IMemberGroup memberGroup);
     }
 }

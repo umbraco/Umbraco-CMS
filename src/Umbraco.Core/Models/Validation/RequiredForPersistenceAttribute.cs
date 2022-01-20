@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models.Validation
+namespace Umbraco.Cms.Core.Models.Validation
 {
     /// <summary>
     /// Specifies that a data field value is required in order to persist an object.
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Validation
         /// <summary>
         /// Determines whether an object has all required values for persistence.
         /// </summary>
-        internal static bool HasRequiredValuesForPersistence(object model)
+        public static bool HasRequiredValuesForPersistence(object model)
         {
             return model.GetType().GetProperties().All(x =>
             {

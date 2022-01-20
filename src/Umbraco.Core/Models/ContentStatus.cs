@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Describes the states of a document, with regard to (schedule) publishing.
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
         // Unpublished (add release date)-> AwaitingRelease (release)-> Published (expire)-> Expired
 
         /// <summary>
-        /// The document is not trashed, and not published. 
+        /// The document is not trashed, and not published.
         /// </summary>
         [EnumMember]
         Unpublished,

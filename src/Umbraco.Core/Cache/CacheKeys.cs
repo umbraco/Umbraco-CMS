@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Cache
+﻿namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Constants storing cache keys used in caching
@@ -12,6 +12,8 @@
 
         public const string MacroContentCacheKey = "macroContent_"; // used in MacroRenderers
         public const string MacroFromAliasCacheKey = "macroFromAlias_";
+
+        public const string UserGroupGetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
 
         public const string UserAllContentStartNodesPrefix = "AllContentStartNodes";
         public const string UserAllMediaStartNodesPrefix = "AllMediaStartNodes";

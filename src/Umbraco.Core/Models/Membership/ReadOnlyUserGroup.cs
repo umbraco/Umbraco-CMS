@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {

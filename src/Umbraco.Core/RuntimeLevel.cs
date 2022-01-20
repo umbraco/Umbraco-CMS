@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Describes the levels in which the runtime can run.
@@ -35,6 +35,6 @@
         /// <summary>
         /// The runtime has detected an up-to-date Umbraco install and is running.
         /// </summary>
-        Run = 4
+        Run = 100
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Defines an entity.
@@ -41,5 +41,7 @@ namespace Umbraco.Core.Models.Entities
         /// Gets a value indicating whether the entity has an identity.
         /// </summary>
         bool HasIdentity { get; }
+
+        void ResetIdentity();
     }
 }

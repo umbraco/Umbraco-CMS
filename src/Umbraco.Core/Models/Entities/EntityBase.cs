@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Provides a base class for entities.
@@ -75,13 +75,13 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Resets the entity identity.
         /// </summary>
-        internal virtual void ResetIdentity()
+        public virtual void ResetIdentity()
         {
             _id = default;
             _key = Guid.Empty;
             _hasIdentity = false;
         }
-        
+
         public virtual bool Equals(EntityBase other)
         {
             return other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));

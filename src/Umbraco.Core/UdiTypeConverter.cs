@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// A custom type converter for UDI
@@ -26,7 +26,7 @@ namespace Umbraco.Core
             if (value is string)
             {
                 Udi udi;
-                if (Udi.TryParse((string)value, out udi))
+                if (UdiParser.TryParse((string)value, out udi))
                 {
                     return udi;
                 }

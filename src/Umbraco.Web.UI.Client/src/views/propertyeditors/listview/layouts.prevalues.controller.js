@@ -9,58 +9,70 @@
 (function() {
    "use strict";
 
-   function ListViewLayoutsPreValsController($scope, editorService) {
+    function ListViewLayoutsPreValsController($scope, editorService, localizationService, overlayService) {
 
-      var vm = this;
-      vm.focusLayoutName = false;
+        var vm = this;
+        vm.focusLayoutName = false;
 
-      vm.layoutsSortableOptions = {
-         axis: "y",
-         containment: "parent",
-         distance: 10,
-         tolerance: "pointer",
-         opacity: 0.7,
-         scroll: true,
-         cursor: "move",
-         handle: ".list-view-layout__sort-handle"
-      };
+        vm.layoutsSortableOptions = {
+            axis: "y",
+            containment: "parent",
+            distance: 10,
+            tolerance: "pointer",
+            opacity: 0.7,
+            scroll: true,
+            cursor: "move",
+            handle: ".list-view-layout__sort-handle"
+        };
 
-      vm.addLayout = addLayout;
-      vm.showPrompt = showPrompt;
-      vm.hidePrompt = hidePrompt;
-      vm.removeLayout = removeLayout;
-      vm.openIconPicker = openIconPicker;
+        vm.addLayout = addLayout;
+        vm.removeLayout = removeLayout;
+        vm.openIconPicker = openIconPicker;
 
-      function addLayout() {
+        function addLayout() {
 
-         vm.focusLayoutName = false;
+            vm.focusLayoutName = false;
 
-         var layout = {
-            "name": "",
-            "path": "",
-            "icon": "icon-stop",
-            "selected": true
-         };
+            var layout = {
+                "name": "",
+                "path": "",
+                "icon": "icon-stop",
+                "selected": true
+            };
 
-         $scope.model.value.push(layout);
-      }
+            $scope.model.value.push(layout);
+        }
 
-      function showPrompt(layout) {
-          layout.deletePrompt = true;
-      }
+       function removeLayout(template, index, event) {
 
-      function hidePrompt(layout) {
-          layout.deletePrompt = false;
-      }
+           const dialog = {
+               view: "views/propertyEditors/listview/overlays/removeListViewLayout.html",
+               layout: template,
+               submitButtonLabelKey: "defaultdialogs_yesRemove",
+               submitButtonStyle: "danger",
+               submit: function (model) {
+                   $scope.model.value.splice(index, 1);
+                   overlayService.close();
+               },
+               close: function () {
+                   overlayService.close();
+               }
+           };
 
-      function removeLayout($index, layout) {
-         $scope.model.value.splice($index, 1);
-      }
+           localizationService.localize("general_remove").then(value => {
+               dialog.title = value;
+               overlayService.open(dialog);
+           });
 
-       function openIconPicker(layout) {
+           event.preventDefault();
+           event.stopPropagation();
+       }
+
+        function openIconPicker(layout) {
             var iconPicker = {
                 icon: layout.icon.split(' ')[0],
                 color: layout.icon.split(' ')[1],
+                size: "medium",
                 submit: function (model) {
                     if (model.icon) {
                         if (model.color) {
@@ -79,7 +91,7 @@
             editorService.iconPicker(iconPicker);
         }
 
-   }
+    }
 
    angular.module("umbraco").controller("Umbraco.PrevalueEditors.ListViewLayoutsPreValsController", ListViewLayoutsPreValsController);
 

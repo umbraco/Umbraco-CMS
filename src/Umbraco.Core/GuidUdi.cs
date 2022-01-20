@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents a guid-based entity identifier.
@@ -37,29 +37,6 @@ namespace Umbraco.Core
                 throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
 
             Guid = guid;
-        }
-
-        /// <summary>
-        /// Converts the string representation of an entity identifier into the equivalent GuidUdi instance.
-        /// </summary>
-        /// <param name="s">The string to convert.</param>
-        /// <returns>A GuidUdi instance that contains the value that was parsed.</returns>
-        public new static GuidUdi Parse(string s)
-        {
-            var udi = Udi.Parse(s);
-            if (udi is GuidUdi == false)
-                throw new FormatException("String \"" + s + "\" is not a GUID entity id.");
-
-            return (GuidUdi) udi;
-        }
-
-        public static bool TryParse(string s, out GuidUdi udi)
-        {
-            Udi tmp;
-            udi = null;
-            if (TryParse(s, out tmp) == false) return false;
-            udi = tmp as GuidUdi;
-            return udi != null;
         }
 
         public override bool Equals(object obj)

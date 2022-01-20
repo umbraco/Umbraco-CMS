@@ -1,20 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
-    /// A group of property types, which corresponds to the properties grouped under a Tab.
+    /// Represents a group of property types.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}, Name: {Name}")]
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This field is for internal use only (to allow changing item keys).")]
+        internal PropertyGroupCollection Collection;
+        private PropertyGroupType _type;
         private string _name;
+        private string _alias;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -33,8 +38,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Name of the Group, which corresponds to the Tab-name in the UI
+        /// Gets or sets the type of the group.
         /// </summary>
+        /// <value>
+        /// The type.
+        /// </value>
+        [DataMember]
+        public PropertyGroupType Type
+        {
+            get => _type;
+            set => SetPropertyValueAndDetectChanges(value, ref _type, nameof(Type));
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the group.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         [DataMember]
         public string Name
         {
@@ -43,8 +64,30 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Sort Order of the Group
+        /// Gets or sets the alias of the group.
         /// </summary>
+        /// <value>
+        /// The alias.
+        /// </value>
+        [DataMember]
+        public string Alias
+        {
+            get => _alias;
+            set
+            {
+                // If added to a collection, ensure the key is changed before setting it (this ensures the internal lookup dictionary is updated)
+                Collection?.ChangeKey(this, value);
+
+                SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the sort order of the group.
+        /// </summary>
+        /// <value>
+        /// The sort order.
+        /// </value>
         [DataMember]
         public int SortOrder
         {
@@ -53,10 +96,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets a collection of PropertyTypes for this PropertyGroup
+        /// Gets or sets a collection of property types for the group.
         /// </summary>
+        /// <value>
+        /// The property types.
+        /// </value>
         /// <remarks>
-        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
+        /// Marked with DoNotClone, because we will manually deal with cloning and the event handlers.
         /// </remarks>
         [DataMember]
         [DoNotClone]
@@ -69,7 +115,7 @@ namespace Umbraco.Core.Models
                 {
                     _propertyTypes.ClearCollectionChangedEvents();
                 }
-                    
+
                 _propertyTypes = value;
 
                 // since we're adding this collection to this group,
@@ -82,30 +128,22 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other)
-        {
-            if (base.Equals(other)) return true;
-            return other != null && Name.InvariantEquals(other.Name);
-        }
+        public bool Equals(PropertyGroup other) => base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias);
 
-        public override int GetHashCode()
-        {
-            var baseHash = base.GetHashCode();
-            var nameHash = Name.ToLowerInvariant().GetHashCode();
-            return baseHash ^ nameHash;
-        }
+        public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {
             base.PerformDeepClone(clone);
 
             var clonedEntity = (PropertyGroup)clone;
+            clonedEntity.Collection = null;
 
             if (clonedEntity._propertyTypes != null)
             {
-                clonedEntity._propertyTypes.ClearCollectionChangedEvents();             //clear this event handler if any
+                clonedEntity._propertyTypes.ClearCollectionChangedEvents(); //clear this event handler if any
                 clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
-                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
+                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged; //re-assign correct event handler
             }
         }
     }

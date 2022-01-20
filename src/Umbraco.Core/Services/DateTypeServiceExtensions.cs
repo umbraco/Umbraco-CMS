@@ -1,10 +1,10 @@
 ﻿using System;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Extensions
 {
-    internal static class DateTypeServiceExtensions
+    public static class DateTypeServiceExtensions
     {
         public static bool IsDataTypeIgnoringUserStartNodes(this IDataTypeService dataTypeService, Guid key)
         {

@@ -1,15 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents an <see cref="IPublishedElement"/> type.
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedContentType"/> class are immutable, ie
     /// if the content type changes, then a new class needs to be created.</remarks>
-    public class PublishedContentType : IPublishedContentType2
+    [DebuggerDisplay("{Alias}")]
+    public class PublishedContentType : IPublishedContentType
     {
         private readonly IPublishedPropertyType[] _propertyTypes;
 
@@ -76,7 +79,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             InitializeIndexes();
         }
-        
+
         [Obsolete("Use the overload specifying a key instead")]
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
             : this(Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
@@ -124,16 +127,15 @@ namespace Umbraco.Core.Models.PublishedContent
         // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
         private static readonly Dictionary<string, int> BuiltinMemberProperties = new Dictionary<string, int>
         {
-            { "Email", Constants.DataTypes.Textbox },
-            { "Username", Constants.DataTypes.Textbox },
-            { "PasswordQuestion", Constants.DataTypes.Textbox },
-            { "Comments", Constants.DataTypes.Textarea },
-            { "IsApproved", Constants.DataTypes.Boolean },
-            { "IsLockedOut", Constants.DataTypes.Boolean },
-            { "LastLockoutDate", Constants.DataTypes.LabelDateTime },
-            { "CreateDate", Constants.DataTypes.LabelDateTime },
-            { "LastLoginDate", Constants.DataTypes.LabelDateTime },
-            { "LastPasswordChangeDate", Constants.DataTypes.LabelDateTime }
+            { nameof(IMember.Email), Constants.DataTypes.Textbox },
+            { nameof(IMember.Username), Constants.DataTypes.Textbox },
+            { nameof(IMember.Comments), Constants.DataTypes.Textbox },
+            { nameof(IMember.IsApproved), Constants.DataTypes.Boolean },
+            { nameof(IMember.IsLockedOut), Constants.DataTypes.Boolean },
+            { nameof(IMember.LastLockoutDate), Constants.DataTypes.LabelDateTime },
+            { nameof(IMember.CreateDate), Constants.DataTypes.LabelDateTime },
+            { nameof(IMember.LastLoginDate), Constants.DataTypes.LabelDateTime },
+            { nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.LabelDateTime },
         };
 
         #region Content type

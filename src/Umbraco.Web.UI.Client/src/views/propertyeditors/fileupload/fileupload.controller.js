@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     /**
@@ -55,7 +55,7 @@
                     if (thumbnail) {
                         if (mediaHelper.detectIfImageByExtension(property.value)) {
                             //get default big thumbnail from image processor
-                            var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500&animationprocessmode=first";
+                            var thumbnailUrl = property.value + "?width=500&rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss");
                             return thumbnailUrl;
                         }
                         else {

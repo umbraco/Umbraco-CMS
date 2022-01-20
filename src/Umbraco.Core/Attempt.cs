@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides ways to create attempts.

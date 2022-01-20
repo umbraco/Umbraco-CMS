@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Exceptions
+namespace Umbraco.Cms.Core.Exceptions
 {
     /// <summary>
     /// Represents an internal exception that in theory should never been thrown, it is only thrown in circumstances that should never happen.

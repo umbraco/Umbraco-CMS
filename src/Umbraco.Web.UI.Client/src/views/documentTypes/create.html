@@ -1,0 +1,107 @@
+<div ng-controller="Umbraco.Editors.DocumentTypes.CreateController">
+
+    <div ng-show="!model.creatingFolder" ng-cloak>
+        <div class="umbracoDialog umb-dialog-body with-footer">
+            <div class="umb-pane">
+                <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+            <ul class="umb-actions umb-actions-child">
+                <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
+                    <button type="button" ng-click="createDocType('icon-document')" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
+                        <umb-icon icon="icon-document" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="create_documentTypeWithTemplate">Document Type with Template</localize>
+                            <small><localize key="create_documentTypeWithTemplateDescription">The data definition for a content page that can be created by editors in the content tree and is directly accessible via a URL.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
+                    <button type="button" ng-click="createComponent('icon-item-arrangement')" class="umb-action-link umb-outline btn-reset">
+                        <umb-icon icon="icon-item-arrangement" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="create_documentType">Document Type</localize>
+                            <small><localize key="create_documentTypeDescription">The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithIsElementTypeChecked" class="umb-action">
+                    <button type="button" ng-click="createElement('icon-science')" class="umb-action-link umb-outline btn-reset">
+                        <umb-icon icon="icon-science" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="create_elementType">Element Type</localize>
+                            <small><localize key="create_elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Nested Content' property editor.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithoutTemplateForComposition" class="umb-action">
+                    <button type="button" ng-click="createComposition('icon-defrag')" class="umb-action-link umb-outline btn-reset">
+                        <umb-icon icon="icon-defrag" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="create_composition">Composition</localize>
+                            <small><localize key="create_compositionDescription">Defines a re-usable set of properties that can be included in the definition of multiple other Document Types. For example, a set of 'Common Page Settings'.</localize></small>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-folder" ng-if="model.allowCreateFolder" class="umb-action">
+                    <button type="button" ng-click="showCreateFolder()" class="umb-action-link umb-outline btn-reset">
+                        <umb-icon icon="icon-folder" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="create_folder">Folder</localize>
+                            <small>
+                                <localize key="create_folderDescription">Used to organise the Document Types, Compositions and Element Types created in this Document Type tree.</localize>
+                            </small>
+                        </span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+            
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <button type="button" class="btn btn-info" ng-click="close(true)">
+                <localize key="buttons_somethingElse">Do something else</localize>
+            </button>
+
+        </div>
+    </div>
+
+    <div ng-show="model.creatingFolder" ng-cloak>
+        <form novalidate name="createFolderForm"
+              ng-submit="createContainer()"
+              val-form-manager>
+            <div class="umbracoDialog umb-dialog-body with-footer">
+                <div class="umb-pane">
+                    <div ng-show="error">
+                        <div class="alert alert-error">
+                            <div><strong>{{error.errorMsg}}</strong></div>
+                            <div>{{error.data.message}}</div>
+                        </div>
+                    </div>
+
+                    <umb-control-group label="Enter a folder name" hide-label="false">
+                        <input type="text"
+                               name="folderName"
+                               maxlength="255"
+                               ng-model="model.folderName"
+                               class="umb-textstring textstring input-block-level"
+                               focus-when="{{model.creatingFolder}}"
+                               required />
+                    </umb-control-group>
+                </div>
+            </div>
+            <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+                <umb-button type="button"
+                            button-style="link"
+                            action="close(true)"
+                            label-key="general_close">
+                </umb-button>
+                <umb-button type="submit"
+                            button-style="primary"
+                            label-key="general_create">
+                </umb-button>
+            </div>
+        </form>
+    </div>
+</div>

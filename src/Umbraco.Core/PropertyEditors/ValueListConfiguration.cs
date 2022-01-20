@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the ValueList editor configuration.
@@ -11,12 +11,13 @@ namespace Umbraco.Core.PropertyEditors
         [ConfigurationField("items", "Configure", "multivalues", Description = "Add, remove or sort values for the list.")]
         public List<ValueListItem> Items { get; set; } = new List<ValueListItem>();
 
+        [DataContract]
         public class ValueListItem
         {
-            [JsonProperty("id")]
+            [DataMember(Name = "id")]
             public int Id { get; set; }
 
-            [JsonProperty("value")]
+            [DataMember(Name = "value")]
             public string Value { get; set; }
         }
     }

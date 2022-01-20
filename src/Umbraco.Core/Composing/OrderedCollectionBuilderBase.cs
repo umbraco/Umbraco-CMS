@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Implements an ordered collection builder.

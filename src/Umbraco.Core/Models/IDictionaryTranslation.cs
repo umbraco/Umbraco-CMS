@@ -1,10 +1,9 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
-    public interface IDictionaryTranslation : IEntity
+    public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the <see cref="Language"/> for the translation

@@ -1,9 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Extensions
 {
     public static class ContentTypeServiceExtensions
     {
@@ -39,7 +44,7 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
-        internal static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
+        public static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
@@ -63,7 +68,7 @@ namespace Umbraco.Core.Services
                     .Select(c => c.Alias)
                     .Union(filterPropertyTypes)
                     .ToArray();
-            
+
             var sourceId = source?.Id ?? 0;
 
             // find out if any content type uses this content type
@@ -127,7 +132,7 @@ namespace Umbraco.Core.Services
 
             return new ContentTypeAvailableCompositionsResults(ancestors, result);
         }
-        
+
 
         private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
         {

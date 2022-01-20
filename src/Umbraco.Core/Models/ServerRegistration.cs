@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Globalization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a registered server in a multiple-servers environment.
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Models
         private string _serverAddress;
         private string _serverIdentity;
         private bool _isActive;
-        private bool _isMaster;
+        private bool _isSchedulingPublisher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
@@ -30,7 +31,7 @@ namespace Umbraco.Core.Models
         /// <param name="accessed">The date and time the registration was last accessed.</param>
         /// <param name="isActive">A value indicating whether the registration is active.</param>
         /// <param name="isMaster">A value indicating whether the registration is master.</param>
-        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isMaster)
+        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isSchedulingPublisher)
         {
             UpdateDate = accessed;
             CreateDate = registered;
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Models
             ServerAddress = serverAddress;
             ServerIdentity = serverIdentity;
             IsActive = isActive;
-            IsMaster = isMaster;
+            IsSchedulingPublisher = isSchedulingPublisher;
         }
 
         /// <summary>
@@ -85,12 +86,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the server is master.
+        /// Gets or sets a value indicating whether the server has the SchedulingPublisher role
         /// </summary>
-        public bool IsMaster
+        public bool IsSchedulingPublisher
         {
-            get => _isMaster;
-            set => SetPropertyValueAndDetectChanges(value, ref _isMaster, nameof(IsMaster));
+            get => _isSchedulingPublisher;
+            set => SetPropertyValueAndDetectChanges(value, ref _isSchedulingPublisher, nameof(IsSchedulingPublisher));
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress, ServerIdentity, IsActive ? "" : "!", IsMaster ? "" : "!");
+            return string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress, ServerIdentity, IsActive ? "" : "!", IsSchedulingPublisher ? "" : "!");
         }
     }
 }

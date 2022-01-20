@@ -20,7 +20,7 @@
                         <tbody>
                             <tr ng-repeat="(key, values) in model.searchResultValues track by key">
                                 <td>{{key}}</td>
-                                <td style="word-break: break-word;">{{values | umbCmsJoinArray:', '}}</td>
+                                <td style="word-break: break-word;">{{ ::values | umbCmsJoinArray:', '}}</td>
                             </tr>
                         </tbody>
                     </table>

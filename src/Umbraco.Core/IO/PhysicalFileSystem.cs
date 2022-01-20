@@ -1,15 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
 using System.Threading;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
-    public class PhysicalFileSystem : IFileSystem
+    public interface IPhysicalFileSystem : IFileSystem
+    { }
+
+    public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     {
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger<PhysicalFileSystem> _logger;
+
         // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
         // eg "c:" or "c:\path\to\site" or "\\server\path"
         private readonly string _rootPath;
@@ -23,21 +31,11 @@ namespace Umbraco.Core.IO
         // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
-        // virtualRoot should be "~/path/to/root" eg "~/Views"
-        // the "~/" is mandatory.
-        public PhysicalFileSystem(string virtualRoot)
+        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
         {
-            if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
-            if (virtualRoot.StartsWith("~/") == false)
-                throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _rootPath = EnsureDirectorySeparatorChar(IOHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
-            _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-            _rootUrl = EnsureUrlSeparatorChar(IOHelper.ResolveUrl(virtualRoot)).TrimEnd(Constants.CharArrays.ForwardSlash);
-        }
-
-        public PhysicalFileSystem(string rootPath, string rootUrl)
-        {
             if (rootPath == null) throw new ArgumentNullException(nameof(rootPath));
             if (string.IsNullOrEmpty(rootPath)) throw new ArgumentException("Value can't be empty.", nameof(rootPath));
             if (rootUrl == null) throw new ArgumentNullException(nameof(rootUrl));
@@ -48,9 +46,12 @@ namespace Umbraco.Core.IO
             if (Path.IsPathRooted(rootPath) == false)
             {
                 // but the test suite App.config cannot really "root" anything so we have to do it here
-                var localRoot = IOHelper.GetRootDirectorySafe();
+                var localRoot = hostingEnvironment.MapPathContentRoot("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }
+
+            // clean up root path
+            rootPath = Path.GetFullPath(rootPath);
 
             _rootPath = EnsureDirectorySeparatorChar(rootPath).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
@@ -74,11 +75,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                _logger.LogError(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Directory not found for '{Path}'", fullPath);
+                _logger.LogError(ex, "Directory not found for '{Path}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -110,7 +111,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Directory not found for '{Path}'", fullPath);
+                _logger.LogError(ex, "Directory not found for '{Path}'", fullPath);
             }
         }
 
@@ -148,17 +149,21 @@ namespace Umbraco.Core.IO
             var fullPath = GetFullPath(path);
             var exists = File.Exists(fullPath);
             if (exists && overrideExisting == false)
+            {
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            }
 
             var directory = Path.GetDirectoryName(fullPath);
             if (directory == null) throw new InvalidOperationException("Could not get directory.");
             Directory.CreateDirectory(directory); // ensure it exists
 
-            if (stream.CanSeek) // TODO: what if we cannot?
+            if (stream.CanSeek)
+            {
                 stream.Seek(0, 0);
+            }
 
-            using (var destination = (Stream) File.Create(fullPath))
-                stream.CopyTo(destination);
+            using var destination = (Stream)File.Create(fullPath);
+            stream.CopyTo(destination);
         }
 
         /// <summary>
@@ -178,7 +183,7 @@ namespace Umbraco.Core.IO
         /// <param name="path">The filesystem-relative path of the directory.</param>
         /// <param name="filter">A filter.</param>
         /// <returns>The filesystem-relative path to the matching files in the directory.</returns>
-        /// <remarks>Filesystem-relative paths use forward-slashes as directory separators.</remarks>
+        /// <remarks>Filesystem-relative paths use forward-slashes as directory separators.</remarks> //TODO check is this is true on linux and windows..
         public IEnumerable<string> GetFiles(string path, string filter)
         {
             var fullPath = GetFullPath(path);
@@ -190,11 +195,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                _logger.LogError(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem, string>(ex, "Directory not found for '{FullPath}'", fullPath);
+                _logger.LogError(ex, "Directory not found for '{FullPath}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -227,7 +232,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem, string>(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
+                _logger.LogError(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
             }
         }
 
@@ -256,18 +261,19 @@ namespace Umbraco.Core.IO
             // test URL
             var path = fullPathOrUrl.Replace('\\', '/'); // ensure URL separator char
 
-            // if it starts with the root URL, strip it and trim the starting slash to make it relative
-            // eg "/Media/1234/img.jpg" => "1234/img.jpg"
-            if (IOHelper.PathStartsWith(path, _rootUrl, '/'))
-                return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
-
             // if it starts with the root path, strip it and trim the starting slash to make it relative
             // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
-            if (IOHelper.PathStartsWith(path, _rootPathFwd, '/'))
+            // or on unix systems "/var/wwwroot/test/Meia/1234/img.jpg"
+            if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
                 return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
 
+            // if it starts with the root URL, strip it and trim the starting slash to make it relative
+            // eg "/Media/1234/img.jpg" => "1234/img.jpg"
+            if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
+                return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+
             // unchanged - what else?
-            return path;
+            return path.TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         /// <summary>
@@ -282,7 +288,7 @@ namespace Umbraco.Core.IO
         public string GetFullPath(string path)
         {
             // normalize
-            var opath = path;
+            var originalPath = path;
             path = EnsureDirectorySeparatorChar(path);
 
             // FIXME: this part should go!
@@ -293,7 +299,7 @@ namespace Umbraco.Core.IO
                 path = GetRelativePath(path);
 
             // if not already rooted, combine with the root path
-            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar) == false)
+            if (_ioHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar) == false)
                 path = Path.Combine(_rootPath, path);
 
             // sanitize - GetFullPath will take care of any relative
@@ -304,7 +310,7 @@ namespace Umbraco.Core.IO
             // at that point, path is within legal parts of the filesystem, ie we have
             // permissions to reach that path, but it may nevertheless be outside of
             // our root path, due to relative segments, so better check
-            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
+            if (_ioHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
             {
                 // this says that 4.7.2 supports long paths - but Windows does not
                 // https://docs.microsoft.com/en-us/dotnet/api/system.io.pathtoolongexception?view=netframework-4.7.2
@@ -315,7 +321,7 @@ namespace Umbraco.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException("File '" + opath + "' is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"File original: [{originalPath}] full: [{path}] is outside this filesystem's root.");
         }
 
         /// <summary>
@@ -446,6 +452,9 @@ namespace Umbraco.Core.IO
                 Thread.Sleep(pausems);
             }
         }
+
+        /// <inheritdoc />
+        public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
 
         #endregion
     }

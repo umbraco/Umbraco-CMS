@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Media
+namespace Umbraco.Cms.Core.Media
 {
     public interface IEmbedProvider
     {

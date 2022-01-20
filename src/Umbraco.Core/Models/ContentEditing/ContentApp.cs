@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// Represents a content app.

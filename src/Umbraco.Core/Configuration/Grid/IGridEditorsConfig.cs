@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Configuration.Grid
+namespace Umbraco.Cms.Core.Configuration.Grid
 {
     public interface IGridEditorsConfig
     {

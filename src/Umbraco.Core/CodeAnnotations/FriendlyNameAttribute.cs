@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Umbraco.Core.CodeAnnotations
+namespace Umbraco.Cms.Core.CodeAnnotations
 {
     /// <summary>
     /// Attribute to add a Friendly Name string with an UmbracoObjectType enum value
     /// </summary>
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = false)]
-    internal class FriendlyNameAttribute : Attribute
+    public class FriendlyNameAttribute : Attribute
     {
         /// <summary>
         /// friendly name value

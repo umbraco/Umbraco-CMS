@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Defines methods that can convert a property value to / from an environment-agnostic string.
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Deploy
         /// <param name="propertyType">The value property type</param>
         /// <param name="dependencies">The content dependencies.</param>
         /// <returns>The deploy property value.</returns>
-        string ToArtifact(object value, PropertyType propertyType, ICollection<ArtifactDependency> dependencies);
+        string ToArtifact(object value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
         /// Gets the content property value corresponding to a deploy property value.
@@ -32,6 +32,6 @@ namespace Umbraco.Core.Deploy
         /// <param name="propertyType">The value property type<</param>
         /// <param name="currentValue">The current content property value.</param>
         /// <returns>The content property value.</returns>
-        object FromArtifact(string value, PropertyType propertyType, object currentValue);
+        object FromArtifact(string value, IPropertyType propertyType, object currentValue);
     }
 }

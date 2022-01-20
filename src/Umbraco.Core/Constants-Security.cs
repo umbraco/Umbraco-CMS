@@ -1,18 +1,15 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
         public static class Security
         {
-            public const string UserMembershipProviderName = "UsersMembershipProvider";
-
             /// <summary>
             /// Gets the identifier of the 'super' user.
             /// </summary>
             public const int SuperUserId = -1;
+
+            public const string SuperUserIdAsString = "-1";
 
             /// <summary>
             /// The id for the 'unknown' user.
@@ -38,9 +35,12 @@ namespace Umbraco.Core
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
+            public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
-            internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
-            internal const string ForceReAuthFlag = "umbraco-force-auth";
+            public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
+
+            public const string DefaultMemberTypeAlias = "Member";
+
 
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
@@ -50,14 +50,24 @@ namespace Umbraco.Core
             /// providers need to be setup differently and each auth type for the back office will be prefixed with this value
             /// </remarks>
             public const string BackOfficeExternalAuthenticationTypePrefix = "Umbraco.";
+            public const string MemberExternalAuthenticationTypePrefix = "UmbracoMembers.";
 
             public const string StartContentNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startcontentnode";
             public const string StartMediaNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
+            public const string TicketExpiresClaimType = "http://umbraco.org/2020/06/identity/claims/backoffice/ticketexpires";
 
-            public const string BackOfficeExternalLoginOptionsProperty = "UmbracoBackOfficeExternalLoginOptions";
+            /// <summary>
+            /// The claim type for the ASP.NET Identity security stamp
+            /// </summary>
+            public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
 
+            public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
+            public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";
+            public const string AspNetUmbraco8PasswordHashAlgorithmName = "HMACSHA256";
+            public const string AspNetUmbraco4PasswordHashAlgorithmName = "HMACSHA1";
+            public const string UnknownPasswordConfigJson = "{\"hashAlgorithm\":\"Unknown\"}";
         }
     }
 }

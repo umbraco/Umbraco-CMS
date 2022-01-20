@@ -1,0 +1,85 @@
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@using Microsoft.AspNetCore.Http.Extensions
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Security
+@using Umbraco.Cms.Web.Website.Controllers
+@using Umbraco.Cms.Web.Website.Models
+@using Umbraco.Extensions
+@inject MemberModelBuilderFactory memberModelBuilderFactory;
+
+@{
+    // Build a registration model with parameters
+    var registerModel = memberModelBuilderFactory
+        .CreateRegisterModel()
+        // Set the member type alias to use for the new member
+        .WithMemberTypeAlias(Constants.Conventions.MemberTypes.DefaultAlias)
+        // If null or not set, this will redirect to the current page
+        .WithRedirectUrl(null)
+        // Set to true if you want the member editable properties shown.
+        // It will only displays properties marked as "Member can edit" on the "Info" tab of the Member Type.
+        .WithCustomProperties(false)
+        .Build();
+
+    var success = TempData["FormSuccess"] != null;
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+@if (success)
+{
+    @* This message will show if registerModel.RedirectUrl is not defined (default) *@
+    <p class="text-success">Registration succeeded.</p>
+}
+else
+{
+    using (Html.BeginUmbracoForm<UmbRegisterController>(
+            "HandleRegisterMember",
+            new {
+                MemberTypeAlias = registerModel.MemberTypeAlias,
+                UsernameIsEmail = registerModel.UsernameIsEmail,
+                RedirectUrl = registerModel.RedirectUrl
+            }))
+    {
+        <h2>Create a new account.</h2>
+        <hr />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="@registerModel.Name" class="form-label"></label>
+            <input asp-for="@registerModel.Name" class="form-control" aria-required="true" />
+            <span asp-validation-for="@registerModel.Name" class="form-text text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="@registerModel.Email" class="form-label"></label>
+            <input asp-for="@registerModel.Email" class="form-control" autocomplete="username" aria-required="true" />
+            <span asp-validation-for="@registerModel.Email" class="form-text text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="@registerModel.Password" class="form-label"></label>
+            <input asp-for="@registerModel.Password" class="form-control" autocomplete="new-password" aria-required="true" />
+            <span asp-validation-for="@registerModel.Password" class="form-text text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="@registerModel.ConfirmPassword" class="form-label"></label>
+            <input asp-for="@registerModel.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+            <span asp-validation-for="@registerModel.ConfirmPassword" class="form-text text-danger"></span>
+        </div>
+
+        @if (registerModel.MemberProperties != null)
+        {
+            for (var i = 0; i < registerModel.MemberProperties.Count; i++)
+            {
+                <div class="mb-3">
+                    @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
+                    <input asp-for="@registerModel.MemberProperties[i].Value" class="form-control" />
+                    @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
+                    <span asp-validation-for="@registerModel.MemberProperties[i].Value" class="form-text text-danger"></span>
+                </div>
+            }
+        }
+
+        <button type="submit" class="btn btn-primary">Register</button>
+        
+    }
+}

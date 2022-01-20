@@ -1,19 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Xml.Linq;
-using Umbraco.Core.Configuration;
 using System.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
         /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public interface IMediaService : IContentServiceBase
+    public interface IMediaService : IContentServiceBase<IMedia>
     {
         int CountNotTrashed(string contentTypeAlias = null);
         int Count(string mediaTypeAlias = null);
@@ -162,14 +158,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
-        OperationResult EmptyRecycleBin();
-
-        /// <summary>
-        /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
-        /// </summary>
-        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
         /// <summary>
@@ -192,7 +181,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
         /// <param name="userId">Optional Id of the user issuing the delete operation</param>
         void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = Constants.Security.SuperUserId);
-        
+
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
@@ -209,16 +198,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> Save(IMedia media, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IMedia media, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
@@ -313,9 +300,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="items"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>

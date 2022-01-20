@@ -12,9 +12,9 @@ var processLess = require('../util/processLess');
 var {js} = require('./js');
 
 function watchTask(cb) {
-    
+
     var watchInterval = 500;
-    
+
     //Setup a watcher for all groups of JS files
     _.forEach(config.sources.js, function (group) {
         if(group.watch !== false) {
@@ -28,22 +28,29 @@ function watchTask(cb) {
             watch(group.watch, { ignoreInitial: true, interval: watchInterval }, function Less_Group_Compile() { return processLess(group.files, group.out); });
         }
     });
-    
+
     //Setup a watcher for all groups of view files
     var viewWatcher;
     _.forEach(config.sources.views, function (group) {
         if(group.watch !== false) {
-            viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval }, 
+            viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval },
                 parallel(
                     function MoveViewsAndRegenerateJS() {
-                        return src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
-                    }, 
+                        var task = src(group.files);
+
+                        _.forEach(config.roots, function(root){
+                            var destPath = root + config.targets.views + group.folder;
+                            console.log("copying " + group.files + " to " + destPath);
+                            task = task.pipe( dest(destPath) );
+                        });
+                        return task;
+                    },
                     js
                 )
             );
         }
     });
-    
+
     return cb();
 };
 

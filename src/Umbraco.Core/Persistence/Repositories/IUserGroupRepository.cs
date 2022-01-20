@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IUserGroupRepository : IReadWriteQueryRepository<int, IUserGroup>
     {

@@ -1,13 +1,8 @@
-﻿using System.IO;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IStylesheetRepository : IReadRepository<string, Stylesheet>, IWriteRepository<Stylesheet>
+    public interface IStylesheetRepository : IReadRepository<string, IStylesheet>, IWriteRepository<IStylesheet>, IFileRepository, IFileWithFoldersRepository
     {
-        bool ValidateStylesheet(Stylesheet stylesheet);
-        Stream GetFileContentStream(string filepath);
-        void SetFileContent(string filepath, Stream content);
-        long GetFileSize(string filepath);
     }
 }

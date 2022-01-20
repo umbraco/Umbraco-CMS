@@ -1,21 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Web.Caching;
-using Umbraco.Core.Composing;
-using CacheItemPriority = System.Web.Caching.CacheItemPriority;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="ObjectCache"/>.
     /// </summary>
-    public class ObjectCacheAppCache : IAppPolicyCache
+    public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectCacheAppCache"/>.
@@ -31,7 +30,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the internal memory cache, for tests only!
         /// </summary>
-        internal ObjectCache MemoryCache { get; private set; }
+        public ObjectCache MemoryCache { get; private set; }
 
         /// <inheritdoc />
         public object Get(string key)
@@ -47,7 +46,7 @@ namespace Umbraco.Core.Cache
                 if (_locker.IsReadLockHeld)
                     _locker.ExitReadLock();
             }
-            return result == null ? null : FastDictionaryAppCacheBase.GetSafeLazyValue(result); // return exceptions as null
+            return result == null ? null : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
         }
 
         /// <inheritdoc />
@@ -73,7 +72,7 @@ namespace Umbraco.Core.Cache
                     _locker.ExitReadLock();
             }
             return entries
-                .Select(x => FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                 .Where(x => x != null) // backward compat, don't store null values in the cache
                 .ToList();
         }
@@ -97,50 +96,65 @@ namespace Umbraco.Core.Cache
                     _locker.ExitReadLock();
             }
             return entries
-                .Select(x => FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                 .Where(x => x != null) // backward compat, don't store null values in the cache
                 .ToList();
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, string[] dependentFiles = null)
         {
             // see notes in HttpRuntimeAppCache
 
             Lazy<object> result;
 
-            using (var lck = new UpgradeableReadLock(_locker))
+            try
             {
-                result = MemoryCache.Get(key) as Lazy<object>;
-                if (result == null || FastDictionaryAppCacheBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
-                {
-                    result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
-                    var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+                _locker.EnterUpgradeableReadLock();
 
-                    lck.UpgradeToWriteLock();
-                    //NOTE: This does an add or update
-                    MemoryCache.Set(key, result, policy);
+                result = MemoryCache.Get(key) as Lazy<object>;
+                if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                {
+                    result = SafeLazy.GetSafeLazy(factory);
+                    var policy = GetPolicy(timeout, isSliding, dependentFiles);
+
+                    try
+                    {
+                        _locker.EnterWriteLock();
+                        //NOTE: This does an add or update
+                        MemoryCache.Set(key, result, policy);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
                 }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
             }
 
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            if (value is FastDictionaryAppCacheBase.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
             return value;
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+            var result = SafeLazy.GetSafeLazy(factory);
             var value = result.Value; // force evaluation now
             if (value == null) return; // do not store null values (backward compat)
 
-            var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            var policy = GetPolicy(timeout, isSliding, dependentFiles);
             //NOTE: This does an add or update
             MemoryCache.Set(key, result, policy);
         }
@@ -178,9 +192,8 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public virtual void ClearOfType(string typeName)
+        public virtual void ClearOfType(Type type)
         {
-            var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             try
@@ -192,7 +205,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -223,7 +236,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -255,7 +268,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
 
                         // if T is an interface remove anything that implements that interface
@@ -314,7 +327,7 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
         {
             var absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration : (timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? ObjectCache.NoSlidingExpiration : (timeout ?? ObjectCache.NoSlidingExpiration);
@@ -330,35 +343,25 @@ namespace Umbraco.Core.Cache
                 policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
             }
 
-            if (removedCallback != null)
-            {
-                policy.RemovedCallback = arguments =>
-                {
-                    //convert the reason
-                    var reason = CacheItemRemovedReason.Removed;
-                    switch (arguments.RemovedReason)
-                    {
-                        case CacheEntryRemovedReason.Removed:
-                            reason = CacheItemRemovedReason.Removed;
-                            break;
-                        case CacheEntryRemovedReason.Expired:
-                            reason = CacheItemRemovedReason.Expired;
-                            break;
-                        case CacheEntryRemovedReason.Evicted:
-                            reason = CacheItemRemovedReason.Underused;
-                            break;
-                        case CacheEntryRemovedReason.ChangeMonitorChanged:
-                            reason = CacheItemRemovedReason.Expired;
-                            break;
-                        case CacheEntryRemovedReason.CacheSpecificEviction:
-                            reason = CacheItemRemovedReason.Underused;
-                            break;
-                    }
-                    //call the callback
-                    removedCallback(arguments.CacheItem.Key, arguments.CacheItem.Value, reason);
-                };
-            }
             return policy;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _locker.Dispose();
+                }
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

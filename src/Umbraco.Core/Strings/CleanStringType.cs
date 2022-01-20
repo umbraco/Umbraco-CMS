@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// Specifies the type of a clean string.

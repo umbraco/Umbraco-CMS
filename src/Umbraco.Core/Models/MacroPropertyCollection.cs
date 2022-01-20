@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A macro's property collection

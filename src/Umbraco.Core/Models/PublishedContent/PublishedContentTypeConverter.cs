@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     internal class PublishedContentTypeConverter : TypeConverter
     {

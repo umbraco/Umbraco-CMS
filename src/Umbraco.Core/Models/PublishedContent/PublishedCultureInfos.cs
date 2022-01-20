@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Contains culture specific values for <see cref="IPublishedContent"/>.
     /// </summary>
+    [DebuggerDisplay("{Culture}")]
     public class PublishedCultureInfo
     {
         /// <summary>
@@ -29,12 +31,12 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the item.
         /// </summary>
-        internal string Name { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the URL segment of the item.
         /// </summary>
-        internal string UrlSegment { get; }
+        public string UrlSegment { get; }
 
         /// <summary>
         /// Gets the date associated with the culture.

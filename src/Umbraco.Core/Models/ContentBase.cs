@@ -4,9 +4,10 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents an abstract class for base Content properties and methods
@@ -18,9 +19,9 @@ namespace Umbraco.Core.Models
     {
         private int _contentTypeId;
         private int _writerId;
-        private PropertyCollection _properties;
+        private IPropertyCollection _properties;
         private ContentCultureInfosCollection _cultureInfos;
-        internal IReadOnlyList<PropertyType> AllPropertyTypes { get; }
+        internal IReadOnlyList<IPropertyType> AllPropertyTypes { get; }
 
         #region Used for change tracking
 
@@ -42,7 +43,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
@@ -52,14 +53,14 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             SetParent(parent);
         }
 
-        private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        private ContentBase(string name, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
         {
             ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
@@ -76,13 +77,13 @@ namespace Umbraco.Core.Models
             //track all property types on this content type, these can never change during the lifetime of this single instance
             //there is no real extra memory overhead of doing this since these property types are already cached on this object via the
             //properties already.
-            AllPropertyTypes = new List<PropertyType>(contentType.CompositionPropertyTypes);
+            AllPropertyTypes = new List<IPropertyType>(contentType.CompositionPropertyTypes);
         }
 
         [IgnoreDataMember]
         public ISimpleContentType ContentType { get; private set; }
 
-        internal void ChangeContentType(ISimpleContentType contentType)
+        public void ChangeContentType(ISimpleContentType contentType)
         {
             ContentType = contentType;
             ContentTypeId = contentType.Id;
@@ -133,7 +134,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [DataMember]
         [DoNotClone]
-        public PropertyCollection Properties
+        public IPropertyCollection Properties
         {
             get => _properties;
             set
@@ -185,7 +186,7 @@ namespace Umbraco.Core.Models
                 if (_cultureInfos != null)
                 {
                     _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
-                }   
+                }
             }
         }
 
@@ -497,7 +498,7 @@ namespace Umbraco.Core.Models
             if (clonedContent._properties != null)
             {
                 clonedContent._properties.ClearCollectionChangedEvents();         //clear this event handler if any
-                clonedContent._properties = (PropertyCollection)_properties.DeepClone(); //manually deep clone
+                clonedContent._properties = (IPropertyCollection)_properties.DeepClone(); //manually deep clone
                 clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
             }
 

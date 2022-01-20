@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Reflection;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Indicates that a composer should be disabled.
@@ -20,6 +21,11 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public DisableAttribute()
         { }
+
+        public DisableAttribute(string fullTypeName, string assemblyName)
+        {
+            DisabledType = Assembly.Load(assemblyName)?.GetType(fullTypeName);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DisableAttribute"/> class.

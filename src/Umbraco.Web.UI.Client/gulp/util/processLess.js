@@ -9,6 +9,7 @@ var cssnano = require('cssnano');
 var cleanCss = require('gulp-clean-css');
 var rename = require('gulp-rename');
 var sourcemaps = require('gulp-sourcemaps');
+var _ = require('lodash');
 
 module.exports = function(files, out) {
 
@@ -16,8 +17,10 @@ module.exports = function(files, out) {
         autoprefixer,
         cssnano({zindex: false})
     ];
-
-    console.log("LESS: ", files, " -> ", config.root + config.targets.css + out)
+    _.forEach(config.roots, function(root){
+        console.log("LESS: ", files, " -> ", root + config.targets.css + out);
+    })
+    
 
     var task = gulp.src(files);
 
@@ -34,7 +37,12 @@ module.exports = function(files, out) {
         task = task.pipe(sourcemaps.write('./maps'));
     }
 
-    task = task.pipe(gulp.dest(config.root + config.targets.css));
+    _.forEach(config.roots, function(root){
+        task = task.pipe(gulp.dest(root + config.targets.css));
+    })
+
+    
+   
 
     return task;
 

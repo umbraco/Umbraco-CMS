@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Provides a common base interface for <see cref="IContentTypeBase"/>.
@@ -58,7 +58,6 @@ namespace Umbraco.Core.Services
 
         void Save(TItem item, int userId = Constants.Security.SuperUserId);
         void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
-
         void Delete(TItem item, int userId = Constants.Security.SuperUserId);
         void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId);
 
@@ -79,7 +78,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         bool HasContainerInPath(params int[] ids);
 
-        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, Guid key, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);

@@ -1,7 +1,11 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a void editor.
@@ -16,11 +20,13 @@ namespace Umbraco.Core.PropertyEditors
         /// Initializes a new instance of the <see cref="VoidEditor"/> class.
         /// </summary>
         /// <param name="aliasSuffix">An optional alias suffix.</param>
-        /// <param name="logger">A logger.</param>
+        /// <param name="loggerFactory">A logger factory.</param>
         /// <remarks>The default alias of the editor is "Umbraco.Void". When a suffix is provided,
         /// it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".</remarks>
-        public VoidEditor(string aliasSuffix, ILogger logger)
-            : base(logger)
+        public VoidEditor(
+            string aliasSuffix,
+            IDataValueEditorFactory dataValueEditorFactory)
+            : base(dataValueEditorFactory)
         {
             Alias = "Umbraco.Void";
             if (string.IsNullOrWhiteSpace(aliasSuffix)) return;
@@ -30,10 +36,11 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="VoidEditor"/> class.
         /// </summary>
-        /// <param name="logger">A logger.</param>
+        /// <param name="loggerFactory">A logger factory.</param>
         /// <remarks>The alias of the editor is "Umbraco.Void".</remarks>
-        public VoidEditor(ILogger logger)
-            : this(null, logger)
+        public VoidEditor(
+            IDataValueEditorFactory dataValueEditorFactory)
+            : this(null, dataValueEditorFactory)
         { }
     }
 }

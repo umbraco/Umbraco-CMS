@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<PublishEventArgs<TEntity>>
     {

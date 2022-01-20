@@ -1,8 +1,8 @@
-﻿using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
-    internal class ManifestValueValidatorCollectionBuilder : LazyCollectionBuilderBase<ManifestValueValidatorCollectionBuilder, ManifestValueValidatorCollection, IManifestValueValidator>
+    public class ManifestValueValidatorCollectionBuilder : SetCollectionBuilderBase<ManifestValueValidatorCollectionBuilder, ManifestValueValidatorCollection, IManifestValueValidator>
     {
         protected override ManifestValueValidatorCollectionBuilder This => this;
     }

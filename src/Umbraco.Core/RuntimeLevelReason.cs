@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Describes the reason for the runtime level.
@@ -64,6 +64,11 @@
         /// Umbraco runs the current version but some migrations have not run.
         /// </summary>
         UpgradeMigrations,
+
+        /// <summary>
+        /// Umbraco runs the current version but some package migrations have not run.
+        /// </summary>
+        UpgradePackageMigrations,
 
         /// <summary>
         /// Umbraco is running.

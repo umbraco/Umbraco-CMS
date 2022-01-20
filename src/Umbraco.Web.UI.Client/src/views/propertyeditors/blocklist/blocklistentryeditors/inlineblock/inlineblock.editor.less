@@ -10,6 +10,12 @@
         border-color: @gray-8;
     }
 
+    .umb-editor-tab-bar {
+        margin: 0;
+        position: static;
+        padding: 0;
+    }
+
     > button {
         width: 100%;
         min-height: 48px;
@@ -27,8 +33,8 @@
             transition: transform 80ms ease-out;
         }
 
-        i {
-            font-size: 22px;
+        .icon {
+            font-size: 1.1rem;
             display: inline-block;
             vertical-align: middle;
         }
@@ -48,17 +54,21 @@
     ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
         > button {
             color: @formErrorText;
+
             .show-validation-type-warning & {
                 color: @formWarningText;
             }
+
             span.caret {
                 border-top-color: @formErrorText;
+
                 .show-validation-type-warning & {
                     border-top-color: @formWarningText;
                 }
             }
         }
     }
+
     ng-form.ng-invalid-val-server-match-content > .umb-block-list__block:not(.--active) > .umb-block-list__block--content > div > & {
         > button {
             span.name {
@@ -78,22 +88,41 @@
                     padding: 2px;
                     line-height: 10px;
                     background-color: @formErrorText;
+
                     .show-validation-type-warning & {
                         background-color: @formWarningText;
                     }
+
                     font-weight: 900;
-        
                     animation-duration: 1.4s;
                     animation-iteration-count: infinite;
                     animation-name: blockelement-inlineblock-editor--badge-bounce;
                     animation-timing-function: ease;
+
                     @keyframes blockelement-inlineblock-editor--badge-bounce {
-                        0%   { transform: translateY(0); }
-                        20%  { transform: translateY(-4px); }
-                        40%  { transform: translateY(0); }
-                        55%  { transform: translateY(-2px); }
-                        70%  { transform: translateY(0); }
-                        100% { transform: translateY(0); }
+                        0% {
+                            transform: translateY(0);
+                        }
+
+                        20% {
+                            transform: translateY(-4px);
+                        }
+
+                        40% {
+                            transform: translateY(0);
+                        }
+
+                        55% {
+                            transform: translateY(-2px);
+                        }
+
+                        70% {
+                            transform: translateY(0);
+                        }
+
+                        100% {
+                            transform: translateY(0);
+                        }
                     }
                 }
             }

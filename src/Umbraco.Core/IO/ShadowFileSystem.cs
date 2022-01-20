@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     internal class ShadowFileSystem : IFileSystem
     {

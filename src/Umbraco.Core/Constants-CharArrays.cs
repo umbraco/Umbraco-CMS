@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -83,6 +77,12 @@ namespace Umbraco.Core
             /// Char array containing ~ /
             /// </summary>
             public static readonly char[] TildeForwardSlash = new char[] { '~', '/' };
+
+
+            /// <summary>
+            /// Char array containing ~ / \
+            /// </summary>
+            public static readonly char[] TildeForwardSlashBackSlash = new char[] { '~', '/', '\\' };
 
             /// <summary>
             /// Char array containing only ?

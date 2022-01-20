@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     // contentApps: [
     //   {
@@ -33,10 +35,12 @@ namespace Umbraco.Core.Manifest
     public class ManifestContentAppFactory : IContentAppFactory
     {
         private readonly ManifestContentAppDefinition _definition;
+        private readonly IIOHelper _ioHelper;
 
-        public ManifestContentAppFactory(ManifestContentAppDefinition definition)
+        public ManifestContentAppFactory(ManifestContentAppDefinition definition, IIOHelper ioHelper)
         {
             _definition = definition;
+            _ioHelper = ioHelper;
         }
 
         private ContentApp _app;
@@ -137,14 +141,14 @@ namespace Umbraco.Core.Manifest
 
             // else
             // content app can be displayed
-            return _app ?? (_app = new ContentApp
+            return _app ??= new ContentApp
             {
                 Alias = _definition.Alias,
                 Name = _definition.Name,
                 Icon = _definition.Icon,
-                View = _definition.View,
+                View = _ioHelper.ResolveRelativeOrVirtualUrl(_definition.View),
                 Weight = _definition.Weight
-            });
+            };
         }
 
         private class ShowRule

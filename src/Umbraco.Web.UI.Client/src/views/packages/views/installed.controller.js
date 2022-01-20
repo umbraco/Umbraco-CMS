@@ -1,80 +1,66 @@
 (function () {
-    "use strict";
+  "use strict";
 
-    function PackagesInstalledController($scope, $route, $location, packageResource, $timeout, $window, localStorageService, localizationService) {
+  function PackagesInstalledController($location, packageResource, localizationService) {
 
-        var vm = this;
+    var vm = this;
 
-        vm.confirmUninstall = confirmUninstall;
-        vm.uninstallPackage = uninstallPackage;
-        vm.packageOptions = packageOptions;
-        vm.state = "list";
-        vm.installState = {
-            status: ""
-        };
-        vm.package = {};
+    vm.confirmMigrations = confirmMigrations;
+    vm.packageOptions = packageOptions;
+    vm.runMigrations = runMigrations;
+    vm.state = "list";
+    vm.installState = {
+      status: "",
+      state: ""
+    };
+    vm.package = {};
 
-        var labels = {};
-        
-        function init() {
-            packageResource.getInstalled()
-                .then(function (packs) {
-                    vm.installedPackages = packs;
-                });
-            vm.installState.status = "";
-            vm.state = "list";
+    var labels = {};
 
-            var labelKeys = [
-                "packager_installStateUninstalling",
-                "packager_installStateComplete"
-            ];
+    function init() {
+      packageResource.getInstalled()
+        .then(function (packs) {
+          vm.installedPackages = packs;
+        });
+      
+      var labelKeys = [
+        "packager_packageMigrationsComplete"
+      ];
 
-            localizationService.localizeMany(labelKeys).then(function (values) {
-                labels.installStateUninstalling = values[0];
-                labels.installStateComplete = values[1];
-            });
-        }
-
-        function packageOptions(pck) {
-            $location.path("packages/packages/options/" + pck.id)
-                .search("packageId", null); //ensure the installId flag is gone, it's only available on first install
-        }
-
-        function confirmUninstall(pck) {
-            vm.state = "packageDetails";
-            vm.package = pck;
-        }
-
-        function uninstallPackage(installedPackage) {
-            vm.installState.status = labels.installStateUninstalling;
-            vm.installState.progress = "0";
-
-            packageResource.uninstall(installedPackage.id)
-                .then(function () {
-
-                    if (installedPackage.files.length > 0) {
-                        vm.installState.status = labels.installStateComplete;
-                        vm.installState.progress = "100";
-
-                        //set this flag so that on refresh it shows the installed packages list
-                        localStorageService.set("packageInstallData", "installed");
-                        
-                        //reload on next digest (after cookie)
-                        $timeout(function () {
-                            $window.location.reload(true);
-                        });
-                        
-                    }
-                    else {
-                        init();
-                    }
-                });
-        }
-
-        init();
-
+      localizationService.localizeMany(labelKeys).then(function (values) {
+        labels.packageMigrationsComplete = values[0];
+      });
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.Packages.InstalledController", PackagesInstalledController);
+    function packageOptions(pck) {
+      $location.path("packages/packages/options/" + pck.name)
+        .search("packageId", null); //ensure the installId flag is gone, it's only available on first install
+    }
+
+    function confirmMigrations(pck) {
+      vm.state = "runMigration";
+      vm.package = pck;
+      vm.installState.state = "";
+      vm.installState.status = "";
+    }
+
+    function runMigrations(pck) {
+      vm.installState.state = "running";
+      packageResource.runMigrations(pck.name)
+        .then(function (packs) {
+          vm.installState.state = "success";
+          vm.installState.status = labels.packageMigrationsComplete;
+          vm.installedPackages = packs;
+        }, function (err) {
+          vm.installState.state = "error";
+          vm.installState.status = err.data.message;
+        });
+    }
+
+    init();
+
+  }
+
+  angular.module("umbraco").controller("Umbraco.Editors.Packages.InstalledController", PackagesInstalledController);
 
 })();

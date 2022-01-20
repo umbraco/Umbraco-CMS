@@ -1,28 +1,26 @@
-﻿using System;
-using Umbraco.Core.Models.Entities;
+using System;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Defines the base contract for <see cref="IMember"/> and <see cref="IUser"/>
     /// </summary>
     public interface IMembershipUser : IEntity
     {
-        object ProviderUserKey { get; set; }
         string Username { get; set; }
         string Email { get; set; }
+        DateTime? EmailConfirmedDate { get; set; }
 
         /// <summary>
         /// Gets or sets the raw password value
         /// </summary>
         string RawPasswordValue { get; set; }
 
-        string PasswordQuestion { get; set; }
-
         /// <summary>
-        /// Gets or sets the raw password answer value
+        /// The user's specific password config (i.e. algorithm type, etc...)
         /// </summary>
-        string RawPasswordAnswerValue { get; set; }
+        string PasswordConfiguration { get; set; }
 
         string Comments { get; set; }
         bool IsApproved { get; set; }
@@ -40,6 +38,11 @@ namespace Umbraco.Core.Models.Membership
         /// Part of the standard properties collection.
         /// </remarks>
         int FailedPasswordAttempts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the security stamp used by ASP.NET Identity
+        /// </summary>
+        string SecurityStamp { get; set; }
 
         //object ProfileId { get; set; }
         //IEnumerable<object> Groups { get; set; }

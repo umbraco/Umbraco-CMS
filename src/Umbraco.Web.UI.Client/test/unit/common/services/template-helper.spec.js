@@ -26,31 +26,31 @@ describe('service: templateHelper', function () {
         it('should return the snippet for inserting a partial from the root', function () {
             var parentId = "";
             var nodeName = "Footer.cshtml";
-            var snippet = '@Html.Partial("Footer")';
+            var snippet = '@await Html.PartialAsync("Footer")';
             expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
         });
 
         it('should return the snippet for inserting a partial from a folder', function () {
             var parentId = "Folder";
             var nodeName = "Footer.cshtml";
-            var snippet = '@Html.Partial("Folder/Footer")';
+            var snippet = '@await Html.PartialAsync("Folder/Footer")';
             expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
         });
 
         it('should return the snippet for inserting a partial from a nested folder', function () {
             var parentId = "Folder/NestedFolder";
             var nodeName = "Footer.cshtml";
-            var snippet = '@Html.Partial("Folder/NestedFolder/Footer")';
+            var snippet = '@await Html.PartialAsync("Folder/NestedFolder/Footer")';
             expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
         });
 
         it('should return the snippet for inserting a partial from a folder with spaces in its name', function () {
             var parentId = "Folder with spaces";
             var nodeName = "Footer.cshtml";
-            var snippet = '@Html.Partial("Folder with spaces/Footer")';
+            var snippet = '@await Html.PartialAsync("Folder with spaces/Footer")';
             expect(templateHelper.getInsertPartialSnippet(parentId, nodeName)).toBe(snippet);
         });
-        
+
     });
 
     describe('getQuerySnippet', function () {
@@ -62,14 +62,14 @@ describe('service: templateHelper', function () {
                 "\t@foreach (var item in selection)\n" +
                 "\t{\n" +
                 "\t\t<li>\n" +
-                "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
+                "\t\t\t<a href=\"@item.Url()\">@item.Name()</a>\n" +
                 "\t\t</li>\n" +
                 "\t}\n" +
                 "</ul>\n\n";
 
             expect(templateHelper.getQuerySnippet(queryExpression)).toBe(snippet);
         });
-        
+
     });
 
     describe('getRenderBodySnippet', function () {
@@ -78,7 +78,7 @@ describe('service: templateHelper', function () {
             var snippet = '@RenderBody()';
             expect(templateHelper.getRenderBodySnippet()).toBe(snippet);
         });
-        
+
     });
 
     describe('getRenderSectionSnippet', function () {
@@ -92,7 +92,7 @@ describe('service: templateHelper', function () {
             var snippet = '@RenderSection("sectionName", true)';
             expect(templateHelper.getRenderSectionSnippet("sectionName", true)).toBe(snippet);
         });
-        
+
     });
 
     describe('getAddSectionSnippet', function () {
@@ -102,7 +102,7 @@ describe('service: templateHelper', function () {
             var snippet = "@section " + sectionName + "\r\n{\r\n\r\n\t{0}\r\n\r\n}\r\n";
             expect(templateHelper.getAddSectionSnippet(sectionName)).toEqual(snippet);
         });
-        
+
     });
 
 });

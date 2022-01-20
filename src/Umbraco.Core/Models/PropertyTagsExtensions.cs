@@ -1,34 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="Property"/> class to manage tags.
     /// </summary>
     public static class PropertyTagsExtensions
     {
-        // TODO: inject
-        private static PropertyEditorCollection PropertyEditors => Current.PropertyEditors;
-        private static IDataTypeService DataTypeService => Current.Services.DataTypeService;
-
         // gets the tag configuration for a property
         // from the datatype configuration, and the editor tag configuration attribute
-        internal static TagConfiguration GetTagConfiguration(this Property property)
+        public static TagConfiguration GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var editor = PropertyEditors[property.PropertyType.PropertyEditorAlias];
+            var editor = propertyEditors[property.PropertyType.PropertyEditorAlias];
             var tagAttribute = editor.GetTagAttribute();
             if (tagAttribute == null) return null;
 
-            var configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId).Configuration;
+            var configurationObject = dataTypeService.GetDataType(property.PropertyType.DataTypeId).Configuration;
             var configuration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(configurationObject);
 
             if (configuration.Delimiter == default)
@@ -41,29 +38,32 @@ namespace Umbraco.Core.Models
         /// Assign tags.
         /// </summary>
         /// <param name="property">The property.</param>
+        /// <param name="serializer"></param>
         /// <param name="tags">The tags.</param>
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void AssignTags(this Property property, IEnumerable<string> tags, bool merge = false, string culture = null)
+        /// <param name="propertyEditors"></param>
+        /// <param name="dataTypeService"></param>
+        public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var configuration = property.GetTagConfiguration();
+            var configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
-            property.AssignTags(tags, merge, configuration.StorageType, configuration.Delimiter, culture);
+            property.AssignTags(tags, merge, configuration.StorageType, serializer, configuration.Delimiter, culture);
         }
 
         // assumes that parameters are consistent with the datatype configuration
-        private static void AssignTags(this Property property, IEnumerable<string> tags, bool merge, TagsStorageType storageType, char delimiter, string culture)
+        private static void AssignTags(this IProperty property, IEnumerable<string> tags, bool merge, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string culture)
         {
             // set the property value
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
 
             if (merge)
             {
-                var currentTags = property.GetTagsValue(storageType, delimiter);
+                var currentTags = property.GetTagsValue(storageType, serializer, delimiter);
 
                 switch (storageType)
                 {
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Models
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray()), culture); // json array
+                        property.SetValue(serializer.Serialize(currentTags.Union(trimmedTags).ToArray()), culture); // json array
                         break;
                 }
             }
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(trimmedTags), culture); // json array
+                        property.SetValue(serializer.Serialize(trimmedTags), culture); // json array
                         break;
                 }
             }
@@ -95,21 +95,24 @@ namespace Umbraco.Core.Models
         /// Removes tags.
         /// </summary>
         /// <param name="property">The property.</param>
+        /// <param name="serializer"></param>
         /// <param name="tags">The tags.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void RemoveTags(this Property property, IEnumerable<string> tags, string culture = null)
+        /// <param name="propertyEditors"></param>
+        /// <param name="dataTypeService"></param>
+        public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var configuration = property.GetTagConfiguration();
+            var configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
-            property.RemoveTags(tags, configuration.StorageType, configuration.Delimiter, culture);
+            property.RemoveTags(tags, configuration.StorageType, serializer, configuration.Delimiter, culture);
         }
 
         // assumes that parameters are consistent with the datatype configuration
-        private static void RemoveTags(this Property property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter, string culture)
+        private static void RemoveTags(this IProperty property, IEnumerable<string> tags, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string culture)
         {
             // already empty = nothing to do
             var value = property.GetValue(culture)?.ToString();
@@ -117,7 +120,7 @@ namespace Umbraco.Core.Models
 
             // set the property value
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
-            var currentTags = property.GetTagsValue(storageType, delimiter, culture);
+            var currentTags = property.GetTagsValue(storageType, serializer, delimiter, culture);
             switch (storageType)
             {
                 case TagsStorageType.Csv:
@@ -125,24 +128,24 @@ namespace Umbraco.Core.Models
                     break;
 
                 case TagsStorageType.Json:
-                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray()), culture); // json array
+                    property.SetValue(serializer.Serialize(currentTags.Except(trimmedTags).ToArray()), culture); // json array
                     break;
             }
         }
 
         // used by ContentRepositoryBase
-        internal static IEnumerable<string> GetTagsValue(this Property property, string culture = null)
+        public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var configuration = property.GetTagConfiguration();
+            var configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
-            return property.GetTagsValue(configuration.StorageType, configuration.Delimiter, culture);
+            return property.GetTagsValue(configuration.StorageType, serializer, configuration.Delimiter, culture);
         }
 
-        private static IEnumerable<string> GetTagsValue(this Property property, TagsStorageType storageType, char delimiter, string culture = null)
+        private static IEnumerable<string> GetTagsValue(this IProperty property, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -157,9 +160,9 @@ namespace Umbraco.Core.Models
                 case TagsStorageType.Json:
                     try
                     {
-                        return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString().Trim());
+                        return serializer.Deserialize<string[]>(value).Select(x => x.ToString().Trim());
                     }
-                    catch (JsonException)
+                    catch (Exception)
                     {
                         //cannot parse, malformed
                         return Enumerable.Empty<string>();
@@ -182,7 +185,7 @@ namespace Umbraco.Core.Models
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>
         /// </remarks>
-        internal static void SetTagsValue(this Property property, object value, TagConfiguration tagConfiguration, string culture)
+        public static void SetTagsValue(this IProperty property, IJsonSerializer serializer, object value, TagConfiguration tagConfiguration, string culture)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
             if (tagConfiguration == null) throw new ArgumentNullException(nameof(tagConfiguration));
@@ -190,19 +193,19 @@ namespace Umbraco.Core.Models
             var storageType = tagConfiguration.StorageType;
             var delimiter = tagConfiguration.Delimiter;
 
-            SetTagsValue(property, value, storageType, delimiter, culture);
+            SetTagsValue(property, value, storageType, serializer, delimiter, culture);
         }
 
         // assumes that parameters are consistent with the datatype configuration
         // value can be an enumeration of string, or a serialized value using storageType format
-        private static void SetTagsValue(Property property, object value, TagsStorageType storageType, char delimiter, string culture)
+        private static void SetTagsValue(IProperty property, object value, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string culture)
         {
             if (value == null) value = Enumerable.Empty<string>();
 
             // if value is already an enumeration of strings, just use it
             if (value is IEnumerable<string> tags1)
             {
-                property.AssignTags(tags1, false, storageType, delimiter, culture);
+                property.AssignTags(tags1, false, storageType, serializer, delimiter, culture);
                 return;
             }
 
@@ -211,18 +214,18 @@ namespace Umbraco.Core.Models
             {
                 case TagsStorageType.Csv:
                     var tags2 = value.ToString().Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
-                    property.AssignTags(tags2, false, storageType, delimiter, culture);
+                    property.AssignTags(tags2, false, storageType, serializer, delimiter, culture);
                     break;
 
                 case TagsStorageType.Json:
                     try
                     {
-                        var tags3 = JsonConvert.DeserializeObject<IEnumerable<string>>(value.ToString());
-                        property.AssignTags(tags3 ?? Enumerable.Empty<string>(), false, storageType, delimiter, culture);
+                        var tags3 = serializer.Deserialize<IEnumerable<string>>(value.ToString());
+                        property.AssignTags(tags3 ?? Enumerable.Empty<string>(), false, storageType, serializer, delimiter, culture);
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Warn(typeof(PropertyTagsExtensions), ex, "Could not automatically convert stored json value to an enumerable string '{Json}'", value.ToString());
+                        StaticApplicationLogging.Logger.LogWarning(ex, "Could not automatically convert stored json value to an enumerable string '{Json}'", value.ToString());
                     }
                     break;
 

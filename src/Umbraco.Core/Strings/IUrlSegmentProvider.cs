@@ -1,7 +1,6 @@
-﻿using System.Globalization;
-using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// Provides URL segments for content.

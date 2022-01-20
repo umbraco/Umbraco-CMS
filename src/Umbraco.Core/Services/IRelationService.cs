@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IRelationService : IService
     {
@@ -132,6 +132,15 @@ namespace Umbraco.Core.Services
         IEnumerable<IRelation> GetByParentOrChildId(int id);
 
         IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias);
+
+        /// <summary>
+        /// Gets a relation by the unique combination of parentId, childId and relationType.
+        /// </summary>
+        /// <param name="parentId">The id of the parent item.</param>
+        /// <param name="childId">The id of the child item.</param>
+        /// <param name="relationType">The RelationType.</param>
+        /// <returns>The relation or null</returns>
+        IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
 
         /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by the Name of the <see cref="IRelationType"/>
@@ -341,5 +350,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="relationType"><see cref="IRelationType"/> to Delete Relations for</param>
         void DeleteRelationsOfType(IRelationType relationType);
+
+
+
     }
 }

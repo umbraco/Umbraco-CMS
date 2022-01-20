@@ -1,12 +1,12 @@
-﻿using Umbraco.Core.Models.Entities;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a data type.
     /// </summary>
-    public interface IDataType : IUmbracoEntity
+    public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the property editor.

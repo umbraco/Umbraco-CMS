@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class SliderValueConverter : PropertyValueConverterBase
@@ -79,7 +78,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
 
-        internal static void ClearCaches()
+        public static void ClearCaches()
         {
             Storages.Clear();
         }

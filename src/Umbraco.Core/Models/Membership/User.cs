@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Represents a backoffice user
@@ -18,11 +19,11 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Constructor for creating a new/empty user
         /// </summary>
-        public User()
+        public User(GlobalSettings globalSettings)
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = Current.Configs.Global().DefaultUILanguage; // TODO: inject
+            _language = globalSettings.DefaultUILanguage;
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -38,13 +39,13 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
-        public User(string name, string email, string username, string rawPasswordValue)
-            : this()
+        public User(GlobalSettings globalSettings, string name, string email, string username, string rawPasswordValue)
+            : this(globalSettings)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
-            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", "email");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            if (string.IsNullOrEmpty(rawPasswordValue)) throw new ArgumentException("Value cannot be null or empty.", "rawPasswordValue");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(email));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrEmpty(rawPasswordValue)) throw new ArgumentException("Value cannot be null or empty.", nameof(rawPasswordValue));
 
             _name = name;
             _email = email;
@@ -65,25 +66,29 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
+        /// <param name="passwordConfig"></param>
         /// <param name="userGroups"></param>
         /// <param name="startContentIds"></param>
         /// <param name="startMediaIds"></param>
-        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
-            : this()
+        public User(GlobalSettings globalSettings, int id, string name, string email, string username,
+            string rawPasswordValue, string passwordConfig,
+            IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
+            : this(globalSettings)
         {
             //we allow whitespace for this value so just check null
-            if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");
-            if (userGroups == null) throw new ArgumentNullException("userGroups");
-            if (startContentIds == null) throw new ArgumentNullException("startContentIds");
-            if (startMediaIds == null) throw new ArgumentNullException("startMediaIds");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (rawPasswordValue == null) throw new ArgumentNullException(nameof(rawPasswordValue));
+            if (userGroups == null) throw new ArgumentNullException(nameof(userGroups));
+            if (startContentIds == null) throw new ArgumentNullException(nameof(startContentIds));
+            if (startMediaIds == null) throw new ArgumentNullException(nameof(startMediaIds));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
 
             Id = id;
             _name = name;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
+            _passwordConfig = passwordConfig;
             _userGroups = new HashSet<IReadOnlyUserGroup>(userGroups);
             _isApproved = true;
             _isLockedOut = false;
@@ -105,6 +110,7 @@ namespace Umbraco.Core.Models.Membership
         private DateTime? _invitedDate;
         private string _email;
         private string _rawPasswordValue;
+        private string _passwordConfig;
         private IEnumerable<string> _allowedSections;
         private HashSet<IReadOnlyUserGroup> _userGroups;
         private bool _isApproved;
@@ -113,9 +119,6 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastPasswordChangedDate;
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
-        private bool _defaultToLiveEditing;
-        private IDictionary<string, object> _additionalData;
-        private object _additionalDataLock = new object();
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
@@ -123,14 +126,6 @@ namespace Umbraco.Core.Models.Membership
                 (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
                 enum1 => enum1.GetHashCode());
 
-        #region Implementation of IMembershipUser
-
-        [IgnoreDataMember]
-        public object ProviderUserKey
-        {
-            get => Id;
-            set => throw new NotSupportedException("Cannot set the provider user key for a user");
-        }
 
         [DataMember]
         public DateTime? EmailConfirmedDate
@@ -138,29 +133,40 @@ namespace Umbraco.Core.Models.Membership
             get => _emailConfirmedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, nameof(EmailConfirmedDate));
         }
+
         [DataMember]
         public DateTime? InvitedDate
         {
             get => _invitedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _invitedDate, nameof(InvitedDate));
         }
+
         [DataMember]
         public string Username
         {
             get => _username;
             set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
+
         [DataMember]
         public string Email
         {
             get => _email;
             set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
-        [DataMember]
+
+        [IgnoreDataMember]
         public string RawPasswordValue
         {
             get => _rawPasswordValue;
             set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
+        }
+
+        [IgnoreDataMember]
+        public string PasswordConfiguration
+        {
+            get => _passwordConfig;
+            set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
         }
 
         [DataMember]
@@ -205,19 +211,8 @@ namespace Umbraco.Core.Models.Membership
             set => SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, nameof(FailedPasswordAttempts));
         }
 
-        // TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
-        // we'll just have them as generic get/set which don't interact with the db.
-
-        [IgnoreDataMember]
-        public string PasswordQuestion { get; set; }
-        [IgnoreDataMember]
-        public string RawPasswordAnswerValue { get; set; }
         [IgnoreDataMember]
         public string Comments { get; set; }
-
-        #endregion
-
-        #region Implementation of IUser
 
         public UserState UserState
         {
@@ -250,13 +245,6 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _allowedSections ?? (_allowedSections = new List<string>(_userGroups.SelectMany(x => x.AllowedSections).Distinct())); }
         }
-
-        /// <summary>
-        /// This used purely for hacking backwards compatibility into this class for &lt; 7.7 compat
-        /// </summary>
-        [DoNotClone]
-        [IgnoreDataMember]
-        internal List<IUserGroup> GroupsToSave = new List<IUserGroup>();
 
         public IProfile ProfileData => new WrappedUserProfile(this);
 
@@ -335,13 +323,6 @@ namespace Umbraco.Core.Models.Membership
             set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
         }
 
-        [IgnoreDataMember]
-        internal bool DefaultToLiveEditing
-        {
-            get => _defaultToLiveEditing;
-            set => SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, nameof(DefaultToLiveEditing));
-        }
-
         /// <summary>
         /// Gets the groups that user is part of
         /// </summary>
@@ -383,29 +364,6 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
-        #endregion
-
-        [IgnoreDataMember]
-        [DoNotClone]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This should not be used, it's currently used for only a single edge case - should probably be removed for netcore")]
-        internal IDictionary<string, object> AdditionalData
-        {
-            get
-            {
-                lock (_additionalDataLock)
-                {
-                    return _additionalData ?? (_additionalData = new Dictionary<string, object>());
-                }
-            }
-        }
-
-        [IgnoreDataMember]
-        [DoNotClone]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Not used, will be removed in future versions")]
-        internal object AdditionalDataLock => _additionalDataLock;
-
         protected override void PerformDeepClone(object clone)
         {
             base.PerformDeepClone(clone);
@@ -415,29 +373,6 @@ namespace Umbraco.Core.Models.Membership
             //manually clone the start node props
             clonedEntity._startContentIds = _startContentIds.ToArray();
             clonedEntity._startMediaIds = _startMediaIds.ToArray();
-
-            // this value has been cloned and points to the same object
-            // which obviously is bad - needs to point to a new object
-            clonedEntity._additionalDataLock = new object();
-
-            if (_additionalData != null)
-            {
-                // clone._additionalData points to the same dictionary, which is bad, because
-                // changing one clone impacts all of them - so we need to reset it with a fresh
-                // dictionary that will contain the same values - and, if some values are deep
-                // cloneable, they should be deep-cloned too
-                var cloneAdditionalData = clonedEntity._additionalData = new Dictionary<string, object>();
-
-                lock (_additionalDataLock)
-                {
-                    foreach (var kvp in _additionalData)
-                    {
-                        var deepCloneable = kvp.Value as IDeepCloneable;
-                        cloneAdditionalData[kvp.Key] = deepCloneable == null ? kvp.Value : deepCloneable.DeepClone();
-                    }
-                }
-            }
-
             //need to create new collections otherwise they'll get copied by ref
             clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
             clonedEntity._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;

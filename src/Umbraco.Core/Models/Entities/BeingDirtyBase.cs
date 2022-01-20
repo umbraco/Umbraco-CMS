@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Provides a base implementation of <see cref="ICanBeDirty"/> and <see cref="IRememberBeingDirty"/>.

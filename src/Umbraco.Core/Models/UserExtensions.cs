@@ -1,62 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public static class UserExtensions
     {
-        public static IEnumerable<string> GetPermissions(this IUser user, string path, IUserService userService)
-        {
-            return userService.GetPermissionsForPath(user, path).GetAllPermissions();
-        }
-
-        public static bool HasSectionAccess(this IUser user, string app)
-        {
-            var apps = user.AllowedSections;
-            return apps.Any(uApp => uApp.InvariantEquals(app));
-        }
-
-        /// <summary>
-        /// Determines whether this user is the 'super' user.
-        /// </summary>
-        public static bool IsSuper(this IUser user)
-        {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            return user.Id == Constants.Security.SuperUserId;
-        }
-
-        /// <summary>
-        /// Determines whether this user belongs to the administrators group.
-        /// </summary>
-        /// <remarks>The 'super' user does not automatically belongs to the administrators group.</remarks>
-        public static bool IsAdmin(this IUser user)
-        {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
-        }
-
         /// <summary>
         /// Tries to lookup the user's Gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
         /// <param name="user"></param>
         /// <param name="cache"></param>
+        /// <param name="mediaFileManager"></param>
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        internal static string[] GetUserAvatarUrls(this IUser user, IAppCache cache)
+        public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator)
         {
-            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
+            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
             // and the website will not run.
             // Also, check if the user has explicitly removed all avatars including a Gravatar, this will be possible and the value will be "none"
@@ -105,85 +76,62 @@ namespace Umbraco.Core.Models
             }
 
             //use the custom avatar
-            var avatarUrl = Current.MediaFileSystem.GetUrl(user.Avatar);
-            var urlGenerator = Current.ImageUrlGenerator;
+            var avatarUrl = mediaFileManager.FileSystem.GetUrl(user.Avatar);
             return new[]
             {
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 30, Height = 30 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 60, Height = 60 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 90, Height = 90 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 150, Height = 150 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 300, Height = 300 })
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 30, Height = 30 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 60, Height = 60 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 90, Height = 90 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 150, Height = 150 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 300, Height = 300 })
             };
 
         }
 
-        /// <summary>
-        /// Returns the culture info associated with this user, based on the language they're assigned to in the back office
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="textService"></param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
-        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService, IGlobalSettings globalSettings)
-        {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            if (textService == null) throw new ArgumentNullException(nameof(textService));
-            return GetUserCulture(user.Language, textService, globalSettings);
-        }
 
-        internal static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService, IGlobalSettings globalSettings)
-        {
-            try
-            {
-                var culture = CultureInfo.GetCultureInfo(userLanguage.Replace("_", "-"));
-                // TODO: This is a hack because we store the user language as 2 chars instead of the full culture
-                // which is actually stored in the language files (which are also named with 2 chars!) so we need to attempt
-                // to convert to a supported full culture
-                var result = textService.ConvertToSupportedCultureWithRegionCode(culture);
-                return result;
-            }
-            catch (CultureNotFoundException)
-            {
-                //return the default one
-                return CultureInfo.GetCultureInfo(globalSettings.DefaultUILanguage);
-            }
-        }
 
         internal static bool HasContentRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches)
-            => ContentPermissionsHelper.HasPathAccess(Constants.System.RootString, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+        {
+            return ContentPermissions.HasPathAccess(Constants.System.RootString, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+        }
 
         internal static bool HasContentBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches)
-            => ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinContentString, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+        {
+            return ContentPermissions.HasPathAccess(Constants.System.RecycleBinContentString, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+        }
 
         internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches)
-            => ContentPermissionsHelper.HasPathAccess(Constants.System.RootString, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+        {
+            return ContentPermissions.HasPathAccess(Constants.System.RootString, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+        }
 
         internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches)
-            => ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinMediaString, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+        {
+            return ContentPermissions.HasPathAccess(Constants.System.RecycleBinMediaString, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+        }
 
-        internal static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService, AppCaches appCaches)
+        public static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService, AppCaches appCaches)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return ContentPermissionsHelper.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+            return ContentPermissions.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
         }
 
-        internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService, AppCaches appCaches)
+        public static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService, AppCaches appCaches)
         {
             if (media == null) throw new ArgumentNullException(nameof(media));
-            return ContentPermissionsHelper.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+            return ContentPermissions.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
         }
 
-        internal static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
+        public static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+            return ContentPermissions.HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
         }
 
-        internal static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
+        public static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
+            return ContentPermissions.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
         }
 
         /// <summary>
@@ -196,17 +144,9 @@ namespace Umbraco.Core.Models
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
         }
 
-        [Obsolete("Use the overload specifying all parameters instead")]
-        public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService)
-            => CalculateContentStartNodeIds(user, entityService, Current.AppCaches);
-
         /// <summary>
         /// Calculate start nodes, combining groups' and user's, and excluding what's in the bin
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="entityService"></param>
-        /// <param name="runtimeCache"></param>
-        /// <returns></returns>
         public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
@@ -221,10 +161,6 @@ namespace Umbraco.Core.Models
 
             return result;
         }
-
-        [Obsolete("Use the overload specifying all parameters instead")]
-        public static int[] CalculateMediaStartNodeIds(this IUser user, IEntityService entityService)
-            => CalculateMediaStartNodeIds(user, entityService, Current.AppCaches);
 
         /// <summary>
         /// Calculate start nodes, combining groups' and user's, and excluding what's in the bin
@@ -248,10 +184,6 @@ namespace Umbraco.Core.Models
             return result;
         }
 
-        [Obsolete("Use the overload specifying all parameters instead")]
-        public static string[] GetMediaStartNodePaths(this IUser user, IEntityService entityService)
-            => GetMediaStartNodePaths(user, entityService, Current.AppCaches);
-
         public static string[] GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserMediaStartNodePathsPrefix + user.Id;
@@ -265,10 +197,6 @@ namespace Umbraco.Core.Models
 
             return result;
         }
-
-        [Obsolete("Use the overload specifying all parameters instead")]
-        public static string[] GetContentStartNodePaths(this IUser user, IEntityService entityService)
-            => GetContentStartNodePaths(user, entityService, Current.AppCaches);
 
         public static string[] GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
@@ -291,14 +219,14 @@ namespace Umbraco.Core.Models
 
         private static string GetBinPath(UmbracoObjectTypes objectType)
         {
-            var binPath = Constants.System.Root + ",";
+            var binPath = Constants.System.RootString + ",";
             switch (objectType)
             {
                 case UmbracoObjectTypes.Document:
-                    binPath += Constants.System.RecycleBinContent;
+                    binPath += Constants.System.RecycleBinContentString;
                     break;
                 case UmbracoObjectTypes.Media:
-                    binPath += Constants.System.RecycleBinMedia;
+                    binPath += Constants.System.RecycleBinMediaString;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(objectType));

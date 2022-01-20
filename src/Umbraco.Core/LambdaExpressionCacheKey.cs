@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents a simple <see cref="LambdaExpression"/> in a form which is suitable for using as a dictionary key
     /// by exposing the return type, argument types and expression string form in a single concatenated string.
     /// </summary>
-    internal struct LambdaExpressionCacheKey
+    public struct LambdaExpressionCacheKey
     {
         public LambdaExpressionCacheKey(string returnType, string expression, params string[] argTypes)
         {

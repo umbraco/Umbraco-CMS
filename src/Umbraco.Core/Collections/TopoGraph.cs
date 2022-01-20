@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     public class TopoGraph
     {
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Collections
                 var start = incr > 0 ? 0 : index;
                 var count = incr > 0 ? index : sorted.Length - index;
                 if (throwOnCycle && Contains(sorted, item, start, count) == false)
-                    throw new Exception(CycleDependencyError);
+                    throw new Exception(CycleDependencyError +": " + item);
                 return;
             }
 

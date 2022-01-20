@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     [SupersedeEvent(typeof(SaveEventArgs<>))]
     [SupersedeEvent(typeof(PublishEventArgs<>))]
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Events
         public IEnumerable<TEntity> DeletedEntities
         {
             get => EventObject;
-            internal set => EventObject = value;
+            set => EventObject = value;
         }
 
         /// <summary>

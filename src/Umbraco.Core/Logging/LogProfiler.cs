@@ -1,31 +1,26 @@
 ﻿using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Cms.Core.Logging
 {
     /// <summary>
     /// Implements <see cref="IProfiler"/> by writing profiling results to an <see cref="ILogger"/>.
     /// </summary>
-    internal class LogProfiler : IProfiler
+    public class LogProfiler : IProfiler
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LogProfiler> _logger;
 
-        public LogProfiler(ILogger logger)
+        public LogProfiler(ILogger<LogProfiler> logger)
         {
             _logger = logger;
         }
 
         /// <inheritdoc/>
-        public string Render()
-        {
-            return string.Empty;
-        }
-
-        /// <inheritdoc/>
         public IDisposable Step(string name)
         {
-            _logger.Debug<LogProfiler, string>("Begin: {ProfileName}", name);
-            return new LightDisposableTimer(duration => _logger.Info<LogProfiler, string,long>("End {ProfileName} ({ProfileDuration}ms)", name, duration));
+            _logger.LogDebug("Begin: {ProfileName}", name);
+            return new LightDisposableTimer(duration => _logger.LogInformation("End {ProfileName} ({ProfileDuration}ms)", name, duration));
         }
 
         /// <inheritdoc/>

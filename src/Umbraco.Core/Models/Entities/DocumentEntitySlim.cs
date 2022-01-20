@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
 
     /// <summary>
@@ -43,6 +43,6 @@ namespace Umbraco.Core.Models.Entities
 
         /// <inheritdoc />
         public bool Edited { get; set; }
-        
+
     }
 }

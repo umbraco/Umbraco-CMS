@@ -179,7 +179,7 @@ When building a custom infinite editor view you can use the same components as a
             } else {
                 focus();
             }
-        });      
+        });
 
         /**
          * @ngdoc method
@@ -214,17 +214,18 @@ When building a custom infinite editor view you can use the same components as a
          * Method to tell editors that they are begin blurred.
          */
         function blur() {
-
-            /* keyboard shortcuts will be overwritten by the new infinite editor
+            if (isEnabled === true) {
+                /* keyboard shortcuts will be overwritten by the new infinite editor
                 so we need to store the shortcuts for the current editor so they can be rebound
                 when the infinite editor closes
             */
-            unbindKeyboardShortcuts();
-            isEnabled = false;
+                unbindKeyboardShortcuts();
+                isEnabled = false;
+            }
         }
         /**
          * @ngdoc method
-         * @name umbraco.services.editorService#blur
+         * @name umbraco.services.editorService#focus
          * @methodOf umbraco.services.editorService
          *
          * @description
@@ -526,7 +527,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
-            if (!editor.size) editor.size = "medium";
+            if (!editor.size) editor.size = "";
             open(editor);
         }
 
@@ -655,7 +656,7 @@ When building a custom infinite editor view you can use the same components as a
          * @returns {object} editor object.
          */
         function documentTypeEditor(editor) {
-            editor.view = "views/documenttypes/edit.html";
+            editor.view = "views/documentTypes/edit.html";
             open(editor);
         }
 
@@ -673,7 +674,7 @@ When building a custom infinite editor view you can use the same components as a
          * @returns {object} editor object.
          */
         function mediaTypeEditor(editor) {
-            editor.view = "views/mediatypes/edit.html";
+            editor.view = "views/mediaTypes/edit.html";
             open(editor);
         }
 
@@ -691,7 +692,7 @@ When building a custom infinite editor view you can use the same components as a
          * @returns {object} editor object.
          */
         function memberTypeEditor(editor) {
-            editor.view = "views/membertypes/edit.html";
+            editor.view = "views/memberTypes/edit.html";
             open(editor);
         }
 
@@ -906,6 +907,50 @@ When building a custom infinite editor view you can use the same components as a
         }
 
         /**
+        * @ngdoc method
+        * @name umbraco.services.editorService#filePicker
+        * @methodOf umbraco.services.editorService
+        *
+        * @description
+        * Opens a file picker in infinite editing, the submit callback returns an array of selected items.
+        * 
+        * @param {object} editor rendering options.
+        * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+        * @param {function} editor.close Callback function when the close button is clicked.
+        * @returns {object} editor object.
+        */
+        function filePicker(editor) {
+          editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+          if (!editor.size) editor.size = "small";
+          editor.section = "settings";
+          editor.treeAlias = "files";
+          editor.entityType = "file";
+          open(editor);
+        }
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.editorService#staticFilePicker
+        * @methodOf umbraco.services.editorService
+        *
+        * @description
+        * Opens a static file picker in infinite editing, the submit callback returns an array of selected items.
+        * 
+        * @param {object} editor rendering options.
+        * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+        * @param {function} editor.close Callback function when the close button is clicked.
+        * @returns {object} editor object.
+        */
+        function staticFilePicker(editor) {
+          editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+          if (!editor.size) editor.size = "small";
+          editor.section = "settings";
+          editor.treeAlias = "staticFiles";
+          editor.entityType = "file";
+          open(editor);
+        }
+
+        /**
          * @ngdoc method
          * @name umbraco.services.editorService#itemPicker
          * @methodOf umbraco.services.editorService
@@ -924,6 +969,28 @@ When building a custom infinite editor view you can use the same components as a
         function itemPicker(editor) {
             editor.view = "views/common/infiniteeditors/itempicker/itempicker.html";
             if (!editor.size) editor.size = "small";
+            open(editor);
+        }
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.editorService#templatePicker
+        * @methodOf umbraco.services.editorService
+        *
+        * @description
+        * Opens a template picker in infinite editing, the submit callback returns an array of selected items.
+        *
+        * @param {object} editor rendering options.
+        * @param {boolean} editor.multiPicker Pick one or multiple items.
+        * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+        * @param {function} editor.close Callback function when the close button is clicked.
+        * @returns {object} editor object.
+        */
+        function templatePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            if (!editor.size) editor.size = "small";
+            editor.section = "settings";
+            editor.treeAlias = "templates";
             open(editor);
         }
 
@@ -1069,6 +1136,8 @@ When building a custom infinite editor view you can use the same components as a
             move: move,
             embed: embed,
             rollback: rollback,
+            filePicker: filePicker,
+            staticFilePicker: staticFilePicker,
             linkPicker: linkPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
@@ -1087,6 +1156,7 @@ When building a custom infinite editor view you can use the same components as a
             templateSections: templateSections,
             userPicker: userPicker,
             itemPicker: itemPicker,
+            templatePicker: templatePicker,
             macroPicker: macroPicker,
             memberGroupPicker: memberGroupPicker,
             memberPicker: memberPicker,

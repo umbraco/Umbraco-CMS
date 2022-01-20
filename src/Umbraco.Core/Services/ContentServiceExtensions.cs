@@ -1,11 +1,16 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Content service extension methods
@@ -16,7 +21,7 @@ namespace Umbraco.Core.Services
 
         private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
-        internal static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string culture = "*")
+        public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string culture = "*")
         {
             var result = new List<string>();
             var content = contentService.GetById(id);
@@ -36,7 +41,7 @@ namespace Umbraco.Core.Services
         }
 
 
-        internal static IEnumerable<string> GetAnchorValuesFromRTEContent(this IContentService contentService, string rteContent)
+        public static IEnumerable<string> GetAnchorValuesFromRTEContent(this IContentService contentService, string rteContent)
         {
             var result = new List<string>();
             var matches = AnchorRegex.Matches(rteContent);

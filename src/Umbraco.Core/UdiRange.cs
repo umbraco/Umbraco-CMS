@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents a <see cref="Core.Udi"/> range.

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Models.Editors
+namespace Umbraco.Cms.Core.Models.Editors
 {
     /// <summary>
     /// Used to track reference to other entities in a property value
     /// </summary>
     public struct UmbracoEntityReference : IEquatable<UmbracoEntityReference>
     {
-        private static readonly UmbracoEntityReference _empty = new UmbracoEntityReference(Udi.UnknownTypeUdi.Instance, string.Empty);
+        private static readonly UmbracoEntityReference _empty = new UmbracoEntityReference(UnknownTypeUdi.Instance, string.Empty);
 
         public UmbracoEntityReference(Udi udi, string relationTypeAlias)
         {

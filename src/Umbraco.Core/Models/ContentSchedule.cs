@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a scheduled action for a document.
@@ -36,7 +37,7 @@ namespace Umbraco.Core.Models
         /// Gets the unique identifier of the document targeted by the scheduled action.
         /// </summary>
         [DataMember]
-        public Guid Id { get; internal set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Gets the culture of the scheduled action.

@@ -20,12 +20,12 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     /// <summary>
     /// Provides a cursor model for navigating Umbraco data as if it were XML.
     /// </summary>
-    class NavigableNavigator : XPathNavigator
+    public class NavigableNavigator : XPathNavigator
     {
         // "The XmlNameTable stores atomized strings of any local name, namespace URI,
         // and prefix used by the XPathNavigator. This means that when the same Name is
@@ -300,7 +300,7 @@ namespace Umbraco.Core.Xml.XPath
         public XPathNavigator CloneWithNewRoot(string id, int maxDepth = int.MaxValue)
         {
             int i;
-            if (int.TryParse(id, out i) == false)
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out i) == false)
                 throw new ArgumentException("Not a valid identifier.", nameof(id));
             return CloneWithNewRoot(id);
         }
@@ -679,7 +679,7 @@ namespace Umbraco.Core.Xml.XPath
             var navRootId = state.Content.Id;
 
             int contentId;
-            if (int.TryParse(id, out contentId))
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out contentId))
             {
                 if (contentId == navRootId)
                 {
@@ -1089,7 +1089,7 @@ namespace Umbraco.Core.Xml.XPath
         #region State management
 
         // the possible state positions
-        internal enum StatePosition
+        public enum StatePosition
         {
             Root,
             Element,
@@ -1101,10 +1101,10 @@ namespace Umbraco.Core.Xml.XPath
 
         // gets the state
         // for unit tests only
-        internal State InternalState => _state;
+        public State InternalState => _state;
 
         // represents the XPathNavigator state
-        internal class State
+        public class State
         {
             public StatePosition Position { get; set; }
 

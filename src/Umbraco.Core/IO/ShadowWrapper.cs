@@ -1,28 +1,38 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
-    internal class ShadowWrapper : IFileSystem
+    internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     {
-        private static readonly string ShadowFsPath = SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
+        private static readonly string ShadowFsPath = Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
 
         private readonly Func<bool> _isScoped;
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;
         private ShadowFileSystem _shadowFileSystem;
         private string _shadowDir;
+        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool> isScoped = null)
         {
             _innerFileSystem = innerFileSystem;
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _loggerFactory = loggerFactory;
             _shadowPath = shadowPath;
             _isScoped = isScoped;
         }
 
-        public static string CreateShadowId()
+        public static string CreateShadowId(IHostingEnvironment hostingEnvironment)
         {
             const int retries = 50; // avoid infinite loop
             const int idLength = 8; // 6 chars
@@ -37,7 +47,7 @@ namespace Umbraco.Core.IO
                 var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
                 var virt = ShadowFsPath + "/" + id;
-                var shadowDir = IOHelper.MapPath(virt);
+                var shadowDir = hostingEnvironment.MapPathContentRoot(virt);
                 if (Directory.Exists(shadowDir))
                     continue;
 
@@ -54,10 +64,10 @@ namespace Umbraco.Core.IO
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
             // in a single thread anyways
 
-            var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
-            _shadowDir = IOHelper.MapPath(virt);
+            var virt = Path.Combine(ShadowFsPath , id , _shadowPath);
+            _shadowDir = _hostingEnvironment.MapPathContentRoot(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(virt);
+            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, _hostingEnvironment.ToAbsolute(virt));
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 
@@ -81,9 +91,9 @@ namespace Umbraco.Core.IO
                     Directory.Delete(dir, true);
 
                     // shadowPath make be path/to/dir, remove each
-                    dir = dir.Replace("/", "\\");
-                    var min = IOHelper.MapPath(ShadowFsPath).Length;
-                    var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
+                    dir = dir.Replace('/', Path.DirectorySeparatorChar);
+                    var min = _hostingEnvironment.MapPathContentRoot(ShadowFsPath).Length;
+                    var pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                     while (pos > min)
                     {
                         dir = dir.Substring(0, pos);
@@ -91,7 +101,7 @@ namespace Umbraco.Core.IO
                             Directory.Delete(dir, true);
                         else
                             break;
-                        pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
+                        pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                     }
                 }
                 catch
@@ -211,5 +221,8 @@ namespace Umbraco.Core.IO
         {
             FileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
         }
+
+        /// <inheritdoc />
+        public IFileProvider Create() => _innerFileSystem.TryCreateFileProvider(out IFileProvider fileProvider) ? fileProvider : null;
     }
 }

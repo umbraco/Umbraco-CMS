@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5D3B8245-ADA6-453F-A008-50ED04BFE770}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Umbraco.Tests</RootNamespace>
+    <AssemblyName>Umbraco.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Text.Encoding" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.4.1" />
+    <PackageReference Include="Examine.Core">
+      <Version>2.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
+    <PackageReference Include="Examine" Version="2.0.0" />
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.11.31</Version>
+    </PackageReference>
+    <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Owin" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Testing" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
+    <PackageReference Include="MiniProfiler" Version="4.2.22" />
+    <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="MiniProfiler" Version="4.0.138" />
+    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
+    <PackageReference Include="NPoco" Version="4.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Owin" Version="1.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Published\ModelTypeTests.cs" />
+    <Compile Include="Routing\BaseUrlProviderTest.cs" />
+    <Compile Include="Routing\MediaUrlProviderTests.cs" />
+    <Compile Include="Scoping\ScopedNuCacheTests.cs" />
+    <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="unit-test-logger.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
+      <Project>{0fad7d2a-d7dd-45b1-91fd-488bb6cdacea}</Project>
+      <Name>Umbraco.Examine.Lucene</Name>
+    </ProjectReference>
+    <ProjectReference Include="...\..\srcUmbraco.Infrastructure\Umbraco.Infrastructure.csproj">
+      <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
+      <Name>Umbraco.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj">
+      <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
+      <Name>Umbraco.Persistence.SqlCe</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
+      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
+      <Name>Umbraco.PublishedCache.NuCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj">
+      <Project>{a499779c-1b3b-48a8-b551-458e582e6e96}</Project>
+      <Name>Umbraco.Tests.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Umbraco.Web\Umbraco.Web.csproj">
+      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
+      <Name>Umbraco.Web</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup />
+  <!-- get NuGet packages directory -->
+  <PropertyGroup>
+    <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+    <Message Text="-BeforeBuild-" Importance="high" />
+    <Message Text="MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="high" />
+    <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
+    <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
+    <Message Text="NuGetPackages:         $(NuGetPackages)" Importance="high" />
+  </Target>
+</Project>

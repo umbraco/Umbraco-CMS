@@ -1,6 +1,6 @@
 ﻿// source: mvpxml.codeplex.com
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// Provides public constants for wellknown XML namespaces.

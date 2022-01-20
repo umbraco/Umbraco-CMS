@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
+﻿using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IPublicAccessService : IService
     {

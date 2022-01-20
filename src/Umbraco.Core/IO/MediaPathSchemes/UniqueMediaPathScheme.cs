@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 
-namespace Umbraco.Core.IO.MediaPathSchemes
+namespace Umbraco.Cms.Core.IO.MediaPathSchemes
 {
     /// <summary>
     /// Implements a unique directory media path scheme.
@@ -14,7 +14,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         private const int DirectoryLength = 8;
 
         /// <inheritdoc />
-        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
         {
             var combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
             var directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength);
@@ -32,6 +32,6 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         /// race conditions. We'd need to implement locks in <see cref="MediaFileSystem"/> for
         /// this.</para>
         /// </remarks>
-        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath) => null;
+        public string GetDeleteDirectory(MediaFileManager fileManager, string filepath) => null;
     }
 }

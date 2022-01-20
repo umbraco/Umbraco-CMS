@@ -1,54 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Configuration.Grid
+namespace Umbraco.Cms.Core.Configuration.Grid
 {
     internal class GridEditorsConfig : IGridEditorsConfig
     {
-        private readonly ILogger _logger;
         private readonly AppCaches _appCaches;
-        private readonly DirectoryInfo _configFolder;
-        private readonly ManifestParser _manifestParser;
-        private readonly bool _isDebug;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IManifestParser _manifestParser;
 
-        public GridEditorsConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, ManifestParser manifestParser, bool isDebug)
+        private readonly IJsonSerializer _jsonSerializer;
+        private readonly ILogger<GridEditorsConfig> _logger;
+
+        public GridEditorsConfig(AppCaches appCaches, IHostingEnvironment hostingEnvironment, IManifestParser manifestParser,IJsonSerializer jsonSerializer, ILogger<GridEditorsConfig> logger)
         {
-            _logger = logger;
             _appCaches = appCaches;
-            _configFolder = configFolder;
+            _hostingEnvironment = hostingEnvironment;
             _manifestParser = manifestParser;
-            _isDebug = isDebug;
+            _jsonSerializer = jsonSerializer;
+            _logger = logger;
         }
 
         public IEnumerable<IGridEditorConfig> Editors
         {
             get
             {
-                List<GridEditor> GetResult()
+                List<IGridEditorConfig> GetResult()
                 {
-                    var editors = new List<GridEditor>();
-                    var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");
+                    var configFolder = new DirectoryInfo(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config));
+                    var editors = new List<IGridEditorConfig>();
+                    var gridConfig = Path.Combine(configFolder.FullName, "grid.editors.config.js");
                     if (File.Exists(gridConfig))
                     {
                         var sourceString = File.ReadAllText(gridConfig);
 
                         try
                         {
-                            editors.AddRange(_manifestParser.ParseGridEditors(sourceString));
+                            editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<GridEditorsConfig,string>(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
+                            _logger.LogError(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
                         }
+                    }
+                    else// Read default from embedded file
+                    {
+                        var assembly = GetType().Assembly;
+                        var resourceStream = assembly.GetManifestResourceStream(
+                                "Umbraco.Cms.Core.EmbeddedResources.Grid.grid.editors.config.js");
+
+                        using var reader = new StreamReader(resourceStream, Encoding.UTF8);
+                        var sourceString = reader.ReadToEnd();
+                        editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
                     }
 
                     // add manifest editors, skip duplicates
-                    foreach (var gridEditor in _manifestParser.Manifest.GridEditors)
+                    foreach (var gridEditor in _manifestParser.CombinedManifest.GridEditors)
                     {
                         if (editors.Contains(gridEditor) == false) editors.Add(gridEditor);
                     }
@@ -57,13 +73,12 @@ namespace Umbraco.Core.Configuration.Grid
                 }
 
                 //cache the result if debugging is disabled
-                var result = _isDebug
+                var result = _hostingEnvironment.IsDebugMode
                     ? GetResult()
-                    : _appCaches.RuntimeCache.GetCacheItem<List<GridEditor>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
+                    : _appCaches.RuntimeCache.GetCacheItem<List<IGridEditorConfig>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
 
                 return result;
             }
-
         }
     }
 }

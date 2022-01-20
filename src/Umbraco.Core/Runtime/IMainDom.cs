@@ -1,7 +1,7 @@
-﻿using System;
+using System;
+using Umbraco.Cms.Core.Hosting;
 
-// TODO: Can't change namespace due to breaking changes, change in netcore
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core.Runtime
 {
     /// <summary>
     /// Represents the main AppDomain running for a given application.
@@ -16,17 +16,14 @@ namespace Umbraco.Core
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
         /// <remarks>
-        /// When the first call is made to this there will generally be some logic executed to acquire a distributed lock lease.
+        /// Acquire must be called first else this will always return false
         /// </remarks>
         bool IsMainDom { get; }
 
         /// <summary>
-        /// Registers a resource that requires the current AppDomain to be the main domain to function.
+        /// Tries to acquire the MainDom, returns true if successful else false
         /// </summary>
-        /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
-        /// <param name="weight">An optional weight (lower goes first).</param>
-        /// <returns>A value indicating whether it was possible to register.</returns>
-        bool Register(Action release, int weight = 100);
+        bool Acquire(IApplicationShutdownRegistry hostingEnvironment);
 
         /// <summary>
         /// Registers a resource that requires the current AppDomain to be the main domain to function.
@@ -37,6 +34,6 @@ namespace Umbraco.Core
         /// <returns>A value indicating whether it was possible to register.</returns>
         /// <remarks>If registering is successful, then the <paramref name="install"/> action
         /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
-        bool Register(Action install, Action release, int weight = 100);
+        bool Register(Action install = null, Action release = null, int weight = 100);
     }
 }

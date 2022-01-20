@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// This is used to parse our customize Umbraco XPath expressions (i.e. that include special tokens like $site) into
     /// a real XPath statement
     /// </summary>
-    internal class UmbracoXPathPathSyntaxParser
+    public class UmbracoXPathPathSyntaxParser
     {
         /// <summary>
         /// Parses custom umbraco xpath expression
@@ -49,9 +50,9 @@ namespace Umbraco.Core.Xml
                 foreach (var i in path)
                 {
                     int idAsInt;
-                    if (int.TryParse(i, out idAsInt))
+                    if (int.TryParse(i, NumberStyles.Integer, CultureInfo.InvariantCulture, out idAsInt))
                     {
-                        var exists = publishedContentExists(int.Parse(i));
+                        var exists = publishedContentExists(int.Parse(i, CultureInfo.InvariantCulture));
                         if (exists)
                             return idAsInt;
                     }

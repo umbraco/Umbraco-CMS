@@ -1,19 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Web.Security;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Extensions
 {
     public static class UserServiceExtensions
     {
         public static EntityPermission GetPermissions(this IUserService userService, IUser user, string path)
         {
             var ids = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.TryConvertTo<int>())
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? Attempt<int>.Succeed(value) : Attempt<int>.Fail())
                 .Where(x => x.Success)
-                .Select(x => x.Result)
+                .Select(x=>x.Result)
                 .ToArray();
             if (ids.Length == 0) throw new InvalidOperationException("The path: " + path + " could not be parsed into an array of integers or the path was empty");
 
@@ -57,7 +59,7 @@ namespace Umbraco.Core.Services
         /// <param name="entityIds"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] {}, entityIds);
+            userService.ReplaceUserGroupPermissions(groupId, null, entityIds);
         }
 
         /// <summary>
@@ -67,58 +69,11 @@ namespace Umbraco.Core.Services
         /// <param name="groupId"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] { });
+            userService.ReplaceUserGroupPermissions(groupId, null);
         }
 
-        /// <summary>
-        /// Maps a custom provider's information to an umbraco user account
-        /// </summary>
-        /// <param name="userService"></param>
-        /// <param name="member"></param>
-        /// <remarks>
-        /// To maintain compatibility we have to check the login name if the provider key lookup fails but otherwise
-        /// we'll store the provider user key in the login column.
-        /// </remarks>
-        internal static IUser CreateUserMappingForCustomProvider(this IUserService userService, MembershipUser member)
-        {
-            if (member == null) throw new ArgumentNullException("member");
 
-
-            var valToLookup = member.ProviderUserKey == null ? member.UserName : member.ProviderUserKey.ToString();
-            var found = userService.GetByUsername(valToLookup);
-            if (found == null && member.ProviderUserKey != null)
-            {
-                //try by username
-                found = userService.GetByUsername(member.UserName);
-            }
-
-            if (found == null)
-            {
-                var user = new User(
-                    member.UserName,
-                    member.Email ?? Guid.NewGuid().ToString("N") + "@example.com", //email cannot be empty
-                    member.ProviderUserKey == null ? member.UserName : member.ProviderUserKey.ToString(),
-                    Guid.NewGuid().ToString("N")); //pass cannot be empty
-                userService.Save(user);
-                return user;
-            }
-
-            return found;
-        }
-
-        /// <summary>
-        /// Gets the concrete assigned permissions for the provided user and node
-        /// </summary>
-        /// <param name="userService"></param>
-        /// <param name="user"></param>
-        /// <param name="nodeId"></param>
-        internal static string[] GetAssignedPermissions(this IUserService userService, IUser user, int nodeId)
-        {
-            var permissionCollection = userService.GetPermissions(user, nodeId);
-            return permissionCollection.SelectMany(c => c.AssignedPermissions).Distinct().ToArray();
-        }
-
-        internal static IEnumerable<IProfile> GetProfilesById(this IUserService userService, params int[] ids)
+        public static IEnumerable<IProfile> GetProfilesById(this IUserService userService, params int[] ids)
         {
             var fullUsers = userService.GetUsersById(ids);
 

@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     /// <summary>
     /// Represents a composite key of (Type, Type) for fast dictionaries.
     /// </summary>
-    internal struct CompositeTypeTypeKey : IEquatable<CompositeTypeTypeKey>
+    public struct CompositeTypeTypeKey : IEquatable<CompositeTypeTypeKey>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositeTypeTypeKey"/> struct.

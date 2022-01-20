@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.Services.Changes
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Services.Changes;
+
+namespace Umbraco.Extensions
 {
     public static class TreeChangeExtensions
     {
-        internal static TreeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<TreeChange<TItem>> changes)
+        public static TreeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<TreeChange<TItem>> changes)
         {
             return new TreeChange<TItem>.EventArgs(changes);
         }

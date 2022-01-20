@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     public interface IFileType
     {

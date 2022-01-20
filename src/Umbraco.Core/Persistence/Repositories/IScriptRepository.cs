@@ -1,13 +1,9 @@
-﻿using System.IO;
-using Umbraco.Core.Models;
+using System.IO;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IScriptRepository : IReadRepository<string, Script>, IWriteRepository<Script>
+    public interface IScriptRepository : IReadRepository<string, IScript>, IWriteRepository<IScript>, IFileRepository, IFileWithFoldersRepository
     {
-        bool ValidateScript(Script script);
-        Stream GetFileContentStream(string filepath);
-        void SetFileContent(string filepath, Stream content);
-        long GetFileSize(string filepath);
     }
 }

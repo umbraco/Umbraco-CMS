@@ -90,26 +90,13 @@
                 vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail && user.email === user.username;
 
                 //go get the config for the membership provider and add it to the model
-                authResource.getMembershipProviderConfig().then(function (data) {
-                    vm.changePasswordModel.config = data;
+                authResource.getPasswordConfig(user.id).then(function (data) {
+                  vm.changePasswordModel.config = data;
 
                     //the user has a password if they are not states: Invited, NoCredentials
-                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== "Invited" && vm.user.userState !== "Inactive";
 
                     vm.changePasswordModel.config.disableToggle = true;
-
-                    //this is only relavent for membership providers now (it's basically obsolete)
-                    vm.changePasswordModel.config.enableReset = false;
-
-                    //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
-                    //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
-                    //the authorization check is also done on the server side when submitted.
-
-                    // only update the setting if not the current logged in user, otherwise leave the value as it is
-                    // currently set in the web.config
-                    if (!vm.user.isCurrentUser) {
-                        vm.changePasswordModel.config.allowManuallyChangingPassword = true;
-                    }
 
                     $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
                     vm.loading = false;
@@ -164,7 +151,6 @@
             if (formHelper.submitForm({ scope: $scope })) {
 
                 vm.page.saveButtonState = "busy";
-                vm.user.resetPasswordValue = null;
 
                 //save current nav to be restored later so that the tabs dont change
                 var currentNav = vm.user.navigation;
@@ -221,7 +207,7 @@
                     vm.changePasswordModel.value = {};
 
                     //the user has a password if they are not states: Invited, NoCredentials
-                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== "Invited" && vm.user.userState !== "Inactive";
                 }, err => {
                     contentEditingHelper.handleSaveError({
                         err: err,
@@ -377,7 +363,7 @@
         function disableUser() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers([vm.user.id]).then(function (data) {
-                vm.user.userState = 1;
+                vm.user.userState = "Disabled";
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
 
@@ -390,7 +376,7 @@
         function enableUser() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
-                vm.user.userState = 0;
+                vm.user.userState = "Active";
                 setUserDisplayState();
                 vm.enableUserButtonState = "success";
             }, function (error) {
@@ -401,7 +387,7 @@
         function unlockUser() {
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers([vm.user.id]).then(function (data) {
-                vm.user.userState = 0;
+                vm.user.userState = "Active";
                 vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
@@ -554,7 +540,7 @@
         }
 
         function setUserDisplayState() {
-            vm.user.userDisplayState = usersHelper.getUserStateFromValue(vm.user.userState);
+            vm.user.userDisplayState = usersHelper.getUserStateByKey(vm.user.userState);
         }
 
         function formatDatesToLocal(user) {

@@ -7,11 +7,11 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-                        $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService) {
+                        $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-    var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style]";
+    var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang]";
     var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
     // these languages are available for localization
     var availableLanguages = [
@@ -298,15 +298,20 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
             var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
 
-
             editor.dom.setAttrib(imageDomElement, 'width', newSize.width);
             editor.dom.setAttrib(imageDomElement, 'height', newSize.height);
 
             // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
             // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
-            if(imgUrl){
-                var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
-                editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
+            if (imgUrl) {
+                mediaHelper.getProcessedImageUrl(imgUrl,
+                    {
+                        width: newSize.width,
+                        height: newSize.height
+                    })
+                    .then(function (resizedImgUrl) {
+                        editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
+                    });
             }
 
             editor.execCommand("mceAutoResize", false, null, null);
@@ -352,18 +357,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     return plugin.name;
                 });
 
-                //plugins that must always be active
+                // Plugins that must always be active
                 plugins.push("autoresize");
                 plugins.push("noneditable");
+
+                // Table plugin use color picker plugin in table properties
+                if (plugins.includes("table")) {
+                    plugins.push("colorpicker");
+                }
 
                 var modeTheme = '';
                 var modeInline = false;
 
-
-                //Based on mode set
-                //classic = Theme: modern, inline: false
-                //inline = Theme: modern, inline: true,
-                //distraction-free = Theme: inlite, inline: true
+                // Based on mode set
+                // classic = Theme: modern, inline: false
+                // inline = Theme: modern, inline: true,
+                // distraction-free = Theme: inlite, inline: true
                 switch (args.mode) {
                     case "classic":
                         modeTheme  = "modern";
@@ -463,8 +472,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 };
 
-                angular.extend(config, pasteConfig);
-
+                Utilities.extend(config, pasteConfig);
 
                 if (tinyMceConfig.customConfig) {
 
@@ -481,7 +489,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
                                     if (Utilities.isArray(config[i]) && Utilities.isArray(tinyMceConfig.customConfig[i])) {
-                                        //concat it and below this concat'd array will overwrite the baseline in angular.extend
+                                        //concat it and below this concat'd array will overwrite the baseline in Utilities.extend
                                         tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
                                     }
                                 }
@@ -498,7 +506,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 
-                    angular.extend(config, tinyMceConfig.customConfig);
+                    Utilities.extend(config, tinyMceConfig.customConfig);
                 }
 
                 return config;
@@ -1218,6 +1226,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             });
 
+            editor.addShortcut('Ctrl+P', '', function () {
+                angularHelper.safeApply($rootScope, function () {
+                    eventsService.emit("rte.shortcut.saveAndPublish");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1264,11 +1278,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             function insertLink() {
                 if (anchorElm) {
                     editor.dom.setAttribs(anchorElm, createElemAttributes());
-
                     editor.selection.select(anchorElm);
                     editor.execCommand('mceEndTyping');
                 } else {
-                    editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    var selectedContent = editor.selection.getContent();
+                    // If there is no selected content, we can't insert a link
+                    // as TinyMCE needs selected content for this, so instead we
+                    // create a new dom element and insert it, using the chosen
+                    // link name as the content.
+                    if (selectedContent !== "") {
+                        editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    } else {
+                        // Using the target url as a fallback, as href might be confusing with a local link
+                        var linkContent = typeof target.name !== "undefined" && target.name !== "" ? target.name : target.url
+                        var domElement = editor.dom.createHTML("a", createElemAttributes(), linkContent);
+                        editor.execCommand('mceInsertContent', false, domElement);
+                    }
                 }
             }
 
@@ -1488,6 +1513,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     });
 
                 }
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    /** prevent injecting arbitrary JavaScript execution in on-attributes. */
+                    const allNodes = Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
+                    allNodes.forEach(node => {
+                        for (var i = 0; i < node.attributes.length; i++) {
+                            if(node.attributes[i].name.indexOf("on") === 0) {
+                                node.removeAttribute(node.attributes[i].name)
+                            }
+                        }
+                    });
+                }
+
             });
 
             args.editor.on('init', function (e) {
@@ -1498,6 +1536,60 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //enable browser based spell checking
                 args.editor.getBody().setAttribute('spellcheck', true);
+
+
+                /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
+                 * https://github.com/advisories/GHSA-w7jx-j77m-wp65
+                 * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
+                 */
+                const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];
+                const parseUri = function() {
+                    // Encapsulated JS logic.
+                    const safeSvgDataUrlElements = [ 'img', 'video' ];
+                    const scriptUriRegExp = /((java|vb)script|mhtml):/i;
+                    const trimRegExp = /[\s\u0000-\u001F]+/g;
+                    const isInvalidUri = (uri, tagName) => {
+                        if (/^data:image\//i.test(uri)) {
+                            return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
+                        } else {
+                            return /^data:/i.test(uri);
+                        }
+                    };
+
+                    return function parseUri(uri, tagName) {
+                        uri = uri.replace(trimRegExp, '');
+                        try {
+                            // Might throw malformed URI sequence
+                            uri = decodeURIComponent(uri);
+                        } catch (ex) {
+                            // Fallback to non UTF-8 decoder
+                            uri = unescape(uri);
+                        }
+
+                        if (scriptUriRegExp.test(uri)) {
+                            return;
+                        }
+
+                        if (isInvalidUri(uri, tagName)) {
+                            return;
+                        }
+
+                        return uri;
+                    }
+                }();
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
+                        nodes.forEach(function(node) {
+                            node.attributes.forEach(function(attr) {
+                                const attrName = attr.name.toLowerCase();
+                                if(uriAttributesToSanitize.indexOf(attrName) !== -1) {
+                                    attr.value = parseUri(attr.value, node.name);
+                                }
+                            });
+                        });
+                    });
+                }
 
                 //start watching the value
                 startWatch();
@@ -1516,10 +1608,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('ObjectResized', function (e) {
-                var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
                 var srcAttr = $(e.target).attr("src");
                 var path = srcAttr.split("?")[0];
-                $(e.target).attr("data-mce-src", path + qs);
+                mediaHelper.getProcessedImageUrl(path, {
+                    width: e.width,
+                    height: e.height,
+                    mode: "max"
+                }).then(function (resizedPath) {
+                    $(e.target).attr("data-mce-src", resizedPath);
+                });
 
                 syncContent();
             });
@@ -1533,21 +1630,23 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
 
+                entityResource.getAnchors(args.model.value).then(anchorValues => {
 
-                entityResource.getAnchors(args.model.value).then(function (anchorValues) {
-                    var linkPicker = {
+                    const linkPicker = {
                         currentTarget: currentTarget,
                         dataTypeKey: args.model.dataTypeKey,
                         ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
                         anchors: anchorValues,
-                        submit: function (model) {
+                        size: args.model.config.overlaySize,
+                        submit: model => {
                             self.insertLinkInEditor(args.editor, model.target, anchorElement);
                             editorService.close();
                         },
-                        close: function () {
+                        close: () => {
                             editorService.close();
                         }
                     };
+
                     editorService.linkPicker(linkPicker);
                 });
 

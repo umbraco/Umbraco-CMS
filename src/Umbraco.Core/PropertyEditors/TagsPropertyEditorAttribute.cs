@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Marks property editors that support tags.

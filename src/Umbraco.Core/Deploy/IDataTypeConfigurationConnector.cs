@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Defines methods that can convert data type configuration to / from an environment-agnostic string.

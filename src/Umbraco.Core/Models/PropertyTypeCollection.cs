@@ -6,26 +6,24 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
+
+    //public interface IPropertyTypeCollection: IEnumerable<IPropertyType>
     /// <summary>
-    /// Represents a collection of <see cref="PropertyType"/> objects.
+    /// Represents a collection of <see cref="IPropertyType"/> objects.
     /// </summary>
     [Serializable]
     [DataContract]
     // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
-    public class PropertyTypeCollection : KeyedCollection<string, PropertyType>, INotifyCollectionChanged, IDeepCloneable
+    public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, INotifyCollectionChanged, IDeepCloneable, ICollection<IPropertyType>
     {
-        [IgnoreDataMember]
-        private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
-
-
-        internal PropertyTypeCollection(bool supportsPublishing)
+        public PropertyTypeCollection(bool supportsPublishing)
         {
             SupportsPublishing = supportsPublishing;
         }
 
-        public PropertyTypeCollection(bool supportsPublishing, IEnumerable<PropertyType> properties)
+        public PropertyTypeCollection(bool supportsPublishing, IEnumerable<IPropertyType> properties)
             : this(supportsPublishing)
         {
             Reset(properties);
@@ -34,25 +32,25 @@ namespace Umbraco.Core.Models
         public bool SupportsPublishing { get; }
 
         /// <summary>
-        /// Resets the collection to only contain the <see cref="PropertyType"/> instances referenced in the <paramref name="properties"/> parameter.
+        /// Resets the collection to only contain the <see cref="IPropertyType"/> instances referenced in the <paramref name="properties"/> parameter.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <remarks></remarks>
-        internal void Reset(IEnumerable<PropertyType> properties)
+        internal void Reset(IEnumerable<IPropertyType> properties)
         {
             //collection events will be raised in each of these calls
             Clear();
 
             //collection events will be raised in each of these calls
             foreach (var property in properties)
-                Add(property);            
+                Add(property);
         }
 
-        protected override void SetItem(int index, PropertyType item)
+        protected override void SetItem(int index, IPropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
             var oldItem = index >= 0 ? this[index] : item;
-            base.SetItem(index, item);            
+            base.SetItem(index, item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
             item.PropertyChanged += Item_PropertyChanged;
         }
@@ -65,10 +63,10 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
 
-        protected override void InsertItem(int index, PropertyType item)
+        protected override void InsertItem(int index, IPropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
-            base.InsertItem(index, item);            
+            base.InsertItem(index, item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
             item.PropertyChanged += Item_PropertyChanged;
         }
@@ -81,52 +79,45 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        // TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
-        internal new void Add(PropertyType item)
+        // 'new' keyword is required! we can explicitly implement ICollection<IPropertyType>.Add BUT since normally a concrete PropertyType type
+        // is passed in, the explicit implementation doesn't get called, this ensures it does get called.
+        public new void Add(IPropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
 
             // TODO: this is not pretty and should be refactored
-            try
-            {
-                _addLocker.EnterWriteLock();
-                var key = GetKeyForItem(item);
-                if (key != null)
-                {
-                    var exists = Contains(key);
-                    if (exists)
-                    {
-                        //collection events will be raised in SetItem
-                        SetItem(IndexOfKey(key), item);
-                        return;
-                    }
-                }
 
-                //check if the item's sort order is already in use
-                if (this.Any(x => x.SortOrder == item.SortOrder))
-                {
-                    //make it the next iteration
-                    item.SortOrder = this.Max(x => x.SortOrder) + 1;
-                }
-
-                //collection events will be raised in InsertItem
-                base.Add(item);
-            }
-            finally
+            var key = GetKeyForItem(item);
+            if (key != null)
             {
-                if (_addLocker.IsWriteLockHeld)
-                    _addLocker.ExitWriteLock();
+                var exists = Contains(key);
+                if (exists)
+                {
+                    //collection events will be raised in SetItem
+                    SetItem(IndexOfKey(key), item);
+                    return;
+                }
             }
+
+            //check if the item's sort order is already in use
+            if (this.Any(x => x.SortOrder == item.SortOrder))
+            {
+                //make it the next iteration
+                item.SortOrder = this.Max(x => x.SortOrder) + 1;
+            }
+
+            //collection events will be raised in InsertItem
+            base.Add(item);
         }
 
         /// <summary>
-        /// Occurs when a property changes on a PropertyType that exists in this collection
+        /// Occurs when a property changes on a IPropertyType that exists in this collection
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var propType = (PropertyType)sender;
+            var propType = (IPropertyType)sender;
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, propType, propType));
         }
 
@@ -156,13 +147,13 @@ namespace Umbraco.Core.Models
             return -1;
         }
 
-        protected override string GetKeyForItem(PropertyType item)
+        protected override string GetKeyForItem(IPropertyType item)
         {
             return item.Alias;
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        
+
         /// <summary>
         /// Clears all <see cref="CollectionChanged"/> event handlers
         /// </summary>
@@ -176,7 +167,7 @@ namespace Umbraco.Core.Models
         {
             var clone = new PropertyTypeCollection(SupportsPublishing);
             foreach (var propertyType in this)
-                clone.Add((PropertyType) propertyType.DeepClone());
+                clone.Add((IPropertyType) propertyType.DeepClone());
             return clone;
         }
     }

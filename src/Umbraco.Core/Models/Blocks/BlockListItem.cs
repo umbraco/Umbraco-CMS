@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
     /// Represents a layout item for the Block List editor.

@@ -1,13 +1,15 @@
 ﻿using System;
-using Umbraco.Core.PropertyEditors;
+using System.Diagnostics;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Provides a base class for <c>IPublishedProperty</c> implementations which converts and caches
     /// the value source to the actual value to use when rendering content.
     /// </summary>
-    internal abstract class PublishedPropertyBase : IPublishedProperty
+    [DebuggerDisplay("{Alias} ({PropertyType?.EditorAlias})")]
+    public abstract class PublishedPropertyBase : IPublishedProperty
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyBase"/> class.

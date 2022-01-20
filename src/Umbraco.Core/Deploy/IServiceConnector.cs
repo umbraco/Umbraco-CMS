@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Connects to an Umbraco service.

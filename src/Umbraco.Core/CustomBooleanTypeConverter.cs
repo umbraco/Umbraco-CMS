@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Allows for converting string representations of 0 and 1 to boolean
     /// </summary>
-    internal class CustomBooleanTypeConverter : BooleanConverter
+    public class CustomBooleanTypeConverter : BooleanConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -24,6 +24,8 @@ namespace Umbraco.Core
                 var str = (string)value;
                 if (str == null || str.Length == 0 || str == "0") return false;
                 if (str == "1") return true;
+                if (str.Equals("Yes", StringComparison.OrdinalIgnoreCase)) return true;
+                if (str.Equals("No", StringComparison.OrdinalIgnoreCase)) return false;
             }
 
             return base.ConvertFrom(context, culture, value);

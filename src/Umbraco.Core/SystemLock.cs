@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Runtime.ConstrainedExecution;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
-    // http://blogs.msdn.com/b/pfxteam/archive/2012/02/12/10266988.aspx
+    // https://devblogs.microsoft.com/pfxteam/building-async-coordination-primitives-part-6-asynclock/
     //
     // notes:
     // - this is NOT a reader/writer lock
@@ -21,7 +20,7 @@ namespace Umbraco.Core
     // been closed, the Semaphore system object is destroyed - so in any case
     // an iisreset should clean up everything
     //
-    internal class SystemLock
+    public class SystemLock
     {
         private readonly SemaphoreSlim _semaphore;
         private readonly Semaphore _semaphore2;

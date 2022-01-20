@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     /// <summary>
     /// A List that can be deep cloned with deep cloned elements and can reset the collection's items dirty flags
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
+    public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
         private readonly ListCloneBehavior _listCloneBehavior;
 
@@ -47,8 +48,7 @@ namespace Umbraco.Core.Collections
                     var newList = new DeepCloneableList<T>(ListCloneBehavior.None);
                     foreach (var item in this)
                     {
-                        var dc = item as IDeepCloneable;
-                        if (dc != null)
+                        if (item is IDeepCloneable dc)
                         {
                             newList.Add((T)dc.DeepClone());
                         }
@@ -66,8 +66,7 @@ namespace Umbraco.Core.Collections
                     var newList2 = new DeepCloneableList<T>(ListCloneBehavior.Always);
                     foreach (var item in this)
                     {
-                        var dc = item as IDeepCloneable;
-                        if (dc != null)
+                        if (item is IDeepCloneable dc)
                         {
                             newList2.Add((T)dc.DeepClone());
                         }
@@ -82,6 +81,7 @@ namespace Umbraco.Core.Collections
             }
         }
 
+        #region IRememberBeingDirty
         public bool IsDirty()
         {
             return this.OfType<IRememberBeingDirty>().Any(x => x.IsDirty());
@@ -121,6 +121,16 @@ namespace Umbraco.Core.Collections
             }
         }
 
+        public void DisableChangeTracking()
+        {
+            // noop
+        }
+
+        public void EnableChangeTracking()
+        {
+            // noop
+        }
+
         public void ResetWereDirtyProperties()
         {
             foreach (var dc in this.OfType<IRememberBeingDirty>())
@@ -142,5 +152,8 @@ namespace Umbraco.Core.Collections
         {
             return Enumerable.Empty<string>();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged; // noop
+        #endregion
     }
 }

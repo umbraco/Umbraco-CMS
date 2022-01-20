@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 
-namespace Umbraco.Core.IO.MediaPathSchemes
+namespace Umbraco.Cms.Core.IO.MediaPathSchemes
 {
     /// <summary>
     /// Implements a combined-guids media path scheme.
@@ -12,7 +12,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     public class CombinedGuidsMediaPathScheme : IMediaPathScheme
     {
         /// <inheritdoc />
-        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
         {
             // assumes that cuid and puid keys can be trusted - and that a single property type
             // for a single content cannot store two different files with the same name
@@ -23,6 +23,6 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath) => Path.GetDirectoryName(filepath);
+        public string GetDeleteDirectory(MediaFileManager fileSystem, string filepath) => Path.GetDirectoryName(filepath);
     }
 }

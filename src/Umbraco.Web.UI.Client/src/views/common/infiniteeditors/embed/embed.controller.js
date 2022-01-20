@@ -67,6 +67,7 @@
 
                     switch (response.data.OEmbedStatus) {
                         case 0:
+                        case 'NotSupported':
                             //not supported
                             $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Not supported";
@@ -76,6 +77,7 @@
                             vm.trustedPreview = null;
                             break;
                         case 1:
+                        case 'Error':
                             //error
                             $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
@@ -85,6 +87,7 @@
                             vm.trustedPreview = null;
                             break;
                         case 2:
+                        case 'Success':
                             $scope.model.embed.success = true;
                             $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
                             $scope.model.embed.preview = response.data.Markup;

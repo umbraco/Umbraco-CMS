@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// The XmlHelper class contains general helper methods for working with xml in umbraco.
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Xml
         /// <param name="parentNode">The parent node.</param>
         /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode"/> to sort.</param>
         /// <param name="orderBy">A function returning the value to order the nodes by.</param>
-        internal static void SortNodes(
+        public static void SortNodes(
             XmlNode parentNode,
             string childNodesXPath,
             Func<XmlNode, int> orderBy)
@@ -158,7 +158,7 @@ namespace Umbraco.Core.Xml
         /// <returns>A value indicating whether sorting was needed.</returns>
         /// <remarks>Assuming all nodes but <paramref name="node"/> are sorted, this will move the node to
         /// the right position without moving all the nodes (as SortNodes would do) - should improve perfs.</remarks>
-        internal static bool SortNode(
+        public static bool SortNode(
             XmlNode parentNode,
             string childNodesXPath,
             XmlNode node,
@@ -206,10 +206,11 @@ namespace Umbraco.Core.Xml
         /// Opens a file as a XmlDocument.
         /// </summary>
         /// <param name="filePath">The relative file path. ie. /config/umbraco.config</param>
+        /// <param name="ioHelper"></param>
         /// <returns>Returns a XmlDocument class</returns>
-        public static XmlDocument OpenAsXmlDocument(string filePath)
+        public static XmlDocument OpenAsXmlDocument(string filePath, IHostingEnvironment hostingEnvironment)
         {
-            using (var reader = new XmlTextReader(IOHelper.MapPath(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
+            using (var reader = new XmlTextReader(hostingEnvironment.MapPathContentRoot(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
             {
                 var xmlDoc = new XmlDocument();
                 //Load the file into the XmlDocument
@@ -346,7 +347,7 @@ namespace Umbraco.Core.Xml
         /// </summary>
         /// <param name="n">The XmlNode.</param>
         /// <returns>the value as a string</returns>
-        internal static string GetNodeValue(XmlNode n)
+        public static string GetNodeValue(XmlNode n)
         {
             var value = string.Empty;
             if (n == null || n.FirstChild == null)
@@ -371,57 +372,11 @@ namespace Umbraco.Core.Xml
         }
 
         /// <summary>
-        /// Splits the specified delimited string into an XML document.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="separator">The separator.</param>
-        /// <param name="rootName">Name of the root.</param>
-        /// <param name="elementName">Name of the element.</param>
-        /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-        internal static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
-        {
-            return Split(new XmlDocument(), data, separator, rootName, elementName);
-        }
-
-        /// <summary>
-        /// Splits the specified delimited string into an XML document.
-        /// </summary>
-        /// <param name="xml">The XML document.</param>
-        /// <param name="data">The delimited string data.</param>
-        /// <param name="separator">The separator.</param>
-        /// <param name="rootName">Name of the root node.</param>
-        /// <param name="elementName">Name of the element node.</param>
-        /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-        internal static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
-        {
-            // load new XML document.
-            xml.LoadXml(string.Concat("<", rootName, "/>"));
-
-            // get the data-value, check it isn't empty.
-            if (!string.IsNullOrEmpty(data))
-            {
-                // explode the values into an array
-                var values = data.Split(separator, StringSplitOptions.None);
-
-                // loop through the array items.
-                foreach (string value in values)
-                {
-                    // add each value to the XML document.
-                    var xn = XmlHelper.AddTextNode(xml, elementName, value);
-                    xml.DocumentElement.AppendChild(xn);
-                }
-            }
-
-            // return the XML node.
-            return xml;
-        }
-
-        /// <summary>
         /// Return a dictionary of attributes found for a string based tag
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
-        internal static Dictionary<string, string> GetAttributesFromElement(string tag)
+        public static Dictionary<string, string> GetAttributesFromElement(string tag)
         {
             var m =
                 Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",

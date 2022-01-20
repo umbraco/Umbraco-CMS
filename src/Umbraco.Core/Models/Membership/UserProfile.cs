@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
-    internal class UserProfile : IProfile, IEquatable<UserProfile>
+    public class UserProfile : IProfile, IEquatable<UserProfile>
     {
         public UserProfile(int id, string name)
         {

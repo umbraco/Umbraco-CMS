@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// There is actually no way to discover an event name in c# at the time of raising the event. It is possible
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Events
     ///
     /// We can also write tests to validate these are all working correctly for all services.
     /// </summary>
-    internal class EventNameExtractor
+    public class EventNameExtractor
     {
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Events
             }
         }
 
-        internal static string[] FindEvents(Type senderType, Type argsType, Func<string, bool> exclude)
+        public static string[] FindEvents(Type senderType, Type argsType, Func<string, bool> exclude)
         {
             var found = MatchedEventNames.GetOrAdd(new Tuple<Type, Type>(senderType, argsType), tuple =>
             {
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <param name="eventName"></param>
         /// <returns></returns>
-        internal static bool MatchIngNames(string eventName)
+        public static bool MatchIngNames(string eventName)
         {
             var splitter = new Regex(@"(?<!^)(?=[A-Z])");
             var words = splitter.Split(eventName);
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <param name="eventName"></param>
         /// <returns></returns>
-        internal static bool MatchNonIngNames(string eventName)
+        public static bool MatchNonIngNames(string eventName)
         {
             var splitter = new Regex(@"(?<!^)(?=[A-Z])");
             var words = splitter.Split(eventName);

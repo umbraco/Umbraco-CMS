@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the type of an editor.

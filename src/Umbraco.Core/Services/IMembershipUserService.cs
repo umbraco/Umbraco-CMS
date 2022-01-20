@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
+﻿using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines part of the UserService, which is specific to methods used by the membership provider.

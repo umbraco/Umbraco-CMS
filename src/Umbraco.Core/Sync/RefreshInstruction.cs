@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     [Serializable]
     public class RefreshInstruction
@@ -16,15 +16,27 @@ namespace Umbraco.Core.Sync
 
         // need this public, parameter-less constructor so the web service messenger
         // can de-serialize the instructions it receives
-        public RefreshInstruction()
-        {
-            //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
-            JsonIdCount = 1;
-        }
 
-        // need this public one so it can be de-serialized - used by the Json thing
-        // otherwise, should use GetInstructions(...)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
+        /// </summary>
+        /// <remarks>
+        /// Need this public, parameter-less constructor so the web service messenger can de-serialize the instructions it receives.
+        /// </remarks>
+        public RefreshInstruction() =>
+
+            // Set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
+            JsonIdCount = 1;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
+        /// </summary>
+        /// <remarks>
+        /// Need this public one so it can be de-serialized - used by the Json thing
+        /// otherwise, should use GetInstructions(...)
+        /// </remarks>
         public RefreshInstruction(Guid refresherId, RefreshMethodType refreshType, Guid guidId, int intId, string jsonIds, string jsonPayload)
+            : this()
         {
             RefresherId = refresherId;
             RefreshType = refreshType;
@@ -32,39 +44,27 @@ namespace Umbraco.Core.Sync
             IntId = intId;
             JsonIds = jsonIds;
             JsonPayload = jsonPayload;
-            //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
-            JsonIdCount = 1;
         }
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType)
+            : this()
         {
             RefresherId = refresher.RefresherUniqueId;
             RefreshType = refreshType;
-            //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
-            JsonIdCount = 1;
         }
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, Guid guidId)
-            : this(refresher, refreshType)
-        {
-            GuidId = guidId;
-        }
+            : this(refresher, refreshType) => GuidId = guidId;
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, int intId)
-            : this(refresher, refreshType)
-        {
-            IntId = intId;
-        }
+            : this(refresher, refreshType) => IntId = intId;
 
         /// <summary>
         /// A private constructor to create a new instance
         /// </summary>
-        /// <param name="refresher"></param>
-        /// <param name="refreshType"></param>
-        /// <param name="json"></param>
         /// <param name="idCount">
         /// When the refresh method is <see cref="RefreshMethodType.RefreshByIds"/> we know how many Ids are being refreshed so we know the instruction
-        /// count which will be taken into account when we store this count in the database. 
+        /// count which will be taken into account when we store this count in the database.
         /// </param>
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string json, int idCount = 1)
             : this(refresher, refreshType)
@@ -72,13 +72,18 @@ namespace Umbraco.Core.Sync
             JsonIdCount = idCount;
 
             if (refreshType == RefreshMethodType.RefreshByJson)
+            {
                 JsonPayload = json;
+            }
             else
+            {
                 JsonIds = json;
+            }
         }
 
         public static IEnumerable<RefreshInstruction> GetInstructions(
             ICacheRefresher refresher,
+            IJsonSerializer jsonSerializer,
             MessageType messageType,
             IEnumerable<object> ids,
             Type idType,
@@ -94,20 +99,27 @@ namespace Umbraco.Core.Sync
 
                 case MessageType.RefreshById:
                     if (idType == null)
+                    {
                         throw new InvalidOperationException("Cannot refresh by id if idType is null.");
+                    }
+
                     if (idType == typeof(int))
                     {
-                        // bulk of ints is supported
+                        // Bulk of ints is supported
                         var intIds = ids.Cast<int>().ToArray();
-                        return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, JsonConvert.SerializeObject(intIds), intIds.Length) };
+                        return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, jsonSerializer.Serialize(intIds), intIds.Length) };
                     }
-                    // else must be guids, bulk of guids is not supported, iterate
+
+                    // Else must be guids, bulk of guids is not supported, so iterate.
                     return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RefreshByGuid, (Guid) x));
 
                 case MessageType.RemoveById:
                     if (idType == null)
+                    {
                         throw new InvalidOperationException("Cannot remove by id if idType is null.");
-                    // must be ints, bulk-remove is not supported, iterate
+                    }
+
+                    // Must be ints, bulk-remove is not supported, so iterate.
                     return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RemoveById, (int) x));
                     //return new[] { new RefreshInstruction(refresher, RefreshMethodType.RemoveByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
 
@@ -144,10 +156,10 @@ namespace Umbraco.Core.Sync
         public string JsonIds { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of Ids contained in the JsonIds json value
+        /// Gets or sets the number of Ids contained in the JsonIds json value.
         /// </summary>
         /// <remarks>
-        /// This is used to determine the instruction count per row
+        /// This is used to determine the instruction count per row.
         /// </remarks>
         public int JsonIdCount { get; set; }
 
@@ -156,21 +168,31 @@ namespace Umbraco.Core.Sync
         /// </summary>
         public string JsonPayload { get; set; }
 
-        protected bool Equals(RefreshInstruction other)
-        {
-            return RefreshType == other.RefreshType
+        protected bool Equals(RefreshInstruction other) =>
+            RefreshType == other.RefreshType
                 && RefresherId.Equals(other.RefresherId)
                 && GuidId.Equals(other.GuidId)
                 && IntId == other.IntId
                 && string.Equals(JsonIds, other.JsonIds)
                 && string.Equals(JsonPayload, other.JsonPayload);
-        }
 
         public override bool Equals(object other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            if (other.GetType() != this.GetType()) return false;
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            if (other.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((RefreshInstruction) other);
         }
 
@@ -188,14 +210,8 @@ namespace Umbraco.Core.Sync
             }
         }
 
-        public static bool operator ==(RefreshInstruction left, RefreshInstruction right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(RefreshInstruction left, RefreshInstruction right) => Equals(left, right);
 
-        public static bool operator !=(RefreshInstruction left, RefreshInstruction right)
-        {
-            return Equals(left, right) == false;
-        }
+        public static bool operator !=(RefreshInstruction left, RefreshInstruction right) => Equals(left, right) == false;
     }
 }

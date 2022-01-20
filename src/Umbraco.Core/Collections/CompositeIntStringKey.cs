@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     /// <summary>
     /// Represents a composite key of (int, string) for fast dictionaries.

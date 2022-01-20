@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.Events
+﻿namespace Umbraco.Cms.Core.Events
 {
     public interface IEventDefinition
     {

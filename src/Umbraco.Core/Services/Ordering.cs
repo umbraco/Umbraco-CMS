@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Represents ordering information.

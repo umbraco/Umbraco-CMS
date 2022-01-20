@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
 
     /// <summary>
@@ -16,8 +16,8 @@ namespace Umbraco.Core.Services
         /// <param name="id"></param>
         /// <returns></returns>
         IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
-        
-        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId);
+
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
@@ -70,19 +70,11 @@ namespace Umbraco.Core.Services
         void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Saves a collection of <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issuing the save</param>
-        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
-        void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents);
-
-        /// <summary>
         /// Deletes an <see cref="IDataType"/>
         /// </summary>
         /// <remarks>
         /// Please note that deleting a <see cref="IDataType"/> will remove
-        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataType"/>.
+        /// all the <see cref="IPropertyType"/> data that references this <see cref="IDataType"/>.
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Id of the user issuing the deletion</param>

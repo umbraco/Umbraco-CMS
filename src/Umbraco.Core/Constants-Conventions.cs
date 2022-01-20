@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models;
-
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -11,7 +7,14 @@ namespace Umbraco.Core
         /// </summary>
         public static class Conventions
         {
-            internal static class PermissionCategories
+            public static class Migrations
+            {
+                public const string UmbracoUpgradePlanName = "Umbraco.Core";
+                public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
+                public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
+            }
+
+            public static class PermissionCategories
             {
                 public const string ContentCategory = "content";
                 public const string AdministrationCategory = "administration";
@@ -174,24 +177,6 @@ namespace Umbraco.Core
                 /// </summary>
                 public static readonly string InternalRolePrefix = "__umbracoRole";
 
-                public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
-
-                public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
-
-                /// <summary>
-                /// Property alias for a Members Password Question
-                /// </summary>
-                public const string PasswordQuestion = "umbracoMemberPasswordRetrievalQuestion";
-
-                public const string PasswordQuestionLabel = "Password Question";
-
-                /// <summary>
-                /// Property alias for Members Password Answer
-                /// </summary>
-                public const string PasswordAnswer = "umbracoMemberPasswordRetrievalAnswer";
-
-                public const string PasswordAnswerLabel = "Password Answer";
-
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>
@@ -242,86 +227,15 @@ namespace Umbraco.Core
                 public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 
                 /// <summary>
-                /// Group name to put the membership properties on
+                /// The standard properties group alias for membership properties.
                 /// </summary>
-                internal const string StandardPropertiesGroupName = "Membership";
+                public const string StandardPropertiesGroupAlias = "membership";
 
-                public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
-                {
-                    return new Dictionary<string, PropertyType>
-                    {
-                        {
-                            Comments,
-                            new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
-                            {
-                                Name = CommentsLabel
-                            }
-                        },
-                        {
-                            FailedPasswordAttempts,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
-                            {
-                                Name = FailedPasswordAttemptsLabel,
-                                DataTypeId = Constants.DataTypes.LabelInt
-                            }
-                        },
-                        {
-                            IsApproved,
-                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
-                            {
-                                Name = IsApprovedLabel
-                            }
-                        },
-                        {
-                            IsLockedOut,
-                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
-                            {
-                                Name = IsLockedOutLabel
-                            }
-                        },
-                        {
-                            LastLockoutDate,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
-                            {
-                                Name = LastLockoutDateLabel,
-                                DataTypeId = Constants.DataTypes.LabelDateTime
-                            }
-                        },
-                        {
-                            LastLoginDate,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
-                            {
-                                Name = LastLoginDateLabel,
-                                DataTypeId = Constants.DataTypes.LabelDateTime
-                            }
-                        },
-                        {
-                            LastPasswordChangeDate,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
-                            {
-                                Name = LastPasswordChangeDateLabel,
-                                DataTypeId = Constants.DataTypes.LabelDateTime
-                            }
-                        },
-                        {
-                            PasswordAnswer,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
-                            {
-                                Name = PasswordAnswerLabel,
-                                DataTypeId = Constants.DataTypes.LabelString
-                            }
-                        },
-                        {
-                            PasswordQuestion,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
-                            {
-                                Name = PasswordQuestionLabel,
-                                DataTypeId = Constants.DataTypes.LabelString
-                            }
-                        }
-                    };
-                }
-            }
+                /// <summary>
+                /// The standard properties group name for membership properties.
+                /// </summary>
+                public const string StandardPropertiesGroupName = "Membership";
+              }
 
             /// <summary>
             /// Defines the alias identifiers for Umbraco member types.
@@ -411,10 +325,11 @@ namespace Umbraco.Core
                 /// Developers should not manually use these relation types since they will all be cleared whenever an entity
                 /// (content, media or member) is saved since they are auto-populated based on property values.
                 /// </remarks>
-                public static string[] AutomaticRelationTypes = new[] { RelatedMediaAlias, RelatedDocumentAlias };
+                public static string[] AutomaticRelationTypes { get; } = new[] { RelatedMediaAlias, RelatedDocumentAlias };
 
                 //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
+
         }
     }
 }

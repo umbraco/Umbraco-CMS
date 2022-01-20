@@ -88,9 +88,9 @@ function startUpDynamicContentController($q, $timeout, $scope, dashboardResource
 
     evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
         $timeout(function(){
-            angular.forEach(vm.tours, function (tourGroup) {
-                angular.forEach(tourGroup, function (tour) {
-                    if(tour.alias === completedTour.alias) {
+            Utilities.forEach(vm.tours, tourGroup => {
+                Utilities.forEach(tourGroup, tour => {
+                    if (tour.alias === completedTour.alias) {
                         tour.completed = true;
                     }
                 });
@@ -100,117 +100,30 @@ function startUpDynamicContentController($q, $timeout, $scope, dashboardResource
 
     //proxy remote css through the local server
     assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
-    dashboardResource.getRemoteDashboardContent("content").then(
-        function (data) {
 
-            vm.loading = false;
+    dashboardResource.getRemoteDashboardContent("content").then(data => {
 
-            //test if we have received valid data
-            //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
-            if (data && data.sections) {
-                vm.dashboard = data;
-            } else {
-                vm.showDefault = true;
-            }
-        },
-        function (exception) {
-            console.error(exception);
-            vm.loading = false;
+        vm.loading = false;
+
+        //test if we have received valid data
+        //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
+        if (data && data.sections) {
+            vm.dashboard = data;
+        } else {
             vm.showDefault = true;
-        });
+        }
+    },
+    function (exception) {
+        console.error(exception);
+        vm.loading = false;
+        vm.showDefault = true;
+    });
 
     onInit();
 
 }
 
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
-
-
-function FormsController($scope, $cookies, packageResource, localizationService) {
-
-    var vm = this;
-
-    var labels = {};
-    var labelKeys = [
-        "packager_installStateDownloading",
-        "packager_installStateImporting",
-        "packager_installStateInstalling",
-        "packager_installStateRestarting",
-        "packager_installStateComplete"
-    ];
-
-    localizationService.localizeMany(labelKeys).then(function(values) {
-        labels.installStateDownloading = values[0];
-        labels.installStateImporting = values[1];
-        labels.installStateInstalling = values[2];
-        labels.installStateRestarting = values[3];
-        labels.installStateComplete = values[4];
-    });
-
-    vm.installForms = function() {
-        vm.state = labels.installStateDownloading;
-        packageResource
-            .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
-            .then(function(pack) {
-                    vm.state = labels.installStateImporting;
-                    return packageResource.import(pack);
-                }, vm.error)
-            .then(function(pack) {
-                vm.state = labels.installStateInstalling;
-                    return packageResource.installFiles(pack);
-                }, vm.error)
-            .then(function(pack) {
-                vm.state = labels.installStateRestarting;
-                    return packageResource.installData(pack);
-                }, vm.error)
-            .then(function(pack) {
-                vm.state = labels.installStateComplete;
-                    return packageResource.cleanUp(pack);
-                }, vm.error)
-            .then(vm.complete, vm.error);
-    };
-
-    vm.complete = function(result) {
-        window.location.href + "?init=true";
-        $cookies.putObject("umbPackageInstallId", result.packageGuid);
-        window.location.reload(true);
-    };
-
-    vm.error = function(err) {
-        vm.state = undefined;
-        vm.error = err;
-        // This will return a rejection meaning that the promise change above will stop
-        return $q.reject();
-    };
-
-    function Video_player (videoId) {
-      // Get dom elements
-      this.container      = document.getElementById(videoId);
-
-      // Create controls
-      this.controls = document.createElement('div');
-      this.controls.className="video-controls";
-
-      this.seek_bar = document.createElement('input');
-      this.seek_bar.className="seek-bar";
-      this.seek_bar.type="range";
-      this.seek_bar.setAttribute('value', '0');
-
-      this.loader = document.createElement('div');
-      this.loader.className="loader";
-
-      this.progress_bar = document.createElement('span');
-      this.progress_bar.className="progress-bar";
-
-      // Insert controls
-      this.controls.appendChild(this.seek_bar);
-      this.container.appendChild(this.controls);
-      this.controls.appendChild(this.loader);
-      this.loader.appendChild(this.progress_bar);
-    }
-}
-
-angular.module("umbraco").controller("Umbraco.Dashboard.FormsDashboardController", FormsController);
 
 function startupLatestEditsController($scope) {
 

@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Implementation of <see cref="IEntitySlim"/> for internal use.
     /// </summary>
     /// <remarks>
-    /// <para>Although it implements <see cref="IEntitySlim"/>, this class does not 
+    /// <para>Although it implements <see cref="IEntitySlim"/>, this class does not
     /// implement <see cref="IRememberBeingDirty"/> and everything this interface defines, throws.</para>
     /// <para>Although it implements <see cref="IEntitySlim"/>, this class does not
     /// implement <see cref="IDeepCloneable"/> and deep-cloning throws.</para>
@@ -23,7 +21,7 @@ namespace Umbraco.Core.Models.Entities
         /// Gets an entity representing "root".
         /// </summary>
         public static readonly IEntitySlim Root = new EntitySlim { Path = "-1", Name = "root", HasChildren = true };
-        
+
         // implement IEntity
 
         /// <inheritdoc />
@@ -121,6 +119,12 @@ namespace Umbraco.Core.Models.Entities
 
         #endregion
 
+        public void ResetIdentity()
+        {
+            Id = default;
+            Key = Guid.Empty;
+        }
+
         #region IRememberBeingDirty
 
         // IEntitySlim does *not* track changes, but since it indirectly implements IUmbracoEntity,
@@ -172,5 +176,6 @@ namespace Umbraco.Core.Models.Entities
         }
 
         #endregion
+
     }
 }

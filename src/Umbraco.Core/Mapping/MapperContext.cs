@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Mapping
+namespace Umbraco.Cms.Core.Mapping
 {
     /// <summary>
     /// Represents a mapper context.
     /// </summary>
     public class MapperContext
     {
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private IDictionary<string, object> _items;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MapperContext"/> class.
         /// </summary>
-        public MapperContext(UmbracoMapper mapper)
+        public MapperContext(IUmbracoMapper mapper)
         {
             _mapper = mapper;
         }

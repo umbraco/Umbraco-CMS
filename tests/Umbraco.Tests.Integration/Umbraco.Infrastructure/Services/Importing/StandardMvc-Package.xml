@@ -1,0 +1,2094 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <info>
+    <package>
+      <name>StandardWebsiteMVC</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <Homepage key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1072" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:39" updateDate="2013-02-17T09:10:47" nodeName="Home" urlName="home" path="-1,1072" isDoc="" nodeType="1062" creatorName="admin" writerName="admin" writerID="0" template="1049">
+        <slideshow><![CDATA[1091,1092,1093]]></slideshow>
+        <panelContent1>
+          <![CDATA[<h2>Built by Creative Founds</h2>
+<p><img src="/images/web_applications.jpg" alt="Web Applications" class="fr"/><strong>Creative Founds</strong> design and build first class software solutions that deliver big results. We provide ASP.NET web and mobile applications, Umbraco development service &amp; technical consultancy.</p>
+<p><a href="http://www.creativefounds.co.uk" target="_blank" rel="noopener">www.creativefounds.co.uk</a></p>]]>
+        </panelContent1>
+        <panelContent2>
+          <![CDATA[<h2>Umbraco Development</h2>
+<p><img src="/images/umbraco_square.jpg" alt="Umbraco" class="fr"/>Umbraco the the leading ASP.NET open source CMS, under pinning over 150,000 websites. Our Certified Developers are experts in developing high performance and feature rich websites.</p>]]>
+        </panelContent2>
+        <panelContent3>
+          <![CDATA[<h2>Contact Us</h2>
+<p><a href="http://www.twitter.com/chriskoiak" target="_blank" rel="noopener"><img src="/images/twitter_square.png" alt="Contact Us on Twitter" class="fr"/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href="https://our.umbraco.com/projects/starter-kits/standard-website-mvc" target="_blank" rel="noopener">project website</a> or via <a href="http://www.twitter.com/chriskoiak" target="_blank" rel="noopener">twitter</a></p>]]>
+        </panelContent3>
+        <primaryNavigation><![CDATA[1072,1073,1077,1079,1080]]></primaryNavigation>
+        <address>Standard Website MVC, Company Address, Glasgow, Postcode</address>
+        <copyright>Copyright &amp;copy; 2012 Your Company</copyright>
+        <affiliationLink1>http://www.umbraco.org</affiliationLink1>
+        <affiliationImage1>/media/1477/umbraco_logo.png</affiliationImage1>
+        <affiliationLink2 />
+        <affiliationImage2 />
+        <affiliationLink3 />
+        <affiliationImage3 />
+        <headerNavigation><![CDATA[1083,1084]]></headerNavigation>
+        <title>Standard Site for Umbraco by Koiak</title>
+        <description><![CDATA[]]></description>
+        <keywords><![CDATA[]]></keywords>
+        <umbracoNaviHide>0</umbracoNaviHide>
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1073" parentID="1072" level="2" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:40" updateDate="2013-02-17T09:17:48" nodeName="About" urlName="about" path="-1,1072,1073" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <bodyText>
+            <![CDATA[<h2>About Us</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur dictum, nisi non gravida blandit, odio nulla ultrices orci, quis blandit tortor libero vitae massa. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla at velit lacus.</p>
+<p>Vivamus dictum, lorem vitae <strong>bold text</strong>, libero <a href="/{localLink:1048}" title="Home">link text</a> elit, vitae tincidunt ante nibh vitae lectus. Praesent molestie justo non mi dapibus et venenatis ante facilisis. Morbi gravida molestie cursus.</p>
+<h3>Sub Section</h3>
+<p>Aliquam at est dui. Pellentesque tortor risus, congue eget pretium ut, elementum eu velit. Phasellus tempus leo sed elit tempus vestibulum. Integer mollis arcu porta leo vulputate dignissim.</p>
+<ul>
+<li>List Item 1</li>
+<li>List Item 2</li>
+<li>List Item 3</li>
+</ul>
+<ol>
+<li>Numbered Item 1</li>
+<li>Numbered Item 2</li>
+<li>Numbered Item 3</li>
+</ol>
+<p>In suscipit lectus vitae nibh faucibus vel lobortis est ullamcorper. Morbi risus nisl, sodales egestas placerat nec, cursus vel tellus. Vivamus aliquet sagittis pellentesque. Nulla rutrum neque nec metus mattis volutpat.</p>
+<p>Vivamus egestas enim sed augue eleifend id tristique magna tempus. Nunc ullamcorper scelerisque ante quis consectetur.</p>
+<p>Curabitur vel dui a enim adipiscing malesuada non quis velit.</p>]]>
+          </bodyText>
+          <contentPanels><![CDATA[1127]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1074" parentID="1073" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="Sub Navigation 1" urlName="sub-navigation-1" path="-1,1072,1073,1074" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <bodyText><![CDATA[]]></bodyText>
+            <contentPanels><![CDATA[]]></contentPanels>
+            <title />
+            <description><![CDATA[]]></description>
+            <keywords><![CDATA[]]></keywords>
+            <umbracoNaviHide>0</umbracoNaviHide>
+            <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1075" parentID="1074" level="4" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="3rd level nav 2" urlName="3rd-level-nav-2" path="-1,1072,1073,1074,1075" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+              <bodyText><![CDATA[]]></bodyText>
+              <contentPanels><![CDATA[]]></contentPanels>
+              <title />
+              <description><![CDATA[]]></description>
+              <keywords><![CDATA[]]></keywords>
+              <umbracoNaviHide>0</umbracoNaviHide>
+            </Standard>
+          </Standard>
+          <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1076" parentID="1073" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="Sub Navigation 2" urlName="sub-navigation-2" path="-1,1072,1073,1076" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <bodyText><![CDATA[]]></bodyText>
+            <contentPanels><![CDATA[]]></contentPanels>
+            <title />
+            <description><![CDATA[]]></description>
+            <keywords><![CDATA[]]></keywords>
+            <umbracoNaviHide>0</umbracoNaviHide>
+          </Standard>
+        </Standard>
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25196" id="1077" parentID="1072" level="2" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:10:47" nodeName="News" urlName="news" path="-1,1072,1077" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1046">
+          <bodyText><![CDATA[<h2>News</h2>]]></bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <NewsArticle key="9c9b55d0-2fbf-4f12-afea-023bd7b25195" id="1078" parentID="1077" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:11:22" nodeName="Article 1" urlName="article-1" path="-1,1072,1077,1078" isDoc="" nodeType="1063" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <articleSummary><![CDATA[Here is an article summary, you can add as much of a description as you require.]]></articleSummary>
+            <articleDate>2012-11-08T00:00:00</articleDate>
+            <bodyText>
+              <![CDATA[<h2>Your first Article</h2>
+<p><span><strong>Aliquam erat volutpat. Sed laoreet leo id nisi convallis sollicitudin sodales orci adipiscing. Sed a dolor ipsum. Quisque ut quam eu arcu placerat rhoncus vel et mi. Pellentesque sed est nisl.</strong> </span></p>
+<p><span>Aliquam at orci justo, id pharetra augue. Aenean ut nunc ut nibh interdum scelerisque ut ac mi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula dictum lectus in interdum. Fusce pellentesque elit nec metus convallis id porttitor felis laoreet. Nunc vitae enim quam.</span></p>]]>
+            </bodyText>
+            <contentPanels><![CDATA[]]></contentPanels>
+            <title />
+            <description><![CDATA[]]></description>
+            <keywords><![CDATA[]]></keywords>
+            <umbracoNaviHide>0</umbracoNaviHide>
+          </NewsArticle>
+        </Standard>
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25194" id="1079" parentID="1072" level="2" creatorID="0" sortOrder="2" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:10:55" nodeName="Clients" urlName="clients" path="-1,1072,1079" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <bodyText>
+            <![CDATA[<h2>Clients</h2>
+<p><strong>This is a standard content page.</strong></p>
+<p><span>Vestibulum malesuada aliquet ante, vitae ullamcorper felis faucibus vel. Vestibulum condimentum faucibus tellus porta ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. </span></p>
+<p><span>Cras at auctor orci. Praesent facilisis erat nec odio consequat at posuere ligula pretium. Nulla eget felis id nisl volutpat pellentesque. Ut id augue id ligula placerat rutrum a nec purus. Maecenas sed lectus ac mi pellentesque luctus quis sit amet turpis. Vestibulum adipiscing convallis vestibulum. </span></p>
+<p><span>Duis condimentum lectus at orci placerat vitae imperdiet lorem cursus. Duis hendrerit porta lorem, non suscipit quam consectetur vitae. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean elit augue, tincidunt nec tincidunt id, elementum vel est.</span></p>]]>
+          </bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>0</umbracoNaviHide>
+        </Standard>
+        <ContactForm key="9c9b55d0-2fbf-4f12-afea-023bd7b25193" id="1080" parentID="1072" level="2" creatorID="0" sortOrder="3" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:04:46" nodeName="Contact Us" urlName="contact-us" path="-1,1072,1080" isDoc="" nodeType="1059" creatorName="admin" writerName="admin" writerID="0" template="1048">
+          <recipientEmailAddress>chriskoiak@gmail.com</recipientEmailAddress>
+          <emailSubject>Standard Website Contact Form</emailSubject>
+          <thankYouPage>1124</thankYouPage>
+          <senderEmailAddress>chriskoiak@gmail.com</senderEmailAddress>
+          <bodyText>
+            <![CDATA[<h2>Contact Us</h2>
+<p>Please get in touch!</p>
+<?UMBRACO_MACRO macroAlias="Map" />]]>
+          </bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25192" id="1081" parentID="1080" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:04:46" nodeName="Thank You" urlName="thank-you" path="-1,1072,1080,1081" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <bodyText><![CDATA[<p><strong>Email sent successfully</strong></p>]]></bodyText>
+            <contentPanels><![CDATA[]]></contentPanels>
+            <title />
+            <description><![CDATA[]]></description>
+            <keywords><![CDATA[]]></keywords>
+            <umbracoNaviHide>1</umbracoNaviHide>
+          </Standard>
+        </ContactForm>
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25191" id="1082" parentID="1072" level="2" creatorID="0" sortOrder="4" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:10:47" nodeName="Search" urlName="search" path="-1,1072,1082" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1051">
+          <bodyText><![CDATA[<h2>Search</h2>]]></bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>0</umbracoNaviHide>
+        </Standard>
+        <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1083" parentID="1072" level="2" creatorID="0" sortOrder="5" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:10:47" nodeName="Sitemap" urlName="sitemap" path="-1,1072,1083" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1052">
+          <bodyText>
+            <![CDATA[<h2>Sitemap</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur dictum, nisi non gravida blandit, odio nulla ultrices orci, quis blandit tortor libero vitae massa.<a href="/contact-us.aspx"><br /></a></p>]]>
+          </bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>0</umbracoNaviHide>
+        </Standard>
+        <ClientArea key="8c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1084" parentID="1072" level="2" creatorID="0" sortOrder="6" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area" urlName="client-area" path="-1,1072,1084" isDoc="" nodeType="1056" creatorName="admin" writerName="admin" writerID="0" template="1047">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1085" parentID="1084" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area 1" urlName="client-area-1" path="-1,1072,1084,1085" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <bodyText><![CDATA[]]></bodyText>
+            <contentPanels><![CDATA[]]></contentPanels>
+            <title />
+            <description><![CDATA[]]></description>
+            <keywords><![CDATA[]]></keywords>
+            <umbracoNaviHide>0</umbracoNaviHide>
+            <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1086" parentID="1085" level="4" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Page 1" urlName="page-1" path="-1,1072,1084,1085,1086" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+              <bodyText><![CDATA[]]></bodyText>
+              <contentPanels><![CDATA[]]></contentPanels>
+              <title />
+              <description><![CDATA[]]></description>
+              <keywords><![CDATA[]]></keywords>
+              <umbracoNaviHide>0</umbracoNaviHide>
+            </Standard>
+          </Standard>
+          <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25196" id="1087" parentID="1084" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area 2" urlName="client-area-2" path="-1,1072,1084,1087" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <bodyText><![CDATA[]]></bodyText>
+            <contentPanels><![CDATA[]]></contentPanels>
+            <title />
+            <description><![CDATA[]]></description>
+            <keywords><![CDATA[]]></keywords>
+            <umbracoNaviHide>0</umbracoNaviHide>
+          </Standard>
+        </ClientArea>
+        <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25195" id="1088" parentID="1072" level="2" creatorID="0" sortOrder="7" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Insufficent Access" urlName="insufficent-access" path="-1,1072,1088" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <bodyText>
+            <![CDATA[<h2>Insufficent Access</h2>
+<p>You have tried to access a page you do not have access to.</p>]]>
+          </bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>1</umbracoNaviHide>
+        </Standard>
+        <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25194" id="1089" parentID="1072" level="2" creatorID="0" sortOrder="8" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:10:47" nodeName="Login" urlName="login" path="-1,1072,1089" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1050">
+          <bodyText><![CDATA[<h2>Login</h2>]]></bodyText>
+          <contentPanels><![CDATA[]]></contentPanels>
+          <title />
+          <description><![CDATA[]]></description>
+          <keywords><![CDATA[]]></keywords>
+          <umbracoNaviHide>1</umbracoNaviHide>
+        </Standard>
+        <Slideshow key="8c9b55d0-2fbf-4f12-afea-023bd7b25193" id="1090" parentID="1072" level="2" creatorID="0" sortOrder="9" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Slideshow" urlName="slideshow" path="-1,1072,1090" isDoc="" nodeType="1065" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <Slide key="8c9b55d0-2fbf-4f12-afea-023bd7b25192" id="1091" parentID="1090" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Purple Hat" urlName="purple-hat" path="-1,1072,1090,1091" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
+            <mainImage>/media/1813/cap.png</mainImage>
+            <bodyText>
+              <![CDATA[<h3>Standard Website MVC</h3>
+<p>Well hello! This website package demonstrates all the standard functionality of Umbraco. It's a great starting point for <span>starting point for further development or as a prototype.</span></p>
+<h3>Creative Founds</h3>
+<p>This package was developed by <a href="http://www.twitter.com/chriskoiak" target="_blank" rel="noopener">Chris Koiak</a> &amp; <a href="http://www.creativefounds.co.uk" target="_blank" rel="noopener">Creative Founds</a>. </p>]]>
+            </bodyText>
+            <umbracoNaviHide>1</umbracoNaviHide>
+          </Slide>
+          <Slide key="8c9b55d0-2fbf-4f12-afea-023bd7b25191" id="1092" parentID="1090" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Red Dice" urlName="red-dice" path="-1,1072,1090,1092" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
+            <mainImage>/media/1824/dice.png</mainImage>
+            <bodyText>
+              <![CDATA[<h3>Secure Client Areas</h3>
+<p>Make sure you check out the secure client areas and MVC login form,</p>
+<h3>Multiple Areas</h3>
+<p>You can create different areas for different clients or just the functionality to suit your project.</p>]]>
+            </bodyText>
+            <umbracoNaviHide>1</umbracoNaviHide>
+          </Slide>
+          <Slide key="7c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1093" parentID="1090" level="3" creatorID="0" sortOrder="2" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Umbraco Speechbubble" urlName="umbraco-speechbubble" path="-1,1072,1090,1093" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
+            <mainImage>/media/2075/chat.jpg</mainImage>
+            <bodyText>
+              <![CDATA[<h3>News List</h3>
+<p>The news page is an example of a list of content. Use this as a starting point for building any list of any type</p>
+<h3>Contact Form</h3>
+<p>The contact form is 100% MVC with strongly type view models.</p>]]>
+            </bodyText>
+            <umbracoNaviHide>1</umbracoNaviHide>
+          </Slide>
+        </Slideshow>
+        <ContentPanels key="7c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1094" parentID="1072" level="2" creatorID="0" sortOrder="10" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Content Panels" urlName="content-panels" path="-1,1072,1094" isDoc="" nodeType="1061" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <umbracoNaviHide>1</umbracoNaviHide>
+          <ContentPanel key="7c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1095" parentID="1094" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Introductory Offers" urlName="introductory-offers" path="-1,1072,1094,1095" isDoc="" nodeType="1060" creatorName="admin" writerName="admin" writerID="0" template="0">
+            <bodyText>
+              <![CDATA[
+<h3>Introductory Offers</h3>
+
+<p>asdjbasd askdja asio]ywer asduyiuy</p>
+
+<ul>
+<li><a href="/rooms.aspx">related link 1</a></li>
+
+<li><a href="/rooms.aspx">related link 1</a></li>
+</ul>
+]]>
+            </bodyText>
+            <umbracoNaviHide>1</umbracoNaviHide>
+          </ContentPanel>
+          <ContentPanel key="7c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1096" parentID="1094" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Sample Panel" urlName="sample-panel" path="-1,1072,1094,1096" isDoc="" nodeType="1060" creatorName="admin" writerName="admin" writerID="0" template="0">
+            <bodyText>
+              <![CDATA[<p><strong>Sample Panel</strong></p>
+<p>Don't you just love MVC?</p>
+<ul>
+<li><a href="/rooms.aspx">related link 1</a></li>
+<li><a href="/rooms.aspx">related link 2</a></li>
+</ul>]]>
+            </bodyText>
+            <umbracoNaviHide>0</umbracoNaviHide>
+          </ContentPanel>
+        </ContentPanels>
+      </Homepage>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>Base</Name>
+        <Key>2db296c1-5c60-45e9-b6d3-8148926dd863</Key>
+        <Alias>Base</Alias>
+        <Icon>folder.gif</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Hide From Navigation</Name>
+          <Alias>umbracoNaviHide</Alias>
+          <Type>38b352c1-e9f8-4fd8-9324-9a2eab06d97a</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>
+          </Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Client Area Folder</Name>
+        <Key>84d692d2-11fe-45ba-927e-2c4ecdb11400</Key>
+        <Alias>ClientArea</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Base</Master>
+        <AllowedTemplates>
+          <Template>ClientAreas</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>ClientAreas</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>ClientArea</DocumentType>
+        <DocumentType>Standard</DocumentType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Content Master</Name>
+        <Key>f6d25616-9f16-4c70-9e8c-e0ad4cd92dfc</Key>
+        <Alias>ContentMaster</Alias>
+        <Icon>folder.gif</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Base</Master>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Title</Name>
+          <Alias>title</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>SEO</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Description</Name>
+          <Alias>description</Alias>
+          <Type>67db8357-ef57-493e-91ac-936d305e0f2a</Type>
+          <Definition>c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3</Definition>
+          <Tab>SEO</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Keywords</Name>
+          <Alias>keywords</Alias>
+          <Type>67db8357-ef57-493e-91ac-936d305e0f2a</Type>
+          <Definition>c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3</Definition>
+          <Tab>SEO</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>6</Id>
+          <Caption>SEO</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Standard</Name>
+        <Key>95a532e7-064f-4651-a619-786f4beac7c1</Key>
+        <Alias>Standard</Alias>
+        <Icon>.sprTreeDoc</Icon>
+        <Thumbnail>doc.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>ContentMaster</Master>
+        <AllowedTemplates>
+          <Template>Articles</Template>
+          <Template>Login</Template>
+          <Template>Search</Template>
+          <Template>Sitemap</Template>
+          <Template>StandardPage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>StandardPage</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>Standard</DocumentType>
+        <DocumentType>NewsArticle</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Main Content</Name>
+          <Alias>bodyText</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Content Panels</Name>
+          <Alias>contentPanels</Alias>
+          <Type>7e062c13-7c41-4ad9-b389-41d88aeef87c</Type>
+          <Definition>d719387b-8261-48ac-b94b-00654896d114</Definition>
+          <Tab>Panels</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Select the panels to appear in the right column]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>7</Id>
+          <Caption>Content</Caption>
+        </Tab>
+        <Tab>
+          <Id>8</Id>
+          <Caption>Panels</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>ContactForm</Name>
+        <Key>67ce11c5-0493-4d8f-9678-d131bd8996ea</Key>
+        <Alias>ContactForm</Alias>
+        <Icon>newsletter.gif</Icon>
+        <Thumbnail>doc.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Standard</Master>
+        <AllowedTemplates>
+          <Template>Contact</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>Contact</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>Standard</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Recipient Email Address</Name>
+          <Alias>recipientEmailAddress</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Form</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Email Subject</Name>
+          <Alias>emailSubject</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Form</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Thank You Page</Name>
+          <Alias>thankYouPage</Alias>
+          <Type>158aa029-24ed-4948-939e-c3da209e5fba</Type>
+          <Definition>a6857c73-d6e9-480c-b6e6-f15f6ad11125</Definition>
+          <Tab>Form</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Sender Email Address</Name>
+          <Alias>senderEmailAddress</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Form</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>9</Id>
+          <Caption>Form</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>ContentPanel</Name>
+        <Key>503b6a5e-69b6-444a-a728-074a1b201b84</Key>
+        <Alias>ContentPanel</Alias>
+        <Icon>.sprTreeDoc</Icon>
+        <Thumbnail>doc.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Base</Master>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Main Content</Name>
+          <Alias>bodyText</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>10</Id>
+          <Caption>Content</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>ContentPanels</Name>
+        <Key>3d1433fc-22a2-4a70-b7cb-b7fafe4a0622</Key>
+        <Alias>ContentPanels</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Base</Master>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>ContentPanel</DocumentType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Homepage</Name>
+        <Key>a5f79cf6-9a2f-4672-ab56-f8bb31fdbb20</Key>
+        <Alias>Homepage</Alias>
+        <Icon>.sprTreeSettingDomain</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>ContentMaster</Master>
+        <AllowedTemplates>
+          <Template>Home</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>Home</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>ClientArea</DocumentType>
+        <DocumentType>Standard</DocumentType>
+        <DocumentType>ContactForm</DocumentType>
+        <DocumentType>ContentPanels</DocumentType>
+        <DocumentType>Slideshow</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Primary Navigation</Name>
+          <Alias>primaryNavigation</Alias>
+          <Type>7e062c13-7c41-4ad9-b389-41d88aeef87c</Type>
+          <Definition>d719387b-8261-48ac-b94b-00654896d114</Definition>
+          <Tab>Navigation</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Panel Content 1</Name>
+          <Alias>panelContent1</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Panel 1</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Panel Content 2</Name>
+          <Alias>panelContent2</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Panel 2</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Panel Content 3</Name>
+          <Alias>panelContent3</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Panel 3</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Slideshow</Name>
+          <Alias>slideshow</Alias>
+          <Type>7e062c13-7c41-4ad9-b389-41d88aeef87c</Type>
+          <Definition>d719387b-8261-48ac-b94b-00654896d114</Definition>
+          <Tab>Slideshow</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Header Navigation</Name>
+          <Alias>headerNavigation</Alias>
+          <Type>7e062c13-7c41-4ad9-b389-41d88aeef87c</Type>
+          <Definition>d719387b-8261-48ac-b94b-00654896d114</Definition>
+          <Tab>Header</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Address</Name>
+          <Alias>address</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[The address appears in the footer of all pages]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Copyright</Name>
+          <Alias>copyright</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Affiliation Link 1</Name>
+          <Alias>affiliationLink1</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Affiliation Image 1</Name>
+          <Alias>affiliationImage1</Alias>
+          <Type>5032a6e6-69e3-491d-bb28-cd31cd11086c</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Affiliation Link 2</Name>
+          <Alias>affiliationLink2</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Affiliation Image 2</Name>
+          <Alias>affiliationImage2</Alias>
+          <Type>5032a6e6-69e3-491d-bb28-cd31cd11086c</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Affiliation Link 3</Name>
+          <Alias>affiliationLink3</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Affiliation Image 3</Name>
+          <Alias>affiliationImage3</Alias>
+          <Type>5032a6e6-69e3-491d-bb28-cd31cd11086c</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Footer</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>11</Id>
+          <Caption>Slideshow</Caption>
+        </Tab>
+        <Tab>
+          <Id>12</Id>
+          <Caption>Panel 1</Caption>
+        </Tab>
+        <Tab>
+          <Id>13</Id>
+          <Caption>Panel 2</Caption>
+        </Tab>
+        <Tab>
+          <Id>14</Id>
+          <Caption>Panel 3</Caption>
+        </Tab>
+        <Tab>
+          <Id>15</Id>
+          <Caption>Navigation</Caption>
+        </Tab>
+        <Tab>
+          <Id>16</Id>
+          <Caption>Footer</Caption>
+        </Tab>
+        <Tab>
+          <Id>17</Id>
+          <Caption>Header</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>NewsArticle</Name>
+        <Key>c4662a2d-4698-4880-9243-2e449d9e0cfd</Key>
+        <Alias>NewsArticle</Alias>
+        <Icon>doc.gif</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Standard</Master>
+        <AllowedTemplates>
+          <Template>StandardPage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>StandardPage</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Article Summary</Name>
+          <Alias>articleSummary</Alias>
+          <Type>67db8357-ef57-493e-91ac-936d305e0f2a</Type>
+          <Definition>c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3</Definition>
+          <Tab>Article</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Article Date</Name>
+          <Alias>articleDate</Alias>
+          <Type>23e93522-3200-44e2-9f29-e61a6fcbb79a</Type>
+          <Definition>5046194e-4237-453c-a547-15db3a07c4e1</Definition>
+          <Tab>Article</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>18</Id>
+          <Caption>Article</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Slide</Name>
+        <Key>cf2153f2-4881-442b-ab58-50c1c786522b</Key>
+        <Alias>Slide</Alias>
+        <Icon>.sprTreeMediaPhoto</Icon>
+        <Thumbnail>docWithImage.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Base</Master>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Main Image</Name>
+          <Alias>mainImage</Alias>
+          <Type>5032a6e6-69e3-491d-bb28-cd31cd11086c</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[500px x 260px]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Main Content</Name>
+          <Alias>bodyText</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>19</Id>
+          <Caption>Content</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Slideshow</Name>
+        <Key>9acb68aa-03e1-4474-823d-c21af8356756</Key>
+        <Alias>Slideshow</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <Master>Base</Master>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>Slide</DocumentType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+  </DocumentTypes>
+  <Templates>
+    <Template>
+      <Name>Articles</Name>
+      <Alias>Articles</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = "SW_Master.cshtml";
+    int pageSize = 2; // How many items per page
+    int page; // The page we are viewing
+
+    /* Set up parameters */
+
+    if (!int.TryParse(Request.QueryString["page"], out page))
+    {
+        page = 1;
+    }
+
+    /* This is your basic query to select the nodes you want */
+
+    var nodes = Model.Content.Children.Where(x => x.DocumentTypeAlias == "NewsArticle").OrderBy(x=>x.CreateDate);
+
+    int totalNodes = nodes.Count();
+    int totalPages = (int)Math.Ceiling((double)totalNodes / (double)pageSize);
+
+    /* Bounds checking */
+
+    if (page > totalPages)
+    {
+        page = totalPages;
+    }
+    else if (page < 1)
+    {
+        page = 1;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+ <div id="mainContent" class="fc">
+      <div class="navigation">
+        @Html.Partial("LeftNavigation",@Model.Content)
+      &nbsp;
+      </div>
+
+       <div id="content">
+
+            @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+
+
+               <ul id="newsList">
+    @foreach (var item in nodes.Skip((page - 1) * pageSize).Take(pageSize))
+    {
+     <li>
+            <h3>
+              <a href="@item.NiceUrl()">
+                @item.Name
+              </a>
+            </h3>
+            <p class="articleDate">
+                @Convert.ToDateTime(item.GetPropertyValue("articleDate")).ToString("dd MMMM yyyy")
+            </p>
+            <p>
+                @item.GetPropertyValue("articleSummary")
+
+            </p>
+        </li>
+    }
+</ul>
+
+@if(totalPages > 1)
+{
+
+      <p id="pager">
+    @for (int p = 1; p < totalPages + 1; p++)
+    {
+        //string selected = (p == page) ? "selected" : String.Empty;
+        //<li class="@selected"><a href="?page=@p" title="Go to page @p of results">@p</a></li>
+        <a href="?page=@p" title="Go to page @p of results">@p</a>
+        if (p < totalPages)
+        {
+            <text>| </text>
+        }
+    }
+</p>
+}
+
+
+       </div>
+
+        @Html.Partial("ContentPanels",@Model.Content)
+    </div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>ClientAreas</Name>
+      <Alias>ClientAreas</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+      Layout = "SW_Master.cshtml";
+      var pages = Model.Content.Children.Where(x => x.IsVisible() && x.TemplateId > 0 && Umbraco.MemberHasAccess(x.Id, x.Path));
+}
+ <div id="mainContent" class="fc">
+
+      <div class="navigation">
+        @Html.Partial("LeftNavigation",@Model.Content)
+      &nbsp;
+      </div>
+
+       <div id="content">
+            @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+
+           @foreach (var page in pages)
+             {
+                 <h3><a href="@page.NiceUrl()">@page.Name</a></h3>
+             }
+
+       </div>
+
+
+    </div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Contact</Name>
+      <Alias>Contact</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = "SW_Master.cshtml";
+}
+ <div id="mainContent" class="fc">
+
+      <div class="navigation">
+        @Html.Partial("LeftNavigation",@Model.Content)
+          &nbsp;
+      </div>
+
+       <div id="content">
+            @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+
+            @Html.Partial("ContactForm",new Koiak.StandardWebsite.ContactFormModel())
+       </div>
+</div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Home</Name>
+      <Alias>Home</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = "SW_Master.cshtml";
+}
+
+    <div id="slideshow">
+    <ul>
+            @{
+        var nodeIds = Model.Content.GetPropertyValue("slideshow").ToString().Split(',');
+        List<IPublishedContent> slides = new List<IPublishedContent>();
+
+        foreach (var nodeId in nodeIds)
+        {
+            if (!String.IsNullOrEmpty(nodeId))
+            {
+                var publishedContent = Umbraco.NiceUrl(Convert.ToInt32(nodeId));
+                if (!String.IsNullOrEmpty(publishedContent) && publishedContent != "#")
+                {
+                    slides.Add(Umbraco.TypedContent(nodeId));
+                }
+            }
+        }
+        }
+
+        @foreach (var slide in slides)
+        {
+            if(slide != null)
+            {
+                string styleString = !slide.IsFirst() ? "display:none;" : "";
+                <li class="rotating-panel fc" style="@styleString">
+                    <img class="fl" alt="@slide.Name" src="@slide.GetPropertyValue("mainImage")"/>
+                    <div class="">
+                    @Html.Raw(slide.GetPropertyValue("bodyText"))
+                    </div>
+                </li>
+            }
+        }
+    </ul>
+      <ul id="slidePager">
+        @foreach (var slide in slides)
+        {
+            string classString = slide.IsFirst() ? "selected" : "";
+          <li>
+            <a href="?position={position()}" class="@classString">
+              @slide.Position()
+            </a>
+          </li>
+        }
+      </ul>
+
+    </div>
+
+    <div class="fc">
+        <div class="feature fl">
+                    @Html.Raw(Model.Content.GetPropertyValue("panelContent1").ToString())
+             </div>
+
+        <div class="feature fl">
+                    @Html.Raw(Model.Content.GetPropertyValue("panelContent2").ToString())
+             </div>
+
+        <div class="feature fr">
+                    @Html.Raw(Model.Content.GetPropertyValue("panelContent3").ToString())
+             </div>
+    </div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Login</Name>
+      <Alias>Login</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[    @inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = "SW_Master.cshtml";
+
+    if(!String.IsNullOrEmpty(Request.QueryString["signout"]))
+    {
+        FormsAuthentication.SignOut();
+        Context.Response.Redirect(Model.Content.NiceUrl(), true);
+    }
+}
+ <div id="mainContent" class="fc">
+
+      <div class="navigation">
+        @Html.Partial("LeftNavigation",@Model.Content)
+          &nbsp;
+      </div>
+
+       <div id="content">
+            @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+
+            @Html.Partial("LoginForm",new Koiak.StandardWebsite.LoginModel())
+       </div>
+</div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Search</Name>
+      <Alias>Search</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using Lucene.Net;
+@using Examine;
+@using Examine.LuceneEngine.SearchCriteria;
+
+@{
+    Layout = "SW_Master.cshtml";
+
+
+    int pageSize = 10; // How many items per page
+    int page; // The page we are viewing
+    string searchTerm = Context.Request.QueryString["search"];
+
+    /* Set up parameters */
+
+    if (!int.TryParse(Request.QueryString["page"], out page))
+    {
+        page = 1;
+    }
+
+    /* This is your basic query to select the nodes you want */
+
+    Examine.Providers.BaseSearchProvider baseSearchProvider = ExamineManager.Instance.DefaultSearchProvider;
+    IEnumerable<SearchResult> nodes = null;
+    //ISearchResults nodes = null;
+    Lucene.Net.Search.Searcher luceneSearcher = null;
+    int totalNodes = 0;
+    int totalPages = 0;
+
+    if (!String.IsNullOrEmpty(searchTerm))
+    {
+        //nodes = baseSearchProvider.Search(searchTerm, true);
+        var searchCriteria = Examine.ExamineManager.Instance.CreateSearchCriteria(Examine.SearchCriteria.BooleanOperation.And);
+
+        var query = searchCriteria.GroupedOr(
+            new string[] { "nodeName", "bodyText", "panelContent1", "panelContent2", "panelContent3", "articleSummary"},searchTerm.Fuzzy(0.7f))
+            .Compile();
+
+        var results = baseSearchProvider.Search(query); //.OrderByDescending(x => x.Score)
+        luceneSearcher = ((Examine.LuceneEngine.SearchResults)results).LuceneSearcher;
+        nodes = results.OrderByDescending(x => x.Score);
+
+        totalNodes = nodes.Count();
+        totalPages = (int)Math.Ceiling((double)totalNodes / (double)pageSize);
+
+        /* Bounds checking */
+
+        if (page > totalPages)
+        {
+            page = totalPages;
+        }
+        else if (page < 1)
+        {
+            page = 1;
+        }
+    }
+
+}
+<div id="mainContent" class="fc">
+    <div class="navigation">
+        @Html.Partial("LeftNavigation", @Model.Content)
+        &nbsp;
+
+    </div>
+
+    <div id="content">
+        @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+
+        @if (totalNodes == 0)
+        {
+            <p>No results match your search</p>
+        }
+        else
+        {
+            <ul id="newsList">
+                @foreach (var item in nodes.Skip((page - 1) * pageSize).Take(pageSize))
+                {
+                    <li>
+                        <h3>
+                            <a href="@Umbraco.NiceUrl(Convert.ToInt32(@item.Fields["id"]))">
+                                @item.Fields["nodeName"]
+                            </a>
+                        </h3>
+                        @{
+                    string fieldName = "bodyText";
+                    string searchHiglight = "";
+
+                    if (item.Fields.ContainsKey(fieldName))
+                    {
+                        string fieldValue = item.Fields[fieldName];
+                        searchHiglight = LuceneHighlightHelper.Instance.GetHighlight(fieldValue, fieldName, luceneSearcher, searchTerm);
+
+                        if (String.IsNullOrEmpty(searchHiglight))
+                        {
+                            searchHiglight = Umbraco.Truncate(fieldValue, 200).ToString();
+                        }
+                        else
+                        {
+                            searchHiglight = System.Text.RegularExpressions.Regex.Replace(searchHiglight, searchTerm, "<strong>" + searchTerm + "</strong>", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                        }
+                    }
+                        }
+
+                        <p>@Html.Raw(searchHiglight)</p>
+
+                        <!--<dl>
+
+                  @foreach (var field in item.Fields)
+                  {
+                      <dt>@field.Key</dt>
+                      <dd>@field.Value</dd>
+                  }
+                      </dl>-->
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (totalPages > 1)
+        {
+
+            <p id="pager">
+                @for (int p = 1; p < totalPages + 1; p++)
+                {
+                    //string selected = (p == page) ? "selected" : String.Empty;
+                    //<li class="@selected"><a href="?page=@p" title="Go to page @p of results">@p</a></li>
+                    <a href="?search=@searchTerm&amp;page=@p" title="Go to page @p of results">@p</a>
+                    if (p < totalPages)
+                    {
+                    <text>| </text>
+                    }
+                }
+            </p>
+        }
+    </div>
+
+    @Html.Partial("ContentPanels", @Model.Content)
+</div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Sitemap</Name>
+      <Alias>Sitemap</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = "SW_Master.cshtml";
+}
+ <div id="mainContent" class="fc">
+
+      <div class="navigation">
+        @Html.Partial("LeftNavigation",@Model.Content)
+      &nbsp;
+      </div>
+
+       <div id="content">
+            @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+
+    <div id="sitemap">
+            @traverse(Model.Content.AncestorOrSelf(1))
+        </div>
+
+       </div>
+
+        @Html.Partial("ContentPanels",@Model.Content)
+    </div>
+
+@helper traverse(IPublishedContent node)
+{
+ var cc = node.Children.Where(x=>x.IsVisible() && x.TemplateId > 0);
+ if (cc.Count()>0)
+ {
+  <ul>
+  @foreach (var c in cc)
+  {
+  <li>
+   <a href="@c.NiceUrl()">@c.Name</a>
+   @traverse(c)
+  </li>
+  }
+  </ul>
+ }
+}]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Standard Page</Name>
+      <Alias>StandardPage</Alias>
+      <Master>SW_Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = "SW_Master.cshtml";
+}
+ <div id="mainContent" class="fc">
+
+      <div class="navigation">
+        @Html.Partial("LeftNavigation",@Model.Content)
+      &nbsp;
+      </div>
+
+       <div id="content">
+            @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
+       </div>
+
+        @Html.Partial("ContentPanels",@Model.Content)
+    </div>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>SW_Master</Name>
+      <Alias>SW_Master</Alias>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = null;
+    var homepage = Model.Content.AncestorOrSelf(1);
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+      <title>@Model.Content.GetPropertyValue("title")</title>
+        <meta name="keywords" content="@Model.Content.GetPropertyValue("keywords")" />
+        <meta name="description" content="@Model.Content.GetPropertyValue("description")" />
+
+
+       <meta http-equiv="Content-Language" content="en" />
+      <meta name="language" content="en" />
+      <meta name="robots" content="all, follow" />
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="MSSmartTagsPreventParsing" content="TRUE" />
+
+      <link rel="stylesheet" href="/css/base-min.css" type="text/css" media="screen, projection" />
+      <link rel="stylesheet" href="/css/default.css" type="text/css" media="screen, projection" />
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css">
+      <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+
+    </head>
+    <body>
+        <div id="header">
+            <div class="page-width fc">
+
+                <a href="/" id="logo"><img src="/images/logo.png" alt="Koiak Basic Site" /></a>
+
+                @if (homepage.HasProperty("headerNavigation"))
+                {
+                    <ul  class="navigation fc">
+                    @foreach (var item in Umbraco.TypedContent(homepage.GetPropertyValue("headerNavigation").ToString().Split(',')))
+                    {
+                        if (item != null)
+                        {
+                        <li><a href="@item.NiceUrl()">@item.Name</a></li>
+                        }
+                    }
+                    </ul>
+                }
+
+
+                @if(Umbraco.MemberIsLoggedOn())
+                {
+                <p class="fr" id="loggedIn">
+      Welcome @Context.User.Identity.Name, <a href="/login.aspx?signout=true">logout</a>
+
+    </p>
+                }
+
+                <form action="/search" id="searchForm" method="get">
+                <fieldset>
+                  <label for="search" class="remove">Search Site</label>
+                  <input type="text" value="@Request.QueryString["search"]" class="input" name="search" id="search"/>
+                  <input type="submit" value="Search" class="submit"/>
+                </fieldset>
+              </form>
+            </div>
+
+            <div class="navigation">
+                @if (homepage.HasProperty("primaryNavigation"))
+                {
+                <ul  class="navigation fc">
+                    @foreach (var item in Umbraco.TypedContent(homepage.GetPropertyValue<string>("primaryNavigation").Split(',')))
+                    {
+                        if (item != null)
+                        {
+                            var selected = Array.IndexOf(Model.Content.Path.Split(','), item.Id.ToString()) >= 0 && item.Level > 1 ? " class=\"selected\"" : "";
+                        <li @Html.Raw(selected)><a href="@item.NiceUrl()">@item.Name</a></li>
+                        }
+                    }
+                    </ul>
+                }
+            </div>
+        </div>
+            <div id="body" class="page-width">
+                @RenderBody()
+            </div>
+
+            <div id="footer" class="fc">
+                <div class="page-width">
+                    @Html.Partial("Affiliations",homepage)
+                    <p>@homepage.GetPropertyValue("address")</p>
+                    <p>@Html.Raw(homepage.GetPropertyValue<string>("copyright"))</p>
+                </div>
+            </div>
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+        <script type="text/javascript" src="/scripts/jquery.timers.js"></script>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript" src="/scripts/default.js"></script>
+    </body>
+</html>]]>
+      </Design>
+    </Template>
+  </Templates>
+  <Stylesheets>
+    <Stylesheet>
+      <Name>admin</Name>
+      <FileName>
+      </FileName>
+      <Content>
+        <![CDATA[
+
+
+
+
+
+
+]]>
+      </Content>
+      <Properties>
+        <Property>
+          <Name>Header 2</Name>
+          <Alias>h2</Alias>
+          <Value>
+          </Value>
+        </Property>
+        <Property>
+          <Name>Header 3</Name>
+          <Alias>h3</Alias>
+          <Value>
+          </Value>
+        </Property>
+        <Property>
+          <Name>Float Right</Name>
+          <Alias>.fr</Alias>
+          <Value>
+          </Value>
+        </Property>
+      </Properties>
+    </Stylesheet>
+    <Stylesheet>
+      <Name>base-min</Name>
+      <FileName>base-min</FileName>
+      <Content>
+        <![CDATA[/*reset*/
+html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var,optgroup{font-style:inherit;font-weight:inherit;}del,ins{text-decoration:none;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:baseline;}sub{vertical-align:baseline;}legend{color:#000;}input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}input,button,textarea,select{*font-size:100%;}
+
+/*base*/
+body{margin:10px;}h1{font-size:138.5%;}h2{font-size:123.1%;}h3{font-size:108%;}h1,h2,h3{margin:1em 0;}h1,h2,h3,h4,h5,h6,strong,dt{font-weight:bold;}optgroup{font-weight:normal;}abbr,acronym{border-bottom:1px dotted #000;cursor:help;}em{font-style:italic;}del{text-decoration:line-through;}blockquote,ul,ol,dl{margin:1em;}ol,ul,dl{margin-left:2em;}ol li{list-style:decimal outside;}ul li{list-style:disc outside;}dl dd{margin-left:1em;}th,td{border:1px solid #000;padding:.5em;}th{font-weight:bold;text-align:center;}caption{margin-bottom:.5em;text-align:center;}sup{vertical-align:super;}sub{vertical-align:sub;}p,fieldset,table,pre{margin-bottom:1em;}button,input[type="checkbox"],input[type="radio"],input[type="reset"],input[type="submit"]{padding:1px;}
+.inline{display:inline;}.remove{display:none;}.hideLegend legend{display:none;}.hide, #skipNav {position:absolute;top:0;left:-200em;width:20em;}.fr{float:right;}.fl{float:left;}.tar{text-align:right;}.tac{text-align:center;}.tal{text-align:left;}.cl {clear:left;}.cr {clear:right;}.cb {clear:both;}ul, ul li { margin: 0; list-style-type :none;}address{line-height: 1.3em;}
+/* FULL CLEAR - forces a container to surround all children - regardless of floating */
+.fc:after, .formRow:after{
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.fc, .formRow{ display: inline-block;}
+/* Hides from IE-mac \*/
+* html .fc, * html .formRow { height: 1%; }
+.fc, .formRow { display: block; }
+
+/*fonts*/
+body{font:13px/1.231 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small;}select,input,button,textarea,button{font:99% arial,helvetica,clean,sans-serif;}table{font-size:inherit;font:100%;}pre,code,kbd,samp,tt{font-family:monospace;*font-size:108%;line-height:100%;}
+
+
+
+
+]]>
+      </Content>
+    </Stylesheet>
+    <Stylesheet>
+      <Name>default</Name>
+      <FileName>default</FileName>
+      <Content>
+        <![CDATA[html, body {
+	background-color:#fff;
+	color:#534442;
+	font-size:12px;
+	margin:0;
+	line-height: 0.8em;
+}
+
+h1, h2, h3, h4, h5, h6, p, blockquote {
+  padding:12px 24px;
+  margin: 0;
+  line-height: 1.5em;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+	font-family:'Lato', sans-serif;
+}
+
+h2, h3
+{
+    font-weight:normal;
+}
+
+a {
+  text-decoration: underline;
+  color: #534442;
+  overflow:hidden;
+}
+
+a:hover,
+a:focus {
+  text-decoration: none;
+}
+
+
+/* LAYOUT */
+
+
+div.page-width {
+	margin: 0 auto;
+	width: 796px;
+	position:relative;
+}
+
+div#body
+{
+	padding: 0px 64px;
+}
+
+#mainContent
+{
+	margin-top:20px;
+}
+
+#mainContent div.navigation
+{
+	float:left;
+	width: 140px;
+}
+
+#mainContent div.navigation ul  a
+{
+	text-decoration: none;
+
+}
+
+#mainContent div.navigation ul a:hover,
+#mainContent div.navigation ul a:focus {
+  text-decoration: underline;
+}
+
+#mainContent div.navigation ul li
+{
+	padding:10px 8px;
+	border: 1px solid #EBE0DE;
+	margin-bottom:10px;
+	line-height:1.2em;
+}
+
+#mainContent div.navigation ul li.selected
+{
+	background-color: #F0F0F0;
+}
+
+#mainContent div.navigation ul li ul
+{
+	padding-top: 4px;
+}
+
+#mainContent div.navigation ul li ul li
+{
+	border: 0px solid #EBE0DE;
+	padding: 12px 0 0 12px;
+	margin: 0;
+}
+
+#mainContent div.navigation ul li a:focus,
+#mainContent div.navigation ul li a:hover
+{
+	color: #333333;
+}
+
+#mainContent div.navigation ul li.selected a,
+#mainContent div.navigation ul li.selected ul li.selected a
+{
+	font-weight: bold;
+}
+
+
+#mainContent div.navigation ul li.selected ul li a
+{
+	font-weight: normal;
+}
+
+#mainContent #content
+{
+	float:left;
+	width: 425px;
+	margin: 0px 20px;
+}
+
+
+#mainContent #rightPanel
+{
+	float:left;
+	width:190px;
+}
+
+div#footer
+{
+	border-top: 1px solid #CDCDCD;
+	padding:20px 0px;
+	margin-top: 20px;
+	background-color: #5F5F5F;
+	color:#FFFFFF;
+}
+
+div#footer p
+{
+	padding: 6px 0px;
+}
+
+div#footer ul
+{
+	width: 350px;
+	float: right;
+}
+
+div#footer ul li
+{
+	float:right;
+	padding: 0 10px;
+}
+/* HEADER */
+div#header
+{
+	position: relative;
+}
+
+    div#header img
+    {
+        padding:30px 0px;
+    }
+
+#header div.navigation
+{
+	border-top:1px solid #CCC;
+	border-bottom:1px solid #CCC;
+	background-color: #F0F0F0;
+}
+
+div#header div.navigation ul.navigation
+{
+	margin:0 auto;
+	width:796px;
+}
+
+div#header div.navigation ul.navigation li
+{
+	display:inline;
+	float:left;
+}
+
+div#header div.navigation ul.navigation li a
+{
+	display:block;
+	font-size:14px;
+	padding:13px 22px;
+	text-decoration: none;
+
+}
+
+div#header div.navigation ul.navigation li a:hover,
+div#header div.navigation ul.navigation li a:focus,
+div#header div.navigation ul.navigation li li.active a,
+div#header div.navigation ul.navigation li.selected a {
+	background-color: #ABABAB;
+	color:#fff;
+}
+
+div#header img.touristBoard
+{
+	position: absolute;
+	top:18px;
+	right:60px;
+}
+
+div#header p#telephone
+{
+	position: absolute;
+	top:30px;
+	left:280px;
+	padding: 0px;
+	font-size:14px;
+}
+
+div#header p#telephone span
+{
+	font-size:16px;
+}
+
+div#header div.page-width ul.navigation
+{
+	float:right;
+	clear:right;
+	width: 300px;
+	text-align:right;
+	padding: 15px 0px 15px 0px;
+}
+
+div#header div.page-width ul.navigation li
+{
+	display: inline;
+	padding-right:6px;
+	margin-right:6px;
+}
+
+
+div#header div.page-width ul.navigation li.last
+{
+	padding:0px;
+	margin:0px;
+}
+div#header #logo{float:left}
+
+
+/* Homepage */
+div#slideshow
+{
+	padding: 30px 0px;
+	position:relative;
+	height: 260px;
+}
+
+div#slideshow div
+{
+
+}
+
+div#slideshow li
+{
+	height: 260px;
+	position:absolute;
+	width:795px;
+	top:20;
+	left:20;
+}
+
+div#slideshow li.rotating-panel img
+{
+	padding-right:20px;
+}
+
+div#slideshow h3,
+div#slideshow p,
+div#slideshow ul li ul {
+	padding:8px 24px;
+}
+
+div#slideshow ul li ul
+{
+	position: relative;
+}
+
+div#slideshow ul li ul li
+{
+	height:auto;
+	background: none transparent;
+	position:relative;
+	padding: 3px 0px 3px 18px;
+	background: url("/images/li_white_bg.gif") no-repeat left 5px transparent;
+	line-height: 1em;
+	width:auto;
+}
+
+div#slideshow h3
+{
+	font-size: 24px;
+}
+
+div#slideshow ul#slidePager
+{
+	position: absolute;
+	bottom: 35px;
+	left:15px;
+}
+
+
+div#slideshow ul#slidePager li
+{
+	display:inline;
+	position: relative;
+	background: none transparent;
+	float:left;
+	height: auto;
+	padding-right: 5px;
+	width: auto;
+}
+
+div#slideshow ul#slidePager li a
+{
+	display:block;
+	height: 15px;
+	width:15px;
+	border: 1px solid #ccc;
+	background-color: #fff;
+	text-indent:-9999em;
+}
+
+div#slideshow ul#slidePager li a.selected
+{
+	background-color: #F0F0F0;
+}
+
+div.feature
+{
+	width: 245px;
+	margin: 0px 10px;
+	border-top:1px solid #cdcdcd;
+}
+
+div.feature h2
+{
+	font-weight: normal;
+	font-size: 18px;
+	border-bottom:1px solid #cdcdcd;
+	padding: 6px 0px 6px 10px;
+}
+
+div.feature p
+{
+	padding: 12px 6px;
+}
+
+/* Main Content */
+#mainContent #content h2
+{
+	font-size: 24px;
+	color: #333;
+	padding: 0 0 12px 0;
+	line-height: 1em;
+}
+
+#mainContent #content h3
+{
+	font-size: 16px;
+	color: #333;
+	padding: 0 0 12px 0;
+}
+
+#mainContent #content p
+{
+	padding: 0 0 12px 0;
+}
+
+#mainContent #content ul
+{
+	padding: 10px 0px;
+}
+
+#mainContent #content ul li
+{
+	padding: 3px 0px 3px 18px;
+	line-height:1.2em;
+	background: url("/images/li_bg.gif") no-repeat left 5px transparent;
+}
+
+#rightPanel li
+{
+	padding-bottom: 11px;
+}
+
+
+#rightPanel li h3
+{
+	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	font-size: 14px;
+	padding: 11px;
+}
+
+
+#rightPanel li p,
+#rightPanel li ul
+{
+	padding: 11px 11px 0px 11px;
+}
+
+#rightPanel li ul li
+{
+	border: 0px solid #fff;
+}
+
+
+/*  Map*/
+#map_canvas {
+	height:280px;
+	line-height:1.2em;
+	width:425px;
+}
+
+/*Search form*/
+#searchForm
+{
+	float:right;
+	clear:right;
+}
+
+#searchForm input#search
+{
+	background:url("/images/search_bg.png") no-repeat 0 0 transparent ;
+	border:medium none;
+	height:18px;
+	padding:4px 5px 4px 30px;
+	margin-right: 3px;
+	width: 110px;
+}
+
+#searchForm input.submit
+{
+	background-color: #fff;
+	border: 1px solid #999;
+	padding: 3.5px 4px 3px 4px;
+}
+
+p.xsltsearch_result_title {font-family: georgia,Times,Serif;color: #333333;font-size: 16px;padding: 0 0 12px; font-weight:bold;}
+div#xsltsearch_results {border-top: 1px solid #CDCDCD; margin-bottom:20px;}
+div.xsltsearch_result {  border-bottom: 1px solid #CDCDCD; padding: 10px 0px 10px 0px;}
+
+
+/* Login */
+p#loggedIn {position: absolute; top: 0; left:300px;}
+
+table th, td {border: 0px solid #fff;}
+
+.formRow  {padding-bottom: 6px;}
+.checkBoxRow {padding: 13px 0px 16px 0px;}
+.formRow label {width: 200px; display:block; padding: 6px 0px;}
+.formRow input,
+.formRow textarea {padding: 5px; width: 250px;}
+.checkBoxRow label {padding-left: 10px;}
+.buttonRow input {padding:5px 10px; border:1px solid #CDCDCD; background-color:#EFEFEF;}
+
+/* List */
+#mainContent #content ul#newsList
+{
+	border-top:1px solid #CDCDCD;
+}
+#mainContent #content ul#newsList li
+{
+	border-bottom:1px solid #CDCDCD;
+	margin-bottom: 20px;
+    padding: 0 0 20px;
+    background-image: none;
+}
+
+
+
+
+
+
+]]>
+      </Content>
+    </Stylesheet>
+  </Stylesheets>
+  <Macros>
+    <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4C0</key>
+      <name>Map</name>
+      <alias>Map</alias>
+      <scriptType>
+      </scriptType>
+      <scriptAssembly>
+      </scriptAssembly>
+      <xslt>
+      </xslt>
+      <useInEditor>True</useInEditor>
+      <refreshRate>0</refreshRate>
+      <scriptingFile>Map.cshtml</scriptingFile>
+      <properties />
+    </macro>
+  </Macros>
+  <DictionaryItems />
+  <Languages />
+  <DataTypes>
+    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114" DatabaseType="Ntext"
+              Configuration="{&quot;x&quot;:3}" />
+      <!--
+      <PreValues>
+        <PreValue Id="5" Value="content" />
+        <PreValue Id="6" Value="" />
+        <PreValue Id="7" Value="-1" />
+        <PreValue Id="8" Value="False" />
+        <PreValue Id="9" Value="1" />
+        <PreValue Id="10" Value="0" />
+        <PreValue Id="11" Value="-1" />
+        <PreValue Id="12" Value="False" />
+        <PreValue Id="13" Value="0" />
+        <PreValue Id="14" Value="0" />
+        <PreValue Id="15" Value="" />
+        <PreValue Id="16" Value="200" />
+        <PreValue Id="17" Value="0" />
+      </PreValues>
+    -->
+  </DataTypes>
+  <control>/usercontrols/StandardWebsiteInstall.ascx</control>
+</umbPackage>

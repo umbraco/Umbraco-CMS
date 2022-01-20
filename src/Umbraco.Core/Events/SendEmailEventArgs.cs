@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Net.Mail;
+using Umbraco.Cms.Core.Models.Email;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
-    internal class SendEmailEventArgs : EventArgs
+    public class SendEmailEventArgs : EventArgs
     {
-        public MailMessage Message { get; private set; }
+        public EmailMessage Message { get; }
 
-        public SendEmailEventArgs(MailMessage message)
+        public SendEmailEventArgs(EmailMessage message)
         {
             Message = message;
         }

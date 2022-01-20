@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     [DataContract(IsReference = true)]
     public class DashboardSlim : IDashboardSlim

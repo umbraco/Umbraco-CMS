@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
+
     /// <summary>
     /// Provides a base class for content items.
     /// </summary>
@@ -11,7 +12,7 @@ namespace Umbraco.Core.Models
     /// <para>Content items are documents, medias and members.</para>
     /// <para>Content items have a content type, and properties.</para>
     /// </remarks>
-    public interface IContentBase : IUmbracoEntity
+    public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Integer Id of the default ContentType
@@ -98,7 +99,7 @@ namespace Umbraco.Core.Models
         /// List of properties, which make up all the data available for this Content object
         /// </summary>
         /// <remarks>Properties are loaded as part of the Content object graph</remarks>
-        PropertyCollection Properties { get; set; }
+        IPropertyCollection Properties { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content entity has a property with the supplied alias.

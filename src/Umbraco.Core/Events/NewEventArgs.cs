@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<NewEventArgs<TEntity>>
     {

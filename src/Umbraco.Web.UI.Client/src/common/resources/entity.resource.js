@@ -127,6 +127,39 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve url for id:' + id);
         },
 
+        getUrlsByIds: function(ids, type, culture) {
+          var query = `type=${type}&culture=${culture || ""}`;
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByIds",
+                     query),
+                 {
+                     ids: ids
+                 }),
+             'Failed to retrieve url map for ids ' + ids);
+        },
+
+        /**
+         * @deprecated use getUrlsByIds instead.
+         */
+        getUrlsByUdis: function(udis, culture) {
+          var query = "culture=" + (culture || "");
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByUdis",
+                     query),
+                 {
+                     udis: udis
+                 }),
+             'Failed to retrieve url map for udis ' + udis);
+        },
+
         getUrlByUdi: function (udi, culture) {
 
             if (!udi) {
@@ -142,7 +175,7 @@ function entityResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetUrl",
-                       [{ udi: udi }, {culture: culture }])),
+                       [{ id: udi }, {culture: culture }])),
                'Failed to retrieve url for UDI:' + udi);
         },
 
@@ -220,7 +253,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     }),
                 'Failed to anchors data for rte content ' + rteContent);
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds
@@ -245,6 +278,10 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          */
         getByIds: function (ids, type) {
+
+          if (!ids || ids.length === 0) {
+            return $q.when([]);
+          }
 
             var query = "type=" + type;
 
@@ -321,7 +358,7 @@ function entityResource($q, $http, umbRequestHelper) {
         getAll: function (type, postFilter) {
             //need to build the query string manually
             var query = "type=" + type + "&postFilter=" + (postFilter ? encodeURIComponent(postFilter) : "");
-         
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
@@ -439,7 +476,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct
@@ -512,7 +549,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct

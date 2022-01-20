@@ -1,27 +1,36 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
-    public class ViewHelper
+    public class ViewHelper : IViewHelper
     {
         private readonly IFileSystem _viewFileSystem;
+        private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
+        [Obsolete("Use ctor with all params")]
         public ViewHelper(IFileSystem viewFileSystem)
         {
-            if (viewFileSystem == null) throw new ArgumentNullException(nameof(viewFileSystem));
-            _viewFileSystem = viewFileSystem;
+            _viewFileSystem = viewFileSystem ?? throw new ArgumentNullException(nameof(viewFileSystem));
+            _defaultViewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
         }
 
-        internal bool ViewExists(ITemplate t)
+        public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
         {
-            return _viewFileSystem.FileExists(ViewPath(t.Alias));
+            _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
+            _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
         }
 
-        internal string GetFileContents(ITemplate t)
+        public bool ViewExists(ITemplate t) => _viewFileSystem.FileExists(ViewPath(t.Alias));
+    
+
+        public string GetFileContents(ITemplate t)
         {
             var viewContent = "";
             var path = ViewPath(t.Alias);
@@ -59,57 +68,13 @@ namespace Umbraco.Core.IO
             return viewContent;
         }
 
-        public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null, string modelNamespace = null, string modelNamespaceAlias = null)
+        [Obsolete("Inject IDefaultViewContentProvider instead")]
+        public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null,
+            string modelNamespace = null, string modelNamespaceAlias = null)
         {
-            var content = new StringBuilder();
-
-            if (string.IsNullOrWhiteSpace(modelNamespaceAlias))
-                modelNamespaceAlias = "ContentModels";
-
-            // either
-            // @inherits Umbraco.Web.Mvc.UmbracoViewPage
-            // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
-            content.Append("@inherits Umbraco.Web.Mvc.UmbracoViewPage");
-            if (modelClassName.IsNullOrWhiteSpace() == false)
-            {
-                content.Append("<");
-                if (modelNamespace.IsNullOrWhiteSpace() == false)
-                {
-                    content.Append(modelNamespaceAlias);
-                    content.Append(".");
-                }
-                content.Append(modelClassName);
-                content.Append(">");
-            }
-            content.Append("\r\n");
-
-            // if required, add
-            // @using ContentModels = ModelNamespace;
-            if (modelClassName.IsNullOrWhiteSpace() == false && modelNamespace.IsNullOrWhiteSpace() == false)
-            {
-                content.Append("@using ");
-                content.Append(modelNamespaceAlias);
-                content.Append(" = ");
-                content.Append(modelNamespace);
-                content.Append(";\r\n");
-            }
-
-            // either
-            // Layout = null;
-            // Layout = "layoutPage.cshtml";
-            content.Append("@{\r\n\tLayout = ");
-            if (layoutPageAlias.IsNullOrWhiteSpace())
-            {
-                content.Append("null");
-            }
-            else
-            {
-                content.Append("\"");
-                content.Append(layoutPageAlias);
-                content.Append(".cshtml\"");
-            }
-            content.Append(";\r\n}");
-            return content.ToString();
+            var viewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
+            return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace,
+                modelNamespaceAlias);
         }
 
         private string SaveTemplateToFile(ITemplate template)
@@ -155,12 +120,12 @@ namespace Umbraco.Core.IO
             return _viewFileSystem.GetRelativePath(alias.Replace(" ", "") + ".cshtml");
         }
 
-        private static string EnsureInheritedLayout(ITemplate template)
+        private string EnsureInheritedLayout(ITemplate template)
         {
             var design = template.Content;
 
             if (string.IsNullOrEmpty(design))
-                design = GetDefaultFileContent(template.MasterTemplateAlias);
+                design = _defaultViewContentProvider.GetDefaultFileContent(template.MasterTemplateAlias);
 
             return design;
         }

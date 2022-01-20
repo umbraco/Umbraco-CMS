@@ -1,9 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
+    // TODO: This needs to be merged into one interface in v9, but better yet
+    // the Localize method should just the based on area + alias and we should remove
+    // the one with the 'key' (the concatenated area/alias) to ensure that we never use that again.
+
     /// <summary>
     /// The entry point to localize any key in the text storage source for a given culture
     /// </summary>
@@ -16,11 +19,19 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Localize a key with variables
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
         /// <param name="culture"></param>
         /// <param name="tokens">This can be null</param>
         /// <returns></returns>
-        string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null);
+        string Localize(string area, string alias, CultureInfo culture, IDictionary<string, string> tokens = null);
+
+
+        /// <summary>
+        /// Returns all key/values in storage for the given culture
+        /// </summary>
+        /// <returns></returns>
+        IDictionary<string, IDictionary<string, string>> GetAllStoredValuesByAreaAndAlias(CultureInfo culture);
 
         /// <summary>
         /// Returns all key/values in storage for the given culture

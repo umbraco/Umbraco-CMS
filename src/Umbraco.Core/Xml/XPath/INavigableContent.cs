@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     /// <summary>
     /// Represents a content that can be navigated via XPath.
     /// </summary>
-    interface INavigableContent
+    public interface INavigableContent
     {
         /// <summary>
         /// Gets the unique identifier of the navigable content.

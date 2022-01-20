@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Umbraco.Core.Configuration.Grid
+﻿namespace Umbraco.Cms.Core.Configuration.Grid
 {
     public interface IGridConfig
     {

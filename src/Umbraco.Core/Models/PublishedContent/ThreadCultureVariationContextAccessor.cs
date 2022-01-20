@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Provides a CurrentUICulture-based implementation of <see cref="IVariationContextAccessor"/>.

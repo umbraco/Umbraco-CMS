@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a language.

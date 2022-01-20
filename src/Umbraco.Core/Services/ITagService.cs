@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Tag service to query for tags in the tags db table. The tags returned are only relevant for published content & saved media or members

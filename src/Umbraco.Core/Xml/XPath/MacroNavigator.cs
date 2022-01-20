@@ -5,12 +5,12 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     /// <summary>
     /// Provides a cursor model for navigating {macro /} as if it were XML.
     /// </summary>
-    class MacroNavigator : XPathNavigator
+    public class MacroNavigator : XPathNavigator
     {
         private readonly XmlNameTable _nameTable;
         private readonly MacroRoot _macro;
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Xml.XPath
         private int _tabs;
         private readonly int _uid = GetUid();
         private static int _uidg;
-        private readonly static object Uidl = new object();
+        private static readonly object Uidl = new object();
         private static int GetUid()
         {
             lock (Uidl)

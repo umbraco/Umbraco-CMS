@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Describes <see cref="RefreshInstruction"/> refresh action type.

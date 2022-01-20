@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// A service for handling lawful data processing requirements

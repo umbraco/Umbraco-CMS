@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     {
@@ -21,7 +20,23 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
+        [Obsolete("This method will be removed in future versions.  Please use ExistsByUserName instead.")]
         bool Exists(string username);
+
+        /// <summary>
+        /// Checks if a user with the username exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        bool ExistsByUserName(string username);
+
+
+        /// <summary>
+        /// Checks if a user with the login exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        bool ExistsByLogin(string login);
 
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects associated with a given group
@@ -43,7 +58,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
-        /// <param name="customFilter"></param>
         /// <param name="orderDirection"></param>
         /// <param name="includeUserGroups">
         /// A filter to only include user that belong to these user groups
@@ -52,6 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// A filter to only include users that do not belong to these user groups
         /// </param>
         /// <param name="userState">Optional parameter to filter by specified user state</param>
+        /// <param name="filter"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
             Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,

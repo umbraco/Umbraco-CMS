@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.Services.Changes
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.Changes;
+
+namespace Umbraco.Extensions
 {
-    internal static class ContentTypeChangeExtensions
+    public static class ContentTypeChangeExtensions
     {
-        public static ContentTypeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<ContentTypeChange<TItem>> changes)
-            where TItem : class, IContentTypeComposition
-        {
-            return new ContentTypeChange<TItem>.EventArgs(changes);
-        }
 
         public static bool HasType(this ContentTypeChangeTypes change, ContentTypeChangeTypes type)
         {

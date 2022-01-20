@@ -1,133 +1,84 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.IO;
-using System.Configuration;
 using System.Linq;
-using System.Web;
-using System.Web.Hosting;
-using System.IO.Compression;
+using System.Reflection;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
-    public static class IOHelper
+    public abstract class IOHelper : IIOHelper
     {
-        /// <summary>
-        /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
-        /// </summary>
-        /// <remarks>This should always be false, unless unit testing.</remarks>
-	    public static bool ForceNotHosted { get; set; }
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        private static string _rootDir = "";
+        public IOHelper(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+        }
 
         // static compiled regex for faster performance
         //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        /// <summary>
-        /// Gets a value indicating whether Umbraco is hosted.
-        /// </summary>
-	    public static bool IsHosted => !ForceNotHosted && (HttpContext.Current != null || HostingEnvironment.IsHosted);
-
-        public static char DirSepChar => Path.DirectorySeparatorChar;
-
         //helper to try and match the old path to a new virtual one
-        public static string FindFile(string virtualPath)
+        public string FindFile(string virtualPath)
         {
             string retval = virtualPath;
 
             if (virtualPath.StartsWith("~"))
-                retval = virtualPath.Replace("~", SystemDirectories.Root);
+                retval = virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath);
 
-            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(SystemDirectories.Root) == false)
-                retval = SystemDirectories.Root + "/" + virtualPath.TrimStart(Constants.CharArrays.ForwardSlash);
+            if (virtualPath.StartsWith("/") && !PathStartsWith(virtualPath, _hostingEnvironment.ApplicationVirtualPath))
+                retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart(Constants.CharArrays.ForwardSlash);
 
             return retval;
         }
 
-        public static string ResolveVirtualUrl(string path)
+        // TODO: This is the same as IHostingEnvironment.ToAbsolute - marked as obsolete in IIOHelper for now
+        public string ResolveUrl(string virtualPath)
         {
-            if (string.IsNullOrWhiteSpace(path)) return path;
-            return path.StartsWith("~/") ? ResolveUrl(path) : path;
+            if (string.IsNullOrWhiteSpace(virtualPath)) return virtualPath;
+            return _hostingEnvironment.ToAbsolute(virtualPath);
+
         }
 
-        //Replaces tildes with the root dir
-        public static string ResolveUrl(string virtualPath)
+        public string MapPath(string path)
         {
-            if (virtualPath.StartsWith("~"))
-                return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
-            else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
-                return virtualPath;
-            else
-                return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
-        }
+            if (path == null) throw new ArgumentNullException(nameof(path));
 
-        public static Attempt<string> TryResolveUrl(string virtualPath)
-        {
-            try
-            {
-                if (virtualPath.StartsWith("~"))
-                    return Attempt.Succeed(virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/"));
-                if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
-                    return Attempt.Succeed(virtualPath);
-                return Attempt.Succeed(VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root));
-            }
-            catch (Exception ex)
-            {
-                return Attempt.Fail(virtualPath, ex);
-            }
-        }
-
-        public static string MapPath(string path, bool useHttpContext)
-        {
-            if (path == null) throw new ArgumentNullException("path");
-
-            useHttpContext = useHttpContext && IsHosted;
-
-            // Check if the path is already mapped
-            if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
-                || path.StartsWith(@"\\")) //UNC Paths start with "\\". If the site is running off a network drive mapped paths will look like "\\Whatever\Boo\Bar"
+            // Check if the path is already mapped - TODO: This should be switched to Path.IsPathFullyQualified once we are on Net Standard 2.1
+            if (IsPathFullyQualified(path))
             {
                 return path;
             }
 
-            if (useHttpContext)
+            if (_hostingEnvironment.IsHosted)
             {
-                //string retval;
-                if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
-                    return HostingEnvironment.MapPath(path);
-                else
-                    return HostingEnvironment.MapPath("~/" + path.TrimStart(Constants.CharArrays.ForwardSlash));
+                var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || PathStartsWith(path, _hostingEnvironment.ApplicationVirtualPath)))
+                    ? _hostingEnvironment.MapPathWebRoot(path)
+                    : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart(Constants.CharArrays.ForwardSlash));
+
+                if (result != null) return result;
             }
 
-            var root = GetRootDirectorySafe();
-            var newPath = path.TrimStart(Constants.CharArrays.TildeForwardSlash).Replace('/', IOHelper.DirSepChar);
-            var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
+            var dirSepChar = Path.DirectorySeparatorChar;
+            var root = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
+            var newPath = path.TrimStart(Constants.CharArrays.TildeForwardSlash).Replace('/', dirSepChar);
+            var retval = root + dirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
             return retval;
         }
 
-        public static string MapPath(string path)
-        {
-            return MapPath(path, true);
-        }
+        /// <summary>
+        /// Returns true if the path has a root, and is considered fully qualified for the OS it is on
+        /// See https://github.com/dotnet/runtime/blob/30769e8f31b20be10ca26e27ec279cd4e79412b9/src/libraries/System.Private.CoreLib/src/System/IO/Path.cs#L281 for the .NET Standard 2.1 version of this
+        /// </summary>
+        /// <param name="path">The path to check</param>
+        /// <returns>True if the path is fully qualified, false otherwise</returns>
+        public abstract bool IsPathFullyQualified(string path);
 
-        //use a tilde character instead of the complete path
-        internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
-        {
-            var retval = ConfigurationManager.AppSettings[settingsKey];
-
-            if (string.IsNullOrEmpty(retval))
-                retval = standardPath;
-
-            return retval.TrimEnd(Constants.CharArrays.ForwardSlash);
-        }
-
-        internal static string ReturnPath(string settingsKey, string standardPath)
-        {
-            return ReturnPath(settingsKey, standardPath, false);
-
-        }
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
@@ -135,7 +86,7 @@ namespace Umbraco.Core.IO
         /// <param name="filePath">The filepath to validate.</param>
         /// <param name="validDir">The valid directory.</param>
         /// <returns>A value indicating whether the filepath is valid.</returns>
-        internal static bool VerifyEditPath(string filePath, string validDir)
+        public bool VerifyEditPath(string filePath, string validDir)
         {
             return VerifyEditPath(filePath, new[] { validDir });
         }
@@ -146,7 +97,7 @@ namespace Umbraco.Core.IO
         /// <param name="filePath">The filepath to validate.</param>
         /// <param name="validDirs">The valid directories.</param>
         /// <returns>A value indicating whether the filepath is valid.</returns>
-        internal static bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
+        public bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
         {
             // this is called from ScriptRepository, PartialViewRepository, etc.
             // filePath is the fullPath (rooted, filesystem path, can be trusted)
@@ -157,9 +108,12 @@ namespace Umbraco.Core.IO
             // TODO: what's below is dirty, there are too many ways to get the root dir, etc.
             // not going to fix everything today
 
-            var mappedRoot = MapPath(SystemDirectories.Root);
-            if (filePath.StartsWith(mappedRoot) == false)
-                filePath = MapPath(filePath);
+            var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
+            if (!PathStartsWith(filePath, mappedRoot))
+            {
+                // TODO this is going to fail.. Scripts Stylesheets need to use WebRoot, PartialViews need to use ContentRoot
+                filePath = _hostingEnvironment.MapPathWebRoot(filePath);
+            }
 
             // yes we can (see above)
             //// don't trust what we get, it may contain relative segments
@@ -168,10 +122,10 @@ namespace Umbraco.Core.IO
             foreach (var dir in validDirs)
             {
                 var validDir = dir;
-                if (validDir.StartsWith(mappedRoot) == false)
-                    validDir = MapPath(validDir);
+                if (!PathStartsWith(validDir, mappedRoot))
+                    validDir = _hostingEnvironment.MapPathWebRoot(validDir);
 
-                if (PathStartsWith(filePath, validDir, Path.DirectorySeparatorChar))
+                if (PathStartsWith(filePath, validDir))
                     return true;
             }
 
@@ -184,100 +138,15 @@ namespace Umbraco.Core.IO
         /// <param name="filePath">The filepath to validate.</param>
         /// <param name="validFileExtensions">The valid extensions.</param>
         /// <returns>A value indicating whether the filepath is valid.</returns>
-        internal static bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
+        public bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
         {
             var ext = Path.GetExtension(filePath);
             return ext != null && validFileExtensions.Contains(ext.TrimStart(Constants.CharArrays.Period));
         }
 
-        public static bool PathStartsWith(string path, string root, char separator)
-        {
-            // either it is identical to root,
-            // or it is root + separator + anything
+        public abstract bool PathStartsWith(string path, string root, params char[] separators);
 
-            if (path.StartsWith(root, StringComparison.OrdinalIgnoreCase) == false) return false;
-            if (path.Length == root.Length) return true;
-            if (path.Length < root.Length) return false;
-            return path[root.Length] == separator;
-        }
-
-        /// <summary>
-        /// Returns the path to the root of the application, by getting the path to where the assembly where this
-        /// method is included is present, then traversing until it's past the /bin directory. Ie. this makes it work
-        /// even if the assembly is in a /bin/debug or /bin/release folder
-        /// </summary>
-        /// <returns></returns>
-        internal static string GetRootDirectorySafe()
-        {
-            if (String.IsNullOrEmpty(_rootDir) == false)
-            {
-                return _rootDir;
-            }
-
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            var baseDirectory = Path.GetDirectoryName(path);
-            if (String.IsNullOrEmpty(baseDirectory))
-                throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
-
-            _rootDir = baseDirectory.Contains("bin")
-                           ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
-                           : baseDirectory;
-
-            return _rootDir;
-        }
-
-        internal static string GetRootDirectoryBinFolder()
-        {
-            string binFolder = String.Empty;
-            if (String.IsNullOrEmpty(_rootDir))
-            {
-                binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory.FullName;
-                return binFolder;
-            }
-
-            binFolder = Path.Combine(GetRootDirectorySafe(), "bin");
-
-            // do this all the time (no #if DEBUG) because Umbraco release
-            // can be used in tests by an app (eg Deploy) being debugged
-            var debugFolder = Path.Combine(binFolder, "debug");
-            if (Directory.Exists(debugFolder))
-                return debugFolder;
-
-            var releaseFolder = Path.Combine(binFolder, "release");
-            if (Directory.Exists(releaseFolder))
-                return releaseFolder;
-
-            if (Directory.Exists(binFolder))
-                return binFolder;
-
-            return _rootDir;
-        }
-
-        /// <summary>
-        /// Allows you to overwrite RootDirectory, which would otherwise be resolved
-        /// automatically upon application start.
-        /// </summary>
-        /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
-        /// <param name="rootPath"></param>
-        internal static void SetRootDirectory(string rootPath)
-        {
-            _rootDir = rootPath;
-        }
-
-        /// <summary>
-        /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
-        /// </summary>
-        /// <param name="filePath">The filename passed to the file handler from the upload field.</param>
-        /// <returns>A safe filename without any path specific chars.</returns>
-        internal static string SafeFileName(string filePath)
-        {
-            // use string extensions
-            return filePath.ToSafeFileName();
-        }
-
-        public static void EnsurePathExists(string path)
+        public void EnsurePathExists(string path)
         {
             var absolutePath = MapPath(path);
             if (Directory.Exists(absolutePath) == false)
@@ -285,50 +154,79 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Checks if a given path is a full path including drive letter
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        // From: http://stackoverflow.com/a/35046453/5018
-        internal static bool IsFullPath(this string path)
-        {
-            return string.IsNullOrWhiteSpace(path) == false
-                   && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
-                   && Path.IsPathRooted(path)
-                   && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
-        }
-
-        /// <summary>
         /// Get properly formatted relative path from an existing absolute or relative path
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        internal static string GetRelativePath(this string path)
+        public string GetRelativePath(string path)
         {
             if (path.IsFullPath())
             {
-                var rootDirectory = GetRootDirectorySafe();
-                var relativePath = path.ToLowerInvariant().Replace(rootDirectory.ToLowerInvariant(), string.Empty);
+                var rootDirectory = MapPath("~");
+                var relativePath = PathStartsWith(path, rootDirectory) ? path.Substring(rootDirectory.Length) : path;
                 path = relativePath;
             }
 
-            return path.EnsurePathIsApplicationRootPrefixed();
+            return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
         }
 
         /// <summary>
-        /// Ensures that a path has `~/` as prefix
+        /// Retrieves array of temporary folders from the hosting environment.
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        internal static string EnsurePathIsApplicationRootPrefixed(this string path)
+        /// <returns>Array of <see cref="DirectoryInfo"/> instances.</returns>
+        public DirectoryInfo[] GetTempFolders()
         {
-            if (path.StartsWith("~/"))
-                return path;
-            if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
-                path = string.Format("/{0}", path);
-            if (path.StartsWith("~") == false)
-                path = string.Format("~{0}", path);
-            return path;
+            var tempFolderPaths = new[]
+            {
+                _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads)
+            };
+
+            foreach (var tempFolderPath in tempFolderPaths)
+            {
+                // Ensure it exists
+                Directory.CreateDirectory(tempFolderPath);
+            }
+
+            return tempFolderPaths.Select(x => new DirectoryInfo(x)).ToArray();
+        }
+
+        /// <summary>
+        /// Cleans contents of a folder by deleting all files older that the provided age.
+        /// If deletition of any file errors (e.g. due to a file lock) the process will continue to try to delete all that it can.
+        /// </summary>
+        /// <param name="folder">Folder to clean.</param>
+        /// <param name="age">Age of files within folder to delete.</param>
+        /// <returns>Result of operation.</returns>
+        public CleanFolderResult CleanFolder(DirectoryInfo folder, TimeSpan age)
+        {
+            folder.Refresh(); // In case it's changed during runtime.
+
+            if (!folder.Exists)
+            {
+                return CleanFolderResult.FailedAsDoesNotExist();
+            }
+
+            var files = folder.GetFiles("*.*", SearchOption.AllDirectories);
+            var errors = new List<CleanFolderResult.Error>();
+            foreach (var file in files)
+            {
+                if (DateTime.UtcNow - file.LastWriteTimeUtc > age)
+                {
+                    try
+                    {
+                        file.IsReadOnly = false;
+                        file.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(new CleanFolderResult.Error(ex, file));
+                    }
+                }
+            }
+
+            return errors.Any()
+                ? CleanFolderResult.FailedWithErrors(errors)
+                : CleanFolderResult.Success();
         }
     }
 }

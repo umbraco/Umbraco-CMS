@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Template file.
@@ -12,19 +13,21 @@ namespace Umbraco.Core.Models
     public class Template : File, ITemplate
     {
         private string _alias;
+        private readonly IShortStringHelper _shortStringHelper;
         private string _name;
         private string _masterTemplateAlias;
         private Lazy<int> _masterTemplateId;
 
-        public Template(string name, string alias)
-            : this(name, alias, (Func<File, string>) null)
+        public Template(IShortStringHelper shortStringHelper, string name, string alias)
+            : this(shortStringHelper, name, alias, null)
         { }
 
-        internal Template(string name, string alias, Func<File, string> getFileContent)
+        public Template(IShortStringHelper shortStringHelper, string name, string alias, Func<File, string> getFileContent)
             : base(string.Empty, getFileContent)
         {
+            _shortStringHelper = shortStringHelper;
             _name = name;
-            _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
+            _alias = alias.ToCleanString(shortStringHelper, CleanStringType.UnderscoreAlias);
             _masterTemplateId = new Lazy<int>(() => -1);
         }
 
@@ -52,13 +55,13 @@ namespace Umbraco.Core.Models
         public new string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.UnderscoreAlias), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias), ref _alias, nameof(Alias));
         }
 
         /// <summary>
         /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
         /// </summary>
-        public bool IsMasterTemplate { get; internal set; }
+        public bool IsMasterTemplate { get; set; }
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {

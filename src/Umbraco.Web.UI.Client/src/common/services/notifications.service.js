@@ -2,12 +2,12 @@
  * @ngdoc service
  * @name umbraco.services.notificationsService
  *
- * @requires $rootScope 
+ * @requires $rootScope
  * @requires $timeout
  * @requires angularHelper
- *	
+ *
  * @description
- * Application-wide service for handling notifications, the umbraco application 
+ * Application-wide service for handling notifications, the umbraco application
  * maintains a single collection of notications, which the UI watches for changes.
  * By default when a notication is added, it is automaticly removed 7 seconds after
  * This can be changed on add()
@@ -19,7 +19,7 @@
  * <pre>
  *		notificationsService.success("Document Published", "hooraaaay for you!");
  *      notificationsService.error("Document Failed", "booooh");
- * </pre> 
+ * </pre>
  */
 angular.module('umbraco.services')
 .factory('notificationsService', function ($rootScope, $timeout, angularHelper) {
@@ -50,7 +50,7 @@ angular.module('umbraco.services')
 		* @param {Object} item The notification item
 		* @param {String} item.headline Short headline
 		* @param {String} item.message longer text for the notication, trimmed after 200 characters, which can then be exanded
-		* @param {String} item.type Notification type, can be: "success","warning","error" or "info" 
+		* @param {String} item.type Notification type, can be: "success","warning","error" or "info"
 		* @param {String} item.url url to open when notification is clicked
 		* @param {String} item.target the target used together with `url`. Empty if not specified.
 		* @param {String} item.view path to custom view to load into the notification box
@@ -76,10 +76,10 @@ angular.module('umbraco.services')
 					if(item.message.length > 200) {
 						item.sticky = true;
 					}
-				}	
-			
-				//we need to ID the item, going by index isn't good enough because people can remove at different indexes 
-				// whenever they want. Plus once we remove one, then the next index will be different. The only way to 
+				}
+
+				//we need to ID the item, going by index isn't good enough because people can remove at different indexes
+				// whenever they want. Plus once we remove one, then the next index will be different. The only way to
 				// effectively remove an item is by an Id.
 				item.id = String.CreateGuid();
 
@@ -110,7 +110,7 @@ angular.module('umbraco.services')
 			}else{
 				view = setViewPath(view).toLowerCase();
 				return _.find(nArray, function(notification){ return notification.view.toLowerCase() === view;});
-			}	
+			}
 		},
 		addView: function(view, args){
 			var item = {
@@ -128,7 +128,7 @@ angular.module('umbraco.services')
 		 *
 		 * @description
 		 * Shows a notification based on the object passed in, normally used to render notifications sent back from the server
-		 *		 
+		 *
 		 * @returns {Object} args notification object
 		 */
         showNotification: function(args) {
@@ -141,25 +141,30 @@ angular.module('umbraco.services')
             if (!args.header) {
                 throw "args.header cannot be null";
             }
-            
+
             switch(args.type) {
                 case 0:
+                case 'Save':
                     //save
                     this.success(args.header, args.message);
                     break;
                 case 1:
+                case 'Info':
                     //info
                     this.info(args.header, args.message);
                     break;
                 case 2:
+                case 'Error':
                     //error
                     this.error(args.header, args.message);
                     break;
                 case 3:
+                case 'Success':
                     //success
                     this.success(args.header, args.message);
                     break;
                 case 4:
+                case 'Warning':
                     //warning
                     this.warning(args.header, args.message);
                     break;
@@ -190,7 +195,7 @@ angular.module('umbraco.services')
 		 * @description
 		 * Adds a red error notication to the notications collection
 		 * This should be used when an operations *fails* and could not complete
-		 * 
+		 *
 		 * @param {String} headline Headline of the notification
 		 * @param {String} message longer text for the notication, trimmed after 200 characters, which can then be exanded
 		 * @returns {Object} notification object
@@ -207,7 +212,7 @@ angular.module('umbraco.services')
 		 * @description
 		 * Adds a yellow warning notication to the notications collection
 		 * This should be used when an operations *completes* but something was not as expected
-		 * 
+		 *
 		 *
 		 * @param {String} headline Headline of the notification
 		 * @param {String} message longer text for the notication, trimmed after 200 characters, which can then be exanded
@@ -225,7 +230,7 @@ angular.module('umbraco.services')
 		 * @description
 		 * Adds a yellow warning notication to the notications collection
 		 * This should be used when an operations *completes* but something was not as expected
-		 * 
+		 *
 		 *
 		 * @param {String} headline Headline of the notification
 		 * @param {String} message longer text for the notication, trimmed after 200 characters, which can then be exanded
@@ -241,7 +246,7 @@ angular.module('umbraco.services')
 		 * @methodOf umbraco.services.notificationsService
 		 *
 		 * @description
-		 * Removes a notification from the notifcations collection at a given index 
+		 * Removes a notification from the notifcations collection at a given index
 		 *
 		 * @param {Int} index index where the notication should be removed from
 		 */
@@ -254,7 +259,7 @@ angular.module('umbraco.services')
 			}else{
 				angularHelper.safeApply($rootScope, function() {
 				    nArray.splice(index, 1);
-				});	
+				});
 			}
 		},
 
@@ -264,7 +269,7 @@ angular.module('umbraco.services')
 		 * @methodOf umbraco.services.notificationsService
 		 *
 		 * @description
-		 * Removes all notifications from the notifcations collection 
+		 * Removes all notifications from the notifcations collection
 		 */
 	    removeAll: function () {
 	        angularHelper.safeApply($rootScope, function() {
@@ -290,7 +295,7 @@ angular.module('umbraco.services')
 		 * @methodOf umbraco.services.notificationsService
 		 *
 		 * @description
-		 * Method to return all notifications from the notifcations collection 
+		 * Method to return all notifications from the notifcations collection
 		 */
 		getCurrent: function(){
 			return nArray;

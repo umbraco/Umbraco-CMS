@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     {
@@ -16,6 +16,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="relations"></param>
         void Save(IEnumerable<IRelation> relations);
+
+        /// <summary>
+        /// Persist multiple <see cref="IRelation"/> at once but Ids are not returned on created relations
+        /// </summary>
+        /// <param name="relations"></param>
+        void SaveBulk(IEnumerable<ReadOnlyRelation> relations);
 
         /// <summary>
         /// Deletes all relations for a parent for any specified relation type alias

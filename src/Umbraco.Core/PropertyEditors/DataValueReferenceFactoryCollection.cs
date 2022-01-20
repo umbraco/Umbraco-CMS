@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataValueReferenceFactory>
     {
-        public DataValueReferenceFactoryCollection(IEnumerable<IDataValueReferenceFactory> items)
-            : base(items)
-        { }
+        public DataValueReferenceFactoryCollection(System.Func<IEnumerable<IDataValueReferenceFactory>> items) : base(items)
+        {
+        }
 
-        public IEnumerable<UmbracoEntityReference> GetAllReferences(PropertyCollection properties, PropertyEditorCollection propertyEditors)
+        // TODO: We could further reduce circular dependencies with PropertyEditorCollection by not having IDataValueReference implemented
+        // by property editors and instead just use the already built in IDataValueReferenceFactory and/or refactor that into a more normal collection
+
+        public IEnumerable<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
         {
             var trackedRelations = new HashSet<UmbracoEntityReference>();
 
@@ -22,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors
                 //TODO: We will need to change this once we support tracking via variants/segments
                 // for now, we are tracking values from ALL variants
 
-                foreach(var propertyVal in p.Values)
+                foreach (var propertyVal in p.Values)
                 {
                     var val = propertyVal.EditedValue;
 
@@ -30,7 +33,7 @@ namespace Umbraco.Core.PropertyEditors
                     if (valueEditor is IDataValueReference reference)
                     {
                         var refs = reference.GetReferences(val);
-                        foreach(var r in refs)
+                        foreach (var r in refs)
                             trackedRelations.Add(r);
                     }
 
@@ -45,14 +48,11 @@ namespace Umbraco.Core.PropertyEditors
                         // in the dataeditor/property has referecnes to media/content items
                         if (item.IsForEditor(editor))
                         {
-                            foreach(var r in item.GetDataValueReference().GetReferences(val))
+                            foreach (var r in item.GetDataValueReference().GetReferences(val))
                                 trackedRelations.Add(r);
                         }
-                            
                     }
                 }
-
-                
             }
 
             return trackedRelations;

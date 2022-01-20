@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Serializes entities to XML
@@ -22,7 +23,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         XElement Serialize(
             IMedia media,
-            bool withDescendants = false);
+            bool withDescendants = false,
+            Action<IMedia, XElement> onMediaItemSerialized = null);
 
         /// <summary>
         /// Exports an IMember item as an XElement.
@@ -54,7 +56,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
         XElement Serialize(IDictionaryItem dictionaryItem, bool includeChildren);
 
-        XElement Serialize(Stylesheet stylesheet);
+        XElement Serialize(IStylesheet stylesheet, bool includeProperties);
 
         /// <summary>
         /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>

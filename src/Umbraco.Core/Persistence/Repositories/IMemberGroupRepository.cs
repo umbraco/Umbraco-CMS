@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IMemberGroupRepository : IReadWriteQueryRepository<int, IMemberGroup>
     {
@@ -40,14 +40,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IMemberGroup> GetMemberGroupsForMember(string username);
 
-        void AssignRoles(string[] usernames, string[] roleNames);
-
-        void DissociateRoles(string[] usernames, string[] roleNames);
+        void ReplaceRoles(int[] memberIds, string[] roleNames);
 
         void AssignRoles(int[] memberIds, string[] roleNames);
 
         void DissociateRoles(int[] memberIds, string[] roleNames);
 
-        int[] GetMemberIds(string[] names);
+        
     }
 }

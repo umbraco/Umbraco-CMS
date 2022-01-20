@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents a published data type.
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// if the data type changes, then a new class needs to be created.</para>
     /// <para>These instances should be created by an <see cref="IPublishedContentTypeFactory"/>.</para>
     /// </remarks>
+    [DebuggerDisplay("{EditorAlias}")]
     public class PublishedDataType
     {
         private readonly Lazy<object> _lazyConfiguration;
@@ -17,7 +19,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedDataType"/> class.
         /// </summary>
-        internal PublishedDataType(int id, string editorAlias, Lazy<object> lazyConfiguration)
+        public PublishedDataType(int id, string editorAlias, Lazy<object> lazyConfiguration)
         {
             _lazyConfiguration = lazyConfiguration;
 

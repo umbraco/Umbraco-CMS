@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extensions methods for <see cref="IDataType"/>.
@@ -35,7 +34,7 @@ namespace Umbraco.Core.Models
 
             throw new InvalidCastException($"Cannot cast dataType configuration, of type {configuration.GetType().Name}, to {typeof(T).Name}.");
         }
-        
+
         private static readonly ISet<Guid> IdsOfBuildInDataTypes = new HashSet<Guid>()
         {
             Constants.DataTypes.Guids.ContentPickerGuid,
@@ -79,7 +78,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="dataType">The data type definition.</param>
         /// <returns></returns>
-        internal static bool IsBuildInDataType(this IDataType dataType)
+        public static bool IsBuildInDataType(this IDataType dataType)
         {
             return IsBuildInDataType(dataType.Key);
         }
@@ -87,7 +86,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if this date type is build-in/default.
         /// </summary>
-        internal static bool IsBuildInDataType(Guid key)
+        public static bool IsBuildInDataType(Guid key)
         {
             return IdsOfBuildInDataTypes.Contains(key);
         }

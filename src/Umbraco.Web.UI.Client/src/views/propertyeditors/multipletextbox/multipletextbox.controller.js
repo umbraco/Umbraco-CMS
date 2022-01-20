@@ -26,6 +26,29 @@
         }
     }
 
+    $scope.paste = function (event, index) {
+        event.preventDefault();
+        var text = (event.clipboardData || window.clipboardData || event.originalEvent.clipboardData).getData('text');
+        var lines = text.split(/\r?\n/).map(line => { return { value: line, hasFocus: false } });
+
+        if (lines.length > 0) {
+            // merge with the current text
+            var currentText = $scope.model.value[index].value;
+            lines[0].value = currentText.substring(0, event.target.selectionStart) + lines[0].value;
+            lines[lines.length - 1].value = lines[lines.length - 1].value + currentText.substring(event.target.selectionEnd);
+
+            // clear selection
+            event.target.selectionEnd = event.target.selectionStart;
+
+            // remove focus from existing values
+            $scope.model.value.forEach(value => value.hasFocus = false);
+
+            // add all the lines to the value
+            lines[lines.length - 1].hasFocus = true;
+            $scope.model.value.splice(index, 1, ...lines);
+        }
+    }
+
     $scope.addRemoveOnKeyDown = function (event, index) {
 
         var txtBoxValue = $scope.model.value[index];

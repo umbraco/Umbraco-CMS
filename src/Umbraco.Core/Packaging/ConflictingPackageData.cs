@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
-    internal class ConflictingPackageData
+    public class ConflictingPackageData
     {
         private readonly IMacroService _macroService;
         private readonly IFileService _fileService;
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Packaging
                     if (xElement == null)
                         throw new FormatException("Missing \"Name\" element");
 
-                    return _fileService.GetStylesheetByName(xElement.Value) as IFile;
+                    return _fileService.GetStylesheet(xElement.Value) as IFile;
                 })
                 .Where(v => v != null);
         }

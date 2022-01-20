@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a RelationType
@@ -18,7 +17,6 @@ namespace Umbraco.Core.Models
         private Guid? _parentObjectType;
         private Guid? _childObjectType;
 
-        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(string alias, string name)
             : this(name: name, alias: alias, false, null, null)
         {
@@ -36,18 +34,6 @@ namespace Umbraco.Core.Models
             _isBidirectional = isBidrectional;
             _parentObjectType = parentObjectType;
             _childObjectType = childObjectType;
-        }
-
-        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
-        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
-            : this(name: alias, alias: alias, isBidrectional: false, parentObjectType: parentObjectType, childObjectType: childObjectType)
-        {   
-        }
-
-        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
-        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
-            : this(name: name, alias: alias, isBidrectional: false, parentObjectType: parentObjectType, childObjectType: childObjectType)
-        {
         }
 
         /// <summary>

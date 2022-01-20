@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -67,9 +67,6 @@ namespace Umbraco.Core
                 public const string Language = "6B05D05B-EC78-49BE-A4E4-79E274F07A77";
 
                 public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
-
-                [Obsolete("This no longer exists in the database")]
-                internal const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
 
                 // ReSharper restore MemberHidesStaticFromOuterClass
             }

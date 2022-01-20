@@ -1,0 +1,3954 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <info>
+    <package>
+      <name>Fanoe</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <Home id="1057" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2014-11-25T12:23:30" updateDate="2014-12-01T13:45:08" nodeName="Home" urlName="home" path="-1,1057" isDoc="" nodeType="1055" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1054" nodeTypeAlias="Home">
+        <siteTitle><![CDATA[Fanoe - Umbraco Starter Kit]]></siteTitle>
+        <siteDescription><![CDATA[This is an official Umbraco Starter kit. It shows of the newest features in Umbraco and is the perfect place to start for newcomers.. Everything is made to be taken apart. It's your own little playground. Enjoy!]]></siteDescription>
+        <logo>
+          <![CDATA[{
+  "focalPoint": {
+    "left": 0.7675,
+    "top": 0.49063670411985016
+  },
+  "src": "/media/1009/logo.svg",
+  "crops": [
+    {
+      "alias": "fanoeLogo",
+      "width": 205,
+      "height": 114,
+      "coordinates": {
+        "x1": 0.563265306122449,
+        "y1": 0.20833333333333334,
+        "x2": 0.02467439237001354,
+        "y2": 0.01193467336683437
+      }
+    }
+  ]
+}]]>
+        </logo>
+        <BlogpostRepository id="1081" parentID="1057" level="2" creatorID="0" sortOrder="0" createDate="2014-11-28T10:29:43" updateDate="2014-11-28T10:29:43" nodeName="Blog" urlName="blog" path="-1,1057,1081" isDoc="" nodeType="1080" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="0" nodeTypeAlias="BlogpostRepository">
+          <Blogpost id="1082" parentID="1081" level="3" creatorID="0" sortOrder="0" createDate="2014-11-28T10:29:57" updateDate="2014-12-01T09:03:41" nodeName="This is a blog post" urlName="this-is-a-blog-post" path="-1,1057,1081,1082" isDoc="" nodeType="1066" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1065" nodeTypeAlias="Blogpost">
+            <blogpost>
+              <![CDATA[{
+  "name": "1 column layout",
+  "sections": [
+    {
+      "grid": 12,
+      "rows": [
+        {
+          "name": "Banner",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "banner_headline"
+              ],
+              "controls": [
+                {
+                  "value": "Hello there",
+                  "editor": {
+                    "name": "Banner Headline",
+                    "alias": "banner_headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold; text-align:center",
+                      "markup": "<h1 style='font-size:62px;text-align:center'>#value#</h1>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "banner_tagline"
+              ],
+              "controls": [
+                {
+                  "value": "You're making great stuff with this thing",
+                  "editor": {
+                    "name": "Banner Tagline",
+                    "alias": "banner_tagline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 25px; line-height: 35px; font-weight: normal; text-align:center",
+                      "markup": "<h2 style='font-weight: 100; font-size: 40px;text-align:center'>#value#</h2>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {
+            "background-image": "url(/media/1001/top-image.jpg)"
+          },
+          "config": {
+            "class": "dark"
+          },
+          "id": "2bd04b6a-0561-05c8-aa48-7ee47fde287f"
+        },
+        {
+          "name": "Article full width",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "media_text_right",
+                "headline",
+                "abstract",
+                "paragraph",
+                "quote",
+                "media",
+                "code"
+              ],
+              "controls": [
+                {
+                  "value": "Something",
+                  "editor": {
+                    "name": "Headline",
+                    "alias": "headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold",
+                      "markup": "<h1>#value#</h1>"
+                    }
+                  }
+                },
+                {
+                  "value": "Sed porttitor lectus nibh. Nulla porttitor accumsan tincidunt. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Cras ultricies ligula sed magna dictum porta. Pellentesque in ipsum id orci porta dapibus. Pellentesque in ipsum id orci porta dapibus.",
+                  "editor": {
+                    "name": "Abstract",
+                    "alias": "abstract",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 20px; line-height: 45px; font-weight: light",
+                      "markup": "<h3>#value#</h3>"
+                    }
+                  }
+                },
+                {
+                  "value": "Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Sed porttitor lectus nibh. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Pellentesque in ipsum id orci porta dapibus. Vivamus suscipit tortor eget felis porttitor volutpat. Vivamus suscipit tortor eget felis porttitor volutpat. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur aliquet quam id dui posuere blandit.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                },
+                {
+                  "value": "Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Sed porttitor lectus nibh. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Pellentesque in ipsum id orci porta dapibus. Vivamus suscipit tortor eget felis porttitor volutpat. Vivamus suscipit tortor eget felis porttitor volutpat. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur aliquet quam id dui posuere blandit.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                },
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1072,
+                    "image": "/media/1004/milkbath.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1004%2Fmilkbath.jpg",
+                    "headline": "Creepy dude in milk",
+                    "paragraph": "Curabitur aliquet quam id dui posuere blandit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Curabitu"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "light"
+          },
+          "id": "7a2e4652-8523-3ade-053d-f7873c9c8020"
+        },
+        {
+          "name": "Image wide",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "media_wide_cropped",
+                "media_wide"
+              ],
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1073,
+                    "image": "/media/1005/54619133.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1005%2F54619133.jpg"
+                  },
+                  "editor": {
+                    "name": "Image wide",
+                    "alias": "media_wide",
+                    "view": "media",
+                    "render": "media_wide",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "full"
+          },
+          "id": "e6c0d256-ccec-5411-ca94-e584cb7f941d"
+        }
+      ]
+    }
+  ]
+}]]>
+            </blogpost>
+          </Blogpost>
+          <Blogpost id="1099" parentID="1081" level="3" creatorID="0" sortOrder="1" createDate="2014-11-28T11:56:56" updateDate="2014-12-01T09:11:13" nodeName="Sebastiaan" urlName="sebastiaan" path="-1,1057,1081,1099" isDoc="" nodeType="1066" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1065" nodeTypeAlias="Blogpost">
+            <blogpost>
+              <![CDATA[{
+  "name": "1 column layout",
+  "sections": [
+    {
+      "grid": 12,
+      "rows": [
+        {
+          "name": "Banner",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "banner_headline"
+              ],
+              "controls": [
+                {
+                  "value": "sydufgisfye",
+                  "editor": {
+                    "name": "Banner Headline",
+                    "alias": "banner_headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold; text-align:center",
+                      "markup": "<h1 style='font-size:62px;text-align:center'>#value#</h1>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "banner_tagline"
+              ],
+              "controls": [
+                {
+                  "value": "ukgfs7 9 yfiugh fi7",
+                  "editor": {
+                    "name": "Banner Tagline",
+                    "alias": "banner_tagline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 25px; line-height: 35px; font-weight: normal; text-align:center",
+                      "markup": "<h2 style='font-weight: 100; font-size: 40px;text-align:center'>#value#</h2>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "blue"
+          },
+          "id": "63d1f52a-a6be-2459-a337-22f97cdb15bb"
+        },
+        {
+          "name": "Article",
+          "areas": [
+            {
+              "grid": 3,
+              "allowAll": false,
+              "allowed": [
+                "media_round",
+                "paragraph"
+              ],
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1069,
+                    "image": "/media/1002/128.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1002%2F128.jpg"
+                  },
+                  "editor": {
+                    "name": "Image rounded",
+                    "alias": "media_round",
+                    "view": "media",
+                    "render": "/App_Plugins/Grid/Editors/Render/media_round.cshtml",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 1,
+              "allowAll": false,
+              "allowed": [],
+              "controls": []
+            },
+            {
+              "grid": 8,
+              "allowAll": false,
+              "allowed": [
+                "headline",
+                "abstract",
+                "paragraph"
+              ],
+              "controls": [
+                {
+                  "value": "gdfsghdfgsfd",
+                  "editor": {
+                    "name": "Headline",
+                    "alias": "headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold",
+                      "markup": "<h1>#value#</h1>"
+                    }
+                  }
+                },
+                {
+                  "value": "Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Donec rutrum congue leo eget malesuada. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada. Nulla quis lorem ut libero malesuada feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula.",
+                  "editor": {
+                    "name": "Abstract",
+                    "alias": "abstract",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 20px; line-height: 45px; font-weight: light",
+                      "markup": "<h3>#value#</h3>"
+                    }
+                  }
+                },
+                {
+                  "value": "Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Donec rutrum congue leo eget malesuada. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada. Nulla quis lorem ut libero malesuada feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                },
+                {
+                  "value": "Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Donec rutrum congue leo eget malesuada. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada. Nulla quis lorem ut libero malesuada feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "dark"
+          },
+          "id": "651b07fa-77eb-9f44-5633-fabbf5e365eb"
+        },
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "Donec rutrum congue leo eget malesuada. Sed porttitor lectus nibh. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Pellentesque in ipsum id orci porta dapibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque in ipsum id orci porta dapibus.",
+                  "editor": {
+                    "name": "Quote",
+                    "alias": "quote",
+                    "view": "textstring",
+                    "icon": "icon-quote",
+                    "config": {
+                      "style": "border-left: 3px solid #ccc; padding: 10px; color: #ccc; font-family: serif; font-variant: italic; font-size: 18px",
+                      "markup": "<blockquote>#value#</blockquote>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "yellow"
+          },
+          "id": "c9aabb6d-7787-ef69-f71c-a85c93c2f973"
+        },
+        {
+          "name": "Image wide",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "media_wide_cropped",
+                "media_wide"
+              ],
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1073,
+                    "image": "/media/1005/54619133.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1005%2F54619133.jpg"
+                  },
+                  "editor": {
+                    "name": "Image wide",
+                    "alias": "media_wide",
+                    "view": "media",
+                    "render": "/App_Plugins/Grid/Editors/Render/media_wide.cshtml",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "full"
+          },
+          "id": "73807b0e-a282-c391-7e40-ccc7eb9a3472"
+        }
+      ]
+    }
+  ]
+}]]>
+            </blogpost>
+          </Blogpost>
+          <Blogpost id="1100" parentID="1081" level="3" creatorID="0" sortOrder="2" createDate="2014-11-29T21:34:40" updateDate="2014-12-01T09:26:50" nodeName="Hey Mikkel" urlName="hey-mikkel" path="-1,1057,1081,1100" isDoc="" nodeType="1066" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1065" nodeTypeAlias="Blogpost">
+            <blogpost>
+              <![CDATA[{
+  "name": "1 column layout",
+  "sections": [
+    {
+      "grid": 12,
+      "rows": [
+        {
+          "name": "Article two col",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "headline",
+                "quote"
+              ],
+              "controls": [
+                {
+                  "value": "Fail spectacurlarly",
+                  "editor": {
+                    "name": "Headline",
+                    "alias": "headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold",
+                      "markup": "<h1>#value#</h1>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 6,
+              "allowAll": false,
+              "allowed": [
+                "abstract",
+                "media",
+                "code",
+                "quote"
+              ],
+              "controls": [
+                {
+                  "value": "What ever happens this should be the best thing you have ever encountered. We are not even beginning to scratch the surface. The comming months will prove that our path is the righteous one and all who oppose will burn on the bonfires of vanity.",
+                  "editor": {
+                    "name": "Abstract",
+                    "alias": "abstract",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 20px; line-height: 45px; font-weight: light",
+                      "markup": "<h3>#value#</h3>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 6,
+              "allowAll": false,
+              "allowed": [
+                "quote",
+                "code",
+                "media"
+              ],
+              "controls": []
+            }
+          ],
+          "id": "d8a63df0-4458-5e9d-778b-f30c8ce0c4a4"
+        }
+      ]
+    }
+  ]
+}]]>
+            </blogpost>
+          </Blogpost>
+          <Blogpost id="1101" parentID="1081" level="3" creatorID="0" sortOrder="3" createDate="2014-12-01T09:15:47" updateDate="2014-12-01T09:41:53" nodeName="RUne" urlName="rune" path="-1,1057,1081,1101" isDoc="" nodeType="1066" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1065" nodeTypeAlias="Blogpost">
+            <blogpost>
+              <![CDATA[{
+  "name": "1 column layout",
+  "sections": [
+    {
+      "grid": 12,
+      "rows": [
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "Nigga what?",
+                  "editor": {
+                    "name": "Headline centered",
+                    "alias": "headline_centered",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 30px; line-height: 45px; font-weight: bold; text-align:center;",
+                      "markup": "<h1 style='text-align:center;'>#value#</h1>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "id": "a3a2fa03-bdc2-fa37-44bf-4b23406e00a1"
+        },
+        {
+          "name": "Image wide",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "media_wide_cropped",
+                "media_wide"
+              ],
+              "config": {
+                "class": "full"
+              },
+              "styles": {},
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1073,
+                    "image": "/media/1005/54619133.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1005%2F54619133.jpg"
+                  },
+                  "editor": {
+                    "name": "Image wide",
+                    "alias": "media_wide",
+                    "view": "media",
+                    "render": "/App_Plugins/Grid/Editors/Render/media_wide.cshtml",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "full"
+          },
+          "id": "bc94a446-dd1a-2aa7-b7ed-77b1a4591618"
+        },
+        {
+          "name": "Article two col",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "headline",
+                "quote"
+              ],
+              "controls": [
+                {
+                  "value": "This is the headline",
+                  "editor": {
+                    "name": "Headline",
+                    "alias": "headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold",
+                      "markup": "<h1>#value#</h1>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 6,
+              "allowAll": false,
+              "allowed": [
+                "abstract",
+                "media",
+                "code",
+                "quote",
+                "paragraph"
+              ],
+              "controls": [
+                {
+                  "value": "Proin eget tortor risus. Sed porttitor lectus nibh. Proin eget tortor risus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Vivamus suscipit tortor eget felis porttitor volutpat. Donec rutrum congue leo eget malesuada. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi.",
+                  "editor": {
+                    "name": "Abstract",
+                    "alias": "abstract",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: bold;",
+                      "markup": "<h3>#value#</h3>"
+                    }
+                  }
+                },
+                {
+                  "value": "Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec rutrum congue leo eget malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Vivamus suscipit tortor eget felis porttitor volutpat. Sed porttitor lectus nibh. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Nulla porttitor accumsan tincidunt. Donec rutrum congue leo eget malesuada.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 6,
+              "allowAll": false,
+              "allowed": [
+                "quote",
+                "code",
+                "media",
+                "paragraph"
+              ],
+              "controls": [
+                {
+                  "value": "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Nulla porttitor accumsan tincidunt. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Proin eget tortor risus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Quisque velit nisi, pretium ut lacinia in, elementum id enim.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                },
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1073,
+                    "image": "/media/1005/54619133.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1005%2F54619133.jpg"
+                  },
+                  "editor": {
+                    "name": "Image",
+                    "alias": "media",
+                    "view": "media",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "light"
+          },
+          "id": "b6697e42-57de-0052-f592-8a688de00877"
+        }
+      ]
+    }
+  ]
+}]]>
+            </blogpost>
+          </Blogpost>
+          <Blogpost id="1102" parentID="1081" level="3" creatorID="0" sortOrder="4" createDate="2014-12-01T10:46:15" updateDate="2014-12-01T11:23:15" nodeName="Render" urlName="render" path="-1,1057,1081,1102" isDoc="" nodeType="1066" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1065" nodeTypeAlias="Blogpost">
+            <blogpost>
+              <![CDATA[{
+  "name": "1 column layout",
+  "sections": [
+    {
+      "grid": 12,
+      "rows": [
+        {
+          "name": "Banner",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "banner_headline"
+              ],
+              "controls": [
+                {
+                  "value": "adgsgdrsdgs",
+                  "editor": {
+                    "name": "Banner Headline",
+                    "alias": "banner_headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold; text-align:center",
+                      "markup": "<h1 style='font-size:62px;text-align:center'>#value#</h1>"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "banner_tagline"
+              ],
+              "controls": [
+                {
+                  "value": "fdggds adegdgs dg sdsggds dgs dgs  sgge egwagerwa gaewgwaearghef",
+                  "editor": {
+                    "name": "Banner Tagline",
+                    "alias": "banner_tagline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 25px; line-height: 35px; font-weight: normal; text-align:center",
+                      "markup": "<h2 style='font-weight: 100; font-size: 40px;text-align:center'>#value#</h2>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "light"
+          },
+          "id": "e051882a-7c75-c14c-747f-9304f0ff329c"
+        },
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vivamus suscipit tortor eget felis porttitor volutpat. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Donec rutrum congue leo eget malesuada.",
+                  "editor": {
+                    "name": "Quote",
+                    "alias": "quote",
+                    "view": "textstring",
+                    "icon": "icon-quote",
+                    "config": {
+                      "style": "border-left: 3px solid #ccc; padding: 10px; color: #ccc; font-family: serif; font-variant: italic; font-size: 18px",
+                      "markup": "<blockquote>#value#</blockquote>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "yellow"
+          },
+          "id": "a8c2e77f-1f2c-4438-69e9-d34ed015e5df"
+        },
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1104,
+                    "image": "/media/1008/boat_2.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1008%2Fboat_2.jpg"
+                  },
+                  "editor": {
+                    "name": "Image wide",
+                    "alias": "media_wide",
+                    "view": "media",
+                    "render": "/App_Plugins/Grid/Editors/Render/media_wide.cshtml",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "full triangle"
+          },
+          "id": "60ae1388-397d-78cf-3f76-e765c1f6f8ba"
+        },
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vivamus suscipit tortor eget felis porttitor volutpat. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Donec rutrum congue leo eget malesuada.",
+                  "editor": {
+                    "name": "Quote",
+                    "alias": "quote",
+                    "view": "textstring",
+                    "icon": "icon-quote",
+                    "config": {
+                      "style": "border-left: 3px solid #ccc; padding: 10px; color: #ccc; font-family: serif; font-variant: italic; font-size: 18px",
+                      "markup": "<blockquote>#value#</blockquote>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "blue"
+          },
+          "id": "14da9201-9f31-1146-21e9-7d1aa64ec86f"
+        },
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "<iframe src=\"//player.vimeo.com/video/112681885\" width=\"1875\" height=\"799\" frameborder=\"0\" title=\"Postcards from Pripyat, Chernobyl\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>",
+                  "editor": {
+                    "name": "Embed",
+                    "alias": "embed",
+                    "view": "embed",
+                    "icon": "icon-movie-alt"
+                  }
+                }
+              ]
+            }
+          ],
+          "id": "2f19df8b-4dcc-4ca0-7e51-690ed3866d10"
+        }
+      ]
+    }
+  ]
+}]]>
+            </blogpost>
+          </Blogpost>
+          <Blogpost id="1105" parentID="1081" level="3" creatorID="0" sortOrder="5" createDate="2014-12-01T11:36:51" updateDate="2014-12-01T11:38:59" nodeName="Hello" urlName="hello" path="-1,1057,1081,1105" isDoc="" nodeType="1066" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1065" nodeTypeAlias="Blogpost">
+            <blogpost>
+              <![CDATA[{
+  "name": "1 column layout",
+  "sections": [
+    {
+      "grid": 12,
+      "rows": [
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "Hello World",
+                  "editor": {
+                    "name": "Banner Headline",
+                    "alias": "banner_headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold; text-align:center",
+                      "markup": "<h1 style='font-size:62px;text-align:center'>#value#</h1>"
+                    }
+                  }
+                },
+                {
+                  "value": "This is a standard thingie that works  for all conweågdopsjv",
+                  "editor": {
+                    "name": "Banner Tagline",
+                    "alias": "banner_tagline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 25px; line-height: 35px; font-weight: normal; text-align:center",
+                      "markup": "<h2 style='font-weight: 100; font-size: 40px;text-align:center'>#value#</h2>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "light"
+          },
+          "id": "62749619-e9ec-4045-be5e-45898cfdaa40"
+        },
+        {
+          "name": "Article",
+          "areas": [
+            {
+              "grid": 3,
+              "allowAll": false,
+              "allowed": [
+                "media_round",
+                "paragraph"
+              ],
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.61691542288557211,
+                      "top": 0.84333333333333338
+                    },
+                    "id": 1072,
+                    "image": "/media/1004/milkbath.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1004%2Fmilkbath.jpg"
+                  },
+                  "editor": {
+                    "name": "Image rounded",
+                    "alias": "media_round",
+                    "view": "media",
+                    "render": "/App_Plugins/Grid/Editors/Render/media_round.cshtml",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            },
+            {
+              "grid": 1,
+              "allowAll": false,
+              "allowed": [],
+              "controls": []
+            },
+            {
+              "grid": 8,
+              "allowAll": false,
+              "allowed": [
+                "headline",
+                "abstract",
+                "paragraph"
+              ],
+              "controls": [
+                {
+                  "value": "dsgrefhbs rb fshbh",
+                  "editor": {
+                    "name": "Headline",
+                    "alias": "headline",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 36px; line-height: 45px; font-weight: bold",
+                      "markup": "<h1>#value#</h1>"
+                    }
+                  }
+                },
+                {
+                  "value": "Nulla porttitor accumsan tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sollicitudin molestie malesuada. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "editor": {
+                    "name": "Abstract",
+                    "alias": "abstract",
+                    "view": "textstring",
+                    "icon": "icon-coin",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: bold;",
+                      "markup": "<h3>#value#</h3>"
+                    }
+                  }
+                },
+                {
+                  "value": "Nulla quis lorem ut libero malesuada feugiat. Cras ultricies ligula sed magna dictum porta. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Nulla porttitor accumsan tincidunt.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                },
+                {
+                  "value": "Pellentesque in ipsum id orci porta dapibus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Nulla quis lorem ut libero malesuada feugiat. Nulla quis lorem ut libero malesuada feugiat.",
+                  "editor": {
+                    "name": "Paragraph",
+                    "alias": "paragraph",
+                    "view": "textstring",
+                    "icon": "icon-font",
+                    "config": {
+                      "style": "font-size: 16px; line-height: 20px; font-weight: light;",
+                      "markup": "<p>#value#</p>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "light"
+          },
+          "id": "ac4f7103-d72e-69f0-efef-501843fe4b93"
+        },
+        {
+          "name": "Image wide",
+          "areas": [
+            {
+              "grid": 12,
+              "allowAll": false,
+              "allowed": [
+                "media_wide_cropped",
+                "media_wide"
+              ],
+              "controls": [
+                {
+                  "value": {
+                    "focalPoint": {
+                      "left": 0.5,
+                      "top": 0.5
+                    },
+                    "id": 1068,
+                    "image": "/media/1001/top-image.jpg",
+                    "thumbnail": "/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=%2Fmedia%2F1001%2Ftop-image.jpg"
+                  },
+                  "editor": {
+                    "name": "Image wide",
+                    "alias": "media_wide",
+                    "view": "media",
+                    "render": "/App_Plugins/Grid/Editors/Render/media_wide.cshtml",
+                    "icon": "icon-picture"
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "full triangle"
+          },
+          "id": "b8cfa16d-98d4-e156-6632-d5c606844f9f"
+        },
+        {
+          "name": "Playground",
+          "areas": [
+            {
+              "grid": 12,
+              "editors": [
+                "headline"
+              ],
+              "allowAll": false,
+              "controls": [
+                {
+                  "value": "Pellentesque in ipsum id orci porta dapibus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Nulla quis lorem ut libero malesuada feugiat. Nulla quis lorem ut libero malesuada feugiat.",
+                  "editor": {
+                    "name": "Quote",
+                    "alias": "quote",
+                    "view": "textstring",
+                    "icon": "icon-quote",
+                    "config": {
+                      "style": "border-left: 3px solid #ccc; padding: 10px; color: #ccc; font-family: serif; font-variant: italic; font-size: 18px",
+                      "markup": "<blockquote>#value#</blockquote>"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "styles": {},
+          "config": {
+            "class": "yellow"
+          },
+          "id": "2e342d39-fe7b-9636-2b6a-030c87a7b820"
+        }
+      ]
+    }
+  ]
+}]]>
+            </blogpost>
+          </Blogpost>
+        </BlogpostRepository>
+        <LandingPage id="1089" parentID="1057" level="2" creatorID="0" sortOrder="1" createDate="2014-11-28T11:21:03" updateDate="2014-11-28T11:21:03" nodeName="Learn" urlName="learn" path="-1,1057,1089" isDoc="" nodeType="1059" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="LandingPage" />
+        <LandingPage id="1090" parentID="1057" level="2" creatorID="0" sortOrder="2" createDate="2014-11-28T11:21:22" updateDate="2014-11-28T11:21:22" nodeName="Explore" urlName="explore" path="-1,1057,1090" isDoc="" nodeType="1059" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="LandingPage">
+          <TextPage id="1093" parentID="1090" level="3" creatorID="0" sortOrder="0" createDate="2014-11-28T11:24:04" updateDate="2014-11-28T11:24:04" nodeName="Our Umbraco" urlName="our-umbraco" path="-1,1057,1090,1093" isDoc="" nodeType="1086" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="TextPage" />
+          <TextPage id="1094" parentID="1090" level="3" creatorID="0" sortOrder="1" createDate="2014-11-28T11:24:19" updateDate="2014-11-28T11:24:19" nodeName="Codegarden" urlName="codegarden" path="-1,1057,1090,1094" isDoc="" nodeType="1086" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="TextPage" />
+          <TextPage id="1095" parentID="1090" level="3" creatorID="0" sortOrder="2" createDate="2014-11-28T11:24:34" updateDate="2014-11-28T11:24:34" nodeName="Meetup Groups" urlName="meetup-groups" path="-1,1057,1090,1095" isDoc="" nodeType="1086" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="TextPage" />
+        </LandingPage>
+        <LandingPage id="1091" parentID="1057" level="2" creatorID="0" sortOrder="3" createDate="2014-11-28T11:21:32" updateDate="2014-11-28T11:21:32" nodeName="Extend" urlName="extend" path="-1,1057,1091" isDoc="" nodeType="1059" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="LandingPage" />
+        <LandingPage id="1092" parentID="1057" level="2" creatorID="0" sortOrder="4" createDate="2014-11-28T11:21:52" updateDate="2014-11-28T11:21:52" nodeName="Contact" urlName="contact" path="-1,1057,1092" isDoc="" nodeType="1059" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="LandingPage">
+          <TextPage id="1096" parentID="1092" level="3" creatorID="0" sortOrder="0" createDate="2014-11-28T11:25:56" updateDate="2014-11-28T11:25:56" nodeName="Forums" urlName="forums" path="-1,1057,1092,1096" isDoc="" nodeType="1086" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="TextPage" />
+          <TextPage id="1097" parentID="1092" level="3" creatorID="0" sortOrder="1" createDate="2014-11-28T11:26:07" updateDate="2014-11-28T11:26:07" nodeName="Support" urlName="support" path="-1,1057,1092,1097" isDoc="" nodeType="1086" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="TextPage" />
+          <TextPage id="1098" parentID="1092" level="3" creatorID="0" sortOrder="2" createDate="2014-11-28T11:26:15" updateDate="2014-11-28T11:26:15" nodeName="HQ" urlName="hq" path="-1,1057,1092,1098" isDoc="" nodeType="1086" creatorName="Rune Strand" writerName="Rune Strand" writerID="0" template="1085" nodeTypeAlias="TextPage" />
+        </LandingPage>
+      </Home>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>Master</Name>
+        <Key>b96c565b-0490-4b34-aed2-ffa0c7f63f2a</Key>
+        <Alias>Master</Alias>
+        <Icon>icon-desktop</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <AllowedTemplates>
+          <Template>Master</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>Master</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>Home</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Site title</Name>
+          <Alias>siteTitle</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab />
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Site Description</Name>
+          <Alias>siteDescription</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab />
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Logo</Name>
+          <Alias>logo</Alias>
+          <Type>Umbraco.ImageCropper</Type>
+          <Definition>1df9f033-e6d4-451f-b8d2-e0cbc50a836f</Definition>
+          <Tab />
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Blogpost</Name>
+        <Key>10dbe2ef-ee50-4ea6-b4d0-dc0c08919424</Key>
+        <Alias>Blogpost</Alias>
+        <Icon>icon-edit</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>Master</Master>
+        <AllowedTemplates>
+          <Template>Blogpost</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>Blogpost</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Blogpost</Name>
+          <Alias>blogpost</Alias>
+          <Type>Umbraco.Grid</Type>
+          <Definition>a3785f08-73d5-406b-855f-8e52805c22e2</Definition>
+          <Tab>Blogpost</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>13</Id>
+          <Caption>Blogpost</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Blogpost Repository</Name>
+        <Key>7d58f0d9-bfe3-4dfe-be18-9f48cc53c768</Key>
+        <Alias>BlogpostRepository</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>True</IsListView>
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure>
+        <DocumentType>Blogpost</DocumentType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Home</Name>
+        <Key>61100eb2-92c7-43d9-9fd8-94707dcbb142</Key>
+        <Alias>Home</Alias>
+        <Icon>icon-home</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>True</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>Master</Master>
+        <AllowedTemplates>
+          <Template>Home</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>Home</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>LandingPage</DocumentType>
+        <DocumentType>BlogpostRepository</DocumentType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Landing page</Name>
+        <Key>dd8c9f38-9847-465a-924d-87983fcec124</Key>
+        <Alias>LandingPage</Alias>
+        <Icon>icon-stamp</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>Master</Master>
+        <AllowedTemplates>
+          <Template>TextPage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>TextPage</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>TextPage</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Grid Blogpost</Name>
+          <Alias>gridBlogpost</Alias>
+          <Type>Umbraco.Grid</Type>
+          <Definition>a3785f08-73d5-406b-855f-8e52805c22e2</Definition>
+          <Tab>Post</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>12</Id>
+          <Caption>Post</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Text page</Name>
+        <Key>8fe738e3-8724-484f-944f-cb0d8fa78aa1</Key>
+        <Alias>TextPage</Alias>
+        <Icon>icon-document</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>Master</Master>
+        <AllowedTemplates>
+          <Template>TextPage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>TextPage</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+  </DocumentTypes>
+  <Templates>
+    <Template>
+      <Name>Blogpost</Name>
+      <Alias>Blogpost</Alias>
+      <Master>Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "Master.cshtml";
+}
+
+@CurrentPage.GetGridHtml("blogpost", "blogpost")]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Home</Name>
+      <Alias>Home</Alias>
+      <Master>Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "Master.cshtml";
+}]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Master</Name>
+      <Alias>Master</Alias>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <!-- Meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="@CurrentPage.siteDescription">
+
+    <title>@CurrentPage.siteTitle</title>
+
+	<!-- Fonts -->
+	<link href="http://fonts.googleapis.com/css?family=Merriweather:400,700,300,900" rel="stylesheet" type="text/css">
+	<link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet" type="text/css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/fanoe.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-8 col-sm-12 col-md-4">
+            <div class="brand" style="background-image:url('@CurrentPage.GetCropUrl("logo", "fanoeLogo")')">
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-8">
+            <nav>
+              @{ Html.RenderPartial("mainNavPartial"); }
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <div id="toggle" class="toggle">
+        <a href="#" class="cross"><span></span></a>
+      </div>
+    </header>
+
+    @RenderBody()
+
+    <footer class="field dark">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-xs-6 col-sm-3">
+            <strong>Products</strong>
+            <ul>
+              <li>
+                <a href="#">Home</a>
+              </li>
+              <li>
+                <a href="#">Products</a>
+              </li>
+              <li>
+                <a class="active" href="#">Services</a>
+              </li>
+              <li>
+                <a href="#">Contact</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-xs-6 col-sm-3">
+            <strong>About</strong>
+            <ul>
+              <li>
+                <a href="#">Home</a>
+              </li>
+              <li>
+                <a href="#">Products</a>
+              </li>
+              <li>
+                <a class="active" href="#">Services</a>
+              </li>
+              <li>
+                <a href="#">Contact</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-xs-6 col-sm-3">
+            <strong>Contact</strong>
+            <ul>
+              <li>
+                <a href="#">Home</a>
+              </li>
+              <li>
+                <a href="#">Products</a>
+              </li>
+              <li>
+                <a class="active" href="#">Services</a>
+              </li>
+              <li>
+                <a href="#">Contact</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-xs-6 col-sm-3">
+            <ul>
+              <li>
+                <img style="display: block; margin: 0 auto 20px;" src="/media/1003/logo-bird.png" height="60" width="60" alt="">
+              </li>
+              <li>
+                <img style="display: block; margin: 0 auto;" src="/media/1001/facebook_follow.png" alt="assets/images/facebook_follow.png">
+              </li>
+            </ul>
+          </div>
+
+
+        </div>
+      </div>
+    </footer>
+
+    <!-- Javascripts -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+	<script src="/scripts/fanoe.js"></script>
+  </body>
+</html>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Text page</Name>
+      <Alias>TextPage</Alias>
+      <Master>Master</Master>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "Master.cshtml";
+}]]>
+      </Design>
+    </Template>
+  </Templates>
+  <Stylesheets>
+    <Stylesheet>
+      <Name>bootstrap.min</Name>
+      <FileName>bootstrap.min</FileName>
+      <Content>
+        <![CDATA[.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.row {
+  margin-left: -15px;
+  margin-right: -15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.row:before,
+.row:after {
+  content: " ";
+  display: table;
+}
+.row:after {
+  clear: both;
+}
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {
+  float: left;
+}
+.col-xs-12 {
+  width: 100%;
+}
+.col-xs-11 {
+  width: 91.66666666666666%;
+}
+.col-xs-10 {
+  width: 83.33333333333334%;
+}
+.col-xs-9 {
+  width: 75%;
+}
+.col-xs-8 {
+  width: 66.66666666666666%;
+}
+.col-xs-7 {
+  width: 58.333333333333336%;
+}
+.col-xs-6 {
+  width: 50%;
+}
+.col-xs-5 {
+  width: 41.66666666666667%;
+}
+.col-xs-4 {
+  width: 33.33333333333333%;
+}
+.col-xs-3 {
+  width: 25%;
+}
+.col-xs-2 {
+  width: 16.666666666666664%;
+}
+.col-xs-1 {
+  width: 8.333333333333332%;
+}
+.col-xs-pull-12 {
+  right: 100%;
+}
+.col-xs-pull-11 {
+  right: 91.66666666666666%;
+}
+.col-xs-pull-10 {
+  right: 83.33333333333334%;
+}
+.col-xs-pull-9 {
+  right: 75%;
+}
+.col-xs-pull-8 {
+  right: 66.66666666666666%;
+}
+.col-xs-pull-7 {
+  right: 58.333333333333336%;
+}
+.col-xs-pull-6 {
+  right: 50%;
+}
+.col-xs-pull-5 {
+  right: 41.66666666666667%;
+}
+.col-xs-pull-4 {
+  right: 33.33333333333333%;
+}
+.col-xs-pull-3 {
+  right: 25%;
+}
+.col-xs-pull-2 {
+  right: 16.666666666666664%;
+}
+.col-xs-pull-1 {
+  right: 8.333333333333332%;
+}
+.col-xs-pull-0 {
+  right: 0%;
+}
+.col-xs-push-12 {
+  left: 100%;
+}
+.col-xs-push-11 {
+  left: 91.66666666666666%;
+}
+.col-xs-push-10 {
+  left: 83.33333333333334%;
+}
+.col-xs-push-9 {
+  left: 75%;
+}
+.col-xs-push-8 {
+  left: 66.66666666666666%;
+}
+.col-xs-push-7 {
+  left: 58.333333333333336%;
+}
+.col-xs-push-6 {
+  left: 50%;
+}
+.col-xs-push-5 {
+  left: 41.66666666666667%;
+}
+.col-xs-push-4 {
+  left: 33.33333333333333%;
+}
+.col-xs-push-3 {
+  left: 25%;
+}
+.col-xs-push-2 {
+  left: 16.666666666666664%;
+}
+.col-xs-push-1 {
+  left: 8.333333333333332%;
+}
+.col-xs-push-0 {
+  left: 0%;
+}
+.col-xs-offset-12 {
+  margin-left: 100%;
+}
+.col-xs-offset-11 {
+  margin-left: 91.66666666666666%;
+}
+.col-xs-offset-10 {
+  margin-left: 83.33333333333334%;
+}
+.col-xs-offset-9 {
+  margin-left: 75%;
+}
+.col-xs-offset-8 {
+  margin-left: 66.66666666666666%;
+}
+.col-xs-offset-7 {
+  margin-left: 58.333333333333336%;
+}
+.col-xs-offset-6 {
+  margin-left: 50%;
+}
+.col-xs-offset-5 {
+  margin-left: 41.66666666666667%;
+}
+.col-xs-offset-4 {
+  margin-left: 33.33333333333333%;
+}
+.col-xs-offset-3 {
+  margin-left: 25%;
+}
+.col-xs-offset-2 {
+  margin-left: 16.666666666666664%;
+}
+.col-xs-offset-1 {
+  margin-left: 8.333333333333332%;
+}
+.col-xs-offset-0 {
+  margin-left: 0%;
+}
+@media (min-width: 768px) {
+  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+    float: left;
+  }
+  .col-sm-12 {
+    width: 100%;
+  }
+  .col-sm-11 {
+    width: 91.66666666666666%;
+  }
+  .col-sm-10 {
+    width: 83.33333333333334%;
+  }
+  .col-sm-9 {
+    width: 75%;
+  }
+  .col-sm-8 {
+    width: 66.66666666666666%;
+  }
+  .col-sm-7 {
+    width: 58.333333333333336%;
+  }
+  .col-sm-6 {
+    width: 50%;
+  }
+  .col-sm-5 {
+    width: 41.66666666666667%;
+  }
+  .col-sm-4 {
+    width: 33.33333333333333%;
+  }
+  .col-sm-3 {
+    width: 25%;
+  }
+  .col-sm-2 {
+    width: 16.666666666666664%;
+  }
+  .col-sm-1 {
+    width: 8.333333333333332%;
+  }
+  .col-sm-pull-12 {
+    right: 100%;
+  }
+  .col-sm-pull-11 {
+    right: 91.66666666666666%;
+  }
+  .col-sm-pull-10 {
+    right: 83.33333333333334%;
+  }
+  .col-sm-pull-9 {
+    right: 75%;
+  }
+  .col-sm-pull-8 {
+    right: 66.66666666666666%;
+  }
+  .col-sm-pull-7 {
+    right: 58.333333333333336%;
+  }
+  .col-sm-pull-6 {
+    right: 50%;
+  }
+  .col-sm-pull-5 {
+    right: 41.66666666666667%;
+  }
+  .col-sm-pull-4 {
+    right: 33.33333333333333%;
+  }
+  .col-sm-pull-3 {
+    right: 25%;
+  }
+  .col-sm-pull-2 {
+    right: 16.666666666666664%;
+  }
+  .col-sm-pull-1 {
+    right: 8.333333333333332%;
+  }
+  .col-sm-pull-0 {
+    right: 0%;
+  }
+  .col-sm-push-12 {
+    left: 100%;
+  }
+  .col-sm-push-11 {
+    left: 91.66666666666666%;
+  }
+  .col-sm-push-10 {
+    left: 83.33333333333334%;
+  }
+  .col-sm-push-9 {
+    left: 75%;
+  }
+  .col-sm-push-8 {
+    left: 66.66666666666666%;
+  }
+  .col-sm-push-7 {
+    left: 58.333333333333336%;
+  }
+  .col-sm-push-6 {
+    left: 50%;
+  }
+  .col-sm-push-5 {
+    left: 41.66666666666667%;
+  }
+  .col-sm-push-4 {
+    left: 33.33333333333333%;
+  }
+  .col-sm-push-3 {
+    left: 25%;
+  }
+  .col-sm-push-2 {
+    left: 16.666666666666664%;
+  }
+  .col-sm-push-1 {
+    left: 8.333333333333332%;
+  }
+  .col-sm-push-0 {
+    left: 0%;
+  }
+  .col-sm-offset-12 {
+    margin-left: 100%;
+  }
+  .col-sm-offset-11 {
+    margin-left: 91.66666666666666%;
+  }
+  .col-sm-offset-10 {
+    margin-left: 83.33333333333334%;
+  }
+  .col-sm-offset-9 {
+    margin-left: 75%;
+  }
+  .col-sm-offset-8 {
+    margin-left: 66.66666666666666%;
+  }
+  .col-sm-offset-7 {
+    margin-left: 58.333333333333336%;
+  }
+  .col-sm-offset-6 {
+    margin-left: 50%;
+  }
+  .col-sm-offset-5 {
+    margin-left: 41.66666666666667%;
+  }
+  .col-sm-offset-4 {
+    margin-left: 33.33333333333333%;
+  }
+  .col-sm-offset-3 {
+    margin-left: 25%;
+  }
+  .col-sm-offset-2 {
+    margin-left: 16.666666666666664%;
+  }
+  .col-sm-offset-1 {
+    margin-left: 8.333333333333332%;
+  }
+  .col-sm-offset-0 {
+    margin-left: 0%;
+  }
+}
+@media (min-width: 992px) {
+  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {
+    float: left;
+  }
+  .col-md-12 {
+    width: 100%;
+  }
+  .col-md-11 {
+    width: 91.66666666666666%;
+  }
+  .col-md-10 {
+    width: 83.33333333333334%;
+  }
+  .col-md-9 {
+    width: 75%;
+  }
+  .col-md-8 {
+    width: 66.66666666666666%;
+  }
+  .col-md-7 {
+    width: 58.333333333333336%;
+  }
+  .col-md-6 {
+    width: 50%;
+  }
+  .col-md-5 {
+    width: 41.66666666666667%;
+  }
+  .col-md-4 {
+    width: 33.33333333333333%;
+  }
+  .col-md-3 {
+    width: 25%;
+  }
+  .col-md-2 {
+    width: 16.666666666666664%;
+  }
+  .col-md-1 {
+    width: 8.333333333333332%;
+  }
+  .col-md-pull-12 {
+    right: 100%;
+  }
+  .col-md-pull-11 {
+    right: 91.66666666666666%;
+  }
+  .col-md-pull-10 {
+    right: 83.33333333333334%;
+  }
+  .col-md-pull-9 {
+    right: 75%;
+  }
+  .col-md-pull-8 {
+    right: 66.66666666666666%;
+  }
+  .col-md-pull-7 {
+    right: 58.333333333333336%;
+  }
+  .col-md-pull-6 {
+    right: 50%;
+  }
+  .col-md-pull-5 {
+    right: 41.66666666666667%;
+  }
+  .col-md-pull-4 {
+    right: 33.33333333333333%;
+  }
+  .col-md-pull-3 {
+    right: 25%;
+  }
+  .col-md-pull-2 {
+    right: 16.666666666666664%;
+  }
+  .col-md-pull-1 {
+    right: 8.333333333333332%;
+  }
+  .col-md-pull-0 {
+    right: 0%;
+  }
+  .col-md-push-12 {
+    left: 100%;
+  }
+  .col-md-push-11 {
+    left: 91.66666666666666%;
+  }
+  .col-md-push-10 {
+    left: 83.33333333333334%;
+  }
+  .col-md-push-9 {
+    left: 75%;
+  }
+  .col-md-push-8 {
+    left: 66.66666666666666%;
+  }
+  .col-md-push-7 {
+    left: 58.333333333333336%;
+  }
+  .col-md-push-6 {
+    left: 50%;
+  }
+  .col-md-push-5 {
+    left: 41.66666666666667%;
+  }
+  .col-md-push-4 {
+    left: 33.33333333333333%;
+  }
+  .col-md-push-3 {
+    left: 25%;
+  }
+  .col-md-push-2 {
+    left: 16.666666666666664%;
+  }
+  .col-md-push-1 {
+    left: 8.333333333333332%;
+  }
+  .col-md-push-0 {
+    left: 0%;
+  }
+  .col-md-offset-12 {
+    margin-left: 100%;
+  }
+  .col-md-offset-11 {
+    margin-left: 91.66666666666666%;
+  }
+  .col-md-offset-10 {
+    margin-left: 83.33333333333334%;
+  }
+  .col-md-offset-9 {
+    margin-left: 75%;
+  }
+  .col-md-offset-8 {
+    margin-left: 66.66666666666666%;
+  }
+  .col-md-offset-7 {
+    margin-left: 58.333333333333336%;
+  }
+  .col-md-offset-6 {
+    margin-left: 50%;
+  }
+  .col-md-offset-5 {
+    margin-left: 41.66666666666667%;
+  }
+  .col-md-offset-4 {
+    margin-left: 33.33333333333333%;
+  }
+  .col-md-offset-3 {
+    margin-left: 25%;
+  }
+  .col-md-offset-2 {
+    margin-left: 16.666666666666664%;
+  }
+  .col-md-offset-1 {
+    margin-left: 8.333333333333332%;
+  }
+  .col-md-offset-0 {
+    margin-left: 0%;
+  }
+}
+@media (min-width: 1200px) {
+  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {
+    float: left;
+  }
+  .col-lg-12 {
+    width: 100%;
+  }
+  .col-lg-11 {
+    width: 91.66666666666666%;
+  }
+  .col-lg-10 {
+    width: 83.33333333333334%;
+  }
+  .col-lg-9 {
+    width: 75%;
+  }
+  .col-lg-8 {
+    width: 66.66666666666666%;
+  }
+  .col-lg-7 {
+    width: 58.333333333333336%;
+  }
+  .col-lg-6 {
+    width: 50%;
+  }
+  .col-lg-5 {
+    width: 41.66666666666667%;
+  }
+  .col-lg-4 {
+    width: 33.33333333333333%;
+  }
+  .col-lg-3 {
+    width: 25%;
+  }
+  .col-lg-2 {
+    width: 16.666666666666664%;
+  }
+  .col-lg-1 {
+    width: 8.333333333333332%;
+  }
+  .col-lg-pull-12 {
+    right: 100%;
+  }
+  .col-lg-pull-11 {
+    right: 91.66666666666666%;
+  }
+  .col-lg-pull-10 {
+    right: 83.33333333333334%;
+  }
+  .col-lg-pull-9 {
+    right: 75%;
+  }
+  .col-lg-pull-8 {
+    right: 66.66666666666666%;
+  }
+  .col-lg-pull-7 {
+    right: 58.333333333333336%;
+  }
+  .col-lg-pull-6 {
+    right: 50%;
+  }
+  .col-lg-pull-5 {
+    right: 41.66666666666667%;
+  }
+  .col-lg-pull-4 {
+    right: 33.33333333333333%;
+  }
+  .col-lg-pull-3 {
+    right: 25%;
+  }
+  .col-lg-pull-2 {
+    right: 16.666666666666664%;
+  }
+  .col-lg-pull-1 {
+    right: 8.333333333333332%;
+  }
+  .col-lg-pull-0 {
+    right: 0%;
+  }
+  .col-lg-push-12 {
+    left: 100%;
+  }
+  .col-lg-push-11 {
+    left: 91.66666666666666%;
+  }
+  .col-lg-push-10 {
+    left: 83.33333333333334%;
+  }
+  .col-lg-push-9 {
+    left: 75%;
+  }
+  .col-lg-push-8 {
+    left: 66.66666666666666%;
+  }
+  .col-lg-push-7 {
+    left: 58.333333333333336%;
+  }
+  .col-lg-push-6 {
+    left: 50%;
+  }
+  .col-lg-push-5 {
+    left: 41.66666666666667%;
+  }
+  .col-lg-push-4 {
+    left: 33.33333333333333%;
+  }
+  .col-lg-push-3 {
+    left: 25%;
+  }
+  .col-lg-push-2 {
+    left: 16.666666666666664%;
+  }
+  .col-lg-push-1 {
+    left: 8.333333333333332%;
+  }
+  .col-lg-push-0 {
+    left: 0%;
+  }
+  .col-lg-offset-12 {
+    margin-left: 100%;
+  }
+  .col-lg-offset-11 {
+    margin-left: 91.66666666666666%;
+  }
+  .col-lg-offset-10 {
+    margin-left: 83.33333333333334%;
+  }
+  .col-lg-offset-9 {
+    margin-left: 75%;
+  }
+  .col-lg-offset-8 {
+    margin-left: 66.66666666666666%;
+  }
+  .col-lg-offset-7 {
+    margin-left: 58.333333333333336%;
+  }
+  .col-lg-offset-6 {
+    margin-left: 50%;
+  }
+  .col-lg-offset-5 {
+    margin-left: 41.66666666666667%;
+  }
+  .col-lg-offset-4 {
+    margin-left: 33.33333333333333%;
+  }
+  .col-lg-offset-3 {
+    margin-left: 25%;
+  }
+  .col-lg-offset-2 {
+    margin-left: 16.666666666666664%;
+  }
+  .col-lg-offset-1 {
+    margin-left: 8.333333333333332%;
+  }
+  .col-lg-offset-0 {
+    margin-left: 0%;
+  }
+}
+@-ms-viewport {
+  width: device-width;
+}
+.visible-xs,
+tr.visible-xs,
+th.visible-xs,
+td.visible-xs {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .visible-xs {
+    display: block !important;
+  }
+  table.visible-xs {
+    display: table;
+  }
+  tr.visible-xs {
+    display: table-row !important;
+  }
+  th.visible-xs,
+  td.visible-xs {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .visible-xs.visible-sm {
+    display: block !important;
+  }
+  table.visible-xs.visible-sm {
+    display: table;
+  }
+  tr.visible-xs.visible-sm {
+    display: table-row !important;
+  }
+  th.visible-xs.visible-sm,
+  td.visible-xs.visible-sm {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .visible-xs.visible-md {
+    display: block !important;
+  }
+  table.visible-xs.visible-md {
+    display: table;
+  }
+  tr.visible-xs.visible-md {
+    display: table-row !important;
+  }
+  th.visible-xs.visible-md,
+  td.visible-xs.visible-md {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 1200px) {
+  .visible-xs.visible-lg {
+    display: block !important;
+  }
+  table.visible-xs.visible-lg {
+    display: table;
+  }
+  tr.visible-xs.visible-lg {
+    display: table-row !important;
+  }
+  th.visible-xs.visible-lg,
+  td.visible-xs.visible-lg {
+    display: table-cell !important;
+  }
+}
+.visible-sm,
+tr.visible-sm,
+th.visible-sm,
+td.visible-sm {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .visible-sm.visible-xs {
+    display: block !important;
+  }
+  table.visible-sm.visible-xs {
+    display: table;
+  }
+  tr.visible-sm.visible-xs {
+    display: table-row !important;
+  }
+  th.visible-sm.visible-xs,
+  td.visible-sm.visible-xs {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .visible-sm {
+    display: block !important;
+  }
+  table.visible-sm {
+    display: table;
+  }
+  tr.visible-sm {
+    display: table-row !important;
+  }
+  th.visible-sm,
+  td.visible-sm {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .visible-sm.visible-md {
+    display: block !important;
+  }
+  table.visible-sm.visible-md {
+    display: table;
+  }
+  tr.visible-sm.visible-md {
+    display: table-row !important;
+  }
+  th.visible-sm.visible-md,
+  td.visible-sm.visible-md {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 1200px) {
+  .visible-sm.visible-lg {
+    display: block !important;
+  }
+  table.visible-sm.visible-lg {
+    display: table;
+  }
+  tr.visible-sm.visible-lg {
+    display: table-row !important;
+  }
+  th.visible-sm.visible-lg,
+  td.visible-sm.visible-lg {
+    display: table-cell !important;
+  }
+}
+.visible-md,
+tr.visible-md,
+th.visible-md,
+td.visible-md {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .visible-md.visible-xs {
+    display: block !important;
+  }
+  table.visible-md.visible-xs {
+    display: table;
+  }
+  tr.visible-md.visible-xs {
+    display: table-row !important;
+  }
+  th.visible-md.visible-xs,
+  td.visible-md.visible-xs {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .visible-md.visible-sm {
+    display: block !important;
+  }
+  table.visible-md.visible-sm {
+    display: table;
+  }
+  tr.visible-md.visible-sm {
+    display: table-row !important;
+  }
+  th.visible-md.visible-sm,
+  td.visible-md.visible-sm {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .visible-md {
+    display: block !important;
+  }
+  table.visible-md {
+    display: table;
+  }
+  tr.visible-md {
+    display: table-row !important;
+  }
+  th.visible-md,
+  td.visible-md {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 1200px) {
+  .visible-md.visible-lg {
+    display: block !important;
+  }
+  table.visible-md.visible-lg {
+    display: table;
+  }
+  tr.visible-md.visible-lg {
+    display: table-row !important;
+  }
+  th.visible-md.visible-lg,
+  td.visible-md.visible-lg {
+    display: table-cell !important;
+  }
+}
+.visible-lg,
+tr.visible-lg,
+th.visible-lg,
+td.visible-lg {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .visible-lg.visible-xs {
+    display: block !important;
+  }
+  table.visible-lg.visible-xs {
+    display: table;
+  }
+  tr.visible-lg.visible-xs {
+    display: table-row !important;
+  }
+  th.visible-lg.visible-xs,
+  td.visible-lg.visible-xs {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .visible-lg.visible-sm {
+    display: block !important;
+  }
+  table.visible-lg.visible-sm {
+    display: table;
+  }
+  tr.visible-lg.visible-sm {
+    display: table-row !important;
+  }
+  th.visible-lg.visible-sm,
+  td.visible-lg.visible-sm {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .visible-lg.visible-md {
+    display: block !important;
+  }
+  table.visible-lg.visible-md {
+    display: table;
+  }
+  tr.visible-lg.visible-md {
+    display: table-row !important;
+  }
+  th.visible-lg.visible-md,
+  td.visible-lg.visible-md {
+    display: table-cell !important;
+  }
+}
+@media (min-width: 1200px) {
+  .visible-lg {
+    display: block !important;
+  }
+  table.visible-lg {
+    display: table;
+  }
+  tr.visible-lg {
+    display: table-row !important;
+  }
+  th.visible-lg,
+  td.visible-lg {
+    display: table-cell !important;
+  }
+}
+.hidden-xs {
+  display: block !important;
+}
+table.hidden-xs {
+  display: table;
+}
+tr.hidden-xs {
+  display: table-row !important;
+}
+th.hidden-xs,
+td.hidden-xs {
+  display: table-cell !important;
+}
+@media (max-width: 767px) {
+  .hidden-xs,
+  tr.hidden-xs,
+  th.hidden-xs,
+  td.hidden-xs {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .hidden-xs.hidden-sm,
+  tr.hidden-xs.hidden-sm,
+  th.hidden-xs.hidden-sm,
+  td.hidden-xs.hidden-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hidden-xs.hidden-md,
+  tr.hidden-xs.hidden-md,
+  th.hidden-xs.hidden-md,
+  td.hidden-xs.hidden-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  .hidden-xs.hidden-lg,
+  tr.hidden-xs.hidden-lg,
+  th.hidden-xs.hidden-lg,
+  td.hidden-xs.hidden-lg {
+    display: none !important;
+  }
+}
+.hidden-sm {
+  display: block !important;
+}
+table.hidden-sm {
+  display: table;
+}
+tr.hidden-sm {
+  display: table-row !important;
+}
+th.hidden-sm,
+td.hidden-sm {
+  display: table-cell !important;
+}
+@media (max-width: 767px) {
+  .hidden-sm.hidden-xs,
+  tr.hidden-sm.hidden-xs,
+  th.hidden-sm.hidden-xs,
+  td.hidden-sm.hidden-xs {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .hidden-sm,
+  tr.hidden-sm,
+  th.hidden-sm,
+  td.hidden-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hidden-sm.hidden-md,
+  tr.hidden-sm.hidden-md,
+  th.hidden-sm.hidden-md,
+  td.hidden-sm.hidden-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  .hidden-sm.hidden-lg,
+  tr.hidden-sm.hidden-lg,
+  th.hidden-sm.hidden-lg,
+  td.hidden-sm.hidden-lg {
+    display: none !important;
+  }
+}
+.hidden-md {
+  display: block !important;
+}
+table.hidden-md {
+  display: table;
+}
+tr.hidden-md {
+  display: table-row !important;
+}
+th.hidden-md,
+td.hidden-md {
+  display: table-cell !important;
+}
+@media (max-width: 767px) {
+  .hidden-md.hidden-xs,
+  tr.hidden-md.hidden-xs,
+  th.hidden-md.hidden-xs,
+  td.hidden-md.hidden-xs {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .hidden-md.hidden-sm,
+  tr.hidden-md.hidden-sm,
+  th.hidden-md.hidden-sm,
+  td.hidden-md.hidden-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hidden-md,
+  tr.hidden-md,
+  th.hidden-md,
+  td.hidden-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  .hidden-md.hidden-lg,
+  tr.hidden-md.hidden-lg,
+  th.hidden-md.hidden-lg,
+  td.hidden-md.hidden-lg {
+    display: none !important;
+  }
+}
+.hidden-lg {
+  display: block !important;
+}
+table.hidden-lg {
+  display: table;
+}
+tr.hidden-lg {
+  display: table-row !important;
+}
+th.hidden-lg,
+td.hidden-lg {
+  display: table-cell !important;
+}
+@media (max-width: 767px) {
+  .hidden-lg.hidden-xs,
+  tr.hidden-lg.hidden-xs,
+  th.hidden-lg.hidden-xs,
+  td.hidden-lg.hidden-xs {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .hidden-lg.hidden-sm,
+  tr.hidden-lg.hidden-sm,
+  th.hidden-lg.hidden-sm,
+  td.hidden-lg.hidden-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hidden-lg.hidden-md,
+  tr.hidden-lg.hidden-md,
+  th.hidden-lg.hidden-md,
+  td.hidden-lg.hidden-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  .hidden-lg,
+  tr.hidden-lg,
+  th.hidden-lg,
+  td.hidden-lg {
+    display: none !important;
+  }
+}
+.visible-print,
+tr.visible-print,
+th.visible-print,
+td.visible-print {
+  display: none !important;
+}
+@media print {
+  .visible-print {
+    display: block !important;
+  }
+  table.visible-print {
+    display: table;
+  }
+  tr.visible-print {
+    display: table-row !important;
+  }
+  th.visible-print,
+  td.visible-print {
+    display: table-cell !important;
+  }
+  .hidden-print,
+  tr.hidden-print,
+  th.hidden-print,
+  td.hidden-print {
+    display: none !important;
+  }
+}
+]]>
+      </Content>
+    </Stylesheet>
+    <Stylesheet>
+      <Name>fanoe</Name>
+      <FileName>fanoe</FileName>
+      <Content>
+        <![CDATA[html,
+body,
+div,
+span,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+abbr,
+address,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+samp,
+small,
+strong,
+sub,
+sup,
+var,
+b,
+i,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+	margin: 0;
+	padding: 0;
+	outline: 0;
+	border: 0;
+	background: transparent;
+	vertical-align: baseline;
+	font-size: 100%;
+}
+
+body {
+	line-height: 1;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+	display: block;
+}
+
+nav ul {
+	list-style: none;
+}
+
+blockquote,
+q {
+	quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+	content: '';
+	content: none;
+}
+
+a {
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	vertical-align: baseline;
+	font-size: 100%;
+}
+
+ins {
+	background-color: #ff9;
+	color: #000;
+	text-decoration: none;
+}
+
+mark {
+	background-color: #ff9;
+	color: #000;
+	font-weight: bold;
+	font-style: italic;
+}
+
+del {
+	text-decoration: line-through;
+}
+
+abbr[title],
+dfn[title] {
+	border-bottom: 1px dotted;
+	cursor: help;
+}
+
+table {
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+
+hr {
+	display: block;
+	margin: 1em 0;
+	padding: 0;
+	height: 1px;
+	border: 0;
+	border-top: 1px solid #cccccc;
+}
+
+input,
+select {
+	vertical-align: middle;
+}
+
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+.dark {
+	background: #1c1c1e;
+}
+
+.dark * {
+	color: #fff;
+}
+
+.dark a,
+.dark a:visited {
+	color: #f45376;
+}
+
+.dark a:hover,
+.dark a:visited:hover {
+	text-decoration: underline;
+}
+
+.dark a.button {
+	border: 1px solid #fff;
+	background: rgba(255, 255, 255, 0);
+	color: #fff;
+}
+
+.dark a.button:hover {
+	background: #fff;
+	color: #000;
+}
+
+.dark a.button.fill {
+	background: #fff;
+	color: #000;
+}
+
+.dark a.button.fill:hover {
+	background: rgba(255, 255, 255, 0.5);
+	color: #fff;
+}
+
+.dark code,
+.dark pre {
+	background-color: rgba(248, 248, 248, 0.1);
+}
+
+.dark + .triangle:before {
+	border-color: transparent transparent transparent #1c1c1e;
+}
+
+.light {
+	background: #fff;
+}
+
+.light * {
+	color: #000;
+}
+
+.light a,
+.light a:visited {
+	color: #f45376;
+}
+
+.light a:hover,
+.light a:visited:hover {
+	text-decoration: underline;
+}
+
+.light a.button {
+	border: 1px solid #000;
+	background: transparent;
+	color: #000;
+}
+
+.light a.button:hover {
+	background: #000;
+	color: #fff;
+}
+
+.light a.button.fill {
+	background: #000;
+	color: #fff;
+}
+
+.light a.button.fill:hover {
+	background: rgba(0, 0, 0, 0.2);
+	color: #000;
+}
+
+.light code,
+.light pre {
+	background-color: #f8f8f8;
+}
+
+.light + .triangle:before {
+	border-color: transparent transparent transparent #fff;
+}
+
+.yellow {
+	background: #FFCC01;
+}
+
+.yellow * {
+	color: #000;
+}
+
+.yellow a,
+.yellow a:visited {
+	color: #f42146;
+}
+
+.yellow a.button {
+	border: 1px solid #000;
+	background: transparent;
+	color: #000;
+}
+
+.yellow a.button:hover {
+	background: #000;
+	color: #FFCC01;
+}
+
+.yellow a.button.fill {
+	background: #000;
+	color: #FFCC01;
+}
+
+.yellow a.button.fill:hover {
+	background: rgba(0, 0, 0, 0.2);
+	color: #000;
+}
+
+.yellow + .triangle:before {
+	border-color: transparent transparent transparent #FFCC01;
+}
+
+.blue {
+	background: #51c1f5;
+}
+
+.blue * {
+	color: #fff;
+}
+
+.blue a,
+.blue a:visited {
+	text-decoration: underline;
+}
+
+.blue a:hover,
+.blue a:visited:hover {
+	text-decoration: none;
+}
+
+.blue a.button {
+	border: 1px solid #fff;
+	background: rgba(255, 255, 255, 0);
+	text-decoration: none;
+}
+
+.blue a.button:hover {
+	background: #fff;
+	color: #51c1f5;
+}
+
+.blue a.button.fill {
+	background: #fff;
+	color: #51c1f5;
+}
+
+.blue a.button.fill:hover {
+	background: rgba(255, 255, 255, 0.5);
+	color: #fff;
+}
+
+.blue + .triangle:before {
+	border-color: transparent transparent transparent #51c1f5;
+}
+
+.purple {
+	background: #C2357B;
+}
+
+.purple * {
+	color: #fff;
+}
+
+.purple a,
+.purple a:visited {
+	text-decoration: underline;
+}
+
+.purple a:hover,
+.purple a:visited:hover {
+	text-decoration: none;
+}
+
+.purple a.button {
+	border: 1px solid #fff;
+	background: rgba(255, 255, 255, 0);
+	text-decoration: none;
+}
+
+.purple a.button:hover {
+	background: #fff;
+	color: #C2357B;
+}
+
+.purple a.button.fill {
+	background: #fff;
+	color: #C2357B;
+}
+
+.purple a.button.fill:hover {
+	background: rgba(255, 255, 255, 0.5);
+	color: #fff;
+}
+
+.purple + .triangle:before {
+	border-color: transparent transparent transparent #C2357B;
+}
+
+.round {
+	border-radius: 50%;
+}
+
+.text--center {
+	text-align: center;
+}
+
+.text--center .separator {
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.center,
+.center img {
+	display: block;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.vcenter {
+	display: inline-block;
+	vertical-align: middle;
+	float: none;
+}
+
+body {
+	font-family: "Lato", sans-serif;
+	line-height: 1.4;
+}
+
+h1 {
+	font-weight: 900;
+}
+
+h2,
+h3,
+h4 {
+	font-weight: 700;
+}
+
+h1 {
+	letter-spacing: -.2px;
+	font-size: 2rem;
+}
+
+h2 {
+	font-size: 1.60rem;
+	font-weight: 900;
+}
+
+h3 {
+	font-size: 1.3rem;
+}
+
+h4 {
+	font-size: 1.1rem;
+	margin-bottom: 3px;
+}
+
+strong {
+	font-weight: 900;
+}
+
+p,
+blockquote,
+li,
+a {
+	font-size: 1rem;
+	line-height: 1.6;
+	letter-spacing: 0.2px;
+}
+
+p,
+blockquote,
+li {
+	color: #4d4d4d;
+	font-weight: 400;
+}
+
+a,
+a:visited {
+	text-decoration: none;
+	width: auto;
+	white-space: nowrap;
+}
+
+blockquote {
+	color: #2c2c2c;
+	font-size: 1.2rem;
+}
+
+blockquote:before,
+blockquote:after {
+	display: inline-block;
+	padding: 0 2px;
+	font-size: 1.4rem;
+	content: '"';
+}
+
+a.button {
+	border-radius: 3px;
+	padding: 8px 18px !important;
+	margin-top: 20px;
+	font-family: "Lato", sans-serif !important;
+	font-size: 1rem;
+	background: transparent;
+	transition: all .2s ease-in-out;
+}
+
+a.button:hover {
+	background: #000;
+	color: #fff;
+	text-decoration: none !important;
+}
+
+a.button.fill {
+	background: #000;
+	color: #fff;
+}
+
+a.button.fill:hover {
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	text-decoration: none;
+}
+
+html,
+body {
+	width: 100%;
+	overflow-x: hidden;
+}
+
+body {
+	background: transparent;
+	min-height: 100%;
+	min-width: 100%;
+	font-size: 17px;
+}
+
+header {
+	background: #000;
+	padding: 30px 0;
+	position: relative;
+}
+
+header .container {
+	max-width: 100%;
+	padding: 0;
+}
+
+header .row {
+	margin: 0;
+}
+
+.brand {
+	margin: 0 auto;
+	width: 205px;
+	height: 114px;
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+#toggle {
+	position: absolute;
+	right: 30px;
+	top: 50%;
+	-webkit-transform: translateY(-40%);
+	-ms-transform: translateY(-40%);
+	transform: translateY(-40%);
+}
+
+.toggle {
+	position: relative;
+	z-index: 999;
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}
+
+.toggle .cross {
+	transition-duration: 0s;
+	transition-delay: .1s;
+}
+
+.toggle .cross span:before {
+	transition-property: margin,  -webkit-transform;
+	transition-property: margin,  transform;
+	transition-duration: .1s;
+	transition-delay: .1s,  0;
+}
+
+.toggle .cross span:after {
+	transition-property: margin,  -webkit-transform;
+	transition-property: margin,  transform;
+	transition-duration: .1s;
+	transition-delay: .1s,  0;
+}
+
+.toggle .cross.open span {
+	background-color: transparent;
+	transition-delay: .1s;
+}
+
+.toggle .cross.open span:before {
+	margin-top: 0;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	transition-delay: 0,  .1s;
+	background-color: #c6c5cd;
+}
+
+.toggle .cross.open span:after {
+	margin-top: 0;
+	-webkit-transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+	transition-delay: 0,  .1s;
+	background-color: #c6c5cd;
+}
+
+.toggle span {
+	margin: 0 auto;
+	position: relative;
+	z-index: 999;
+	top: 12px;
+	width: 25px;
+	height: 2px;
+	background-color: #fff;
+	display: block;
+}
+
+.toggle span:before,
+.toggle span:after {
+	position: absolute;
+	content: '';
+	width: 25px;
+	height: 2px;
+	background-color: #fff;
+	display: block;
+}
+
+.toggle span:before {
+	margin-top: -7px;
+}
+
+.toggle span:after {
+	margin-top: 7px;
+}
+
+nav {
+	z-index: 999;
+	background: rgba(0, 0, 0, 0.95);
+	text-align: right;
+	left: 0px;
+	right: 0px;
+	display: block;
+	position: relative;
+	transition: height 300ms ease-in-out;
+}
+
+nav > ul {
+	padding: 20px;
+	position: relative;
+	display: inline-table;
+	width: 100%;
+}
+
+nav > ul li {
+	position: relative;
+	font-family: "Lato", sans-serif;
+}
+
+nav > ul li a {
+	display: inline-block;
+	padding: 25px;
+	font-size: 20px;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.75);
+}
+
+nav > ul li a:hover {
+	color: #fff;
+}
+
+nav > ul li:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+nav li > ul {
+	position: absolute;
+}
+
+nav li > ul li {
+	float: none;
+	display: block;
+	position: relative;
+}
+
+nav li > ul li a {
+	font-size: 17px;
+	padding: 15px 15px;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+nav li > ul li a:hover {
+	color: #fff;
+}
+
+nav li > ul > li > ul {
+	left: 100%;
+	top: 0;
+	display: none;
+}
+
+.dark,
+.light,
+.yellow,
+.blue,
+.purple {
+	display: block;
+	margin: 0 auto;
+	padding: 50px 0;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	color: #000;
+}
+
+.dark .row,
+.light .row,
+.yellow .row,
+.blue .row,
+.purple .row {
+	margin: 0;
+}
+
+.dark .row div[class^="col-"],
+.light .row div[class^="col-"],
+.yellow .row div[class^="col-"],
+.blue .row div[class^="col-"],
+.purple .row div[class^="col-"] {
+	margin-bottom: 50px;
+}
+
+.dark p,
+.light p,
+.yellow p,
+.blue p,
+.purple p,
+.dark a,
+.light a,
+.yellow a,
+.blue a,
+.purple a,
+.dark blockquote,
+.light blockquote,
+.yellow blockquote,
+.blue blockquote,
+.purple blockquote,
+.dark li,
+.light li,
+.yellow li,
+.blue li,
+.purple li {
+	font-family: "Merriweather", serif;
+}
+
+.dark h1,
+.light h1,
+.yellow h1,
+.blue h1,
+.purple h1 {
+	margin-bottom: 10px;
+}
+
+.dark h2,
+.light h2,
+.yellow h2,
+.blue h2,
+.purple h2,
+.dark h3,
+.light h3,
+.yellow h3,
+.blue h3,
+.purple h3 {
+	margin: 0 0 15px;
+}
+
+.dark p,
+.light p,
+.yellow p,
+.blue p,
+.purple p {
+	letter-spacing: 0.2px;
+	margin: 0 auto;
+}
+
+.dark p + *,
+.light p + *,
+.yellow p + *,
+.blue p + *,
+.purple p + * {
+	margin-top: 20px;
+}
+
+.dark a,
+.light a,
+.yellow a,
+.blue a,
+.purple a {
+	position: relative;
+	display: inline-block;
+}
+
+.dark img,
+.light img,
+.yellow img,
+.blue img,
+.purple img {
+	padding: 20px 0;
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	margin: 30px 0;
+}
+
+.dark li,
+.light li,
+.yellow li,
+.blue li,
+.purple li {
+	padding: 2px 0 0;
+}
+
+footer ul {
+	margin: 15px auto 0;
+	text-align: center;
+}
+
+footer ul li {
+	position: relative;
+	display: block;
+	text-align: left;
+	padding: 0 0 5px 0;
+	margin: 0;
+	line-height: 1;
+}
+
+footer.dark a {
+	color: rgba(255, 255, 255, 0.6) !important;
+	font-size: 1rem;
+	border-bottom: 1px solid transparent;
+	padding-bottom: 3px;
+	font-family: "Lato", sans-serif;
+	font-weight: 100;
+}
+
+footer.dark a:hover {
+	color: rgba(255, 255, 255, 0.9) !important;
+	border-bottom: 1px solid #fff !important;
+	padding-bottom: 3px;
+	text-decoration: none;
+}
+
+ul {
+	margin-left: 20px;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+blockquote {
+	padding: 30px 10px;
+	text-align: center;
+	position: relative;
+	font-size: 1.3rem;
+}
+
+* + ul {
+	margin-bottom: 30px;
+}
+
+.equal {
+	display: table;
+	table-layout: fixed;
+}
+
+.equal .vcenter {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.full {
+	margin: 0;
+	padding: 0 !important;
+	overflow: hidden;
+}
+
+.full * {
+	max-width: 100%;
+	width: 100%;
+	height: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+	line-height: 0;
+}
+
+.full .wide {
+	width: 100%;
+	height: auto;
+}
+
+.small {
+	font-size: .85rem;
+}
+
+code,
+pre {
+	overflow: auto;
+	padding: 6px 10px;
+	border-radius: 3px;
+	background-color: rgba(248, 248, 248, 0.3);
+	font-size: .9rem;
+	font-family: "Courier 10 Pitch", Courier, monospace;
+	line-height: 2.3;
+}
+
+.gallery .row > div {
+	margin-bottom: 2%;
+}
+
+.gallery img {
+	margin: 0;
+}
+
+.video-wrapper {
+	margin-top: 25px;
+	position: relative;
+	padding-bottom: 56.25%;
+	padding-top: 25px;
+	height: 0;
+}
+
+.video-wrapper iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+@media (min-width: 768px) {
+
+.dark,
+.light,
+.yellow,
+.blue,
+.purple {
+	padding: 80px 0;
+}
+
+.dark img,
+.light img,
+.yellow img,
+.blue img,
+.purple img {
+	padding: 0;
+}
+
+}
+
+@media (min-width: 992px) {
+
+.triangle + .dark:before {
+	border-color: transparent transparent transparent #1c1c1e;
+}
+
+.triangle + .light:before {
+	border-color: transparent transparent transparent #fff;
+}
+
+.triangle + .yellow:before {
+	border-color: transparent transparent transparent #FFCC01;
+}
+
+.triangle + .blue:before {
+	border-color: transparent transparent transparent #51c1f5;
+}
+
+.triangle + .purple:before {
+	border-color: transparent transparent transparent #C2357B;
+}
+
+header {
+	padding: 15px 0;
+}
+
+header .container {
+	max-width: 960px;
+	padding: 0 20px;
+}
+
+#toggle {
+	display: none;
+}
+
+nav {
+	margin: 0 auto;
+	background: none;
+	width: 100%;
+}
+
+nav > ul {
+	padding-right: 0;
+	width: auto;
+}
+
+nav > ul li {
+	float: left;
+}
+
+nav > ul li a {
+	font-size: 15px;
+}
+
+nav > ul li:last-child a {
+	padding-right: 0;
+}
+
+nav li > ul {
+	left: 0;
+	top: 75%;
+	display: none;
+	white-space: nowrap;
+	height: auto;
+	margin-bottom: 0;
+	margin-left: 10px;
+	text-align: left;
+	background: rgba(0, 0, 0, 0.8);
+	padding: 5px 8px 5px 0;
+}
+
+nav li > ul li a {
+	padding: 8px 15px;
+	font-size: 15px;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+nav .has-child:hover > .sublevel {
+	display: block;
+}
+
+.dark .row div[class^="col-"],
+.light .row div[class^="col-"],
+.yellow .row div[class^="col-"],
+.blue .row div[class^="col-"],
+.purple .row div[class^="col-"] {
+	margin-bottom: 20px;
+}
+
+.triangle {
+	position: relative;
+}
+
+.triangle img {
+	position: relative;
+	z-index: 100;
+}
+
+.triangle:before {
+	content: "";
+	display: block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 0 150px 100vw;
+	border-color: inherit;
+	position: absolute;
+	z-index: 120;
+}
+
+.triangle + .light,
+.triangle + .dark,
+.triangle + .blue,
+.triangle + .yellow,
+.triangle + .purple {
+	position: relative;
+}
+
+.triangle + .light:before,
+.triangle + .dark:before,
+.triangle + .blue:before,
+.triangle + .yellow:before,
+.triangle + .purple:before {
+	content: "";
+	display: block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 150px 0 0 100vw;
+	border-color: none;
+	position: absolute;
+	z-index: 120;
+	top: -150px;
+}
+
+}
+
+@media (max-width: 992px) {
+
+body {
+	width: 100vw;
+	overflow-x: hidden;
+}
+
+nav {
+	-webkit-transform: translateX(100%);
+	-ms-transform: translateX(100%);
+	transform: translateX(100%);
+	opacity: 1;
+	transition: -webkit-transform 300ms ease-in-out, opacity 300ms ease-in-out;
+	transition: transform 300ms ease-in-out, opacity 300ms ease-in-out;
+	text-align: center;
+	position: absolute;
+	top: 144px;
+}
+
+nav.open {
+	opacity: 1;
+	-webkit-transform: translateX(0);
+	-ms-transform: translateX(0);
+	transform: translateX(0);
+}
+
+nav > ul {
+	margin: 0;
+}
+
+nav > ul li:first-child a {
+	padding: 10px 25px;
+}
+
+nav > ul li a {
+	padding: 25px 25px 10px 25px;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+nav > ul li.active > a {
+	color: #fff;
+	font-weight: 700;
+}
+
+nav > ul li.active ul {
+	-webkit-transform: scale(1);
+	-ms-transform: scale(1);
+	transform: scale(1);
+	height: 120%;
+}
+
+nav li > ul {
+	-webkit-transform: scale(0);
+	-ms-transform: scale(0);
+	transform: scale(0);
+	position: relative;
+	text-align: center;
+	transition: all 300ms ease-in-out;
+	height: 0;
+	margin: 0;
+}
+
+}
+
+@media (max-width: 992px) and (max-width: 992px) {
+
+nav > ul li.active ul li a {
+	color: #fff;
+	font-weight: 500;
+}
+
+}
+]]>
+      </Content>
+    </Stylesheet>
+    <Stylesheet>
+      <Name>style</Name>
+      <FileName>style</FileName>
+      <Content>
+        <![CDATA[/* Go crazy with your own styles here */
+]]>
+      </Content>
+    </Stylesheet>
+  </Stylesheets>
+  <Macros>
+    <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4CB</key>
+      <name>Insert form</name>
+      <alias>umbracoforms.RenderForm</alias>
+      <scriptType>
+      </scriptType>
+      <scriptAssembly>
+      </scriptAssembly>
+      <xslt>
+      </xslt>
+      <useInEditor>True</useInEditor>
+      <refreshRate>0</refreshRate>
+      <scriptingFile>~/Views/MacroPartials/InsertUmbracoForm.cshtml</scriptingFile>
+      <properties>
+        <property name="Choose a form" alias="FormGuid" propertyType="UmbracoForms.FormPicker" />
+      </properties>
+    </macro>
+    <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4C0</key>
+      <name>Render Forms Scripts</name>
+      <alias>umbracoforms.RenderScripts</alias>
+      <scriptType>
+      </scriptType>
+      <scriptAssembly>
+      </scriptAssembly>
+      <xslt>
+      </xslt>
+      <useInEditor>False</useInEditor>
+      <refreshRate>0</refreshRate>
+      <scriptingFile>~/Views/MacroPartials/RenderUmbracoFormScripts.cshtml</scriptingFile>
+      <properties />
+    </macro>
+  </Macros>
+  <DictionaryItems />
+  <Languages />
+  <DataTypes>
+    <DataType Name="Grid Blogpost" Id="Umbraco.Grid" Definition="a3785f08-73d5-406b-855f-8e52805c22e2" DatabaseType="Ntext">
+      <PreValues>
+        <PreValue Id="72" Value="{&#xD;&#xA;  &quot;styles&quot;: [&#xD;&#xA;    {&#xD;&#xA;      &quot;label&quot;: &quot;Set a background image&quot;,&#xD;&#xA;      &quot;description&quot;: &quot;Set a row background&quot;,&#xD;&#xA;      &quot;key&quot;: &quot;background-image&quot;,&#xD;&#xA;      &quot;view&quot;: &quot;imagepicker&quot;,&#xD;&#xA;      &quot;modifier&quot;: &quot;url({0})&quot;&#xD;&#xA;    }&#xD;&#xA;  ],&#xD;&#xA;  &quot;config&quot;: [&#xD;&#xA;    {&#xD;&#xA;      &quot;label&quot;: &quot;Background color&quot;,&#xD;&#xA;      &quot;description&quot;: &quot;Choose background color&quot;,&#xD;&#xA;      &quot;key&quot;: &quot;class&quot;,&#xD;&#xA;      &quot;view&quot;: &quot;radiobuttonlist&quot;,&#xD;&#xA;      &quot;prevalues&quot;: [&#xD;&#xA;        &quot;light&quot;,&#xD;&#xA;        &quot;dark&quot;,&#xD;&#xA;        &quot;yellow&quot;,&#xD;&#xA;        &quot;blue&quot;,&#xD;&#xA;        &quot;purple&quot;,&#xD;&#xA;        &quot;full&quot;,&#xD;&#xA;        &quot;full triangle&quot;&#xD;&#xA;      ]&#xD;&#xA;    }&#xD;&#xA;  ],&#xD;&#xA;  &quot;columns&quot;: 12,&#xD;&#xA;  &quot;templates&quot;: [&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;1 column layout&quot;,&#xD;&#xA;      &quot;sections&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    }&#xD;&#xA;  ],&#xD;&#xA;  &quot;layouts&quot;: [&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;Playground&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;editors&quot;: [&#xD;&#xA;            &quot;headline&quot;&#xD;&#xA;          ],&#xD;&#xA;          &quot;allowAll&quot;: false&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;Article&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 3,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;media_round&quot;,&#xD;&#xA;            &quot;paragraph&quot;&#xD;&#xA;          ]&#xD;&#xA;        },&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 1,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: []&#xD;&#xA;        },&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 8,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;headline&quot;,&#xD;&#xA;            &quot;abstract&quot;,&#xD;&#xA;            &quot;paragraph&quot;&#xD;&#xA;          ]&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;Banner&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;banner_headline&quot;&#xD;&#xA;          ]&#xD;&#xA;        },&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;banner_tagline&quot;&#xD;&#xA;          ]&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;Image wide&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;media_wide_cropped&quot;,&#xD;&#xA;            &quot;media_wide&quot;&#xD;&#xA;          ]&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;Article full width&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;media_text_right&quot;,&#xD;&#xA;            &quot;headline&quot;,&#xD;&#xA;            &quot;abstract&quot;,&#xD;&#xA;            &quot;paragraph&quot;,&#xD;&#xA;            &quot;quote&quot;,&#xD;&#xA;            &quot;media&quot;,&#xD;&#xA;            &quot;code&quot;&#xD;&#xA;          ]&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;super quote&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;allowAll&quot;: false&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;name&quot;: &quot;Article two col&quot;,&#xD;&#xA;      &quot;areas&quot;: [&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 12,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;headline&quot;,&#xD;&#xA;            &quot;quote&quot;&#xD;&#xA;          ]&#xD;&#xA;        },&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 6,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;abstract&quot;,&#xD;&#xA;            &quot;media&quot;,&#xD;&#xA;            &quot;code&quot;,&#xD;&#xA;            &quot;quote&quot;,&#xD;&#xA;            &quot;paragraph&quot;&#xD;&#xA;          ]&#xD;&#xA;        },&#xD;&#xA;        {&#xD;&#xA;          &quot;grid&quot;: 6,&#xD;&#xA;          &quot;allowAll&quot;: false,&#xD;&#xA;          &quot;allowed&quot;: [&#xD;&#xA;            &quot;quote&quot;,&#xD;&#xA;            &quot;code&quot;,&#xD;&#xA;            &quot;media&quot;,&#xD;&#xA;            &quot;paragraph&quot;&#xD;&#xA;          ]&#xD;&#xA;        }&#xD;&#xA;      ]&#xD;&#xA;    }&#xD;&#xA;  ]&#xD;&#xA;}" Alias="items" />
+        <PreValue Id="73" Value="{&#xD;&#xA;  &quot;toolbar&quot;: [&#xD;&#xA;    &quot;code&quot;,&#xD;&#xA;    &quot;styleselect&quot;,&#xD;&#xA;    &quot;bold&quot;,&#xD;&#xA;    &quot;italic&quot;,&#xD;&#xA;    &quot;alignleft&quot;,&#xD;&#xA;    &quot;aligncenter&quot;,&#xD;&#xA;    &quot;alignright&quot;,&#xD;&#xA;    &quot;bullist&quot;,&#xD;&#xA;    &quot;numlist&quot;,&#xD;&#xA;    &quot;outdent&quot;,&#xD;&#xA;    &quot;indent&quot;,&#xD;&#xA;    &quot;link&quot;,&#xD;&#xA;    &quot;umbmediapicker&quot;,&#xD;&#xA;    &quot;umbmacro&quot;,&#xD;&#xA;    &quot;umbembeddialog&quot;&#xD;&#xA;  ],&#xD;&#xA;  &quot;stylesheets&quot;: [],&#xD;&#xA;  &quot;dimensions&quot;: {&#xD;&#xA;    &quot;height&quot;: 500&#xD;&#xA;  },&#xD;&#xA;  &quot;maxImageSize&quot;: 500&#xD;&#xA;}" Alias="rte" />
+      </PreValues>
+    </DataType>
+  </DataTypes>
+</umbPackage>

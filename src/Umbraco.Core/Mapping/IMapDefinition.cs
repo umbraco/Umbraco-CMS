@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Mapping
+﻿namespace Umbraco.Cms.Core.Mapping
 {
     /// <summary>
     /// Defines maps for <see cref="UmbracoMapper"/>.
@@ -8,6 +8,6 @@
         /// <summary>
         /// Defines maps.
         /// </summary>
-        void DefineMaps(UmbracoMapper mapper);
+        void DefineMaps(IUmbracoMapper mapper);
     }
 }

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function HealthCheckController($scope, healthCheckResource) {
+    function HealthCheckController(healthCheckResource) {
         var SUCCESS = 0;
         var WARNING = 1;
         var ERROR = 2;
@@ -19,6 +19,7 @@
         vm.checkAllInGroup = checkAllInGroup;
         vm.openGroup = openGroup;
         vm.setViewState = setViewState;
+        vm.parseRegex = parseRegex;
 
         // Get a (grouped) list of all health checks
         healthCheckResource.getAllChecks()
@@ -39,15 +40,19 @@
                     check.status.forEach(status => {
                         switch (status.resultType) {
                             case SUCCESS:
+                            case 'Success':
                                 totalSuccess = totalSuccess + 1;
                                 break;
                             case WARNING:
+                            case 'Warning':
                                 totalWarning = totalWarning + 1;
                                 break;
                             case ERROR:
+                            case 'Error':
                                 totalError = totalError + 1;
                                 break;
                             case INFO:
+                            case 'Info':
                                 totalInfo = totalInfo + 1;
                                 break;
                         }
@@ -69,7 +74,7 @@
             healthCheckResource.getStatus(check.id)
                 .then(function (response) {
                     check.loading = false;
-                    check.status = response;
+                  check.status = response;
                 });
         }
 
@@ -130,6 +135,10 @@
                     setGroupGlobalResultType(group);
                 }
             }
+        }
+
+        function parseRegex(regexAsString) {
+            return new RegExp(regexAsString);
         }
     }
 

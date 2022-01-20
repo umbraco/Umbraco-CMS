@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Services.Changes
+namespace Umbraco.Cms.Core.Services.Changes
 {
     public class TreeChange<TItem>
     {

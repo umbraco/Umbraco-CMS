@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Core.Collections
+﻿namespace Umbraco.Cms.Core.Collections
 {
-    internal enum ListCloneBehavior
+    public enum ListCloneBehavior
     {
         /// <summary>
         /// When set, DeepClone will clone the items one time and the result list behavior will be None

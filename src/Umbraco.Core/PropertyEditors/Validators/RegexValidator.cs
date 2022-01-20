@@ -1,19 +1,24 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.Validators
+namespace Umbraco.Cms.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates that the value against a regular expression.
     /// </summary>
-    internal sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
+    public sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
     {
         private readonly ILocalizedTextService _textService;
         private string _regex;
+
+        const string ValueIsInvalid = "Value is invalid, it does not match the correct pattern";
 
         /// <inheritdoc cref="IManifestValueValidator.ValidationName"/>
         public string ValidationName => "Regex";
@@ -25,7 +30,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
         /// and the regular expression is supplied at validation time. This constructor is also used when
         /// the validator is used as an <see cref="IManifestValueValidator"/> and the regular expression
         /// is supplied via the <see cref="Configuration"/> method.</remarks>
-        public RegexValidator() : this(Current.Services.TextService, null)
+        public RegexValidator(ILocalizedTextService textService) : this(textService, null)
         { }
 
         /// <summary>
@@ -72,7 +77,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
             if (string.IsNullOrWhiteSpace(format)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(format));
             if (value == null || !new Regex(format).IsMatch(value.ToString()))
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidPattern"), new[] { "value" });
+                yield return new ValidationResult(_textService?.Localize("validation", "invalidPattern") ?? ValueIsInvalid, new[] { "value" });
             }
         }
     }

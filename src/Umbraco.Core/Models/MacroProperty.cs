@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Macro Property
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : BeingDirtyBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
+    public class MacroProperty : BeingDirtyBase, IMacroProperty
     {
         public MacroProperty()
         {
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// <param name="name"></param>
         /// <param name="sortOrder"></param>
         /// <param name="editorAlias"></param>
-        internal MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
+        public MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
         {
             _id = id;
             _alias = alias;
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _id;
         private string _editorAlias;
-        
+
         /// <summary>
         /// Gets or sets the Key of the Property
         /// </summary>

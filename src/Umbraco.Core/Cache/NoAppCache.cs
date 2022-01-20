@@ -1,21 +1,24 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Caching;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> and do not cache.
     /// </summary>
-    public class NoAppCache : IAppPolicyCache
+    public class NoAppCache : IAppPolicyCache, IRequestCache
     {
-        private NoAppCache() { }
+        protected NoAppCache() { }
 
         /// <summary>
         /// Gets the singleton instance.
         /// </summary>
         public static NoAppCache Instance { get; } = new NoAppCache();
+
+        /// <inheritdoc />
+        public bool IsAvailable => false;
 
         /// <inheritdoc />
         public virtual object Get(string cacheKey)
@@ -28,6 +31,10 @@ namespace Umbraco.Core.Cache
         {
             return factory();
         }
+
+        public bool Set(string key, object value) => false;
+
+        public bool Remove(string key) => false;
 
         /// <inheritdoc />
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
@@ -42,13 +49,13 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, string[] dependentFiles = null)
         {
             return factory();
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
         { }
 
         /// <inheritdoc />
@@ -60,7 +67,7 @@ namespace Umbraco.Core.Cache
         { }
 
         /// <inheritdoc />
-        public virtual void ClearOfType(string typeName)
+        public virtual void ClearOfType(Type type)
         { }
 
         /// <inheritdoc />
@@ -78,5 +85,9 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public virtual void ClearByRegex(string regex)
         { }
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => new Dictionary<string, object>().GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

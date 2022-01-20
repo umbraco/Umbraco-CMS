@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>Template-Update</name>
+    </package>
+  </info>
+  <DocumentTypes />
+  <Templates>
+    <Template>
+      <Name>Homepage</Name>
+      <Alias>umbHomepage</Alias>
+      <Master>umbMaster</Master>
+      <Design>
+        <![CDATA[<%@ Master Language="C#" MasterPageFile="~/masterpages/umbMaster.master" AutoEventWireup="true" %>
+<asp:content id="Content1" contentplaceholderid="cp_content" runat="server">
+    <div id="skinHeader" class="clearfix">
+        <h1>
+            don't panic<br>
+            just yet*
+        </h1>
+        <p>
+            *<br>
+            Most of the time ghosts are friendly and there is really no need to panic.
+            Ghosts are lost souls looking to be released and pass on to whatever 
+            heaven they attend (depending on religion).
+        </p>
+    </div>
+
+    <div id="content" class="frontPage">
+        <umbraco:item id="Item1" runat="server" field="bodyText"></umbraco:item>
+    </div>
+
+   
+</asp:content>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Textpage</Name>
+      <Alias>umbTextpage</Alias>
+      <Master>umbMaster</Master>
+      <Design>
+        <![CDATA[<%@ Master Language="C#" MasterPageFile="~/masterpages/umbMaster.master" AutoEventWireup="true" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="cp_top" runat="server">
+    <div id="top">
+        <div id="topInner">
+            <h1 id="siteName"><a href="/"><umbraco:Item runat="server" field="siteName" recursive="true" /></a></h1>
+            <h2 id="siteDescription"><umbraco:Item  runat="server" field="siteDescription" recursive="true" /></h2>
+        </div>
+        <div id="naviWrap">
+            <umbraco:Macro ID="Macro1" Alias="umbTopNavigation" runat="server" />
+        </div>
+        <div id="subNavigation">
+            <umbraco:Macro ID="Macro2" Alias="umb2ndLevelNavigation" runat="server"></umbraco:Macro>
+        </div>
+    </div>
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="cp_content" runat="server">
+    <div id="content" class="textpage">
+          <div id="contentHeader">  
+              <h2><umbraco:Item  runat="server" field="pageName"/></h2>
+          </div>
+          <umbraco:Item  runat="server" field="bodyText" />
+    </div>
+</asp:Content>]]>
+      </Design>
+    </Template>
+  </Templates>
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+</umbPackage>

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
 
     /// <summary>
@@ -32,6 +32,6 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets or sets the invalid properties, if the status failed due to validation.
         /// </summary>
-        public IEnumerable<Property> InvalidProperties { get; set; }
+        public IEnumerable<IProperty> InvalidProperties { get; set; }
     }
 }

@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Used to track the property types that are visible/editable on member profiles
     /// </summary>
-    internal class MemberTypePropertyProfileAccess
+    public class MemberTypePropertyProfileAccess
     {
         public MemberTypePropertyProfileAccess(bool isVisible, bool isEditable, bool isSenstive)
         {

@@ -1,17 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService : IContentServiceBase
+    public interface IContentService : IContentServiceBase<IContent>
     {
         #region Blueprints
 
@@ -238,13 +236,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves documents.
         /// </summary>
         // TODO: why only 1 result not 1 per content?!
-        OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a document.
@@ -314,16 +312,9 @@ namespace Umbraco.Core.Services
         OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Empties the recycle bin.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
-        OperationResult EmptyRecycleBin();
-
-        /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
         /// <summary>
@@ -334,12 +325,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -358,8 +349,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The document to publish.</param>
         /// <param name="culture">The culture to publish.</param>
         /// <param name="userId">The identifier of the user performing the action.</param>
-        /// <param name="raiseEvents">A value indicating whether to raise events.</param>
-        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves and publishes a document.
@@ -372,8 +362,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The document to publish.</param>
         /// <param name="cultures">The cultures to publish.</param>
         /// <param name="userId">The identifier of the user performing the action.</param>
-        /// <param name="raiseEvents">A value indicating whether to raise events.</param>
-        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves and publishes a document branch.
@@ -498,6 +487,11 @@ namespace Umbraco.Core.Services
         /// Creates a document.
         /// </summary>
         IContent Create(string name, int parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Creates a document
+        /// </summary>
+        IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates a document.

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Strings
+﻿namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// Provides string functions for short strings such as aliases or URL segments.

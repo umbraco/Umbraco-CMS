@@ -6,6 +6,7 @@ var gulp = require('gulp');
 var MergeStream = require('merge-stream');
 
 var imagemin = require('gulp-imagemin');
+var _ = require('lodash');
 
 /**************************
  * Task processes and copies all dependencies, either installed by npm or stored locally in the project
@@ -45,7 +46,10 @@ function dependencies() {
         },
         {
             "name": "angular",
-            "src":  ["./node_modules/angular/angular.js"],
+            "src":  [
+                "./node_modules/angular/angular.min.js",
+                "./node_modules/angular/angular.min.js.map"
+            ],
             "base": "./node_modules/angular"
         },
         {
@@ -56,7 +60,10 @@ function dependencies() {
         },
         {
             "name": "angular-cookies",
-            "src":  ["./node_modules/angular-cookies/angular-cookies.js"],
+            "src":  [
+                "./node_modules/angular-cookies/angular-cookies.min.js",
+                "./node_modules/angular-cookies/angular-cookies.min.js.map"
+            ],
             "base": "./node_modules/angular-cookies"
         },
         {
@@ -69,27 +76,39 @@ function dependencies() {
         },
         {
             "name": "angular-sanitize",
-            "src":  ["./node_modules/angular-sanitize/angular-sanitize.js"],
+            "src":  [
+                "./node_modules/angular-sanitize/angular-sanitize.min.js",
+                "./node_modules/angular-sanitize/angular-sanitize.min.js.map"
+            ],
             "base": "./node_modules/angular-sanitize"
         },
         {
             "name": "angular-touch",
-            "src":  ["./node_modules/angular-touch/angular-touch.js"],
+            "src":  [
+                "./node_modules/angular-touch/angular-touch.min.js",
+                "./node_modules/angular-touch/angular-touch.min.js.map"
+            ],
             "base": "./node_modules/angular-touch"
         },
         {
             "name": "angular-ui-sortable",
-            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.js"],
+            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.min.js"],
             "base": "./node_modules/angular-ui-sortable/dist"
         },
         {
             "name": "angular-route",
-            "src":  ["./node_modules/angular-route/angular-route.js"],
+            "src":  [
+                "./node_modules/angular-route/angular-route.min.js",
+                "./node_modules/angular-route/angular-route.min.js.map"
+            ],
             "base": "./node_modules/angular-route"
         },
         {
             "name": "angular-animate",
-            "src":  ["./node_modules/angular-animate/angular-animate.js"],
+            "src":  [
+                "./node_modules/angular-animate/angular-animate.min.js",
+                "./node_modules/angular-animate/angular-animate.min.js.map"
+            ],
             "base": "./node_modules/angular-animate"
         },
         {
@@ -110,7 +129,10 @@ function dependencies() {
         },
         {
             "name": "angular-messages",
-            "src":  ["./node_modules/angular-messages/angular-messages.js"],
+            "src":  [
+                "./node_modules/angular-messages/angular-messages.min.js",
+                "./node_modules/angular-messages/angular-messages.min.js.map"
+            ],
             "base": "./node_modules/angular-messages"
         },        
         {
@@ -131,12 +153,15 @@ function dependencies() {
 
         {
             "name": "angular-chart.js",
-            "src":  ["./node_modules/angular-chart.js/dist/angular-chart.min.js"],
+            "src":  [
+                "./node_modules/angular-chart.js/dist/angular-chart.min.js",
+                "./node_modules/angular-chart.js/dist/angular-chart.min.js.map"
+            ],
             "base": "./node_modules/angular-chart.js/dist"
         },
         {
             "name": "chart.js",
-            "src":  ["./node_modules/chart.js/dist/chart.min.js"],
+            "src":  ["./node_modules/chart.js/dist/Chart.min.js"],
             "base": "./node_modules/chart.js/dist"
         },
         {
@@ -152,8 +177,8 @@ function dependencies() {
         {
             "name": "flatpickr",
             "src":  [
-                "./node_modules/flatpickr/dist/flatpickr.js",
-                "./node_modules/flatpickr/dist/flatpickr.css",
+                "./node_modules/flatpickr/dist/flatpickr.min.js",
+                "./node_modules/flatpickr/dist/flatpickr.min.css",
                 "./node_modules/flatpickr/dist/l10n/*.js"
             ],
             "base": "./node_modules/flatpickr/dist"
@@ -186,7 +211,7 @@ function dependencies() {
         },
         {
             "name": "lazyload-js",
-            "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
+            "src":  ["./node_modules/lazyload-js/LazyLoad.min.js"],
             "base": "./node_modules/lazyload-js"
         },
         {
@@ -207,21 +232,23 @@ function dependencies() {
         {
             "name": "nouislider",
             "src":  [
-                "./node_modules/nouislider/distribute/nouislider.min.js",
-                "./node_modules/nouislider/distribute/nouislider.min.css"
+                "./node_modules/nouislider/dist/nouislider.min.js",
+                "./node_modules/nouislider/dist/nouislider.min.css"
             ],
-            "base": "./node_modules/nouislider/distribute"
+            "base": "./node_modules/nouislider/dist"
         },
         {
             "name": "signalr",
-            "src":  ["./node_modules/signalr/jquery.signalR.js"],
-            "base": "./node_modules/signalr"
+            "src":  [
+                "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
+            ],
+            "base": "./node_modules/@microsoft/signalr/dist/browser"
         },
         {
             "name": "spectrum",
             "src":  [
                 "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
-                "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.min.css"
             ],
             "base": "./node_modules/spectrum-colorpicker2/dist"
         },
@@ -265,18 +292,23 @@ function dependencies() {
 
     // add streams for node modules
     nodeModules.forEach(module => {
-        stream.add(
-            gulp.src(module.src,
-                { base: module.base, allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.lib + "/" + module.name))
-        );
+        var task = gulp.src(module.src, { base: module.base, allowEmpty: true });
+        
+        _.forEach(config.roots, function(root){
+            task = task.pipe(gulp.dest(root + config.targets.lib + "/" + module.name))
+        });
+        
+        stream.add(task);
     });
 
     //copy over libs which are not on npm (/lib)
-    stream.add(
-        gulp.src(config.sources.globs.lib, { allowEmpty: true })
-            .pipe(gulp.dest(config.root + config.targets.lib))
-        );
+    var libTask = gulp.src(config.sources.globs.lib, { allowEmpty: true });
+
+    _.forEach(config.roots, function(root){
+        libTask = libTask.pipe(gulp.dest(root + config.targets.lib))
+    });
+    
+    stream.add(libTask);
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
@@ -284,7 +316,7 @@ function dependencies() {
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
     assetsTask = assetsTask.pipe(imagemin([
         imagemin.gifsicle({interlaced: true}),
-        imagemin.jpegtran({progressive: true}),
+        imagemin.mozjpeg({progressive: true}),
         imagemin.optipng({optimizationLevel: 5}),
         imagemin.svgo({
             plugins: [
@@ -293,28 +325,38 @@ function dependencies() {
             ]
         })
     ]));
-    
-    assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
+
+    _.forEach(config.roots, function(root){
+        assetsTask = assetsTask.pipe(gulp.dest(root + config.targets.assets));
+    });
+   
     
     stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less compiler client side
-    stream.add(
-        gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.assets + "/less"))
-        );
+    var lessTask = gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true });
+
+    _.forEach(config.roots, function(root){
+        lessTask = lessTask.pipe(gulp.dest(root + config.targets.assets + "/less"));
+    });
+    stream.add(lessTask);
+
+
 
 	// TODO: check if we need these fileSize
-    stream.add(
-        gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.views + "/propertyeditors/grid/config"))
-        );
-    stream.add(
-        gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.views + "/dashboard/default"))
-        );
-
+    var configTask = gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true });
+    _.forEach(config.roots, function(root){
+        configTask = configTask.pipe(gulp.dest(root + config.targets.views + "/propertyeditors/grid/config"));
+    });
+    stream.add(configTask);
+    
+    var dashboardTask = gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true });
+    _.forEach(config.roots, function(root){
+        dashboardTask = dashboardTask .pipe(gulp.dest(root + config.targets.views + "/dashboard/default"));
+    });
+    stream.add(dashboardTask);
+  
     return stream;
 };
 

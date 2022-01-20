@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Umbraco.Core.CodeAnnotations;
+using Umbraco.Cms.Core.CodeAnnotations;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Provides utilities and extension methods to handle object types.

@@ -1,11 +1,15 @@
-﻿using System.Xml.XPath;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.Xml
+using System.Xml.XPath;
+using Umbraco.Cms.Core.Xml;
+
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extensions to XPathNavigator.
     /// </summary>
-    internal static class XPathNavigatorExtensions
+    public static class XPathNavigatorExtensions
     {
         /// <summary>
         /// Selects a node set, using the specified XPath expression.

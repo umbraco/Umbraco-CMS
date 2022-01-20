@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// Provides a base class for classes representing event data, for events that support cancellation, and expose an impacted object.
@@ -41,6 +41,6 @@ namespace Umbraco.Core.Events
         /// <remarks>
         /// This is protected so that inheritors can expose it with their own name
         /// </remarks>
-        internal object EventObject { get; set; }
+        public object EventObject { get; set; }
     }
 }

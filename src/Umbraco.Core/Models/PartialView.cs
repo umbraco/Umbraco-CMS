@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Partial View file
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
             : this(viewType, path, null)
         { }
 
-        internal PartialView(PartialViewType viewType, string path, Func<File, string> getFileContent)
+        public PartialView(PartialViewType viewType, string path, Func<File, string> getFileContent)
             : base(path, getFileContent)
         {
             ViewType = viewType;

@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Persistence;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// A set of helper methods for dealing with expressions
     /// </summary>
     /// <remarks></remarks>
-    internal static class ExpressionHelper
+    public static class ExpressionHelper
     {
         private static readonly ConcurrentDictionary<LambdaExpressionCacheKey, PropertyInfo> PropertyInfoCache = new ConcurrentDictionary<LambdaExpressionCacheKey, PropertyInfo>();
 
@@ -106,7 +106,7 @@ namespace Umbraco.Core
                     case ExpressionType.Call:
                         var callExpr = (MethodCallExpression) expr;
                         var method = callExpr.Method;
-                        if (method.DeclaringType != typeof(NPocoSqlExtensions.Statics) || method.Name != "Alias" || !(callExpr.Arguments[1] is ConstantExpression aliasExpr))
+                        if (method.DeclaringType != typeof(SqlExtensionsStatics) || method.Name != "Alias" || !(callExpr.Arguments[1] is ConstantExpression aliasExpr))
                             Throw();
                         expr = callExpr.Arguments[0];
                         alias = aliasExpr.Value.ToString();

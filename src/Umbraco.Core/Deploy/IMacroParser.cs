@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     public interface IMacroParser
     {

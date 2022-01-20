@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// Represents a content app factory.

@@ -4,22 +4,23 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Strings.Css;
+using Umbraco.Cms.Core.Strings.Css;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Stylesheet file
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Stylesheet : File
+    public class Stylesheet : File, IStylesheet
     {
         public Stylesheet(string path)
             : this(path, null)
         { }
 
-        internal Stylesheet(string path, Func<File, string> getFileContent)
+        public Stylesheet(string path, Func<File, string> getFileContent)
             : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent)
         {
             InitializeProperties();
@@ -120,7 +121,7 @@ namespace Umbraco.Core.Models
         /// /** umb_name: MyPropertyName */ p { font-size: 1em; }
         /// </remarks>
         [IgnoreDataMember]
-        public IEnumerable<StylesheetProperty> Properties
+        public IEnumerable<IStylesheetProperty> Properties
         {
             get { return _properties.Value; }
         }
@@ -129,7 +130,7 @@ namespace Umbraco.Core.Models
         /// Adds an Umbraco stylesheet property for use in the back office
         /// </summary>
         /// <param name="property"></param>
-        public void AddProperty(StylesheetProperty property)
+        public void AddProperty(IStylesheetProperty property)
         {
             if (Properties.Any(x => x.Name.InvariantEquals(property.Name)))
             {

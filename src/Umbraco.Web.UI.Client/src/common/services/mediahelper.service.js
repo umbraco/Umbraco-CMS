@@ -1,9 +1,9 @@
-﻿/**
+/**
 * @ngdoc service
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
 **/
-function mediaHelper(umbRequestHelper, $log) {
+function mediaHelper(umbRequestHelper, $http, $log) {
 
     //container of fileresolvers
     var _mediaFileResolvers = {};
@@ -394,6 +394,61 @@ function mediaHelper(umbRequestHelper, $log) {
             var lowered = filePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ext;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getProcessedImageUrl
+         * @methodOf umbraco.services.mediaHelper
+         * @function
+         *
+         * @description
+         * Returns image URL with configured crop and other processing parameters.
+         *
+         * @param {string} imagePath Raw image path
+         * @param {object} options Object describing image generation parameters:
+         *  {
+         *      width: <int>
+         *      height: <int>
+         *      focalPoint: {
+         *          left: <int>
+         *          top: <int>
+         *      },
+         *      mode: <string>
+         *      cacheBusterValue: <string>
+         *      crop: {
+         *          x1: <int>
+         *          x2: <int>
+         *          y1: <int>
+         *          y2: <int>
+         *      },
+         *  }
+         */
+        getProcessedImageUrl: function (imagePath, options) {
+
+            if (!options) {
+                return imagePath;
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "imagesApiBaseUrl",
+                        "GetProcessedImageUrl",
+                        {
+                            imagePath,
+                            width: options.width,
+                            height: options.height,
+                            focalPointLeft: options.focalPoint ? options.focalPoint.left : null,
+                            focalPointTop:  options.focalPoint ? options.focalPoint.top : null,
+                            mode: options.mode,
+                            cacheBusterValue: options.cacheBusterValue,
+                            cropX1: options.crop ? options.crop.x1 : null,
+                            cropX2: options.crop ? options.crop.x2 : null,
+                            cropY1: options.crop ? options.crop.y1 : null,
+                            cropY2: options.crop ? options.crop.y2 : null
+                        })),
+                "Failed to retrieve processed image URL for image: " + imagePath);
         }
 
     };

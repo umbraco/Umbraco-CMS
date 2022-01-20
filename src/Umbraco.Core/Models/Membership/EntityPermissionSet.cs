@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
-    /// Represents an entity -> user group & permission key value pair collection
+    /// Represents an entity -&gt; user group & permission key value pair collection
     /// </summary>
     public class EntityPermissionSet
     {

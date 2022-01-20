@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class CheckboxListValueConverter : PropertyValueConverterBase
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
+        public CheckboxListValueConverter(IJsonSerializer jsonSerializer)
+        {
+            _jsonSerializer = jsonSerializer;
+        }
+
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.CheckBoxList);
 
@@ -25,7 +33,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (string.IsNullOrEmpty(sourceString))
                 return Enumerable.Empty<string>();
 
-            return JsonConvert.DeserializeObject<string[]>(sourceString);
+            return _jsonSerializer.Deserialize<string[]>(sourceString);
         }
     }
 }

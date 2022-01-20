@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides utilities to simplify reflection.
@@ -18,7 +18,7 @@ namespace Umbraco.Core
     /// <para>Supports emitting constructors, instance and static methods, instance property getters and
     /// setters. Does not support static properties yet.</para>
     /// </remarks>
-    public static partial class ReflectionUtilities
+    public static class ReflectionUtilities
     {
         #region Fields
 

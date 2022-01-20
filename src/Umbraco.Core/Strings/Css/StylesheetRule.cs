@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Strings.Css
+namespace Umbraco.Cms.Core.Strings.Css
 {
-    internal class StylesheetRule
+    public class StylesheetRule
     {
         public string Name { get; set; }
 

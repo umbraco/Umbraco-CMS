@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides methods for encoding byte arrays into hexadecimal strings.
     /// </summary>
-    internal static class HexEncoder
+    public static class HexEncoder
     {
         // LUT's that provide the hexadecimal representation of each possible byte value.
         private static readonly char[] HexLutBase = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };

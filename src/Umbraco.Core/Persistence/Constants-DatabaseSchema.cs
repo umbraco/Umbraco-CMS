@@ -1,5 +1,5 @@
-﻿// ReSharper disable once CheckNamespace
-namespace Umbraco.Core
+// ReSharper disable once CheckNamespace
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -26,6 +26,8 @@ namespace Umbraco.Core
                 public const string Content = TableNamePrefix + "Content";
                 public const string ContentVersion = TableNamePrefix + "ContentVersion";
                 public const string ContentVersionCultureVariation = TableNamePrefix + "ContentVersionCultureVariation";
+                public const string ContentVersionCleanupPolicy = TableNamePrefix + "ContentVersionCleanupPolicy";
+
                 public const string Document = TableNamePrefix + "Document";
                 public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
@@ -50,8 +52,10 @@ namespace Umbraco.Core
                 public const string User2UserGroup = TableNamePrefix + "User2UserGroup";
                 public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
                 public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
+                public const string UserGroup2Node = TableNamePrefix + "UserGroup2Node";
                 public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
                 public const string ExternalLogin = TableNamePrefix + "ExternalLogin";
+                public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
 
                 public const string Macro = /*TableNamePrefix*/ "cms" + "Macro";
                 public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";
@@ -75,6 +79,10 @@ namespace Umbraco.Core
                 public const string AuditEntry = TableNamePrefix + "Audit";
                 public const string Consent = TableNamePrefix + "Consent";
                 public const string UserLogin = TableNamePrefix + "UserLogin";
+
+                public const string LogViewerQuery = TableNamePrefix + "LogViewerQuery";
+
+                public const string CreatedPackageSchema = TableNamePrefix + "CreatedPackageSchema";
             }
         }
     }

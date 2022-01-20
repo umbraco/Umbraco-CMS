@@ -30,7 +30,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 					"At least 4 people have the Umbraco logo tattooed on them",
 					"'Umbraco' is the Danish name for an allen key",
 					"Umbraco has been around since 2005, that's a looong time in IT",
-					"More than 700 people from all over the world meet each year in Denmark in May for our annual conference <a target='_blank' rel='noopener' href='https://umbra.co/codegarden'>CodeGarden</a>", 
+					"More than 700 people from all over the world meet each year in Denmark in May for our annual conference <a target='_blank' rel='noopener' href='https://umbra.co/codegarden'>CodeGarden</a>",
 					"While you are installing Umbraco someone else on the other side of the planet is probably doing it too",
 					"You can extend Umbraco without modifying the source code using either JavaScript or C#",
 					"Umbraco has been installed in more than 198 countries"
@@ -47,7 +47,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 	    }
 	    return null;
 	}
-    /* Returns the description for the given step name */ 
+    /* Returns the description for the given step name */
 	function getDescriptionForStepName(steps, name) {
 	    var found = _.find(steps, function(i) {
 	        return i.name == name;
@@ -166,8 +166,8 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 			service.status.current = step;
 		},
 
-	    /** 
-            Finds the next step containing a view. If one is found it stores it as the current step 
+	    /**
+            Finds the next step containing a view. If one is found it stores it as the current step
             and retreives the step information and returns it, otherwise returns null .
         */
 		findNextStep : function(){
@@ -266,32 +266,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
                         else {
                             service.complete();
                         }
-                    }, function (response) {
-
-                        var data = response.data;
-                        var status = response.status;
-                        //need to handle 500's separately, this will happen if something goes wrong outside
-                        // of the installer (like app startup events or something) and these will get returned as text/html
-                        // not as json. If this happens we can't actually load in external views since they will YSOD as well!
-                        // so we need to display this in our own internal way
-
-                        if (status >= 500 && status < 600) {
-                            service.status.current = { view: "ysod", model: null };
-                            var ysod = data;
-                            //we need to manually write the html to the iframe - the html contains full html markup
-                            $timeout(function () {
-                                document.getElementById('ysod').contentDocument.write(ysod);
-                            }, 500);
-                        }
-                        else {
-                            //this is where we handle installer error
-                            var v = data.view ? resolveView(data.view) : resolveView("error");
-                            var model = data.model ? data.model : data;
-                            service.status.current = { view: v, model: model };
-                        }
-
-                        service.switchToConfiguration();
-                    });
+                    }, handleErrorResponse);
 			}
 			processInstallStep();
 		},
@@ -329,20 +304,54 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 
 		complete : function(){
 
-			service.status.progress = "100%";	
-			service.status.done = true;
-			service.status.feedback = "Redirecting you to Umbraco, please wait";
-			service.status.loading = false;
+            $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "CompleteInstall", _installerModel)
+                .then(function () {
+                    service.status.progress = "100%";
+                    service.status.done = true;
+                    service.status.feedback = "Restarting and redirecting you to Umbraco, please wait";
+                    service.status.loading = false;
 
-			if (factTimer) {
-			    clearInterval(factTimer);
-			}
+                    if (factTimer) {
+                        clearInterval(factTimer);
+                    }
 
-			$timeout(function(){
-				window.location.href = Umbraco.Sys.ServerVariables.umbracoBaseUrl;
-			}, 1500);
+                    window.location.href = Umbraco.Sys.ServerVariables.umbracoBaseUrl;
+                }, handleErrorResponse);
+
+
 		}
 	};
+
+	var handleErrorResponse = function (response) {
+
+        var data = response.data;
+        var status = response.status;
+        //need to handle 500's separately, this will happen if something goes wrong outside
+        // of the installer (like app startup events or something) and these will get returned as text/html
+        // not as json. If this happens we can't actually load in external views since they will YSOD as well!
+        // so we need to display this in our own internal way
+
+        if (status >= 500 && status < 600) {
+            service.status.current = { view: "ysod", model: null };
+            var ysod = data;
+            //we need to manually write the html to the iframe
+            // TODO: In dotnetcore the resulting YSOD isn't HTML, the error is just a string so it looks ugly
+            // So we shouldn't be using an iframe and will need to change this so that we have an unhandled exception filter for the installer (and eventually
+            // the rest of the back office) to handle errors and chuck the data into a json format for us to use.
+            // It might turn out that our new Api Convention `UmbracoApiBehaviorApplicationModelProvider` might handle this for us with it's custom error handling.
+            $timeout(function () {
+                document.getElementById('ysod').contentDocument.write(ysod);
+            }, 500);
+        }
+        else {
+            //this is where we handle installer error
+            var v = data.view ? resolveView(data.view) : resolveView("error");
+            var model = data.model ? data.model : data;
+            service.status.current = { view: v, model: model };
+        }
+
+        service.switchToConfiguration();
+    }
 
 	return service;
 });

@@ -1,0 +1,128 @@
+<div ng-controller="Umbraco.Editors.DocumentType.PermissionsController as vm">
+
+    <umb-box>
+        <umb-box-content>
+
+            <div class="sub-view-columns" ng-hide="model.isElement">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_allowAsRootHeading">Allow as root</localize></h5>
+                    <small><localize key="contentTypeEditor_allowAsRootDescription">Allow editors to create content of this type in the root of the content tree.</localize></small>
+                </div>
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-as-root"
+                                checked="model.allowAsRoot"
+                                on-click="vm.toggleAllowAsRoot()"
+                                hotkey="alt+shift+r">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+            <div class="sub-view-columns" ng-hide="model.isElement">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_childNodesHeading">Allowed child node types</localize></h5>
+                    <small><localize key="contentTypeEditor_childNodesDescription">Allow content of the specified types to be created underneath content of this type.</localize></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-child-selector selected-children="vm.selectedChildren"
+                                        available-children="vm.contentTypes"
+                                        parent-name="model.name"
+                                        parent-icon="model.icon"
+                                        parent-id="model.id"
+                                        on-add="vm.addChild"
+                                        on-remove="vm.removeChild"
+                                        on-sort="vm.sortChildren">
+                    </umb-child-selector>
+                </div>
+
+            </div>
+
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_cultureVariantHeading">Allow vary by culture</localize></h5>
+                    <small><localize key="contentTypeEditor_cultureVariantDescription">Allow editors to create content of different languages.</localize></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowCultureVariant"
+                                on-click="vm.toggleAllowCultureVariants()"
+                                hotkey="alt+shift+v">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+
+            <div class="sub-view-columns" ng-if="vm.showAllowSegmentationOption">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_segmentVariantHeading">Allow segmentation</localize></h5>
+                    <small><localize key="contentTypeEditor_segmentVariantDescription">Allow editors to create segments of this content.</localize></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowSegmentVariant"
+                                on-click="vm.toggleAllowSegmentVariants()">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_elementHeading">Is an Element Type</localize></h5>
+                    <small><localize key="contentTypeEditor_elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the tree.</localize></small>
+                    <small ng-if="!vm.canToggleIsElement"><br/><localize key="contentTypeEditor_elementCannotToggle">A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.</localize></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-is-element"
+                                checked="model.isElement"
+                                disabled="!vm.canToggleIsElement"
+                                on-click="vm.toggleIsElement()">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_historyCleanupHeading">History cleanup</localize></h5>
+                    <small><localize key="contentTypeEditor_historyCleanupDescription">Allow override the global settings for when history versions are removed.</localize></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                  <umb-box-content>
+                    <div class="umb-panel-group__details-status-text umb-alert umb-alert--info mb3" ng-if="!model.historyCleanup.globalEnableCleanup">
+                      <p class="mb0">
+                        <localize key="contentTypeEditor_historyCleanupGloballyDisabled"><b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.</localize>
+                      </p>
+                    </div>
+
+                    <umb-control-group label="@contentTypeEditor_historyCleanupPreventCleanup">
+                        <umb-toggle checked="model.historyCleanup.preventCleanup" on-click="vm.toggleHistoryCleanupPreventCleanup()"></umb-toggle>
+                    </umb-control-group>
+
+                    <umb-control-group label="@contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays">
+                        <input ng-readonly="model.historyCleanup.preventCleanup" placeholder="{{model.historyCleanup.globalKeepAllVersionsNewerThanDays}}" type="number" min="0" max="2147483647" ng-model="model.historyCleanup.keepAllVersionsNewerThanDays" />
+                    </umb-control-group>
+
+                    <umb-control-group label="@contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays">
+                        <input ng-readonly="model.historyCleanup.preventCleanup" placeholder="{{model.historyCleanup.globalKeepLatestVersionPerDayForDays}}" type="number" min="0" max="2147483647" ng-model="model.historyCleanup.keepLatestVersionPerDayForDays" />
+                    </umb-control-group>
+                </div>
+
+            </div>
+
+            </umb-box-content>
+    </umb-box>
+</div>

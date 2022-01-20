@@ -1,34 +1,37 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime
 {
     /// <summary>
     /// Uses a system-wide Semaphore and EventWaitHandle to synchronize the current AppDomain
     /// </summary>
-    internal class MainDomSemaphoreLock : IMainDomLock
+    public class MainDomSemaphoreLock : IMainDomLock
     {
         private readonly SystemLock _systemLock;
 
         // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
-        private readonly ILogger _logger;
+        private readonly ILogger<MainDomSemaphoreLock> _logger;
         private IDisposable _lockRelease;
 
-        public MainDomSemaphoreLock(ILogger logger)
+        public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
         {
-            var lockName = "UMBRACO-" + MainDom.GetMainDomId() + "-MAINDOM-LCK";
+            var mainDomId = MainDom.GetMainDomId(hostingEnvironment);
+            var lockName = "UMBRACO-" + mainDomId + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);
 
-            var eventName = "UMBRACO-" + MainDom.GetMainDomId() + "-MAINDOM-EVT";
+            var eventName = "UMBRACO-" + mainDomId + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
             _logger = logger;
         }
 
-        //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
+        // WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
         public Task ListenAsync() => _signal.WaitOneAsync();
 
         public Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -43,7 +46,7 @@ namespace Umbraco.Core.Runtime
             // if more than 1 instance reach that point, one will get the lock
             // and the other one will timeout, which is accepted
 
-            //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
+            // This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
             try
             {
                 _lockRelease = _systemLock.Lock(millisecondsTimeout);
@@ -51,7 +54,7 @@ namespace Umbraco.Core.Runtime
             }
             catch (TimeoutException ex)
             {
-                _logger.Error<MainDomSemaphoreLock>(ex);
+                _logger.LogError(ex.Message);
                 return Task.FromResult(false);
             }
             finally
@@ -63,7 +66,7 @@ namespace Umbraco.Core.Runtime
                 // which is accepted
 
                 _signal.Reset();
-            }            
+            }
         }
 
         #region IDisposable Support

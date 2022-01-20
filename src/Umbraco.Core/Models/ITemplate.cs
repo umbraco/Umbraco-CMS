@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Defines a Template File (Mvc View)
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
         /// </summary>
-        bool IsMasterTemplate { get; }
+        bool IsMasterTemplate { get; set; }
 
         /// <summary>
         /// returns the master template alias

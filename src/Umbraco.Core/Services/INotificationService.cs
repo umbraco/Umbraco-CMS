@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface INotificationService : IService
     {
@@ -19,7 +15,7 @@ namespace Umbraco.Core.Services
         /// <param name="operatingUser"></param>
         /// <param name="action"></param>
         /// <param name="actionName"></param>
-        /// <param name="http"></param>
+        /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
         void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,

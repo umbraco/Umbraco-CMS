@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using Umbraco.Core.CodeAnnotations;
+﻿using Umbraco.Cms.Core.CodeAnnotations;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Enum used to represent the Umbraco Object Types and their associated GUIDs
@@ -61,7 +59,7 @@ namespace Umbraco.Core.Models
         [FriendlyName("Member Group")]
         [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
         MemberGroup,
-        
+
         /// <summary>
         /// "Media Type
         /// </summary>
@@ -84,14 +82,6 @@ namespace Umbraco.Core.Models
         [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentRecycleBin)]
         [FriendlyName("Recycle Bin")]
         RecycleBin,
-
-        /// <summary>
-        /// Stylesheet
-        /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.Strings.Stylesheet)]
-        [FriendlyName("Stylesheet")]
-        [UmbracoUdiType(Constants.UdiEntityType.Stylesheet)]
-        Stylesheet,
 
         /// <summary>
         /// Member

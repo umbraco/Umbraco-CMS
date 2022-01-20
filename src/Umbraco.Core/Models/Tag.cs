@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a tag entity.
@@ -54,6 +54,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public int NodeCount { get; internal set; }
+        public int NodeCount { get; set; }
     }
 }

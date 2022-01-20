@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
         {
         }
 
-        public Guid AccessEntryId { get; internal set; }
+        public Guid AccessEntryId { get; set; }
 
         public string RuleValue
         {

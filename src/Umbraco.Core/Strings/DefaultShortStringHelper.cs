@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Globalization;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// New default implementation of string functions for short strings such as aliases or URL segments.
@@ -19,9 +21,9 @@ namespace Umbraco.Core.Strings
     {
         #region Ctor, consts and vars
 
-        public DefaultShortStringHelper(IUmbracoSettingsSection settings)
+        public DefaultShortStringHelper(IOptions<RequestHandlerSettings> settings)
         {
-            _config = new DefaultShortStringHelperConfig().WithDefault(settings);
+            _config = new DefaultShortStringHelperConfig().WithDefault(settings.Value);
         }
 
         // clones the config so it cannot be changed at runtime
@@ -619,6 +621,6 @@ namespace Umbraco.Core.Strings
             return new string(output, 0, opos);
         }
 
-        #endregion      
+        #endregion
     }
 }

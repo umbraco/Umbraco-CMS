@@ -16,6 +16,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 
 [Contributing code changes](#contributing-code-changes)
   * [Guidelines for contributions we welcome](#guidelines-for-contributions-we-welcome)
+    * [Ownership and copyright](#ownership-and-copyright)
   * [What can I start with?](#what-can-i-start-with)
   * [How do I begin?](#how-do-i-begin)
   * [Pull requests](#pull-requests)
@@ -44,6 +45,17 @@ We have [documented what we consider small and large changes](CONTRIBUTION_GUIDE
 
 Remember, it is always worth working on an issue from the `Up for grabs` list or even asking for some feedback before you send us a PR. This way, your PR will not be closed as unwanted.
 
+#### Ownership and copyright
+
+It is your responsibility to make sure that you're allowed to share the code you're providing us.
+For example, you should have permission from your employer or customer to share code.
+
+Similarly, if your contribution is copied or adapted from somewhere else, make sure that the license allows you to reuse that for a contribution to Umbraco-CMS.
+
+If you're not sure, leave a note on your contribution and we will be happy to guide you.
+
+When your contribution has been accepted, it will be [MIT licensed](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/LICENSE.md) from that time onwards.
+
 ### What can I start with?
 
 Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` issues](https://github.com/umbraco/Umbraco-CMS/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs+)
@@ -59,11 +71,11 @@ Great question! The short version goes like this:
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
 
   ![Clone the fork](img/clonefork.png)
-  
-  * **Switch to the correct branch** - switch to the `v8/contrib` branch
+
+  * **Switch to the correct branch** - switch to the `v9/contrib` branch
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
-  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/contrib`, create a new branch first.
+  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v9/contrib`, create a new branch first.
   * **Push** - great, now you can push the changes up to your fork on GitHub
   * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress - you can now make use of GitHub's draft pull request status, detailed [here](https://github.blog/2019-02-14-introducing-draft-pull-requests/)). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
@@ -109,7 +121,7 @@ The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan](ht
 - [Owain Williams](https://github.com/OwainWilliams)
 
 
-These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 
+These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged.
 
 ### Questions?
 
@@ -124,7 +136,7 @@ You can get in touch with [the core contributors team](#the-core-contributors-te
 
 In order to build the Umbraco source code locally, first make sure you have the following installed.
 
-  * [Visual Studio 2019 v16.3+ (with .NET Core 3.0)](https://visualstudio.microsoft.com/vs/)
+  * [Visual Studio 2019 v16.8+ (with .NET Core 3.0)](https://visualstudio.microsoft.com/vs/)
   * [Node.js v10+](https://nodejs.org/en/download/)
   * npm v6.4.1+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)
@@ -147,21 +159,21 @@ There are two big areas that you should know about:
   You may need to run the following commands to set up gulp properly:
   ```
   npm cache clean --force
-  npm install
+  npm ci
   npm run build
   ```
   The caching for the back office has been described as 'aggressive' so we often find it's best when making back office changes to disable caching in the browser to help you to see the changes you're making.
- 
+
   2. "The rest" is a C# based codebase, which is mostly ASP.NET MVC based. You can make changes, build them in Visual Studio, and hit `F5` to see the result.
 
 To find the general areas for something you're looking to fix or improve, have a look at the following two parts of the API documentation.
 
-  * [The AngularJS based backoffice files](https://our.umbraco.com/apidocs/ui/#/api) (to be found  in `src\Umbraco.Web.UI.Client\src`)
-  * [The C# application](https://our.umbraco.com/apidocs/csharp/)
+  * [The AngularJS based backoffice files](https://apidocs.umbraco.com/v9/ui#/api) (to be found  in `src\Umbraco.Web.UI.Client\src`)
+  * [The C# application](https://apidocs.umbraco.com/v9/csharp/)
 
 ### Which branch should I target for my contributions?
 
-We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v8/contrib`. If you are working on v8, this is the branch you should be targetting. For v7 contributions, please target 'v7/dev'. 
+We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v9/contrib`. If you are working on v9, this is the branch you should be targetting. For v8 contributions, please target 'v8/contrib'
 
 Please note: we are no longer accepting features for v7 but will continue to merge bug fixes as and when they arise.
 
@@ -187,13 +199,13 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/v8/contrib
+git rebase upstream/v9/contrib
 ```
 
-In this command we're syncing with the `v8/contrib` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `v9/contrib` branch, but you can of course choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
 
 ### And finally
 
-We welcome all kinds of contributions to this repository. If you don't feel you'd like to make code changes here, you can visit our [documentation repository](https://github.com/umbraco/UmbracoDocs) and use your experience to contribute to making the docs we have, even better. We also encourage community members to feel free to comment on others' pull requests and issues - the expertise we have is not limited to the Core Contributors and HQ. So, if you see something on the issue tracker or pull requests you feel you can add to, please don't be shy. 
+We welcome all kinds of contributions to this repository. If you don't feel you'd like to make code changes here, you can visit our [documentation repository](https://github.com/umbraco/UmbracoDocs) and use your experience to contribute to making the docs we have, even better. We also encourage community members to feel free to comment on others' pull requests and issues - the expertise we have is not limited to the Core Contributors and HQ. So, if you see something on the issue tracker or pull requests you feel you can add to, please don't be shy.

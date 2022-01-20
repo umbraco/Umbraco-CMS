@@ -8,11 +8,16 @@ var sort = require('gulp-sort');
 var concat = require('gulp-concat');
 var wrap = require("gulp-wrap-js");
 var embedTemplates = require('gulp-angular-embed-templates');
+var minify = require('gulp-minify');
+var rename = require('gulp-rename');
+var _ = require('lodash');
 
 module.exports = function (files, out) {
-
-    console.log("JS: ", files, " -> ", config.root + config.targets.js + out)
-
+    
+    _.forEach(config.roots, function(root){
+        console.log("JS: ", files, " -> ", root + config.targets.js + out)
+    })
+    
     var task = gulp.src(files);
 
     // check for js errors
@@ -29,9 +34,32 @@ module.exports = function (files, out) {
         task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }));
     }
     
-    task = task.pipe(concat(out))
-        .pipe(wrap('(function(){\n%= body %\n})();'))
-        .pipe(gulp.dest(config.root + config.targets.js));
+    task = task.pipe(concat(out)).pipe(wrap('(function(){\n%= body %\n})();'))
+
+    // NOTE: if you change something here, you probably also need to change it in the js task
+    if (config.compile.current.minify === true) {
+      task = task.pipe(
+        minify({
+          noSource:true,
+          ext: {min:'.min.js'},
+          mangle: false,
+          compress: {
+            keep_classnames: true,
+            keep_fnames: true
+          }
+        })
+      );
+    } else {
+      // rename the un-minified file so the client can reference it as '.min.js'
+      task = task.pipe(rename(function(path) {
+        path.basename += '.min';
+      }));
+    }
+
+    _.forEach(config.roots, function(root){
+        task = task.pipe(gulp.dest(root + config.targets.js));
+    })
+        
 
 
     return task;

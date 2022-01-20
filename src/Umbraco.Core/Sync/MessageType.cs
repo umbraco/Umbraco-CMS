@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Sync
+﻿namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// The message type to be used for syncing across servers.

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines part of the MemberService, which is specific to methods used by the membership provider.
@@ -125,26 +125,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entity"><see cref="IMember"/> or <see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(T entity, bool raiseEvents = true);
+        void Save(T entity);
 
         /// <summary>
         /// Saves a list of <see cref="IMembershipUser"/> objects
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entities"><see cref="IEnumerable{T}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IEnumerable<T> entities, bool raiseEvents = true);
-
-        /// <summary>
-        /// Gets the default MemberType alias
-        /// </summary>
-        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll
-        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
-        /// <returns>Alias of the default MemberType</returns>
-        string GetDefaultMemberType();
+        void Save(IEnumerable<T> entities);
 
         /// <summary>
         /// Finds a list of <see cref="IMembershipUser"/> objects by a partial email string

@@ -1,6 +1,7 @@
-﻿using System.Web;
+﻿using System.Net;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents an item in an array that stores its own index and the total count.
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <value>
         /// The total count.
         /// </value>
-        public int TotalCount { get; internal set; }
+        public int TotalCount { get; set; }
 
         /// <summary>
         /// Determines whether this item is the first.
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsFirst(string valueIfTrue)
+        public IHtmlEncodedString IsFirst(string valueIfTrue)
         {
             return IsFirst(valueIfTrue, string.Empty);
         }
@@ -76,9 +77,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsFirst(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsFirst() ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsFirst() ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -93,6 +94,7 @@ namespace Umbraco.Core.Models.PublishedContent
             return IsFirst() == false;
         }
 
+
         /// <summary>
         /// If this item is not the first, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
         /// </summary>
@@ -101,12 +103,12 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotFirst(string valueIfTrue)
+        public IHtmlEncodedString IsNotFirst(string valueIfTrue)
         {
             return IsNotFirst(valueIfTrue, string.Empty);
         }
 
-        /// <summary>
+         /// <summary>
         /// If this item is not the first, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
         /// </summary>
         /// <param name="valueIfTrue">The value if <c>true</c>.</param>
@@ -115,9 +117,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotFirst(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsNotFirst() ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsNotFirst() ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -132,7 +134,7 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index == index;
         }
 
-        /// <summary>
+         /// <summary>
         /// If this item is at the specified <paramref name="index" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
         /// </summary>
         /// <param name="index">The index.</param>
@@ -141,7 +143,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsIndex(int index, string valueIfTrue)
+        public IHtmlEncodedString IsIndex(int index, string valueIfTrue)
         {
             return IsIndex(index, valueIfTrue, string.Empty);
         }
@@ -156,10 +158,10 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsIndex(int index, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsIndex(int index, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsIndex(index) ? valueIfTrue : valueIfFalse));
-        }
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsIndex(index) ? valueIfTrue : valueIfFalse));
+         }
 
         /// <summary>
         /// Determines whether this item is at an index that can be divided by the specified <paramref name="modulus" />.
@@ -182,7 +184,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsModZero(int modulus, string valueIfTrue)
+        public IHtmlEncodedString IsModZero(int modulus, string valueIfTrue)
         {
             return IsModZero(modulus, valueIfTrue, string.Empty);
         }
@@ -197,9 +199,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsModZero(modulus) ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsModZero(modulus) ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -224,7 +226,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotModZero(int modulus, string valueIfTrue)
+        public IHtmlEncodedString IsNotModZero(int modulus, string valueIfTrue)
         {
             return IsNotModZero(modulus, valueIfTrue, string.Empty);
         }
@@ -239,9 +241,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsNotModZero(modulus) ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsNotModZero(modulus) ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -266,7 +268,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotIndex(int index, string valueIfTrue)
+        public IHtmlEncodedString IsNotIndex(int index, string valueIfTrue)
         {
             return IsNotIndex(index, valueIfTrue, string.Empty);
         }
@@ -281,9 +283,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotIndex(int index, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotIndex(int index, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsNotIndex(index) ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsNotIndex(index) ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -305,7 +307,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsLast(string valueIfTrue)
+        public IHtmlEncodedString IsLast(string valueIfTrue)
         {
             return IsLast(valueIfTrue, string.Empty);
         }
@@ -319,9 +321,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsLast(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsLast() ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsLast() ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -344,7 +346,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotLast(string valueIfTrue)
+        public IHtmlEncodedString IsNotLast(string valueIfTrue)
         {
             return IsNotLast(valueIfTrue, string.Empty);
         }
@@ -358,9 +360,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsNotLast() ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsNotLast() ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -382,7 +384,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsEven(string valueIfTrue)
+        public IHtmlEncodedString IsEven(string valueIfTrue)
         {
             return IsEven(valueIfTrue, string.Empty);
         }
@@ -396,9 +398,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsEven(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsEven() ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsEven() ? valueIfTrue : valueIfFalse));
         }
 
         /// <summary>
@@ -420,7 +422,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsOdd(string valueIfTrue)
+        public IHtmlEncodedString IsOdd(string valueIfTrue)
         {
             return IsOdd(valueIfTrue, string.Empty);
         }
@@ -434,9 +436,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// The HTML encoded value.
         /// </returns>
         // TODO: This method should be removed or moved to an extension method on HtmlHelper.
-        public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsOdd(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(HttpUtility.HtmlEncode(IsOdd() ? valueIfTrue : valueIfFalse));
+            return new HtmlEncodedString(WebUtility.HtmlEncode(IsOdd() ? valueIfTrue : valueIfFalse));
         }
     }
 }

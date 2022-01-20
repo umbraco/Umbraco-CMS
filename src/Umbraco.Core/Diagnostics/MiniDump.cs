@@ -1,16 +1,16 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Diagnostics
+namespace Umbraco.Cms.Core.Diagnostics
 {
     // taken from https://blogs.msdn.microsoft.com/dondu/2010/10/24/writing-minidumps-in-c/
     // and https://blogs.msdn.microsoft.com/dondu/2010/10/31/writing-minidumps-from-exceptions-in-c/
     // which itself got it from http://blog.kalmbach-software.de/2008/12/13/writing-minidumps-in-c/
 
-    internal static class MiniDump
+    public static class MiniDump
     {
         private static readonly object LockO = new object();
 
@@ -77,29 +77,33 @@ namespace Umbraco.Core.Diagnostics
         [DllImport("kernel32.dll", EntryPoint = "GetCurrentThreadId", ExactSpelling = true)]
         private static extern uint GetCurrentThreadId();
 
-        private static bool Write(SafeHandle fileHandle, Option options, bool withException = false)
+        private static bool Write(IMarchal marchal, SafeHandle fileHandle, Option options, bool withException = false)
         {
-            var currentProcess = Process.GetCurrentProcess();
-            var currentProcessHandle = currentProcess.Handle;
-            var currentProcessId = (uint)currentProcess.Id;
+            using (var currentProcess = Process.GetCurrentProcess())
+            {
+                var currentProcessHandle = currentProcess.Handle;
+                var currentProcessId = (uint)currentProcess.Id;
 
-            MiniDumpExceptionInformation exp;
+                MiniDumpExceptionInformation exp;
 
-            exp.ThreadId = GetCurrentThreadId();
-            exp.ClientPointers = false;
-            exp.ExceptionPointers = IntPtr.Zero;
+                exp.ThreadId = GetCurrentThreadId();
+                exp.ClientPointers = false;
+                exp.ExceptionPointers = IntPtr.Zero;
 
-            if (withException)
-                exp.ExceptionPointers = Marshal.GetExceptionPointers();
+                if (withException)
+                {
+                    exp.ExceptionPointers = marchal.GetExceptionPointers();
+                }
 
-            var bRet = exp.ExceptionPointers == IntPtr.Zero
-                ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
-                : MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, ref exp, IntPtr.Zero, IntPtr.Zero);
+                var bRet = exp.ExceptionPointers == IntPtr.Zero
+                    ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint)options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
+                    : MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint)options, ref exp, IntPtr.Zero, IntPtr.Zero);
 
-            return bRet;
+                return bRet;
+            }
         }
 
-        public static bool Dump(Option options = Option.WithFullMemory, bool withException = false)
+        public static bool Dump(IMarchal marchal, IHostingEnvironment hostingEnvironment, Option options = Option.WithFullMemory, bool withException = false)
         {
             lock (LockO)
             {
@@ -109,25 +113,31 @@ namespace Umbraco.Core.Diagnostics
                 // filter everywhere in our code = not!
                 var stacktrace = withException ? Environment.StackTrace : string.Empty;
 
-                var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
-                if (Directory.Exists(filepath) == false)
-                    Directory.CreateDirectory(filepath);
+                var directory = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
 
-                var filename = Path.Combine(filepath, string.Format("{0:yyyyMMddTHHmmss}.{1}.dmp", DateTime.UtcNow, Guid.NewGuid().ToString("N").Substring(0, 4)));
+                if (Directory.Exists(directory) == false)
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var filename = Path.Combine(directory, $"{DateTime.UtcNow:yyyyMMddTHHmmss}.{Guid.NewGuid().ToString("N").Substring(0, 4)}.dmp");
                 using (var stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Write))
                 {
-                    return Write(stream.SafeFileHandle, options, withException);
+                    return Write(marchal, stream.SafeFileHandle, options, withException);
                 }
             }
         }
 
-        public static bool OkToDump()
+        public static bool OkToDump(IHostingEnvironment hostingEnvironment)
         {
             lock (LockO)
             {
-                var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
-                if (Directory.Exists(filepath) == false) return true;
-                var count = Directory.GetFiles(filepath, "*.dmp").Length;
+                var directory = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
+                if (Directory.Exists(directory) == false)
+                {
+                    return true;
+                }
+                var count = Directory.GetFiles(directory, "*.dmp").Length;
                 return count < 8;
             }
         }

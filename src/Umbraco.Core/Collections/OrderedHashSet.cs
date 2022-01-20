@@ -1,13 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     /// <summary>
     /// A custom collection similar to HashSet{T} which only contains unique items, however this collection keeps items in order
     /// and is customizable to keep the newest or oldest equatable item
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class OrderedHashSet<T> : KeyedCollection<T, T>
+    public class OrderedHashSet<T> : KeyedCollection<T, T>
     {
         private readonly bool _keepOldest;
 

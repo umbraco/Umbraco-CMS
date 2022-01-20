@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a property index value factory.
@@ -19,6 +19,6 @@ namespace Umbraco.Core.PropertyEditors
         /// values. By default, there would be only one object: the property value. But some implementations may return
         /// more than one value for a given field.</para>
         /// </remarks>
-        IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published);
+        IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published);
     }
 }

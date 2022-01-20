@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Membership
+﻿namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Defines the User Profile interface

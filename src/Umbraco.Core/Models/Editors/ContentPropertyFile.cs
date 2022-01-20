@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Editors
+﻿namespace Umbraco.Cms.Core.Models.Editors
 {
 
     /// <summary>
@@ -22,7 +22,7 @@
         public string Segment { get; set; }
 
         /// <summary>
-        /// An array of metadata that is parsed out from the file info posted to the server which is set on the client. 
+        /// An array of metadata that is parsed out from the file info posted to the server which is set on the client.
         /// </summary>
         /// <remarks>
         /// This can be used for property types like Nested Content that need to have special unique identifiers for each file since there might be multiple files

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Indicates that this is a default property value converter (shipped with Umbraco)
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    internal class DefaultPropertyValueConverterAttribute : Attribute
+    public class DefaultPropertyValueConverterAttribute : Attribute
     {
         public DefaultPropertyValueConverterAttribute()
         {

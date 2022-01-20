@@ -1,12 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users.
@@ -206,6 +203,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
+        IEnumerable<IUser> GetNextUsers(int id, int count);
+
         #region User groups
 
         /// <summary>
@@ -244,9 +243,7 @@ namespace Umbraco.Core.Services
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true);
+        void Save(IUserGroup userGroup, int[] userIds = null);
 
         /// <summary>
         /// Deletes a UserGroup

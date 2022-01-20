@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
-    internal interface IDeletingMediaFilesEventArgs
+    public interface IDeletingMediaFilesEventArgs
     {
         List<string> MediaFilesToDelete { get; }
     }

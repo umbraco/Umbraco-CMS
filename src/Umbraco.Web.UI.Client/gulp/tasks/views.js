@@ -12,12 +12,15 @@ function views() {
 
     _.forEach(config.sources.views, function (group) {
 
-        console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder)
+        var task = gulp.src(group.files);
 
-        stream.add (
-            gulp.src(group.files)
-                .pipe( gulp.dest(config.root + config.targets.views + group.folder) )
-        );
+        _.forEach(config.roots, function(root){
+            var destPath = root + config.targets.views + group.folder;
+            console.log("copying " + group.files + " to " + destPath)
+            task = task.pipe( gulp.dest(destPath));
+        })
+
+        stream.add (task);
 
     });
 

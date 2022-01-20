@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines the Localization Service, which is an easy access to operations involving Languages and Dictionary
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
         /// Adds or updates a translation for a dictionary item and language
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="language"></param>
+        /// <param name="language"></param
         /// <param name="value"></param>
         /// <returns></returns>
         void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value);
@@ -102,12 +102,12 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="ILanguage"/></param>
         /// <returns><see cref="ILanguage"/></returns>
         ILanguage GetLanguageById(int id);
-        
+
         /// <summary>
-        /// Gets a <see cref="Language"/> by its iso code
+        /// Gets a <see cref="ILanguage"/> by its iso code
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
-        /// <returns><see cref="Language"/></returns>
+        /// <returns><see cref="ILanguage"/></returns>
         ILanguage GetLanguageByIsoCode(string isoCode);
 
         /// <summary>

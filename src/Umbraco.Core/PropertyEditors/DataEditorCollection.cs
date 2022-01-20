@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using System;
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class DataEditorCollection : BuilderCollectionBase<IDataEditor>
     {
-        public DataEditorCollection(IEnumerable<IDataEditor> items)
-            : base(items)
-        { }
+        public DataEditorCollection(Func<IEnumerable<IDataEditor>> items) : base(items)
+        {
+        }
     }
 }

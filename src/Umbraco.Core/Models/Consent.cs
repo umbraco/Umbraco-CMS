@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a consent.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class Consent : EntityBase, IConsent
+    public class Consent : EntityBase, IConsent
     {
         private bool _current;
         private string _source;
@@ -81,6 +81,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the previous states of this consent.
         /// </summary>
-        internal List<IConsent> HistoryInternal { get; set; }
+        public List<IConsent> HistoryInternal { get; set; }
     }
 }

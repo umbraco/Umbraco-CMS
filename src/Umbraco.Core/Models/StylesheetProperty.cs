@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Stylesheet Property
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class StylesheetProperty : BeingDirtyBase, IValueObject
+    public class StylesheetProperty : BeingDirtyBase, IValueObject, IStylesheetProperty
     {
         private string _alias;
         private string _value;

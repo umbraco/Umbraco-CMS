@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services.Changes
+namespace Umbraco.Cms.Core.Services.Changes
 {
     public class ContentTypeChange<TItem>
         where TItem : class, IContentTypeComposition
@@ -15,26 +15,7 @@ namespace Umbraco.Core.Services.Changes
 
         public TItem Item { get; }
 
-        public ContentTypeChangeTypes ChangeTypes { get; internal set; }
-
-        public EventArgs ToEventArgs(ContentTypeChange<TItem> change)
-        {
-            return new EventArgs(change);
-        }
-
-        public class EventArgs : System.EventArgs
-        {
-            public EventArgs(IEnumerable<ContentTypeChange<TItem>> changes)
-            {
-                Changes = changes.ToArray();
-            }
-
-            public EventArgs(ContentTypeChange<TItem> change)
-                : this(new[] { change })
-            { }
-
-            public IEnumerable<ContentTypeChange<TItem>> Changes { get; private set; }
-        }
+        public ContentTypeChangeTypes ChangeTypes { get; set; }
     }
 
 }

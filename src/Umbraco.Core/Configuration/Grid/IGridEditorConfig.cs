@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Core.Configuration.Grid
+namespace Umbraco.Cms.Core.Configuration.Grid
 {
     public interface IGridEditorConfig
     {

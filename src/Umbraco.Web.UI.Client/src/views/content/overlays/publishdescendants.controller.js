@@ -22,7 +22,7 @@
                 });
             }
             if (!vm.labels.includeUnpublished) {
-                localizationService.localize("content_includeUnpublished").then(function (value) {
+                localizationService.localize("content_includeUnpublished").then(value => {
                     vm.labels.includeUnpublished = value;
                 });
             }

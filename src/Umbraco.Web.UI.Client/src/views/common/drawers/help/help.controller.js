@@ -1,11 +1,11 @@
+
 (function () {
     "use strict";
 
-    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState) {
+    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState, notificationsService, currentUserResource, platformService) {
 
         var vm = this;
         var evts = [];
-
         vm.title = "";
         vm.subtitle = "Umbraco version" + " " + Umbraco.Sys.ServerVariables.application.version;
         vm.section = $routeParams.section;
@@ -13,16 +13,25 @@
         vm.sectionName = "";
         vm.customDashboard = null;
         vm.tours = [];
+        vm.systemInfoDisplay = false;
+        vm.labels = {};
+        vm.labels.copiedSuccessInfo = "";
+        vm.labels.copySuccessStatus = "";
+        vm.labels.copiedErrorInfo = "";
+        vm.labels.copyErrorStatus = "";
+
 
         vm.closeDrawer = closeDrawer;
         vm.startTour = startTour;
         vm.getTourGroupCompletedPercentage = getTourGroupCompletedPercentage;
         vm.showTourButton = showTourButton;
+        vm.copyInformation = copyInformation;
 
         vm.showDocTypeTour = false;
         vm.docTypeTours = [];
+        vm.systemInfo = [];
         vm.nodeName = '';
-            
+
         function startTour(tour) {
             tourService.startTour(tour);
             closeDrawer();
@@ -34,7 +43,32 @@
             localizationService.localize("general_help").then(function(data){
                 vm.title = data;
             });
+            //Set help dashboard messages
+          var labelKeys = [
+            "general_help",
+            "speechBubbles_copySuccessMessage",
+            "general_success",
+            "speechBubbles_cannotCopyInformation",
+            "general_error"
+          ];
+          localizationService.localizeMany(labelKeys).then(function(resp){
+            [
+              vm.title,
+              vm.labels.copiedSuccessInfo,
+              vm.labels.copySuccessStatus,
+              vm.labels.copiedErrorInfo,
+              vm.labels.copyErrorStatus
+            ] = resp;
+          });
 
+            currentUserResource.getUserData().then(function(systemInfo){
+              vm.systemInfo = systemInfo;
+              let browserInfo = platformService.getBrowserInfo();
+              if(browserInfo != null){
+                vm.systemInfo.push({name :"Browser", data: browserInfo.name + " " + browserInfo.version});
+              }
+              vm.systemInfo.push({name :"Browser OS", data: getPlatform()});
+            } );
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
                 getTourGroupCompletedPercentage();
@@ -52,11 +86,11 @@
             setSectionName();
 
             userService.getCurrentUser().then(function (user) {
-                
+
                 vm.userType = user.userType;
                 vm.userLang = user.locale;
 
-                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
+                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');
 
                 evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
                     handleSectionChange();
@@ -72,7 +106,7 @@
             });
 
             setDocTypeTour(editorState.getCurrent());
-            
+
             // check if a tour is running - if it is open the matching group
             var currentTour = tourService.getCurrentTour();
 
@@ -89,7 +123,7 @@
         function handleSectionChange() {
             $timeout(function () {
                 if (vm.section !== $routeParams.section || vm.tree !== $routeParams.tree) {
-                    
+
                     vm.section = $routeParams.section;
                     vm.tree = $routeParams.tree;
 
@@ -107,7 +141,7 @@
                     vm.topics = topics;
                 });
             }
-            
+
 
             var rq = {};
             rq.section = vm.section;
@@ -134,7 +168,7 @@
                 helpService.findVideos(rq).then(function (videos) {
                     vm.videos = videos;
                 });
-            }                       
+            }
         }
 
         function setSectionName() {
@@ -190,13 +224,40 @@
                     tourService.getToursForDoctype(node.contentTypeAlias).then(function (data) {
                         if (data && data.length > 0) {
                             vm.docTypeTours = data;
-                            var currentVariant = _.find(node.variants, (x) => x.active);                           
+                            var currentVariant = _.find(node.variants, (x) => x.active);
                             vm.nodeName = currentVariant.name;
                             vm.showDocTypeTour = true;
                         }
                     });
                 }
             }
+        }
+        function copyInformation(){
+          //Write start and end text for table formatting in github issues
+          let copyStartText = "<html>\n<body>\n<!--StartFragment-->\n\nCategory | Data\n-- | --\n";
+          let copyEndText = "\n<!--EndFragment-->\n</body>\n</html>";
+
+          let copyText = copyStartText;
+          vm.systemInfo.forEach(function (info){
+            copyText += info.name + " | " + info.data + "\n";
+          });
+
+          copyText += copyEndText;
+
+          // Check if copyText is only start + end text
+          // if it is something went wrong and we will not copy to clipboard
+          let emptyCopyText = copyStartText + copyEndText;
+          if(copyText !== emptyCopyText) {
+            notificationsService.success(vm.labels.copySuccessStatus, vm.labels.copiedSuccessInfo);
+            navigator.clipboard.writeText(copyText);
+          }
+          else {
+            notificationsService.error(vm.labels.copyErrorStatus, vm.labels.copiedErrorInfo);
+          }
+        }
+
+        function getPlatform() {
+          return window.navigator.platform;
         }
 
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
@@ -206,7 +267,7 @@
                 getTourGroupCompletedPercentage();
             });
         }));
-           
+
         $scope.$on('$destroy', function () {
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
@@ -214,8 +275,8 @@
         });
 
         oninit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Drawers.Help", HelpDrawerController);
+
 })();

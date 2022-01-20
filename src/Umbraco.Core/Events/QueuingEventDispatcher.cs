@@ -1,17 +1,22 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.Events
+using Umbraco.Cms.Core.IO;
+
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// An IEventDispatcher that queues events, and raise them when the scope
     /// exits and has been completed.
     /// </summary>
-    internal class QueuingEventDispatcher : QueuingEventDispatcherBase
+    public class QueuingEventDispatcher : QueuingEventDispatcherBase
     {
-        public QueuingEventDispatcher()
+        private readonly MediaFileManager _mediaFileManager;
+        public QueuingEventDispatcher(MediaFileManager mediaFileManager)
             : base(true)
-        { }
+        {
+            _mediaFileManager = mediaFileManager;
+        }
 
         protected override void ScopeExitCompleted()
         {
@@ -28,13 +33,11 @@ namespace Umbraco.Core.Events
                 // but then where should it be (without making things too complicated)?
                 var delete = e.Args as IDeletingMediaFilesEventArgs;
                 if (delete != null && delete.MediaFilesToDelete.Count > 0)
-                    MediaFileSystem.DeleteMediaFiles(delete.MediaFilesToDelete);
+                    _mediaFileManager.DeleteMediaFiles(delete.MediaFilesToDelete);
             }
         }
 
-        private IMediaFileSystem _mediaFileSystem;
 
-        // TODO: inject
-        private IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
+
     }
 }

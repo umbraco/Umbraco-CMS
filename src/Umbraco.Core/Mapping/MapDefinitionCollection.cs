@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using System;
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Mapping
+namespace Umbraco.Cms.Core.Mapping
 {
     public class MapDefinitionCollection : BuilderCollectionBase<IMapDefinition>
     {
-        public MapDefinitionCollection(IEnumerable<IMapDefinition> items)
-            : base(items)
-        { }
+        public MapDefinitionCollection(Func<IEnumerable<IMapDefinition>> items) : base(items)
+        {
+        }
     }
 }

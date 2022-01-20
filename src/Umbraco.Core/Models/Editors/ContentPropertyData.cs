@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models.Editors
+namespace Umbraco.Cms.Core.Models.Editors
 {
     /// <summary>
     /// Represents data that has been submitted to be saved for a content property

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
@@ -49,6 +49,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Readonly value of the language ISO code for the domain
         /// </summary>
-        public string LanguageIsoCode { get; internal set; }
+        public string LanguageIsoCode { get; set; }
     }
 }

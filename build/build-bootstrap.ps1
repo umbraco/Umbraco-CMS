@@ -23,7 +23,7 @@
   $cache = 4
   $nuget = "$scriptTemp\nuget.exe"
   # ensure the correct NuGet-source is used. This one is used by Umbraco
-  $nugetsourceUmbraco = "https://www.myget.org/F/umbracocore/api/v3/index.json"
+  $nugetsourceUmbraco = "https://www.myget.org/F/umbracoprereleases/api/v3/index.json"
   if (-not $local)
   {
     $source = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
@@ -34,7 +34,7 @@
     if (-not (test-path $nuget))
     {
       Write-Host "Download NuGet..."
-      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+	  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
       Invoke-WebRequest $source -OutFile $nuget
       if (-not $?) { throw "Failed to download NuGet." }
     }

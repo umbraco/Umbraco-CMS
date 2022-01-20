@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Exceptions
+namespace Umbraco.Cms.Core.Exceptions
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class DataOperationException<T> : Exception
+    public class DataOperationException<T> : Exception
         where T : Enum
     {
         /// <summary>

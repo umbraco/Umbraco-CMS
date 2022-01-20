@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Xml;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class DatePickerValueConverter : PropertyValueConverterBase

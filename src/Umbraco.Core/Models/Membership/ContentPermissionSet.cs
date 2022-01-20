@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Represents an <see cref="IContent"/> -> user group & permission key value pair collection
     /// </summary>
     /// <remarks>
-    /// This implements <see cref="IAggregateRoot"/> purely so it can be used with the repository layer which is why it's explicitly implemented.
+    /// This implements <see cref="IEntity"/> purely so it can be used with the repository layer which is why it's explicitly implemented.
     /// </remarks>
     public class ContentPermissionSet : EntityPermissionSet, IEntity
     {
@@ -36,6 +35,8 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return EntityId > 0; }
         }
+
+        void IEntity.ResetIdentity() => throw new InvalidOperationException($"Resetting identity on {nameof(ContentPermissionSet)} is invalid");
 
         Guid IEntity.Key { get; set; }
 

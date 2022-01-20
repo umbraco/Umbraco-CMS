@@ -5,14 +5,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
+
     /// <summary>
     /// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
     /// than doing a manual type check in c#
     /// </summary>
-    internal static class TypeHelper
+    public static class TypeHelper
     {
         private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
@@ -21,11 +23,13 @@ namespace Umbraco.Core.Composing
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
 
+
+
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.
         /// </summary>
-        internal static IList CreateGenericEnumerableFromObject(object obj)
+        public static IList CreateGenericEnumerableFromObject(object obj)
         {
             var type = obj.GetType();
 
@@ -79,9 +83,9 @@ namespace Umbraco.Core.Composing
         /// If the assembly of the assignTypeFrom Type is in the App_Code assembly, then we return nothing since things cannot
         /// reference that assembly, same with the global.asax assembly.
         /// </remarks>
-        public static Assembly[] GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
+        public static IReadOnlyList<Assembly> GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
         {
-            if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
+            if (assembly.IsDynamic || assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
                 return EmptyAssemblies;
 
 
@@ -89,7 +93,7 @@ namespace Umbraco.Core.Composing
             // should only be scanning those assemblies because any other assembly will definitely not
             // contain sub type's of the one we're currently looking for
             var name = assembly.GetName().Name;
-            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToArray();
+            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToList();
         }
 
         /// <summary>
@@ -323,7 +327,7 @@ namespace Umbraco.Core.Composing
             return MatchType(implementation, contract, new Dictionary<string, Type>());
         }
 
-        internal static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
+        public static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
         {
             if (contract.IsGenericType)
             {

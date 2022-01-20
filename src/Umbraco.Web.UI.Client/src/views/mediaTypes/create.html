@@ -1,0 +1,76 @@
+<div ng-controller="Umbraco.Editors.MediaTypes.CreateController">
+
+  <div ng-cloak ng-show="!model.creatingFolder">
+    <div class="umbracoDialog umb-dialog-body with-footer">
+
+      <div class="umb-pane">
+        <h5>
+          <localize key="create_createUnder">Create an item under</localize>
+          {{currentNode.name}}
+        </h5>
+
+        <ul class="umb-actions umb-actions-child">
+          <li class="umb-action">
+            <button class="umb-action-link umb-outline btn-reset" ng-click="createMediaType()" type="button"
+                    umb-auto-focus>
+              <umb-icon class="icon large" icon="icon-item-arrangement"></umb-icon>
+              <span class="menu-label">
+                                <localize key="general_new">New</localize>
+                                <localize key="content_mediatype">Media type</localize>
+                            </span>
+            </button>
+          </li>
+          <li class="umb-action">
+            <button class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()" type="button">
+              <umb-icon class="icon large" icon="icon-folder"></umb-icon>
+              <span class="menu-label"><localize key="general_folder">Folder</localize>...</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+      <button class="btn btn-info" ng-click="close()" type="button">
+        <localize key="buttons_somethingElse">Do something else</localize>
+      </button>
+    </div>
+  </div>
+
+  <div ng-cloak ng-show="model.creatingFolder">
+    <form name="createFolderForm" ng-submit="createContainer()"
+          novalidate
+          val-form-manager>
+      <div class="umbracoDialog umb-dialog-body with-footer">
+        <div class="umb-pane" ng-show="model.creatingFolder">
+          <div ng-show="error">
+            <div class="alert alert-error">
+              <div><strong>{{error.errorMsg}}</strong></div>
+              <div>{{error.data.message}}</div>
+            </div>
+          </div>
+
+          <umb-control-group hide-label="false" label="Enter a folder name">
+            <input class="umb-textstring textstring input-block-level"
+                   focus-when="{{model.creatingFolder}}"
+                   name="folderName"
+                   ng-model="model.folderName"
+                   required
+                   type="text"/>
+          </umb-control-group>
+        </div>
+      </div>
+      <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <umb-button action="close()"
+                    button-style="link"
+                    label-key="general_close"
+                    type="button">
+        </umb-button>
+        <umb-button button-style="primary"
+                    label-key="general_create"
+                    type="submit">
+        </umb-button>
+      </div>
+    </form>
+  </div>
+</div>

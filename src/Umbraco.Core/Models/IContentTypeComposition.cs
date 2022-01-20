@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Defines the Composition of a ContentType
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the property types for the entire composition.
         /// </summary>
-        IEnumerable<PropertyType> CompositionPropertyTypes { get; }
+        IEnumerable<IPropertyType> CompositionPropertyTypes { get; }
 
         /// <summary>
         /// Adds a new ContentType to the list of composite ContentTypes
@@ -55,5 +55,18 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>An enumerable list of integer ids</returns>
         IEnumerable<int> CompositionIds();
+
+        /// <summary>
+        /// Returns a list of content type ids that have been removed from this instance's composition
+        /// </summary>
+        IEnumerable<int> RemovedContentTypes { get; }
+
+        /// <summary>
+        /// Gets the property types obtained via composition.
+        /// </summary>
+        /// <remarks>
+        /// <para>Gets them raw, ie with their original variation.</para>
+        /// </remarks>
+        IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes();
     }
 }

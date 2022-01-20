@@ -3,31 +3,42 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xml.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
-using Umbraco.Core.PropertyEditors.Validators;
-using Umbraco.Core.Services;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a value editor.
     /// </summary>
+    [DataContract]
     public class DataValueEditor : IDataValueEditor
     {
-        private string _view;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly IJsonSerializer _jsonSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor() // for tests, and manifest
+        public DataValueEditor(
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer) // for tests, and manifest
         {
+            _localizedTextService = localizedTextService;
+            _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
         }
@@ -35,24 +46,26 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(string view, params IValueValidator[] validators) // not used
-            : this()
-        {
-            View = view;
-            Validators.AddRange(validators);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
-        /// </summary>
-        public DataValueEditor(DataEditorAttribute attribute)
-            : this()
+        public DataValueEditor(
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+            _localizedTextService = localizedTextService;
+            _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
 
             var view = attribute.View;
             if (string.IsNullOrWhiteSpace(view))
                 throw new ArgumentException("The attribute does not specify a view.", nameof(attribute));
+
+            if (view.StartsWith("~/"))
+            {
+                view = ioHelper.ResolveRelativeOrVirtualUrl(view);
+            }
 
             View = view;
             ValueType = attribute.ValueType;
@@ -71,17 +84,14 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>The view can be three things: (1) the full virtual path, or (2) the relative path to the current Umbraco
         /// folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.</para>
         /// </remarks>
-        [JsonProperty("view", Required = Required.Always)]
-        public string View
-        {
-            get => _view;
-            set => _view = IOHelper.ResolveVirtualUrl(value);
-        }
+        [Required]
+        [DataMember(Name = "view")]
+        public string View { get; set; }
 
         /// <summary>
         /// The value type which reflects how it is validated and stored in the database
         /// </summary>
-        [JsonProperty("valueType")]
+        [DataMember(Name = "valueType")]
         public string ValueType { get; set; }
 
         /// <inheritdoc />
@@ -114,23 +124,23 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// A collection of validators for the pre value editor
         /// </summary>
-        [JsonProperty("validation")]
-        public List<IValueValidator> Validators { get; private set; }
+        [DataMember(Name = "validation")]
+        public List<IValueValidator> Validators { get; private set; } = new List<IValueValidator>();
 
         /// <summary>
         /// Gets the validator used to validate the special property type -level "required".
         /// </summary>
-        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator();
+        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator(_localizedTextService);
 
         /// <summary>
         /// Gets the validator used to validate the special property type -level "format".
         /// </summary>
-        public virtual IValueFormatValidator FormatValidator => new RegexValidator();
+        public virtual IValueFormatValidator FormatValidator => new RegexValidator(_localizedTextService);
 
         /// <summary>
         /// If this is true than the editor will be displayed full width without a label
         /// </summary>
-        [JsonProperty("hideLabel")]
+        [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
 
         /// <summary>
@@ -145,8 +155,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
-            if (value is JValue)
-                value = value.ToString();
+            // if (value is JValue)
+            //     value = value.ToString();
 
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
             if (value is string s && string.IsNullOrWhiteSpace(s))
@@ -219,7 +229,7 @@ namespace Umbraco.Core.PropertyEditors
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
-                Current.Logger.Warn<DataValueEditor,object,ValueStorageType>("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
+                StaticApplicationLogging.Logger.LogWarning("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
                 return null;
             }
             return result.Result;
@@ -237,7 +247,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public virtual object ToEditor(IProperty property, string culture = null, string segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return string.Empty;
@@ -253,7 +263,7 @@ namespace Umbraco.Core.PropertyEditors
                     {
                         try
                         {
-                            var json = JsonConvert.DeserializeObject(asString);
+                            var json = _jsonSerializer.Deserialize<dynamic>(asString);
                             return json;
                         }
                         catch
@@ -283,16 +293,17 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
+
         // TODO: the methods below should be replaced by proper property value convert ToXPath usage!
 
         /// <summary>
         /// Converts a property to Xml fragments.
         /// </summary>
-        public IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published)
+        public IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published)
         {
             published &= property.PropertyType.SupportsPublishing;
 
-            var nodeName = property.PropertyType.Alias.ToSafeAlias();
+            var nodeName = property.PropertyType.Alias.ToSafeAlias(_shortStringHelper);
 
             foreach (var pvalue in property.Values)
             {
@@ -306,7 +317,7 @@ namespace Umbraco.Core.PropertyEditors
                 if (pvalue.Segment != null)
                     xElement.Add(new XAttribute("segment", pvalue.Segment));
 
-                var xValue = ConvertDbToXml(property.PropertyType, value, dataTypeService);
+                var xValue = ConvertDbToXml(property.PropertyType, value);
                 xElement.Add(xValue);
 
                 yield return xElement;
@@ -322,12 +333,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public XNode ConvertDbToXml(IPropertyType propertyType, object value)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (value == null || value.ToString().IsNullOrWhiteSpace())
             {
-                return new XText(ConvertDbToString(propertyType, value, dataTypeService));
+                return new XText(ConvertDbToString(propertyType, value));
             }
 
             switch (ValueTypes.ToStorageType(ValueType))
@@ -335,11 +346,11 @@ namespace Umbraco.Core.PropertyEditors
                 case ValueStorageType.Date:
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
-                    return new XText(ConvertDbToString(propertyType, value, dataTypeService));
+                    return new XText(ConvertDbToString(propertyType, value));
                 case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     //put text in cdata
-                    return new XCData(ConvertDbToString(propertyType, value, dataTypeService));
+                    return new XCData(ConvertDbToString(propertyType, value));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -348,7 +359,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a string.
         /// </summary>
-        public virtual string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public virtual string ConvertDbToString(IPropertyType propertyType, object value)
         {
             if (value == null)
                 return string.Empty;

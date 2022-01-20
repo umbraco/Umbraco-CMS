@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Core.Persistence.Querying
 {
     /// <summary>
     /// Represents a query for building Linq translatable SQL queries

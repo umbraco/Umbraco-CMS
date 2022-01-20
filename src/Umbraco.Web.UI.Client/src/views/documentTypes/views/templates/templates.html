@@ -1,0 +1,43 @@
+<div ng-controller="Umbraco.Editors.DocumentType.TemplatesController as vm">
+    <umb-box ng-hide="vm.isElement">
+        <umb-box-content>
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_allowedTemplatesHeading">Allowed Templates</localize></h5>
+                    <small><localize key="contentTypeEditor_allowedTemplatesDescription">Choose which templates editors are allowed to use on content of this type</localize></small>
+                </div>
+                
+                <div class="sub-view-column-right">
+                    <umb-grid-selector
+                        ng-if="vm.availableTemplates"
+                        selected-items="model.allowedTemplates"
+                        available-items="vm.availableTemplates"
+                        default-item="model.defaultTemplate"
+                        item-name="template"
+                        name="model.name"
+                        alias="model.alias"
+                        update-placeholder="vm.updateTemplatePlaceholder"
+                        item-picker="vm.openTemplatePicker">
+                    </umb-grid-selector>
+
+                    <umb-button
+                        ng-if="vm.canCreateTemplate"
+                        type="button"
+                        button-style="info"
+                        action="vm.createTemplate()"
+                        state="vm.createTemplateButtonState"
+                        label-key="settings_createMatchingTemplate">
+                    </umb-button>
+
+                </div>
+
+            </div>
+        </umb-box-content>
+    </umb-box>
+    <umb-empty-state
+        ng-show="vm.isElement"
+        position="center">
+        <localize key="contentTypeEditor_elementDoesNotSupport">This is not applicable for an Element type</localize>
+    </umb-empty-state>
+</div>

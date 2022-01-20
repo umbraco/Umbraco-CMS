@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Marks a ConfigurationEditor property as a configuration field, and a class as a configuration field type.

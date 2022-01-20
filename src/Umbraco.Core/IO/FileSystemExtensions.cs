@@ -1,11 +1,34 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
+using Microsoft.Extensions.FileProviders;
+using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Extensions
 {
     public static class FileSystemExtensions
     {
+        public static string GetStreamHash(this Stream fileStream)
+        {
+            if (fileStream.CanSeek)
+            {
+                fileStream.Seek(0, SeekOrigin.Begin);
+            }
+
+            using HashAlgorithm alg = SHA1.Create();
+
+            // create a string output for the hash
+            var stringBuilder = new StringBuilder();
+            var hashedByteArray = alg.ComputeHash(fileStream);
+            foreach (var b in hashedByteArray)
+            {
+                stringBuilder.Append(b.ToString("x2"));
+            }
+            return stringBuilder.ToString();
+        }
+
         /// <summary>
         /// Attempts to open the file at <code>filePath</code> up to <code>maxRetries</code> times,
         /// with a thread sleep time of <code>sleepPerRetryInMilliseconds</code> between retries.
@@ -55,7 +78,7 @@ namespace Umbraco.Core.IO
         }
 
         // TODO: Currently this is the only way to do this
-        internal static void CreateFolder(this IFileSystem fs, string folderPath)
+        public static void CreateFolder(this IFileSystem fs, string folderPath)
         {
             var path = fs.GetRelativePath(folderPath);
             var tempFile = Path.Combine(path, Guid.NewGuid().ToString("N") + ".tmp");
@@ -67,31 +90,22 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Unwraps a filesystem.
+        /// Creates a new <see cref="IFileProvider" /> from the file system.
         /// </summary>
-        /// <remarks>
-        /// <para>A filesystem can be wrapped in a <see cref="FileSystemWrapper"/> (public) or a <see cref="ShadowWrapper"/> (internal),
-        /// and this method deals with the various wrappers and </para>
-        /// </remarks>
-        public static IFileSystem Unwrap(this IFileSystem filesystem)
+        /// <param name="fileSystem">The file system.</param>
+        /// <param name="fileProvider">When this method returns, contains an <see cref="IFileProvider"/> created from the file system.</param>
+        /// <returns>
+        /// <c>true</c> if the <see cref="IFileProvider" /> was successfully created; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool TryCreateFileProvider(this IFileSystem fileSystem, out IFileProvider fileProvider)
         {
-            var unwrapping = true;
-            while (unwrapping)
+            fileProvider = fileSystem switch
             {
-                switch (filesystem)
-                {
-                    case FileSystemWrapper wrapper:
-                        filesystem = wrapper.InnerFileSystem;
-                        break;
-                    case ShadowWrapper shadow:
-                        filesystem = shadow.InnerFileSystem;
-                        break;
-                    default:
-                        unwrapping = false;
-                        break;
-                }
-            }
-            return filesystem;
+                IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
+                _ => null
+            };
+
+            return fileProvider != null;
         }
     }
 }

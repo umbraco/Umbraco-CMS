@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Services.Changes
+namespace Umbraco.Cms.Core.Services.Changes
 {
     [Flags]
     public enum TreeChangeTypes : byte
