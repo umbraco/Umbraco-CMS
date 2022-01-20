@@ -5,3 +5,4 @@ paths:
 
 paths-ignore:
   - '**/node_modules'
+  - 'src/Umbraco.Web.UI/wwwroot'

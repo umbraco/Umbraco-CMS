@@ -7,6 +7,7 @@
     "e2e": "gulp testE2e",
     "build": "gulp build",
     "build:skip-tests": "gulp coreBuild",
+    "build:dev": "gulp buildDev",
     "dev": "gulp dev",
     "fastdev": "gulp fastdev",
     "watch": "gulp watch"
