@@ -22,13 +22,6 @@ jobs:
       with:
         config-file: ./.github/config/codeql-config.yml
 
-    - name: npm build
-      run: |
-        pushd src/Umbraco.Web.UI.Client
-        npm ci        
-        npm run build:dev
-        popd
-
     - name: dotnet build
       run: dotnet build umbraco-netcore-only.sln
 
