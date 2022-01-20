@@ -14,6 +14,19 @@
 *    }]);
 * </pre>
 *
+* Here is a example of a preview template. (base on the audio-preview).
+*
+* <pre>
+*   <audio ng-if="vm.clientSide" name="{{vm.name}}" controls>
+*     <source ng-init="previewUrl = URL.createObjectURL(vm.clientSideData)" ng-src="{{previewUrl}}"/>
+*    </audio>
+*    <audio ng-if="!vm.clientSide" name="{{vm.name}}" controls>
+*      <source ng-src="{{vm.source}}" />
+*    </audio>
+* </pre>
+*
+* Notice that there often is a need to differentiate based on the file-data origin. In the state of the file still begin located locally its often needed to create an Object-URL for the data to be useable in HTML. As well you might want to provide links for the uploaded file when it is uploaded to the server. See 'vm.clientSide' and 'vm.clientSideData'.
+*
 **/
 function mediaPreview() {
 
