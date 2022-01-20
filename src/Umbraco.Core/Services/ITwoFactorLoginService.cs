@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services
         Task DeleteUserLoginsAsync(Guid userOrMemberKey);
 
         Task<bool> IsTwoFactorEnabledAsync(Guid userKey);
-        Task<string> GetSecretForUserAndConfirmedProviderAsync(Guid userKey, string providerName);
+        Task<string> GetSecretForUserAndProviderAsync(Guid userKey, string providerName);
 
         Task<object> GetSetupInfoAsync(Guid userOrMemberKey, string providerName);
 

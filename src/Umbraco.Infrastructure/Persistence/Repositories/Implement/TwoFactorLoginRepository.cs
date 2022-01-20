@@ -87,7 +87,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 UserOrMemberKey = entity.UserOrMemberKey,
                 ProviderName = entity.ProviderName,
                 Secret = entity.Secret,
-                Confirmed = entity.Confirmed,
             };
         }
 
@@ -101,7 +100,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 UserOrMemberKey = dto.UserOrMemberKey,
                 ProviderName = dto.ProviderName,
                 Secret = dto.Secret,
-                Confirmed = dto.Confirmed,
             };
         }
 

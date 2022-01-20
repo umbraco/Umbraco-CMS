@@ -61,13 +61,6 @@ namespace Umbraco.Extensions
             return identityBuilder;
         }
 
-        public static MemberIdentityBuilder AddTwoFactorProvider<T>(this MemberIdentityBuilder identityBuilder) where T : class, ITwoFactorProvider
-        {
-            identityBuilder.AddTwoFactorProvider<T>(typeof(T).Name);
-
-            return identityBuilder;
-        }
-
         public static MemberIdentityBuilder AddTwoFactorProvider<T>(this MemberIdentityBuilder identityBuilder, string providerName) where T : class, ITwoFactorProvider
         {
             identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();

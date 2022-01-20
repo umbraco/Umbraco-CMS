@@ -29,8 +29,5 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Length(400)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public string Secret { get; set; }
-
-        [Column("confirmed")]
-        public bool Confirmed { get; set; }
     }
 }

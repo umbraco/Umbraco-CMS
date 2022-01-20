@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -13,16 +15,19 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly ITwoFactorLoginRepository _twoFactorLoginRepository;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IOptions<IdentityOptions> _identityOptions;
         private readonly IDictionary<string, ITwoFactorProvider> _twoFactorSetupGenerators;
 
         public TwoFactorLoginService(
             ITwoFactorLoginRepository twoFactorLoginRepository,
             IScopeProvider scopeProvider,
-            IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators)
+            IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
+                IOptions<IdentityOptions> identityOptions)
         {
             _twoFactorLoginRepository = twoFactorLoginRepository;
             _scopeProvider = scopeProvider;
-            _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x=>x.GetType().Name);
+            _identityOptions = identityOptions;
+            _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x=>x.ProviderName);
         }
 
         public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
@@ -33,27 +38,33 @@ namespace Umbraco.Cms.Core.Services
 
         public async Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey)
         {
+            return await GetEnabledProviderNamesAsync(userOrMemberKey);
+        }
+
+        private async Task<IEnumerable<string>> GetEnabledProviderNamesAsync(Guid userOrMemberKey)
+        {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
+            var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
                 .Select(x => x.ProviderName).ToArray();
+
+            return providersOnUser.Where(x => _identityOptions.Value.Tokens.ProviderMap.ContainsKey(x));
         }
 
 
         public async Task<bool> IsTwoFactorEnabledAsync(Guid userOrMemberKey)
         {
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).Any();
+            return (await GetEnabledProviderNamesAsync(userOrMemberKey)).Any();
         }
 
-        public async Task<string> GetSecretForUserAndConfirmedProviderAsync(Guid userOrMemberKey, string providerName)
+        public async Task<string> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).FirstOrDefault(x=>x.ProviderName == providerName && x.Confirmed == true)?.Secret;
+            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).FirstOrDefault(x=>x.ProviderName == providerName)?.Secret;
         }
 
         public async Task<object> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
         {
-            var secret = await GetSecretForUserAndConfirmedProviderAsync(userOrMemberKey, providerName);
+            var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
 
             //Dont allow to generate a new secrets if user already has one
             if (!string.IsNullOrEmpty(secret))

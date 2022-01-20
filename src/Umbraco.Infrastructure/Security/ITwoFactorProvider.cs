@@ -5,6 +5,8 @@ namespace Umbraco.Cms.Core.Security
 {
     public interface ITwoFactorProvider
     {
+        string ProviderName { get; }
+
         Task<object> GetSetupDataAsync(Guid userOrMemberKey, string secret);
 
         bool ValidateTwoFactorPIN(string secret, string token);

@@ -8,6 +8,5 @@ namespace Umbraco.Cms.Core.Models
         string ProviderName { get; }
         string Secret { get; }
         Guid UserOrMemberKey { get; }
-        bool Confirmed { get; }
     }
 }
