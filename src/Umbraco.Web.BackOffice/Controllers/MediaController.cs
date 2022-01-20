@@ -802,7 +802,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var mediaType = string.Empty;
             var mediaTypes = _mediaTypeService.GetAll().ToList();
 
-
             //Check if we have a parent folder before checking it's permissions.
             if (parentId.HasValue && parentId != Constants.System.Root)
             {
@@ -816,12 +815,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     IMediaType mediaTypeItem = null;
                     foreach (var allowedContentType in mediaFolderType.AllowedContentTypes)
                     {
-                        mediaTypeItem = _mediaTypeService.Get(allowedContentType.Id.Value);
-                        var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                        var checkMediaTypeItem = _mediaTypeService.Get(allowedContentType.Id.Value);
+                        var fileProperty = checkMediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
 
                         if (fileProperty != null)
                         {
                             allowedContentTypesCount++;
+                            mediaTypeItem = checkMediaTypeItem;
                         }
                     }
 
@@ -832,7 +832,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
             }
-
 
             //get the files
             foreach (var formFile in file)
@@ -889,12 +888,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     var f = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-
                     await using (var stream = formFile.OpenReadStream())
                     {
                         f.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
                     }
-
 
                     var saveResult = _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                     if (saveResult == false)
