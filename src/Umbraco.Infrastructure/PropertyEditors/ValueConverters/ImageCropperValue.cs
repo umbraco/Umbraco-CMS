@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
@@ -122,13 +123,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// </summary>
         /// <returns></returns>
         public bool HasFocalPoint()
-            => FocalPoint != null && (FocalPoint.Left != 0.5m || FocalPoint.Top != 0.5m);
+            => FocalPoint is ImageCropperFocalPoint focalPoint && (focalPoint.Left != 0.5m || focalPoint.Top != 0.5m);
+
+        /// <summary>
+        /// Determines whether the value has crops.
+        /// </summary>
+        public bool HasCrops()
+            => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any();
 
         /// <summary>
         /// Determines whether the value has a specified crop.
         /// </summary>
         public bool HasCrop(string alias)
-            => Crops != null && Crops.Any(x => x.Alias == alias);
+            => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any(x => x.Alias == alias);
 
         /// <summary>
         /// Determines whether the value has a source image.
@@ -165,6 +172,51 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 Crops = crops,
                 FocalPoint = FocalPoint ?? imageCropperValue?.FocalPoint
             };
+        }
+
+        /// <summary>
+        /// Removes redundant crop data/default focal point.
+        /// </summary>
+        /// <param name="value">The image cropper value.</param>
+        /// <returns>
+        /// The cleaned up value.
+        /// </returns>
+        public static void Prune(JObject value)
+        {
+            if (value is null) throw new ArgumentNullException(nameof(value));
+
+            if (value.TryGetValue("crops", out var crops))
+            {
+                if (crops.HasValues)
+                {
+                    foreach (var crop in crops.Values<JObject>().ToList())
+                    {
+                        if (crop.TryGetValue("coordinates", out var coordinates) == false || coordinates.HasValues == false)
+                        {
+                            // Remove crop without coordinates
+                            crop.Remove();
+                            continue;
+                        }
+
+                        // Width/height are already stored in the crop configuration
+                        crop.Remove("width");
+                        crop.Remove("height");
+                    }
+                }
+
+                if (crops.HasValues == false)
+                {
+                    // Remove empty crops
+                    value.Remove("crops");
+                }
+            }
+
+            if (value.TryGetValue("focalPoint", out var focalPoint) &&
+                (focalPoint.HasValues == false || (focalPoint.Value<decimal>("top") == 0.5m && focalPoint.Value<decimal>("left") == 0.5m)))
+            {
+                // Remove empty/default focal point
+                value.Remove("focalPoint");
+            }
         }
 
         #region IEquatable

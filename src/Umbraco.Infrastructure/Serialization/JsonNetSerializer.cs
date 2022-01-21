@@ -14,7 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             Converters = new List<JsonConverter>()
             {
                 new StringEnumConverter()
-            }
+            },
+            Formatting = Formatting.None
         };
         public string Serialize(object input)
         {

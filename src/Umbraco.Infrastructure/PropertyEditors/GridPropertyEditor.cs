@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
 
                 // Convert back to raw JSON for persisting
-                return JsonConvert.SerializeObject(grid);
+                return JsonConvert.SerializeObject(grid, Formatting.None);
             }
 
             /// <summary>
