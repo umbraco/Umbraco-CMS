@@ -38,7 +38,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 mockScopeProvider.Object,
                 new IdentityErrorDescriber(),
                 Mock.Of<IPublishedSnapshotAccessor>(),
-                Mock.Of<IExternalLoginWithKeyService>()
+                Mock.Of<IExternalLoginWithKeyService>(),
+                Mock.Of<ITwoFactorLoginService>()
                 );
         }
 
