@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// The name of the member group
         /// </summary>
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Profile of the user who created this Entity

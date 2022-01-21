@@ -15,8 +15,8 @@ namespace Umbraco.Cms.Core.Models.Entities
     public abstract class BeingDirtyBase : IRememberBeingDirty
     {
         private bool _withChanges = true; // should we track changes?
-        private Dictionary<string, bool> _currentChanges; // which properties have changed?
-        private Dictionary<string, bool> _savedChanges; // which properties had changed at last commit?
+        private Dictionary<string, bool>? _currentChanges; // which properties have changed?
+        private Dictionary<string, bool>? _savedChanges; // which properties had changed at last commit?
 
         #region ICanBeDirty
 
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         /// <summary>
         /// Occurs when a property changes.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Registers that a property has changed.
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         /// <param name="valueRef">A reference to the value to set.</param>
         /// <param name="propertyName">The property name.</param>
         /// <param name="comparer">A comparer to compare property values.</param>
-        protected void SetPropertyValueAndDetectChanges<T>(T value, ref T valueRef, string propertyName, IEqualityComparer<T> comparer = null)
+        protected void SetPropertyValueAndDetectChanges<T>(T? value, ref T? valueRef, string propertyName, IEqualityComparer<T>? comparer = null)
         {
             if (comparer == null)
             {

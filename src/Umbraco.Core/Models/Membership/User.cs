@@ -96,26 +96,26 @@ namespace Umbraco.Cms.Core.Models.Membership
             _startMediaIds = startMediaIds;
         }
 
-        private string _name;
-        private string _securityStamp;
-        private string _avatar;
-        private string _tourData;
+        private string? _name;
+        private string? _securityStamp;
+        private string? _avatar;
+        private string? _tourData;
         private int _sessionTimeout;
-        private int[] _startContentIds;
-        private int[] _startMediaIds;
+        private int[]? _startContentIds;
+        private int[]? _startMediaIds;
         private int _failedLoginAttempts;
 
-        private string _username;
+        private string? _username;
         private DateTime? _emailConfirmedDate;
         private DateTime? _invitedDate;
-        private string _email;
-        private string _rawPasswordValue;
-        private string _passwordConfig;
-        private IEnumerable<string> _allowedSections;
+        private string? _email;
+        private string? _rawPasswordValue;
+        private string? _passwordConfig;
+        private IEnumerable<string>? _allowedSections;
         private HashSet<IReadOnlyUserGroup> _userGroups;
         private bool _isApproved;
         private bool _isLockedOut;
-        private string _language;
+        private string? _language;
         private DateTime _lastPasswordChangedDate;
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
@@ -142,28 +142,28 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string Username
+        public string? Username
         {
             get => _username;
             set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
 
         [DataMember]
-        public string Email
+        public string? Email
         {
             get => _email;
             set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
 
         [IgnoreDataMember]
-        public string RawPasswordValue
+        public string? RawPasswordValue
         {
             get => _rawPasswordValue;
             set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
         }
 
         [IgnoreDataMember]
-        public string PasswordConfiguration
+        public string? PasswordConfiguration
         {
             get => _passwordConfig;
             set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [IgnoreDataMember]
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
 
         public UserState UserState
         {
@@ -235,7 +235,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -252,14 +252,14 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// The security stamp used by ASP.Net identity
         /// </summary>
         [IgnoreDataMember]
-        public string SecurityStamp
+        public string? SecurityStamp
         {
             get => _securityStamp;
             set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
         }
 
         [DataMember]
-        public string Avatar
+        public string? Avatar
         {
             get => _avatar;
             set => SetPropertyValueAndDetectChanges(value, ref _avatar, nameof(Avatar));
@@ -269,7 +269,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// A Json blob stored for recording tour data for a user
         /// </summary>
         [DataMember]
-        public string TourData
+        public string? TourData
         {
             get => _tourData;
             set => SetPropertyValueAndDetectChanges(value, ref _tourData, nameof(TourData));
@@ -296,7 +296,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// </value>
         [DataMember]
         [DoNotClone]
-        public int[] StartContentIds
+        public int[]? StartContentIds
         {
             get => _startContentIds;
             set => SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), IntegerEnumerableComparer);
@@ -310,14 +310,14 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// </value>
         [DataMember]
         [DoNotClone]
-        public int[] StartMediaIds
+        public int[]? StartMediaIds
         {
             get => _startMediaIds;
             set => SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), IntegerEnumerableComparer);
         }
 
         [DataMember]
-        public string Language
+        public string? Language
         {
             get => _language;
             set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
@@ -371,8 +371,8 @@ namespace Umbraco.Cms.Core.Models.Membership
             var clonedEntity = (User)clone;
 
             //manually clone the start node props
-            clonedEntity._startContentIds = _startContentIds.ToArray();
-            clonedEntity._startMediaIds = _startMediaIds.ToArray();
+            clonedEntity._startContentIds = _startContentIds?.ToArray();
+            clonedEntity._startMediaIds = _startMediaIds?.ToArray();
             //need to create new collections otherwise they'll get copied by ref
             clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
             clonedEntity._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
@@ -393,14 +393,14 @@ namespace Umbraco.Cms.Core.Models.Membership
 
             public int Id => _user.Id;
 
-            public string Name => _user.Name;
+            public string? Name => _user.Name;
 
             private bool Equals(WrappedUserProfile other)
             {
                 return _user.Equals(other._user);
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;

@@ -28,13 +28,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizedTextService = localizedTextService;
         }
 
-        public UserProfile GetOwner(IContentBase source, MapperContext context)
+        public UserProfile? GetOwner(IContentBase source, MapperContext context)
         {
             var profile = source.GetCreatorProfile(_userService);
             return profile == null ? null : context.Map<IProfile, UserProfile>(profile);
         }
 
-        public UserProfile GetCreator(IContent source, MapperContext context)
+        public UserProfile? GetCreator(IContent source, MapperContext context)
         {
             var profile = source.GetWriterProfile(_userService);
             return profile == null ? null : context.Map<IProfile, UserProfile>(profile);

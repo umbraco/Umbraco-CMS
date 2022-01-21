@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Packaging
         {
             var sb = new StringBuilder();
 
-            void WriteConflicts<T>(IEnumerable<T> source, Func<T, string> selector, string message, bool appendLine = true)
+            void WriteConflicts<T>(IEnumerable<T>? source, Func<T, string> selector, string message, bool appendLine = true)
             {
                 var result = source?.Select(selector).ToList();
                 if (result?.Count > 0)

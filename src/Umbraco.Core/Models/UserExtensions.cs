@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models
 
             if (user.Avatar.IsNullOrWhiteSpace())
             {
-                var gravatarHash = user.Email.GenerateHash<MD5>();
+                var gravatarHash = user.Email?.GenerateHash<MD5>();
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try Gravatar
@@ -147,13 +147,13 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Calculate start nodes, combining groups' and user's, and excluding what's in the bin
         /// </summary>
-        public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
             var result = runtimeCache.GetCacheItem(cacheKey, () =>
             {
-                var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
+                var gsn = user.Groups.Select(x => x.StartContentId).Distinct().ToArray();
                 var usn = user.StartContentIds;
                 var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
                 return vals;
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="entityService"></param>
         /// <param name="runtimeCache"></param>
         /// <returns></returns>
-        public static int[] CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static int[]? CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Core.Models
             return result;
         }
 
-        public static string[] GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static string[]? GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserMediaStartNodePathsPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Core.Models
             return result;
         }
 
-        public static string[] GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static string[]? GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserContentStartNodePathsPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();

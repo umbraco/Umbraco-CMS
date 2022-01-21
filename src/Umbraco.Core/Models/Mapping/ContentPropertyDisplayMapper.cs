@@ -38,13 +38,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // - does it make any sense to use a IDataValueEditor without configuring it?
 
             // configure the editor for display with configuration
-            var valEditor = dest.PropertyEditor.GetValueEditor(config);
+            var valEditor = dest.PropertyEditor?.GetValueEditor(config);
 
             //set the display properties after mapping
             dest.Alias = originalProp.Alias;
             dest.Description = originalProp.PropertyType.Description;
             dest.Label = originalProp.PropertyType.Name;
-            dest.HideLabel = valEditor.HideLabel;
+            dest.HideLabel = valEditor?.HideLabel ?? false;
             dest.LabelOnTop = originalProp.PropertyType.LabelOnTop;
 
             //add the validation information
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             {
                 //let the property editor format the pre-values
                 dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
-                dest.View = valEditor.View;
+                dest.View = valEditor?.View;
             }
 
             //Translate

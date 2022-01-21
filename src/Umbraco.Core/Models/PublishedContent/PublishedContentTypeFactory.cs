@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         private readonly PropertyValueConverterCollection _propertyValueConverters;
         private readonly IDataTypeService _dataTypeService;
         private readonly object _publishedDataTypesLocker = new object();
-        private Dictionary<int, PublishedDataType> _publishedDataTypes;
+        private Dictionary<int, PublishedDataType>? _publishedDataTypes;
 
         public PublishedContentTypeFactory(IPublishedModelFactory publishedModelFactory, PropertyValueConverterCollection propertyValueConverters, IDataTypeService dataTypeService)
         {
@@ -119,6 +119,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         private PublishedDataType CreatePublishedDataType(IDataType dataType)
-            => new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => dataType.Configuration));
+            => new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object?>(() => dataType.Configuration));
     }
 }

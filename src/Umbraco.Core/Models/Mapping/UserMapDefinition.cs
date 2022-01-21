@@ -94,8 +94,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target.Id = id;
 
             target.ClearAllowedSections();
-            foreach (var section in source.Sections)
-                target.AddAllowedSection(section);
+            if (source.Sections is not null)
+            {
+                foreach (var section in source.Sections)
+                {
+                    target.AddAllowedSection(section);
+                }
+            }
+
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -289,7 +295,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.CreateDate = source.CreateDate;
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
+            target.EmailHash = source.Email?.ToLowerInvariant().Trim().GenerateHash();
             target.FailedPasswordAttempts = source.FailedPasswordAttempts;
             target.Id = source.Id;
             target.Key = source.Key;
@@ -300,8 +306,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Navigation = CreateUserEditorNavigation();
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
-            target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media","mediaRoot", context);
+            target.StartContentIds = GetStartNodes(source.StartContentIds?.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
+            target.StartMediaIds = GetStartNodes(source.StartMediaIds?.ToArray(), UmbracoObjectTypes.Media, "media","mediaRoot", context);
             target.UpdateDate = source.UpdateDate;
             target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
             target.Username = source.Username;
@@ -317,7 +323,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
+            target.EmailHash = source.Email?.ToLowerInvariant().Trim().GenerateHash();
             target.Id = source.Id;
             target.Key = source.Key;
             target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
@@ -336,7 +342,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
+            target.EmailHash = source.Email?.ToLowerInvariant().Trim().GenerateHash();
             target.Name = source.Name;
             target.StartContentIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
@@ -391,12 +397,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.ToArray());
         }
 
-        private static string MapContentTypeIcon(IEntitySlim entity)
+        private static string? MapContentTypeIcon(IEntitySlim entity)
             => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
-        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedArea,string localizedAlias, MapperContext context)
+        private IEnumerable<EntityBasic> GetStartNodes(int[]? startNodeIds, UmbracoObjectTypes objectType, string localizedArea,string localizedAlias, MapperContext context)
         {
-            if (startNodeIds.Length <= 0)
+            if (startNodeIds is null || startNodeIds.Length <= 0)
                 return Enumerable.Empty<EntityBasic>();
 
             var startNodes = new List<EntityBasic>();
@@ -423,7 +429,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             };
         }
 
-        private static int GetIntId(object id)
+        private static int GetIntId(object? id)
         {
             if (id is string strId && int.TryParse(strId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
             {

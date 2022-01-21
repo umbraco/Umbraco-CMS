@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Packaging
         private static readonly IList<GuidUdi> s_emptyGuidUdiList = new List<GuidUdi>();
 
 
-        public PackageDefinition ToPackageDefinition(XElement xml)
+        public PackageDefinition? ToPackageDefinition(XElement xml)
         {
             if (xml == null)
             {

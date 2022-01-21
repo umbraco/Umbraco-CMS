@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// and action with the same key but only the first one is used, the others are ignored.</para>
         /// <para>The action boolean parameter indicates whether the scope completed or not.</para>
         /// </remarks>
-        T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100);
+        T Enlist<T>(string key, Func<T> creator, Action<bool, T>? action = null, int priority = 100);
 
         /// <summary>
         /// Gets an enlisted object.

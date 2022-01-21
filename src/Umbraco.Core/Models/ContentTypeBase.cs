@@ -21,20 +21,21 @@ namespace Umbraco.Cms.Core.Models
         private readonly IShortStringHelper _shortStringHelper;
 
         private string _alias;
-        private string _description;
-        private string _icon = "icon-folder";
-        private string _thumbnail = "folder.png";
+        private string? _description;
+        private string? _icon = "icon-folder";
+        private string? _thumbnail = "folder.png";
         private bool _allowedAsRoot; // note: only one that's not 'pure element type'
         private bool _isContainer;
         private bool _isElement;
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _noGroupPropertyTypes;
-        private IEnumerable<ContentTypeSort> _allowedContentTypes;
+        private IEnumerable<ContentTypeSort>? _allowedContentTypes;
         private bool _hasPropertyTypeBeenRemoved;
         private ContentVariation _variations;
 
         protected ContentTypeBase(IShortStringHelper shortStringHelper, int parentId)
         {
+            _alias = string.Empty;
             _shortStringHelper = shortStringHelper;
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
             ParentId = parentId;
@@ -51,7 +52,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         protected ContentTypeBase(IShortStringHelper shortStringHelper, IContentTypeBase parent)
-            : this(shortStringHelper, parent, null)
+            : this(shortStringHelper, parent, string.Empty)
         { }
 
         protected ContentTypeBase(IShortStringHelper shortStringHelper, IContentTypeBase parent, string alias)
@@ -93,12 +94,12 @@ namespace Umbraco.Cms.Core.Models
                 (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
                 sorts => sorts.GetHashCode());
 
-        protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected void PropertyGroupsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(PropertyGroups));
         }
 
-        protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             //enable this to detect duplicate property aliases. We do want this, however making this change in a
             //patch release might be a little dangerous
@@ -127,7 +128,7 @@ namespace Umbraco.Cms.Core.Models
             get => _alias;
             set => SetPropertyValueAndDetectChanges(
                 value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase),
-                ref _alias,
+                ref _alias!,
                 nameof(Alias));
         }
 
@@ -135,7 +136,7 @@ namespace Umbraco.Cms.Core.Models
         /// Description for the ContentType
         /// </summary>
         [DataMember]
-        public string Description
+        public string? Description
         {
             get => _description;
             set => SetPropertyValueAndDetectChanges(value, ref _description, nameof(Description));
@@ -145,7 +146,7 @@ namespace Umbraco.Cms.Core.Models
         /// Name of the icon (sprite class) used to identify the ContentType
         /// </summary>
         [DataMember]
-        public string Icon
+        public string? Icon
         {
             get => _icon;
             set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
@@ -155,7 +156,7 @@ namespace Umbraco.Cms.Core.Models
         /// Name of the thumbnail used to identify the ContentType
         /// </summary>
         [DataMember]
-        public string Thumbnail
+        public string? Thumbnail
         {
             get => _thumbnail;
             set => SetPropertyValueAndDetectChanges(value, ref _thumbnail, nameof(Thumbnail));
@@ -196,7 +197,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
         [DataMember]
-        public IEnumerable<ContentTypeSort> AllowedContentTypes
+        public IEnumerable<ContentTypeSort>? AllowedContentTypes
         {
             get => _allowedContentTypes;
             set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes),
@@ -306,7 +307,7 @@ namespace Umbraco.Cms.Core.Models
         public abstract bool AddPropertyGroup(string alias, string name);
 
         /// <inheritdoc />
-        public abstract bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string propertyGroupName = null);
+        public abstract bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string? propertyGroupName = null);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
@@ -339,7 +340,7 @@ namespace Umbraco.Cms.Core.Models
             if (propertyType == null) return false;
 
             // get new group, if required, and ensure it exists
-            PropertyGroup newPropertyGroup = null;
+            PropertyGroup? newPropertyGroup = null;
             if (propertyGroupAlias != null)
             {
                 var index = PropertyGroups.IndexOfKey(propertyGroupAlias);
@@ -347,7 +348,7 @@ namespace Umbraco.Cms.Core.Models
 
                 newPropertyGroup = PropertyGroups[index];
             }
-            
+
             // get old group
             var oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
                 x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));

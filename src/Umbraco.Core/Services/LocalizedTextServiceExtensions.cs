@@ -20,7 +20,7 @@ namespace Umbraco.Extensions
          where T: System.Enum =>
              manager.Localize(area, key.ToString(), Thread.CurrentThread.CurrentUICulture);
 
-        public static string Localize(this ILocalizedTextService manager, string area, string? alias)
+        public static string Localize(this ILocalizedTextService manager, string? area, string? alias)
             => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture);
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Umbraco.Extensions
                  .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
          }
 
-         public static string? UmbracoDictionaryTranslate(this ILocalizedTextService manager, ICultureDictionary cultureDictionary, string text)
+         public static string? UmbracoDictionaryTranslate(this ILocalizedTextService manager, ICultureDictionary cultureDictionary, string? text)
          {
              if (text == null)
                  return null;

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets or sets the key.
         /// </summary>
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the id.

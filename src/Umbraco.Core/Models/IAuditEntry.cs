@@ -23,12 +23,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets free-form details about the user triggering the audited event.
         /// </summary>
-        string PerformingDetails { get; set; }
+        string? PerformingDetails { get; set; }
 
         /// <summary>
         /// Gets or sets the IP address or the request triggering the audited event.
         /// </summary>
-        string PerformingIp { get; set; }
+        string? PerformingIp { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time of the audited event.
@@ -45,16 +45,16 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets free-form details about the entity affected by the audited event.
         /// </summary>
         /// <remarks>The entity affected by the event can be another user, a member...</remarks>
-        string AffectedDetails { get; set; }
+        string? AffectedDetails { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the audited event.
         /// </summary>
-        string EventType { get; set; }
+        string? EventType { get; set; }
 
         /// <summary>
         /// Gets or sets free-form details about the audited event.
         /// </summary>
-        string EventDetails { get; set; }
+        string? EventDetails { get; set; }
     }
 }

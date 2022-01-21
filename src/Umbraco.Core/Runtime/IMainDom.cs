@@ -34,6 +34,6 @@ namespace Umbraco.Cms.Core.Runtime
         /// <returns>A value indicating whether it was possible to register.</returns>
         /// <remarks>If registering is successful, then the <paramref name="install"/> action
         /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
-        bool Register(Action install = null, Action release = null, int weight = 100);
+        bool Register(Action? install = null, Action? release = null, int weight = 100);
     }
 }

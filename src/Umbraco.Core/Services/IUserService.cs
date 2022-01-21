@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
-        EntityPermissionSet GetPermissionsForPath(IUser user, string path);
+        EntityPermissionSet GetPermissionsForPath(IUser user, string? path);
 
         /// <summary>
         /// Gets the permissions for the provided groups and path

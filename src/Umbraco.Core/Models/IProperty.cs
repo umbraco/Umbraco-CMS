@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
-        IPropertyType PropertyType { get; }
+        IPropertyType? PropertyType { get; }
 
         /// <summary>
         /// Gets the list of values.
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the value.
         /// </summary>
-        object GetValue(string? culture = null, string? segment = null, bool published = false);
+        object? GetValue(string? culture = null, string? segment = null, bool published = false);
 
         /// <summary>
         /// Sets a value.
@@ -33,8 +33,8 @@ namespace Umbraco.Cms.Core.Models
         void SetValue(object? value, string? culture = null, string? segment = null);
 
         int PropertyTypeId { get; }
-        void PublishValues(string culture = "*", string segment = "*");
-        void UnpublishValues(string culture = "*", string segment = "*");
+        void PublishValues(string? culture = "*", string segment = "*");
+        void UnpublishValues(string? culture = "*", string segment = "*");
 
     }
 }

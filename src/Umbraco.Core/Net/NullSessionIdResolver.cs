@@ -2,6 +2,6 @@
 {
     public class NullSessionIdResolver : ISessionIdResolver
     {
-        public string SessionId => null;
+        public string? SessionId => null;
     }
 }

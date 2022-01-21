@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, Uri current = null);
 
-        string GetUrlFromRoute(int id, string route, string culture);
+        string GetUrlFromRoute(int id, string? route, string? culture);
 
         /// <summary>
         /// Gets the other urls of a published content.

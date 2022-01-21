@@ -20,14 +20,14 @@ namespace Umbraco.Cms.Core.Collections
         where TKey : notnull
     {
         protected Dictionary<TKey, int> Indecies { get; }
-        protected Func<TValue?, TKey> KeySelector { get; }
+        protected Func<TValue, TKey> KeySelector { get; }
 
         /// <summary>
         /// Create new ObservableDictionary
         /// </summary>
         /// <param name="keySelector">Selector function to create key from value</param>
         /// <param name="equalityComparer">The equality comparer to use when comparing keys, or null to use the default comparer.</param>
-        public ObservableDictionary(Func<TValue?, TKey> keySelector, IEqualityComparer<TKey>? equalityComparer = null)
+        public ObservableDictionary(Func<TValue, TKey> keySelector, IEqualityComparer<TKey>? equalityComparer = null)
         {
             KeySelector = keySelector ?? throw new ArgumentException(nameof(keySelector));
             Indecies = new Dictionary<TKey, int>(equalityComparer);

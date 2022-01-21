@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
@@ -68,7 +69,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
             // if we just had all of the membership provider fields on the member table :(
             // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
+            var isLockedOutProperty = resolved.Where(x => x.Properties is not null).SelectMany(x => x.Properties!).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
                 isLockedOutProperty.View = "readonlyvalue";
@@ -160,9 +161,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return prop;
         }
 
-        internal IDictionary<string, bool> GetMemberGroupValue(string username)
+        internal IDictionary<string, bool> GetMemberGroupValue(string? username)
         {
-            IEnumerable<string> userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
+            IEnumerable<string>? userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
             var result = _memberGroupService.GetAll()
@@ -187,7 +188,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return result;
         }
 
-        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext context)
+        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext? context)
         {
             var properties = new List<ContentPropertyDisplay>
             {
@@ -218,7 +219,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize(null,"password"),
-                    Value = new Dictionary<string, object>
+                    Value = new Dictionary<string, object?>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
                         {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},

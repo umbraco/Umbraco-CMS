@@ -42,21 +42,21 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "resetPasswordValue")]
         [ReadOnly(true)]
-        public string ResetPasswordValue { get; set; }
+        public string? ResetPasswordValue { get; set; }
 
         /// <summary>
         /// A readonly value showing the user's current calculated start content ids
         /// </summary>
         [DataMember(Name = "calculatedStartContentIds")]
         [ReadOnly(true)]
-        public IEnumerable<EntityBasic> CalculatedStartContentIds { get; set; }
+        public IEnumerable<EntityBasic>? CalculatedStartContentIds { get; set; }
 
         /// <summary>
         /// A readonly value showing the user's current calculated start media ids
         /// </summary>
         [DataMember(Name = "calculatedStartMediaIds")]
         [ReadOnly(true)]
-        public IEnumerable<EntityBasic> CalculatedStartMediaIds { get; set; }
+        public IEnumerable<EntityBasic>? CalculatedStartMediaIds { get; set; }
 
         [DataMember(Name = "failedPasswordAttempts")]
         [ReadOnly(true)]

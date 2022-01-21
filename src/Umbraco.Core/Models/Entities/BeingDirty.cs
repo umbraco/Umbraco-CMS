@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         /// <param name="valueRef">A reference to the value to set.</param>
         /// <param name="propertyName">The property name.</param>
         /// <param name="comparer">A comparer to compare property values.</param>
-        public new void SetPropertyValueAndDetectChanges<T>(T value, ref T valueRef, string propertyName, IEqualityComparer<T> comparer = null)
+        public new void SetPropertyValueAndDetectChanges<T>(T value, ref T? valueRef, string propertyName, IEqualityComparer<T>? comparer = null)
         {
             base.SetPropertyValueAndDetectChanges(value, ref valueRef, propertyName, comparer);
         }

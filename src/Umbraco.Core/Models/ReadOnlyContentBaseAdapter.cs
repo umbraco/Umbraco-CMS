@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models
 
         public DateTime UpdateDate => _content.UpdateDate;
 
-        public string Name => _content.Name;
+        public string? Name => _content.Name;
 
         public int CreatorId => _content.CreatorId;
 
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Models
 
         public int Level => _content.Level;
 
-        public string Path => _content.Path;
+        public string? Path => _content.Path;
 
         public int SortOrder => _content.SortOrder;
 

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Mapping
     public class MapperContext
     {
         private readonly IUmbracoMapper _mapper;
-        private IDictionary<string, object> _items;
+        private IDictionary<string, object>? _items;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MapperContext"/> class.

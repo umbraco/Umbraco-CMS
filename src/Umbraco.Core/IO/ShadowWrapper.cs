@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Core.IO
             return FileSystem.GetFullPath(path);
         }
 
-        public string GetUrl(string path)
+        public string GetUrl(string? path)
         {
             return FileSystem.GetUrl(path);
         }

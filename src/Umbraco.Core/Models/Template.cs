@@ -14,15 +14,15 @@ namespace Umbraco.Cms.Core.Models
     {
         private string _alias;
         private readonly IShortStringHelper _shortStringHelper;
-        private string _name;
-        private string _masterTemplateAlias;
-        private Lazy<int> _masterTemplateId;
+        private string? _name;
+        private string? _masterTemplateAlias;
+        private Lazy<int>? _masterTemplateId;
 
-        public Template(IShortStringHelper shortStringHelper, string name, string alias)
+        public Template(IShortStringHelper shortStringHelper, string? name, string alias)
             : this(shortStringHelper, name, alias, null)
         { }
 
-        public Template(IShortStringHelper shortStringHelper, string name, string alias, Func<File, string> getFileContent)
+        public Template(IShortStringHelper shortStringHelper, string? name, string alias, Func<File, string>? getFileContent)
             : base(string.Empty, getFileContent)
         {
             _shortStringHelper = shortStringHelper;
@@ -32,20 +32,20 @@ namespace Umbraco.Cms.Core.Models
         }
 
         [DataMember]
-        public Lazy<int> MasterTemplateId
+        public Lazy<int>? MasterTemplateId
         {
             get => _masterTemplateId;
             set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, nameof(MasterTemplateId));
         }
 
-        public string MasterTemplateAlias
+        public string? MasterTemplateAlias
         {
             get => _masterTemplateAlias;
             set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, nameof(MasterTemplateAlias));
         }
 
         [DataMember]
-        public new string Name
+        public new string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Models
         public new string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias), ref _alias!, nameof(Alias));
         }
 
         /// <summary>

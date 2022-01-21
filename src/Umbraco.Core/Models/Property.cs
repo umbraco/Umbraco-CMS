@@ -20,16 +20,10 @@ namespace Umbraco.Cms.Core.Models
         private List<IPropertyValue> _values = new List<IPropertyValue>();
 
         // _pvalue contains the invariant-neutral property value
-        private IPropertyValue _pvalue;
+        private IPropertyValue? _pvalue;
 
         // _vvalues contains the (indexed) variant property values
-        private Dictionary<CompositeNStringNStringKey, IPropertyValue> _vvalues;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Property"/> class.
-        /// </summary>
-        protected Property()
-        { }
+        private Dictionary<CompositeNStringNStringKey, IPropertyValue>? _vvalues;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
@@ -104,18 +98,18 @@ namespace Umbraco.Cms.Core.Models
             // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
             // class to deal with change tracking which variants have changed
 
-            private string _culture;
-            private string _segment;
+            private string? _culture;
+            private string? _segment;
 
             /// <summary>
             /// Gets or sets the culture of the property.
             /// </summary>
             /// <remarks>The culture is either null (invariant) or a non-empty string. If the property is
             /// set with an empty or whitespace value, its value is converted to null.</remarks>
-            public string Culture
+            public string? Culture
             {
                 get => _culture;
-                set => _culture = value.IsNullOrWhiteSpace() ? null : value.ToLowerInvariant();
+                set => _culture = value.IsNullOrWhiteSpace() ? null : value!.ToLowerInvariant();
             }
 
             /// <summary>
@@ -123,7 +117,7 @@ namespace Umbraco.Cms.Core.Models
             /// </summary>
             /// <remarks>The segment is either null (neutral) or a non-empty string. If the property is
             /// set with an empty or whitespace value, its value is converted to null.</remarks>
-            public string Segment
+            public string? Segment
             {
                 get => _segment;
                 set => _segment = value?.ToLowerInvariant();
@@ -132,12 +126,12 @@ namespace Umbraco.Cms.Core.Models
             /// <summary>
             /// Gets or sets the edited value of the property.
             /// </summary>
-            public object EditedValue { get; set; }
+            public object? EditedValue { get; set; }
 
             /// <summary>
             /// Gets or sets the published value of the property.
             /// </summary>
-            public object PublishedValue { get; set; }
+            public object? PublishedValue { get; set; }
 
             /// <summary>
             /// Clones the property value.
@@ -147,12 +141,12 @@ namespace Umbraco.Cms.Core.Models
 
             public object DeepClone() => Clone();
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 return Equals(obj as PropertyValue);
             }
 
-            public bool Equals(PropertyValue other)
+            public bool Equals(PropertyValue? other)
             {
                 return other != null &&
                        _culture == other._culture &&
@@ -164,15 +158,30 @@ namespace Umbraco.Cms.Core.Models
             public override int GetHashCode()
             {
                 var hashCode = 1885328050;
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_culture);
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_segment);
-                hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(EditedValue);
-                hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(PublishedValue);
+                if (_culture is not null)
+                {
+                    hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_culture);
+                }
+
+                if (_segment is not null)
+                {
+                    hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_segment);
+                }
+
+                if (EditedValue is not null)
+                {
+                    hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(EditedValue);
+                }
+
+                if (PublishedValue is not null)
+                {
+                    hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(PublishedValue);
+                }
                 return hashCode;
             }
         }
 
-        private static readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
+        private static readonly DelegateEqualityComparer<object?> PropertyValueComparer = new DelegateEqualityComparer<object?>(
             (o, o1) =>
             {
                 if (o == null && o1 == null) return true;
@@ -209,7 +218,7 @@ namespace Umbraco.Cms.Core.Models
             {
                 // make sure we filter out invalid variations
                 // make sure we leave _vvalues null if possible
-                _values = value.Where(x => PropertyType.SupportsVariation(x.Culture, x.Segment)).ToList();
+                _values = value.Where(x => PropertyType?.SupportsVariation(x.Culture, x.Segment) ?? false).ToList();
                 _pvalue = _values.FirstOrDefault(x => x.Culture == null && x.Segment == null);
                 _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
                     ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeNStringNStringKey(x.Culture, x.Segment), x => x)
@@ -241,11 +250,11 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the value.
         /// </summary>
-        public object GetValue(string culture = null, string? segment = null, bool published = false)
+        public object? GetValue(string? culture = null, string? segment = null, bool published = false)
         {
             // ensure null or whitespace are nulls
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
+            segment = segment?.NullOrWhiteSpaceAsNull();
 
             if (!PropertyType.SupportsVariation(culture, segment)) return null;
             if (culture == null && segment == null) return GetPropertyValue(_pvalue, published);
@@ -255,7 +264,7 @@ namespace Umbraco.Cms.Core.Models
                 : null;
         }
 
-        private object GetPropertyValue(IPropertyValue pvalue, bool published)
+        private object? GetPropertyValue(IPropertyValue? pvalue, bool published)
         {
             if (pvalue == null) return null;
 
@@ -266,10 +275,10 @@ namespace Umbraco.Cms.Core.Models
 
         // internal - must be invoked by the content item
         // does *not* validate the value - content item must validate first
-        public void PublishValues(string culture = "*", string segment = "*")
+        public void PublishValues(string? culture = "*", string? segment = "*")
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
+            segment = segment?.NullOrWhiteSpaceAsNull();
 
             // if invariant or all, and invariant-neutral is supported, publish invariant-neutral
             if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
@@ -282,8 +291,8 @@ namespace Umbraco.Cms.Core.Models
             // and match the specified culture and segment (or anything when '*').
             var pvalues = _vvalues.Where(x =>
                     PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
-                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
+                    (culture == "*" || (x.Value.Culture?.InvariantEquals(culture) ?? false)) && // the culture matches
+                    (segment == "*" || (x.Value.Segment?.InvariantEquals(segment) ?? false))) // the segment matches
                 .Select(x => x.Value);
 
             foreach (var pvalue in pvalues)
@@ -291,10 +300,10 @@ namespace Umbraco.Cms.Core.Models
         }
 
         // internal - must be invoked by the content item
-        public void UnpublishValues(string culture = "*", string segment = "*")
+        public void UnpublishValues(string? culture = "*", string? segment = "*")
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
+            segment = segment?.NullOrWhiteSpaceAsNull();
 
             // if invariant or all, and invariant-neutral is supported, publish invariant-neutral
             if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
@@ -307,15 +316,15 @@ namespace Umbraco.Cms.Core.Models
             // and match the specified culture and segment (or anything when '*').
             var pvalues = _vvalues.Where(x =>
                     PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
-                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
+                    (culture == "*" || (x.Value.Culture?.InvariantEquals(culture) ?? false)) && // the culture matches
+                    (segment == "*" || (x.Value.Segment?.InvariantEquals(segment) ?? false))) // the segment matches
                 .Select(x => x.Value);
 
             foreach (var pvalue in pvalues)
                 UnpublishValue(pvalue);
         }
 
-        private void PublishValue(IPropertyValue pvalue)
+        private void PublishValue(IPropertyValue? pvalue)
         {
             if (pvalue == null) return;
 
@@ -326,7 +335,7 @@ namespace Umbraco.Cms.Core.Models
             DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
-        private void UnpublishValue(IPropertyValue pvalue)
+        private void UnpublishValue(IPropertyValue? pvalue)
         {
             if (pvalue == null) return;
 
@@ -340,22 +349,25 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Sets a value.
         /// </summary>
-        public void SetValue(object value, string? culture = null, string? segment = null)
+        public void SetValue(object? value, string? culture = null, string? segment = null)
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
+            segment = segment?.NullOrWhiteSpaceAsNull();
 
             if (!PropertyType.SupportsVariation(culture, segment))
                 throw new NotSupportedException($"Variation \"{culture??"<null>"},{segment??"<null>"}\" is not supported by the property type.");
 
             var (pvalue, change) = GetPValue(culture, segment, true);
 
-            var origValue = pvalue.EditedValue;
-            var setValue = ConvertAssignedValue(value);
+            if (pvalue is not null)
+            {
+                var origValue = pvalue.EditedValue;
+                var setValue = ConvertAssignedValue(value);
 
-            pvalue.EditedValue = setValue;
+                pvalue.EditedValue = setValue;
 
-            DetectChanges(setValue, origValue, nameof(Values), PropertyValueComparer, change);
+                DetectChanges(setValue, origValue, nameof(Values), PropertyValueComparer, change);
+            }
         }
 
         // bypasses all changes detection and is the *only* way to set the published value
@@ -363,13 +375,16 @@ namespace Umbraco.Cms.Core.Models
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
-            if (published && PropertyType.SupportsPublishing)
-                pvalue.PublishedValue = value;
-            else
-                pvalue.EditedValue = value;
+            if (pvalue is not null)
+            {
+                if (published && PropertyType.SupportsPublishing)
+                    pvalue.PublishedValue = value;
+                else
+                    pvalue.EditedValue = value;
+            }
         }
 
-        private (IPropertyValue, bool) GetPValue(bool create)
+        private (IPropertyValue?, bool) GetPValue(bool create)
         {
             var change = false;
             if (_pvalue == null)
@@ -382,7 +397,7 @@ namespace Umbraco.Cms.Core.Models
             return (_pvalue, change);
         }
 
-        private (IPropertyValue, bool) GetPValue(string culture, string segment, bool create)
+        private (IPropertyValue?, bool) GetPValue(string? culture, string? segment, bool create)
         {
             if (culture == null && segment == null)
                 return GetPValue(create);
@@ -408,7 +423,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public object ConvertAssignedValue(object value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
+        public object? ConvertAssignedValue(object? value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
 
         /// <summary>
         /// Tries to convert a value assigned to a property.
@@ -416,7 +431,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// <para></para>
         /// </remarks>
-        private bool TryConvertAssignedValue(object value, bool throwOnError, out object converted)
+        private bool TryConvertAssignedValue(object? value, bool throwOnError, out object? converted)
         {
             var isOfExpectedType = IsOfExpectedPropertyType(value);
             if (isOfExpectedType)
@@ -429,7 +444,7 @@ namespace Umbraco.Cms.Core.Models
             // "garbage-in", accept what we can & convert
             // throw only if conversion is not possible
 
-            var s = value.ToString();
+            var s = value?.ToString();
             converted = null;
 
             switch (ValueStorageType)
@@ -445,7 +460,7 @@ namespace Umbraco.Cms.Core.Models
                     if (s.IsNullOrWhiteSpace())
                         return true; // assume empty means null
                     var convInt = value.TryConvertTo<int>();
-                    if (convInt)
+                    if (convInt.Success.HasValue && convInt.Success.Value)
                     {
                         converted = convInt.Result;
                         return true;
@@ -459,7 +474,7 @@ namespace Umbraco.Cms.Core.Models
                     if (s.IsNullOrWhiteSpace())
                         return true; // assume empty means null
                     var convDecimal = value.TryConvertTo<decimal>();
-                    if (convDecimal)
+                    if (convDecimal.Success.HasValue && convDecimal.Success.Value)
                     {
                         // need to normalize the value (change the scaling factor and remove trailing zeros)
                         // because the underlying database is going to mess with the scaling factor anyways.
@@ -475,7 +490,7 @@ namespace Umbraco.Cms.Core.Models
                     if (s.IsNullOrWhiteSpace())
                         return true; // assume empty means null
                     var convDateTime = value.TryConvertTo<DateTime>();
-                    if (convDateTime)
+                    if (convDateTime.Success.HasValue && convDateTime.Success.Value)
                     {
                         converted = convDateTime.Result;
                         return true;
@@ -490,9 +505,9 @@ namespace Umbraco.Cms.Core.Models
             }
         }
 
-        private static void ThrowTypeException(object value, Type expected, string alias)
+        private static void ThrowTypeException(object? value, Type expected, string alias)
         {
-            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
+            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value?.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
         }
 
         /// <summary>
@@ -502,7 +517,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>If the value is of the expected type, it can be directly assigned to the property.
         /// Otherwise, some conversion is required.</para>
         /// </remarks>
-        private bool IsOfExpectedPropertyType(object value)
+        private bool IsOfExpectedPropertyType(object? value)
         {
             // null values are assumed to be ok
             if (value == null)

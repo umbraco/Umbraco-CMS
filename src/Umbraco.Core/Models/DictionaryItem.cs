@@ -14,10 +14,10 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryItem : EntityBase, IDictionaryItem
     {
-        public Func<int, ILanguage> GetLanguage { get; set; }
+        public Func<int, ILanguage>? GetLanguage { get; set; }
         private Guid? _parentId;
         private string _itemKey;
-        private IEnumerable<IDictionaryTranslation> _translations;
+        private IEnumerable<IDictionaryTranslation>? _translations;
 
         public DictionaryItem(string itemKey)
             : this(null, itemKey)
@@ -53,21 +53,21 @@ namespace Umbraco.Cms.Core.Models
         public string ItemKey
         {
             get { return _itemKey; }
-            set { SetPropertyValueAndDetectChanges(value, ref _itemKey, nameof(ItemKey)); }
+            set { SetPropertyValueAndDetectChanges(value, ref _itemKey!, nameof(ItemKey)); }
         }
 
         /// <summary>
         /// Gets or sets a list of translations for the Dictionary Item
         /// </summary>
         [DataMember]
-        public IEnumerable<IDictionaryTranslation> Translations
+        public IEnumerable<IDictionaryTranslation>? Translations
         {
             get { return _translations; }
             set
             {
-                var asArray = value.ToArray();
+                var asArray = value?.ToArray();
                 //ensure the language callback is set on each translation
-                if (GetLanguage != null)
+                if (GetLanguage != null && asArray is not null)
                 {
                     foreach (var translation in asArray.OfType<DictionaryTranslation>())
                     {

@@ -12,19 +12,19 @@ namespace Umbraco.Cms.Core.Packaging
 {
     public static class PackageMigrationResource
     {
-        private static Stream GetEmbeddedPackageZipStream(Type planType)
+        private static Stream? GetEmbeddedPackageZipStream(Type planType)
         {
             // lookup the embedded resource by convention
             Assembly currentAssembly = planType.Assembly;
             var fileName = $"{planType.Namespace}.package.zip";
-            Stream stream = currentAssembly.GetManifestResourceStream(fileName);
+            Stream? stream = currentAssembly.GetManifestResourceStream(fileName);
 
             return stream;
         }
 
-        public static XDocument GetEmbeddedPackageDataManifest(Type planType, out ZipArchive zipArchive)
+        public static XDocument? GetEmbeddedPackageDataManifest(Type planType, out ZipArchive? zipArchive)
         {
-            XDocument packageXml;
+            XDocument? packageXml;
             var zipStream = GetEmbeddedPackageZipStream(planType);
             if (zipStream is not null)
             {
@@ -37,17 +37,17 @@ namespace Umbraco.Cms.Core.Packaging
             return packageXml;
         }
 
-        public static XDocument GetEmbeddedPackageDataManifest(Type planType)
+        public static XDocument? GetEmbeddedPackageDataManifest(Type planType)
         {
             return GetEmbeddedPackageDataManifest(planType, out _);
         }
 
-        private static XDocument GetEmbeddedPackageXmlDoc(Type planType)
+        private static XDocument? GetEmbeddedPackageXmlDoc(Type planType)
         {
             // lookup the embedded resource by convention
             Assembly currentAssembly = planType.Assembly;
             var fileName = $"{planType.Namespace}.package.xml";
-            Stream stream = currentAssembly.GetManifestResourceStream(fileName);
+            Stream? stream = currentAssembly.GetManifestResourceStream(fileName);
             if (stream == null)
             {
                 return null;
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Packaging
             // But it is still very fast ~303ms for a 100MB file. This will only be an issue if there are
             // several very large package.zips.
 
-            using Stream stream = GetEmbeddedPackageZipStream(planType);
+            using Stream? stream = GetEmbeddedPackageZipStream(planType);
 
             if (stream is not null)
             {
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Packaging
             throw new IOException("Missing embedded files for planType: " + planType);
         }
 
-        public static bool TryGetEmbeddedPackageDataManifest(Type planType, out XDocument packageXml, out ZipArchive zipArchive)
+        public static bool TryGetEmbeddedPackageDataManifest(Type planType, out XDocument? packageXml, out ZipArchive? zipArchive)
         {
             var zipStream = GetEmbeddedPackageZipStream(planType);
             if (zipStream is not null)
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.Packaging
             }
 
             var zip = new ZipArchive(packageZipStream, ZipArchiveMode.Read);
-            ZipArchiveEntry packageXmlEntry = zip.GetEntry("package.xml");
+            ZipArchiveEntry? packageXmlEntry = zip.GetEntry("package.xml");
             if (packageXmlEntry == null)
             {
                 throw new InvalidOperationException("Zip package does not contain the required package.xml file");

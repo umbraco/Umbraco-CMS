@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the history cleanup configuration.
         /// </summary>
         /// <value>The history cleanup configuration.</value>
-        HistoryCleanup HistoryCleanup { get; set; }
+        HistoryCleanup? HistoryCleanup { get; set; }
     }
 
     /// <summary>
@@ -30,12 +30,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         ///     Gets the default Template of the ContentType
         /// </summary>
-        ITemplate DefaultTemplate { get; }
+        ITemplate? DefaultTemplate { get; }
 
         /// <summary>
         ///     Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
-        IEnumerable<ITemplate> AllowedTemplates { get; set; }
+        IEnumerable<ITemplate>? AllowedTemplates { get; set; }
 
         /// <summary>
         ///     Determines if AllowedTemplates contains templateId
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Models
         ///     Sets the default template for the ContentType
         /// </summary>
         /// <param name="template">Default <see cref="ITemplate" /></param>
-        void SetDefaultTemplate(ITemplate template);
+        void SetDefaultTemplate(ITemplate? template);
 
         /// <summary>
         ///     Removes a template from the list of allowed templates

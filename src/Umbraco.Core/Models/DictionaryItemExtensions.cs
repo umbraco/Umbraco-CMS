@@ -11,9 +11,9 @@ namespace Umbraco.Extensions
         /// <param name="d"></param>
         /// <param name="languageId"></param>
         /// <returns></returns>
-        public static string GetTranslatedValue(this IDictionaryItem d, int languageId)
+        public static string? GetTranslatedValue(this IDictionaryItem d, int languageId)
         {
-            var trans = d.Translations.FirstOrDefault(x => x.LanguageId == languageId);
+            var trans = d.Translations?.FirstOrDefault(x => x.LanguageId == languageId);
             return trans == null ? string.Empty : trans.Value;
         }
 
@@ -22,9 +22,9 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="d"></param>
         /// <returns></returns>
-        public static string GetDefaultValue(this IDictionaryItem d)
+        public static string? GetDefaultValue(this IDictionaryItem d)
         {
-            var defaultTranslation = d.Translations.FirstOrDefault(x => x.Language.Id == 1);
+            var defaultTranslation = d.Translations?.FirstOrDefault(x => x.Language?.Id == 1);
             return defaultTranslation == null ? string.Empty : defaultTranslation.Value;
         }
     }

@@ -40,6 +40,6 @@ namespace Umbraco.Cms.Core.Models.Editors
         /// <summary>
         /// Gets or sets the uploaded files.
         /// </summary>
-        public ContentPropertyFile[] Files { get; set; }
+        public ContentPropertyFile[]? Files { get; set; }
     }
 }

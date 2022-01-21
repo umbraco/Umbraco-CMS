@@ -15,6 +15,6 @@ namespace Umbraco.Cms.Core.Models
         { }
 
         [DataMember(Name = "items")]
-        public IEnumerable<T> Items { get; set; }
+        public IEnumerable<T>? Items { get; set; }
     }
 }

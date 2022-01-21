@@ -74,9 +74,9 @@ namespace Umbraco.Cms.Core.Packaging
             MediaFileManager mediaFileManager,
             FileSystems fileSystems,
             string packageRepositoryFileName,
-            string tempFolderPath = null,
-            string packagesFolderPath = null,
-            string mediaFolderPath = null)
+            string? tempFolderPath = null,
+            string? packagesFolderPath = null,
+            string? mediaFolderPath = null)
         {
             if (string.IsNullOrWhiteSpace(packageRepositoryFileName))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageRepositoryFileName));
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.Packaging
 
         private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
 
-        public IEnumerable<PackageDefinition> GetAll()
+        public IEnumerable<PackageDefinition?> GetAll()
         {
             var packagesXml = EnsureStorage(out _);
             if (packagesXml?.Root == null)
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Packaging
                 yield return _parser.ToPackageDefinition(packageXml);
         }
 
-        public PackageDefinition GetById(int id)
+        public PackageDefinition? GetById(int id)
         {
             var packagesXml = EnsureStorage(out var packageFile);
             var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
@@ -129,7 +129,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             packageXml.Remove();
 
-            packagesXml.Save(packagesFile);
+            packagesXml?.Save(packagesFile);
         }
 
         public bool SavePackage(PackageDefinition definition)
@@ -403,7 +403,7 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                XElement macroXml = GetMacroXml(outInt, out IMacro macro);
+                XElement? macroXml = GetMacroXml(outInt, out IMacro macro);
                 if (macroXml == null)
                 {
                     continue;
@@ -416,8 +416,8 @@ namespace Umbraco.Cms.Core.Packaging
             root.Add(macros);
 
             // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
-            IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
-                .Select(x => x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
+            IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource is not null).Where(x => x.MacroSource!.StartsWith(Constants.SystemDirectories.MacroPartials))
+                .Select(x => x.MacroSource!.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
             PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
         }
 
@@ -431,8 +431,8 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                XElement xml = GetStylesheetXml(stylesheet, true);
-                if (xml != null)
+                XElement? xml = GetStylesheetXml(stylesheet, true);
+                if (xml is not null)
                 {
                     stylesheetsXml.Add(xml);
                 }
@@ -445,7 +445,7 @@ namespace Umbraco.Cms.Core.Packaging
             XContainer root,
             string containerName,
             string elementName,
-            IFileSystem fileSystem)
+            IFileSystem? fileSystem)
         {
             var scriptsXml = new XElement(containerName);
             foreach (var file in filePaths)
@@ -455,20 +455,25 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                if (!fileSystem.FileExists(file))
+                if (!fileSystem?.FileExists(file) ?? false)
                 {
                     throw new InvalidOperationException("No file found with path " + file);
                 }
 
-                using (Stream stream = fileSystem.OpenFile(file))
-                using (var reader = new StreamReader(stream))
+                using (Stream? stream = fileSystem?.OpenFile(file))
                 {
-                    var fileContents = reader.ReadToEnd();
-                    scriptsXml.Add(
-                        new XElement(
-                            elementName,
-                            new XAttribute("path", file),
-                            new XCData(fileContents)));
+                    if (stream is not null)
+                    {
+                        using (var reader = new StreamReader(stream))
+                        {
+                            var fileContents = reader.ReadToEnd();
+                            scriptsXml.Add(
+                                new XElement(
+                                    elementName,
+                                    new XAttribute("path", file),
+                                    new XCData(fileContents)));
+                        }
+                    }
                 }
             }
             root.Add(scriptsXml);
@@ -622,8 +627,8 @@ namespace Umbraco.Cms.Core.Packaging
                 // get the media file path and store that separately in the XML.
                 // the media file path is different from the URL and is specifically
                 // extracted using the property editor for this media file and the current media file system.
-                Stream mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
-                if (mediaStream != null)
+                Stream? mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
+                if (mediaStream != null && mediaFilePath is not null)
                 {
                     xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath));
 
@@ -653,7 +658,7 @@ namespace Umbraco.Cms.Core.Packaging
 
         // TODO: Delete this
         /// <summary>
-        private XElement GetMacroXml(int macroId, out IMacro macro)
+        private XElement? GetMacroXml(int macroId, out IMacro macro)
         {
             macro = _macroService.GetById(macroId);
             if (macro == null)
@@ -668,7 +673,7 @@ namespace Umbraco.Cms.Core.Packaging
         /// <param name="path">The path of the stylesheet.</param>
         /// <param name="includeProperties">if set to <c>true</c> [include properties].</param>
         /// <returns></returns>
-        private XElement GetStylesheetXml(string path, bool includeProperties)
+        private XElement? GetStylesheetXml(string path, bool includeProperties)
         {
             if (string.IsNullOrWhiteSpace(path))
             {

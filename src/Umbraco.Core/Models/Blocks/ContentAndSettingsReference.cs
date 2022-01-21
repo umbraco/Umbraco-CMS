@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
 
         public Udi SettingsUdi { get; }
 
-        public override bool Equals(object obj) => obj is ContentAndSettingsReference reference && Equals(reference);
+        public override bool Equals(object? obj) => obj is ContentAndSettingsReference reference && Equals(reference);
 
         public bool Equals(ContentAndSettingsReference other) => other != null
             && EqualityComparer<Udi>.Default.Equals(ContentUdi, other.ContentUdi)

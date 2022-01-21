@@ -14,7 +14,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the context culture.
         /// </summary>
-        public static string GetCulture(this MapperContext context)
+        public static string? GetCulture(this MapperContext context)
         {
             return context.HasItems && context.Items.TryGetValue(CultureKey, out var obj) && obj is string s ? s : null;
         }
@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the context segment.
         /// </summary>
-        public static string GetSegment(this MapperContext context)
+        public static string? GetSegment(this MapperContext context)
         {
             return context.HasItems && context.Items.TryGetValue(SegmentKey, out var obj) && obj is string s ? s : null;
         }
@@ -30,23 +30,29 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Sets a context culture.
         /// </summary>
-        public static void SetCulture(this MapperContext context, string culture)
+        public static void SetCulture(this MapperContext context, string? culture)
         {
-            context.Items[CultureKey] = culture;
+            if (culture is not null)
+            {
+                context.Items[CultureKey] = culture;
+            }
         }
 
         /// <summary>
         /// Sets a context segment.
         /// </summary>
-        public static void SetSegment(this MapperContext context, string segment)
+        public static void SetSegment(this MapperContext context, string? segment)
         {
-            context.Items[SegmentKey] = segment;
+            if (segment is not null)
+            {
+                context.Items[SegmentKey] = segment;
+            }
         }
 
         /// <summary>
         /// Get included properties.
         /// </summary>
-        public static string[] GetIncludedProperties(this MapperContext context)
+        public static string[]? GetIncludedProperties(this MapperContext context)
         {
             return context.HasItems && context.Items.TryGetValue(IncludedPropertiesKey, out var obj) && obj is string[] s ? s : null;
         }

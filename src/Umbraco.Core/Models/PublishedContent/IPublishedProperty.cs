@@ -37,7 +37,7 @@
         /// <para>If you're using that value, you're probably wrong, unless you're doing some internal
         /// Umbraco stuff.</para>
         /// </remarks>
-        object GetSourceValue(string? culture = null, string? segment = null);
+        object? GetSourceValue(string? culture = null, string? segment = null);
 
         /// <summary>
         /// Gets the object value of the property.
@@ -47,7 +47,7 @@
         /// <para>It can be null, or any type of CLR object.</para>
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        object GetValue(string? culture = null, string? segment = null);
+        object? GetValue(string? culture = null, string? segment = null);
 
         /// <summary>
         /// Gets the XPath value of the property.
@@ -57,6 +57,6 @@
         /// <para>It must be either null, or a string, or an XPathNavigator.</para>
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        object GetXPathValue(string? culture = null, string? segment = null);
+        object? GetXPathValue(string? culture = null, string? segment = null);
     }
 }

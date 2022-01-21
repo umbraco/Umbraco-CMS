@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Core.Models
         private IDataEditor _editor;
         private ValueStorageType _databaseType;
         private readonly IConfigurationEditorJsonSerializer _serializer;
-        private object _configuration;
+        private object? _configuration;
         private bool _hasConfiguration;
-        private string _configurationJson;
+        private string? _configurationJson;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public object Configuration
+        public object? Configuration
         {
             get
             {
@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>This method is meant to be used when creating published datatypes, exclusively.</para>
         /// <para>Think before using!</para>
         /// </remarks>
-        internal Lazy<object> GetLazyConfiguration()
+        internal Lazy<object?> GetLazyConfiguration()
         {
             // note: in both cases, make sure we capture what we need - we don't want
             // to capture a reference to this full, potentially heavy, DataType instance.
@@ -171,14 +171,14 @@ namespace Umbraco.Cms.Core.Models
             {
                 // if configuration has already been de-serialized, return
                 var capturedConfiguration = _configuration;
-                return new Lazy<object>(() => capturedConfiguration);
+                return new Lazy<object?>(() => capturedConfiguration);
             }
             else
             {
                 // else, create a Lazy de-serializer
                 var capturedConfiguration = _configurationJson;
                 var capturedEditor = _editor;
-                return new Lazy<object>(() =>
+                return new Lazy<object?>(() =>
                 {
                     try
                     {

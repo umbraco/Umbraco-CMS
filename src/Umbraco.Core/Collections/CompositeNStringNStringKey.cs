@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Collections
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositeNStringNStringKey"/> struct.
         /// </summary>
-        public CompositeNStringNStringKey(string key1, string key2)
+        public CompositeNStringNStringKey(string? key1, string? key2)
         {
             _key1 = key1?.ToLowerInvariant() ?? "NULL";
             _key2 = key2?.ToLowerInvariant() ?? "NULL";

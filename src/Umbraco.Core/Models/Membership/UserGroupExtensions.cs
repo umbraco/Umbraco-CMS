@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
         public static bool IsSystemUserGroup(this IReadOnlyUserGroup group) =>
             IsSystemUserGroup(group.Alias);
 
-        private static bool IsSystemUserGroup(this string groupAlias)
+        private static bool IsSystemUserGroup(this string? groupAlias)
         {
             return groupAlias == Constants.Security.AdminGroupAlias
                    || groupAlias == Constants.Security.SensitiveDataGroupAlias

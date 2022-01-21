@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Models.Membership
             if (_aggregateNodePermissions == null)
                 _aggregateNodePermissions = new Dictionary<int, string[]>();
 
-            string[] entityPermissions;
+            string[]? entityPermissions;
             if (_aggregateNodePermissions.TryGetValue(entityId, out entityPermissions) == false)
             {
                 entityPermissions = this.Where(x => x.EntityId == entityId).SelectMany(x => x.AssignedPermissions).Distinct().ToArray();
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Models.Membership
             return entityPermissions;
         }
 
-        private Dictionary<int, string[]> _aggregateNodePermissions;
+        private Dictionary<int, string[]>? _aggregateNodePermissions;
 
         /// <summary>
         /// Returns the aggregate permissions in the permission set for all nodes
@@ -52,6 +52,6 @@ namespace Umbraco.Cms.Core.Models.Membership
                        this.SelectMany(x => x.AssignedPermissions).Distinct().ToArray());
         }
 
-        private string[] _aggregatePermissions;
+        private string[]? _aggregatePermissions;
     }
 }

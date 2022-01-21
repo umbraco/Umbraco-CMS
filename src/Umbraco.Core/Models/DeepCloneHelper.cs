@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models
 
             public PropertyInfo PropertyInfo { get; private set; }
             public bool IsDeepCloneable { get; set; }
-            public Type GenericListType { get; set; }
+            public Type? GenericListType { get; set; }
             public bool IsList
             {
                 get { return GenericListType != null; }
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Models
                         return new ClonePropertyInfo(propertyInfo);
                     })
                     .Where(x => x.HasValue)
-                    .Select(x => x.Value)
+                    .Select(x => x!.Value)
                     .ToArray());
 
             foreach (var clonePropertyInfo in refProperties)
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.Models
                 if (clonePropertyInfo.IsDeepCloneable)
                 {
                     //this ref property is also deep cloneable so clone it
-                    var result = (IDeepCloneable)clonePropertyInfo.PropertyInfo.GetValue(input, null);
+                    var result = (IDeepCloneable?)clonePropertyInfo.PropertyInfo.GetValue(input, null);
 
                     if (result != null)
                     {
@@ -140,10 +140,10 @@ namespace Umbraco.Cms.Core.Models
                 }
                 else if (clonePropertyInfo.IsList)
                 {
-                    var enumerable = (IEnumerable)clonePropertyInfo.PropertyInfo.GetValue(input, null);
+                    var enumerable = (IEnumerable?)clonePropertyInfo.PropertyInfo.GetValue(input, null);
                     if (enumerable == null) continue;
 
-                    var newList = (IList)Activator.CreateInstance(clonePropertyInfo.GenericListType);
+                    var newList = clonePropertyInfo.GenericListType is not null ? (IList?)Activator.CreateInstance(clonePropertyInfo.GenericListType) : null;
 
                     var isUsableType = true;
 
@@ -154,12 +154,12 @@ namespace Umbraco.Cms.Core.Models
                         var dc = o as IDeepCloneable;
                         if (dc != null)
                         {
-                            newList.Add(dc.DeepClone());
+                            newList?.Add(dc.DeepClone());
                         }
                         else if (o is string || o.GetType().IsValueType)
                         {
                             //check if the item is a value type or a string, then we can just use it
-                            newList.Add(o);
+                            newList?.Add(o);
                         }
                         else
                         {
@@ -179,11 +179,15 @@ namespace Umbraco.Cms.Core.Models
                     if (clonePropertyInfo.PropertyInfo.PropertyType.IsArray)
                     {
                         //need to convert to array
-                        var arr = (object[])Activator.CreateInstance(clonePropertyInfo.PropertyInfo.PropertyType, newList.Count);
-                        for (int i = 0; i < newList.Count; i++)
+                        var arr = (object?[]?)Activator.CreateInstance(clonePropertyInfo.PropertyInfo.PropertyType, newList?.Count ?? 0);
+                        for (int i = 0; i < newList?.Count; i++)
                         {
-                            arr[i] = newList[i];
+                            if (arr != null)
+                            {
+                                arr[i] = newList[i];
+                            }
                         }
+
                         //set the cloned collection
                         clonePropertyInfo.PropertyInfo.SetValue(output, arr, null);
                     }

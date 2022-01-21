@@ -39,10 +39,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public virtual string Name => this.Name(_variationContextAccessor);
+        public virtual string? Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        public virtual string UrlSegment => this.UrlSegment(_variationContextAccessor);
+        public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
@@ -75,10 +75,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
-        public abstract bool IsDraft(string culture = null);
+        public abstract bool IsDraft(string? culture = null);
 
         /// <inheritdoc />
-        public abstract bool IsPublished(string culture = null);
+        public abstract bool IsPublished(string? culture = null);
 
         #endregion
 

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public string Alias { get; set; }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }

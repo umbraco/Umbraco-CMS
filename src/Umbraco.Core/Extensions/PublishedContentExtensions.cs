@@ -166,7 +166,7 @@ namespace Umbraco.Extensions
             }
 
             var template = fileService.GetTemplate(content.TemplateId.Value);
-            return template == null ? string.Empty : template.Alias;
+            return template.Alias ?? string.Empty;
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService,
@@ -1358,7 +1358,7 @@ namespace Umbraco.Extensions
             return fields;
         }
 
-        private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType) => contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+        private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType) => contentType.PropertyTypes.Where(x => x.Alias is not null && x.Name is not null).ToDictionary(x => x.Alias!, x => x.Name!);
 
         #endregion
     }

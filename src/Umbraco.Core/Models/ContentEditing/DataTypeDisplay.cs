@@ -20,13 +20,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "selectedEditor", IsRequired = true)]
         [Required]
-        public string SelectedEditor { get; set; }
+        public string? SelectedEditor { get; set; }
 
         [DataMember(Name = "availableEditors")]
-        public IEnumerable<PropertyEditorBasic> AvailableEditors { get; set; }
+        public IEnumerable<PropertyEditorBasic>? AvailableEditors { get; set; }
 
         [DataMember(Name = "preValues")]
-        public IEnumerable<DataTypeConfigurationFieldDisplay> PreValues { get; set; }
+        public IEnumerable<DataTypeConfigurationFieldDisplay>? PreValues { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

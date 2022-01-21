@@ -90,7 +90,7 @@ namespace Umbraco.Extensions
         /// <param name="entity"></param>
         public static void SanitizeEntityPropertiesForXmlStorage(this IContentBase entity)
         {
-            entity.Name = entity.Name.ToValidXmlString();
+            entity.Name = entity.Name?.ToValidXmlString();
             foreach (var property in entity.Properties)
             {
                 foreach (var propertyValue in property.Values)
@@ -170,8 +170,8 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of integer ids</returns>
-        public static IEnumerable<int> GetAncestorIds(this IContent content) =>
-            content.Path.Split(Constants.CharArrays.Comma)
+        public static IEnumerable<int>? GetAncestorIds(this IContent content) =>
+            content.Path?.Split(Constants.CharArrays.Comma)
                 .Where(x => x != Constants.System.RootString && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(s =>
                     int.Parse(s, CultureInfo.InvariantCulture));
 
@@ -311,7 +311,7 @@ namespace Umbraco.Extensions
 
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType.CompositionPropertyTypes
-                .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+                .FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             if (propertyType == null)
                 throw new Exception("No property type exists with alias " + propertyTypeAlias + ".");
 
@@ -340,7 +340,7 @@ namespace Umbraco.Extensions
         {
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType
-                .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+                .CompositionPropertyTypes.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             if (propertyType == null)
                 throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
             return mediaFileManager.StoreFile(content, propertyType, filename, filestream, filepath);

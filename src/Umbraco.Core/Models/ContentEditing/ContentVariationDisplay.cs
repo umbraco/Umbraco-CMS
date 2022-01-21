@@ -19,10 +19,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         }
 
         [DataMember(Name = "name", IsRequired = true)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "displayName")]
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
 
         /// <summary>
         /// Defines the tabs containing display properties
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Internal property used for tests to get all properties from all tabs
         /// </summary>
         [IgnoreDataMember]
-        IEnumerable<ContentPropertyDisplay> IContentProperties<ContentPropertyDisplay>.Properties => Tabs.SelectMany(x => x.Properties);
+        IEnumerable<ContentPropertyDisplay> IContentProperties<ContentPropertyDisplay>.Properties => Tabs.Where(x => x.Properties is not null).SelectMany(x => x.Properties!);
 
         /// <summary>
         /// The language/culture assigned to this content variation
@@ -43,10 +43,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// If this is null it means this content variant is an invariant culture
         /// </remarks>
         [DataMember(Name = "language")]
-        public Language Language { get; set; }
+        public Language? Language { get; set; }
 
         [DataMember(Name = "segment")]
-        public string Segment { get; set; }
+        public string? Segment { get; set; }
 
         [DataMember(Name = "state")]
         public ContentSavedState State { get; set; }

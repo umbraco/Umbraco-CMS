@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Cache
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                 {
                     var pathid = "," + payload.Id + ",";
-                    isolatedCache.ClearOfType<IContent>((k, v) => v.Path.Contains(pathid));
+                    isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
                 }
 
                 //if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content

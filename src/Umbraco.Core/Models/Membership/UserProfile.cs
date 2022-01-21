@@ -13,14 +13,14 @@ namespace Umbraco.Cms.Core.Models.Membership
         public int Id { get; private set; }
         public string Name { get; private set; }
 
-        public bool Equals(UserProfile other)
+        public bool Equals(UserProfile? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

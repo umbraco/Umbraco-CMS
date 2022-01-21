@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
             }
             else
             {
-                return GetKey<T>() + id?.ToString().ToUpperInvariant();
+                return GetKey<T>() + id?.ToString()?.ToUpperInvariant();
             }
         }
     }

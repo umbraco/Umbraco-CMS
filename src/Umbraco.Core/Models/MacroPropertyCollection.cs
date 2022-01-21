@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models
         /// The existing property alias
         /// </param>
         /// <param name="newAlias"></param>
-        public void UpdateProperty(string currentAlias, string name = null, int? sortOrder = null, string editorAlias = null, string newAlias = null)
+        public void UpdateProperty(string currentAlias, string? name = null, int? sortOrder = null, string? editorAlias = null, string? newAlias = null)
         {
             var prop = this[currentAlias];
             if (prop == null)
@@ -50,12 +50,12 @@ namespace Umbraco.Cms.Core.Models
             {
                 prop.SortOrder = sortOrder.Value;
             }
-            if (name.IsNullOrWhiteSpace() == false)
+            if (name.IsNullOrWhiteSpace() == false && editorAlias is not null)
             {
                 prop.EditorAlias = editorAlias;
             }
 
-            if (newAlias.IsNullOrWhiteSpace() == false && currentAlias != newAlias)
+            if (newAlias.IsNullOrWhiteSpace() == false && currentAlias != newAlias && newAlias is not null)
             {
                 prop.Alias = newAlias;
                 ChangeKey(currentAlias, newAlias);

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets or sets the display name.
         /// </summary>
         [DataMember(Name = "displayName")]
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether has translation.

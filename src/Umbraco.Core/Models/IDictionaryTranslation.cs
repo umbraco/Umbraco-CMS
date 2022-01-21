@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the <see cref="Language"/> for the translation
         /// </summary>
         [DataMember]
-        ILanguage Language { get; set; }
+        ILanguage? Language { get; set; }
 
         int LanguageId { get; }
 
@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the translated text
         /// </summary>
         [DataMember]
-        string Value { get; set; }
+        string? Value { get; set; }
     }
 }

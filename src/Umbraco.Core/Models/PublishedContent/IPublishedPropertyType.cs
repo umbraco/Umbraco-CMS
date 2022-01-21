@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets the published content type containing the property type.
         /// </summary>
-        IPublishedContentType ContentType { get; }
+        IPublishedContentType? ContentType { get; }
 
         /// <summary>
         /// Gets the data type.
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <remarks>
         /// <para>The XPath value can be either a string or an XPathNavigator.</para>
         /// </remarks>
-        object ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
 
         /// <summary>
         /// Gets the property model CLR type.
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>The model CLR type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
         /// <para>For the actual CLR type, see <see cref="ClrType"/>.</para>
         /// </remarks>
-        Type ModelClrType { get; }
+        Type? ModelClrType { get; }
 
         /// <summary>
         /// Gets the property CLR type.
@@ -103,6 +103,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>Mapping from <see cref="ModelClrType"/> may throw if some <see cref="ModelType"/> instances
         /// could not be mapped to actual CLR types.</para>
         /// </remarks>
-        Type ClrType { get; }
+        Type? ClrType { get; }
     }
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the unique identifier of whoever is consenting.
         /// </summary>
-        string Source { get; }
+        string? Source { get; }
 
         /// <summary>
         /// Gets the unique identifier of the context of the consent.
@@ -30,12 +30,12 @@ namespace Umbraco.Cms.Core.Models
         /// <para>Represents the domain, application, scope... of the action.</para>
         /// <para>When the action is a Udi, this should be the Udi type.</para>
         /// </remarks>
-        string Context { get; }
+        string? Context { get; }
 
         /// <summary>
         /// Gets the unique identifier of the consented action.
         /// </summary>
-        string Action { get; }
+        string? Action { get; }
 
         /// <summary>
         /// Gets the state of the consent.
@@ -45,11 +45,11 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets some additional free text.
         /// </summary>
-        string Comment { get; }
+        string? Comment { get; }
 
         /// <summary>
         /// Gets the previous states of this consent.
         /// </summary>
-        IEnumerable<IConsent> History { get; }
+        IEnumerable<IConsent>? History { get; }
     }
 }

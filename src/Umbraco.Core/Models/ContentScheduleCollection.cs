@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models
         private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule
             = new Dictionary<string, SortedList<DateTime, ContentSchedule>>(StringComparer.InvariantCultureIgnoreCase);
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         /// <summary>
         /// Clears all <see cref="CollectionChanged"/> event handlers
@@ -202,10 +202,10 @@ namespace Umbraco.Cms.Core.Models
             return clone;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is ContentScheduleCollection other && Equals(other);
 
-        public bool Equals(ContentScheduleCollection other)
+        public bool Equals(ContentScheduleCollection? other)
         {
             if (other == null) return false;
 

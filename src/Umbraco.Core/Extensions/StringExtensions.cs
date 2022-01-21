@@ -1307,7 +1307,7 @@ namespace Umbraco.Extensions
         /// <param name="shortStringHelper">The short string helper.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe url segment.</returns>
-        public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper, string culture)
+        public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper, string? culture)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));

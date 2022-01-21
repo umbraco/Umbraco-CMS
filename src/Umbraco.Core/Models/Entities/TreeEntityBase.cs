@@ -8,19 +8,19 @@ namespace Umbraco.Cms.Core.Models.Entities
     /// </summary>
     public abstract class TreeEntityBase : EntityBase, ITreeEntity
     {
-        private string _name;
+        private string? _name;
         private int _creatorId;
         private int _parentId;
         private bool _hasParentId;
-        private ITreeEntity _parent;
+        private ITreeEntity? _parent;
         private int _level;
-        private string _path;
+        private string? _path;
         private int _sortOrder;
         private bool _trashed;
 
         /// <inheritdoc />
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public string Path
+        public string? Path
         {
             get => _path;
             set => SetPropertyValueAndDetectChanges(value, ref _path, nameof(Path));

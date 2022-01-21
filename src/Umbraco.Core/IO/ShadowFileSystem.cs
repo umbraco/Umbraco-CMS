@@ -262,7 +262,7 @@ namespace Umbraco.Cms.Core.IO
             return _fs.GetFullPath(path);
         }
 
-        public string GetUrl(string path)
+        public string GetUrl(string? path)
         {
             return _fs.GetUrl(path);
         }

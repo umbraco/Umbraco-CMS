@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Adds or updates a <see cref="ContentCultureInfos"/> instance.
         /// </summary>
-        public void AddOrUpdate(string culture, string name, DateTime date)
+        public void AddOrUpdate(string culture, string? name, DateTime date)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));

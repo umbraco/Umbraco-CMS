@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Models
                 rule.AccessEntryId = Key;
         }
 
-        void _ruleCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void _ruleCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Rules));
 
@@ -67,13 +67,15 @@ namespace Umbraco.Cms.Core.Models
 
             if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                var item = e.OldItems.Cast<PublicAccessRule>().First();
+                var item = e.OldItems?.Cast<PublicAccessRule>().First();
 
-                if (_removedRules.Contains(item.Key) == false)
+                if (item is not null)
                 {
-                    _removedRules.Add(item.Key);
+                    if (_removedRules.Contains(item.Key) == false)
+                    {
+                        _removedRules.Add(item.Key);
+                    }
                 }
-
             }
         }
 

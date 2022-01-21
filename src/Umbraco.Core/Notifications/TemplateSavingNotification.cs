@@ -51,14 +51,21 @@ namespace Umbraco.Cms.Core.Notifications
             set => State[s_templateForContentTypeKey] = value;
         }
 
-        public string ContentTypeAlias
+        public string? ContentTypeAlias
         {
             get
             {
                 State.TryGetValue(s_contentTypeAliasKey, out var result);
                 return result as string;
             }
-            set => State[s_contentTypeAliasKey] = value;
+
+            set
+            {
+                if (value is not null)
+                {
+                    State[s_contentTypeAliasKey] = value;
+                }
+            }
         }
     }
 }

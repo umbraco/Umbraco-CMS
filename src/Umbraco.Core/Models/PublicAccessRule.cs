@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class PublicAccessRule : EntityBase
     {
-        private string _ruleValue;
-        private string _ruleType;
+        private string? _ruleValue;
+        private string? _ruleType;
 
         public PublicAccessRule(Guid id, Guid accessEntryId)
         {
@@ -24,13 +24,13 @@ namespace Umbraco.Cms.Core.Models
 
         public Guid AccessEntryId { get; set; }
 
-        public string RuleValue
+        public string? RuleValue
         {
             get => _ruleValue;
             set => SetPropertyValueAndDetectChanges(value, ref _ruleValue, nameof(RuleValue));
         }
 
-        public string RuleType
+        public string? RuleType
         {
             get => _ruleType;
             set => SetPropertyValueAndDetectChanges(value, ref _ruleType, nameof(RuleType));

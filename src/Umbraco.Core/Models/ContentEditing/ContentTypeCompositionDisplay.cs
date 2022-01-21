@@ -18,19 +18,19 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "listViewEditorName")]
         [ReadOnly(true)]
-        public string ListViewEditorName { get; set; }
+        public string? ListViewEditorName { get; set; }
 
         //Allowed child types
         [DataMember(Name = "allowedContentTypes")]
-        public IEnumerable<int> AllowedContentTypes { get; set; }
+        public IEnumerable<int>? AllowedContentTypes { get; set; }
 
         //Compositions
         [DataMember(Name = "compositeContentTypes")]
-        public IEnumerable<string> CompositeContentTypes { get; set; }
+        public IEnumerable<string?> CompositeContentTypes { get; set; }
 
         //Locked compositions
         [DataMember(Name = "lockedCompositeContentTypes")]
-        public IEnumerable<string> LockedCompositeContentTypes { get; set; }
+        public IEnumerable<string>? LockedCompositeContentTypes { get; set; }
 
         [DataMember(Name = "allowAsRoot")]
         public bool AllowAsRoot { get; set; }
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "ModelState")]
         [ReadOnly(true)]
-        public IDictionary<string, object> Errors { get; set; }
+        public IDictionary<string, object>? Errors { get; set; }
     }
 
     [DataContract(Name = "contentType", Namespace = "")]

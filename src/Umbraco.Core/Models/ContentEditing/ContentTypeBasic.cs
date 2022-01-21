@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public ContentTypeBasic()
         {
             Blueprints = new Dictionary<int, string>();
+            Alias = string.Empty;
         }
 
         /// <summary>
@@ -38,10 +39,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public DateTime CreateDate { get; set; }
 
         [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataMember(Name = "thumbnail")]
-        public string Thumbnail { get; set; }
+        public string? Thumbnail { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
                     return true;
                 }
                 //if it starts with a '.' or doesn't contain a '.' at all then it is a class
-                return Icon.StartsWith(".") || Icon.Contains(".") == false;
+                return (Icon?.StartsWith(".") ?? false) || Icon?.Contains(".") == false;
             }
         }
 
@@ -66,7 +67,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "iconFilePath")]
         [ReadOnly(true)]
-        public string IconFilePath { get; set; }
+        public string? IconFilePath { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
@@ -82,7 +83,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
                     return true;
                 }
                 //if it starts with a '.' or doesn't contain a '.' at all then it is a class
-                return Thumbnail.StartsWith(".") || Thumbnail.Contains(".") == false;
+                return (Thumbnail?.StartsWith(".") ?? false) || Thumbnail?.Contains(".") == false;
             }
         }
 
@@ -91,7 +92,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "thumbnailFilePath")]
         [ReadOnly(true)]
-        public string ThumbnailFilePath { get; set; }
+        public string? ThumbnailFilePath { get; set; }
 
         [DataMember(Name = "blueprints")]
         [ReadOnly(true)]

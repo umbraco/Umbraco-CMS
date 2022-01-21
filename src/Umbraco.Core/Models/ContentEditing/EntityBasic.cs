@@ -13,22 +13,23 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public EntityBasic()
         {
             AdditionalData = new Dictionary<string, object>();
+            Alias = string.Empty;
         }
 
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
-        public object Id { get; set; }
+        public object? Id { get; set; }
 
         [DataMember(Name = "udi")]
         [ReadOnly(true)]
-        public Udi Udi { get; set; }
+        public Udi? Udi { get; set; }
 
         [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [DataMember(Name = "trashed")]
         [ReadOnly(true)]
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The path of the entity
         /// </summary>
         [DataMember(Name = "path")]
-        public string Path { get; set; }
+        public string? Path { get; set; }
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>

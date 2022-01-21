@@ -63,10 +63,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual int Id => _content.Id;
 
         /// <inheritdoc />
-        public virtual string Name => _content.Name;
+        public virtual string? Name => _content.Name;
 
         /// <inheritdoc />
-        public virtual string UrlSegment => _content.UrlSegment;
+        public virtual string? UrlSegment => _content.UrlSegment;
 
         /// <inheritdoc />
         public virtual int SortOrder => _content.SortOrder;
@@ -99,10 +99,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual PublishedItemType ItemType => _content.ItemType;
 
         /// <inheritdoc />
-        public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);
+        public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);
 
         /// <inheritdoc />
-        public virtual bool IsPublished(string culture = null) => _content.IsPublished(culture);
+        public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
         #endregion
 

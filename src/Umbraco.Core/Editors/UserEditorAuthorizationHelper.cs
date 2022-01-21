@@ -59,12 +59,12 @@ namespace Umbraco.Cms.Core.Editors
 
             var changedStartContentIds = savingUser == null
                 ? startContentIds
-                : startContentIds == null
+                : startContentIds == null || savingUser.StartContentIds is null
                     ? null
                     : startContentIds.Except(savingUser.StartContentIds).ToArray();
             var changedStartMediaIds = savingUser == null
                 ? startMediaIds
-                : startMediaIds == null
+                : startMediaIds == null || savingUser.StartMediaIds is null
                     ? null
                     : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
             var pathResult = AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);

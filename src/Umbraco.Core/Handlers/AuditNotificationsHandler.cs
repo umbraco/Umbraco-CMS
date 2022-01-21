@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Handlers
                 var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
                     ? string.Join(", ", group.AllowedSections)
                     : null;
-                var perms = ((UserGroup)group).WasPropertyDirty("Permissions")
+                var perms = ((UserGroup)group).WasPropertyDirty("Permissions") && group.Permissions is not null
                     ? string.Join(", ", group.Permissions)
                     : null;
 

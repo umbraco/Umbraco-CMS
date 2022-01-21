@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             target.Id = source.Id;
             target.IsoCode = source.IsoCode;
-            target.Name = source.CultureInfo.DisplayName;
+            target.Name = source.CultureInfo?.DisplayName;
             target.IsDefault = source.IsDefault;
             target.IsMandatory = source.IsMandatory;
             target.FallbackLanguageId = source.FallbackLanguageId;
@@ -49,8 +49,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var defaultLang = temp.SingleOrDefault(x => x.IsDefault);
 
             // insert default lang first, then remaining language a-z
-            list.Add(defaultLang);
-            list.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
+            if (defaultLang is not null)
+            {
+                list.Add(defaultLang);
+                list.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
+            }
         }
     }
 }

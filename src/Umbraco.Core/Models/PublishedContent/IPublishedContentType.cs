@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets the content type properties.
         /// </summary>
-        IEnumerable<IPublishedPropertyType> PropertyTypes { get; }
+        IEnumerable<IPublishedPropertyType>? PropertyTypes { get; }
 
         /// <summary>
         /// Gets a property type index.
@@ -59,11 +59,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets a property type.
         /// </summary>
-        IPublishedPropertyType GetPropertyType(string alias);
+        IPublishedPropertyType? GetPropertyType(string alias);
 
         /// <summary>
         /// Gets a property type.
         /// </summary>
-        IPublishedPropertyType GetPropertyType(int index);
+        IPublishedPropertyType? GetPropertyType(int index);
     }
 }

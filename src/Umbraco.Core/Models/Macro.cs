@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Models
 
         public Macro(IShortStringHelper shortStringHelper)
         {
+            _alias = string.Empty;
             _shortStringHelper = shortStringHelper;
             _properties = new MacroPropertyCollection();
             _properties.CollectionChanged += PropertiesChanged;
@@ -87,46 +88,52 @@ namespace Umbraco.Cms.Core.Models
         }
 
         private string _alias;
-        private string _name;
+        private string? _name;
         private bool _useInEditor;
         private int _cacheDuration;
         private bool _cacheByPage;
         private bool _cacheByMember;
         private bool _dontRender;
-        private string _macroSource;
+        private string? _macroSource;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
 
-        void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void PropertiesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Properties));
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 //listen for changes
-                var prop = e.NewItems.Cast<MacroProperty>().First();
-                prop.PropertyChanged += PropertyDataChanged;
-
-                var alias = prop.Alias;
-
-                if (_addedProperties.Contains(alias) == false)
+                MacroProperty? prop = e.NewItems?.Cast<MacroProperty>().First();
+                if (prop is not null)
                 {
-                    //add to the added props
-                    _addedProperties.Add(alias);
+                    prop.PropertyChanged += PropertyDataChanged;
+
+                    var alias = prop.Alias;
+
+                    if (_addedProperties.Contains(alias) == false)
+                    {
+                        //add to the added props
+                        _addedProperties.Add(alias);
+                    }
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 //remove listening for changes
-                var prop = e.OldItems.Cast<MacroProperty>().First();
-                prop.PropertyChanged -= PropertyDataChanged;
-
-                var alias = prop.Alias;
-
-                if (_removedProperties.Contains(alias) == false)
+                var prop = e.OldItems?.Cast<MacroProperty>().First();
+                if (prop is not null)
                 {
-                    _removedProperties.Add(alias);
+                    prop.PropertyChanged -= PropertyDataChanged;
+
+                    var alias = prop.Alias;
+
+                    if (_removedProperties.Contains(alias) == false)
+                    {
+                        _removedProperties.Add(alias);
+                    }
                 }
             }
         }
@@ -136,7 +143,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void PropertyDataChanged(object sender, PropertyChangedEventArgs e)
+        void PropertyDataChanged(object? sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Properties));
         }
@@ -171,14 +178,14 @@ namespace Umbraco.Cms.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias), ref _alias!, nameof(Alias));
         }
 
         /// <summary>
         /// Gets or sets the name of the Macro
         /// </summary>
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -238,7 +245,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or set the path to the Partial View to render
         /// </summary>
         [DataMember]
-        public string MacroSource
+        public string? MacroSource
         {
             get => _macroSource;
             set => SetPropertyValueAndDetectChanges(value, ref _macroSource, nameof(MacroSource));

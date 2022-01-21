@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string propertyTypeAlias)
+        public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string? propertyTypeAlias)
             : this(shortStringHelper, dataType)
         {
             _alias = SanitizeAlias(propertyTypeAlias);
@@ -246,19 +246,19 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Sanitizes a property type alias.
         /// </summary>
-        private string SanitizeAlias(string value)
+        private string? SanitizeAlias(string? value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
             // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
             // which is used internally
 
-            return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
+            return value?.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix) ?? false
                 ? value
-                : value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
+                : value?.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
         }
 
         /// <inheritdoc />
-        public bool Equals(PropertyType other)
+        public bool Equals(PropertyType? other)
         {
             return other != null && (base.Equals(other) || Alias.InvariantEquals(other.Alias));
         }

@@ -29,12 +29,12 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the content item for the current culture.
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Gets the URL segment of the content item for the current culture.
         /// </summary>
-        string UrlSegment { get; }
+        string? UrlSegment { get; }
 
         /// <summary>
         /// Gets the sort order of the content item.
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// is the edited version) or false (document is published, and has not been edited, and
         /// what is returned is the published version).</para>
         /// </remarks>
-        bool IsDraft(string culture = null);
+        bool IsDraft(string? culture = null);
 
         /// <summary>
         /// Gets a value indicating whether the content is published.
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>It is therefore possible for both IsDraft and IsPublished to be true at the same
         /// time, meaning that the content is the draft version, and a published version exists.</para>
         /// </remarks>
-        bool IsPublished(string culture = null);
+        bool IsPublished(string? culture = null);
 
         #endregion
 

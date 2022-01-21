@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
-        public IEnumerable<TVariant> Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
+        public IEnumerable<TVariant>? Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
         {
             var variesByCulture = source.ContentType.VariesByCulture();
             var variesBySegment = source.ContentType.VariesBySegment();
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
 
 
-        private IList<TVariant> SortVariants<TVariant>(IList<TVariant> variants) where TVariant : ContentVariantDisplay
+        private IList<TVariant>? SortVariants<TVariant>(IList<TVariant> variants) where TVariant : ContentVariantDisplay
         {
             if (variants == null || variants.Count <= 1)
             {
@@ -117,11 +117,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <returns>
         /// Returns all segments assigned to the content including the default `null` segment.
         /// </returns>
-        private IEnumerable<string> GetSegments(IContent content)
+        private IEnumerable<string?> GetSegments(IContent content)
         {
             // The default segment (null) is always there,
             // even when there is no property data at all yet
-            var segments = new List<string> { null };
+            var segments = new List<string?> { null };
 
             // Add actual segments based on the property values
             segments.AddRange(content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)));
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return segments.Distinct();
         }
 
-        private TVariant CreateVariantDisplay<TVariant>(MapperContext context, IContent content, ContentEditing.Language language, string segment) where TVariant : ContentVariantDisplay
+        private TVariant CreateVariantDisplay<TVariant>(MapperContext context, IContent content, ContentEditing.Language? language, string? segment) where TVariant : ContentVariantDisplay
         {
             context.SetCulture(language?.IsoCode);
             context.SetSegment(segment);
@@ -145,9 +145,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return variantDisplay;
         }
 
-        private string GetDisplayName(ContentEditing.Language language, string segment)
+        private string GetDisplayName(ContentEditing.Language? language, string? segment)
         {
-            var isCultureVariant = language != null;
+            var isCultureVariant = language is not null;
             var isSegmentVariant = !segment.IsNullOrWhiteSpace();
 
             if(!isCultureVariant && !isSegmentVariant)
@@ -158,10 +158,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var parts = new List<string>();
 
             if (isSegmentVariant)
-                parts.Add(segment);
+                parts.Add(segment!);
 
             if (isCultureVariant)
-                parts.Add(language.Name);
+                parts.Add(language?.Name!);
 
             return string.Join(" — ", parts);
 

@@ -87,12 +87,12 @@ namespace Umbraco.Cms.Core.Models.Entities
             return other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj != null && (ReferenceEquals(this, obj) || SameIdentityAs(obj as EntityBase));
         }
 
-        private bool SameIdentityAs(EntityBase other)
+        private bool SameIdentityAs(EntityBase? other)
         {
             if (other == null) return false;
 

@@ -26,12 +26,12 @@ namespace Umbraco.Cms.Core.Handlers
             foreach (var grp in affectedEntities)
             {
                 //check if the name has changed
-                if (grp.AdditionalData.ContainsKey("previousName")
+                if ((grp.AdditionalData?.ContainsKey("previousName") ?? false)
                     && grp.AdditionalData["previousName"] != null
-                    && grp.AdditionalData["previousName"].ToString().IsNullOrWhiteSpace() == false
-                    && grp.AdditionalData["previousName"].ToString() != grp.Name)
+                    && grp.AdditionalData["previousName"]?.ToString().IsNullOrWhiteSpace() == false
+                    && grp.AdditionalData["previousName"]?.ToString() != grp.Name)
                 {
-                    _publicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"].ToString(), grp.Name);
+                    _publicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"]?.ToString(), grp.Name);
                 }
             }
         }

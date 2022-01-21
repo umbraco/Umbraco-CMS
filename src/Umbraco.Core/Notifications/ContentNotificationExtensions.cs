@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Notifications
         /// Determines whether a culture is being saved, during a Saving notification
         /// </summary>
         public static bool IsSavingCulture<T>(this SavingNotification<T> notification, T content, string culture) where T : IContentBase
-            => content.CultureInfos.TryGetValue(culture, out ContentCultureInfos cultureInfo) && cultureInfo.IsDirty();
+            => (content.CultureInfos?.TryGetValue(culture, out ContentCultureInfos cultureInfo) ?? false) && cultureInfo.IsDirty();
 
         /// <summary>
         /// Determines whether a culture has been saved, during a Saved notification
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Notifications
             => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);
 
         public static bool IsPublishingCulture(IContent content, string culture)
-            => content.PublishCultureInfos.TryGetValue(culture, out ContentCultureInfos cultureInfo) && cultureInfo.IsDirty();
+            => (content.PublishCultureInfos?.TryGetValue(culture, out ContentCultureInfos cultureInfo) ?? false) && cultureInfo.IsDirty();
 
         public static bool HasUnpublishedCulture(IContent content, string culture)
             => content.WasPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);

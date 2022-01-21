@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Core.Security
                 : ContentAccess.Denied;
         }
 
-        private bool CheckPermissionsPath(string path, IUser user, IReadOnlyList<char> permissionsToCheck = null)
+        private bool CheckPermissionsPath(string? path, IUser user, IReadOnlyList<char> permissionsToCheck = null)
         {
             if (permissionsToCheck == null)
             {
@@ -220,12 +220,12 @@ namespace Umbraco.Cms.Core.Security
             return allowed;
         }
 
-        public static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
+        public static bool HasPathAccess(string? path, int[]? startNodeIds, int recycleBinId)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             // check for no access
-            if (startNodeIds.Length == 0)
+            if (startNodeIds is null || startNodeIds.Length == 0)
                 return false;
 
             // check for root access

@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Cache
             return _items.GetOrAdd(key, _ => factory());
         }
 
-        public bool Set(string key, object value) => _items.TryAdd(key, value);
+        public bool Set(string key, object? value) => _items.TryAdd(key, value);
 
         public bool Remove(string key) => _items.TryRemove(key, out _);
 

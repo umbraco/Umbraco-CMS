@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <remarks>Converting the configuration object to the serialized database value is
         /// achieved by simply serializing the configuration. See <see cref="ConfigurationEditor.ToDatabase"/>.</remarks>
-        object FromDatabase(string configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
+        object FromDatabase(string? configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
         /// <summary>
         /// Converts the values posted by the configuration editor into the actual configuration object.
@@ -65,12 +65,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Converts the configuration object to values for the configuration editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        IDictionary<string, object> ToConfigurationEditor(object configuration);
+        IDictionary<string, object> ToConfigurationEditor(object? configuration);
 
         /// <summary>
         /// Converts the configuration object to values for the value editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        IDictionary<string, object> ToValueEditor(object configuration);
+        IDictionary<string, object> ToValueEditor(object? configuration);
     }
 }

@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Models
         [DataMember]
         public ContentScheduleAction Action { get; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is ContentSchedule other && Equals(other);
 
         public bool Equals(ContentSchedule other)

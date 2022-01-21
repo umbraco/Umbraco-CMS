@@ -9,15 +9,15 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     {
         [DataMember(Name = "editor")]
         [ReadOnly(true)]
-        public string Editor { get; set; }
+        public string? Editor { get; set; }
 
         [DataMember(Name = "view")]
         [ReadOnly(true)]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         [DataMember(Name = "config")]
         [ReadOnly(true)]
-        public IDictionary<string, object> Config { get; set; }
+        public IDictionary<string, object>? Config { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this property should be locked when editing.
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "contentTypeName")]
         [ReadOnly(true)]
-        public string ContentTypeName { get; set; }
+        public string? ContentTypeName { get; set; }
 
     }
 }

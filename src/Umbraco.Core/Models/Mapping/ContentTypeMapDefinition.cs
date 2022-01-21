@@ -163,8 +163,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (MemberPropertyTypeBasic propertyType in source.Groups.SelectMany(x => x.Properties))
             {
                 MemberPropertyTypeBasic localCopy = propertyType;
-                IPropertyType destProp =
-                    target.PropertyTypes.SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                IPropertyType? destProp =
+                    target.PropertyTypes.SingleOrDefault(x => x.Alias?.InvariantEquals(localCopy.Alias) ?? false);
                 if (destProp == null)
                 {
                     continue;
@@ -199,7 +199,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.ContentApps = _commonMapper.GetContentApps(source);
 
             //sync templates
-            target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
+            if (source.AllowedTemplates is not null)
+            {
+                target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
+            }
 
             if (source.DefaultTemplate != null)
             {
@@ -251,8 +254,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (IPropertyType propertyType in source.PropertyTypes)
             {
                 IPropertyType localCopy = propertyType;
-                MemberPropertyTypeDisplay displayProp = target.Groups.SelectMany(dest => dest.Properties)
-                    .SingleOrDefault(dest => dest.Alias.InvariantEquals(localCopy.Alias));
+                MemberPropertyTypeDisplay? displayProp = target.Groups.SelectMany(dest => dest.Properties)
+                    .SingleOrDefault(dest => dest.Alias?.InvariantEquals(localCopy.Alias) ?? false);
                 if (displayProp == null)
                 {
                     continue;
@@ -314,10 +317,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Name = source.Label;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
-            target.Mandatory = source.Validation.Mandatory;
-            target.MandatoryMessage = source.Validation.MandatoryMessage;
-            target.ValidationRegExp = source.Validation.Pattern;
-            target.ValidationRegExpMessage = source.Validation.PatternMessage;
+            target.Mandatory = source.Validation?.Mandatory;
+            target.MandatoryMessage = source.Validation?.MandatoryMessage;
+            target.ValidationRegExp = source.Validation?.Pattern;
+            target.ValidationRegExpMessage = source.Validation?.PatternMessage;
             target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
             target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
 
@@ -344,7 +347,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target, context);
 
             //sync templates
-            IEnumerable<string> destAllowedTemplateAliases = target.AllowedTemplates.Select(x => x.Alias);
+            IEnumerable<string?> destAllowedTemplateAliases = target.AllowedTemplates.Select(x => x.Alias);
             //if the dest is set and it's the same as the source, then don't change
             if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
             {
@@ -352,7 +355,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target.AllowedTemplates = source.AllowedTemplates
                     .Select(x =>
                     {
-                        ITemplate template = templates.SingleOrDefault(t => t.Alias == x);
+                        ITemplate? template = templates.SingleOrDefault(t => t.Alias == x);
                         return template != null
                             ? context.Map<EntityBasic>(template)
                             : null;
@@ -586,7 +589,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // the old groups - they are just gone and will be cleared by the repository
 
             // handle non-grouped (ie generic) properties
-            PropertyGroupBasic<TSourcePropertyType> genericPropertiesGroup =
+            PropertyGroupBasic<TSourcePropertyType>? genericPropertiesGroup =
                 source.Groups.FirstOrDefault(x => x.IsGenericProperties);
             if (genericPropertiesGroup != null)
             {
@@ -630,7 +633,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
-            target.AllowedContentTypes = source.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
+            target.AllowedContentTypes = source.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
             target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
             target.LockedCompositeContentTypes = MapLockedCompositions(source);
         }
@@ -706,23 +709,27 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             var aliases = new List<string>();
-            IEnumerable<int> ancestorIds = parent.Path.Split(Constants.CharArrays.Comma)
+            IEnumerable<int>? ancestorIds = parent.Path?.Split(Constants.CharArrays.Comma)
                 .Select(s => int.Parse(s, CultureInfo.InvariantCulture));
             // loop through all content types and return ordered aliases of ancestors
             IContentType[] allContentTypes = _contentTypeService.GetAll().ToArray();
-            foreach (var ancestorId in ancestorIds)
+            if (ancestorIds is not null)
             {
-                IContentType ancestor = allContentTypes.FirstOrDefault(x => x.Id == ancestorId);
-                if (ancestor != null)
+                foreach (var ancestorId in ancestorIds)
                 {
-                    aliases.Add(ancestor.Alias);
+                    IContentType? ancestor = allContentTypes.FirstOrDefault(x => x.Id == ancestorId);
+                    if (ancestor is not null && ancestor.Alias is not null)
+                    {
+                        aliases.Add(ancestor.Alias);
+                    }
                 }
             }
+
 
             return aliases.OrderBy(x => x);
         }
 
-        public static Udi MapContentTypeUdi(IContentTypeComposition source)
+        public static Udi? MapContentTypeUdi(IContentTypeComposition source)
         {
             if (source == null)
             {
@@ -752,7 +759,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             IEnumerable<PropertyGroup> destOrigGroups, MapperContext context)
             where TPropertyType : PropertyTypeBasic
         {
-            PropertyGroup destGroup;
+            PropertyGroup? destGroup;
             if (sourceGroup.Id > 0)
             {
                 // update an existing group
@@ -778,7 +785,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private static IPropertyType MapSaveProperty(PropertyTypeBasic sourceProperty,
             IEnumerable<IPropertyType> destOrigProperties, MapperContext context)
         {
-            IPropertyType destProperty;
+            IPropertyType? destProperty;
             if (sourceProperty.Id > 0)
             {
                 // updating an existing property

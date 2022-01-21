@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Dictionary
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        string this[string key] { get; }
+        string? this[string key] { get; }
 
         /// <summary>
         /// Returns the current culture

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// /views/partials/file.cshtml
         /// </summary>
         [DataMember(Name = "virtualPath", IsRequired = true)]
-        public string VirtualPath { get; set; }
+        public string? VirtualPath { get; set; }
 
         /// <summary>
         /// Path represents the path used by the backoffice tree
@@ -30,24 +30,24 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "path")]
         [ReadOnly(true)]
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         [DataMember(Name = "name", IsRequired = true)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "content", IsRequired = true)]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [DataMember(Name = "fileType", IsRequired = true)]
-        public string FileType { get; set; }
+        public string? FileType { get; set; }
 
         [DataMember(Name = "snippet")]
         [ReadOnly(true)]
-        public string Snippet { get; set; }
+        public string? Snippet { get; set; }
 
         [DataMember(Name = "id")]
         [ReadOnly(true)]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         public List<BackOfficeNotification> Notifications { get; private set; }
 
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var illegalChars = System.IO.Path.GetInvalidFileNameChars();
-            if (Name.ContainsAny(illegalChars))
+            if (Name?.ContainsAny(illegalChars) ?? false)
             {
                 yield return new ValidationResult(
                     "The file name cannot contain illegal characters",

@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the server unique identity.
         /// </summary>
-        string ServerIdentity { get; set; }
+        string? ServerIdentity { get; set; }
 
-        new string ServerAddress { get; set; }
+        new string? ServerAddress { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the server is active.

@@ -8,13 +8,13 @@ namespace Umbraco.Extensions
 {
     public static class VariationContextAccessorExtensions
     {
-        public static void ContextualizeVariation(this IVariationContextAccessor variationContextAccessor, ContentVariation variations, ref string culture, ref string segment)
+        public static void ContextualizeVariation(this IVariationContextAccessor variationContextAccessor, ContentVariation variations, ref string? culture, ref string? segment)
             => variationContextAccessor.ContextualizeVariation(variations, null, ref culture, ref segment);
 
-        public static void ContextualizeVariation(this IVariationContextAccessor variationContextAccessor, ContentVariation variations, int contentId, ref string culture, ref string segment)
+        public static void ContextualizeVariation(this IVariationContextAccessor variationContextAccessor, ContentVariation variations, int contentId, ref string? culture, ref string? segment)
             => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, ref culture, ref segment);
 
-        private static void ContextualizeVariation(this IVariationContextAccessor variationContextAccessor, ContentVariation variations, int? contentId, ref string culture, ref string segment)
+        private static void ContextualizeVariation(this IVariationContextAccessor variationContextAccessor, ContentVariation variations, int? contentId, ref string? culture, ref string? segment)
         {
             if (culture != null && segment != null) return;
 

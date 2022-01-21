@@ -27,14 +27,14 @@ namespace Umbraco.Cms.Core.Models
         [DataMember(Name = "disabled")]
         public bool Disabled { get; set; }
 
-        public bool Equals(UserTourStatus other)
+        public bool Equals(UserTourStatus? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(Alias, other.Alias);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

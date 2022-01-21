@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Cache
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                     {
                         var pathid = "," + payload.Id + ",";
-                        mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path.Contains(pathid));
+                        mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
                     }
                 }
             }

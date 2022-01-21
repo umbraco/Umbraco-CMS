@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets or sets the <see cref="VariationContext"/> object.
         /// </summary>
-        public VariationContext VariationContext
+        public VariationContext? VariationContext
         {
             get => Value;
             set => Value = value;

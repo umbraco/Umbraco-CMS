@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value, ref _alias!, nameof(Alias));
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models.Editors
         public Udi Udi { get; }
         public string RelationTypeAlias { get; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is UmbracoEntityReference reference && Equals(reference);
         }

@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Persistence
         /// </summary>
         /// <param name="field">The name of the field.</param>
         /// <param name="expr">A function producing Sql text.</param>
-        public static T SqlText<T>(string field, Func<string, string> expr) => default;
+        public static T? SqlText<T>(string field, Func<string, string> expr) => default;
 
         /// <summary>
         /// Produces Sql text.
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Persistence
         /// <param name="field1">The name of the first field.</param>
         /// <param name="field2">The name of the second field.</param>
         /// <param name="expr">A function producing Sql text.</param>
-        public static T SqlText<T>(string field1, string field2, Func<string, string, string> expr) => default;
+        public static T? SqlText<T>(string field1, string field2, Func<string, string, string> expr) => default;
 
         /// <summary>
         /// Produces Sql text.
@@ -40,6 +40,6 @@ namespace Umbraco.Cms.Core.Persistence
         /// <param name="field2">The name of the second field.</param>
         /// <param name="field3">The name of the third field.</param>
         /// <param name="expr">A function producing Sql text.</param>
-        public static T SqlText<T>(string field1, string field2, string field3, Func<string, string, string, string> expr) => default;
+        public static T? SqlText<T>(string field1, string field2, string field3, Func<string, string, string, string> expr) => default;
     }
 }

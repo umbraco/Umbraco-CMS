@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Name of the Property
         /// </summary>
         [DataMember]
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Sort Order of the Property

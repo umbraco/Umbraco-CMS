@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the name of the Macro
         /// </summary>
         [DataMember]
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets a boolean indicating whether the Macro can be used in an Editor
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or set the path to the macro source to render
         /// </summary>
         [DataMember]
-        string MacroSource { get; set; }
+        string? MacroSource { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Macro Properties

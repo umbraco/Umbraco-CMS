@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Core.Notifications
         {
         }
 
-        public string SignOutRedirectUrl { get; set; }
+        public string? SignOutRedirectUrl { get; set; }
     }
 }

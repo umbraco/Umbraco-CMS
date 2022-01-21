@@ -31,14 +31,14 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the culture.
         /// </summary>
         [DataMember]
-        string Culture { get; set; }
+        string? Culture { get; set; }
 
         /// <summary>
         /// Gets or sets the redirect URL route.
         /// </summary>
         /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
         [DataMember]
-        string Url { get; set; }
+        string? Url { get; set; }
 
     }
 }

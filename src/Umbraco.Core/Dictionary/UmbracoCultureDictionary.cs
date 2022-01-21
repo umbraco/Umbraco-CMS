@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Dictionary
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string this[string key]
+        public string? this[string key]
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Dictionary
                     return string.Empty;
                 }
 
-                var byLang = found.Translations.FirstOrDefault(x => x.Language.Equals(Language));
+                var byLang = found.Translations?.FirstOrDefault(x => x.Language?.Equals(Language) ?? false);
                 if (byLang == null)
                 {
                     return string.Empty;
@@ -105,8 +105,8 @@ namespace Umbraco.Cms.Core.Dictionary
 
             foreach (var dictionaryItem in children)
             {
-                var byLang = dictionaryItem.Translations.FirstOrDefault((x => x.Language.Equals(Language)));
-                if (byLang != null)
+                var byLang = dictionaryItem.Translations?.FirstOrDefault((x => x.Language?.Equals(Language) ?? false));
+                if (byLang != null && dictionaryItem.ItemKey is not null && byLang.Value is not null)
                 {
                     result.Add(dictionaryItem.ItemKey, byLang.Value);
                 }

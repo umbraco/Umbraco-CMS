@@ -18,9 +18,9 @@ namespace Umbraco.Cms.Core.Models.Membership
         private int? _startContentId;
         private int? _startMediaId;
         private string _alias;
-        private string _icon;
-        private string _name;
-        private IEnumerable<string> _permissions;
+        private string? _icon;
+        private string? _name;
+        private IEnumerable<string>? _permissions;
         private List<string> _sectionCollection;
 
         //Custom comparer for enumerable
@@ -34,6 +34,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// </summary>
         public UserGroup(IShortStringHelper shortStringHelper)
         {
+            _alias = string.Empty;
             _shortStringHelper = shortStringHelper;
             _sectionCollection = new List<string>();
         }
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string Icon
+        public string? Icon
         {
             get => _icon;
             set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
@@ -81,11 +82,11 @@ namespace Umbraco.Cms.Core.Models.Membership
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!, nameof(Alias));
         }
 
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -98,7 +99,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
         /// </remarks>
         [DataMember]
-        public IEnumerable<string> Permissions
+        public IEnumerable<string>? Permissions
         {
             get => _permissions;
             set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);

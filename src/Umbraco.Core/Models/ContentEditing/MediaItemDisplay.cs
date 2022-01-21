@@ -15,10 +15,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         }
 
         [DataMember(Name = "contentType")]
-        public ContentTypeBasic ContentType { get; set; }
+        public ContentTypeBasic? ContentType { get; set; }
 
         [DataMember(Name = "mediaLink")]
-        public string MediaLink { get; set; }
+        public string? MediaLink { get; set; }
 
         [DataMember(Name = "apps")]
         public IEnumerable<ContentApp> ContentApps { get; set; }

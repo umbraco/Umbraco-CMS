@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models
 {
     public interface IMigrationEntry : IEntity, IRememberBeingDirty
     {
-        string MigrationName { get; set; }
-        SemVersion Version { get; set; }
+        string? MigrationName { get; set; }
+        SemVersion? Version { get; set; }
     }
 }

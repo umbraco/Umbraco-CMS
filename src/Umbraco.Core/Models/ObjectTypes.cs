@@ -14,17 +14,17 @@ namespace Umbraco.Cms.Core.Models
         private static readonly ConcurrentDictionary<UmbracoObjectTypes, Guid> UmbracoGuids = new ConcurrentDictionary<UmbracoObjectTypes, Guid>();
         private static readonly ConcurrentDictionary<UmbracoObjectTypes, string> UmbracoUdiTypes = new ConcurrentDictionary<UmbracoObjectTypes, string>();
         private static readonly ConcurrentDictionary<UmbracoObjectTypes, string> UmbracoFriendlyNames = new ConcurrentDictionary<UmbracoObjectTypes, string>();
-        private static readonly ConcurrentDictionary<UmbracoObjectTypes, Type> UmbracoTypes = new ConcurrentDictionary<UmbracoObjectTypes, Type>();
+        private static readonly ConcurrentDictionary<UmbracoObjectTypes, Type?> UmbracoTypes = new ConcurrentDictionary<UmbracoObjectTypes, Type?>();
         private static readonly ConcurrentDictionary<Guid, string> GuidUdiTypes = new ConcurrentDictionary<Guid, string>();
         private static readonly ConcurrentDictionary<Guid, UmbracoObjectTypes> GuidObjectTypes = new ConcurrentDictionary<Guid, UmbracoObjectTypes>();
-        private static readonly ConcurrentDictionary<Guid, Type> GuidTypes = new ConcurrentDictionary<Guid, Type>();
+        private static readonly ConcurrentDictionary<Guid, Type?> GuidTypes = new ConcurrentDictionary<Guid, Type?>();
 
-        private static FieldInfo GetEnumField(string name)
+        private static FieldInfo? GetEnumField(string name)
         {
             return typeof (UmbracoObjectTypes).GetField(name, BindingFlags.Public | BindingFlags.Static);
         }
 
-        private static FieldInfo GetEnumField(Guid guid)
+        private static FieldInfo? GetEnumField(Guid guid)
         {
             var fields = typeof (UmbracoObjectTypes).GetFields(BindingFlags.Public | BindingFlags.Static);
             foreach (var field in fields)
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Models
                 var field = GetEnumField(objectType);
                 if (field == null) return UmbracoObjectTypes.Unknown;
 
-                return (UmbracoObjectTypes) field.GetValue(null);
+                return (UmbracoObjectTypes?)field.GetValue(null) ?? UmbracoObjectTypes.Unknown;
             });
         }
 
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the CLR type corresponding to an object type Guid.
         /// </summary>
-        public static Type GetClrType(Guid objectType)
+        public static Type? GetClrType(Guid objectType)
         {
             return GuidTypes.GetOrAdd(objectType, t =>
             {
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Core.Models
             return UmbracoGuids.GetOrAdd(objectType, t =>
             {
                 var field = GetEnumField(t.ToString());
-                var attribute = field.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
+                var attribute = field?.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
 
                 return attribute?.ObjectId ?? Guid.Empty;
             });
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Models
             return UmbracoUdiTypes.GetOrAdd(objectType, t =>
             {
                 var field = GetEnumField(t.ToString());
-                var attribute = field.GetCustomAttribute<UmbracoUdiTypeAttribute>(false);
+                var attribute = field?.GetCustomAttribute<UmbracoUdiTypeAttribute>(false);
 
                 return attribute?.UdiType ?? Constants.UdiEntityType.Unknown;
             });
@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the name corresponding to this Umbraco object type.
         /// </summary>
-        public static string GetName(this UmbracoObjectTypes objectType)
+        public static string? GetName(this UmbracoObjectTypes objectType)
         {
             return Enum.GetName(typeof (UmbracoObjectTypes), objectType);
         }
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.Models
             return UmbracoFriendlyNames.GetOrAdd(objectType, t =>
             {
                 var field = GetEnumField(t.ToString());
-                var attribute = field.GetCustomAttribute<FriendlyNameAttribute>(false);
+                var attribute = field?.GetCustomAttribute<FriendlyNameAttribute>(false);
 
                 return attribute?.ToString() ?? string.Empty;
             });
@@ -147,12 +147,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the CLR type corresponding to this Umbraco object type.
         /// </summary>
-        public static Type GetClrType(this UmbracoObjectTypes objectType)
+        public static Type? GetClrType(this UmbracoObjectTypes objectType)
         {
             return UmbracoTypes.GetOrAdd(objectType, t =>
             {
                 var field = GetEnumField(t.ToString());
-                var attribute = field.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
+                var attribute = field?.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
 
                 return attribute?.ModelType;
             });

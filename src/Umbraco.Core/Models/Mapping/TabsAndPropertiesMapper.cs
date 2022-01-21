@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
     {
         protected ICultureDictionary CultureDictionary { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
-        protected IEnumerable<string> IgnoreProperties { get; set; }
+        protected IEnumerable<string?> IgnoreProperties { get; set; }
 
         protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService)
             : this(cultureDictionary, localizedTextService, new List<string>())

@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// <summary>
         /// The angular service method name to call for this menu item
         /// </summary>
-        public virtual string AngularServiceMethodName { get; } = null;
+        public virtual string? AngularServiceMethodName { get; } = null;
 
         protected ActionMenuItem(string alias, string name) : base(alias, name)
         {

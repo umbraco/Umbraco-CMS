@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Cache
             return factory();
         }
 
-        public bool Set(string key, object value) => false;
+        public bool Set(string key, object? value) => false;
 
         public bool Remove(string key) => false;
 

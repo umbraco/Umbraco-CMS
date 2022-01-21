@@ -7,8 +7,8 @@ namespace Umbraco.Cms.Core.Packaging
     /// </summary>
     public interface IPackageDefinitionRepository
     {
-        IEnumerable<PackageDefinition> GetAll();
-        PackageDefinition GetById(int id);
+        IEnumerable<PackageDefinition?> GetAll();
+        PackageDefinition? GetById(int id);
         void Delete(int id);
 
         /// <summary>

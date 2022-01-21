@@ -2,8 +2,8 @@
 {
     public class QueryCondition
     {
-        public PropertyModel Property { get; set; }
-        public OperatorTerm Term { get; set; }
-        public string ConstraintValue { get; set; }
+        public PropertyModel Property { get; set; } = new PropertyModel();
+        public OperatorTerm Term { get; set; } = new OperatorTerm();
+        public string ConstraintValue { get; set; } = string.Empty;
     }
 }
