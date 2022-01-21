@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
             ITwoFactorLoginRepository twoFactorLoginRepository,
             IScopeProvider scopeProvider,
             IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
-                IOptions<IdentityOptions> identityOptions)
+            IOptions<IdentityOptions> identityOptions)
         {
             _twoFactorLoginRepository = twoFactorLoginRepository;
             _scopeProvider = scopeProvider;

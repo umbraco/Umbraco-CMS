@@ -32,8 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 ? sql.SelectCount()
                 : sql.Select<TwoFactorLoginDto>();
 
-            sql
-                .From<TwoFactorLoginDto>();
+            sql.From<TwoFactorLoginDto>();
 
             return sql;
         }
