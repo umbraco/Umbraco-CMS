@@ -21,7 +21,7 @@
     <key alias="emptyRecycleBin">Gwagu bin ailgylchu</key>
     <key alias="enable">Galluogi</key>
     <key alias="exportDocumentType">Allforio Math o Ddogfen</key>
-    <key alias="importDocumentType">Mewnforio Math o Ddogfen</key>
+    <key alias="importdocumenttype">Mewnforio Math o Ddogfen</key>
     <key alias="importPackage">Mewnforio Pecyn</key>
     <key alias="liveEdit">Golygu mewn Cynfas</key>
     <key alias="logout">Gadael</key>

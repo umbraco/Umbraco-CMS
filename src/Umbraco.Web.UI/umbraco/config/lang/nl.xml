@@ -21,7 +21,7 @@
     <key alias="emptyRecycleBin">Prullenbak leegmaken</key>
     <key alias="enable">Inschakelen</key>
     <key alias="exportDocumentType">Documenttype exporteren</key>
-    <key alias="importDocumentType">Documenttype importeren</key>
+    <key alias="importdocumenttype">Documenttype importeren</key>
     <key alias="importPackage">Package importeren</key>
     <key alias="liveEdit">Aanpassen in Canvas</key>
     <key alias="logout">Afsluiten</key>
@@ -770,6 +770,7 @@
     <key alias="pleasewait">Een ogenblik geduld aub...</key>
     <key alias="previous">Vorige</key>
     <key alias="properties">Eigenschappen</key>
+    <key alias="readMore">Lees meer</key>
     <key alias="rebuild">Opnieuw opbouwen</key>
     <key alias="reciept">E-mail om formulier resultaten te ontvangen</key>
     <key alias="recycleBin">Prullenbak</key>
@@ -1251,6 +1252,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="rollbackTo">Terugzetten naar</key>
     <key alias="selectVersion">Selecteer versie</key>
     <key alias="view">Bekijk</key>
+    <key alias="pagination"><![CDATA[Toont versie %0% tot %1% van %2% versies]]></key>
+    <key alias="versions">Versies</key>
+    <key alias="currentDraftVersion">Conceptversie</key>
+    <key alias="currentPublishedVersion">Gepubliceerde versie</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Bewerk script-bestand</key>
@@ -1670,6 +1675,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       weggooien?
     </key>
     <key alias="addTab">Tabblad toevoegen</key>
+    <key alias="historyCleanupHeading">Geschiedenis opschonen</key>
+    <key alias="historyCleanupDescription">Overschrijf de standaard geschiedenis opschonen instellingen.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Bewaar alle versies nieuwer dan dagen</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Bewaar de laatste versie per dag voor dagen</key>
+    <key alias="historyCleanupPreventCleanup">Voorkom opschonen</key>
+    <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
@@ -1794,7 +1805,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="memberRoles">Rollen</key>
     <key alias="memberTypes">Ledentypes</key>
     <key alias="documentTypes">Documenttypes</key>
-    <key alias="relationTypes">RelatieTypen</key>
+    <key alias="relationTypes">Relatietypes</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="partialViews">Partial Views</key>
