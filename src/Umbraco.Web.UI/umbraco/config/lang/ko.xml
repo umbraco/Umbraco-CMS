@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">호스트명 관리</key>
+    <key alias="assigndomain">호스트명 관리</key>
     <key alias="auditTrail">감사 추적</key>
     <key alias="browse">노드 탐색</key>
     <key alias="copy">복사</key>

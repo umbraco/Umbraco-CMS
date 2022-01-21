@@ -79,19 +79,22 @@
 
                     </div>
                 </div>
-                <div class="umb-table-body">
-                    <div class="umb-table-row umb-media-grid__list-item -selectable" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse" ng-class="{'-selected': item.selected}">
+                <div class="umb-table-body"> 
+                    <div class="umb-table-row umb-media-grid__list-item -selectable"
+                         ng-click="clickItem(item, $event, $index)"
+                         ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse"
+                         ng-class="{'-selected': item.selected, '-folder': item.isFolder, '-filtered': item.filtered}">
                         <div class="umb-table-cell">
                             <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
                             <umb-icon icon="{{item.thumbnail ? 'icon-picture' : item.icon}}" class="umb-table-body__icon" ng-if="!item.selected"></umb-icon>
                         </div>
                         <div class="umb-table-cell umb-table__name">
-                            <umb-icon icon="icon-navigation-right"
-                                      ng-show="item.isFolder"
-                                      ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}"
-                                      ng-click="clickItemName(item, $event, $index)">
-                            </umb-icon>
-                            <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
+                            <div class="umb-media-grid__list-item-name"
+                                 ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}"
+                                 ng-click="clickItemName(item, $event, $index)">
+                                <umb-icon icon="icon-navigation-right" ng-show="item.isFolder"></umb-icon>
+                                <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
+                            </div>
                         </div>
                         <div class="umb-table-cell">
                             <span class="muted small" style="font-size:0.8em">{{item.updateDate | date:'medium'}}</span>

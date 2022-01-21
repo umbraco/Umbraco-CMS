@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Zarządzanie hostami</key>
+    <key alias="assigndomain">Zarządzanie hostami</key>
     <key alias="auditTrail">Historia zmian</key>
     <key alias="browse">Przeglądaj węzeł</key>
     <key alias="changeDocType">Zmień typ dokumentu</key>

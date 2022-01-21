@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -48,6 +49,14 @@ namespace Umbraco.Extensions
         {
             identityBuilder.AddSignInManager<TSignInManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TSignInManager));
+            return identityBuilder;
+        }
+
+
+        public static IdentityBuilder AddUserStore<TInterface, TStore>(this IdentityBuilder identityBuilder, Func<IServiceProvider, TStore> implementationFactory)
+            where TStore : class, TInterface
+        {
+            identityBuilder.Services.AddScoped(typeof(TInterface), implementationFactory);
             return identityBuilder;
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -54,6 +54,7 @@
             public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
             public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
             public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
+            public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
         }
     }
 }
