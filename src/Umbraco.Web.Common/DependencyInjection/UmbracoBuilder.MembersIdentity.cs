@@ -64,6 +64,7 @@ namespace Umbraco.Extensions
 
 
             builder.AddNotificationHandler<MemberDeletedNotification, DeleteExternalLoginsOnMemberDeletedHandler>();
+            builder.AddNotificationAsyncHandler<MemberDeletedNotification, DeleteTwoFactorLoginsOnMemberDeletedHandler>();
             services.ConfigureOptions<ConfigureMemberIdentityOptions>();
 
             services.AddScoped<IMemberUserStore>(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
