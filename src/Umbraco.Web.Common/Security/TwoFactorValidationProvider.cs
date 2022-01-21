@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Infrastructure.Security
             UserManager<TUmbracoIdentityUser> manager, TUmbracoIdentityUser user)
         {
             var secret =
-                await _twoFactorLoginService.GetSecretForUserAndProviderAsync(GetUserKey(user), _generator.GetType().Name);
+                await _twoFactorLoginService.GetSecretForUserAndProviderAsync(GetUserKey(user), _generator.ProviderName);
 
             if (secret is null)
             {
