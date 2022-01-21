@@ -237,6 +237,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return keyRepo.Get(key);
         }
 
+        public IEnumerable<IDictionaryItem> Get(string[] keys)
+        {
+            var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches, _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+            return keyRepo.GetMany(keys);
+        }
+
         private IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
             var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
@@ -382,6 +388,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
             }
 
+            protected override IEnumerable<IDictionaryItem> PerformGetAll(params string[] ids)
+            {
+                var sql = Sql().SelectAll().From<DictionaryDto>();
+
+                if (ids.Any())
+                {
+                    sql.Where(GetWhereInClauseForGetAll(), new { /*ids =*/ ids });
+                }
+
+                return Database.Fetch<DictionaryDto>(sql).Select(ConvertToEntity);
+            }
+
             protected override IRepositoryCachePolicy<IDictionaryItem, string> CreateCachePolicy()
             {
                 var options = new RepositoryCachePolicyOptions
@@ -390,6 +408,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     GetAllCacheAllowZeroCount = true
                 };
 
+                return new FullDataSetRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, false);
                 return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
             }
         }

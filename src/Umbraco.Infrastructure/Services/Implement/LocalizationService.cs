@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -161,6 +161,17 @@ namespace Umbraco.Cms.Core.Services.Implement
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
                 return item;
+            }
+        }
+
+        public IDictionaryItem[] GetDictionaryItemsByKeys(string[] keys)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var items = _dictionaryRepository.Get(keys).ToArray();
+                foreach(var item in items)
+                    EnsureDictionaryItemLanguageCallback(item);
+                return items;
             }
         }
 

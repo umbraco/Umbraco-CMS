@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         IDictionaryItem Get(Guid uniqueId);
         IDictionaryItem Get(string key);
+        IEnumerable<IDictionaryItem> Get(string[] keys);
         IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId);
         Dictionary<string, Guid> GetDictionaryItemKeyMap();
     }

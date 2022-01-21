@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -53,6 +53,8 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="key">Key of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
         IDictionaryItem GetDictionaryItemByKey(string key);
+
+        IDictionaryItem[] GetDictionaryItemsByKeys(string[] keys);
 
         /// <summary>
         /// Gets a list of children for a <see cref="IDictionaryItem"/>
