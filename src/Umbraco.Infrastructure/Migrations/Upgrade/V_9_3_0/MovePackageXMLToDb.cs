@@ -9,7 +9,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0
 {
     public class MovePackageXMLToDb : MigrationBase
     {

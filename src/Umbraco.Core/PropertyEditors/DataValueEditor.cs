@@ -197,6 +197,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             return value.TryConvertTo(valueType);
         }
 
@@ -232,6 +233,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 StaticApplicationLogging.Logger.LogWarning("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
                 return null;
             }
+
             return result.Result;
         }
 

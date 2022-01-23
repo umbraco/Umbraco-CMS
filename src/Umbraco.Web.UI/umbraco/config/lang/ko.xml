@@ -15,7 +15,7 @@
     <key alias="disable">비활성</key>
     <key alias="emptyRecycleBin">휴지통 비우기</key>
     <key alias="exportDocumentType">추출 문서 유형</key>
-    <key alias="importDocumentType">등록 문서 유형</key>
+    <key alias="importdocumenttype">등록 문서 유형</key>
     <key alias="importPackage">패키지 등록</key>
     <key alias="liveEdit">캔버스 내용 편집</key>
     <key alias="logout">종료</key>

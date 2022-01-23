@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Security;
 
@@ -6,6 +7,7 @@ namespace Umbraco.Cms.Core.Services
     /// <summary>
     /// Used to store the external login info
     /// </summary>
+    [Obsolete("Use IExternalLoginServiceWithKey. This will be removed in Umbraco 10")]
     public interface IExternalLoginService : IService
     {
         /// <summary>

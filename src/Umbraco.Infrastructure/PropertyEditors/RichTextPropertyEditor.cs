@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
-                return parsed;
+                return parsed.NullOrWhiteSpaceAsNull();
             }
 
             /// <summary>

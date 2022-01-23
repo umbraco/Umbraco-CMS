@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -82,7 +85,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<BasicAuthSettings>()
                 .AddUmbracoOptions<RuntimeMinificationSettings>()
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
-                .AddUmbracoOptions<PackageMigrationSettings>();
+                .AddUmbracoOptions<PackageMigrationSettings>()
+                .AddUmbracoOptions<ContentDashboardSettings>();
+
+            builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 
             return builder;
         }
