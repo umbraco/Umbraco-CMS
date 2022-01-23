@@ -29,11 +29,13 @@ using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -289,8 +291,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IRelationService, RelationService>();
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
             Services.AddUnique<INotificationService, NotificationService>();
-            Services.AddUnique<IExternalLoginService, ExternalLoginService>();
-
+            Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
+                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ILoggerFactory>(),
+                factory.GetRequiredService<IEventMessagesFactory>(),
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>()
+            ));
+            Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
+            Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));

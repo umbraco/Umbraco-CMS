@@ -18,9 +18,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -46,21 +44,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
             builder.Services.AddUnique<IEntityService, EntityService>();
             builder.Services.AddUnique<IRelationService, RelationService>();
-            builder.Services.AddUnique<IMacroService, MacroService>();
             builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
-            builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();
             builder.Services.AddUnique<INotificationService, NotificationService>();
-            builder.Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
-                factory.GetRequiredService<IScopeProvider>(),
-                factory.GetRequiredService<ILoggerFactory>(),
-                factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IExternalLoginWithKeyRepository>()
-                ));
-            builder.Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
-            builder.Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
-            builder.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
-            builder.Services.AddUnique<IConsentService, ConsentService>();
             builder.Services.AddTransient(SourcesFactory);
             builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
