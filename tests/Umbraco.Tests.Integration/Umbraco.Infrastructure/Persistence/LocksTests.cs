@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;

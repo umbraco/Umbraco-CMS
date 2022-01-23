@@ -103,8 +103,6 @@
     <Message Text="Generate the appsettings json schema." Importance="High" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
 
     <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
-    
-   
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
 

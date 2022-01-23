@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -201,6 +201,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
             IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
+
+            // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
+            services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
 
             // Add it!
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();

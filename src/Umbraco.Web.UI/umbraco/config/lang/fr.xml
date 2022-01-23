@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture et noms d'hôte</key>
+    <key alias="assigndomain">Culture et noms d'hôte</key>
     <key alias="auditTrail">Informations d'audit</key>
     <key alias="browse">Parcourir</key>
     <key alias="changeDocType">Changer le type de document</key>
@@ -19,7 +19,7 @@
     <key alias="emptyRecycleBin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
-    <key alias="importDocumentType">Importer un type de document</key>
+    <key alias="importdocumenttype">Importer un type de document</key>
     <key alias="importPackage">Importer un package</key>
     <key alias="liveEdit">Editer dans Canvas</key>
     <key alias="logout">Déconnexion</key>

@@ -37,7 +37,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider.Object),
                 mockScopeProvider.Object,
                 new IdentityErrorDescriber(),
-                Mock.Of<IPublishedSnapshotAccessor>());
+                Mock.Of<IPublishedSnapshotAccessor>(),
+                Mock.Of<IExternalLoginWithKeyService>(),
+                Mock.Of<ITwoFactorLoginService>()
+                );
         }
 
         [Test]

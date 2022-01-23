@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoCssPath),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data),
-                hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPath),
+                hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Preview)
             };
             _packagesPermissionsDirs = new[]
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             EnsureFiles(_permissionFiles, out errors);
             report[FilePermissionTest.FileWriting] = errors.ToList();
 
-            EnsureCanCreateSubDirectory(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPath), out errors);
+            EnsureCanCreateSubDirectory(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath), out errors);
             report[FilePermissionTest.MediaFolderCreation] = errors.ToList();
 
             return report.Sum(x => x.Value.Count()) == 0;

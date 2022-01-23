@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -109,7 +109,6 @@ namespace Umbraco.Extensions
             var appCaches = AppCaches.Create(requestCache);
 
             services.ConfigureOptions<ConfigureKestrelServerOptions>();
-            services.ConfigureOptions<ConfigureIISServerOptions>();
             services.ConfigureOptions<ConfigureFormOptions>();
 
             IProfiler profiler = GetWebProfiler(config);

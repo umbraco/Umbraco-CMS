@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
