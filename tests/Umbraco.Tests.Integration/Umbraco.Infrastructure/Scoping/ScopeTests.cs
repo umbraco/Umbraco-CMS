@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Assert.IsInstanceOf<Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
-                database = scope.Database; // populates scope's database
+                database = ScopeAccessor.AmbientScope.Database; // populates scope's database
                 Assert.IsNotNull(database);
                 Assert.IsNotNull(database.Connection); // in a transaction
             }
@@ -360,7 +360,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Assert.IsInstanceOf<Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
-                database = scope.Database; // populates scope's database
+                database = ScopeAccessor.AmbientScope.Database; // populates scope's database
                 Assert.IsNotNull(database);
                 Assert.IsNotNull(database.Connection); // in a transaction
                 using (IScope nested = scopeProvider.CreateScope())
@@ -369,7 +369,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     Assert.IsNotNull(scopeProvider.AmbientScope);
                     Assert.AreSame(nested, scopeProvider.AmbientScope);
                     Assert.AreSame(scope, ((Scope)nested).ParentScope);
-                    Assert.AreSame(database, nested.Database);
+                    Assert.AreSame(database, ScopeAccessor.AmbientScope.Database);
                 }
 
                 Assert.IsNotNull(database.Connection); // still
@@ -386,32 +386,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
+                ScopeAccessor.AmbientScope.Database.Execute("CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
+                ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.AreEqual("a", n);
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.IsNull(n);
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
+                ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.AreEqual("a", n);
             }
         }
@@ -423,24 +423,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute($"CREATE TABLE tmp1 (id INT, name NVARCHAR(64))");
+                ScopeAccessor.AmbientScope.Database.Execute($"CREATE TABLE tmp1 (id INT, name NVARCHAR(64))");
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("INSERT INTO tmp1 (id, name) VALUES (1, 'a')");
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=1");
+                ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp1 (id, name) VALUES (1, 'a')");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=1");
                 Assert.AreEqual("a", n);
 
                 using (IScope nested = scopeProvider.CreateScope())
                 {
-                    nested.Database.Execute("INSERT INTO tmp1 (id, name) VALUES (2, 'b')");
-                    string nn = nested.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
+                    ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp1 (id, name) VALUES (2, 'b')");
+                    string nn = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
                     Assert.AreEqual("b", nn);
                 }
 
-                n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
+                n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
                 Assert.AreEqual("b", n);
 
                 scope.Complete();
@@ -448,9 +448,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=1");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=1");
                 Assert.IsNull(n);
-                n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
+                n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
                 Assert.IsNull(n);
             }
         }
@@ -462,33 +462,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("CREATE TABLE tmp2 (id INT, name NVARCHAR(64))");
+                ScopeAccessor.AmbientScope.Database.Execute("CREATE TABLE tmp2 (id INT, name NVARCHAR(64))");
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("INSERT INTO tmp2 (id, name) VALUES (1, 'a')");
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=1");
+                ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp2 (id, name) VALUES (1, 'a')");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=1");
                 Assert.AreEqual("a", n);
 
                 using (IScope nested = scopeProvider.CreateScope())
                 {
-                    nested.Database.Execute("INSERT INTO tmp2 (id, name) VALUES (2, 'b')");
-                    string nn = nested.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
+                    ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp2 (id, name) VALUES (2, 'b')");
+                    string nn = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
                     Assert.AreEqual("b", nn);
                     nested.Complete();
                 }
 
-                n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
+                n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
                 Assert.AreEqual("b", n);
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=1");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=1");
                 Assert.IsNull(n);
-                n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
+                n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
                 Assert.IsNull(n);
             }
         }
@@ -500,34 +500,34 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+                ScopeAccessor.AmbientScope.Database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                scope.Database.Execute("INSERT INTO tmp (id, name) VALUES (1, 'a')");
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=1");
+                ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp (id, name) VALUES (1, 'a')");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=1");
                 Assert.AreEqual("a", n);
 
                 using (IScope nested = scopeProvider.CreateScope())
                 {
-                    nested.Database.Execute("INSERT INTO tmp (id, name) VALUES (2, 'b')");
-                    string nn = nested.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
+                    ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp (id, name) VALUES (2, 'b')");
+                    string nn = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                     Assert.AreEqual("b", nn);
                     nested.Complete();
                 }
 
-                n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
+                n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                 Assert.AreEqual("b", n);
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                string n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=1");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=1");
                 Assert.AreEqual("a", n);
-                n = scope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
+                n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
                 Assert.AreEqual("b", n);
             }
         }
@@ -615,13 +615,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public void ScopeReference()
         {
             ScopeProvider scopeProvider = ScopeProvider;
-            IScope scope = scopeProvider.CreateScope();
-            IScope nested = scopeProvider.CreateScope();
+            Scope scope = (Scope) scopeProvider.CreateScope();
+            Scope nested = (Scope) scopeProvider.CreateScope();
+
             Assert.IsNotNull(scopeProvider.AmbientScope);
+
             var scopeRef = new HttpScopeReference(scopeProvider);
             scopeRef.Register();
             scopeRef.Dispose();
+
             Assert.IsNull(scopeProvider.AmbientScope);
+
             Assert.Throws<ObjectDisposedException>(() =>
             {
                 IUmbracoDatabase db = scope.Database;

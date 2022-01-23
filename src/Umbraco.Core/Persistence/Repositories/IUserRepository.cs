@@ -106,5 +106,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         int ClearLoginSessions(int userId);
         int ClearLoginSessions(TimeSpan timespan);
         void ClearLoginSession(Guid sessionId);
+
+        IEnumerable<IUser> GetNextUsers(int id, int count);
     }
 }

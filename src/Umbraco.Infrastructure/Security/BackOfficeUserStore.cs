@@ -62,29 +62,6 @@ namespace Umbraco.Cms.Core.Security
             _externalLoginService = externalLoginService;
         }
 
-        [Obsolete("Use ctor injecting IExternalLoginWithKeyService ")]
-        public BackOfficeUserStore(
-            IScopeProvider scopeProvider,
-            IUserService userService,
-            IEntityService entityService,
-            IExternalLoginService externalLoginService,
-            IOptions<GlobalSettings> globalSettings,
-            IUmbracoMapper mapper,
-            BackOfficeErrorDescriber describer,
-            AppCaches appCaches)
-            : this(
-                scopeProvider,
-                userService,
-                entityService,
-                StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-                globalSettings,
-                mapper,
-                describer,
-                appCaches)
-        {
-
-        }
-
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
         {

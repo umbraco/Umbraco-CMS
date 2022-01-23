@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             using IScope scope = ScopeProvider.CreateScope();
             foreach (IPropertyType propertyType in mRBasePage.PropertyTypes)
             {
-                PropertyTypeDto propertyTypeDto = scope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
+                PropertyTypeDto propertyTypeDto = ScopeAccessor.AmbientScope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
                 Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
             }
         }
@@ -424,7 +424,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             string configuration;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
+                List<DataTypeDto> dtos = ScopeAccessor.AmbientScope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;
             }
 

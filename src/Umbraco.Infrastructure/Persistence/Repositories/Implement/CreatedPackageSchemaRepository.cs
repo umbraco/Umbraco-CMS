@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// Initializes a new instance of the <see cref="CreatedPackageSchemaRepository"/> class.
         /// </summary>
         public CreatedPackageSchemaRepository(
-            IUmbracoDatabase umbracoDatabase,
+            IUmbracoDatabaseFactory umbracoDatabaseFactory,
             IHostingEnvironment hostingEnvironment,
             IOptions<GlobalSettings> globalSettings,
             FileSystems fileSystems,
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             string mediaFolderPath = null,
             string tempFolderPath = null)
         {
-            _umbracoDatabase = umbracoDatabase;
+            _umbracoDatabase = umbracoDatabaseFactory.CreateDatabase();
             _hostingEnvironment = hostingEnvironment;
             _fileSystems = fileSystems;
             _serializer = serializer;

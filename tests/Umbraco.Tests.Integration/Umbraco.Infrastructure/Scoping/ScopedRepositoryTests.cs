@@ -318,20 +318,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public static string GetCacheIdKey<T>(object id) => $"{GetCacheTypeKey<T>()}{id}";
 
         public static string GetCacheTypeKey<T>() => $"uRepo_{typeof(T).Name}_";
-
-        public class PassiveEventDispatcher : QueuingEventDispatcherBase
-        {
-            public PassiveEventDispatcher()
-                : base(false)
-            {
-            }
-
-            protected override void ScopeExitCompleted()
-            {
-                // do nothing
-            }
-        }
-
+        
         public class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()

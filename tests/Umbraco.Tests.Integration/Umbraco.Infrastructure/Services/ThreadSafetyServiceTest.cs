@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.Database.Execute("SET LOCK_TIMEOUT 60000");
+                ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
                 service.Save(content);
                 scope.Complete();
             }
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.Database.Execute("SET LOCK_TIMEOUT 60000");
+                ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
                 service.Save(media);
                 scope.Complete();
             }

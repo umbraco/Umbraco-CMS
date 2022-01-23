@@ -38,7 +38,7 @@ namespace Umbraco.Extensions
                     factory.GetRequiredService<IUserService>(),
                     factory.GetRequiredService<IEntityService>(),
                     factory.GetRequiredService<IExternalLoginWithKeyService>(),
-                    factory.GetRequiredService<IOptions<GlobalSettings>>(),
+                    factory.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
                     factory.GetRequiredService<IUmbracoMapper>(),
                     factory.GetRequiredService<BackOfficeErrorDescriber>(),
                     factory.GetRequiredService<AppCaches>()

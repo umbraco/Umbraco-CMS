@@ -523,7 +523,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(),
                 It.IsAny<IScopedNotificationPublisher>(),
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),

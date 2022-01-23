@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;

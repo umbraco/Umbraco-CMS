@@ -50,6 +50,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
@@ -68,7 +69,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddLogging();
 
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();
             builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
@@ -93,9 +93,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Mappers().AddCoreMappers();
 
             // register the scope provider
-            builder.Services.AddSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
             builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+
+
             builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
             builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();

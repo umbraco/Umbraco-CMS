@@ -29,7 +29,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
             scopeMock.Setup(x => x.CreateScope(
                     It.IsAny<IsolationLevel>(),
                     It.IsAny<RepositoryCacheMode>(),
-                    It.IsAny<IEventDispatcher>(),
                     It.IsAny<IScopedNotificationPublisher>(),
                     It.IsAny<bool?>(),
                     It.IsAny<bool>(),
