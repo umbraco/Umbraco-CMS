@@ -153,11 +153,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
 
-            StaticApplicationLogging.Initialize(_loggerFactory);
-            StaticServiceProvider.Instance = _serviceProvider;
-
             if (isRestarting == false)
             {
+                StaticApplicationLogging.Initialize(_loggerFactory);
+                StaticServiceProvider.Instance = _serviceProvider;
+
                 AppDomain.CurrentDomain.UnhandledException += (_, args)
                     => _logger.LogError(args.ExceptionObject as Exception, $"Unhandled exception in AppDomain{(args.IsTerminating ? " (terminating)" : null)}.");
             }
@@ -226,7 +226,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
             _components.Terminate();
             await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
-            StaticApplicationLogging.Initialize(null);
         }
 
         private void AcquireMainDom()
