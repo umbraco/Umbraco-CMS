@@ -195,7 +195,7 @@
     <Compile Include="PropertyEditors\IPropertyCacheCompression.cs" />
     <Compile Include="PropertyEditors\UnPublishedContentPropertyCacheCompressionOptions.cs" />
     <Compile Include="Security\IHtmlSanitizer.cs" />
-    <Compile Include="Security\NoOpHtmlSanitizer.cs" />
+    <Compile Include="Security\NoopHtmlSanitizer.cs" />
     <Compile Include="Serialization\AutoInterningStringConverter.cs" />
     <Compile Include="Serialization\AutoInterningStringKeyCaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />

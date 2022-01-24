@@ -82,7 +82,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                     new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
 
             composition.RegisterUnique<ITelemetryService, TelemetryService>();
-            composition.RegisterUnique<IHtmlSanitizer, NoOpHtmlSanitizer>();
+            composition.RegisterUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
 
             return composition;
         }
