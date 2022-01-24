@@ -153,26 +153,26 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             StaticApplicationLogging.Initialize(_loggerFactory);
             StaticServiceProvider.Instance = _serviceProvider;
 
-            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            if (isRestarting == false)
             {
-                var exception = (Exception)args.ExceptionObject;
-                var isTerminating = args.IsTerminating; // always true?
-
-                var msg = "Unhandled exception in AppDomain";
-
-                if (isTerminating)
+                // Only subscribe to events on initial startup
+                AppDomain.CurrentDomain.UnhandledException += (_, args) =>
                 {
-                    msg += " (terminating)";
-                }
+                    var exception = (Exception)args.ExceptionObject;
+                    var isTerminating = args.IsTerminating; // always true?
 
-                msg += ".";
+                    var msg = "Unhandled exception in AppDomain";
 
-                _logger.LogError(exception, msg);
-            };
+                    if (isTerminating)
+                    {
+                        msg += " (terminating)";
+                    }
 
-            // Add application started and stopped notifications (only on initial startup, not restarts)
-            if (_hostApplicationLifetime.ApplicationStarted.IsCancellationRequested == false)
-            {
+                    msg += ".";
+
+                    _logger.LogError(exception, msg);
+                };
+
                 _hostApplicationLifetime.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
                 _hostApplicationLifetime.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
             }
