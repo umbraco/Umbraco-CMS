@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
@@ -14,8 +16,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProviderBase<TSyntax>
         where TSyntax : ISqlSyntaxProvider
     {
+        private readonly ILogger _logger;
+
         protected MicrosoftSqlSyntaxProviderBase()
         {
+            _logger = StaticApplicationLogging.CreateLogger<TSyntax>();
+
             AutoIncrementDefinition = "IDENTITY(1,1)";
             GuidColumnDefinition = "UniqueIdentifier";
             RealColumnDefinition = "FLOAT";
@@ -174,6 +180,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                     throw new ArgumentOutOfRangeException();
             }
             return sqlDbType;
+        }
+
+        public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition)
+        {
+            var createSql = Format(tableDefinition);
+            var createPrimaryKeySql = FormatPrimaryKey(tableDefinition);
+            List<string> foreignSql = Format(tableDefinition.ForeignKeys);
+
+            _logger.LogInformation("Create table:\n {Sql}", createSql);
+            database.Execute(new Sql(createSql));
+
+            //If any statements exists for the primary key execute them here
+            if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
+            {
+                _logger.LogInformation("Create Primary Key:\n {Sql}", createPrimaryKeySql);
+                database.Execute(new Sql(createPrimaryKeySql));
+            }
+
+            List<string> indexSql = Format(tableDefinition.Indexes);
+            //Loop through index statements and execute sql
+            foreach (var sql in indexSql)
+            {
+                _logger.LogInformation("Create Index:\n {Sql}", sql);
+                database.Execute(new Sql(sql));
+            }
+
+            //Loop through foreignkey statements and execute sql
+            foreach (var sql in foreignSql)
+            {
+                _logger.LogInformation("Create Foreign Key:\n {Sql}", sql);
+                database.Execute(new Sql(sql));
+            }
         }
     }
 }

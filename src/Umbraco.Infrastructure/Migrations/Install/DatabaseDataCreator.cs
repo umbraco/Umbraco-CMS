@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (tableName.Equals(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery))
                 CreateLogViewerQueryData();
 
-            _logger.LogInformation("Done creating table {TableName} data.", tableName);
+            _logger.LogInformation("Completed creating data in {TableName}", tableName);
         }
 
         private void CreateNodeData()

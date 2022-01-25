@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Data.SQLite" Version="6.0.1" />
+      <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
     </ItemGroup>
 
 </Project>

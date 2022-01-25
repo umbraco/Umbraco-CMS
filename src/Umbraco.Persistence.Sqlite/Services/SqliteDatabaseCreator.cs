@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Persistence.Sqlite.Services;
@@ -12,9 +12,12 @@ public class SqliteDatabaseCreator : IDatabaseCreator
     public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Creates a SQLite database file.
+    /// </remarks>
     public void Create(string connectionString)
     {
-        using var connection = new SqlConnection(connectionString);
+        using var connection = new SqliteConnection(connectionString);
         connection.Open();
     }
 }
