@@ -16,29 +16,30 @@ namespace Umbraco.Cms.Tests.Integration.Testing
     /// <remarks>
     /// It's not meant to be pretty, rushed port of LocalDb.cs + LocalDbTestDatabase.cs
     /// </remarks>
-    public class SqlDeveloperTestDatabase : BaseTestDatabase, ITestDatabase
+    public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
     {
         private readonly TestDatabaseSettings _settings;
-        private readonly string _masterConnectionString;
         public const string DatabaseName = "UmbracoTests";
 
-        public static SqlDeveloperTestDatabase Instance { get; private set; }
+        public static SqlServerTestDatabase Instance { get; private set; }
 
-        public SqlDeveloperTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory databaseFactory, string masterConnectionString)
+        public SqlServerTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory,
+            IUmbracoDatabaseFactory databaseFactory)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _databaseFactory = databaseFactory ?? throw new ArgumentNullException(nameof(databaseFactory));
 
             _settings = settings;
-            _masterConnectionString = masterConnectionString;
 
             var counter = 0;
 
             var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
-                .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false, masterConnectionString));
+                .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false,
+                    _settings.SQLServerMasterConnectionString));
 
             var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
-                .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true, masterConnectionString));
+                .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true,
+                    _settings.SQLServerMasterConnectionString));
 
             _testDatabases = schema.Concat(empty).ToList();
 
@@ -66,7 +67,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         private void CreateDatabase(TestDbMeta meta)
         {
-            using (var connection = new SqlConnection(_masterConnectionString))
+            Drop(meta);
+
+            using (var connection = new SqlConnection(_settings.SQLServerMasterConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = connection.CreateCommand())
@@ -79,14 +82,21 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         private void Drop(TestDbMeta meta)
         {
-            using (var connection = new SqlConnection(_masterConnectionString))
+            using (var connection = new SqlConnection(_settings.SQLServerMasterConnectionString))
             {
                 connection.Open();
                 using (SqlCommand command = connection.CreateCommand())
                 {
+                    SetCommand(command, "select count(1) from sys.databases where name = @0", meta.Name);
+                    var records = (int)command.ExecuteScalar();
+                    if (records == 0)
+                    {
+                        return;
+                    }
+
                     string sql = $@"
-                        ALTER DATABASE{LocalDb.QuotedName(meta.Name)}
-                        SET SINGLE_USER
+                        ALTER DATABASE {LocalDb.QuotedName(meta.Name)}
+                        SET SINGLE_USER 
                         WITH ROLLBACK IMMEDIATE";
                     SetCommand(command, sql);
                     command.ExecuteNonQuery();
