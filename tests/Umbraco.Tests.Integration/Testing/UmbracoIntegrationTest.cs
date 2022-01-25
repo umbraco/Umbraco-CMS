@@ -24,6 +24,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Extensions;
+using Umbraco.Persistence.Sqlite;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
@@ -42,7 +43,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         [SetUp]
         public void Setup()
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
+            InMemoryConfiguration[Core.Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
             IHostBuilder hostBuilder = CreateHostBuilder();
 
             _host = hostBuilder.Build();
@@ -74,7 +75,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
-
+                    configBuilder.AddJsonFile("appsettings.Tests.json");
+                    configBuilder.AddEnvironmentVariables();
                     Configuration = configBuilder.Build();
                 })
                 .ConfigureServices((_, services) =>
@@ -125,6 +127,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
                 .AddExamine()
+                .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper);
 
             if (TestOptions.Mapper)
