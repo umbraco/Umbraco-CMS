@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -17,17 +18,15 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoSqliteSupport(this IUmbracoBuilder builder)
     {
-        if (DbProviderFactories.TryGetFactory(Constants.ProviderName, out _))
-        {
-            return builder;
-        }
+        // TryAddEnumerable takes both TService and TImplementation into consideration (unlike TryAddSingleton)
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ISqlSyntaxProvider, SqliteSyntaxProvider>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseCreator, SqliteDatabaseCreator>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificMapperFactory, SqliteSpecificMapperFactory>());
 
-        builder.Services.AddSingleton<ISqlSyntaxProvider, SqliteSyntaxProvider>();
-        builder.Services.AddSingleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>();
-        builder.Services.AddSingleton<IDatabaseCreator, SqliteDatabaseCreator>();
-        builder.Services.AddSingleton<IProviderSpecificMapperFactory, SqliteSpecificMapperFactory>();
-
-        DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);
+        DbProviderFactories.UnregisterFactory(Constants.ProviderName);
+        //DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);
+        DbProviderFactories.RegisterFactory(Constants.ProviderName, System.Data.SQLite.SQLiteFactory.Instance);
 
         return builder;
     }

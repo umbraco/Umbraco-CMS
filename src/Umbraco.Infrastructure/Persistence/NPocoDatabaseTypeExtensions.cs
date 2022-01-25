@@ -27,6 +27,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             return databaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType;
         }
 
+        public static bool IsSqlite(this DatabaseType databaseType)
+        {
+            return databaseType is NPoco.DatabaseTypes.SQLiteDatabaseType;
+        }
+
         public static bool IsSqlServerOrCe(this DatabaseType databaseType)
         {
             return databaseType.IsSqlServer() || databaseType.IsSqlCe();

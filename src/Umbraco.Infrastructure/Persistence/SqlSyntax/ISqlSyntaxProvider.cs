@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
@@ -23,6 +23,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
         string GetConcat(params string[] args);
+
+        string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false);
 
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
@@ -63,6 +65,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
+
+        void HandleCreateTable(IDatabase database, TableDefinition tableDefinition);
+
+
 
         /// <summary>
         /// Gets a regex matching aliased fields.
@@ -137,5 +143,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         void ReadLock(IDatabase db, params int[] lockIds);
         void WriteLock(IDatabase db, params int[] lockIds);
+
+        string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
     }
 }

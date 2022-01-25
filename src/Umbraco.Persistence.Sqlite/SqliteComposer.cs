@@ -9,5 +9,8 @@ namespace Umbraco.Persistence.Sqlite;
 public class SqliteComposer : IComposer
 {
     /// <inheritdoc />
-    public void Compose(IUmbracoBuilder builder) => builder.AddUmbracoSqliteSupport();
+    public void Compose(IUmbracoBuilder builder)
+    {
+        builder.AddUmbracoSqliteSupport();
+    }
 }
