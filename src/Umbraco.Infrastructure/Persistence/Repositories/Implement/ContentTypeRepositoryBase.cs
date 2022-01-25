@@ -757,7 +757,7 @@ AND umbracoNode.id <> @id",
                 //now we need to insert names into these 2 tables based on the invariant data
 
                 //insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
-                var cols = Sql().Columns<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
+                var cols = Sql().ColumnsForInsert<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
                 sqlSelect = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
                     .Append($", {defaultLanguageId}") //default language ID
                     .From<ContentVersionDto>()
@@ -768,7 +768,7 @@ AND umbracoNode.id <> @id",
                 Database.Execute(sqlInsert);
 
                 //insert rows into the documentCultureVariation table
-                cols = Sql().Columns<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
+                cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
                 sqlSelect = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
                     .AndSelect<NodeDto>(x => x.Text)
                     .Append($", 1, {defaultLanguageId}") //make Available + default language ID
@@ -856,7 +856,7 @@ AND umbracoNode.id <> @id",
                 .WhereNull<TagDto>(x => x.Id, "xtags") // ie, not exists
                 .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
 
-            var cols = Sql().Columns<TagDto>(x => x.Text, x => x.Group, x => x.LanguageId);
+            var cols = Sql().ColumnsForInsert<TagDto>(x => x.Text, x => x.Group, x => x.LanguageId);
             var sqlInsertTags = Sql($"INSERT INTO {TagDto.TableName} ({cols})").Append(sqlSelectTagsToInsert);
 
             Database.Execute(sqlInsertTags);
@@ -884,7 +884,7 @@ AND umbracoNode.id <> @id",
                 .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1))
                 .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds);
 
-            var relationColumnsToInsert = Sql().Columns<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
+            var relationColumnsToInsert = Sql().ColumnsForInsert<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
             var sqlInsertRelations = Sql($"INSERT INTO {TagRelationshipDto.TableName} ({relationColumnsToInsert})").Append(sqlSelectRelationsToInsert);
 
             Database.Execute(sqlInsertRelations);
@@ -972,7 +972,7 @@ AND umbracoNode.id <> @id",
 
             //now insert all property data into the target language that exists under the source language
             var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
-            var cols = Sql().Columns<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue, x => x.LanguageId);
+            var cols = Sql().ColumnsForInsert<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue, x => x.LanguageId);
             var sqlSelectData = Sql().Select<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue)
                 .Append(", " + targetLanguageIdS) //default language ID
                 .From<PropertyDataDto>();

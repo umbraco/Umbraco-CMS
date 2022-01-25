@@ -328,6 +328,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
 
             }
+
+            // HACK: SQLite
+            else if (Database.DatabaseType.IsSqlite())
+            {
+                var query = Sql().Append(@"delete from umbracoRelation");
+
+                var subQuery = Sql().Select<RelationDto>(x => x.Id)
+                    .From<RelationDto>()
+                    .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                    .Where<RelationDto>(x => x.ParentId == parentId);
+
+                if (relationTypeAliases.Length > 0)
+                {
+                    subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                }
+
+                var fullQuery = query.WhereIn<RelationDto>(x => x.Id, subQuery);
+
+                Database.Execute(fullQuery);
+            }
             else
             {
                 if (relationTypeAliases.Length > 0)

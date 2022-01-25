@@ -409,16 +409,34 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null)
         {
             var type = typeof(TDto);
-            var tableName = type.GetTableName();
-            var join = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
-            if (alias != null) join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+
+            var tableName = sql.SqlContext.SqlSyntax.GetQuotedTableName(type.GetTableName());
+            var join = tableName;
+            string quotedAlias = null;
+
+            if (alias != null)
+            {
+                quotedAlias = sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+                join += " " + quotedAlias;
+            }
 
             var nestedSql = new Sql<ISqlContext>(sql.SqlContext);
             nestedSql = nestedJoin(nestedSql);
 
-            var sqlJoin = sql.LeftJoin(join);
-            sql.Append(nestedSql);
-            return sqlJoin;
+            // HACK: SQLite
+            if (sql.SqlContext.DatabaseType.IsSqlite())
+            {
+                Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin = sql.LeftJoin("(" + join);
+                sql.Append(nestedSql);
+                sql.Append($") {quotedAlias ?? tableName}");
+                return sqlJoin;
+            }
+            else
+            {
+                Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin = sql.LeftJoin(join);
+                sql.Append(nestedSql);
+                return sqlJoin;
+            }
         }
 
         /// <summary>
@@ -900,6 +918,15 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets fields for a Dto.
         /// </summary>
+        public static string ColumnsForInsert<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, forInsert: true));
+        }
+
+        /// <summary>
+        /// Gets fields for a Dto.
+        /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The origin sql.</param>
         /// <param name="alias">The Dto table alias.</param>
@@ -929,7 +956,8 @@ namespace Umbraco.Extensions
             var type = typeof(TDto);
             var tableName = type.GetTableName();
 
-            sql.Append($"DELETE {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
+            // FROM optional SQL server, but not elsewhere.
+            sql.Append($"DELETE FROM {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
             return sql;
         }
 
@@ -998,7 +1026,7 @@ namespace Umbraco.Extensions
 
             public SqlUpd<TDto> Set(Expression<Func<TDto, object>> fieldSelector, object value)
             {
-                var fieldName = _sqlContext.SqlSyntax.GetFieldName(fieldSelector);
+                var fieldName = _sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
                 _setExpressions.Add(new Tuple<string, object>(fieldName, value));
                 return this;
             }
@@ -1018,6 +1046,11 @@ namespace Umbraco.Extensions
         /// <remarks>NOTE: This method will not work for all queries, only simple ones!</remarks>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
         {
+            if (sql.SqlContext.DatabaseType.IsSqlite())
+            {
+                // HACK: SQLite
+                return sql;
+            }
             // go find the first FROM clause, and append the lock hint
             Sql s = sql;
             var updated = false;
@@ -1037,6 +1070,16 @@ namespace Umbraco.Extensions
 
             if (updated)
                 SqlInspector.Reset(sql);
+
+            return sql;
+        }
+
+        public static Sql<ISqlContext> AppendUpdlockHint(this Sql<ISqlContext> sql)
+        {
+            if (sql.SqlContext.DatabaseType.IsSqlServerOrCe())
+            {
+                sql.Append(" WITH (UPDLOCK) ");
+            }
 
             return sql;
         }
@@ -1095,7 +1138,7 @@ namespace Umbraco.Extensions
 
         #region Utilities
 
-        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true)
+        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
@@ -1135,21 +1178,8 @@ namespace Umbraco.Extensions
             }
 
             return queryColumns
-                .Select(x => GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value), referenceName))
+                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value), referenceName, forInsert: forInsert))
                 .ToArray();
-        }
-
-        private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)
-        {
-            tableName = dbType.EscapeTableName(tableName);
-            columnName = dbType.EscapeSqlIdentifier(columnName);
-            var column = tableName + "." + columnName;
-            if (columnAlias == null) return column;
-
-            referenceName = referenceName == null ? string.Empty : referenceName + "__";
-            columnAlias = dbType.EscapeSqlIdentifier(referenceName + columnAlias);
-            column += " AS " + columnAlias;
-            return column;
         }
 
         private static string GetTableName(this Type type)
