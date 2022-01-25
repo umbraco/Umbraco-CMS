@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -105,7 +105,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 var rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
                 if (rows.Count == 0)
+                {
                     return null;
+                }
 
                 foreach (var row in rows.ToList())
                 {
@@ -140,8 +142,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             #endregion
-
-
 
             #region Convert database // editor
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -155,15 +155,30 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
-            // if (value is JValue)
-            //     value = value.ToString();
-
-            //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
+            // this is a custom check to avoid any errors, if it's a string and it's empty just make it null
             if (value is string s && string.IsNullOrWhiteSpace(s))
+            {
                 value = null;
+            }
 
+            if (value is not null && ValueType.InvariantEquals(ValueTypes.Json))
+            {
+                // Serialize value to string
+                var jsonValue = _jsonSerializer.Serialize(value);
+
+                // if it's json but it's empty json, then return null
+                if (jsonValue.DetectIsEmptyJson())
+                {
+                    value = null;
+                }
+                else
+                {
+                    value = jsonValue;
+                }
+            }
+
+            // convert the string to a known type
             Type valueType;
-            //convert the string to a known type
             switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Ntext:
@@ -221,12 +236,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         ///  </remarks>
         public virtual object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
-            //if it's json but it's empty json, then return null
-            if (ValueType.InvariantEquals(ValueTypes.Json) && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
-            {
-                return null;
-            }
-
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
