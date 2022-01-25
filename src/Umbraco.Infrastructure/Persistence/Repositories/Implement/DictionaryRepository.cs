@@ -408,7 +408,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     GetAllCacheAllowZeroCount = true
                 };
 
-                return new FullDataSetRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, false);
                 return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
             }
         }
