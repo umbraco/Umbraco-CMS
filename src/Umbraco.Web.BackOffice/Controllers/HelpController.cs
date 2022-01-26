@@ -20,21 +20,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class HelpController : UmbracoAuthorizedJsonController
     {
         private readonly ILogger<HelpController> _logger;
-        private readonly HelpPageSettings _helpPageSettings;
+        private HelpPageSettings _helpPageSettings;
 
         [Obsolete("Use constructor that takes IOptions<HelpPageSettings>")]
         public HelpController(ILogger<HelpController> logger)
-            : this(logger, StaticServiceProvider.Instance.GetRequiredService<IOptions<HelpPageSettings>>())
+            : this(logger, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<HelpPageSettings>>())
         {
         }
 
         [ActivatorUtilitiesConstructor]
         public HelpController(
             ILogger<HelpController> logger,
-            IOptions<HelpPageSettings> helpPageSettings)
+            IOptionsMonitor<HelpPageSettings> helpPageSettings)
         {
             _logger = logger;
-            _helpPageSettings = helpPageSettings.Value;
+
+            ResetHelpPageSettings(helpPageSettings.CurrentValue);
+            helpPageSettings.OnChange(ResetHelpPageSettings);
+        }
+
+        private void ResetHelpPageSettings(HelpPageSettings settings)
+        {
+            _helpPageSettings = settings;
         }
 
         private static HttpClient _httpClient;
