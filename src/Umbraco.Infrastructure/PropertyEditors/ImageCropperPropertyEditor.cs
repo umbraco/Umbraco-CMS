@@ -208,6 +208,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         continue;
                     }
+
                     var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(src);
                     var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
                     jo["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
@@ -273,10 +274,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             // the property value will be the file source eg '/media/23454/hello.jpg' and we
                             // are fixing that anomaly here - does not make any sense at all but... bah...
                             src = svalue;
-                            property.SetValue(JsonConvert.SerializeObject(new
-                            {
-                                src = svalue
-                            }, Formatting.None), pvalue.Culture, pvalue.Segment);
+
+                            property.SetValue(JsonConvert.SerializeObject(new { src = svalue }, Formatting.None), pvalue.Culture, pvalue.Segment);
                         }
                         else
                         {

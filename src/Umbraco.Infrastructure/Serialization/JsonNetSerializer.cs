@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -15,25 +15,20 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             {
                 new StringEnumConverter()
             },
-            Formatting = Formatting.None
+            Formatting = Formatting.None,
+            NullValueHandling = NullValueHandling.Ignore
         };
-        public string Serialize(object input)
-        {
-            return JsonConvert.SerializeObject(input, JsonSerializerSettings);
-        }
 
-        public T Deserialize<T>(string input)
-        {
-            return JsonConvert.DeserializeObject<T>(input, JsonSerializerSettings);
-        }
+        public string Serialize(object input) => JsonConvert.SerializeObject(input, JsonSerializerSettings);
+
+        public T Deserialize<T>(string input) => JsonConvert.DeserializeObject<T>(input, JsonSerializerSettings);
 
         public T DeserializeSubset<T>(string input, string key)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
-            var root = JsonConvert.DeserializeObject<JObject>(input);
-
-            var jToken = root.SelectToken(key);
+            var root = Deserialize<JObject>(input);
+            var jToken = root?.SelectToken(key);
 
             return jToken switch
             {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -148,7 +148,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null)
+                {
                     return null;
+                }
 
                 var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
