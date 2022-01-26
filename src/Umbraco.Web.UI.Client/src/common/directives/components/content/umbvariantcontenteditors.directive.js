@@ -197,7 +197,11 @@
             
             //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
             const culture = vm.editors[0].content.language ? vm.editors[0].content.language.culture : null;
-
+            
+            //retain the main culture
+            const mculture = $location.search().mculture;
+            $location.search({ "cculture": culture, 'mculture': mculture, "csegment": vm.editors[0].content.segment});
+          
             $location.search({"cculture": culture, "csegment": vm.editors[0].content.segment});
             splitViewChanged();
             unbindSplitViewRequest();
