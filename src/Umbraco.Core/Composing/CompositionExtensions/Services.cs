@@ -6,6 +6,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Packaging;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Telemetry;
@@ -81,6 +82,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                     new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
 
             composition.RegisterUnique<ITelemetryService, TelemetryService>();
+            composition.RegisterUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
 
             return composition;
         }
