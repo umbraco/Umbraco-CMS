@@ -137,6 +137,8 @@
     <Compile Include="Constants-Sql.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
     <Compile Include="Events\UnattendedInstallEventArgs.cs" />
+    <Compile Include="Help\HelpPageSettings.cs" />
+    <Compile Include="Help\IHelpPageSettings.cs" />
     <Compile Include="Logging\ILogger2.cs" />
     <Compile Include="Logging\Logger2Extensions.cs" />
     <Compile Include="Dashboards\ContentDashboardSettings.cs" />

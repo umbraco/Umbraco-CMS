@@ -126,6 +126,11 @@ namespace Umbraco.Core
             public const string ContentDashboardUrlAllowlist = "Umbraco.Core.ContentDashboardUrl-Allowlist";
 
             /// <summary>
+            /// A list of allowed addresses to fetch content for the help page.
+            /// </summary>
+            public const string HelpPageUrlAllowList = "Umbraco.Core.HelpPage-Allowlist";
+
+            /// <summary>
             /// TODO: FILL ME IN
             /// </summary>
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";

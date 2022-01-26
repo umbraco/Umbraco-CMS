@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.Help;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -50,6 +51,8 @@ namespace Umbraco.Core
                 factory.GetInstance<IRuntimeState>().Debug));
 
             configs.Add<IContentDashboardSettings>(() => new ContentDashboardSettings());
+
+            configs.Add<IHelpPageSettings>(() => new HelpPageSettings());
         }
     }
 }
