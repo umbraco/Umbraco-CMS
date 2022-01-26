@@ -85,5 +85,15 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Add additional character replacements, or override defaults
         /// </summary>
         public IEnumerable<CharItem> UserDefinedCharCollection { get; set; }
+
+        [Obsolete("Use CharItem in the Umbraco.Cms.Core.Configuration.Models namespace instead.")]
+        public class CharItem : IChar
+        {
+            /// <inheritdoc/>
+            public string Char { get; set; }
+
+            /// <inheritdoc/>
+            public string Replacement { get; set; }
+        }
     }
 }
