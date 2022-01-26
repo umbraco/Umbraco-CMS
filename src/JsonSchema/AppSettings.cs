@@ -89,6 +89,8 @@ namespace JsonSchema
                 public LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
 
                 public ContentDashboardSettings ContentDashboard { get; set; }
+
+                public HelpPageSettings HelpPage { get; set; }
             }
 
             /// <summary>
