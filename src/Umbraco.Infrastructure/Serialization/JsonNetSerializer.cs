@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Infrastructure.Serialization
     {
         protected static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
         {
-            Formatting = Formatting.None,
-            NullValueHandling = NullValueHandling.Ignore,
             Converters = new List<JsonConverter>()
             {
                 new StringEnumConverter()
-            }
+            },
+            Formatting = Formatting.None,
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         public string Serialize(object input) => JsonConvert.SerializeObject(input, JsonSerializerSettings);
