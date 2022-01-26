@@ -81,6 +81,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private readonly HtmlLocalLinkParser _localLinkParser;
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly IImageUrlGenerator _imageUrlGenerator;
+            private readonly IHtmlSanitizer _htmlSanitizer;
 
             public RichTextPropertyValueEditor(
                 DataEditorAttribute attribute,
@@ -92,7 +93,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 RichTextEditorPastedImages pastedImages,
                 IImageUrlGenerator imageUrlGenerator,
                 IJsonSerializer jsonSerializer,
-                IIOHelper ioHelper)
+                IIOHelper ioHelper,
+                IHtmlSanitizer htmlSanitizer)
                 : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -100,6 +102,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _localLinkParser = localLinkParser;
                 _pastedImages = pastedImages;
                 _imageUrlGenerator = imageUrlGenerator;
+                _htmlSanitizer = htmlSanitizer;
             }
 
             /// <inheritdoc />
@@ -156,8 +159,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _imageUrlGenerator);
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
+                var sanitized = _htmlSanitizer.Sanitize(parsed);
 
-                return parsed.NullOrWhiteSpaceAsNull();
+                return sanitized.NullOrWhiteSpaceAsNull();
             }
 
             /// <summary>
