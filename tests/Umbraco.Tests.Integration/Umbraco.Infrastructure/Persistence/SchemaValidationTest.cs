@@ -9,10 +9,11 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class SchemaValidationTest : UmbracoIntegrationTest
     {
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
+
         private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
 
         [Test]
