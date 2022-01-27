@@ -11,11 +11,13 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class SqlServerTableByTableTest : UmbracoIntegrationTest
     {
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
+
         private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
+
         private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
 
         [Test]
@@ -423,7 +425,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
                 helper.CreateTable<ContentDto>();
-                helper.CreateTable<ContentTypeDto>();
                 helper.CreateTable<DataTypeDto>();
                 helper.CreateTable<PropertyTypeGroupDto>();
                 helper.CreateTable<PropertyTypeDto>();

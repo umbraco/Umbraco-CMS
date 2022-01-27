@@ -269,10 +269,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public abstract void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
-        public virtual bool DoesTableExist(IDatabase db, string tableName)
-        {
-            return false;
-        }
+        public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 
         public virtual bool SupportsClustered()
         {
