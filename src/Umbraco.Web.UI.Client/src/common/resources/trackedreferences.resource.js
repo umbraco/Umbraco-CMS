@@ -39,7 +39,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
         getPagedReferences: function (id, args) {
 
             var defaults = {
-                pageSize: 25,
+                pageSize: 10,
                 pageNumber: 1,
                 entityType: "DOCUMENT"
             };
