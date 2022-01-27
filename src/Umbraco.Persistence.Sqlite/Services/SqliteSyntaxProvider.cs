@@ -54,7 +54,16 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
 
 
-    public override string GetIndexType(IndexTypes indexTypes) => string.Empty;
+    public override string GetIndexType(IndexTypes indexTypes)
+    {
+        switch (indexTypes)
+        {
+            case IndexTypes.UniqueNonClustered:
+                return "UNIQUE";
+            default:
+                return string.Empty;
+        }
+    }
 
     public override List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys)
     {

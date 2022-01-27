@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml");
 
-                Assert.Throws<SqlException>(() => repository.Save(macro));
+                Assert.That(() => repository.Save(macro), Throws.InstanceOf<DbException>());
             }
         }
 
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMacro macro = repository.Get(1);
                 macro.Alias = "test2";
 
-                Assert.Throws<SqlException>(() => repository.Save(macro));
+                Assert.That(() => repository.Save(macro), Throws.InstanceOf<DbException>());
             }
         }
 
