@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -54,7 +55,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
+                if (ScopeAccessor.AmbientScope.Database.DatabaseType.IsSqlServer())
+                {
+                    ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
+                }
+
                 service.Save(content);
                 scope.Complete();
             }
@@ -64,7 +69,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
+                if (ScopeAccessor.AmbientScope.Database.DatabaseType.IsSqlServer())
+                {
+                    ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
+                }
+
                 service.Save(media);
                 scope.Complete();
             }
@@ -121,8 +130,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        ConcurrentStack<IScope> currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
-                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}", Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
+                        ConcurrentStack<IScope>
+                            currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
+                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}",
+                            Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
 
                         // NOTE: This is NULL because we have supressed the execution context flow.
                         // If we don't do that we will get various exceptions because we're trying to run concurrent threads
@@ -135,7 +146,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // So although the test passes in v8, there's actually some strange things occuring because Scopes
                         // are being created and disposed concurrently and out of order.
                         var currentScope = ScopeAccessor.AmbientScope;
-                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
+                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}",
+                            Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
@@ -218,8 +230,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        ConcurrentStack<IScope> currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
-                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}", Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
+                        ConcurrentStack<IScope>
+                            currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
+                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}",
+                            Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
 
                         // NOTE: This is NULL because we have supressed the execution context flow.
                         // If we don't do that we will get various exceptions because we're trying to run concurrent threads
@@ -232,7 +246,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // So although the test passes in v8, there's actually some strange things occuring because Scopes
                         // are being created and disposed concurrently and out of order.
                         var currentScope = ScopeAccessor.AmbientScope;
-                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
+                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}",
+                            Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
