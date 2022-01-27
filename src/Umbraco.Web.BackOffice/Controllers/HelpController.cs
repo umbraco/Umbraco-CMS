@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (IsAllowedUrl(baseUrl) is false)
             {
-                _logger.LogError($"The following URL is not listed in the allowlist for HelpPage in web.config: {baseUrl}");
+                _logger.LogError($"The following URL is not listed in the allowlist for HelpPage in HelpPageSettings: {baseUrl}");
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
                 // Ideally we'd want to return a BadRequestResult here,
