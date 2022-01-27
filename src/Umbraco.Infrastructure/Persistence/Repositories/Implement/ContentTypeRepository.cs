@@ -92,8 +92,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             var sqlClause = Sql()
                 .SelectAll()
-                .From<PropertyTypeGroupDto>()
-                .RightJoin<PropertyTypeDto>()
+                .From<PropertyTypeDto>()
+                .LeftJoin<PropertyTypeGroupDto>()
                 .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                 .InnerJoin<DataTypeDto>()
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
