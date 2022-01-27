@@ -29,8 +29,8 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                     //If we have any with same controller name and located in the same area, then it is a confict.
                     var conflicting = potentialConflicting
                         .Select(x => x.GetCustomAttribute<PluginControllerAttribute>())
-                        .GroupBy(x => x.AreaName)
-                        .Any(x => x.Count() > 1);
+                        .GroupBy(x => x?.AreaName)
+                        .Any(x => x?.Count() > 1);
 
                     if (conflicting)
                     {
