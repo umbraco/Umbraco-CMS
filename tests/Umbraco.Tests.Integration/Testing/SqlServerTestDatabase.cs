@@ -21,8 +21,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         private readonly TestDatabaseSettings _settings;
         public const string DatabaseName = "UmbracoTests";
 
-        public static SqlServerTestDatabase Instance { get; private set; }
-
         public SqlServerTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory,
             IUmbracoDatabaseFactory databaseFactory)
         {
@@ -42,8 +40,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     _settings.SQLServerMasterConnectionString));
 
             _testDatabases = schema.Concat(empty).ToList();
-
-            Instance = this; // For GlobalSetupTeardown.cs
         }
 
         protected override void Initialize()
@@ -107,7 +103,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             }
         }
 
-        public void Finish()
+        public override void TearDown()
         {
             if (_prepareQueue == null)
             {
