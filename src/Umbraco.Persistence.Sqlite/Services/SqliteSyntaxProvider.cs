@@ -96,6 +96,11 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             .ToList();
     }
 
+
+    public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    public override string ConvertDateToOrderableString => "{0}";
+
     /// <inheritdoc />
     public override string GetSpecialDbType(SpecialDbType dbType) => "TEXT COLLATE NOCASE";
 
