@@ -56,11 +56,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Synta
 
             var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery("cmsContentNu", "nodeId", subQuery);
 
-            Assert.AreEqual(@"DELETE FROM [cmsContentNu] WHERE [nodeId] IN (SELECT [nodeId] FROM (SELECT DISTINCT cmsContentNu.nodeId
-FROM [cmsContentNu]
-INNER JOIN [umbracoNode]
-ON [cmsContentNu].[nodeId] = [umbracoNode].[id]
-WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "),
+            string t(string x) => SqlContext.SqlSyntax.GetQuotedTableName(x);
+            string c(string x) => SqlContext.SqlSyntax.GetQuotedColumnName(x);
+
+            Assert.AreEqual(@$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT cmsContentNu.nodeId
+FROM {t("cmsContentNu")}
+INNER JOIN {t("umbracoNode")}
+ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")}
+WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "),
                                                 sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
 
             Assert.AreEqual(1, sqlOutput.Arguments.Length);

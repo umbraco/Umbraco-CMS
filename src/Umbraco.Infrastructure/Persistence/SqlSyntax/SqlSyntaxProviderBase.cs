@@ -221,13 +221,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false)
         {
-            tableName = dbType.EscapeTableName(tableName);
-            columnName = dbType.EscapeSqlIdentifier(columnName);
+            tableName = GetQuotedTableName(tableName);
+            columnName = GetQuotedColumnName(columnName);
             var column = tableName + "." + columnName;
             if (columnAlias == null) return column;
 
             referenceName = referenceName == null ? string.Empty : referenceName + "__";
-            columnAlias = dbType.EscapeSqlIdentifier(referenceName + columnAlias);
+            columnAlias = GetQuotedColumnName(referenceName + columnAlias);
             column += " AS " + columnAlias;
             return column;
         }
