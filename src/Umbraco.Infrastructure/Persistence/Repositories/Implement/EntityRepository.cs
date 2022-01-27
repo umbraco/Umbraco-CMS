@@ -356,7 +356,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     .On<NodeDto, DocumentCultureVariationDto, LanguageDto>((node, dcv, lang) => node.NodeId == dcv.NodeId && lang.Id == dcv.LanguageId, aliasRight: "dcv")
 
                 // for selected nodes
-                .WhereIn<NodeDto>(x => x.NodeId, ids);
+                .WhereIn<NodeDto>(x => x.NodeId, ids)
+                .OrderBy<LanguageDto>(x => x.Id);
         }
 
         // gets the full sql for a given object type and a given unique id
