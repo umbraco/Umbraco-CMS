@@ -22,6 +22,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         protected BlockingCollection<TestDbMeta> _prepareQueue;
         protected BlockingCollection<TestDbMeta> _readySchemaQueue;
         protected BlockingCollection<TestDbMeta> _readyEmptyQueue;
+        public static BaseTestDatabase Instance { get; private set; }
+
+        public BaseTestDatabase() => Instance = this;
 
         protected abstract void Initialize();
 
@@ -130,5 +133,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 }
             }
         }
+
+        public abstract void TearDown();
     }
 }

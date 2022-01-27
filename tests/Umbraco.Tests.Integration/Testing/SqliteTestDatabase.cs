@@ -19,8 +19,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 {
-    public static SqliteTestDatabase Instance { get; private set; }
-
     private readonly TestDatabaseSettings _settings;
     private readonly TestUmbracoDatabaseFactoryProvider _dbFactoryProvider;
     public const string DatabaseName = "UmbracoTests";
@@ -44,8 +42,6 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             .Select(x => CreateSqLiteMeta(++counter, true));
 
         _testDatabases = schema.Concat(empty).ToList();
-
-        Instance = this; // For GlobalSetupTeardown.cs
     }
 
     protected override void Initialize()
@@ -138,7 +134,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             .ToArray();
     }
 
-    public void Finish()
+    public override void TearDown()
     {
         if (_prepareQueue == null)
         {

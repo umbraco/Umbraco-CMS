@@ -30,9 +30,7 @@ public class GlobalSetupTeardown
     [OneTimeTearDown]
     public void TearDown()
     {
-        LocalDbTestDatabase.Instance?.Finish();
-        SqlServerTestDatabase.Instance?.Finish();
-        SqliteTestDatabase.Instance?.Finish();
+        BaseTestDatabase.Instance?.TearDown();
 
         Console.WriteLine("TOTAL TESTS DURATION: {0}", _stopwatch.Elapsed);
     }
