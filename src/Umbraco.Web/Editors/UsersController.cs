@@ -540,7 +540,7 @@ namespace Umbraco.Web.Editors
                 });
 
             // Construct full URL will use the value in settings if specified, otherwise will use the current request URL
-            var requestUrl = ApplicationUrlHelper.GetApplicationUriUncached(http.Request, _umbracoSettingsSection);
+            var requestUrl = ApplicationUrlHelper.GetApplicationUriUncached(http.Request, _umbracoSettingsSection, GlobalSettings);
             var inviteUri = new Uri(requestUrl, action);
 
             var emailSubject = Services.TextService.Localize("user", "inviteEmailCopySubject",

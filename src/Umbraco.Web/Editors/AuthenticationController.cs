@@ -566,7 +566,7 @@ namespace Umbraco.Web.Editors
                 });
 
             // Construct full URL using configured application URL (which will fall back to current request)
-            var applicationUri = ApplicationUrlHelper.GetApplicationUriUncached(http.Request, _umbracoSettingsSection);
+            var applicationUri = ApplicationUrlHelper.GetApplicationUriUncached(http.Request, _umbracoSettingsSection, GlobalSettings);
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

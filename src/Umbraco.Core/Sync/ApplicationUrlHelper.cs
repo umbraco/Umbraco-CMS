@@ -112,12 +112,25 @@ namespace Umbraco.Core.Sync
         /// <returns></returns>
         public static Uri GetApplicationUriUncached(
             HttpRequestBase request,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IGlobalSettings globalSettings)
         {
             var settingUrl = umbracoSettingsSection.WebRouting.UmbracoApplicationUrl;
-            return string.IsNullOrEmpty(settingUrl)
-                ? new Uri(request.Url, IOHelper.ResolveUrl(SystemDirectories.Umbraco))
-                : new Uri(settingUrl);
+
+
+            if (string.IsNullOrEmpty(settingUrl))
+            {
+                if (!Uri.TryCreate(request.Url, VirtualPathUtility.ToAbsolute(globalSettings.Path), out var result))
+                {
+                    throw new InvalidOperationException(
+                        $"Could not create an url from {request.Url} and {globalSettings.Path}");
+                }
+                return result;
+            }
+            else
+            {
+                return new Uri(settingUrl);
+            }
         }
     }
 }
