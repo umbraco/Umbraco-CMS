@@ -6,10 +6,13 @@
         var vm = this;
         var autoSelectedVariants = [];
 
+        vm.id = $scope.content.id;
+        vm.warningText = null;
         vm.changeSelection = changeSelection;
 
         function onInit() {
 
+            $scope.model.hideSubmitButton = true;
             vm.variants = $scope.model.variants;
             vm.unpublishableVariants = vm.variants.filter(publishedVariantFilter)
 
@@ -107,6 +110,17 @@
                 variant.save = variant.disabled = false;
             });
         });
+
+        vm.checkingReferencesComplete = () => {
+            $scope.model.hideSubmitButton = false;
+        };
+
+        vm.onReferencesWarning = () => {
+            $scope.model.submitButtonStyle = "danger";
+            localizationService.localize("references_unpublishWarning").then((value) => {
+                vm.warningText = value;
+            });
+        };
 
         onInit();
 
