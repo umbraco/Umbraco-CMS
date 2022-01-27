@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +36,9 @@ namespace Umbraco.Cms.Web.Common.Authorization
 
         private bool? IsAllowed(AuthorizationHandlerContext context)
         {
+            #nullable enable
             Endpoint? endpoint = null;
+            #nullable disable
 
             switch (context.Resource)
             {
