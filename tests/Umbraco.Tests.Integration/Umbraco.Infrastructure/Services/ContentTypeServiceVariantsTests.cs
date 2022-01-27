@@ -650,7 +650,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value1':[{'c':'fr','v':'v1fr'},{'c':'en','v':'v1en'}],'value2':[{'v':'v2'}]},'cd':");
+                "{'pd':{'value1':[{'c':'en','v':'v1en'},{'c':'fr','v':'v1fr'}],'value2':[{'v':'v2'}]},'cd':");
         }
 
         [Test]
@@ -825,7 +825,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value1':[{'c':'fr','v':'v1fr'},{'c':'en','v':'v1en'}],'value2':[{'v':'v2'}]},'cd':");
+                "{'pd':{'value1':[{'c':'en','v':'v1en'},{'c':'fr','v':'v1fr'}],'value2':[{'v':'v2'}]},'cd':");
 
             // switch other property to Culture
             contentType.PropertyTypes.First(x => x.Alias == "value2").Variations = ContentVariation.Culture;
@@ -844,7 +844,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value1':[{'c':'fr','v':'v1fr'},{'c':'en','v':'v1en'}],'value2':[{'c':'en','v':'v2'}]},'cd':");
+                "{'pd':{'value1':[{'c':'en','v':'v1en'},{'c':'fr','v':'v1fr'}],'value2':[{'c':'en','v':'v2'}]},'cd':");
         }
 
         [TestCase(ContentVariation.Culture, ContentVariation.Nothing)]
@@ -1106,7 +1106,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value11':[{'c':'fr','v':'v11fr'},{'c':'en','v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'c':'en','v':'v11en'},{'c':'fr','v':'v11fr'}],'value12':[{'v':'v12'}],'value21':[{'v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
 
             composed.PropertyTypes.First(x => x.Alias == "value21").Variations = ContentVariation.Culture;
             ContentTypeService.Save(composed);
@@ -1115,7 +1115,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value11':[{'c':'fr','v':'v11fr'},{'c':'en','v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'c':'en','v':'v11en'},{'c':'fr','v':'v11fr'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             composing.Variations = ContentVariation.Nothing;
             ContentTypeService.Save(composing);
@@ -1124,7 +1124,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             composing.Variations = ContentVariation.Culture;
             ContentTypeService.Save(composing);
@@ -1133,7 +1133,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             composing.PropertyTypes.First(x => x.Alias == "value11").Variations = ContentVariation.Culture;
             ContentTypeService.Save(composing);
@@ -1142,7 +1142,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(
                 document.Id,
-                "{'pd':{'value11':[{'c':'fr','v':'v11fr'},{'c':'en','v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'c':'en','v':'v11en'},{'c':'fr','v':'v11fr'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
         }
 
         [Test]
@@ -1247,7 +1247,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document1.Id));
             AssertJsonStartsWith(
                 document1.Id,
-                "{'pd':{'value11':[{'c':'fr','v':'v11fr'},{'c':'en','v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'c':'en','v':'v11en'},{'c':'fr','v':'v11fr'}],'value12':[{'v':'v12'}],'value21':[{'v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
 
             Console.WriteLine(GetJson(document2.Id));
             AssertJsonStartsWith(
@@ -1261,7 +1261,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document1.Id));
             AssertJsonStartsWith(
                 document1.Id,
-                "{'pd':{'value11':[{'c':'fr','v':'v11fr'},{'c':'en','v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'c':'en','v':'v11en'},{'c':'fr','v':'v11fr'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             Console.WriteLine(GetJson(document2.Id));
             AssertJsonStartsWith(
@@ -1275,7 +1275,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document1.Id));
             AssertJsonStartsWith(
                 document1.Id,
-                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             Console.WriteLine(GetJson(document2.Id));
             AssertJsonStartsWith(
@@ -1289,7 +1289,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document1.Id));
             AssertJsonStartsWith(
                 document1.Id,
-                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             Console.WriteLine(GetJson(document2.Id));
             AssertJsonStartsWith(
@@ -1303,7 +1303,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(GetJson(document1.Id));
             AssertJsonStartsWith(
                 document1.Id,
-                "{'pd':{'value11':[{'c':'fr','v':'v11fr'},{'c':'en','v':'v11en'}],'value12':[{'v':'v12'}],'value21':[{'c':'fr','v':'v21fr'},{'c':'en','v':'v21en'}],'value22':[{'v':'v22'}]},'cd':");
+                "{'pd':{'value11':[{'c':'en','v':'v11en'},{'c':'fr','v':'v11fr'}],'value12':[{'v':'v12'}],'value21':[{'c':'en','v':'v21en'},{'c':'fr','v':'v21fr'}],'value22':[{'v':'v22'}]},'cd':");
 
             Console.WriteLine(GetJson(document2.Id));
             AssertJsonStartsWith(
