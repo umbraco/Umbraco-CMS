@@ -21,9 +21,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             DatabaseSchemaResult result;
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var schema = new DatabaseSchemaCreator(ScopeAccessor.AmbientScope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
+                schema.InitializeDatabaseSchema();
                 result = schema.ValidateSchema(DatabaseSchemaCreator.OrderedTables);
             }
 
