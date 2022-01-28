@@ -44,27 +44,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
-        /// </summary>
-        public RuntimeState(
-            IOptions<GlobalSettings> globalSettings,
-            IOptions<UnattendedSettings> unattendedSettings,
-            IUmbracoVersion umbracoVersion,
-            IUmbracoDatabaseFactory databaseFactory,
-            ILogger<RuntimeState> logger,
-            PendingPackageMigrations packageMigrationState)
-            : this(
-                globalSettings,
-                unattendedSettings,
-                umbracoVersion,
-                databaseFactory,
-                logger,
-                packageMigrationState,
-                StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
-        {
-        }
-
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
             IOptions<UnattendedSettings> unattendedSettings,
@@ -81,6 +60,28 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _logger = logger;
             _packageMigrationState = packageMigrationState;
             _conflictingRouteService = conflictingRouteService;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
+        /// </summary>
+        [Obsolete("use ctor with all params")]
+        public RuntimeState(
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoDatabaseFactory databaseFactory,
+            ILogger<RuntimeState> logger,
+            PendingPackageMigrations packageMigrationState)
+            : this(
+                globalSettings,
+                unattendedSettings,
+                umbracoVersion,
+                databaseFactory,
+                logger,
+                packageMigrationState,
+                StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
+        {
         }
 
         /// <inheritdoc />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,9 +20,10 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             {
                 return reader.Value;
             }
+
             // Load JObject from stream
             JObject jObject = JObject.Load(reader);
-            return jObject.ToString();
+            return jObject.ToString(Formatting.None);
         }
 
         public override bool CanConvert(Type objectType)

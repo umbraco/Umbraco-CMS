@@ -38,6 +38,8 @@ angular.module("umbraco")
                 entityResource.getById(vm.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                     vm.media = mediaEntity;
                     vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, true);
+                    vm.fileSrc = mediaHelper.resolveFileFromEntity(mediaEntity, false);
+                    vm.fileExtension = mediaHelper.getFileExtension(vm.fileSrc);
                     vm.loading = false;
                     vm.hasDimensions = false;
                     vm.isCroppable = false;
