@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NPoco;
+using Org.BouncyCastle.Asn1.Cms;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -41,7 +42,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string StringLengthUnicodeColumnDefinitionFormat => "TEXT COLLATE NOCASE";
 
     /// <inheritdoc />
-    public override IsolationLevel DefaultIsolationLevel => IsolationLevel.Serializable;
+    public override IsolationLevel DefaultIsolationLevel => IsolationLevel.ReadCommitted;
 
     /// <inheritdoc />
     public override string DbProvider => Constants.ProviderName;
@@ -52,7 +53,6 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     /// <inheritdoc />
     public override bool SupportsClustered() => false;
-
 
 
     public override string GetIndexType(IndexTypes indexTypes)
@@ -129,23 +129,55 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
-    public override void WriteLock(IDatabase db, TimeSpan timeout, int lockId) => ObtainWriteLock(db, timeout, lockId);
-
-    /// <inheritdoc />
+    /// <remarks>
+    /// Please read notes on <see cref="SqliteDatabaseCreator.Create"/>
+    /// </remarks>
     public override void WriteLock(IDatabase db, params int[] lockIds)
     {
-        TimeSpan timeout = _globalSettings.Value.SqlWriteLockTimeOut;
-
         foreach (var lockId in lockIds)
         {
-            ObtainWriteLock(db, timeout, lockId);
+            WriteLock(db, _globalSettings.Value.SqlWriteLockTimeOut, lockId);
         }
     }
 
     /// <inheritdoc />
-    public override void ReadLock(IDatabase db, TimeSpan timeout, int lockId) => ObtainReadLock(db, timeout, lockId);
+    /// <remarks>
+    /// Please read notes on <see cref="SqliteDatabaseCreator.Create"/>
+    /// </remarks>
+    public override void WriteLock(IDatabase db, TimeSpan timeout, int lockId)
+    {
+        if (db is null)
+        {
+            throw new ArgumentNullException(nameof(db));
+        }
+
+        if (db.Transaction is null)
+        {
+            throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
+        }
+
+        // soon as we get Database, a transaction is started
+        if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+        {
+            throw new InvalidOperationException(
+                "A transaction with minimum ReadCommitted isolation level is required.");
+        }
+
+        DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, $"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={lockId}");
+        command.CommandTimeout = (int)timeout.TotalMilliseconds;
+
+        var i = command.ExecuteNonQuery();
+
+        if (i == 0) // ensure we are actually locking!
+        {
+            throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+        }
+    }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Please read notes on <see cref="SqliteDatabaseCreator.Create"/>
+    /// </remarks>
     public override void ReadLock(IDatabase db, params int[] lockIds)
     {
         foreach (var lockId in lockIds)
@@ -154,7 +186,13 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         }
     }
 
-    private static void ObtainReadLock(IDatabase db, TimeSpan? timeout, int lockId)
+    /// <inheritdoc />
+    /// <remarks>
+    /// Please read notes on <see cref="SqliteDatabaseCreator.Create"/>
+    /// </remarks>
+    public override void ReadLock(IDatabase db, TimeSpan timeout, int lockId) => ObtainReadLock(db, timeout, lockId);
+
+    private void ObtainReadLock(IDatabase db, TimeSpan? timeout, int lockId)
     {
         if (db is null)
         {
@@ -166,48 +204,22 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
         }
 
-        if (db.Transaction.IsolationLevel < IsolationLevel.Serializable)
+        // soon as we get Database, a transaction is started
+        if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
         {
-            throw new InvalidOperationException("A transaction with minimum Serializable isolation level is required.");
+            throw new InvalidOperationException(
+                "A transaction with minimum ReadCommitted isolation level is required.");
         }
 
+        DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, $"SELECT value FROM umbracoLock WHERE id={lockId}");
         if (timeout.HasValue)
         {
-            db.Execute(@$"PRAGMA busy_timeout = {timeout.Value.TotalMilliseconds};");
+            command.CommandTimeout = (int)timeout.Value.TotalMilliseconds;
         }
 
-        var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new {id = lockId});
+        var i = command.ExecuteScalar() as long?;
 
-        // ensure we are actually locking!
-        if (i == null)
-        {
-            throw new ArgumentException($"LockObject with id={lockId} does not exist.");
-        }
-    }
-
-    private static void ObtainWriteLock(IDatabase db, TimeSpan timeout, int lockId)
-    {
-        if (db is null)
-        {
-            throw new ArgumentNullException(nameof(db));
-        }
-
-        if (db.Transaction is null)
-        {
-            throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
-        }
-
-        if (db.Transaction.IsolationLevel < IsolationLevel.Serializable)
-        {
-            throw new InvalidOperationException("A transaction with minimum Serializable isolation level is required.");
-        }
-
-        db.Execute(@$"PRAGMA busy_timeout = {timeout.TotalMilliseconds};");
-
-        var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
-
-        // ensure we are actually locking!
-        if (i == 0)
+        if (i == null) // ensure lockId exists to match behaviour in other syntax providers
         {
             throw new ArgumentException($"LockObject with id={lockId} does not exist.");
         }
@@ -258,7 +270,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return string.Join(" || ", args.AsEnumerable());
     }
 
-    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false)
+    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
+        string referenceName = null, bool forInsert = false)
     {
         if (forInsert)
         {
@@ -316,7 +329,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sb.ToString().TrimStart(',');
     }
 
-    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition)
+    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition,
+        bool skipKeysAndIndexes = false)
     {
         var columns = Format(tableDefinition.Columns);
         var primaryKey = FormatPrimaryKey(tableDefinition);
@@ -327,14 +341,17 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         sb.AppendLine("(");
         sb.Append(columns);
 
-        if (!string.IsNullOrEmpty(primaryKey))
+        if (!string.IsNullOrEmpty(primaryKey) && !skipKeysAndIndexes)
         {
             sb.AppendLine($", {primaryKey}");
         }
 
-        foreach (var foreignKey in foreignKeys)
+        if (!skipKeysAndIndexes)
         {
-            sb.AppendLine($", {foreignKey}");
+            foreach (var foreignKey in foreignKeys)
+            {
+                sb.AppendLine($", {foreignKey}");
+            }
         }
 
         sb.AppendLine(")");
@@ -343,6 +360,11 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
         _log.LogInformation("Create table:\n {Sql}", createSql);
         database.Execute(new Sql(createSql));
+
+        if (skipKeysAndIndexes)
+        {
+            return;
+        }
 
         List<string> indexSql = Format(tableDefinition.Indexes);
         foreach (var sql in indexSql)
@@ -354,7 +376,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override IEnumerable<string> GetTablesInSchema(IDatabase db) =>
         db.Fetch<string>("select name from sqlite_master where type='table'")
-          .Where(x => !x.StartsWith("sqlite_"));
+            .Where(x => !x.StartsWith("sqlite_"));
 
     public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
     {
@@ -384,7 +406,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         var items = db.Fetch<SqliteMaster>("select * from sqlite_master where type = 'table'")
             .Where(x => !x.Name.StartsWith("sqlite_"));
 
-        List<Constraint> foundConstraints = new ();
+        List<Constraint> foundConstraints = new();
         foreach (SqliteMaster row in items)
         {
             var altPk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>PK_\w+)\s.*UNIQUE \(""(?<field>.+?)""\)");
