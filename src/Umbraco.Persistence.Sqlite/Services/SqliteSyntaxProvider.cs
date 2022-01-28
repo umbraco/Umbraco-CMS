@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -100,7 +101,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
                 pragma_index_list(m.name) AS ilist,
                 pragma_index_info(ilist.name) AS iinfo");
 
-        return items.Select(item =>
+        return items
+            .Where(x => !x.IndexName.StartsWith("sqlite_"))
+            .Select(item =>
                 new Tuple<string, string, string, bool>(item.TableName, item.IndexName, item.ColumnName, item.IsUnique))
             .ToList();
     }
@@ -273,11 +276,6 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             return string.Empty;
         }
 
-        if (table.Columns.Any(x => x.IsIdentity))
-        {
-            return string.Empty;
-        }
-
         var constraintName = string.IsNullOrEmpty(columnDefinition.PrimaryKeyName)
             ? $"PK_{table.Name}"
             : columnDefinition.PrimaryKeyName;
@@ -288,7 +286,12 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
                 .Split(Cms.Core.Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                 .Select(GetQuotedColumnName));
 
-        return $"CONSTRAINT {constraintName} PRIMARY KEY ({columns})";
+        // We can't name the PK if it's set as a column constraint so add an alternate at table level.
+        var constraintType = table.Columns.Any(x => x.IsIdentity)
+            ? "UNIQUE"
+            : "PRIMARY KEY";
+
+        return $"CONSTRAINT {constraintName} {constraintType} ({columns})";
     }
 
 
@@ -349,10 +352,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         }
     }
 
-    public override IEnumerable<string> GetTablesInSchema(IDatabase db)
-    {
-        return db.Fetch<string>("select name from sqlite_master where type='table'");
-    }
+    public override IEnumerable<string> GetTablesInSchema(IDatabase db) =>
+        db.Fetch<string>("select name from sqlite_master where type='table'")
+          .Where(x => !x.StartsWith("sqlite_"));
 
     public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
     {
@@ -366,13 +368,89 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
             while (reader.Read())
             {
-                var cid = reader.GetInt32("cid");
-                var column = reader.GetString("name");
+                var ordinal = reader.GetInt32("cid");
+                var columnName = reader.GetString("name");
                 var type = reader.GetString("type");
                 var notNull = reader.GetBoolean("notnull");
-                yield return new ColumnInfo(table, column, cid, notNull, type);
+                yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
             }
         }
+    }
+
+
+    /// <inheritdoc />
+    public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
+    {
+        var items = db.Fetch<SqliteMaster>("select * from sqlite_master where type = 'table'")
+            .Where(x => !x.Name.StartsWith("sqlite_"));
+
+        List<Constraint> foundConstraints = new ();
+        foreach (SqliteMaster row in items)
+        {
+            var altPk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>PK_\w+)\s.*UNIQUE \(""(?<field>.+?)""\)");
+            if (altPk.Success)
+            {
+                var field = altPk.Groups["field"].Value;
+                var constraint = altPk.Groups["constraint"].Value;
+                foundConstraints.Add(new Constraint(row.Name, field, constraint));
+            }
+            else
+            {
+                var identity = Regex.Match(row.Sql, @"""(?<field>.+)"".*AUTOINCREMENT");
+                if (identity.Success)
+                {
+                    foundConstraints.Add(new Constraint(row.Name, identity.Groups["field"].Value, $"PK_{row.Name}"));
+                }
+            }
+
+            var pk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>\w+)\s.*PRIMARY KEY \(""(?<field>.+?)""\)");
+            if (pk.Success)
+            {
+                var field = pk.Groups["field"].Value;
+                var constraint = pk.Groups["constraint"].Value;
+                foundConstraints.Add(new Constraint(row.Name, field, constraint));
+            }
+
+            var fkRegex = new Regex(@"CONSTRAINT (?<constraint>\w+) FOREIGN KEY \(""(?<field>.+?)""\) REFERENCES");
+            var foreignKeys = fkRegex.Matches(row.Sql).Cast<Match>();
+            {
+                foreach (var fk in foreignKeys)
+                {
+                    var field = fk.Groups["field"].Value;
+                    var constraint = fk.Groups["constraint"].Value;
+                    foundConstraints.Add(new Constraint(row.Name, field, constraint));
+                }
+            }
+        }
+
+        // item.TableName, item.ColumnName, item.ConstraintName
+        return foundConstraints
+            .Select(x => Tuple.Create(x.TableName, x.ColumnName, x.ConstraintName));
+    }
+
+    private class Constraint
+    {
+        public string TableName { get; }
+
+        public string ColumnName { get; }
+
+        public string ConstraintName { get; }
+
+        public Constraint(string tableName, string columnName, string constraintName)
+        {
+            TableName = tableName;
+            ColumnName = columnName;
+            ConstraintName = constraintName;
+        }
+
+        public override string ToString() => ConstraintName;
+    }
+
+    private class SqliteMaster
+    {
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public string Sql { get; set; }
     }
 
     private class IndexMeta
