@@ -107,11 +107,36 @@ stages:
       displayName: Integration Tests
       dependsOn: []
       jobs:
-          - job: Linux_Integration_Tests
-            services:
-                mssql: mssql
+        - job: Linux_Integration_Tests_SQLServer
+          services:
+            mssql: mssql
+          timeoutInMinutes: 120
+          displayName: Linux (SQL Server)
+          pool:
+            vmImage: ubuntu-latest
+          steps:
+            - task: UseDotNet@2
+              displayName: Use .Net 6.x
+              inputs:
+                version: 6.x
+            - task: DotNetCoreCLI@2
+              displayName: dotnet build
+              inputs:
+                command: build
+                projects: '**/umbraco-netcore-only.sln'
+            - task: DotNetCoreCLI@2
+              displayName: dotnet test
+              inputs:
+                command: test
+                projects: '**/Umbraco.Tests.Integration.csproj'
+                arguments: '--no-build'
+              env:
+                Tests__Database__DatabaseType: 'SqlServer'
+                Tests__Database__SQLServerMasterConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+
+          - job: Linux_Integration_Tests_SQLite
             timeoutInMinutes: 120
-            displayName: Linux
+            displayName: Linux (SQLite)
             pool:
                 vmImage: ubuntu-latest
             steps:
@@ -130,11 +155,10 @@ stages:
                       command: test
                       projects: '**/Umbraco.Tests.Integration.csproj'
                       arguments: '--no-build'
-                  env:
-                      UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+
           - job: Windows_Integration_Tests
             timeoutInMinutes: 120
-            displayName: Windows
+            displayName: Windows (LocalDb)
             pool:
                 vmImage: windows-latest
             steps:
@@ -155,6 +179,8 @@ stages:
                       command: test
                       projects: '**\Umbraco.Tests.Integration*.csproj'
                       arguments: '--no-build'
+                  env:
+                    Tests__Database__DatabaseType: 'LocalDb'
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
       dependsOn: []
