@@ -438,7 +438,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 
                 var k1 = new ThingA12Dto { Name = "a", Thing1Id = tA1A.Id, Thing2Id = tA2A.Id };
                 ScopeAccessor.AmbientScope.Database.Insert(k1);
-                var k2 = new ThingA12Dto { Name = "B", Thing1Id = tA1A.Id, Thing2Id = tA2B.Id };
+                var k2 = new ThingA12Dto { Name = "b", Thing1Id = tA1A.Id, Thing2Id = tA2B.Id };
                 ScopeAccessor.AmbientScope.Database.Insert(k2);
 
                 string sql = @"SELECT a1.id, a1.name,
