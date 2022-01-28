@@ -1,4 +1,5 @@
-using Microsoft.Data.Sqlite;
+using System.Data.SQLite;
+using System.Diagnostics;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Persistence.Sqlite.Services;
@@ -11,13 +12,37 @@ public class SqliteDatabaseCreator : IDatabaseCreator
     /// <inheritdoc />
     public string ProviderName => Constants.ProviderName;
 
-    /// <inheritdoc />
-    /// <remarks>
+    /// <summary>
     /// Creates a SQLite database file.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// With journal_mode = wal we have snapshot isolation.
+    /// </para>
+    /// <para>
+    /// Concurrent read/write can take occur, committing a write transaction will have no impact
+    /// on open read transactions as they see only committed data from the point in time that they began reading.
+    /// </para>
+    /// <para>
+    /// A write transaction still requires exclusive access to database files so concurrent writes are not possible.
+    /// </para>
+    /// <para>
+    /// Read more <a href="https://www.sqlite.org/isolation.html">Isolation in SQLite</a> <br/>
+    /// Read more <a href="https://www.sqlite.org/wal.html">Write-Ahead Logging</a>
+    /// </para>
     /// </remarks>
     public void Create(string connectionString)
     {
-        using var connection = new SqliteConnection(connectionString);
+        using var connection = new SQLiteConnection(connectionString);
         connection.Open();
+
+        using SQLiteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA journal_mode = wal;";
+        command.ExecuteNonQuery();
+
+        command.CommandText = "PRAGMA journal_mode";
+        var mode = command.ExecuteScalar();
+
+        Debug.Assert(mode as string == "wal", "incorrect journal_mode");
     }
 }

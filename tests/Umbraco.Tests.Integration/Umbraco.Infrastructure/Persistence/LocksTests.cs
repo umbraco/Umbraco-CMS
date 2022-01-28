@@ -239,6 +239,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void DeadLockTest()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                Assert.Ignore("This test doesn't work with SQLite");
+                return;
+            }
+
             Exception e1 = null, e2 = null;
             AutoResetEvent ev1 = new AutoResetEvent(false), ev2 = new AutoResetEvent(false);
 
@@ -286,6 +292,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             Assert.IsNotNull(sqlException);
             Assert.AreEqual(1222, sqlException.Number);
         }
+
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -327,6 +334,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void NoDeadLockTest()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                Assert.Ignore("This test doesn't work with SQLite");
+                return;
+            }
+
             Exception e1 = null, e2 = null;
             AutoResetEvent ev1 = new AutoResetEvent(false), ev2 = new AutoResetEvent(false);
 
@@ -356,6 +369,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 [Test]
         public void Throws_When_Lock_Timeout_Is_Exceeded()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                Assert.Ignore("This test doesn't work with SQLite");
+                return;
+            }
+
             using (ExecutionContext.SuppressFlow())
             {
 
@@ -414,6 +433,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void Read_Lock_Waits_For_Write_Lock()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                Assert.Ignore("This test doesn't work with SQLite");
+                return;
+            }
+
             var locksCompleted = 0;
 
             using (ExecutionContext.SuppressFlow())

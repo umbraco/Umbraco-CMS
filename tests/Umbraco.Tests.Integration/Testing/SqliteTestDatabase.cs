@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Cms.Core.Configuration;
@@ -177,11 +178,12 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
     {
         var name = $"{DatabaseName}-{i}.sqlite";
         var path = Path.Combine(_settings.FilesPath, name);
-        var connectionString =
-            $"Data Source={path}"; // In memory only? just keep a connection open here to stop it getting wiped.
-        // Data Source={name};Mode=Memory;Cache=Shared // The database persists as long as at least one connection to it remains open.
 
+        var builder = new SqliteConnectionStringBuilder
+        {
+            DataSource = path
+        };
 
-        return new TestDbMeta(name, empty, connectionString, Persistence.Sqlite.Constants.ProviderName, path);
+        return new TestDbMeta(name, empty, builder.ConnectionString, Persistence.Sqlite.Constants.ProviderName, path);
     }
 }
