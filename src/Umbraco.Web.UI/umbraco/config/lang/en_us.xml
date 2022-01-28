@@ -21,7 +21,7 @@
     <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="importDocumentType">Import Document Type</key>
+    <key alias="importdocumenttype">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>
     <key alias="logout">Exit</key>

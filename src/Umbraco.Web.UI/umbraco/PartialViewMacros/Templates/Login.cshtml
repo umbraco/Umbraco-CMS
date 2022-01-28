@@ -1,9 +1,12 @@
 @inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+
 @using Umbraco.Cms.Web.Common.Models
 @using Umbraco.Cms.Web.Common.Security
 @using Umbraco.Cms.Web.Website.Controllers
+@using Umbraco.Cms.Core.Services
 @using Umbraco.Extensions
 @inject IMemberExternalLoginProviders memberExternalLoginProviders
+@inject ITwoFactorLoginService twoFactorLoginService
 @{
     var loginModel = new LoginModel();
     // You can modify this to redirect to a different URL instead of the current one
@@ -13,6 +16,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+
+@if (ViewData.TryGetTwoFactorProviderNames(out var providerNames))
+{
+
+    foreach (var providerName in providerNames)
+    {
+        <div class="2fa-form">
+            <h4>Two factor with @providerName.</h4>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            @using (Html.BeginUmbracoForm<UmbTwoFactorLoginController>(nameof(UmbTwoFactorLoginController.Verify2FACode)))
+            {
+
+                <text>
+                    <input type="hidden" name="provider" value="@providerName"/>
+                    Input security code: <input name="code" value=""/><br/>
+                    <button type="submit" class="btn btn-primary">Validate</button>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                </text>
+            }
+        </div>
+    }
+
+}
+else
+{
+
 
 <div class="login-form">
 
@@ -74,3 +104,4 @@
     }
 }
 </div>
+}

@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             UpdateBlockListRecursively(blockListValue, createGuid);
 
-            return JsonConvert.SerializeObject(blockListValue.BlockValue);
+            return JsonConvert.SerializeObject(blockListValue.BlockValue, Formatting.None);
         }
 
         private void UpdateBlockListRecursively(BlockEditorData blockListData, Func<Guid> createGuid)
