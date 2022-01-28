@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Cms.Core.Configuration;
@@ -179,7 +178,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         var name = $"{DatabaseName}-{i}.sqlite";
         var path = Path.Combine(_settings.FilesPath, name);
 
-        var builder = new SqliteConnectionStringBuilder
+        var builder = new SQLiteConnectionStringBuilder
         {
             DataSource = path
         };
