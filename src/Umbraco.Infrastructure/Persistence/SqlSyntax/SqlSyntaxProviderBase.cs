@@ -571,7 +571,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
-        public abstract void HandleCreateTable(IDatabase database, TableDefinition tableDefinition);
+        public abstract void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 
         public virtual string DeleteDefaultConstraint => throw new NotSupportedException("Default constraints are not supported");
 

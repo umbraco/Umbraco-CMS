@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
 
-        void HandleCreateTable(IDatabase database, TableDefinition tableDefinition);
+        void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 
 
 

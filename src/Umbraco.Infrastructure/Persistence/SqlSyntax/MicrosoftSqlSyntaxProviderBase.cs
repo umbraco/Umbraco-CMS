@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return sqlDbType;
         }
 
-        public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition)
+        public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false)
         {
             var createSql = Format(tableDefinition);
             var createPrimaryKeySql = FormatPrimaryKey(tableDefinition);
@@ -190,6 +190,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
             _logger.LogInformation("Create table:\n {Sql}", createSql);
             database.Execute(new Sql(createSql));
+
+            if (skipKeysAndIndexes)
+            {
+                return;
+            }
 
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)

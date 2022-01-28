@@ -18,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -98,6 +99,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         [Test]
         public void CreateKeysAndIndexesOfTDto()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // TODO: Think about this for future migrations.
+                Assert.Ignore("Can't add / drop keys in SQLite.");
+                return;
+            }
+
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
@@ -133,6 +141,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         [Test]
         public void CreateKeysAndIndexes()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // TODO: Think about this for future migrations.
+                Assert.Ignore("Can't add / drop keys in SQLite.");
+                return;
+            }
+
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
