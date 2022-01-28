@@ -75,8 +75,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
-                    configBuilder.AddJsonFile("appsettings.Tests.json");
-                    configBuilder.AddEnvironmentVariables();
+                    configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
+
                     Configuration = configBuilder.Build();
                 })
                 .ConfigureServices((_, services) =>

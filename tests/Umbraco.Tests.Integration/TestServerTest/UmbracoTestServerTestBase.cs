@@ -140,6 +140,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
+                    configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
 
                     Configuration = configBuilder.Build();
                 })

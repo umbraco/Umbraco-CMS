@@ -78,8 +78,7 @@
     <Content Include="Umbraco.Infrastructure\Services\Importing\TemplateOnly-Updated-Package.xml" />
     <Content Include="Umbraco.Infrastructure\Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Umbraco.Infrastructure\Services\Importing\XsltSearch-Package.xml" />
-    <None Remove="appsettings.Tests.json" />
-    <Content Include="appsettings.Tests.json">
+    <Content Include="*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
