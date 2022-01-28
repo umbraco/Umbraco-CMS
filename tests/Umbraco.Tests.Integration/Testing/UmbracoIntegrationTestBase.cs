@@ -118,7 +118,7 @@ public abstract class UmbracoIntegrationTestBase
         ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
         // This will create a db, install the schema and ensure the app is configured to run
-        SetupTestDatabase(testDatabaseFactoryProvider, databaseFactory, loggerFactory, state, TestHelper.WorkingDirectory);
+        SetupTestDatabase(testDatabaseFactoryProvider, databaseFactory, loggerFactory, state);
     }
 
     private void ConfigureTestDatabaseFactory(TestDbMeta meta, IUmbracoDatabaseFactory factory, IRuntimeState state)
@@ -130,29 +130,18 @@ public abstract class UmbracoIntegrationTestBase
         state.DetermineRuntimeLevel();
     }
 
-    private void SetupTestDatabase(
+        private void SetupTestDatabase(
             TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
             IUmbracoDatabaseFactory databaseFactory,
             ILoggerFactory loggerFactory,
-            IRuntimeState runtimeState,
-            string workingDirectory)
+            IRuntimeState runtimeState)
         {
             if (TestOptions.Database == UmbracoTestOptions.Database.None)
             {
                 return;
             }
 
-            // need to manually register this factory
-            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
-
-            string dbFilePath = Path.Combine(workingDirectory, "databases");
-
-            if (!Directory.Exists(dbFilePath))
-            {
-                Directory.CreateDirectory(dbFilePath);
-            }
-
-            ITestDatabase db = GetOrCreateDatabase(dbFilePath, loggerFactory, testUmbracoDatabaseFactoryProvider);
+            ITestDatabase db = GetOrCreateDatabase(loggerFactory, testUmbracoDatabaseFactoryProvider);
 
             switch (TestOptions.Database)
             {
@@ -219,7 +208,9 @@ public abstract class UmbracoIntegrationTestBase
             }
         }
 
-    private ITestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+
+    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory,
+        TestUmbracoDatabaseFactoryProvider dbFactory)
     {
         lock (s_dbLocker)
         {
@@ -230,13 +221,15 @@ public abstract class UmbracoIntegrationTestBase
 
             var settings = new TestDatabaseSettings
             {
-                FilesPath = filesPath,
-                Provider = Configuration.GetValue<string>("Tests:Database:Provider"),
+                FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
+                DatabaseType = Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
                 PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
                 EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
                 SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
                 SQLServerMasterConnectionString = Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
             };
+
+            Directory.CreateDirectory(settings.FilesPath);
 
             s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
 

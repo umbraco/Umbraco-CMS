@@ -10,20 +10,33 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 {
     public static class TestDatabaseFactory
     {
+        /// <summary>
+        /// Creates a TestDatabase instance
+        /// </summary>
+        /// <remarks>
+        /// SQL Server setup requires configured master connection string &amp; privileges to create database.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// # SQL Server Environment variable setup
+        /// $ export Tests__Database__DatabaseType="SqlServer"
+        /// $ export Tests__Database__SQLServerMasterConnectionString="Server=localhost,1433; User Id=sa; Password=MySuperSecretPassword123!;"
+        /// </code>
+        /// </example>
+        /// <example>
+        /// <code>
+        /// # Docker cheat sheet
+        /// $ docker run -e 'ACCEPT_EULA=Y' -e "SA_PASSWORD=MySuperSecretPassword123!" -e 'MSSQL_PID=Developer' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+        /// </code>
+        /// </example>
         public static ITestDatabase Create(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactory, ILoggerFactory loggerFactory) =>
-            settings.Provider switch
+            settings.DatabaseType switch
             {
-                Persistence.Sqlite.Constants.ProviderName => new SqliteTestDatabase(settings, dbFactory, loggerFactory),
-                Core.Constants.DatabaseProviders.SqlServer => CreateSqlServer(settings, dbFactory, loggerFactory),
+                TestDatabaseSettings.TestDatabaseType.Sqlite=> new SqliteTestDatabase(settings, dbFactory, loggerFactory),
+                TestDatabaseSettings.TestDatabaseType.SqlServer => CreateSqlServer(settings, loggerFactory, dbFactory),
+                TestDatabaseSettings.TestDatabaseType.LocalDb => CreateLocalDb(settings, loggerFactory, dbFactory),
                 _ => throw new ApplicationException("Unsupported test database provider")
             };
-
-        private static ITestDatabase CreateSqlServer(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactory, ILoggerFactory loggerFactory)
-        {
-            return string.IsNullOrEmpty(settings.SQLServerMasterConnectionString)
-                ? CreateLocalDb(settings, loggerFactory, dbFactory)
-                : CreateSqlDeveloper(settings, loggerFactory, dbFactory);
-        }
 
         private static ITestDatabase CreateLocalDb(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
@@ -37,12 +50,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             return new LocalDbTestDatabase(settings, loggerFactory, localDb,  dbFactory.Create());
         }
 
-        private static ITestDatabase CreateSqlDeveloper(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+        private static ITestDatabase CreateSqlServer(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
-            // NOTE: Example setup for Linux box.
-            // $ export SA_PASSWORD=Foobar123!
-            // $ docker run -e 'ACCEPT_EULA=Y' -e "SA_PASSWORD=$SA_PASSWORD" -e 'MSSQL_PID=Developer' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest-ubuntu
-     
             return new SqlServerTestDatabase(settings, loggerFactory, dbFactory.Create());
         }
     }

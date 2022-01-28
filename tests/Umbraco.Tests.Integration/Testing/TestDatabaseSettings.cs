@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 {
     public class TestDatabaseSettings
     {
-        public string Provider { get; set; }
+        public TestDatabaseType DatabaseType { get; set; }
 
         public int PrepareThreadCount { get; set; }
 
@@ -17,5 +17,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         /// Only used for SQL Server e.g. on Linux/MacOS (not required for localdb).
         /// </remarks>
         public string SQLServerMasterConnectionString { get; set; }
+
+        public enum TestDatabaseType
+        {
+            Unknown,
+            Sqlite,
+            SqlServer,
+            LocalDb
+        }
     }
 }
