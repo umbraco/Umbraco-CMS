@@ -18,13 +18,17 @@
                 <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
             </div>
 
-            <umb-tracked-references id="currentNode.id" loading="checkingReferences" hide-no-result="true" warning-text="warningText"></umb-tracked-references>
+            <umb-tracked-references id="currentNode.id" on-loading-complete="checkingReferencesComplete()" hide-no-result="true" on-warning="onReferencesWarning()"></umb-tracked-references>
+
+            <div class="abstract umb-alert umb-alert--warning" ng-if="warningText">
+                {{warningText}}
+            </div>
 
             <div class="umb-alert umb-alert--warning" ng-show="currentNode.trashed">
                 <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
             </div>
 
-            <umb-confirm on-confirm="performDelete" confirm-button-style="danger" on-cancel="cancel"></umb-confirm>
+            <umb-confirm on-confirm="performDelete" confirm-button-style="danger" on-cancel="cancel" ng-hide="checkingReferences"></umb-confirm>
         </div>
 
     </div>

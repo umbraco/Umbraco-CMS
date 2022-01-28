@@ -18,11 +18,7 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
     }
 
     $scope.checkingReferences = true;
-    $scope.warningText = "The item or one of the underlying items is being used.";
-
-    localizationService.localize("references_deleteWarning").then(function (value) {
-        $scope.warningText = value;
-    });
+    $scope.warningText = null;
     
     $scope.performDelete = function() {
 
@@ -82,6 +78,16 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
             }
         });
 
+    };
+
+    $scope.checkingReferencesComplete = () => {
+        $scope.checkingReferences = false;
+    };
+
+    $scope.onReferencesWarning = () => {
+        localizationService.localize("references_deleteWarning").then((value) => {
+            $scope.warningText = value;
+        });
     };
 
     $scope.cancel = function() {
