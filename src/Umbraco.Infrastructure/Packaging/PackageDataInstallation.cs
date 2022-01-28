@@ -606,14 +606,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         current = _contentTypeService.GetContainer(rootFolderKey.Value);
                     }
 
-                    // The folder might already exists, but with a different key, so check if it exists, even if there is a key.
+                    // The folder might already exist, but with a different key, so check if it exists, even if there is a key.
                     // Level 1 = root level folders, there can only be one with the same name
                     current ??= _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                     if (current == null)
                     {
-                        Attempt<OperationResult<OperationResultType, EntityContainer>> tryCreateFolder =
-                            _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
+                        Attempt<OperationResult<OperationResultType, EntityContainer>> tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
+
                         if (tryCreateFolder == false)
                         {
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
