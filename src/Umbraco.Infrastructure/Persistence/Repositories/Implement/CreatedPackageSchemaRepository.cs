@@ -168,10 +168,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 };
 
                 // Set the ids, we have to save in database first to get the Id
-                definition.PackageId = dto.PackageId;
-                var result = _umbracoDatabase.Insert(dto);
-                var decimalResult = result.SafeCast<decimal>();
-                definition.Id = decimal.ToInt32(decimalResult);
+                _umbracoDatabase.Insert(dto);
+                definition.Id = dto.Id;
             }
 
             // Save snapshot locally, we do this to the updated packagePath
