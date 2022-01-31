@@ -24,9 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
             if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
 
-            return database.DatabaseType.IsSqlServer2008OrLater()
-                ? BulkInsertRecordsSqlServer(database, pocoData, recordsA)
-                : BasicBulkSqlInsertProvider.BulkInsertRecordsWithCommands(database, recordsA);
+            return BulkInsertRecordsSqlServer(database, pocoData, recordsA);
         }
 
         /// <summary>

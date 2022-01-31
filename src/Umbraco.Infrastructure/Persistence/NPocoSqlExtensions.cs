@@ -1076,7 +1076,7 @@ namespace Umbraco.Extensions
 
         public static Sql<ISqlContext> AppendUpdlockHint(this Sql<ISqlContext> sql)
         {
-            if (sql.SqlContext.DatabaseType.IsSqlServerOrCe())
+            if (sql.SqlContext.DatabaseType.IsSqlServer())
             {
                 sql.Append(" WITH (UPDLOCK) ");
             }

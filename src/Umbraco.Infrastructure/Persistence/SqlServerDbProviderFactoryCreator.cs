@@ -8,6 +8,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
+    // TODO: PMJ try remove this?
     [Obsolete("This is only used for integration tests and should be moved into a test project.")]
     public class SqlServerDbProviderFactoryCreator : IDbProviderFactoryCreator
     {
@@ -31,7 +32,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName)
             => providerName switch
             {
-                Cms.Core.Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
                 Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerSyntaxProvider(_globalSettings),
                 _ => throw new InvalidOperationException($"Unknown provider name \"{providerName}\""),
             };
@@ -39,9 +39,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public IBulkSqlInsertProvider CreateBulkSqlInsertProvider(string providerName)
             => providerName switch
             {
-                Cms.Core.Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
                 Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerBulkSqlInsertProvider(),
-                _ => new BasicBulkSqlInsertProvider(),
+                _ => throw new InvalidOperationException($"Unknown provider name \"{providerName}\""),
             };
 
         public void CreateDatabase(string providerName, string connectionString)

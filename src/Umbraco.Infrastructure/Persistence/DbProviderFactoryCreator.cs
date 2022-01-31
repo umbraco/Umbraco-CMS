@@ -50,10 +50,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         public IBulkSqlInsertProvider CreateBulkSqlInsertProvider(string providerName)
         {
-
             if (!_bulkSqlInsertProviders.TryGetValue(providerName, out var result))
             {
-                return new BasicBulkSqlInsertProvider();
+                throw new InvalidOperationException($"Unknown provider name \"{providerName}\"");
             }
 
             return result;

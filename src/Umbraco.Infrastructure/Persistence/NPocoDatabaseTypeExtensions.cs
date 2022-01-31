@@ -1,9 +1,11 @@
-﻿using NPoco;
+﻿using System;
+using NPoco;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
     internal static class NPocoDatabaseTypeExtensions
     {
+        [Obsolete("Usage of this method indicates a code smell.")]
         public static bool IsSqlServer(this DatabaseType databaseType)
         {
             // note that because SqlServerDatabaseType is the base class for
@@ -12,29 +14,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             return databaseType is NPoco.DatabaseTypes.SqlServerDatabaseType;
         }
 
-        public static bool IsSqlServer2008OrLater(this DatabaseType databaseType)
-        {
-            return databaseType is NPoco.DatabaseTypes.SqlServer2008DatabaseType;
-        }
-
-        public static bool IsSqlServer2012OrLater(this DatabaseType databaseType)
-        {
-            return databaseType is NPoco.DatabaseTypes.SqlServer2012DatabaseType;
-        }
-
+        [Obsolete("Usage of this method indicates a code smell.")]
         public static bool IsSqlCe(this DatabaseType databaseType)
         {
             return databaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType;
         }
 
+        [Obsolete("Usage of this method indicates a code smell.")]
         public static bool IsSqlite(this DatabaseType databaseType)
         {
             return databaseType is NPoco.DatabaseTypes.SQLiteDatabaseType;
-        }
-
-        public static bool IsSqlServerOrCe(this DatabaseType databaseType)
-        {
-            return databaseType.IsSqlServer() || databaseType.IsSqlCe();
         }
     }
 }

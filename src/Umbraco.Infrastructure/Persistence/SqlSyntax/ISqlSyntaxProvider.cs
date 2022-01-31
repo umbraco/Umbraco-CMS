@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// <param name="constraintName">The constraint name.</param>
         /// <returns>A value indicating whether a default constraint was found.</returns>
         /// <remarks>
-        /// <para>Some database engines (e.g. SqlCe) may not have names for default constraints,
+        /// <para>Some database engines may not have names for default constraints,
         /// in which case the function may return true, but <paramref name="constraintName"/> is
         /// unspecified.</para>
         /// </remarks>

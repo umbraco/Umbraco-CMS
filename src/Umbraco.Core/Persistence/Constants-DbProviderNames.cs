@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Core
         public static class DbProviderNames
         {
             public const string SqlServer = "Microsoft.Data.SqlClient";
-            public const string SqlCe = "System.Data.SqlServerCe.4.0";
         }
     }
 }
