@@ -56,7 +56,7 @@ stages:
                   displayName: dotnet build
                   inputs:
                       command: build
-                      projects: '**/umbraco-netcore-only.sln'
+                      projects: '**/umbraco.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
@@ -76,7 +76,7 @@ stages:
                   displayName: dotnet build
                   inputs:
                       command: build
-                      projects: '**/umbraco-netcore-only.sln'
+                      projects: '**/umbraco.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
@@ -123,7 +123,7 @@ stages:
                 displayName: dotnet build
                 inputs:
                     command: build
-                    projects: '**/umbraco-netcore-only.sln'
+                    projects: '**/umbraco.sln'
               - task: DotNetCoreCLI@2
                 displayName: dotnet test
                 inputs:
@@ -149,7 +149,7 @@ stages:
               displayName: dotnet build
               inputs:
                 command: build
-                projects: '**/umbraco-netcore-only.sln'
+                projects: '**/umbraco.sln'
             - task: DotNetCoreCLI@2
               displayName: dotnet test
               inputs:
@@ -174,7 +174,7 @@ stages:
                 displayName: dotnet build
                 inputs:
                     command: build
-                    projects: '**/umbraco-netcore-only.sln'
+                    projects: '**/umbraco.sln'
               - task: DotNetCoreCLI@2
                 displayName: dotnet test
                 inputs:
