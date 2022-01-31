@@ -7,8 +7,6 @@
 
     <ItemGroup>
         <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-        <PackageReference Include="Umbraco.Cms.SqlCe" Version="UMBRACO_VERSION_FROM_TEMPLATE" Condition="'$(UseSqlCe)' == 'true'" />
-        <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
     </ItemGroup>
 
     <!-- Force windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older windows 10 and most if not all winodws servers will run NLS -->
