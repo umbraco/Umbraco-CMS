@@ -36,13 +36,13 @@ public class GlobalSetupTeardown
         var databaseType = TestConfiguration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
         var version = testHelper.GetUmbracoVersion().SemanticVersion;
 
-        TestContext.Progress.WriteLine($"*********************************************************");
+        TestContext.Progress.WriteLine($"******************************************************************************");
         TestContext.Progress.WriteLine($"* Umbraco.Tests.Integration");
         TestContext.Progress.WriteLine($"*");
-        TestContext.Progress.WriteLine($"* DatabaseType: {databaseType}");
-        TestContext.Progress.WriteLine($"* Umbraco Version: {version.ToString().Split('+').First()}");
-        TestContext.Progress.WriteLine($"* WorkingDirectory: {testHelper.WorkingDirectory}");
-        TestContext.Progress.WriteLine($"*********************************************************");
+        TestContext.Progress.WriteLine($"* DatabaseType     : {databaseType}");
+        TestContext.Progress.WriteLine($"* UmbracoVersion   : {version.ToString().Split('+').First()}");
+        TestContext.Progress.WriteLine($"* WorkingDirectory : {testHelper.WorkingDirectory}");
+        TestContext.Progress.WriteLine($"******************************************************************************");
 
         _stopwatch = Stopwatch.StartNew();
     }
