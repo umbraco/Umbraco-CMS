@@ -183,6 +183,13 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             // Update application main URL
             if (_applicationUrls.TryAdd(currentApplicationUrl))
             {
+                // Do not downgrade existing secure main URL to non-secure protocol
+                if (currentApplicationUrl.Scheme == Uri.UriSchemeHttp &&
+                    ApplicationMainUrl?.Scheme == Uri.UriSchemeHttps)
+                {
+                    return;
+                }
+
                 // Check if application URL is known by the server
                 var serverAddresses = _server?.Features.Get<IServerAddressesFeature>()?.Addresses;
                 if (serverAddresses is not null)
