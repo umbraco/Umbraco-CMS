@@ -78,8 +78,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
                 return Task.CompletedTask;
             }
 
-            // If we're the IServerRoleAccessor has been changed away from ElectedServerRoleAccessor
-            // this task no longer makes sense, since all it's used for is to allow the ElectedServerRoleAccessor
+            // If the IServerRoleAccessor has been changed away from ElectedServerRoleAccessor this task no longer makes sense,
+            // since all it's used for is to allow the ElectedServerRoleAccessor
             // to figure out what role a given server has, so we just stop this task.
             if (_serverRoleAccessor is not ElectedServerRoleAccessor)
             {
