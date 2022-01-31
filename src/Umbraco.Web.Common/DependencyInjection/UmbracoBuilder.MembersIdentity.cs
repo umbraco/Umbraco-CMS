@@ -51,7 +51,8 @@ namespace Umbraco.Extensions
                     factory.GetRequiredService<IScopeProvider>(),
                     factory.GetRequiredService<IdentityErrorDescriber>(),
                     factory.GetRequiredService<IPublishedSnapshotAccessor>(),
-                    factory.GetRequiredService<IExternalLoginWithKeyService>()
+                    factory.GetRequiredService<IExternalLoginWithKeyService>(),
+                    factory.GetRequiredService<ITwoFactorLoginService>()
                 ))
                 .AddRoleStore<MemberRoleStore>()
                 .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
@@ -63,6 +64,7 @@ namespace Umbraco.Extensions
 
 
             builder.AddNotificationHandler<MemberDeletedNotification, DeleteExternalLoginsOnMemberDeletedHandler>();
+            builder.AddNotificationAsyncHandler<MemberDeletedNotification, DeleteTwoFactorLoginsOnMemberDeletedHandler>();
             services.ConfigureOptions<ConfigureMemberIdentityOptions>();
 
             services.AddScoped<IMemberUserStore>(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());

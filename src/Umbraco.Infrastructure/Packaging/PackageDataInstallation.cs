@@ -575,21 +575,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             var importedFolders = new Dictionary<string, int>();
             var trackEntityContainersInstalled = new List<EntityContainer>();
-            foreach (var documentType in unsortedDocumentTypes)
+
+            foreach (XElement documentType in unsortedDocumentTypes)
             {
-                var foldersAttribute = documentType.Attribute("Folders");
-                var infoElement = documentType.Element("Info");
+                XAttribute foldersAttribute = documentType.Attribute("Folders");
+                XElement infoElement = documentType.Element("Info");
                 if (foldersAttribute != null && infoElement != null
-                    //don't import any folder if this is a child doc type - the parent doc type will need to
-                    //exist which contains it's folders
+                    // don't import any folder if this is a child doc type - the parent doc type will need to
+                    // exist which contains it's folders
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
 
-                    var folderKeysAttribute = documentType.Attribute("FolderKeys");
+                    XAttribute folderKeysAttribute = documentType.Attribute("FolderKeys");
 
-                    var folderKeys = Array.Empty<Guid>();
+                    Guid[] folderKeys = Array.Empty<Guid>();
                     if (folderKeysAttribute != null)
                     {
                         folderKeys = folderKeysAttribute.Value.Split(Constants.CharArrays.ForwardSlash).Select(x=>Guid.Parse(x)).ToArray();
@@ -597,22 +598,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                     var rootFolder = WebUtility.UrlDecode(folders[0]);
 
-                    EntityContainer current;
+                    EntityContainer current = null;
                     Guid? rootFolderKey = null;
                     if (folderKeys.Length == folders.Length && folderKeys.Length > 0)
                     {
                         rootFolderKey = folderKeys[0];
                         current = _contentTypeService.GetContainer(rootFolderKey.Value);
                     }
-                    else
-                    {
-                        //level 1 = root level folders, there can only be one with the same name
-                        current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
-                    }
+
+                    // The folder might already exist, but with a different key, so check if it exists, even if there is a key.
+                    // Level 1 = root level folders, there can only be one with the same name
+                    current ??= _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                     if (current == null)
                     {
-                        var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
+                        Attempt<OperationResult<OperationResultType, EntityContainer>> tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
+
                         if (tryCreateFolder == false)
                         {
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
@@ -644,7 +645,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer CreateContentTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             var children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName) ||x.Key.Equals(folderKey));
+            var found = children.Any(x => x.Name.InvariantEquals(folderName) || x.Key.Equals(folderKey));
             if (found)
             {
                 var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;

@@ -91,8 +91,8 @@
     <Message Text="-CheckPreconditions-" Importance="high" />
     <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
     <Message Text="BellePath:       $(BellePath)" Importance="high" />
-
-   <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
+    
+    <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
     <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip Belle because $(BellePath) exists." Importance="High" Condition="Exists('$(BellePath)')" />
     <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
