@@ -130,10 +130,7 @@ namespace Umbraco.Extensions
             this IUmbracoBuilder builder)
         {
             builder.Services.TryAddTransient(sp =>
-            {
-                IUserDataService userDataService = sp.GetRequiredService<IUserDataService>();
-                return ActivatorUtilities.CreateInstance<CurrentUserController>(sp, userDataService);
-            });
+                ActivatorUtilities.CreateInstance<CurrentUserController>(sp));
 
             return builder;
         }
