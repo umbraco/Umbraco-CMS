@@ -68,12 +68,6 @@
             "replaces":"PackageTestSiteName",
             "description": "The name of the package this should be a test site for (Default: '')"
         },
-        "UseSqlCe":{
-            "type": "parameter",
-            "datatype":"bool",
-            "defaultValue": "false",
-            "description": "Adds the required dependencies to use SqlCE (Windows only) (Default: false)"
-        },
         "Framework": {
             "type": "parameter",
             "description": "The target framework for the project",
