@@ -81,7 +81,7 @@
     <PackageReference Include="AutoFixture.NUnit3" Version="4.17.0" />
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.17.0" />
     <PackageReference Include="Castle.Core" Version="4.4.1" />
-    <PackageReference Include="Examine" Version="1.2.0" />
+    <PackageReference Include="Examine" Version="1.2.2" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
     </PackageReference>
