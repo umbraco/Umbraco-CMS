@@ -42,7 +42,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/umbraco-netcore-only.sln",
+                "${workspaceFolder}/src/umbraco.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

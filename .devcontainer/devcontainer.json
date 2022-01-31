@@ -21,7 +21,7 @@
 				"profileName": "mssql-container"
 			}
 		],
-		"omnisharp.defaultLaunchSolution": "umbraco-netcore-only.sln",
+		"omnisharp.defaultLaunchSolution": "umbraco.sln",
 		"omnisharp.enableDecompilationSupport": true,
 		"omnisharp.enableRoslynAnalyzers": true
 	},
