@@ -111,13 +111,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         /// </summary>
         public override object ViewModel
         {
+            // TODO: PMJ - SQLite/Generic
             get
             {
                 return new
                 {
                     minCharLength = _passwordConfiguration.RequiredLength,
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
-                    quickInstallAvailable = DatabaseConfigureStep.IsSqlCeAvailable() || DatabaseConfigureStep.IsLocalDbAvailable(),
+                    quickInstallAvailable = DatabaseConfigureStep.IsLocalDbAvailable(),
                     customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
                 };
             }

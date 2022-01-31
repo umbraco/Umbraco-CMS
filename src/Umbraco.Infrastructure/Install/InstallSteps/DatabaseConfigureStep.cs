@@ -40,10 +40,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 {
                     database.DatabaseType = DatabaseType.SqlLocalDb;
                 }
-                else if (IsSqlCeAvailable())
-                {
-                    database.DatabaseType = DatabaseType.SqlCe;
-                }
             }
 
             if (_databaseBuilder.CanConnect(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
@@ -58,6 +54,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         private void ConfigureConnection(DatabaseModel database)
         {
+            // TODO: PMJ - SQLite/Generic
             if (database.ConnectionString.IsNullOrWhiteSpace() == false)
             {
                 _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString);
@@ -65,10 +62,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             else if (database.DatabaseType == DatabaseType.SqlLocalDb)
             {
                 _databaseBuilder.ConfigureSqlLocalDbDatabaseConnection();
-            }
-            else if (database.DatabaseType == DatabaseType.SqlCe)
-            {
-                _databaseBuilder.ConfigureEmbeddedDatabaseConnection();
             }
             else if (database.IntegratedAuth)
             {
@@ -85,6 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override object ViewModel
         {
+            // TODO: PMJ - SQLite/Generic
             get
             {
                 var databases = new List<object>()
@@ -93,11 +87,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     new { name = "Microsoft SQL Azure", id = DatabaseType.SqlAzure.ToString() },
                     new { name = "Custom connection string", id = DatabaseType.Custom.ToString() },
                 };
-
-                if (IsSqlCeAvailable())
-                {
-                    databases.Insert(0,  new { name = "Microsoft SQL Server Compact (SQL CE)", id = DatabaseType.SqlCe.ToString() });
-                }
 
                 if (IsLocalDbAvailable())
                 {
@@ -113,13 +102,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         }
 
         public static bool IsLocalDbAvailable() => new LocalDb().IsAvailable;
-
-        public static bool IsSqlCeAvailable() =>
-            // NOTE: Type.GetType will only return types that are currently loaded into the appdomain. In this case
-            // that is ok because we know if this is availalbe we will have manually loaded it into the appdomain.
-            // Else we'd have to use Assembly.LoadFrom and need to know the DLL location here which we don't need to do.
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
-            !(Type.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
 
         public override string View => ShouldDisplayView() ? base.View : "";
 

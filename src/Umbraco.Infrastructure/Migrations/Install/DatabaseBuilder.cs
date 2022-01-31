@@ -85,8 +85,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </summary>
         public bool CanConnect(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
         {
-            // we do not test SqlCE or LocalDB connections
-            if (databaseType.InvariantContains("SqlCe") || databaseType.InvariantContains("SqlLocalDb"))
+            // we do not test LocalDB connections
+            if (databaseType.InvariantContains("SqlLocalDb"))
                 return true;
 
             string providerName;
@@ -148,18 +148,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         #region Configure Connection String
 
         public const string EmbeddedDatabaseConnectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1";
-
-        /// <summary>
-        /// Configures a connection string for the embedded database.
-        /// </summary>
-        public void ConfigureEmbeddedDatabaseConnection()
-        {
-            const string connectionString = EmbeddedDatabaseConnectionString;
-            const string providerName = Constants.DbProviderNames.SqlCe;
-
-            _configManipulator.SaveConnectionString(connectionString, providerName);
-            Configure(connectionString, providerName, true);
-        }
 
         public const string LocalDbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True";
 

@@ -4,7 +4,6 @@
     {
         public static class DatabaseProviders
         {
-            public const string SqlCe = "System.Data.SqlServerCe.4.0";
             public const string SqlServer = "Microsoft.Data.SqlClient";
         }
     }

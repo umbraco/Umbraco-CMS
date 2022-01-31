@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         protected void AppendStatementSeparator(StringBuilder stmtBuilder)
         {
             stmtBuilder.AppendLine(";");
-            if (DatabaseType.IsSqlServerOrCe())
+            if (DatabaseType.IsSqlServer())
                 stmtBuilder.AppendLine("GO");
         }
 

@@ -211,7 +211,7 @@ WHERE r.tagId IS NULL";
                 }
 
                 // HACK: SQLite (or rather SQL server setup was a hack)
-                if (SqlContext.DatabaseType.IsSqlServerOrCe())
+                if (SqlContext.DatabaseType.IsSqlServer())
                 {
                     sql.Append("SELECT N'");
                 }
