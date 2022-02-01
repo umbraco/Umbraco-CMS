@@ -37,6 +37,11 @@ namespace Umbraco.Core
             public static class Aliases
             {
                 /// <summary>
+                /// Block List.
+                /// </summary>
+                public const string BlockList = "Umbraco.BlockList";
+
+                /// <summary>
                 /// CheckBox List.
                 /// </summary>
                 public const string CheckBoxList = "Umbraco.CheckBoxList";
@@ -45,6 +50,11 @@ namespace Umbraco.Core
                 /// Color Picker.
                 /// </summary>
                 public const string ColorPicker = "Umbraco.ColorPicker";
+
+                /// <summary>
+                /// EyeDropper Color Picker.
+                /// </summary>
+                public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
 
                 /// <summary>
                 /// Content Picker.
@@ -85,11 +95,16 @@ namespace Umbraco.Core
                 /// ListView.
                 /// </summary>
                 public const string ListView = "Umbraco.ListView";
-                
+
                 /// <summary>
                 /// Media Picker.
                 /// </summary>
                 public const string MediaPicker = "Umbraco.MediaPicker";
+
+                /// <summary>
+                /// Media Picker v.3.
+                /// </summary>
+                public const string MediaPicker3 = "Umbraco.MediaPicker3";
 
                 /// <summary>
                 /// Multiple Media Picker.
@@ -187,7 +202,7 @@ namespace Umbraco.Core
                 public const string NestedContent = "Umbraco.NestedContent";
 
                 /// <summary>
-                /// Alias for the multi url picker editor.
+                /// Alias for the multi URL picker editor.
                 /// </summary>
                 public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
             }

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Tests.Testing.Objects
 {
+
     internal class TestDataSource : IDataSource
     {
         public TestDataSource(params ContentNodeKit[] kits)

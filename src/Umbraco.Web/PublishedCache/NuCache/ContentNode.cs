@@ -109,6 +109,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // everything that is common to both draft and published versions
         // keep this as small as possible
+
+        
         public readonly int Id;
         public readonly Guid Uid;
         public IPublishedContentType ContentType;
@@ -116,10 +118,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public readonly string Path;
         public readonly int SortOrder;
         public readonly int ParentContentId;
+
+        // TODO: Can we make everything readonly?? This would make it easier to debug and be less error prone especially for new developers.
+        // Once a Node is created and exists in the cache it is readonly so we should be able to make that happen at the API level too.
         public int FirstChildContentId;
         public int LastChildContentId;
         public int NextSiblingContentId;
         public int PreviousSiblingContentId;
+
         public readonly DateTime CreateDate;
         public readonly int CreatorId;
 

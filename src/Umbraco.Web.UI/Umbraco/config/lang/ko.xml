@@ -67,7 +67,7 @@
     <key alias="save">저장</key>
     <key alias="saveAndPublish">저장 후 발행</key>
     <key alias="saveToPublish">저장 후 승인을 위해 전송</key>
-    <key alias="showPage">미리보기</key>
+    <key alias="saveAndPreview">미리보기</key>
     <key alias="styleChoose">스타일 선택</key>
     <key alias="styleShow">스타일 보기</key>
     <key alias="tableInsert">테이블 삽입</key>
@@ -180,8 +180,8 @@
     <key alias="recycleBinDeleting">휴지통안에 이 항목들이 완전히 삭제중 입니다. 작업이 완료되기전까지 창을 닫지마세요.</key>
     <key alias="recycleBinIsEmpty">휴지통이 비었습니다.</key>
     <key alias="recycleBinWarning">휴지통에서 삭제하시면 완전히 삭제됩니다.</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>의 웹서비스는 현재 제어할 수 없는 몇가지 문제점이 보고되었습니다. 불편을 드려 대단히 죄송합니다.]]></key>
-    <key alias="regexSearchHelp">필드 유효성검사를 위해 정규표현식을 검색합니다. 예: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>의 웹서비스는 현재 제어할 수 없는 몇가지 문제점이 보고되었습니다. 불편을 드려 대단히 죄송합니다.]]></key>
+    <key alias="regexSearchHelp">필드 유효성검사를 위해 정규표현식을 검색합니다. 예: 'email, 'zip-code' 'URL'</key>
     <key alias="removeMacro">매크로 삭제</key>
     <key alias="requiredField">필수 필드</key>
     <key alias="sitereindexed">사이트의 색인이 재생성되었습니다.</key>
@@ -326,7 +326,7 @@
     <key alias="update">업데이트</key>
     <key alias="upgrade">업그레이드</key>
     <key alias="upload">업로드</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">사용자</key>
     <key alias="username">사용자</key>
     <key alias="value">값</key>
@@ -357,8 +357,8 @@
     <key alias="databaseNotFound"><![CDATA[<p>데이터베이스를 찾을 수 없습니다. “web.config”파일의 "connection string"이 바르게 설정되었는지 확인하세요.</p>
             <p>"web.config" 파일에 맨아래에 ,키네임을 "UmbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
             <p>
-            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-		               web.config의 더많은 정보는 여기에 있습니다.</a></p>]]></key>
+            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+		               web.config의 더많은 정보는 여기에 있습니다</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[이과정을 위해선, 당신의 DB서버 정보에 대해서 알고 계셔야합니다.("connection string").<br />
       필요하시다면 사용하시는 ISP쪽에 문의하시기 바랍니다..
       로컬 머신이나 서버에 설치되어 있다면 해당 시스템 관리자에게 문의하시기 바랍니다.]]></key>
@@ -395,7 +395,7 @@
     <key alias="runwayFromScratch">scratch를 시작하기 원합니다.</key>
     <key alias="runwayFromScratchText"><![CDATA[
       사이트가 완전히 비어있는 상태입니다. 스크래치를 시작하시거나 문서유형, 템플릿을 만드시기에 완벽한 상태입니다.
-      (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+      (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
       Runway설치를 나중에 실행하실 수 있습니다. 개발도구 부분에서 패키지를 선택하세요.
     ]]></key>
     <key alias="runwayHeader">여러분은 Umbraco 플랫폼 설치를 완료하였습니다. 다음엔 어떤 작업을 원하십니까?</key>
@@ -452,7 +452,7 @@
     <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">대시보드</key>
@@ -815,7 +815,7 @@
     <key alias="administrators">관리자</key>
     <key alias="categoryField">카테고리 필드</key>
     <key alias="changePassword">Change Your Password</key>
-    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
+    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">컨텐츠 채널</key>
     <key alias="descriptionField">설명 필드</key>
     <key alias="disabled">사용자 비활성화</key>
@@ -844,5 +844,9 @@
     <key alias="usertype">사용자 타입</key>
     <key alias="userTypes">사용자 타입</key>
     <key alias="writer">작성자</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">모두 선택</key>
+    <key alias="deselectAllLogLevelFilters">모두 선택 해제</key>
   </area>
 </language>

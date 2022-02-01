@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerSearchController($location, logViewerResource, overlayService) {
+    function LogViewerSearchController($location, $timeout, logViewerResource, overlayService, localizationService) {
 
         var vm = this;
 
@@ -16,29 +16,106 @@
         vm.logLevels = [
             {
                 name: 'Verbose',
-                logTypeColor: ''
-            },
-            {
-                name: 'Debug',
                 logTypeColor: 'gray'
             },
             {
+                name: 'Debug',
+                logTypeColor: 'info'
+            },
+            {
                 name: 'Information',
-                logTypeColor: 'success' 
+                logTypeColor: 'success'
             },
             {
                 name: 'Warning',
-                logTypeColor: 'primary'
-            },
-            {
-                name: 'Error',
                 logTypeColor: 'warning'
             },
             {
-                name: 'Fatal',
+                name: 'Error',
                 logTypeColor: 'danger'
+            },
+            {
+                name: 'Fatal',
+                logTypeColor: 'dark'
             }
         ];
+
+        vm.polling = {
+            enabled: false,
+            interval: 0,
+            promise: null,
+
+            defaultButton: {
+                labelKey: "logViewer_polling",
+                handler: function() {
+                    if (vm.polling.enabled) {
+                        vm.polling.enabled = false;
+                        vm.polling.interval = 0;
+                        vm.polling.defaultButton.icon = null;
+                        vm.polling.defaultButton.labelKey = "logViewer_polling";
+                    }
+                    else {
+                        vm.polling.subButtons[0].handler();
+                    }
+                }
+            },
+            subButtons: [
+                {
+                    labelKey: "logViewer_every2",
+                    handler: function() {
+                        enablePolling(2);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every5",
+                    handler: function() {
+                        enablePolling(5);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every10",
+                    handler: function() {
+                        enablePolling(10);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every20",
+                    handler: function() {
+                        enablePolling(20);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every30",
+                    handler: function() {
+                        enablePolling(30);
+                    }
+                }
+            ]
+
+        }
+
+        function enablePolling(interval) {
+            vm.polling.enabled = true;
+            vm.polling.interval = interval;
+            vm.polling.defaultButton.icon = "icon-axis-rotation fa-spin";
+            vm.polling.defaultButton.labelKey = "logViewer_pollingEvery" + interval;
+
+            if (vm.polling.promise)
+            {
+                $timeout.cancel(vm.polling.promise);
+            }
+            vm.polling.promise = poll(interval);
+        }
+
+        function poll(interval) {
+            vm.polling.promise = $timeout(function() {
+                getLogs(true, true);
+                if (vm.polling.enabled && vm.polling.interval > 0) {
+                    poll(vm.polling.interval);
+                }
+            }, interval*1000);
+        }
+
 
         vm.searches = [];
 
@@ -47,7 +124,6 @@
         vm.logOptions.orderDirection = 'Descending';
 
         vm.fromDatePickerConfig = {
-            pickDate: true,
             pickTime: true,
             useSeconds: false,
             useCurrent: false,
@@ -61,7 +137,6 @@
         };
 
         vm.toDatePickerConfig = {
-            pickDate: true,
             pickTime: true,
             useSeconds: false,
             format: "YYYY-MM-DD HH:mm",
@@ -79,6 +154,8 @@
         vm.search = search;
         vm.getFilterName = getFilterName;
         vm.setLogLevelFilter = setLogLevelFilter;
+        vm.selectAllLogLevelFilters = selectAllLogLevelFilters;
+        vm.deselectAllLogLevelFilters = deselectAllLogLevelFilters;
         vm.toggleOrderBy = toggleOrderBy;
         vm.selectSearch = selectSearch;
         vm.resetSearch = resetSearch;
@@ -138,11 +215,12 @@
                         "name": "Find all logs that use a specific log message template",
                         "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
                     }
-                ]
+                ];
             });
 
             //Get all logs on init load
             getLogs();
+
         }
 
 
@@ -160,10 +238,17 @@
             getLogs();
         }
 
-        function getLogs(){
-            vm.logsLoading = true;
+        function getLogs(hideLoadingIndicator, keepOpenItems){
+            vm.logsLoading = !hideLoadingIndicator;
 
             logViewerResource.getLogs(vm.logOptions).then(function (data) {
+                if (keepOpenItems) {
+                    var openItemTimestamps = vm.logItems.items.filter(item => item.open).map(item => item.Timestamp);
+                    data.items = data.items.map(item => {
+                        item.open = openItemTimestamps.indexOf(item.Timestamp) > -1;
+                        return item;
+                    });
+                }
                 vm.logItems = data;
                 vm.logsLoading = false;
 
@@ -174,14 +259,14 @@
         }
 
         function setLogTypeColor(logItems) {
-            logItems.forEach(logItem => 
+            logItems.forEach(logItem =>
                 logItem.logTypeColor = vm.logLevels.find(x => x.name === logItem.Level).logTypeColor);
         }
 
         function getFilterName(array) {
             var name = "All";
             var found = false;
-            angular.forEach(array, function (item) {
+            array.forEach(function (item) {
                 if (item.selected) {
                     if (!found) {
                         name = item.name
@@ -206,6 +291,24 @@
                 var index = vm.logOptions.logLevels.indexOf(logLevel.name);
                 vm.logOptions.logLevels.splice(index, 1);
             }
+
+            getLogs();
+        }
+
+        function updateAllLogLevelFilterCheckboxes(bool) {
+            vm.logLevels.forEach(logLevel => logLevel.selected = bool);
+        }
+
+        function selectAllLogLevelFilters() {
+            vm.logOptions.logLevels = vm.logLevels.map(logLevel => logLevel.name);
+            updateAllLogLevelFilterCheckboxes(true);
+
+            getLogs();
+        }
+
+        function deselectAllLogLevelFilters() {
+            vm.logOptions.logLevels = [];
+            updateAllLogLevelFilterCheckboxes(false);
 
             getLogs();
         }
@@ -255,43 +358,47 @@
 
         function addToSavedSearches(){
 
-            var overlay = {
+            const overlay = {
                 title: "Save Search",
-                subtitle: "Enter a friendly name for your search query",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
                 view: "logviewersearch",
-                query: {
-                    filterExpression: vm.logOptions.filterExpression,
-                    startDate: vm.logOptions.startDate,
-                    endDate: vm.logOptions.endDate
-                },
+                query: vm.logOptions.filterExpression,
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
-                    logViewerResource.postSavedSearch(model.name, model.query).then(function(data){
+                    logViewerResource.postSavedSearch(model.queryName, model.query).then(function(data){
                         vm.searches = data;
                         overlayService.close();
                     });
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => overlayService.close()
             };
 
-            overlayService.open(overlay);
+            var labelKeys = [
+                "general_cancel",
+                "logViewer_saveSearch",
+                "logViewer_saveSearchDescription"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                overlay.title = values[1];
+                overlay.subtitle = values[2],
+                overlay.submitButtonLabel = values[1],
+                overlay.closeButtonLabel = values[0],
+
+                overlayService.open(overlay);
+            });
         }
 
         function deleteSavedSearch(searchItem) {
 
-            var overlay = {
+            const overlay = {
                 title: "Delete Saved Search",
-                subtitle: "Are you sure you wish to delete?",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Delete Saved Search",
                 submitButtonStyle: "danger",
-                view: "default",
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
@@ -300,12 +407,23 @@
                         overlayService.close();
                     });
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => overlayService.close()
             };
 
-            overlayService.open(overlay);
+            var labelKeys = [
+                "general_cancel",
+                "defaultdialogs_confirmdelete",
+                "logViewer_deleteSavedSearch"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                overlay.title = values[2];
+                overlay.subtitle = values[1];
+                overlay.submitButtonLabel = values[2];
+                overlay.closeButtonLabel = values[0];
+
+                overlayService.open(overlay);
+            });
         }
 
         function back() {
@@ -313,7 +431,6 @@
         }
 
         init();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.LogViewer.SearchController", LogViewerSearchController);

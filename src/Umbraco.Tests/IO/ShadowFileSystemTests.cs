@@ -238,7 +238,7 @@ namespace Umbraco.Tests.IO
             var sfs = new PhysicalFileSystem(path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
-            Assert.Throws<FileSecurityException>(() =>
+            Assert.Throws<UnauthorizedAccessException>(() =>
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                     ss.AddFile("../../f1.txt", ms);
@@ -887,12 +887,12 @@ namespace Umbraco.Tests.IO
         }
 
         /// <summary>
-        /// Ensure the url returned contains the path relative to the FS root,
+        /// Ensure the URL returned contains the path relative to the FS root,
         /// but including the rootUrl the FS was initialized with.
         /// </summary>
         /// <remarks>
         /// This file stuff in this test is kinda irrelevant with the current implementation.
-        /// We do tests that the files are written to the correct places and the url is returned correct,
+        /// We do tests that the files are written to the correct places and the URL is returned correct,
         /// but GetUrl is currently really just string manipulation so files are not actually hit by the code.
         /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
         /// </remarks>

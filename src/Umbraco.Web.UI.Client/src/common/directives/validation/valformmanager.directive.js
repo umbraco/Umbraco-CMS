@@ -12,50 +12,92 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService, localizationService) {
+function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService, localizationService, angularHelper) {
 
     var SHOW_VALIDATION_CLASS_NAME = "show-validation";
+    var SHOW_VALIDATION_Type_CLASS_NAME = "show-validation-type-";
     var SAVING_EVENT_NAME = "formSubmitting";
     var SAVED_EVENT_NAME = "formSubmitted";
+
+    function notify(scope) {
+        scope.$broadcast("valStatusChanged", { form: scope.formCtrl });
+    }
+
+    function ValFormManagerController($scope) {
+        //This exposes an API for direct use with this directive
+
+        // We need this as a way to reference this directive in the scope chain. Since this directive isn't a component and
+        // because it's an attribute instead of an element, we can't use controllerAs or anything like that. Plus since this is
+        // an attribute an isolated scope doesn't work so it's a bit weird. By doing this we are able to lookup the parent valFormManager
+        // in the scope hierarchy even if the DOM hierarchy doesn't match (i.e. in infinite editing)
+        $scope.valFormManager = this;
+
+        var unsubscribe = [];
+        var self = this;
+
+        //This is basically the same as a directive subscribing to an event but maybe a little
+        // nicer since the other directive can use this directive's API instead of a magical event
+        this.onValidationStatusChanged = function (cb) {
+            unsubscribe.push($scope.$on("valStatusChanged", function (evt, args) {
+                cb.apply(self, [evt, args]);
+            }));
+        };
+
+        this.isShowingValidation = () => $scope.showValidation === true;
+
+        this.getValidationMessageType = () => $scope.valMsgType;
+
+        this.notify = notify;
+
+        this.isValid = function () {
+            return !$scope.formCtrl.$invalid;
+        }
+
+        //Ensure to remove the event handlers when this instance is destroyted
+        $scope.$on('$destroy', function () {
+            for (var u in unsubscribe) {
+                unsubscribe[u]();
+            }
+        });
+    }
+
+    /**
+     * Find's the valFormManager in the scope/DOM hierarchy
+     * @param {any} scope
+     * @param {any} ctrls
+     * @param {any} index
+     */
+    function getAncestorValFormManager(scope, ctrls, index) {
+
+        // first check the normal directive inheritance which relies on DOM inheritance
+        var found = ctrls[index];
+        if (found) {
+            return found;
+        }
+
+        // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
+        // inheritance is (i.e.infinite editing)
+        var found = angularHelper.traverseScopeChain(scope, s => s && s.valFormManager && s.valFormManager.constructor.name === "ValFormManagerController");
+        return found ? found.valFormManager : null;
+    }
 
     return {
         require: ["form", "^^?valFormManager", "^^?valSubView"],
         restrict: "A",
-        controller: function($scope) {
-            //This exposes an API for direct use with this directive
-
-            var unsubscribe = [];
-            var self = this;
-
-            //This is basically the same as a directive subscribing to an event but maybe a little
-            // nicer since the other directive can use this directive's API instead of a magical event
-            this.onValidationStatusChanged = function (cb) {
-                unsubscribe.push($scope.$on("valStatusChanged", function(evt, args) {
-                    cb.apply(self, [evt, args]);
-                }));
-            };
-
-            this.showValidation = $scope.showValidation === true;
-
-            //Ensure to remove the event handlers when this instance is destroyted
-            $scope.$on('$destroy', function () {
-                for (var u in unsubscribe) {
-                    unsubscribe[u]();
-                }
-            });
-        },
+        controller: ValFormManagerController,
         link: function (scope, element, attr, ctrls) {
 
             function notifySubView() {
-                if (subView){
+                if (subView) {
                     subView.valStatusChanged({ form: formCtrl, showValidation: scope.showValidation });
                 }
             }
 
-            var formCtrl = ctrls[0];
-            var parentFormMgr = ctrls.length > 0 ? ctrls[1] : null;
+            var formCtrl = scope.formCtrl = ctrls[0];
+            var parentFormMgr = scope.parentFormMgr = getAncestorValFormManager(scope, ctrls, 1);
             var subView = ctrls.length > 1 ? ctrls[2] : null;
             var labels = {};
+            var valMsgType = 2;// error
 
             var labelKeys = [
                 "prompt_unsavedChanges",
@@ -71,46 +113,63 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 labels.stayButton = values[3];
             });
 
-            //watch the list of validation errors to notify the application of any validation changes
-            scope.$watch(function () {
-                //the validators are in the $error collection: https://docs.angularjs.org/api/ng/type/form.FormController#$error
-                //since each key is the validator name (i.e. 'required') we can't just watch the number of keys, we need to watch
-                //the sum of the items inside of each key
+            var lastValidationMessageType = null;
+            function setValidationMessageType(type) {
 
-                //get the lengths of each array for each key in the $error collection
-                var validatorLengths = _.map(formCtrl.$error, function (val, key) {
-                    // if there are child ng-forms, include the $error collections in those as well
-                    var innerErrorCount = _.reduce(
-                            _.map(val, v =>
-                                _.reduce(
-                                    _.map(v.$error, e => e.length),
-                                    (m, n) => m + n
-                                )
-                            ),
-                            (memo, num) => memo + num
-                        );
-                    return val.length + innerErrorCount;
+                removeValidationMessageType();
+                scope.valMsgType = type;
+
+                // overall a copy of message types from notifications.service:
+                var postfix = "";
+                switch(type) {
+                    case 0:
+                        //save
+                        break;
+                    case 1:
+                        //info
+                        postfix = "info";
+                        break;
+                    case 2:
+                        //error
+                        postfix = "error";
+                        break;
+                    case 3:
+                        //success
+                        postfix = "success";
+                        break;
+                    case 4:
+                        //warning
+                        postfix = "warning";
+                        break;
+                }
+                var cssClass = SHOW_VALIDATION_Type_CLASS_NAME+postfix;
+                element.addClass(cssClass);
+                lastValidationMessageType = cssClass;
+            }
+            function removeValidationMessageType() {
+                if(lastValidationMessageType) {
+                    element.removeClass(lastValidationMessageType);
+                    lastValidationMessageType = null;
+                }
+            }
+
+            // watch the list of validation errors to notify the application of any validation changes
+            scope.$watch(() => formCtrl.$invalid,
+                function (e) {
+
+                    notify(scope);
+
+                    notifySubView();
+
+                    //find all invalid elements' .control-group's and apply the error class
+                    var inError = element.find(".control-group .ng-invalid").closest(".control-group");
+                    inError.addClass("error");
+
+                    //find all control group's that have no error and ensure the class is removed
+                    var noInError = element.find(".control-group .ng-valid").closest(".control-group").not(inError);
+                    noInError.removeClass("error");
+
                 });
-                //sum up all numbers in the resulting array
-                var sum = _.reduce(validatorLengths, function (memo, num) {
-                    return memo + num;
-                }, 0);
-                //this is the value we watch to notify of any validation changes on the form
-                return sum;
-            }, function (e) {
-                scope.$broadcast("valStatusChanged", { form: formCtrl });
-
-                notifySubView();
-
-                //find all invalid elements' .control-group's and apply the error class
-                var inError = element.find(".control-group .ng-invalid").closest(".control-group");
-                inError.addClass("error");
-
-                //find all control group's that have no error and ensure the class is removed
-                var noInError = element.find(".control-group .ng-valid").closest(".control-group").not(inError);
-                noInError.removeClass("error");
-
-            });
 
             //This tracks if the user is currently saving a new item, we use this to determine
             // if we should display the warning dialog that they are leaving the page - if a new item
@@ -119,39 +178,47 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             var isSavingNewItem = false;
 
             //we should show validation if there are any msgs in the server validation collection
-            if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.showValidation)) {
+            if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.isShowingValidation())) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
+                var parentValMsgType = parentFormMgr ? parentFormMgr.getValidationMessageType() : 2;
+                setValidationMessageType(parentValMsgType || 2);
                 notifySubView();
             }
 
             var unsubscribe = [];
 
             //listen for the forms saving event
-            unsubscribe.push(scope.$on(SAVING_EVENT_NAME, function(ev, args) {
+            unsubscribe.push(scope.$on(SAVING_EVENT_NAME, function (ev, args) {
+
+                var messageType = 2;//error
+                switch (args.action) {
+                    case "save":
+                        messageType = 4;//warning
+                    break;
+                }
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
+                setValidationMessageType(messageType);
                 notifySubView();
                 //set the flag so we can check to see if we should display the error.
                 isSavingNewItem = $routeParams.create;
             }));
 
             //listen for the forms saved event
-            unsubscribe.push(scope.$on(SAVED_EVENT_NAME, function(ev, args) {
+            unsubscribe.push(scope.$on(SAVED_EVENT_NAME, function (ev, args) {
                 //remove validation class
                 element.removeClass(SHOW_VALIDATION_CLASS_NAME);
+                removeValidationMessageType();
                 scope.showValidation = false;
                 notifySubView();
-                //clear form state as at this point we retrieve new data from the server
-                //and all validation will have cleared at this point
-                formCtrl.$setPristine();
             }));
 
             var confirmed = false;
 
             //This handles the 'unsaved changes' dialog which is triggered when a route is attempting to be changed but
             // the form has pending changes
-            var locationEvent = $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
+            var locationEvent = $rootScope.$on('$locationChangeStart', function (event, nextLocation, currentLocation) {
 
                 var infiniteEditors = editorService.getEditors();
 
@@ -178,10 +245,10 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                             "disableEscKey": true,
                             "submitButtonLabel": labels.stayButton,
                             "closeButtonLabel": labels.discardChangesButton,
-                            submit: function() {
+                            submit: function () {
                                 overlayService.close();
                             },
-                            close: function() {
+                            close: function () {
                                 // close all editors
                                 editorService.closeAll();
                                 // allow redirection
@@ -190,7 +257,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                                 var parts = nextPath.split("?");
                                 var query = {};
                                 if (parts.length > 1) {
-                                    _.each(parts[1].split("&"), function(q) {
+                                    parts[1].split("&").forEach(q => {
                                         var keyVal = q.split("=");
                                         query[keyVal[0]] = keyVal[1];
                                     });
@@ -215,13 +282,15 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             unsubscribe.push(locationEvent);
 
             //Ensure to remove the event handler when this instance is destroyted
-            scope.$on('$destroy', function() {
+            scope.$on('$destroy', function () {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }
             });
 
-            $timeout(function(){
+            // TODO: I'm unsure why this exists, i believe this may be a hack for something like tinymce which might automatically
+            // change a form value on load but we need it to be $pristine?
+            $timeout(function () {
                 formCtrl.$setPristine();
             }, 1000);
 

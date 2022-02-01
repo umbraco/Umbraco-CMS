@@ -21,12 +21,12 @@ angular.module('umbraco')
 
         //combine the config with any values returned from the server
         if ($scope.model.config) {
-            angular.extend(config, $scope.model.config);
+            Utilities.extend(config, $scope.model.config);
         }
 
         if ($scope.model.value) {
 
-            if (Array.isArray($scope.model.value)) {
+            if (!Array.isArray($scope.model.value)) {
                 $scope.ids = $scope.model.value.split(",");
             } else {
                 $scope.ids.push($scope.model.value);
@@ -49,7 +49,7 @@ angular.module('umbraco')
             });
         }
 
-        $scope.openContentPicker = function () {
+        $scope.openTreePicker = function () {
             var treePicker = config;
             treePicker.section = config.type;
 
@@ -118,7 +118,7 @@ angular.module('umbraco')
         }
 
         function populate(data) {
-            if (angular.isArray(data)) {
+            if (Utilities.isArray(data)) {
                 _.each(data, function (item, i) {
                     $scope.add(item);
                 });

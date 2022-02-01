@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading;
 
 namespace Umbraco.Core.Models
 {
@@ -16,10 +15,6 @@ namespace Umbraco.Core.Models
     // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyTypeCollection : KeyedCollection<string, PropertyType>, INotifyCollectionChanged, IDeepCloneable
     {
-        [IgnoreDataMember]
-        private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
-
-
         internal PropertyTypeCollection(bool supportsPublishing)
         {
             SupportsPublishing = supportsPublishing;
@@ -87,36 +82,28 @@ namespace Umbraco.Core.Models
             item.SupportsPublishing = SupportsPublishing;
 
             // TODO: this is not pretty and should be refactored
-            try
-            {
-                _addLocker.EnterWriteLock();
-                var key = GetKeyForItem(item);
-                if (key != null)
-                {
-                    var exists = Contains(key);
-                    if (exists)
-                    {
-                        //collection events will be raised in SetItem
-                        SetItem(IndexOfKey(key), item);
-                        return;
-                    }
-                }
 
-                //check if the item's sort order is already in use
-                if (this.Any(x => x.SortOrder == item.SortOrder))
-                {
-                    //make it the next iteration
-                    item.SortOrder = this.Max(x => x.SortOrder) + 1;
-                }
-
-                //collection events will be raised in InsertItem
-                base.Add(item);
-            }
-            finally
+            var key = GetKeyForItem(item);
+            if (key != null)
             {
-                if (_addLocker.IsWriteLockHeld)
-                    _addLocker.ExitWriteLock();
+                var exists = Contains(key);
+                if (exists)
+                {
+                    //collection events will be raised in SetItem
+                    SetItem(IndexOfKey(key), item);
+                    return;
+                }
             }
+
+            //check if the item's sort order is already in use
+            if (this.Any(x => x.SortOrder == item.SortOrder))
+            {
+                //make it the next iteration
+                item.SortOrder = this.Max(x => x.SortOrder) + 1;
+            }
+
+            //collection events will be raised in InsertItem
+            base.Add(item);
         }
 
         /// <summary>
@@ -162,7 +149,11 @@ namespace Umbraco.Core.Models
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
+        
+        /// <summary>
+        /// Clears all <see cref="CollectionChanged"/> event handlers
+        /// </summary>
+        public void ClearCollectionChangedEvents() => CollectionChanged = null;
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             CollectionChanged?.Invoke(this, args);

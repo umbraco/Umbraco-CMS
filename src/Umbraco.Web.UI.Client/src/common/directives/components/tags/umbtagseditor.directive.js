@@ -159,7 +159,7 @@
 
         function configureViewModel(isInitLoad) {
             if (vm.value) {
-                if (angular.isString(vm.value) && vm.value.length > 0) {
+                if (Utilities.isString(vm.value) && vm.value.length > 0) {
                     if (vm.config.storageType === "Json") {
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
@@ -191,7 +191,7 @@
                         }
                     }
                 }
-                else if (angular.isArray(vm.value)) {
+                else if (Utilities.isArray(vm.value)) {
                     vm.viewModel = vm.value;
                 }
             }

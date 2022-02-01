@@ -24,6 +24,7 @@
                 if ($routeParams) {
                     // it's an API request, add the current client culture as a header value
                     config.headers["X-UMB-CULTURE"] = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
+                    config.headers["X-UMB-SEGMENT"] = $routeParams.csegment ? $routeParams.csegment : null;
                 }
                 
                 return config;

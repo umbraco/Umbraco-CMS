@@ -119,6 +119,46 @@ namespace Umbraco.Core
                 public const string Image = "Image";
 
                 /// <summary>
+                /// MediaType name for a video.
+                /// </summary>
+                public const string Video = "Video";
+
+                /// <summary>
+                /// MediaType name for an audio.
+                /// </summary>
+                public const string Audio = "Audio";
+
+                /// <summary>
+                /// MediaType name for an article.
+                /// </summary>
+                public const string Article = "Article";
+
+                /// <summary>
+                /// MediaType name for vector graphics.
+                /// </summary>
+                public const string VectorGraphics = "VectorGraphics";
+
+                /// <summary>
+                /// MediaType alias for a video.
+                /// </summary>
+                public const string VideoAlias = "umbracoMediaVideo";
+
+                /// <summary>
+                /// MediaType alias for an audio.
+                /// </summary>
+                public const string AudioAlias = "umbracoMediaAudio";
+
+                /// <summary>
+                /// MediaType alias for an article.
+                /// </summary>
+                public const string ArticleAlias = "umbracoMediaArticle";
+
+                /// <summary>
+                /// MediaType alias for vector graphics.
+                /// </summary>
+                public const string VectorGraphicsAlias = "umbracoMediaVectorGraphics";
+
+                /// <summary>
                 /// MediaType alias indicating allowing auto-selection.
                 /// </summary>
                 public const string AutoSelect = "umbracoAutoSelect";
@@ -202,9 +242,14 @@ namespace Umbraco.Core
                 public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 
                 /// <summary>
-                /// Group name to put the membership properties on
+                /// The standard properties group alias for membership properties.
                 /// </summary>
-                internal const string StandardPropertiesGroupName = "Membership";
+                public const string StandardPropertiesGroupAlias = "membership";
+
+                /// <summary>
+                /// The standard properties group name for membership properties.
+                /// </summary>
+                public const string StandardPropertiesGroupName = "Membership";
 
                 public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
                 {
@@ -315,34 +360,65 @@ namespace Umbraco.Core
             public static class RelationTypes
             {
                 /// <summary>
-                /// ContentType name for default relation type "Relate Document On Copy".
+                /// Name for default relation type "Related Media".
+                /// </summary>
+                public const string RelatedMediaName = "Related Media";
+
+                /// <summary>
+                /// Alias for default relation type "Related Media"
+                /// </summary>
+                public const string RelatedMediaAlias = "umbMedia";
+
+                /// <summary>
+                /// Name for default relation type "Related Document".
+                /// </summary>
+                public const string RelatedDocumentName = "Related Document";
+
+                /// <summary>
+                /// Alias for default relation type "Related Document"
+                /// </summary>
+                public const string RelatedDocumentAlias = "umbDocument";
+
+                /// <summary>
+                /// Name for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyName = "Relate Document On Copy";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Document On Copy".
+                /// Alias for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Document On Delete".
+                /// Name for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteName = "Relate Parent Document On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Document On Delete".
+                /// Alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// Name for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// Alias for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
+
+                /// <summary>
+                /// Returns the types of relations that are automatically tracked
+                /// </summary>
+                /// <remarks>
+                /// Developers should not manually use these relation types since they will all be cleared whenever an entity
+                /// (content, media or member) is saved since they are auto-populated based on property values.
+                /// </remarks>
+                public static string[] AutomaticRelationTypes = new[] { RelatedMediaAlias, RelatedDocumentAlias };
+
+                //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
         }
     }

@@ -1,14 +1,14 @@
 ﻿namespace Umbraco.Core.Configuration
 {
     /// <summary>
-    /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
+    /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
     /// </summary>
     public interface IGlobalSettings
     {
         /// <summary>
-        /// Gets the reserved urls from web.config.
+        /// Gets the reserved URLs from web.config.
         /// </summary>
-        /// <value>The reserved urls.</value>
+        /// <value>The reserved URLs.</value>
         string ReservedUrls { get; }
 
         /// <summary>
@@ -21,7 +21,12 @@
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
         string Path { get; }
-        
+
+        /// <summary>
+        /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
+        /// </summary>
+        string IconsPath { get; }
+
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
         /// </summary>
@@ -40,10 +45,10 @@
         string DefaultUILanguage { get; }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco should hide top level nodes from generated urls.
+        /// Gets a value indicating whether umbraco should hide top level nodes from generated URLs.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
+        /// 	<c>true</c> if umbraco hides top level nodes from URLs; otherwise, <c>false</c>.
         /// </value>
         bool HideTopLevelNodeFromPath { get; }
 
@@ -67,5 +72,15 @@
         /// Gets the location of temporary files.
         /// </summary>
         string LocalTempPath { get; }
+
+        /// <summary>
+        /// Gets the write lock timeout.
+        /// </summary>
+        int SqlWriteLockTimeOut { get; }
+
+        /// <summary>
+        /// Returns true if TinyMCE scripting sanitization should be applied
+        /// </summary>
+        bool SanitizeTinyMce { get; }
     }
 }

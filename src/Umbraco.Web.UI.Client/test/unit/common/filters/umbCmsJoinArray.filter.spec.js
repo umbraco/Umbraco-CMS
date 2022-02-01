@@ -11,12 +11,9 @@
             {input:[],  separator:', ', prop:'param' ,   expectedResult: ''},
             {input:[{param:'a'},{param:'b'},{param:'c'}],  separator:', ', prop:null ,   expectedResult: ', , '},
             {input:[{param:'a'},{param:'b'},{param:'c'}],  separator:null, prop:'param' ,   expectedResult: 'abc'},
-        ];
-
-        var testCasesWithExpectedError = [
-            {input:'test',  separator:', ', prop:'param'},
-            {input:null,  separator:', ', prop:'param'},
-            {input:undefined,  separator:', ', prop:'param'},
+            {input:'test',  separator:', ', prop:'param', expectedResult: 'test'},
+            {input:null,  separator:', ', prop:'param', expectedResult: ''},
+            {input:undefined,  separator:', ', prop:'param', expectedResult: ''},
         ];
 
         beforeEach(module('umbraco'));
@@ -25,19 +22,11 @@
             $umbCmsJoinArray = $filter('umbCmsJoinArray');
         }));
 
-
         testCases.forEach(function(test){
             it('Blackbox tests with expected result=\''+test.expectedResult+'\'', function() {
                 expect($umbCmsJoinArray(test.input, test.separator, test.prop)).toBe(test.expectedResult);
             });
         });
-
-        testCasesWithExpectedError.forEach(function(test){
-            it('Blackbox tests with expected error.  Input=\''+test.input+'\'', function() {
-                expect(function() { $umbCmsJoinArray(test.input, test.separator, test.prop)}).toThrow();
-            });
-        });
-
     });
 
 }());

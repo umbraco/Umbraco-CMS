@@ -21,28 +21,30 @@
             <umb-box ng-if="!vm.loadingDataType">
                 <umb-box-content>
 
-                    <div class="umb-control-group" ng-if="vm.dataType.id !== 0">
-                        <i class="icon-alert red"></i>
-                        <strong class="red"><localize key="contentTypeEditor_allDocumentTypes"></localize></strong> using this editor will get updated with the new settings.
+                    <div class="control-group umb-control-group" ng-if="vm.dataType.id !== 0">
+                        <umb-icon icon="icon-alert" class="red"></umb-icon>
+                        <strong class="red"><localize key="contentTypeEditor_allDocumentTypes">All Document Types</localize></strong> <localize key="usingEditor">using this editor will get updated with the new settings.</localize>
                     </div>
-                    
+
                     <div class="control-group umb-control-group">
                         <div class="umb-el-wrap">
                             <label class="control-label" for="dataTypeName">
-                                <localize key="name"></localize>
+                                <localize key="general_name">Name</localize>
                             </label>
                             <div class="controls">
-                                <input type="text" ng-model="vm.dataType.name" class="umb-property-editor" umb-auto-focus focus-on-filled="true" required />
+                                <input type="text" id="dataTypeName" ng-model="vm.dataType.name" class="umb-property-editor" umb-auto-focus focus-on-filled="true" required />
                             </div>
                         </div>
                     </div>
-                    
-                    <h5><localize key="contentTypeEditor_configuration"></localize></h5>
-                    
-                    <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
-                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
-                    </umb-property>
-                        
+
+                    <div ng-if="vm.dataType.preValues.length > 0">
+                        <h5><localize key="contentTypeEditor_configuration">Configuration</localize></h5>
+
+                        <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
+                            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                        </umb-property>
+                    </div>
+
                 </umb-box-content>
             </umb-box>
         </umb-editor-container>

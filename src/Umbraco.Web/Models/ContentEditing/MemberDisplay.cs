@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -15,7 +15,11 @@ namespace Umbraco.Web.Models.ContentEditing
         public MemberDisplay()
         {
             MemberProviderFieldMapping = new Dictionary<string, string>();
+            ContentApps = new List<ContentApp>();
         }
+
+        [DataMember(Name = "contentType")]
+        public ContentTypeBasic ContentType { get; set; }
 
         [DataMember(Name = "username")]
         public string Username { get; set; }
@@ -34,5 +38,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "fieldConfig")]
         public IDictionary<string, string> MemberProviderFieldMapping { get; set; }
 
+        [DataMember(Name = "apps")]
+        public IEnumerable<ContentApp> ContentApps { get; set; }
+
+        [DataMember(Name = "membershipProperties")]
+        public IEnumerable<ContentPropertyDisplay> MembershipProperties { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Overlays.SaveContentController as vm">
+<div ng-controller="Umbraco.Overlays.SaveContentController as vm" class="umb-variant-selector-overlay">
 
     <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
         <umb-load-indicator></umb-load-indicator>
@@ -7,70 +7,55 @@
     <div ng-if="!vm.loading">
         <div class="mb3">
             <p>
-                <localize ng-if="!vm.isNew" key="content_languagesToSave"></localize>
-                <localize ng-if="vm.isNew" key="content_languagesToSaveForFirstTime"></localize>
+                <localize key="content_variantsToSave">Choose which variants to be saved.</localize>
             </p>
         </div>
 
         <div class="umb-list umb-list--condensed">
 
             <div class="umb-list-item"
-                 ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
+                 ng-repeat="variant in vm.availableVariants track by variant.compositeId">
                 <ng-form name="saveVariantSelectorForm">
-                    <div ng-class="{'umb-list-item--error': saveVariantSelectorForm.saveVariantSelector.$invalid}">
+                    <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--warning': saveVariantSelectorForm.saveVariantSelector.$invalid}">
 
-                        <umb-checkbox
-                            input-id="{{variant.htmlId}}"
-                            name="saveVariantSelector"
-                            model="variant.save"
-                            on-change="vm.changeSelection(variant)"
-                            server-validation-field="{{variant.htmlId}}"
-                            text="{{variant.language.name}}"
-                        />
+                        <input type="hidden" name="saveInvariant" val-server-field="_content_variant_invariant_null_" ng-model="variant.save"></input>
 
-                        <div>
-                                <span class="db umb-list-item__description umb-list-item__description--checkbox" ng-if="!saveVariantSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                    <umb-variant-state variant="variant"></umb-variant-state>
-                                    <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                                </span>
+                        <umb-checkbox input-id="{{variant.htmlId}}"
+                                      name="saveVariantSelector"
+                                      model="variant.save"
+                                      on-change="vm.changeSelection(variant)"
+                                      server-validation-field="{{variant.htmlId}}">
 
-                                <span class="db" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
-                                    <span class="db umb-list-item__description umb-list-item__description--checkbox text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
-                                </span>
 
-                                <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
-                        </div>
+
+                            <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
+                                <span ng-bind="variant.displayName"></span>
+                            </span>
+                            <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                                <span ng-bind="variant.segment"></span>
+                                <span class="__secondarytitle"> — {{variant.language.name}}</span>
+                                <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                            </span>
+                            <span class="umb-variant-selector-entry__description" ng-if="!saveVariantSelectorForm.saveVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.isMandatory"> - </span>
+                                <span ng-if="variant.isMandatory"><localize key="general_mandatory">Mandatory</localize></span>
+                            </span>
+                            <span class="umb-variant-selector-entry__description" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
+                                <span class="text-warning" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
+                            </span>
+                            <span class="umb-variant-selector-entry__description" ng-messages="saveVariantSelectorForm.saveInvariant.$error" show-validation-on-submit>
+                                <span class="text-warning" ng-message="valServerField">{{saveVariantSelectorForm.saveInvariant.errorMsg}}</span>
+                            </span>
+
+                        </umb-checkbox>
+
+                        <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+
                     </div>
-
                 </ng-form>
             </div>
             <br/>
-        </div>
-
-        <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
-            <div class="bold mb3">
-                <p>
-                    <localize ng-if="!vm.isNew" key="content_unmodifiedLanguages"></localize>
-                    <localize ng-if="vm.isNew" key="content_untouchedLanguagesForFirstTime"></localize>
-                </p>
-            </div>
-
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
-                <div>
-                    <div style="margin-bottom: 2px;">
-                        <span>{{ variant.language.name }}</span>
-                        <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
-                    </div>
-
-                    <div ng-if="!(variant.notifications && variant.notifications.length > 0)">
-                        <umb-variant-state class="umb-list-item__description" variant="variant"></umb-variant-state>
-                    </div>
-
-                    <div ng-repeat="notification in variant.notifications">
-                        <div class="umb-list-item__description text-success">{{notification.message}}</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

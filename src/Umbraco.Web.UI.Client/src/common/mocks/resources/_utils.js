@@ -1,5 +1,5 @@
 angular.module('umbraco.mocks').
-    factory('mocksUtils', ['$cookies', function ($cookies) {
+    factory('mocksUtils', ['$cookies', 'udiService', function ($cookies, udiService) {
         'use strict';
          
         //by default we will perform authorization
@@ -40,13 +40,17 @@ angular.module('umbraco.mocks').
             },
 
             /** Creats a mock content object */
-            getMockContent: function(id) {
+            getMockContent: function (id, key, udi) {
+                key = key || String.CreateGuid();
+                var udi = udi || udiService.build("content", key);
                 var node = {
                     name: "My content with id: " + id,
                     updateDate: new Date().toIsoDateTimeString(),
                     publishDate: new Date().toIsoDateTimeString(),
                     createDate: new Date().toIsoDateTimeString(),
                     id: id,
+                    key: key,
+                    udi: udi,
                     parentId: 1234,
                     icon: "icon-umb-content",
                     owner: { name: "Administrator", id: 0 },
@@ -90,7 +94,7 @@ angular.module('umbraco.mocks').
                                             name: "1 column layout",
                                             sections: [
                                                 {
-                                                    grid: 12,
+                                                    grid: 12
                                                 }
                                             ]
                                         },
@@ -98,7 +102,7 @@ angular.module('umbraco.mocks').
                                             name: "2 column layout",
                                             sections: [
                                                 {
-                                                    grid: 4,
+                                                    grid: 4
                                                 },
                                                 {
                                                     grid: 8
@@ -139,7 +143,7 @@ angular.module('umbraco.mocks').
                                     }
 
                                 }
-                            },
+                            }
                         ]
                     },
                     {
@@ -274,6 +278,182 @@ angular.module('umbraco.mocks').
                             }
                         ]
                     }
+                    ]
+                };
+
+                return node;
+            },
+
+
+            /** Creats a mock variant content object */
+            getMockVariantContent: function(id, key, udi) {
+                key = key || String.CreateGuid();
+                var udi = udi || udiService.build("content", key);
+                var node = {
+                    name: "My content with id: " + id,
+                    updateDate: new Date().toIsoDateTimeString(),
+                    publishDate: new Date().toIsoDateTimeString(),
+                    createDate: new Date().toIsoDateTimeString(),
+                    id: id,
+                    key: key,
+                    udi: udi,
+                    parentId: 1234,
+                    icon: "icon-umb-content",
+                    owner: { name: "Administrator", id: 0 },
+                    updater: { name: "Per Ploug Krogslund", id: 1 },
+                    path: "-1,1234,2455",
+                    allowedActions: ["U", "H", "A"],
+                    contentTypeAlias: "testAlias", 
+                    contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", 
+                    apps: [],
+                    variants: [
+                        {
+                            name: "",
+                            language: null,
+                            segment: null,
+                            state: "NotCreated",
+                            updateDate: "0001-01-01 00:00:00",
+                            createDate: "0001-01-01 00:00:00",
+                            publishDate: null,
+                            releaseDate: null,
+                            expireDate: null,
+                            notifications: [],
+                            tabs: [
+                                {
+                                    label: "Content",
+                                    id: 2,
+                                    properties: [
+                                        { alias: "testproperty", label: "Test property", view: "textbox", value: "asdfghjk" },
+                                        { alias: "valTest", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                                        { alias: "bodyText", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                                        { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                                        { alias: "media", label: "Media picker", view: "mediapicker", value: "1234,23242,23232,23231", config: {multiPicker: 1} }
+                                    ]
+                                },
+                                {
+                                    label: "Sample Editor",
+                                    id: 3,
+                                    properties: [
+                                        { alias: "datepicker", label: "Datepicker", view: "datepicker", config: { pickTime: false, format: "yyyy-MM-dd" } },
+                                        { alias: "tags", label: "Tags", view: "tags", value: "" }
+                                    ]
+                                },
+                                {
+                                    label: "This",
+                                    id: 4,
+                                    properties: [
+                                        { alias: "valTest4", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                                        { alias: "bodyText4", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                                        { alias: "textarea4", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                                        { alias: "content4", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                                    ]
+                                },
+                                {
+                                    label: "Is",
+                                    id: 5,
+                                    properties: [
+                                        { alias: "valTest5", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                                        { alias: "bodyText5", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                                        { alias: "textarea5", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                                        { alias: "content5", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                                    ]
+                                },
+                                {
+                                    label: "Overflown",
+                                    id: 6,
+                                    properties: [
+                                        { alias: "valTest6", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                                        { alias: "bodyText6", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                                        { alias: "textarea6", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                                        { alias: "content6", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                                    ]
+                                },
+                                {
+                                    label: "Generic Properties",
+                                    id: 0,
+                                    properties: [
+                                        {
+                                            label: 'Id',
+                                            value: 1234,
+                                            view: "readonlyvalue",
+                                            alias: "_umb_id"
+                                        },
+                                        {
+                                            label: 'Created by',
+                                            description: 'Original author',
+                                            value: "Administrator",
+                                            view: "readonlyvalue",
+                                            alias: "_umb_createdby"
+                                        },
+                                        {
+                                            label: 'Created',
+                                            description: 'Date/time this document was created',
+                                            value: new Date().toIsoDateTimeString(),
+                                            view: "readonlyvalue",
+                                            alias: "_umb_createdate"
+                                        },
+                                        {
+                                            label: 'Updated',
+                                            description: 'Date/time this document was created',
+                                            value: new Date().toIsoDateTimeString(),
+                                            view: "readonlyvalue",
+                                            alias: "_umb_updatedate"
+                                        },                            
+                                        {
+                                            label: 'Document Type',
+                                            value: "Home page",
+                                            view: "readonlyvalue",
+                                            alias: "_umb_doctype" 
+                                        },
+                                        {
+                                            label: 'Publish at',
+                                            description: 'Date/time to publish this document',
+                                            value: new Date().toIsoDateTimeString(),
+                                            view: "datepicker",
+                                            alias: "_umb_releasedate"
+                                        },
+                                        { 
+                                            label: 'Unpublish at',
+                                            description: 'Date/time to un-publish this document',
+                                            value: new Date().toIsoDateTimeString(),
+                                            view: "datepicker",
+                                            alias: "_umb_expiredate"
+                                        },
+                                        {
+                                            label: 'Template', 
+                                            value: "myTemplate",
+                                            view: "dropdown",
+                                            alias: "_umb_template",
+                                            config: {
+                                                items: {
+                                                    "" : "-- Choose template --",
+                                                    "myTemplate" : "My Templates",
+                                                    "home" : "Home Page",
+                                                    "news" : "News Page"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            label: 'Link to document',
+                                            value: ["/testing" + id, "http://localhost/testing" + id, "http://mydomain.com/testing" + id].join(),
+                                            view: "urllist",
+                                            alias: "_umb_urllist"
+                                        },
+                                        {
+                                            alias: "test", label: "Stuff", view: "test", value: "",
+                                            config: {
+                                                fields: [
+                                                            { alias: "embedded", label: "Embbeded", view: "textstring", value: "" },
+                                                            { alias: "embedded2", label: "Embbeded 2", view: "contentpicker", value: "" },
+                                                            { alias: "embedded3", label: "Embbeded 3", view: "textarea", value: "" },
+                                                            { alias: "embedded4", label: "Embbeded 4", view: "datepicker", value: "" }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
                     ]
                 };
 

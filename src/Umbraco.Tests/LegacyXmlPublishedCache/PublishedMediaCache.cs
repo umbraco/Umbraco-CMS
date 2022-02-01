@@ -28,7 +28,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// <remarks>
     /// NOTE: In the future if we want to properly cache all media this class can be extended or replaced when these classes/interfaces are exposed publicly.
     /// </remarks>
-    internal class PublishedMediaCache : PublishedCacheBase, IPublishedMediaCache
+    internal class PublishedMediaCache : PublishedCacheBase, IPublishedMediaCache2
     {
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             var miss = Interlocked.CompareExchange(ref _examineIndexMiss, 0, 0); // volatile read
             if (miss < ExamineIndexMissMax && Interlocked.Increment(ref _examineIndexMiss) == ExamineIndexMissMax)
-                Current.Logger.Warn<PublishedMediaCache>("Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
+                Current.Logger.Warn<PublishedMediaCache,int>("Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
                     + " them from DB. This may indicate that the Examine index is corrupted.", ExamineIndexMissMax);
 
             return ConvertFromIMedia(media);
@@ -356,7 +356,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            Current.Logger.Warn<PublishedMediaCache>("Could not retrieve media {MediaId} from Examine index or from legacy library.GetMedia method", id);
+            Current.Logger.Warn<PublishedMediaCache,int>("Could not retrieve media {MediaId} from Examine index or from legacy library.GetMedia method", id);
 
             return null;
         }
@@ -612,15 +612,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Media, id);
-        }
+        public override IPublishedContentType GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Media, id);
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Media, alias);
-        }
+        public override IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Media, alias);
+
+        public override IPublishedContentType GetContentType(Guid key) => _contentTypeCache.Get(PublishedItemType.Media, key);
 
         public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {

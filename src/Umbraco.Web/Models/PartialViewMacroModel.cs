@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// The model used when rendering Partial View Macros
     /// </summary>
-    public class PartialViewMacroModel
+    public class PartialViewMacroModel : IContentModel
     {
 
         public PartialViewMacroModel(IPublishedContent page,

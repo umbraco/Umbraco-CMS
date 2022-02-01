@@ -35,11 +35,11 @@
 		 */
         function open(options) {
 
-            if(options && options.element) {
+            if (options && options.element) {
                 args.element = options.element;
             }
 
-            if(options && options.disableEventsOnClick) {
+            if (options && options.disableEventsOnClick) {
                 args.disableEventsOnClick = options.disableEventsOnClick;
             }
 
@@ -58,11 +58,11 @@
          * 
 		 */
         function close() {
-            args.opacity = null,
-            args.element = null,
-            args.elementPreventClick = false,
-            args.disableEventsOnClick = false,
-            args.show = false
+            args.opacity = null;
+            args.element = null;
+            args.elementPreventClick = false;
+            args.disableEventsOnClick = false;
+            args.show = false;
             eventsService.emit("appState.backdrop", args);
         }
 

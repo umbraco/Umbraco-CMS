@@ -9,6 +9,7 @@ using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Models.PublishedContent;
@@ -358,12 +359,28 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
+            // Handle culture specific node names
+            const string nodeNamePrefix = "nodeName-";
+            // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
+            // We have to use Invariant comparisons, because when we get them from ContentBase in EntityXmlSerializer they're all lowercase.
+            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
+            foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
+            {
+                var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
+                // Skip the culture if it does not exist in the current project
+                if (installedLanguages.InvariantContains(newCulture))
+                {
+                    content.SetCultureName(localizedNodeName.Value, newCulture);
+                }
+            }
+
             //Here we make sure that we take composition properties in account as well
             //otherwise we would skip them and end up losing content
             var propTypes = contentType.CompositionPropertyTypes.Any()
                 ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
                 : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
 
+            var foundLanguages = new HashSet<string>();
             foreach (var property in properties)
             {
                 string propertyTypeAlias = property.Name.LocalName;
@@ -371,11 +388,27 @@ namespace Umbraco.Core.Packaging
                 {
                     var propertyValue = property.Value;
 
+                    // Handle properties language attributes
+                    var propertyLang = property.Attribute(XName.Get("lang"))?.Value;
+                    foundLanguages.Add(propertyLang);
                     if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
                     {
-                        //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue);
+                        // set property value
+                        // Skip unsupported language variation, otherwise we'll get a "not supported error"
+                        // We allow null, because that's invariant
+                        if (installedLanguages.InvariantContains(propertyLang) || propertyLang is null)
+                        {
+                            content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
+                        }
                     }
+                }
+            }
+
+            foreach (var propertyLang in foundLanguages)
+            {
+                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) && installedLanguages.InvariantContains(propertyLang))
+                {
+                    content.SetCultureName(nodeName, propertyLang);
                 }
             }
 
@@ -522,7 +555,7 @@ namespace Umbraco.Core.Packaging
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
-                    var folders = foldersAttribute.Value.Split('/');
+                    var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //level 1 = root level folders, there can only be one with the same name
                     var current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
@@ -532,7 +565,7 @@ namespace Umbraco.Core.Packaging
                         var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
+                            _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
@@ -566,7 +599,7 @@ namespace Umbraco.Core.Packaging
             var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
+                _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -604,6 +637,8 @@ namespace Umbraco.Core.Packaging
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
             contentType.Name = infoElement.Element("Name").Value;
+            if (infoElement.Element("Key") != null)
+                contentType.Key = new Guid(infoElement.Element("Key").Value);
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
@@ -656,10 +691,44 @@ namespace Umbraco.Core.Packaging
             }
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
-            UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
+            UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
+            UpdateHistoryCleanupPolicy(contentType, documentType.Element("HistoryCleanupPolicy"));
 
             return contentType;
+        }
+
+        private void UpdateHistoryCleanupPolicy(IContentType contentType, XElement element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            contentType.HistoryCleanup ??= new HistoryCleanup();
+
+            if (bool.TryParse(element.Attribute("preventCleanup")?.Value, out var preventCleanup))
+            {
+                contentType.HistoryCleanup.PreventCleanup = preventCleanup;
+            }
+
+            if (int.TryParse(element.Attribute("keepAllVersionsNewerThanDays")?.Value, out var keepAll))
+            {
+                contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = keepAll;
+            }
+            else
+            {
+                contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = null;
+            }
+
+            if (int.TryParse(element.Attribute("keepLatestVersionPerDayForDays")?.Value, out var keepLatest))
+            {
+                contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = keepLatest;
+            }
+            else
+            {
+                contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = null;
+            }
         }
 
         private void UpdateContentTypesAllowedTemplates(IContentType contentType,
@@ -679,7 +748,7 @@ namespace Umbraco.Core.Packaging
                     }
                     else
                     {
-                        _logger.Warn<PackagingService>("Packager: Error handling allowed templates. Template with alias '{TemplateAlias}' could not be found.", alias);
+                        _logger.Warn<PackagingService,string>("Packager: Error handling allowed templates. Template with alias '{TemplateAlias}' could not be found.", alias);
                     }
                 }
 
@@ -695,33 +764,44 @@ namespace Umbraco.Core.Packaging
                 }
                 else
                 {
-                    _logger.Warn<PackagingService>("Packager: Error handling default template. Default template with alias '{DefaultTemplateAlias}' could not be found.", defaultTemplateElement.Value);
+                    _logger.Warn<PackagingService,string>("Packager: Error handling default template. Default template with alias '{DefaultTemplateAlias}' could not be found.", defaultTemplateElement.Value);
                 }
             }
         }
 
-        private void UpdateContentTypesTabs(IContentType contentType, XElement tabElement)
+        private void UpdateContentTypesPropertyGroups(IContentType contentType, XElement propertyGroupsContainer)
         {
-            if (tabElement == null)
+            if (propertyGroupsContainer == null)
                 return;
 
-            var tabs = tabElement.Elements("Tab");
-            foreach (var tab in tabs)
+            var propertyGroupElements = propertyGroupsContainer.Elements("Tab");
+            foreach (var propertyGroupElement in propertyGroupElements)
             {
-                var id = tab.Element("Id").Value;//Do we need to use this for tracking?
-                var caption = tab.Element("Caption").Value;
+                var name = propertyGroupElement.Element("Caption").Value; // TODO Rename to Name (same in EntityXmlSerializer)
 
-                if (contentType.PropertyGroups.Contains(caption) == false)
+                var alias = propertyGroupElement.Element("Alias")?.Value;
+                if (string.IsNullOrEmpty(alias))
                 {
-                    contentType.AddPropertyGroup(caption);
-
+                    alias = name.ToSafeAlias(true);
                 }
 
-                int sortOrder;
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                contentType.AddPropertyGroup(alias, name);
+                var propertyGroup = contentType.PropertyGroups[alias];
+
+                if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))
+                {
+                    propertyGroup.Key = key;
+                }
+
+                if (Enum.TryParse<PropertyGroupType>(propertyGroupElement.Element("Type")?.Value, out var type))
+                {
+                    propertyGroup.Type = type;
+                }
+
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
                 {
                     // Override the sort order with the imported value
-                    contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    propertyGroup.SortOrder = sortOrder;
                 }
             }
         }
@@ -767,7 +847,7 @@ namespace Umbraco.Core.Packaging
                 if (dataTypeDefinition == null)
                 {
                     // TODO: We should expose this to the UI during install!
-                    _logger.Warn<PackagingService>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
+                    _logger.Warn<PackagingService, string, Guid, string>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
                     //convert to a label!
@@ -787,21 +867,42 @@ namespace Umbraco.Core.Packaging
                     Mandatory = property.Element("Mandatory") != null
                         ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true")
                         : false,
+                    MandatoryMessage = property.Element("MandatoryMessage") != null
+                        ? (string)property.Element("MandatoryMessage")
+                        : string.Empty,
+
                     ValidationRegExp = (string)property.Element("Validation"),
+                    ValidationRegExpMessage = property.Element("ValidationRegExpMessage") != null
+                        ? (string)property.Element("ValidationRegExpMessage")
+                        : string.Empty,
                     SortOrder = sortOrder,
                     Variations = property.Element("Variations") != null
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
-                        : ContentVariation.Nothing
+                        : ContentVariation.Nothing,
+                    LabelOnTop = property.Element("LabelOnTop") != null
+                        ? property.Element("LabelOnTop").Value.ToLowerInvariant().Equals("true")
+                        : false
                 };
+                if (property.Element("Key") != null)
+                    propertyType.Key = new Guid(property.Element("Key").Value);
 
-                var tab = (string)property.Element("Tab");
-                if (string.IsNullOrEmpty(tab))
+                var tabElement = property.Element("Tab");
+                if (tabElement == null || string.IsNullOrEmpty(tabElement.Value))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
                 else
                 {
-                    contentType.AddPropertyType(propertyType, tab);
+                    var tabName = tabElement.Value;
+                    var tabAlias = tabElement.Attribute("Alias")?.Value;
+                    if (string.IsNullOrEmpty(tabAlias))
+                    {
+                        contentType.AddPropertyType(propertyType, tabName);
+                    }
+                    else
+                    {
+                        contentType.AddPropertyType(propertyType, tabAlias, tabName);
+                    }
                 }
             }
         }
@@ -817,7 +918,7 @@ namespace Umbraco.Core.Packaging
                 var allowedChild = importedContentTypes.ContainsKey(alias) ? importedContentTypes[alias] : _contentTypeService.Get(alias);
                 if (allowedChild == null)
                 {
-                    _logger.Warn<PackagingService>(
+                    _logger.Warn<PackagingService, string, string>(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{DoctypeAlias}' could not be found and was not added to the structure for '{DoctypeStructureAlias}'.",
                         alias, contentType.Alias);
                     continue;
@@ -928,7 +1029,7 @@ namespace Umbraco.Core.Packaging
                 if (foldersAttribute != null)
                 {
                     var name = datatypeElement.Attribute("Name").Value;
-                    var folders = foldersAttribute.Value.Split('/');
+                    var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //there will only be a single result by name for level 1 (root) containers
                     var current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
@@ -938,7 +1039,7 @@ namespace Umbraco.Core.Packaging
                         var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
+                            _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -971,7 +1072,7 @@ namespace Umbraco.Core.Packaging
             var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
+                _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -1276,7 +1377,7 @@ namespace Umbraco.Core.Packaging
                 else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
                          templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    _logger.Info<PackageDataInstallation>(
+                    _logger.Info<PackageDataInstallation, string, string>(
                         "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
                         (string)elementCopy.Element("Alias"),
                         (string)elementCopy.Element("Master"));

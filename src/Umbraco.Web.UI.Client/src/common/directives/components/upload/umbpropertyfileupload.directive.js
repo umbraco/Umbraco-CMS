@@ -26,6 +26,7 @@
             fileManager.setFiles({
                 propertyAlias: vm.propertyAlias,
                 culture: vm.culture,
+                segment: vm.segment,
                 files: []
             });
             //clear the current files
@@ -77,12 +78,14 @@
         /** Called when the component initializes */
         function onInit() {
             $scope.$on("filesSelected", onFilesSelected);
+            $scope.$on("isDragover", isDragover);
+
             initialize();
         }
 
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
-            
+
         }
 
         function initialize() {
@@ -90,6 +93,11 @@
             //normalize culture to null if it's not there
             if (!vm.culture) {
                 vm.culture = null;
+            }
+
+            //normalize segment to null if it's not there
+            if (!vm.segment) {
+                vm.segment = null;
             }
 
             // TODO: need to figure out what we can do for things like Nested Content
@@ -112,7 +120,9 @@
                         isImage: mediaHelper.detectIfImageByExtension(file),
                         extension: getExtension(file)
                     };
+
                     f.fileSrc = getThumbnail(f);
+
                     return f;
                 });
 
@@ -134,11 +144,16 @@
                 vm.culture = null;
             }
 
+            //normalize segment to null if it's not there
+            if (!vm.segment) {
+                vm.segment = null;
+            }
+
             //check the file manager to see if there's already local files pending for this editor
             var existingClientFiles = _.map(
                 _.filter(fileManager.getFiles(),
                     function (f) {
-                        return f.alias === vm.propertyAlias && f.culture === vm.culture;
+                        return f.alias === vm.propertyAlias && f.culture === vm.culture && f.segment === vm.segment;
                     }),
                 function (f) {
                     return f.file;
@@ -171,7 +186,7 @@
                         });
                     }
                 }
-                
+
             }
         }
 
@@ -217,19 +232,22 @@
                 var index = i; //capture
 
                 var isImage = mediaHelper.detectIfImageByExtension(files[i].name);
+                var extension = getExtension(files[i].name);
 
-                //save the file object to the files collection
-                vm.files.push({
+                var f = {
                     isImage: isImage,
-                    extension: getExtension(files[i].name),
+                    extension: extension,
                     fileName: files[i].name,
                     isClientSide: true
-                });
+                };
+
+                // Save the file object to the files collection
+                vm.files.push(f);
 
                 //special check for a comma in the name
                 newVal += files[i].name.split(',').join('-') + ",";
 
-                if (isImage) {
+                if (isImage || extension === "svg") {
 
                     var deferred = $q.defer();
 
@@ -264,7 +282,8 @@
                 fileManager.setFiles({
                     propertyAlias: vm.propertyAlias,
                     files: args.files,
-                    culture: vm.culture
+                    culture: vm.culture,
+                    segment: vm.segment
                 });
 
                 updateModelFromSelectedFiles(args.files).then(function(newVal) {
@@ -281,15 +300,22 @@
             }
         }
 
+        function isDragover(e, args) {
+            vm.dragover = args.value;
+            angularHelper.safeApply($scope);
+        }
+
     };
 
     var umbPropertyFileUploadComponent = {
         templateUrl: 'views/components/upload/umb-property-file-upload.html',
         bindings: {
             culture: "@?",
+            segment: "@?",
             propertyAlias: "@",
             value: "<",
             hideSelection: "<",
+            dragover: "<",
             /**
              * Called when a file is selected on this instance
              */
@@ -299,7 +325,8 @@
              */
             onFilesChanged: "&",
             onInit: "&",
-            required: "="
+            required: "=",
+            acceptFileExt: "<?"
         },
         transclude: true,
         controllerAs: 'vm',

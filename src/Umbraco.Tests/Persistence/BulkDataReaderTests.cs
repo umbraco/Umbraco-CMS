@@ -1693,7 +1693,7 @@ namespace Umbraco.Tests.Persistence
             {
                 Assert.IsTrue(testReader.Read());
 
-                Assert.AreEqual(testReader.Depth, 0);
+                Assert.AreEqual(0, testReader.Depth);
             }
         }
 
@@ -2067,7 +2067,7 @@ namespace Umbraco.Tests.Persistence
             {
                 Assert.IsTrue(testReader.Read());
 
-                Assert.AreEqual(testReader.RecordsAffected, -1);
+                Assert.AreEqual(-1, testReader.RecordsAffected);
             }
         }
 

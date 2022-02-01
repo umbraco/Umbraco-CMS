@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,7 +11,9 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -43,8 +47,11 @@ namespace Umbraco.Web.Editors.Filters
         where TModelSave: IContentSave<TPersisted>
         where TModelWithProperties : IContentProperties<ContentPropertyBasic>
     {
-        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+        private readonly ILocalizedTextService _textService;
+
+        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService) : base(logger, umbracoContextAccessor)
         {
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
         
         /// <summary>
@@ -157,6 +164,8 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="property"></param>
         /// <param name="postedValue"></param>
         /// <param name="modelState"></param>
+        /// <param name="requiredDefaultMessages"></param>
+        /// <param name="formatDefaultMessages"></param>
         protected virtual void ValidatePropertyValue(
             TModelSave model,
             TModelWithProperties modelWithProperties,
@@ -165,14 +174,27 @@ namespace Umbraco.Web.Editors.Filters
             object postedValue,
             ModelStateDictionary modelState)
         {
-            // validate
-            var valueEditor = editor.GetValueEditor(property.DataType.Configuration);
-            foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
+            if (property is null) throw new ArgumentNullException(nameof(property));
+            if (property.DataType is null) throw new InvalidOperationException($"{nameof(property)}.{nameof(property.DataType)} cannot be null");
+
+            foreach (var validationResult in PropertyValidationService.ValidatePropertyValue(
+                _textService,  editor, property.DataType, postedValue, property.IsRequired,
+                property.ValidationRegExp, property.IsRequiredMessage, property.ValidationRegExpMessage))
             {
-                modelState.AddPropertyError(r, property.Alias, property.Culture);
+                AddPropertyError(model, modelWithProperties, editor, property, validationResult, modelState);
             }
         }
 
+        protected virtual void AddPropertyError(
+            TModelSave model,
+            TModelWithProperties modelWithProperties,
+            IDataEditor editor,
+            ContentPropertyDto property,
+            ValidationResult validationResult,
+            ModelStateDictionary modelState)
+        {
+            modelState.AddPropertyError(validationResult, property.Alias, property.Culture, property.Segment);
+        }
 
     }
 }

@@ -2,11 +2,14 @@
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web.Http.Filters;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -15,8 +18,17 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class UpdateCheckController : UmbracoAuthorizedJsonController
     {
+        private readonly IUpgradeService _upgradeService;
+
+        public UpdateCheckController() { }
+
+        public UpdateCheckController(IUpgradeService upgradeService)
+        {
+            _upgradeService = upgradeService;
+        }
+
         [UpdateCheckResponseFilter]
-        public UpgradeCheckResponse GetCheck()
+        public async Task<UpgradeCheckResponse> GetCheck()
         {
             var updChkCookie = Request.Headers.GetCookies("UMB_UPDCHK").FirstOrDefault();
             var updateCheckCookie = updChkCookie != null ? updChkCookie["UMB_UPDCHK"].Value : "";
@@ -24,14 +36,11 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var check = new org.umbraco.update.CheckForUpgrade { Timeout = 2000 };
+                    var version = new SemVersion(UmbracoVersion.Current.Major, UmbracoVersion.Current.Minor,
+                        UmbracoVersion.Current.Build, UmbracoVersion.Comment);
+                    var result = await _upgradeService.CheckUpgrade(version);
 
-                    var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
-                                                    UmbracoVersion.Current.Minor,
-                                                    UmbracoVersion.Current.Build,
-                                                    UmbracoVersion.Comment);
-
-                    return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
+                    return new UpgradeCheckResponse(result.UpgradeType, result.Comment, result.UpgradeUrl);
                 }
                 catch (System.Net.WebException)
                 {

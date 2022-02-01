@@ -6,13 +6,12 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService, iconHelper) {
+function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
 
     $scope.model = {
-        allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === "container",
-        folderName: "",
-        creatingFolder: false,
-        creatingDoctypeCollection: false
+        allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === 'container',
+        folderName: '',
+        creatingFolder: false
     };
 
     var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
@@ -24,105 +23,82 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $scope.model.creatingFolder = true;
     };
 
-    $scope.showCreateDocTypeCollection = function () {
-        $scope.model.creatingDoctypeCollection = true;
-        $scope.model.collectionCreateTemplate = !$scope.model.disableTemplates;
-        $scope.model.collectionItemCreateTemplate = !$scope.model.disableTemplates;
-    };
-
     $scope.createContainer = function () {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createFolderForm })) {
 
             contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
 
-                var currPath = node.path ? node.path : "-1";
+                var currPath = node.path ? node.path : '-1';
 
                 navigationService.syncTree({
-                    tree: "documenttypes",
-                    path: currPath + "," + folderId,
+                    tree: 'documenttypes',
+                    path: currPath + ',' + folderId,
                     forceReload: true,
                     activate: true
                 });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
-                var section = appState.getSectionState("currentSection");
+                var section = appState.getSectionState('currentSection');
 
             }, function (err) {
 
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
                 $scope.error = err;
 
             });
         }
     };
 
-    $scope.createCollection = function () {
+    function createDocType(config) {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createDoctypeCollectionForm, statusMessage: "Creating Doctype Collection..." })) {
+        $location.search('create', null);
+        $location.search('notemplate', null);
+        $location.search('iscomposition', null);
+        $location.search('iselement', null);
+        $location.search('icon', null);
 
-            // see if we can find matching icons
-            var collectionIcon = "icon-folders", collectionItemIcon = "icon-document";
-            iconHelper.getIcons().then(function (icons) {
+        var icon = null;
 
-                for (var i = 0; i < icons.length; i++) {
-                    // for matching we'll require a full match for collection, partial match for item
-                    if (icons[i].substring(5) == $scope.model.collectionName.toLowerCase()) {
-                        collectionIcon = icons[i];
-                    } else if (icons[i].substring(5).indexOf($scope.model.collectionItemName.toLowerCase()) > -1) {
-                        collectionItemIcon = icons[i];
-                    }
-                }
-
-                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionCreateTemplate, $scope.model.collectionItemName, $scope.model.collectionItemCreateTemplate, collectionIcon, collectionItemIcon)
-                    .then(function (collectionData) {
-
-                        navigationService.hideMenu();
-                        $location.search('create', null);
-                        $location.search('notemplate', null);
-
-                        formHelper.resetForm({
-                            scope: $scope
-                        });
-
-                        var section = appState.getSectionState("currentSection");
-
-                        // redirect to the item id
-                        $location.path("/" + section + "/documenttypes/edit/" + collectionData.containerId);
-
-                    }, function (err) {
-
-                        $scope.error = err;
-
-                        //show any notifications
-                        if (angular.isArray(err.data.notifications)) {
-                            for (var i = 0; i < err.data.notifications.length; i++) {
-                                notificationsService.showNotification(err.data.notifications[i]);
-                            }
-                        }
-                    });
-            });
+        if (config.icon != undefined && config.icon != null) {
+            icon = config.icon;
+            if (config.color) {
+                icon += ' ' + config.color;
+            }
         }
 
-    };
+        $location
+            .path('/settings/documenttypes/edit/' + node.id)
+            .search('create', 'true')
+            .search('notemplate', config.notemplate ? 'true' : null)
+            .search('iscomposition', config.iscomposition ? 'true' : null)
+            .search('iselement', config.iselement ? 'true' : null)
+            .search('icon', icon);
+
+        navigationService.hideMenu();
+    }
+
 
     // Disabling logic for creating document type with template if disableTemplates is set to true
     if (!disableTemplates) {
-        $scope.createDocType = function () {
-            $location.search('create', null);
-            $location.search('notemplate', null);
-            $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
-            navigationService.hideMenu();
+        $scope.createDocType = function (icon) {
+            createDocType({ icon });
         };
     }
 
-    $scope.createComponent = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
-        navigationService.hideMenu();
+    $scope.createComponent = function (icon) {
+        createDocType({ notemplate: true, icon });
+    };
+
+    $scope.createComposition = function (icon) {
+        createDocType({ notemplate: true, iscomposition: true, iselement: true, icon });
+    };
+
+    $scope.createElement = function (icon) {
+        createDocType({ notemplate: true, iselement: true, icon });
     };
 
     $scope.close = function() {
@@ -131,4 +107,4 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     };
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);
+angular.module('umbraco').controller('Umbraco.Editors.DocumentTypes.CreateController', DocumentTypesCreateController);

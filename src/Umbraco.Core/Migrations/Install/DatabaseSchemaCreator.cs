@@ -21,8 +21,13 @@ namespace Umbraco.Core.Migrations.Install
 
         public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger)
         {
-            _database = database;
-            _logger = logger;
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (_database?.SqlContext?.SqlSyntax == null)
+            {
+                throw new InvalidOperationException("No SqlContext has been assigned to the database");
+            }
         }
 
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
@@ -80,7 +85,8 @@ namespace Umbraco.Core.Migrations.Install
             typeof (AuditEntryDto),
             typeof (ContentVersionCultureVariationDto),
             typeof (DocumentCultureVariationDto),
-            typeof (ContentScheduleDto)
+            typeof (ContentScheduleDto),
+            typeof (ContentVersionCleanupPolicyDto)
         };
 
         /// <summary>
@@ -95,7 +101,7 @@ namespace Umbraco.Core.Migrations.Install
                 var tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
                 var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
 
-                _logger.Info<DatabaseSchemaCreator>("Uninstall {TableName}", tableName);
+                _logger.Info<DatabaseSchemaCreator, string>("Uninstall {TableName}", tableName);
 
                 try
                 {
@@ -106,7 +112,7 @@ namespace Umbraco.Core.Migrations.Install
                 {
                     //swallow this for now, not sure how best to handle this with diff databases... though this is internal
                     // and only used for unit tests. If this fails its because the table doesn't exist... generally!
-                    _logger.Error<DatabaseSchemaCreator>(ex, "Could not drop table {TableName}", tableName);
+                    _logger.Error<DatabaseSchemaCreator, string>(ex, "Could not drop table {TableName}", tableName);
                 }
             }
         }
@@ -143,7 +149,7 @@ namespace Umbraco.Core.Migrations.Install
 
         internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
         {
-            var result = new DatabaseSchemaResult(SqlSyntax);
+            var result = new DatabaseSchemaResult();
 
             result.IndexDefinitions.AddRange(SqlSyntax.GetDefinedIndexes(_database)
                 .Select(x => new DbIndexDefinition(x)));
@@ -431,7 +437,7 @@ namespace Umbraco.Core.Migrations.Install
             var tableExist = TableExists(tableName);
             if (overwrite && tableExist)
             {
-                _logger.Info<DatabaseSchemaCreator>("Table {TableName} already exists, but will be recreated", tableName);
+                _logger.Info<DatabaseSchemaCreator, string>("Table {TableName} already exists, but will be recreated", tableName);
 
                 DropTable(tableName);
                 tableExist = false;
@@ -440,19 +446,19 @@ namespace Umbraco.Core.Migrations.Install
             if (tableExist)
             {
                 // The table exists and was not recreated/overwritten.
-                _logger.Info<Database>("Table {TableName} already exists - no changes were made", tableName);
+                _logger.Info<Database, string>("Table {TableName} already exists - no changes were made", tableName);
                 return;
             }
 
             //Execute the Create Table sql
-            var created = _database.Execute(new Sql(createSql));
-                    _logger.Info<DatabaseSchemaCreator>("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
+            _database.Execute(new Sql(createSql));
+            _logger.Info<DatabaseSchemaCreator,string,string>("Create Table {TableName}: \n {Sql}", tableName, createSql);
 
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
             {
-                var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
-                _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
+                _database.Execute(new Sql(createPrimaryKeySql));
+                _logger.Info<DatabaseSchemaCreator,string>("Create Primary Key:\n {Sql}", createPrimaryKeySql);
             }
 
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
@@ -469,24 +475,24 @@ namespace Umbraco.Core.Migrations.Install
             //Loop through index statements and execute sql
             foreach (var sql in indexSql)
             {
-                var createdIndex = _database.Execute(new Sql(sql));
-                _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
+                _database.Execute(new Sql(sql));
+                _logger.Info<DatabaseSchemaCreator,string>("Create Index:\n {Sql}", sql);
             }
 
             //Loop through foreignkey statements and execute sql
             foreach (var sql in foreignSql)
             {
-                var createdFk = _database.Execute(new Sql(sql));
-                _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
+                _database.Execute(new Sql(sql));
+                _logger.Info<DatabaseSchemaCreator,string>("Create Foreign Key:\n {Sql}", sql);
             }
 
             if (overwrite)
             {
-                        _logger.Info<Database>("Table {TableName} was recreated", tableName);
+                _logger.Info<Database,string>("Table {TableName} was recreated", tableName);
             }
             else
             {
-                        _logger.Info<Database>("New table {TableName} was created", tableName);
+                _logger.Info<Database,string>("New table {TableName} was created", tableName);
 
             }
         }

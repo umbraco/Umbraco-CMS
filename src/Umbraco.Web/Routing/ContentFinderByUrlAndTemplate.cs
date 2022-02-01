@@ -9,11 +9,11 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page nice urls and a template.
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page nice URLs and a template.
     /// </summary>
     /// <remarks>
     /// <para>This finder allows for an odd routing pattern similar to altTemplate, probably only use case is if there is an alternative mime type template and it should be routable by something like "/hello/world/json" where the JSON template is to be used for the "world" page</para>
-    /// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
+    /// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice URL of a document, and <c>template</c> a template alias.</para>
     /// <para>If successful, then the template of the document request is also assigned.</para>
     /// </remarks>
     public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
@@ -56,11 +56,11 @@ namespace Umbraco.Web.Routing
 
             if (template == null)
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid template: '{TemplateAlias}'", templateAlias);
+                Logger.Debug<ContentFinderByUrlAndTemplate, string>("Not a valid template: '{TemplateAlias}'", templateAlias);
                 return false;
             }
 
-            Logger.Debug<ContentFinderByUrlAndTemplate>("Valid template: '{TemplateAlias}'", templateAlias);
+            Logger.Debug<ContentFinderByUrlAndTemplate, string>("Valid template: '{TemplateAlias}'", templateAlias);
 
             // look for node corresponding to the rest of the route
             var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
@@ -68,14 +68,14 @@ namespace Umbraco.Web.Routing
 
             if (node == null)
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid route to node: '{Route}'", route);
+                Logger.Debug<ContentFinderByUrlAndTemplate, string>("Not a valid route to node: '{Route}'", route);
                 return false;
             }
 
             // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
             if (!node.IsAllowedTemplate(template.Id))
             {
-                Logger.Warn<ContentFinderByUrlAndTemplate>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
+                Logger.Warn<ContentFinderByUrlAndTemplate, string,int>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
                 frequest.PublishedContent = null; // clear
                 return false;
             }

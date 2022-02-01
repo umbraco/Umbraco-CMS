@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -84,10 +85,18 @@ namespace Umbraco.Core.Migrations
 
         protected void ReplaceColumn<T>(string tableName, string currentName, string newName)
         {
-            AddColumn<T>(tableName, newName, out var sqls);
-            Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
-            foreach (var sql in sqls) Execute.Sql(sql).Do();
-            Delete.Column(currentName).FromTable(tableName).Do();
+            if (DatabaseType.IsSqlCe())
+            {
+                AddColumn<T>(tableName, newName, out var sqls);
+                Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
+                foreach (var sql in sqls) Execute.Sql(sql).Do();
+                Delete.Column(currentName).FromTable(tableName).Do();
+            }
+            else
+            {
+                Execute.Sql(SqlSyntax.FormatColumnRename(tableName, currentName, newName)).Do();
+                AlterColumn<T>(tableName, newName);
+            }
         }
 
         protected bool TableExists(string tableName)

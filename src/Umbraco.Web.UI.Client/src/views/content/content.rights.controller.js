@@ -11,7 +11,8 @@
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-        
+        vm.initialState = {};
+
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
@@ -24,7 +25,7 @@
         function onInit() {
             vm.loading = true;
             contentResource.getDetailedPermissions($scope.currentNode.id).then(function (userGroups) {
-                initData(userGroups);                
+                initData(userGroups);
                 vm.loading = false;
                 currentForm = angularHelper.getCurrentForm($scope);
             });
@@ -39,12 +40,27 @@
           //reset this
           vm.selectedUserGroups = [];
           vm.availableUserGroups = userGroups;
-          angular.forEach(vm.availableUserGroups, function (group) {
+          vm.availableUserGroups.forEach(function (group) {
             if (group.permissions) {
               //if there's explicit permissions assigned than it's selected
               assignGroupPermissions(group);
             }
           });
+          vm.initialState = angular.copy(userGroups);
+        }
+
+        function resetData() {
+            vm.selectedUserGroups = [];
+            vm.availableUserGroups = angular.copy(vm.initialState);
+            vm.availableUserGroups.forEach(function (group) {
+                if (group.permissions) {
+                    //if there's explicit permissions assigned than it's selected
+                    group.selected = false;
+                    assignGroupPermissions(group);
+                }
+            });
+            currentForm = angularHelper.getCurrentForm($scope);
+
         }
 
         function setViewSate(state) {
@@ -70,8 +86,8 @@
           group.allowedPermissions = [];
 
           // get list of checked permissions
-          angular.forEach(group.permissions, function (permissionGroup) {
-            angular.forEach(permissionGroup, function (permission) {
+          Object.values(group.permissions).forEach(function (permissionGroup) {
+            permissionGroup.forEach(function (permission) {
               if (permission.checked) {
                 //the `allowedPermissions` is what will get sent up to the server for saving
                 group.allowedPermissions.push(permission);
@@ -91,7 +107,7 @@
         }
 
         function setPermissions(group) {
-            assignGroupPermissions(group);  
+            assignGroupPermissions(group);
             setViewSate("manageGroups");
             $scope.dialog.confirmDiscardChanges = true;
         }
@@ -114,12 +130,13 @@
 
         function cancelManagePermissions() {
             setViewSate("manageGroups");
+            resetData();
         }
 
         function formatSaveModel(permissionsSave, groupCollection) {
-          angular.forEach(groupCollection, function (g) {
+          groupCollection.forEach(function (g) {
             permissionsSave[g.id] = [];
-            angular.forEach(g.allowedPermissions, function (p) {
+            g.allowedPermissions.forEach(function (p) {
               permissionsSave[g.id].push(p.permissionCode);
             });
           });
@@ -146,7 +163,7 @@
 
                 //re-assign model from server since it could have changed
                 initData(userGroups);
-
+                
                 // clear dirty state on the form so we don't see the discard changes notification
                 // we use a timeout here because in some cases the initData reformats the userGroups model and triggers a change after the form state was changed
                 $timeout(function() {
@@ -154,9 +171,10 @@
                     currentForm.$dirty = false;
                   }
                 });
-
+                $scope.dialog.confirmDiscardChanges = false;
                 vm.saveState = "success";
                 vm.saveSuccces = true;
+
             }, function(error){
                 vm.saveState = "error";
                 vm.saveError = error;

@@ -7,10 +7,24 @@
 
             scope.dataType = {};
             scope.customListViewCreated = false;
+
+            const listViewPrefix = "List View - ";
             
-            const checkForCustomListView = () => scope.dataType.name === "List View - " + scope.modelAlias;
+            const checkForCustomListView = () => invariantEquals(scope.dataType.name, listViewPrefix + scope.modelAlias);
+
+            // We also use "localeCompare" a few other places. Should probably be moved to a utility/helper function in future.
+            function invariantEquals(a, b) {
+                return typeof a === "string" && typeof b === "string"
+                    ? a.localeCompare(b, undefined, { sensitivity: "base" }) === 0
+                    : a === b;
+            }
 
             /* ---------- INIT ---------- */ 
+
+            const setDataType = (dataType) => {
+                scope.dataType = dataType;
+                listViewPrevalueHelper.setPrevalues(dataType.preValues);
+            }
 
             const activate = () => {
 
@@ -18,10 +32,7 @@
 
                     dataTypeResource.getByName(scope.listViewName)
                         .then(dataType => {
-
-                            scope.dataType = dataType;
-
-                            listViewPrevalueHelper.setPrevalues(dataType.preValues);
+                            setDataType(dataType);
                             scope.customListViewCreated = checkForCustomListView();
                         });
 
@@ -64,7 +75,7 @@
                 dataTypeResource.createCustomListView(scope.modelAlias).then(dataType => {
 
                     // store data type
-                    scope.dataType = dataType;
+                    setDataType(dataType);
 
                     // set list view name on scope
                     scope.listViewName = dataType.name;
@@ -95,7 +106,7 @@
                         .then(defaultDataType => {
 
                             // store data type
-                            scope.dataType = defaultDataType;
+                            setDataType(defaultDataType);
 
                             // change state to default list view
                             scope.customListViewCreated = false;

@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.RollbackController as vm">
+<div class="editor-rollback" ng-controller="Umbraco.Editors.RollbackController as vm">
 
     <umb-editor-view>
 
@@ -9,75 +9,145 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-        
+
         <umb-editor-container>
-            
+
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
 
-            <umb-box>
-                <umb-box-content>
+            <div class="main-content">
 
-                    <div ng-if="model.node.variants.length > 1">
-                        <h5><localize key="general_language"></localize></h5>
-                        <select 
-                            class="input-block-level"
-                            ng-model="vm.selectedLanguage"
-                            ng-options="variant as variant.language.name for variant in model.node.variants track by variant.language.culture"
-                            ng-change="vm.changeLanguage(vm.selectedLanguage)">
-                        </select>
-                    </div>
-                    
-                    <div>
-                                            
-                        <h5><localize key="rollback_currentVersion"></localize></h5>
-                        <p>{{vm.currentVersion.name}} (Created: {{vm.currentVersion.createDate}})</p>
-                        
-                        <h5><localize key="rollback_rollbackTo"></localize></h5>
-                        <select 
-                            class="input-block-level"
-                            ng-model="vm.selectedVersion"
-                            ng-options="version.displayValue for version in vm.previousVersions track by version.versionId"
-                            ng-change="vm.changeVersion(vm.selectedVersion)">
-                            <option value="">{{vm.labels.choose}}...</option>
-                        </select>
-                    </div>
+                <umb-box class="side-panel">
+                    <umb-box-header title-key="rollback_versions">
+                        <small>
+                            <localize 
+                                key="rollback_pagination"
+                                tokens="[vm.paginationCount.from, vm.paginationCount.to, vm.paginationCount.total]"
+                                watch-tokens="true">
+                            </localize>
+                        </small>
+                    </umb-box-header>
 
-                    <div ng-if="vm.diff" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
+                    <umb-box-content>
 
-                        <h5>Changes</h5>
-                        <small style="margin-bottom: 15px; display: block;"><localize key="rollback_diffHelp"></localize></small>
-        
-                        <table class="table table-condensed table-bordered">
-                            <tbody>
-                                <tr>
-                                    <td class="bold">Name</td>
-                                    <td>
-                                        <span ng-repeat="part in vm.diff.name">
-                                            <ins ng-if="part.added">{{part.value}}</ins>
-                                            <del ng-if="part.removed">{{part.value}}</del>
-                                            <span ng-if="!part.added && !part.removed">{{part.value}}</span>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr ng-repeat="property in vm.diff.properties track by property.alias">
-                                    <td class="bold">{{property.label}}</td>
-                                    <td ng-class="{'pre-line': property.isObject, 'word-wrap': !property.isObject}">
-                                        <span ng-repeat="part in property.diff">
-                                            <ins ng-if="part.added">{{part.value}}</ins>
-                                            <del ng-if="part.removed">{{part.value}}</del>
-                                            <span ng-if="!part.added && !part.removed">{{part.value}}</span>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-        
-                    </div>
+                        <div ng-if="model.node.variants.length > 1">
+                            <h5 class="mt0"><localize key="general_language">Language</localize></h5>
+                            <select
+                                class="culture-select input-block-level"
+                                ng-model="vm.selectedLanguage"
+                                ng-options="variant as variant.displayName for variant in model.node.variants track by variant.language.culture"
+                                ng-change="vm.changeLanguage(vm.selectedLanguage)">
+                            </select>
+                        </div>
 
-                </umb-box-content>
-            </umb-box>
+                        <div>
+                            <div class="current-version">
+                                <span class="bold"><localize key="rollback_currentVersion">Current version</localize>: </span>
+                                <span>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</span>
+                            </div>
+
+                            <div class="umb-table umb-table--condensed">
+
+                                <div class="umb-table-body">
+                                    <div class="umb-table-row umb-outline"
+                                        ng-repeat="version in vm.previousVersions track by version.versionId"
+                                        ng-class="{'-selectable cursor-pointer': !version.currentDraftVersion && !version.currentPublishedVersion,'-selected': version.versionId === vm.previousVersion.versionId }"
+                                        ng-click="vm.changeVersion(version)">
+                                        <div class="umb-table-cell dn"></div>
+                                        <div class="umb-table-cell black">
+                                            <div class="flex flex-column">
+                                                <div>{{ version.displayValue }}</div>
+                                                <div class="version-details">{{version.username}}</div>
+                                                <div class="version-details">
+                                                    <localize ng-if="version.currentPublishedVersion" key="rollback_currentPublishedVersion">Current version</localize>
+                                                    <localize ng-if="version.currentDraftVersion" key="rollback_currentDraftVersion">Current version</localize>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="umb-table-cell umb-table-cell--auto-width">
+                                            <umb-button 
+                                                style="margin-left: auto;"
+                                                button-style="outline"
+                                                type="button"
+                                                size="xxs"
+                                                state="version.pinningState"
+                                                action="vm.pinVersion(version, $event)"
+                                                label="{{ version.preventCleanup ? 'Enable cleanup' : 'Prevent cleanup' }}">
+                                            </umb-button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <umb-pagination
+                            ng-if="vm.totalPages > 0 && !vm.loading"
+                            page-number="vm.pageNumber"
+                            total-pages="vm.totalPages"
+                            on-change="vm.goToPage(pageNumber)">
+                        </umb-pagination>
+
+                    </umb-box-content>
+                </umb-box>
+
+                <umb-box class="compare-panel">
+
+                    <umb-box-header ng-if="vm.previousVersion" title="{{vm.previousVersion.displayValue}}"></umb-box-header>
+
+                    <umb-box-content>
+
+                        <umb-load-indicator ng-if="vm.loadingDiff"></umb-load-indicator>
+
+                        <umb-empty-state
+                            ng-if="!vm.diff"
+                            position="center">
+                            <localize key="rollback_headline"></localize>
+                        </umb-empty-state>
+
+                        <div ng-if="vm.diff && !vm.loadingDiff" class="diff">
+                            
+                            <small class="db" style="margin-bottom: 15px;">
+                                <localize key="rollback_diffHelp">
+                                    This shows the differences between the current version and the selected version<br /><del>Red text</del> will be
+                                    removed in the selected version, <ins>green text</ins> will be added
+                                </localize>
+                            </small>
+
+                            <table class="table table-condensed table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td class="bold">
+                                            <localize key="general_name">Name</localize>
+                                        </td>
+                                        <td>
+                                            <span ng-repeat="part in vm.diff.name track by $id(part)">
+                                                <ins ng-if="part.added">{{part.value}}</ins>
+                                                <del ng-if="part.removed">{{part.value}}</del>
+                                                <span ng-if="!part.added && !part.removed">{{part.value}}</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat="property in vm.diff.properties track by property.alias">
+                                        <td class="bold">{{property.label}}</td>
+                                        <td ng-class="{'pre-line': property.isObject, 'word-wrap': !property.isObject}">
+                                            <span ng-repeat="part in property.diff track by $id(part)">
+                                                <ins ng-if="part.added">{{part.value}}</ins>
+                                                <del ng-if="part.removed">{{part.value}}</del>
+                                                <span ng-if="!part.added && !part.removed">{{part.value}}</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </umb-box-content>
+                </umb-box>
+
+            </div>
         </umb-editor-container>
 
         <umb-editor-footer>

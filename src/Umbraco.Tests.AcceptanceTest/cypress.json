@@ -1,0 +1,15 @@
+{
+    "baseUrl": "https://localhost:44331",
+    "viewportHeight": 1024,
+    "viewportWidth": 1200,
+    "env": {
+        "username": "<insert username/email in cypress.env.json>",
+        "password": "<insert password in cypress.env.json>"
+    },
+    "supportFile": "cypress/support/index.ts",
+    "videoUploadOnPasses" : false,
+    "retries": {
+      "runMode": 5,
+      "openMode": 1
+    }
+}

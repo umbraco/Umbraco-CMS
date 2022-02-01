@@ -16,7 +16,6 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -174,7 +173,6 @@ AND umbracoNode.nodeObjectType = @objectType",
                     SortOrder = allowedContentType.SortOrder
                 });
             }
-
 
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
@@ -367,7 +365,7 @@ AND umbracoNode.id <> @id",
                     // see http://issues.umbraco.org/issue/U4-8663
                     orphanPropertyTypeIds = Database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete })
                         .Select(x => x.Id).ToList();
-                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId=NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
 
                     // now we can delete the tabs
                     Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = groupsToDelete });
@@ -449,8 +447,14 @@ AND umbracoNode.id <> @id",
                     // The composed property is only considered segment variant when the base content type is also segment variant.
                     // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
                     var target = newContentTypeVariation & composedPropertyType.Variations;
+                    // Determine the previous variation
+                    // We have to compare with the old content type variation because the composed property might already have changed
+                    // Example: A property with variations in an element type with variations is used in a document without
+                    //          when you enable variations the property has already enabled variations from the element type,
+                    //          but it's still a change from nothing because the document did not have variations, but it does now.
+                    var from = oldContentTypeVariation & composedPropertyType.Variations;
 
-                    propertyTypeVariationChanges[composedPropertyType.Id] = (composedPropertyType.Variations, target);
+                    propertyTypeVariationChanges[composedPropertyType.Id] = (from, target);
                 }
             }
 
@@ -506,7 +510,7 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Corrects the property type variations for the given entity
         /// to make sure the property type variation is compatible with the
-        /// variation set on the entity itself.        
+        /// variation set on the entity itself.
         /// </summary>
         /// <param name="entity">Entity to correct properties for</param>
         private void CorrectPropertyTypeVariations(IContentTypeComposition entity)
@@ -754,7 +758,7 @@ AND umbracoNode.id <> @id",
                 //we don't need to move the names! this is because we always keep the invariant names with the name of the default language.
 
                 //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
-                // if we want these SQL statements back, look into GIT history    
+                // if we want these SQL statements back, look into GIT history
             }
         }
 
@@ -764,7 +768,7 @@ AND umbracoNode.id <> @id",
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             // delete existing relations (for target language)
@@ -902,7 +906,7 @@ AND umbracoNode.id <> @id",
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             //first clear out any existing property data that might already exists under the target language
@@ -1001,7 +1005,7 @@ AND umbracoNode.id <> @id",
             //based on the current variance of each item to see if it's 'edited' value should be true/false.
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             var propertySql = Sql()
@@ -1033,7 +1037,7 @@ AND umbracoNode.id <> @id",
 
             //keep track of this node/lang to mark or unmark a culture as edited
             var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
-            //keep track of which node to mark or unmark as edited 
+            //keep track of which node to mark or unmark as edited
             var editedDocument = new Dictionary<int, bool>();
             var nodeId = -1;
             var propertyTypeId = -1;
@@ -1090,14 +1094,20 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            //lookup all matching rows in umbracoDocumentCultureVariation
-            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
-                .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
-                    Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
-                            .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
-                            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
-                //convert to dictionary with the same key type
-                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+            // lookup all matching rows in umbracoDocumentCultureVariation
+            // fetch in batches to account for maximum parameter count (distinct languages can't exceed 2000)
+            var languageIds = editedLanguageVersions.Keys.Select(x => x.langId).Distinct().ToArray();
+            var nodeIds = editedLanguageVersions.Keys.Select(x => x.nodeId).Distinct();
+            var docCultureVariationsToUpdate = nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length)
+                .SelectMany(group =>
+                {
+                    var sql = Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
+                        .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, languageIds)
+                        .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, group);
+
+                    return Database.Fetch<DocumentCultureVariationDto>(sql);
+                })
+                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x); //convert to dictionary with the same key type
 
             var toUpdate = new List<DocumentCultureVariationDto>();
             foreach (var ev in editedLanguageVersions)
@@ -1185,7 +1195,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
@@ -1198,7 +1208,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     pt.Name);
 
                 throw ex;
@@ -1211,7 +1221,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string, string>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     typeof(TEntity).Name,
                     entity.Name);
 
@@ -1243,7 +1253,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
+                    Logger.Warn<ContentTypeRepositoryBase<TEntity>, string, string>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
         }
@@ -1310,18 +1320,31 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             return test;
         }
 
-        /// <summary>
-        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
-        /// </summary>
-        /// <param name="contentPath"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse);
+            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray();
+            return HasContainerInPath(ids);
+        }
+
+        /// <inheritdoc />
+        public bool HasContainerInPath(params int[] ids)
+        {
             var sql = new Sql($@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
 WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        public bool HasContentNodes(int id)
+        {
+            var sql = new Sql(
+                $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = @id) THEN 1 ELSE 0 END",
+                new { id });
+            return Database.ExecuteScalar<int>(sql) == 1;
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -1340,8 +1363,8 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
                 "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-                "DELETE FROM cmsPropertyType WHERE contentTypeId = @id",
-                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id"
             };
             return list;
         }

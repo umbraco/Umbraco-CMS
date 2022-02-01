@@ -2,13 +2,17 @@ angular.module("umbraco.filters")
     .filter('compareArrays', function() {
         return function inArray(array, compareArray, compareProperty) {
 
+            if (!compareArray || !compareArray.length) {
+                return [...array];
+            }
+
             var result = [];
 
-            angular.forEach(array, function(arrayItem){
+            array.forEach(function(arrayItem){
 
                 var exists = false;
 
-                angular.forEach(compareArray, function(compareItem){
+                compareArray.forEach(function(compareItem){
                     if( arrayItem[compareProperty] === compareItem[compareProperty]) {
                         exists = true;
                     }

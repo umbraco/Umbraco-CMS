@@ -1,4 +1,4 @@
-function ExamineManagementController($scope, $http, $q, $timeout, $location, umbRequestHelper, localizationService, overlayService, editorService) {
+function ExamineManagementController($http, $q, $timeout, umbRequestHelper, localizationService, overlayService, editorService) {
 
     var vm = this;
 
@@ -9,7 +9,9 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
     vm.selectedIndex = null;
     vm.selectedSearcher = null;
     vm.searchResults = null;
+    vm.showSearchResultFields = [];
 
+    vm.showSelectFieldsDialog = showSelectFieldsDialog;
     vm.showSearchResultDialog = showSearchResultDialog;
     vm.showIndexInfo = showIndexInfo;
     vm.showSearcherInfo = showSearcherInfo;
@@ -24,22 +26,61 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
 
     vm.infoOverlay = null;
 
-    function showSearchResultDialog(values) {
+    function showSelectFieldsDialog() {
         if (vm.searchResults) {
 
-            localizationService.localize("examineManagement_fieldValues").then(function (value) {
+            // build list of available fields
+            var availableFields = [];
+            vm.searchResults.results.map(r => Object.keys(r.values).map(key => {
+                if (availableFields.indexOf(key) == -1 && key != "__NodeId" && key != "nodeName") {
+                    availableFields.push(key);
+                }
+            }));
 
-                vm.searchResults.overlay = {
-                    title: value,
-                    searchResultValues: values,
-                    view: "views/dashboard/settings/examinemanagementresults.html",
-                    close: function () {
-                        vm.searchResults.overlay = null;
-                    }
-                };
+            availableFields.sort();
+
+            editorService.open({
+                title: "Fields",
+                availableFields: availableFields,
+                fieldIsSelected: function(key) {
+                    return vm.showSearchResultFields.indexOf(key) > -1;
+                },
+                toggleField: vm.toggleField,
+                size: "small",
+                view: "views/dashboard/settings/examinemanagementfields.html",
+                close: function () {
+                    editorService.close();
+                }
             });
         }
     }
+
+    function showSearchResultDialog(values) {
+        if (vm.searchResults) {
+            localizationService.localize("examineManagement_fieldValues").then(function (value) {
+                editorService.open({
+                    title: value,
+                    searchResultValues: values,
+                    size: "medium",
+                    view: "views/dashboard/settings/examinemanagementresults.html",
+                    close: function () {
+                        editorService.close();
+                    }
+                });
+            });
+        }
+    }
+
+    vm.toggleField = function(key) {
+        if (vm.showSearchResultFields.indexOf(key) > -1) {
+            vm.showSearchResultFields = vm.showSearchResultFields.filter(field => field != key);
+        }
+        else {
+            vm.showSearchResultFields.push(key);
+        }
+
+        vm.showSearchResultFields.sort();
+    };
 
     function nextSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
@@ -167,17 +208,17 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
                 vm.searchResults.totalPages = Math.ceil(vm.searchResults.totalRecords / 20);
                 // add URLs to edit well known entities
                 _.each(vm.searchResults.results, function (result) {
-                    var section = result.values["__IndexType"];
+                    var section = result.values["__IndexType"][0];
                     switch (section) {
                         case "content":
                         case "media":
-                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"];
-                            result.editId = result.values["__NodeId"];
+                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"][0];
+                            result.editId = result.values["__NodeId"][0];
                             result.editSection = section;
                             break;
                         case "member":
-                            result.editUrl = "/member/member/edit/" + result.values["__Key"];
-                            result.editId = result.values["__Key"];
+                            result.editUrl = "/member/member/edit/" + result.values["__Key"][0];
+                            result.editId = result.values["__Key"][0];
                             result.editSection = section;
                             break;
                     }

@@ -92,7 +92,7 @@
 
         function save() {
             vm.buttonState = "busy";
-            var groups = _.map(vm.groups, function (group) { return group.name; });
+            var groups = _.map(vm.groups, function (group) { return encodeURIComponent(group.name); });
             var usernames = _.map(vm.members, function (member) { return member.username; });
             contentResource.updatePublicAccess(id, groups, usernames, vm.loginPage.id, vm.errorPage.id).then(
                 function () {

@@ -38,12 +38,15 @@ namespace Umbraco.Web.Models.Mapping
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
             {
-                _logger.Error<ContentPropertyBasicMapper<TDestination>>(
+                _logger.Error<ContentPropertyBasicMapper<TDestination>, string>(
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"),
                     "No property editor '{PropertyEditorAlias}' found, converting to a Label",
                     property.PropertyType.PropertyEditorAlias);
 
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
+
+                if (editor == null)
+                    throw new InvalidOperationException($"Could not resolve the property editor {Constants.PropertyEditors.Aliases.Label}");
             }
 
             dest.Id = property.Id;
@@ -70,8 +73,13 @@ namespace Umbraco.Web.Models.Mapping
 
             dest.Culture = culture;
 
+            // Get the segment, which is always allowed to be null even if the propertyType *can* be varied by segment.
+            // There is therefore no need to perform the null check like with culture above.
+            var segment = !property.PropertyType.VariesBySegment() ? null : context.GetSegment();
+            dest.Segment = segment;
+
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
+            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture, segment);
         }
     }
 }

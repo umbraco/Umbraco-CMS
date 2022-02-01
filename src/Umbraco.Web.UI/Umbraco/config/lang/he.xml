@@ -68,7 +68,7 @@
     <key alias="save">שמור</key>
     <key alias="saveAndPublish">שמור ופרסם</key>
     <key alias="saveToPublish">שמור ושלח לאישור</key>
-    <key alias="showPage">תצוגה מקדימה</key>
+    <key alias="saveAndPreview">תצוגה מקדימה</key>
     <key alias="styleChoose">בחר עיצוב</key>
     <key alias="styleShow">הצג עיצוב</key>
     <key alias="tableInsert">הוספת טבלה</key>
@@ -181,7 +181,7 @@
     <key alias="recycleBinDeleting">הפריטים הנמצאים בסל המיחזור נמחקים כעת, השאר חלון זה פתוח עד לגמר פעולת המחיקה.</key>
     <key alias="recycleBinIsEmpty">סל המיחזור ריק כעת</key>
     <key alias="recycleBinWarning">מחיקת פריטים מסל המיחזור תמחוק את הפריטים לצמיתות</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
     <key alias="regexSearchHelp">חיפוש ביטויים להוספת אימות עבור שדות טופס. לדוגמא: 'כתובת אימייל', 'מיקוד', 'כתובת אתר' ועוד</key>
     <key alias="removeMacro">הסר מאקרו</key>
     <key alias="requiredField">שדה חובה</key>
@@ -361,8 +361,8 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
-              done.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              More information on editing web.config here.</a></p>]]></key>
+              done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              More information on editing web.config here</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
         If you're installing on a local machine or server you might need information from your system administrator.]]></key>
@@ -409,7 +409,7 @@
     <key alias="runwayFromScratch">אני רוצה להתחיל מאתר ריק</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
     <key alias="runwayHeader">סיימת להתקין את מערכת אומברקו, מה ברצונך לעשות כעת?</key>
@@ -449,7 +449,7 @@ Get help from our award winning community, browse the documentation or watch som
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+To manage your website, simply open the Umbraco backoffice and start adding content, updating the templates and stylesheets or add new functionality]]></key>
     <key alias="Unavailable">ההתחברות לבסיס הנתונים נכשלה.</key>
     <key alias="Version3">Umbraco גירסה 3</key>
     <key alias="Version4">Umbraco גירסה 4</key>
@@ -467,7 +467,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="renewSession">יש לבצע חידוש פעילות על מנת לשמור על התוכן</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">לוח הבקרה</key>
@@ -863,5 +863,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="usertype">סוג משתמש</key>
     <key alias="userTypes">סוגי משתמש</key>
     <key alias="writer">כותב</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">בחר הכל</key>
+    <key alias="deselectAllLogLevelFilters">הסר סימון מהכל</key>
   </area>
 </language>

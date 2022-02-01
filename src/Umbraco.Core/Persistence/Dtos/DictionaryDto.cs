@@ -5,11 +5,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.DictionaryEntry)]
+    [TableName(TableName)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class DictionaryDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
+
         [Column("pk")]
         [PrimaryKeyColumn]
         public int PrimaryKey { get; set; }
@@ -21,6 +23,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("parent")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [ForeignKey(typeof(DictionaryDto), Column = "id")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Parent")] 
         public Guid? Parent { get; set; }
 
         [Column("key")]

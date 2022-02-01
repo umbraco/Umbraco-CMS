@@ -73,7 +73,7 @@ namespace Umbraco.Web.HealthCheck
             }
             catch (Exception ex)
             {
-                _logger.Error<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}", check.Name);
+                _logger.Error<HealthCheckController, string>(ex, "Exception in health check: {HealthCheckName}", check.Name);
                 throw;
             }
         }

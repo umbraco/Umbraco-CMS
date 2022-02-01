@@ -26,22 +26,22 @@ namespace Umbraco.Tests.Packaging
     public class PackageDataInstallationTests : TestWithSomeContentBase
     {
         [HideFromTypeFinder]
+        [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c", "Editor1", "editor1")]
         public class Editor1 : DataEditor
         {
             public Editor1(ILogger logger)
                 : base(logger)
             {
-                Alias = "7e062c13-7c41-4ad9-b389-41d88aeef87c";
             }
         }
 
         [HideFromTypeFinder]
+        [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5", "Editor2", "editor2")]
         public class Editor2 : DataEditor
         {
             public Editor2(ILogger logger)
                 : base(logger)
             {
-                Alias = "d15e1281-e456-4b24-aa86-1dda3e4299d5";
             }
         }
 
@@ -756,6 +756,119 @@ namespace Umbraco.Tests.Packaging
                                     }
                 }
             );
+        }
+
+        [Test]
+        public void ImportDocumentType_NewTypeWithOmittedHistoryCleanupPolicy_InsertsDefaultPolicy()
+        {
+            // Arrange
+            var withoutCleanupPolicy = XElement.Parse(ImportResources.SingleDocType);
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(withoutCleanupPolicy, 0);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsFalse(contentTypes.Single().HistoryCleanup.PreventCleanup);
+            });
+        }
+
+        [Test]
+        public void ImportDocumentType_WithHistoryCleanupPolicyElement_ImportsWithCorrectValues()
+        {
+            // Arrange
+            var docTypeElement = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            });
+        }
+
+
+        [Test]
+        public void ImportDocumentType_ExistingTypeWithOmittedHistoryCleanupPolicy_DoesNotOverwriteDatabaseContent()
+        {
+            // Arrange
+            var withoutCleanupPolicy = XElement.Parse(ImportResources.SingleDocType);
+            var withCleanupPolicy = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(withCleanupPolicy, 0);
+            var contentTypesUpdated = PackageDataInstallation.ImportDocumentType(withoutCleanupPolicy, 0);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+
+                Assert.NotNull(contentTypesUpdated.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypesUpdated.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            });
+        }
+
+        // This test covers EntityXmlSerializer, it's in an odd place, much like Can_Export_Single_DocType
+        [Test]
+        public void Serialize_ForContentTypeWithHistoryCleanupPolicy_OutputsSerializedHistoryCleanupPolicy()
+        {
+            // Arrange
+            var docTypeElement = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            var serializer = Factory.GetInstance<IEntityXmlSerializer>();
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            var contentType = contentTypes.FirstOrDefault();
+            var element = serializer.Serialize(contentType);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value, Is.EqualTo("true"));
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value, Is.EqualTo("1"));
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value, Is.EqualTo("2"));
+            });
+        }
+
+
+        // This test covers EntityXmlSerializer, it's in an odd place, much like Can_Export_Single_DocType
+        [Test]
+        public void Serialize_ForContentTypeWithNullHistoryCleanupPolicy_DoesNotOutputSerializedDefaultPolicy()
+        {
+            // Arrange
+            var docTypeElement = XElement.Parse(ImportResources.SingleDocType);
+
+            var serializer = Factory.GetInstance<IEntityXmlSerializer>();
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            var contentType = contentTypes.First();
+
+            // Import results in this being created even if not present in XML
+            // These tests are all a bit confused as to what is under test, do better in v9.
+            contentType.HistoryCleanup = null;
+
+            var element = serializer.Serialize(contentType);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(element.Element("HistoryCleanupPolicy"), Is.Null);
+            });
         }
     }
 }

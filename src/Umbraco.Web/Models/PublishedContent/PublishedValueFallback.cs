@@ -111,7 +111,7 @@ namespace Umbraco.Web.Models.PublishedContent
             var propertyType = content.ContentType.GetPropertyType(alias);
             if (propertyType != null)
             {
-                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment);
                 noValueProperty = content.GetProperty(alias);
             }
 
@@ -168,7 +168,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 {
                     culture = null;
                     segment = null;
-                    _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+                    _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment);
                 }
 
                 property = content?.GetProperty(alias);

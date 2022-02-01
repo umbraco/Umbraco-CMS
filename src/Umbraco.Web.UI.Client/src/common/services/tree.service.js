@@ -47,14 +47,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
         /** Internal method to track expanded paths on a tree */
         _trackExpandedPaths: function (node, expandedPaths) {
-            if (!node.children || !angular.isArray(node.children) || node.children.length == 0) {
+            if (!node.children || !Utilities.isArray(node.children) || node.children.length == 0) {
                 return;
             }
 
             //take the last child
             var childPath = this.getPath(node.children[node.children.length - 1]).join(",");
             //check if this already exists, if so exit
-            if (expandedPaths.indexOf(childPath) !== -1) {
+            if (expandedPaths.includes(childPath)) {
                 return;
             }
 
@@ -65,18 +65,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
 
-            _.each(clonedPaths, function (p) {
+            clonedPaths.forEach(p => {
                 if (childPath.startsWith(p + ",")) {
                     //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
                     expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    if (expandedPaths.indexOf(childPath) === -1) {
+                    if (expandedPaths.includes(childPath) === false) {
                         expandedPaths.push(childPath); //replace it
                     }
                 }
                 else if (p.startsWith(childPath + ",")) {
                     //this means we've already tracked a deeper node so we shouldn't track this one
                 }
-                else if (expandedPaths.indexOf(childPath) === -1) {
+                else if (expandedPaths.includes(childPath) === false) {
                     expandedPaths.push(childPath); //track it
                 }
             });
@@ -135,7 +135,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (treeNode.iconIsClass === undefined || treeNode.iconIsClass) {
                     var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
                     treeNode.cssClass = standardCssClass + " " + converted;
-                    if (converted.startsWith('.')) {
+                    if (converted && converted.startsWith('.')) {
                         //its legacy so add some width/height
                         treeNode.style = "height:16px;width:16px;";
                     }
@@ -174,7 +174,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //we determine this based on the server variables
             if (Umbraco.Sys.ServerVariables.umbracoPlugins &&
                 Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
-                angular.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
+                Utilities.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
 
                 var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function (item) {
                     return invariantEquals(item.alias, treeAlias);
@@ -235,7 +235,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         }
                     });
                 }
-                else if (args.filter && angular.isFunction(args.filter)) {
+                else if (args.filter && Utilities.isFunction(args.filter)) {
                     //if a filter is supplied a cacheKey must be supplied as well
                     if (!args.cacheKey) {
                         throw "args.cacheKey is required if args.filter is supplied";
@@ -315,7 +315,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         args.node.hasChildren = true;
 
                         //Since we've removed the children &  reloaded them, we need to refresh the UI now because the tree node UI doesn't operate on normal angular $watch since that will be pretty slow
-                        if (angular.isFunction(args.node.updateNodeData)) {
+                        if (Utilities.isFunction(args.node.updateNodeData)) {
                             args.node.updateNodeData(args.node);
                         }
                     }
@@ -349,7 +349,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {object} treeNode the node to remove
          */
         removeNode: function (treeNode) {
-            if (!angular.isFunction(treeNode.parent)) {
+            if (!Utilities.isFunction(treeNode.parent)) {
                 return;
             }
 
@@ -390,7 +390,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets a child node with a given ID, from a specific treeNode
-         * @param {object} treeNode to retrive child node from
+         * @param {object} treeNode to retrieve child node from
          * @param {int} id id of child node
          */
         getChildNode: function (treeNode, id) {
@@ -411,7 +411,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets a descendant node by id
-         * @param {object} treeNode to retrive descendant node from
+         * @param {object} treeNode to retrieve descendant node from
          * @param {int} id id of descendant node
          * @param {string} treeAlias - optional tree alias, if fetching descendant node from a child of a listview document
          */
@@ -473,7 +473,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             for (var i = 0; i < treeNode.children.length; i++) {
                 var child = treeNode.children[i];
-                if (child.children && angular.isArray(child.children) && child.children.length > 0) {
+                if (child.children && Utilities.isArray(child.children) && child.children.length > 0) {
                     //recurse
                     found = this.getDescendantNode(child, id);
                     if (found) {
@@ -494,7 +494,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets the root node of the current tree type for a given tree node
-         * @param {object} treeNode to retrive tree root node from
+         * @param {object} treeNode to retrieve tree root node from
          */
         getTreeRoot: function (treeNode) {
             if (!treeNode) {
@@ -509,7 +509,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (current.metaData && current.metaData["treeAlias"]) {
                     root = current;
                 }
-                else if (angular.isFunction(current.parent)) {
+                else if (Utilities.isFunction(current.parent)) {
                     //we can only continue if there is a parent() method which means this
                     // tree node was loaded in as part of a real tree, not just as a single tree
                     // node from the server.
@@ -531,7 +531,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node
-         * @param {object} treeNode to retrive tree alias from
+         * @param {object} treeNode to retrieve tree alias from
          */
         getTreeAlias: function (treeNode) {
             var root = this.getTreeRoot(treeNode);
@@ -706,7 +706,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     //to fire, instead we're just going to replace all the properties of this node.
 
                     //there should always be a method assigned but we'll check anyways
-                    if (angular.isFunction(node.parent().children[index].updateNodeData)) {
+                    if (Utilities.isFunction(node.parent().children[index].updateNodeData)) {
                         node.parent().children[index].updateNodeData(found);
                     }
                     else {
@@ -741,7 +741,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!node) {
                 throw "node cannot be null";
             }
-            if (!angular.isFunction(node.parent)) {
+            if (!Utilities.isFunction(node.parent)) {
                 throw "node.parent is not a function, the path cannot be resolved";
             }
 
@@ -773,7 +773,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!args.path) {
                 throw "No path defined on args object for syncTree";
             }
-            if (!angular.isArray(args.path)) {
+            if (!Utilities.isArray(args.path)) {
                 throw "Path must be an array";
             }
             if (args.path.length < 1) {

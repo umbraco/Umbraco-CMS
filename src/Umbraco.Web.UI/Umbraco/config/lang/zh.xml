@@ -90,31 +90,11 @@
     <key alias="saveAndPublish">保存并发布</key>
     <key alias="saveToPublish">保存并提交审核</key>
     <key alias="saveListView">保存列表视图</key>
-    <key alias="showPage">预览</key>
+    <key alias="saveAndPreview">预览</key>
     <key alias="showPageDisabled">因未设置模板无法预览</key>
     <key alias="styleChoose">选择样式</key>
     <key alias="styleShow">显示样式</key>
     <key alias="tableInsert">插入表格</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">要更改所选节点的文档类型，先在列表中选择合适的文档类型。</key>
-    <key alias="changeDocTypeInstruction2">然后设置当前文档类型到新文档类型的各字段间的对应映射关系并保存。</key>
-    <key alias="contentRepublished">内容已被重新发布</key>
-    <key alias="currentProperty">当前属性</key>
-    <key alias="currentType">当前类型</key>
-    <key alias="docTypeCannotBeChanged">不能改变文档类型，因为没有可替代的类型。</key>
-    <key alias="docTypeChanged">文档类型已更改</key>
-    <key alias="mapProperties">要映射的字段</key>
-    <key alias="mapToProperty">映射字段</key>
-    <key alias="newTemplate">新模板</key>
-    <key alias="newType">新类型</key>
-    <key alias="none">无</key>
-    <key alias="selectedContent">内容</key>
-    <key alias="selectNewDocType">选择新的文档类型</key>
-    <key alias="successMessage">选中文档的类型已被成功更改为[new type]，以下字段被映射：</key>
-    <key alias="to">至</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成字段映射，因为存在一个字段映射至多字段的问题。</key>
-    <key alias="validDocTypesNote">仅显示可作为替代的文档类型。</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">已发布</key>
@@ -146,8 +126,8 @@
     <key alias="otherElements">属性</key>
     <key alias="parentNotPublished">该文档不可见，因为其上级 '%0%' 未发布。</key>
     <key alias="parentNotPublishedAnomaly">该文档已发布，但是没有更新至缓存（内部错误）</key>
-    <key alias="getUrlException">Could not get the url</key>
-    <key alias="routeError">This document is published but its url would collide with content %0%</key>
+    <key alias="getUrlException">Could not get the URL</key>
+    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
     <key alias="publish">发布</key>
     <key alias="publishStatus">发布状态</key>
     <key alias="releaseDate">发布于</key>
@@ -169,7 +149,7 @@
     <key alias="childItems" version="7.0">子项</key>
     <key alias="target" version="7.0">目标</key>
     <key alias="scheduledPublishServerTime">这将转换到服务器上的以下时间:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">这是什么意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">这是什么意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">点击上传</key>
@@ -257,8 +237,8 @@
     <key alias="recycleBinDeleting">正在清空回收站，请不要关闭窗口。</key>
     <key alias="recycleBinIsEmpty">回收站已清空</key>
     <key alias="recycleBinWarning">从回收站删除的项目将不可恢复</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>的服务暂时出现问题。]]></key>
-    <key alias="regexSearchHelp">查找正则表达式来验证输入，如: 'email、'zip-code'、'url'。</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>的服务暂时出现问题。]]></key>
+    <key alias="regexSearchHelp">查找正则表达式来验证输入，如: 'email、'zip-code'、'URL'。</key>
     <key alias="removeMacro">移除宏</key>
     <key alias="requiredField">必填项</key>
     <key alias="sitereindexed">站点已重建索引</key>
@@ -514,7 +494,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
               <p>您可以自行编辑“web.config”文件，键名为 “UmbracoDbDSN”</p>
               <p>
-             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">。
+             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">。
                                     如何编辑web.config</a></p>
     ]]></key>
     <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />
@@ -562,7 +542,7 @@
     <key alias="runwayFromScratch">我要从头开始</key>
     <key alias="runwayFromScratchText"><![CDATA[
        此时您的网站是全空的,您应该首先建立您的文档类型和模板
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
        您也可以安装晚一些安装“Runway”。
     ]]></key>
     <key alias="runwayHeader">您刚刚安装了一个干净的系统，要继续吗？</key>
@@ -630,7 +610,7 @@
     <key alias="instruction">在下方登录</key>
     <key alias="signInWith">登录</key>
     <key alias="timeout">会话超时</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">忘记密码?</key>
     <key alias="forgottenPasswordInstruction">电子邮件将发送到地址指定的链接, 以重置您的密码</key>
     <key alias="requestPasswordResetConfirmation">如果电子邮件与我们的记录相符, 则将发送带有密码重置指令的邮件</key>
@@ -847,7 +827,6 @@
     <key alias="tabs">选项卡</key>
     <key alias="contentTypeEnabled">主控文档类型激活</key>
     <key alias="contentTypeUses">该文档类型使用</key>
-    <key alias="asAContentMasterType">作为主控文档类型. 主控文档类型的标签只能在主控文档类型里修改。</key>
     <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
     <key alias="addIcon">添加图标</key>
   </area>
@@ -1156,7 +1135,7 @@
     <key alias="validation">验证</key>
     <key alias="validateAsEmail">验证为电子邮件</key>
     <key alias="validateAsNumber">验证为数字</key>
-    <key alias="validateAsUrl">验证为 url</key>
+    <key alias="validateAsUrl">验证为 URL</key>
     <key alias="enterCustomValidation">...或输入自定义验证</key>
     <key alias="fieldIsMandatory">字段是强制性的</key>
   </area>
@@ -1195,7 +1174,7 @@
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
     <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
@@ -1245,19 +1224,23 @@
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
   </area>
   <area alias="redirectUrls">
-    <key alias="disableUrlTracker">禁用 url 跟踪程序</key>
-    <key alias="enableUrlTracker">启用 url 跟踪程序</key>
+    <key alias="disableUrlTracker">禁用 URL 跟踪程序</key>
+    <key alias="enableUrlTracker">启用 URL 跟踪程序</key>
     <key alias="originalUrl">原始网址</key>
     <key alias="redirectedTo">已重定向至</key>
     <key alias="noRedirects">未进行重定向</key>
     <key alias="noRedirectsDescription">当已发布的页重命名或移动时, 将自动对新页进行重定向。</key>
     <key alias="confirmRemove">确实要删除 "%0%" 到 "%1%" 的重定向吗？</key>
     <key alias="redirectRemoved">重定向URL已删除。</key>
-    <key alias="redirectRemoveError">删除重定向 url 时出错.</key>
-    <key alias="confirmDisable">是否确实要禁用 url 跟踪程序?</key>
-    <key alias="disabledConfirm">url 跟踪器现在已被禁用。</key>
-    <key alias="disableError">禁用 url 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
-    <key alias="enabledConfirm">现在已启用 url 跟踪程序。</key>
-    <key alias="enableError">启用 url 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
+    <key alias="redirectRemoveError">删除重定向 URL 时出错.</key>
+    <key alias="confirmDisable">是否确实要禁用 URL 跟踪程序?</key>
+    <key alias="disabledConfirm">URL 跟踪器现在已被禁用。</key>
+    <key alias="disableError">禁用 URL 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
+    <key alias="enabledConfirm">现在已启用 URL 跟踪程序。</key>
+    <key alias="enableError">启用 URL 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">全选</key>
+    <key alias="deselectAllLogLevelFilters">取消全选</key>
   </area>
 </language>

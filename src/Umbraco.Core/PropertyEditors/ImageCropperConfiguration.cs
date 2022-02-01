@@ -1,4 +1,8 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using static Umbraco.Core.PropertyEditors.ValueConverters.ImageCropperValue;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -20,6 +24,37 @@ namespace Umbraco.Core.PropertyEditors
 
             [JsonProperty("height")]
             public int Height { get; set; }
+        }
+    }
+
+    internal static class ImageCropperConfigurationExtensions
+    {
+        /// <summary>
+        /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, ImageCropperConfiguration configuration)
+        {
+            var crops = new List<ImageCropperCrop>();
+
+            var configuredCrops = configuration?.Crops;
+            if (configuredCrops != null)
+            {
+                foreach (var configuredCrop in configuredCrops)
+                {
+                    var crop = imageCropperValue.Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+
+                    crops.Add(new ImageCropperCrop
+                    {
+                        Alias = configuredCrop.Alias,
+                        Width = configuredCrop.Width,
+                        Height = configuredCrop.Height,
+                        Coordinates = crop?.Coordinates
+                    });
+                }
+            }
+
+            imageCropperValue.Crops = crops;
         }
     }
 }

@@ -2,7 +2,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.UrlListController"
 	function($rootScope, $scope, $filter) {
 
 	    function formatDisplayValue() {            
-	        if (angular.isArray($scope.model.value)) {
+	        if (Utilities.isArray($scope.model.value)) {
 	            //it's the json value
 	            $scope.renderModel = _.map($scope.model.value, function (item) {
 	                return {

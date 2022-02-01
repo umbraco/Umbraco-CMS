@@ -1,0 +1,152 @@
+.umb-block-card, 
+umb-block-card {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: auto;
+    background-color: white;
+    border-radius: @doubleBorderRadius;
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+
+    transition: box-shadow 120ms;
+
+    cursor: pointer;
+
+    .umb-outline();
+
+    &:hover {
+        box-shadow: 0 1px 3px rgba(@ui-action-type-hover, .5);
+    }
+
+    &.--isOpen {
+        &::after {
+            content: "";
+            position: absolute;
+            border: 2px solid @ui-active-border;
+            border-radius: @doubleBorderRadius;
+            top:0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    }
+
+    &.--sortable-placeholder {
+        &::after {
+            content: "";
+            position: absolute;
+            background-color:rgba(@ui-drop-area-color, .05);
+            border: 2px solid rgba(@ui-drop-area-color, .1);
+            border-radius: @doubleBorderRadius;
+            box-shadow: 0 0 4px rgba(@ui-drop-area-color, 0.05);
+            top:0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            animation: umb-block-card--sortable-placeholder 400ms ease-in-out alternate infinite;
+            @keyframes umb-block-card--sortable-placeholder {
+                0%   { opacity: 1; }
+                100% { opacity: 0.5; }
+            }
+        }
+        box-shadow: none;
+    }
+
+    .__showcase {
+        position: relative;
+        width: 100%;
+        padding-bottom: 10/16*100%;
+        background-color: @gray-12;
+        
+        background-size: contain;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        
+        border-top-left-radius: @doubleBorderRadius;
+        border-top-right-radius: @doubleBorderRadius;
+
+        &.--error {
+            border: 2px solid @errorBackground;
+            border-bottom: none;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            box-sizing: border-box;
+        }
+        
+        .__icon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size:42px;
+        }
+    }
+    
+    .__info {
+        width: 100%;
+        background-color: #fff;
+        padding-top: 10px;
+        padding-bottom: 11px;// 10 + 1 to compentiate for the -1 substraction in margin-bottom.
+        border-bottom-left-radius: @doubleBorderRadius;
+        border-bottom-right-radius: @doubleBorderRadius;
+
+        &.--error {
+            background-color: @errorBackground;
+            .__name, .__subname {
+                color: @errorText;
+            }
+        }
+
+        .__name {
+            font-weight: bold;
+            font-size: 14px;
+            color: @ui-action-type;
+            margin-left: 16px;
+            margin-bottom: -1px;
+        }
+        .__subname {
+            color: @gray-4;
+            font-size: 12px;
+            margin-left: 16px;
+            margin-top: 1px;
+            margin-bottom: -1px;
+            line-height: 1.5em;
+        }
+    }
+
+    &:hover {
+        .__info:not(.--error) {
+            .__name {
+                color: @ui-action-type-hover;
+            }
+        }
+    }
+
+    .__actions {
+        position: absolute;
+        top: 10px;
+        right: 0;
+        opacity: 0;
+        transition: opacity 120ms;
+        .__action {
+            display: inline-block;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+            background-color: white;
+            color:@ui-action-type;
+            &:hover {
+                color: @ui-action-type-hover;
+            }
+        }
+    }
+    &:hover, &:focus, &:focus-within {
+        .__actions {
+            opacity: 1;
+        }
+    }
+
+}

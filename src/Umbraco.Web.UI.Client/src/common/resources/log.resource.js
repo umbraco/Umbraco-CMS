@@ -1,7 +1,7 @@
 /**
     * @ngdoc service
     * @name umbraco.resources.logResource
-    * @description Retrives log history from umbraco
+    * @description Retrieves log history from umbraco
     * 
     *
     **/
@@ -71,7 +71,7 @@ function logResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
 
@@ -140,7 +140,7 @@ function logResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
 

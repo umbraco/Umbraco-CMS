@@ -1,24 +1,53 @@
-//this controller simply tells the dialogs service to open a memberPicker window
+//this controller tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberGroupPicker($scope, editorService, memberGroupResource){
+function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
+
+    var vm = this;
+
+    vm.openMemberGroupPicker = openMemberGroupPicker;
+    vm.remove = remove;
+    vm.clear = clear;
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
     }
 
+    var removeAllEntriesAction = {
+        labelKey: 'clipboard_labelForRemoveAllEntries',
+        labelTokens: [],
+        icon: 'trash',
+        method: removeAllEntries,
+        isDisabled: true
+    };
+
     $scope.renderModel = [];
     $scope.allowRemove = true;
     $scope.groupIds = [];
 
+    if ($scope.model.config && $scope.umbProperty) {
+        $scope.umbProperty.setPropertyActions([
+            removeAllEntriesAction
+        ]);
+    }
+
     if ($scope.model.value) {
         var groupIds = $scope.model.value.split(',');
+
         memberGroupResource.getByIds(groupIds).then(function(groups) {
             $scope.renderModel = groups;
         });
+
+        removeAllEntriesAction.isDisabled = groupIds.length === 0;
     }
 
-    $scope.openMemberGroupPicker = function() {
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
+    function openMemberGroupPicker() {
         var memberGroupPicker = {
             multiPicker: true,
             submit: function (model) {
@@ -27,11 +56,18 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                     : [model.selectedMemberGroup],
                     function (id) { return parseInt(id); }
                 );
+
+                var currIds = renderModelIds();
+
                 // figure out which groups are new and fetch them
-                var newGroupIds = _.difference(selectedGroupIds, renderModelIds());
+                var newGroupIds = _.difference(selectedGroupIds, currIds);
+
+                removeAllEntriesAction.isDisabled = currIds.length === 0 && newGroupIds.length === 0;
+
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
+                        setDirty();
                         editorService.close();
                     });
                 }
@@ -39,37 +75,49 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                     // no new groups selected
                     editorService.close();
                 }
-                editorService.close();
             },
             close: function() {
                 editorService.close();
             }
         };
         editorService.memberGroupPicker(memberGroupPicker);
-    };
+    }
 
-    $scope.remove =function(index){
+    function remove(index) {
         $scope.renderModel.splice(index, 1);
-    };
 
-    $scope.add = function (item) {
-        var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
-        });
+        var currIds = renderModelIds();
+        removeAllEntriesAction.isDisabled = currIds.length === 0;
 
-        if (currIds.indexOf(item) < 0) {
-            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
-        }	
-    };
+        setDirty();
+    }
 
-    $scope.clear = function() {
+    function clear() {
         $scope.renderModel = [];
-    };
+        removeAllEntriesAction.isDisabled = true;
+
+        setDirty();
+    }
+
+    function removeAllEntries() {
+        localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
+            overlayService.confirmDelete({
+                title: data[1],
+                content: data[0],
+                close: () => {
+                    overlayService.close();
+                },
+                submit: () => {
+                    vm.clear();
+                    overlayService.close();
+                }
+            });
+        });
+    }
 
     function renderModelIds() {
-        return _.map($scope.renderModel, function (i) {
-            return i.id;
-        });
+        var currIds = $scope.renderModel.map(i => i.id);
+        return currIds;
     }
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {

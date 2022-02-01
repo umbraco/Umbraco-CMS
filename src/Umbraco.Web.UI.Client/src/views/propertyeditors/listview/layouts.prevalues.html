@@ -1,49 +1,52 @@
 <div ng-controller="Umbraco.PrevalueEditors.ListViewLayoutsPreValsController as vm">
 
-   <div class="list-view-layouts" ui-sortable="vm.layoutsSortableOptions" ng-model="model.value">
+   <div class="list-view-layouts-container">
 
-      <div class="list-view-layout" ng-repeat="layout in model.value">
+       <div class="list-view-layouts" ui-sortable="vm.layoutsSortableOptions" ng-model="model.value">
 
-         <i class="icon-navigation list-view-layout__sort-handle" aria-label="Sort"></i>
+           <div class="list-view-layout" ng-repeat="layout in model.value">
 
-         <div>
+               <umb-icon icon="icon-navigation" class="list-view-layout__sort-handle" aria-label="Sort"></umb-icon>
 
-            <button ng-if="layout.isSystem !== 1" type="button" ng-click="vm.openIconPicker(layout)" class="list-view-layout__icon" umb-auto-focus>
-               <i class="{{ layout.icon }}"></i>
-            </button>
+               <div class="list-view-layout__icon-wrapper">
 
-            <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
-               <i class="{{ layout.icon }}"></i>
-            </div>
+                   <button type="button"
+                           class="btn-reset"
+                           ng-disabled="layout.isSystem === 1"
+                           ng-click="vm.openIconPicker(layout)"
+                           umb-auto-focus="{{layout.isSystem !== 1}}">
+                       <span class="list-view-layout__icon">
+                           <umb-icon icon="{{layout.icon}}"></umb-icon>
+                       </span>
+                   </button>
 
-         </div>
+               </div>
 
-         <div class="list-view-layout__name">
-            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
-            <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{ layout.name }}</span>
-            <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
-         </div>
+               <div class="list-view-layout__name">
+                   <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
+                   <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{layout.name}}</span>
+                   <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
+               </div>
 
-         <div class="list-view-layout__path">
-            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
-         </div>
+               <div class="list-view-layout__path">
+                   <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
+               </div>
 
-         <div>
-           <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected" /> 
-            <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
-                <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
-                <umb-confirm-action
-                    ng-if="layout.deletePrompt"
-                    direction="left"
-                    on-confirm="vm.removeLayout($index, layout)"
-                    on-cancel="vm.hidePrompt(layout)">
-                </umb-confirm-action>
-            </div>
-         </div>
+               <div class="list-view-layout__action">
+                    <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
 
-      </div>
+                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
+                        <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.removeLayout(layout, $index, $event)">
+                           <localize key="general_remove">Remove</localize>
+                        </button>
+                    </div>
+               </div>
 
-      <button type="button" class="list-view-add-layout" ng-click="vm.addLayout()">Add layout</button>
+           </div>
+
+       </div>
+
+      <button type="button" class="list-view-add-layout mt2" ng-click="vm.addLayout()">Add layout</button>
 
    </div>
 

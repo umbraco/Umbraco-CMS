@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -11,14 +13,16 @@ namespace Umbraco.Web.Scheduling
     internal class KeepAlive : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
+        private readonly IKeepAliveSection _keepAliveSection;
         private readonly IProfilingLogger _logger;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IProfilingLogger logger)
+            IRuntimeState runtime, IKeepAliveSection keepAliveSection, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
+            _keepAliveSection = keepAliveSection;
             _logger = logger;
             if (_httpClient == null)
                 _httpClient = new HttpClient();
@@ -46,25 +50,27 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                string umbracoAppUrl = null;
-
+                var keepAlivePingUrl = _keepAliveSection.KeepAlivePingUrl;
                 try
                 {
-                    umbracoAppUrl = _runtime.ApplicationUrl.ToString();
-                    if (umbracoAppUrl.IsNullOrWhiteSpace())
+                    if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))
                     {
-                        _logger.Warn<KeepAlive>("No url for service (yet), skip.");
-                        return true; // repeat
+                        var umbracoAppUrl = _runtime.ApplicationUrl.ToString();
+                        if (umbracoAppUrl.IsNullOrWhiteSpace())
+                        {
+                            _logger.Warn<KeepAlive>("No umbracoApplicationUrl for service (yet), skip.");
+                            return true; // repeat
+                        }
+
+                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd(Constants.CharArrays.ForwardSlash));
                     }
 
-                    var url = umbracoAppUrl.TrimEnd('/') + "/api/keepalive/ping";
-
-                    var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
                     var result = await _httpClient.SendAsync(request, token);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(ex, "Keep alive failed (at '{UmbracoAppUrl}').", umbracoAppUrl);
+                    _logger.Error<KeepAlive, string>(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
                 }
             }
 

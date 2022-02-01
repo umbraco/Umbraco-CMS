@@ -121,7 +121,7 @@
     <key alias="saveAndPublish">Zapisz i publikuj</key>
     <key alias="saveToPublish">Zapisz i wyślij do zaakceptowania</key>
     <key alias="saveListView">Zapisz widok listy</key>
-    <key alias="showPage">Podgląd</key>
+    <key alias="saveAndPreview">Podgląd</key>
     <key alias="showPageDisabled">Podgląd jest wyłączony, ponieważ żaden szablon nie został przydzielony</key>
     <key alias="styleChoose">Wybierz styl</key>
     <key alias="styleShow">Pokaż style</key>
@@ -129,26 +129,6 @@
     <key alias="saveAndGenerateModels">Zapisz i wygeneruj modele</key>
     <key alias="undo">Cofnij</key>
     <key alias="redo">Powtórz</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Aby zmienić typ dokumentu dla wybranej treści, najpierw wybierz typ z listy typów obowiązujących dla tej lokalizacji.</key>
-    <key alias="changeDocTypeInstruction2">Następnie potwierdź i/lub zmień mapowanie właściwości z bieżącego typu do nowego i kliknij "Zapisz".</key>
-    <key alias="contentRepublished">Treść została opublikowana ponownie.</key>
-    <key alias="currentProperty">Bieżąca właściwość</key>
-    <key alias="currentType">Bieżący typ</key>
-    <key alias="docTypeCannotBeChanged">Typ dokumentu nie może być zmieniony, ponieważ nie istnieją obowiązujące alternatywy dla tej lokalizacji. Alternatywa będzie dostępna, jeśli będzie dozwolona pod rodzicem wybranego elementu zawartości i jeśli wszystkie istniejące dzieci elementu zawartości będą mieć pozwolenie na bycie tworzonym pod rodzicem.</key>
-    <key alias="docTypeChanged">Typ dokumentu został zmieniony</key>
-    <key alias="mapProperties">Mapuj Właściwości</key>
-    <key alias="mapToProperty">Mapuj do Właściwości</key>
-    <key alias="newTemplate">Nowy Szablon</key>
-    <key alias="newType">Nowy typ</key>
-    <key alias="none">Nic</key>
-    <key alias="selectedContent">Zawartość</key>
-    <key alias="selectNewDocType">Wybierz Nowy Typ Dokumentu</key>
-    <key alias="successMessage">Typ dokumentu wybranej zawartości został zmieniony z powodzeniem do [new type] i następujące właściwości zostały zmapowane:</key>
-    <key alias="to">do</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Nie można dokończyć mapowania właściwości, ponieważ jedna lub więcej właściwości mają zdefiniowane więcej niż jedno mapowanie.</key>
-    <key alias="validDocTypesNote">Wyświetlane są tylko alternatywne typy obowiązujące dla obecnej lokalizacji.</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Jest Opublikowany</key>
@@ -205,7 +185,7 @@
     <key alias="childItems" version="7.0">Elementy dzieci</key>
     <key alias="target" version="7.0">Cel</key>
     <key alias="scheduledPublishServerTime">Oznacza to następującą godzinę na serwerze:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Co to oznacza?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Co to oznacza?</a>]]></key>
     <key alias="nestedContentDeleteItem">Czy na pewno chcesz usunąć ten element?</key>
     <key alias="nestedContentEditorNotSupported">Właściwość %0% używa edytora %1%, który nie jest wspierany przez Nested Content.</key>
     <key alias="addTextBox">Dodaj kolejne pole tekstowe</key>
@@ -213,7 +193,7 @@
     <key alias="contentRoot">Korzeń zawartości</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Stwórz nowy Szablon Zawartości z '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Stwórz nowy Szablon Zawartości z <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Pusty</key>
     <key alias="selectBlueprint">Wybierz Szablon Zawartości</key>
     <key alias="createdBlueprintHeading">Szablon Zawartości został stworzony</key>
@@ -321,8 +301,8 @@
     <key alias="recycleBinDeleting">Zawartość kosza jest teraz usuwana. Proszę nie zamykać tego okna do momentu zakończenia procesu.</key>
     <key alias="recycleBinIsEmpty">Zawartość kosza została usunięta</key>
     <key alias="recycleBinWarning">Usunięcie elementów z kosza powoduje ich trwałe i nieodwracalne skasowanie</key>
-    <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
-    <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'url'</key>
+    <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
+    <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'URL'</key>
     <key alias="removeMacro">Usuń Makro</key>
     <key alias="requiredField">Pole wymagane</key>
     <key alias="sitereindexed">Strona została przeindeksowana</key>
@@ -612,8 +592,8 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
                 <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p>
                 <p>
                 Kliknij <strong>ponów próbę</strong> kiedy
-                skończysz.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-                Tu znajdziesz więcej informacji na temat edycji pliku "web.config".</a></p>]]></key>
+                skończysz.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+                Tu znajdziesz więcej informacji na temat edycji pliku "web.config"</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Aby zakończyć ten etap instalacji, będziesz musiał podać parametry połączenia do Twojego serwera baz danych ("connection string").<br />
                 Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba.
                 W przypadku instalacji na lokalnej maszynie lub serwerze możesz potrzebować pomocy administratora.]]></key>
@@ -660,7 +640,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="runwayFromScratch">Chcę zacząć od zera</key>
     <key alias="runwayFromScratchText"><![CDATA[
                 Twoja strona jest obecnie pusta. To idealna sytuacja, jeśli chcesz zacząć od zera i stworzyć własne typy dokumentów i szablony.
-                (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dowiedz się jak</a>)
+                (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dowiedz się jak</a>)
                 Ciągle możesz wybrać, aby zainstalować Runway w późniejszym terminie. W tym celu przejdź do sekcji Deweloper i wybierz Pakiety.
                 ]]></key>
     <key alias="runwayHeader">Właśnie stworzyłeś czystą instalację platformy Umbraco. Co chcesz zrobić teraz?</key>
@@ -728,7 +708,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="instruction">Zaloguj się poniżej</key>
     <key alias="signInWith">Zaloguj się z</key>
     <key alias="timeout">Sesja wygasła</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Zapomniałeś hasła?</key>
     <key alias="forgottenPasswordInstruction">E-mail z linkiem do zresetowania hasła zostanie wysłany na podany adres</key>
     <key alias="requestPasswordResetConfirmation">E-mail z instrukcjami do zresetowania hasła zostanie wysłany, jeśli zgadza się z naszą bazą danych</key>
@@ -737,7 +717,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="setPasswordConfirmation">Twoje hasło zostało zmienione</key>
     <key alias="resetCodeExpired">Link, na który kliknąłeś jest niewłaściwy lub wygasł</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Resetowanie hasła</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>Twoja nazwa użytkownika do zalogowania się w Umbraco back-office to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>]]></key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>Twoja nazwa użytkownika do zalogowania się w Umbraco backoffice to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Panel zarządzania</key>
@@ -981,7 +961,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="tabs">Zakładki</key>
     <key alias="contentTypeEnabled">Włączono Główny Typ Treści</key>
     <key alias="contentTypeUses">Ten Typ Treści używa</key>
-    <key alias="asAContentMasterType">jako Główny Typ Treści. Zakładki Głównego Typu Treści nie są wyświetlone i mogą być edytowane jedynie w samym Głównym Typie Treści</key>
     <key alias="noPropertiesDefinedOnTab">Żadne właściwości nie zostały zdefiniowane dla tej zakładki. Kliknij w link "dodaj nową właściwość", który znajduje się na górze strony, aby stworzyć nową właściwość.</key>
     <key alias="addIcon">Dodaj ikonę</key>
   </area>
@@ -1096,9 +1075,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       ]]></key>
     <key alias="sectionName">Nazwa Sekcji</key>
     <key alias="sectionMandatory">Sekcja jest wymagana</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Jeśli wymagana, szablon dziecka musi zawierać definicję <code>@section</code>, w przeciwnym przypadku wystąpi błąd.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Konstruktor zapytań</key>
     <key alias="itemsReturned">Element zwrócony, w</key>
     <key alias="iWant">Chcę</key>
@@ -1321,7 +1300,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="changePassword">Zmień hasło!</key>
     <key alias="newPassword">Nowe hasło</key>
     <key alias="confirmNewPassword">Potwierdź nowe hasło</key>
-    <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco Back Office przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"</key>
+    <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco backoffice przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"</key>
     <key alias="contentChannel">Kanał zawartości</key>
     <key alias="descriptionField">Opis</key>
     <key alias="disabled">Wyłącz użytkownika</key>
@@ -1480,5 +1459,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="textbox">
     <key alias="characters_left">pozostało znaków</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Zaznacz wszystko</key>
+    <key alias="deselectAllLogLevelFilters">Odznacz wszystkie</key>
   </area>
 </language>

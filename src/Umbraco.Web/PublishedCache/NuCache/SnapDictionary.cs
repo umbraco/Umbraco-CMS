@@ -22,6 +22,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // This class is optimized for many readers, few writers
         // Readers are lock-free
 
+        // NOTE - we used to lock _rlocko the long hand way with Monitor.Enter(_rlocko, ref lockTaken) but this has
+        // been replaced with a normal c# lock because that's exactly how the normal c# lock works,
+        // see https://blogs.msdn.microsoft.com/ericlippert/2009/03/06/locks-and-exceptions-do-not-mix/
+        // for the readlock, there's no reason here to use the long hand way.
+
         private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
         private readonly ConcurrentQueue<GenObj> _genObjs;
         private GenObj _genObj;
@@ -30,7 +35,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private long _liveGen, _floorGen;
         private bool _nextGen, _collectAuto;
         private Task _collectTask;
-        private volatile int _wlocked;
 
         // minGenDelta to be adjusted
         // we may want to throttle collects even if delta is reached
@@ -71,20 +75,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //  are all ignored - Release is private and meant to be invoked with 'commit' being false only
         //  only on the outermost lock (by SnapDictionaryWriter)
 
-        // using (...) {} for locking is prone to nasty leaks in case of weird exceptions
-        // such as thread-abort or out-of-memory, but let's not worry about it now
+        // side note - using (...) {} for locking is prone to nasty leaks in case of weird exceptions
+        // such as thread-abort or out-of-memory, which is why we've moved away from the old using wrapper we had on locking.
 
         private readonly string _instanceId = Guid.NewGuid().ToString("N");
-
-        private class ReadLockInfo
-        {
-            public bool Taken;
-        }
 
         private class WriteLockInfo
         {
             public bool Taken;
-            public bool Count;
         }
 
         // a scope contextual that represents a locked writer to the dictionary
@@ -92,8 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
             private readonly SnapDictionary<TKey, TValue> _dictionary;
-            private int _released;
-
+            
             public ScopedWriteLock(SnapDictionary<TKey, TValue> dictionary, bool scoped)
             {
                 _dictionary = dictionary;
@@ -102,8 +99,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             public override void Release(bool completed)
             {
-                if (Interlocked.CompareExchange(ref _released, 1, 0) != 0)
-                    return;
                 _dictionary.Release(_lockinfo, completed);
             }
         }
@@ -117,28 +112,31 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
+        private void EnsureLocked()
+        {
+            if (!Monitor.IsEntered(_wlocko))
+                throw new InvalidOperationException("Write lock must be acquried.");
+        }
+
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
         {
+            if (Monitor.IsEntered(_wlocko))
+                throw new InvalidOperationException("Recursive locks not allowed");
+
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
-            var rtaken = false;
-            try
+            lock(_rlocko)
             {
-                Monitor.Enter(_rlocko, ref rtaken);
-
                 // assume everything in finally runs atomically
                 // http://stackoverflow.com/questions/18501678/can-this-unexpected-behavior-of-prepareconstrainedregions-and-thread-abort-be-ex
                 // http://joeduffyblog.com/2005/03/18/atomicity-and-asynchronous-exception-failures/
                 // http://joeduffyblog.com/2007/02/07/introducing-the-new-readerwriterlockslim-in-orcas/
                 // http://chabster.blogspot.fr/2013/12/readerwriterlockslim-fails-on-dual.html
                 //RuntimeHelpers.PrepareConstrainedRegions();
-                try { } finally
+                try { }
+                finally
                 {
-                    // increment the lock count, and register that this lock is counting
-                    _wlocked++;
-                    lockInfo.Count = true;
-
-                    if (_nextGen == false || (forceGen && _wlocked == 1))
+                    if (_nextGen == false || (forceGen))
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
@@ -149,15 +147,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }
                 }
             }
-            finally
-            {
-                if (rtaken) Monitor.Exit(_rlocko);
-            }
-        }
-
-        private void Lock(ReadLockInfo lockInfo)
-        {
-            Monitor.Enter(_rlocko, ref lockInfo.Taken);
         }
 
         private void Release(WriteLockInfo lockInfo, bool commit = true)
@@ -168,22 +157,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (commit == false)
             {
-                var rtaken = false;
-                try
+                lock(_rlocko)
                 {
-                    Monitor.Enter(_rlocko, ref rtaken);
-                    try { } finally
+                    try { }
+                    finally
                     {
                         // forget about the temp. liveGen
                         _nextGen = false;
                         _liveGen -= 1;
                     }
                 }
-                finally
-                {
-                    if (rtaken) Monitor.Exit(_rlocko);
-                }
-
+                
                 foreach (var item in _items)
                 {
                     var link = item.Value;
@@ -197,14 +181,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            // decrement the lock count, if counting, then exit the lock
-            if (lockInfo.Count) _wlocked--;
+            // TODO: Shouldn't this be in a finally block?
             Monitor.Exit(_wlocko);
-        }
-
-        private void Release(ReadLockInfo lockInfo)
-        {
-            if (lockInfo.Taken) Monitor.Exit(_rlocko);
         }
 
         #endregion
@@ -219,75 +197,59 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return link;
         }
 
-        public void Set(TKey key, TValue value)
+        public void SetLocked(TKey key, TValue value)
         {
-            var lockInfo = new WriteLockInfo();
-            try
-            {
-                Lock(lockInfo);
+            EnsureLocked();
 
-                // this is safe only because we're write-locked
-                var link = GetHead(key);
-                if (link != null)
+            // this is safe only because we're write-locked
+            var link = GetHead(key);
+            if (link != null)
+            {
+                // already in the dict
+                if (link.Gen != _liveGen)
                 {
-                    // already in the dict
-                    if (link.Gen != _liveGen)
-                    {
-                        // for an older gen - if value is different then insert a new
-                        // link for the new gen, with the new value
-                        if (link.Value != value)
-                            _items.TryUpdate(key, new LinkedNode<TValue>(value, _liveGen, link), link);
-                    }
-                    else
-                    {
-                        // for the live gen - we can fix the live gen - and remove it
-                        // if value is null and there's no next gen
-                        if (value == null && link.Next == null)
-                            _items.TryRemove(key, out link);
-                        else
-                            link.Value = value;
-                    }
+                    // for an older gen - if value is different then insert a new
+                    // link for the new gen, with the new value
+                    if (link.Value != value)
+                        _items.TryUpdate(key, new LinkedNode<TValue>(value, _liveGen, link), link);
                 }
                 else
                 {
-                    _items.TryAdd(key, new LinkedNode<TValue>(value, _liveGen));
-                }
-            }
-            finally
-            {
-                Release(lockInfo);
-            }
-        }
-
-        public void Clear(TKey key)
-        {
-            Set(key, null);
-        }
-
-        public void Clear()
-        {
-            var lockInfo = new WriteLockInfo();
-            try
-            {
-                Lock(lockInfo);
-
-                // this is safe only because we're write-locked
-                foreach (var kvp in _items.Where(x => x.Value != null))
-                {
-                    if (kvp.Value.Gen < _liveGen)
-                    {
-                        var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
-                        _items.TryUpdate(kvp.Key, link, kvp.Value);
-                    }
+                    // for the live gen - we can fix the live gen - and remove it
+                    // if value is null and there's no next gen
+                    if (value == null && link.Next == null)
+                        _items.TryRemove(key, out link);
                     else
-                    {
-                        kvp.Value.Value = null;
-                    }
+                        link.Value = value;
                 }
             }
-            finally
+            else
             {
-                Release(lockInfo);
+                _items.TryAdd(key, new LinkedNode<TValue>(value, _liveGen));
+            }
+        }
+
+        public void ClearLocked(TKey key)
+        {
+            SetLocked(key, null);
+        }
+
+        public void ClearLocked()
+        {
+            EnsureLocked();
+
+            // this is safe only because we're write-locked
+            foreach (var kvp in _items.Where(x => x.Value != null))
+            {
+                if (kvp.Value.Gen < _liveGen)
+                {
+                    var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
+                    _items.TryUpdate(kvp.Key, link, kvp.Value);
+                }
+                else
+                {
+                    kvp.Value.Value = null;
+                }
             }
         }
 
@@ -347,11 +309,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot CreateSnapshot()
         {
-            var lockInfo = new ReadLockInfo();
-            try
+            lock(_rlocko)
             {
-                Lock(lockInfo);
-
                 // if no next generation is required, and we already have a gen object,
                 // use it to create a new snapshot
                 if (_nextGen == false && _genObj != null)
@@ -360,7 +319,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // else we need to try to create a new gen object
                 // whether we are wlocked or not, noone can rlock while we do,
                 // so _liveGen and _nextGen are safe
-                if (_wlocked > 0) // volatile, cannot ++ but could --
+                if (Monitor.IsEntered(_wlocko))
                 {
                     // write-locked, cannot use latest gen (at least 1) so use previous
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
@@ -398,10 +357,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 return snapshot;
             }
-            finally
-            {
-                Release(lockInfo);
-            }
         }
 
         public Task CollectAsync()
@@ -425,7 +380,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     _collectTask = null;
                 }
-            }, TaskContinuationOptions.ExecuteSynchronously);
+            },
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+            TaskScheduler.Default);
             // ReSharper restore InconsistentlySynchronizedField
 
             return task;
@@ -496,17 +455,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public /*async*/ Task PendingCollect()
-        {
-            Task task;
-            lock (_rlocko)
-            {
-                task = _collectTask;
-            }
-            return task ?? Task.CompletedTask;
-            //if (task != null)
-            //    await task;
-        }
+        // TODO: This is never used? Should it be? Maybe move to TestHelper below?
+        //public /*async*/ Task PendingCollect()
+        //{
+        //    Task task;
+        //    lock (_rlocko)
+        //    {
+        //        task = _collectTask;
+        //    }
+        //    return task ?? Task.CompletedTask;
+        //    //if (task != null)
+        //    //    await task;
+        //}
 
         public long GenCount => _genObjs.Count;
 
@@ -531,7 +491,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             public long LiveGen => _dict._liveGen;
             public long FloorGen => _dict._floorGen;
             public bool NextGen => _dict._nextGen;
-            public int WLocked => _dict._wlocked;
+            public bool IsLocked => Monitor.IsEntered(_dict._wlocko);
 
             public bool CollectAuto
             {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Core.Models
 {
@@ -16,6 +17,12 @@ namespace Umbraco.Core.Models
         /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
+
+        /// <summary>
+        /// Gets or sets the history cleanup configuration.
+        /// </summary>
+        /// <value>The history cleanup configuration.</value>
+        HistoryCleanup HistoryCleanup { get; set; }
 
         /// <summary>
         /// Determines if AllowedTemplates contains templateId

@@ -6,7 +6,6 @@
 		<option value="member">Members</option>
 	</select>
 
-
     <umb-node-preview
 		ng-show="node"
         class="mt1"
@@ -21,61 +20,62 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type !== 'member'" class="mt2">
-        <span ng-hide="showSearch || model.value.query">
-            <a class="umb-node-preview-add"
-               href=""
-               ng-click="openContentPicker()"
-               prevent-default>
+        <div ng-hide="showSearch || model.value.query">
+            <button type="button" class="umb-node-preview-add"
+                    ng-click="openContentPicker()">
                 <localize key="general_choose">Choose a root node</localize>
-            </a>
+            </button>
             <div class="mt2" ng-show="model.value.type == 'content'">
-                <i class="icon icon-search"></i>
-                <a href ng-click="showSearch = true">Query for root node with xpath</a>
+                <umb-icon icon="icon-search" class="icon"></umb-icon>
+                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with XPath</button>
             </div>
-        </span>
+        </div>
 
-        <span ng-show="showSearch || model.value.query">
+        <div ng-show="showSearch || model.value.query">
 
             <input type="text"
                    ng-model="model.value.query"
                    class="umb-property-editor umb-textstring"
-                   placeholder="Enter xpath query">
+                   placeholder="Enter XPath query">
 
-            <ul class="unstyled list-icons" style="margin-top: 15px">
+            <ul class="unstyled list-icons mt3">
                 <li style="max-width: 600px">
-                    <i class="icon icon-help-alt"></i>
-                    <a href ng-click="showHelp = 1" prevent-default>
-                        Show xpath query help
-                    </a>
+                    <umb-icon icon="icon-help-alt" class="icon"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="showHelp = !showHelp">{{showHelp ? 'Hide' : 'Show'}} XPath query help</button>
 
-                    <small ng-if="showHelp">
+                    <div class="small" ng-show="showHelp">
                         <p>
-                            Use Xpath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
+                            Use an XPath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
                         </p>
 
                         <p>
-                            Placeholders finds the nearest published ID and runs its query from there. so for instance:
-
-                            <pre>$parent/newsArticle</pre>
-
-                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news articles there.
+                            A placeholder finds the nearest published ID and runs its query from there, so for instance:
+                        </p>
+                        
+                        <pre>$parent/newsArticle</pre>
+                        
+                        <p>
+                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
                         </p>
 
                         <p>
                             Available placeholders: <br/>
-                            <code>$current</code>: current page or closest found ancestor<br/>
-                            <code>$parent</code>: parent page or closest found ancestor<br/>
-                            <code>$root</code>: root of the content tree<br/>
-                            <code>$site</code>: Ancestor node at level 1 <br/>
+                            <code>$current</code>: Current page or closest found ancestor<br/>
+                            <code>$parent</code>: Parent page or closest found ancestor<br/>
+                            <code>$root</code>: Root of the content tree<br/>
+                            <code>$site</code>: Ancestor node at level 1<br/>
                         </p>
-                    </small>
+                        <p>
+                            Note: The placeholder can only be used at the beginning of the query.
+                        </p>
+                    </div>
                 </li>
                 <li>
-                    <i class="icon icon-delete red"></i>
-                    <a href ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</a>
+                    <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</button>
                 </li>
             </ul>
-        </span>
+        </div>
     </div>
 
 </div>

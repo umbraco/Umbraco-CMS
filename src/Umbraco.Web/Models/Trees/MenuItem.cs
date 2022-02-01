@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using System.Threading;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -28,12 +29,12 @@ namespace Umbraco.Web.Models.Trees
             Name = name;
         }
 
-
         public MenuItem(string alias, ILocalizedTextService textService)
             : this()
         {
             Alias = alias;
-            Name = textService.Localize($"actions/{Alias}");
+            Name = textService.Localize("actions", Alias);
+            TextDescription =  textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
         }
 
         /// <summary>
@@ -73,6 +74,9 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
         public string Alias { get; set; }
+
+        [DataMember(Name = "textDescription")]
+        public string TextDescription { get; set; }
 
         /// <summary>
         /// Ensures a menu separator will exist before this menu item
@@ -158,7 +162,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Sets the menu item to display a dialog based on a url path in an iframe
+        /// Sets the menu item to display a dialog based on a URL path in an iframe
         /// </summary>
         /// <param name="url"></param>
         /// <param name="dialogTitle"></param>

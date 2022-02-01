@@ -12,7 +12,24 @@
 function authResource($q, $http, umbRequestHelper, angularHelper) {
 
   return {
-
+     /**
+     * @ngdoc method
+     * @name umbraco.resources.authResource#get2FAProviders
+     * @methodOf umbraco.resources.authResource
+     *
+     * @description
+     * Logs the Umbraco backoffice user in if the credentials are good
+     *
+     * ##usage
+     * <pre>
+     * authResource.get2FAProviders()
+     *    .then(function(data) {
+     *        //Do stuff ...
+     *    });
+     * </pre>
+     * @returns {Promise} resourcePromise object
+     * 
+     */
     get2FAProviders: function () {
 
       return umbRequestHelper.resourcePromise(
@@ -20,9 +37,28 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
           umbRequestHelper.getApiUrl(
             "authenticationApiBaseUrl",
             "Get2FAProviders")),
-        'Could not retrive two factor provider info');
+        'Could not retrieve two factor provider info');
     },
 
+    /**
+    * @ngdoc method
+    * @name umbraco.resources.authResource#get2FAProviders
+    * @methodOf umbraco.resources.authResource
+    *
+    * @description
+    * Generate the two-factor authentication code for the provider and send it to the user
+    *
+    * ##usage
+    * <pre>
+    * authResource.send2FACode(provider)
+    *    .then(function(data) {
+    *        //Do stuff ...
+    *    });
+    * </pre>
+    * @param {string} provider Name of the provider
+    * @returns {Promise} resourcePromise object
+    *
+    */
     send2FACode: function (provider) {
 
       return umbRequestHelper.resourcePromise(
@@ -30,10 +66,30 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
           umbRequestHelper.getApiUrl(
             "authenticationApiBaseUrl",
             "PostSend2FACode"),
-          angular.toJson(provider)),
+          Utilities.toJson(provider)),
         'Could not send code');
     },
 
+    /**
+    * @ngdoc method
+    * @name umbraco.resources.authResource#get2FAProviders
+    * @methodOf umbraco.resources.authResource
+    *
+    * @description
+    * Verify the two-factor authentication code entered by the user against the provider
+    *
+    * ##usage
+    * <pre>
+    * authResource.verify2FACode(provider, code)
+    *    .then(function(data) {
+    *        //Do stuff ...
+    *    });
+    * </pre>
+    * @param {string} provider Name of the provider
+    * @param {string} code The two-factor authentication code
+    * @returns {Promise} resourcePromise object
+    *
+    */
     verify2FACode: function (provider, code) {
 
       return umbRequestHelper.resourcePromise(

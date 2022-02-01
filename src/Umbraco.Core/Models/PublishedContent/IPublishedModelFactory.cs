@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
+
     /// <summary>
     /// Provides the published model creation service.
     /// </summary>

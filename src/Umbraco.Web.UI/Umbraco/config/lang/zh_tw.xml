@@ -87,31 +87,11 @@
     <key alias="saveAndPublish">保存並發佈</key>
     <key alias="saveToPublish">保存並提交審核</key>
     <key alias="saveListView">保存清單檢視</key>
-    <key alias="showPage">預覽</key>
+    <key alias="saveAndPreview">預覽</key>
     <key alias="showPageDisabled">因未設置範本無法預覽</key>
     <key alias="styleChoose">選擇樣式</key>
     <key alias="styleShow">顯示樣式</key>
     <key alias="tableInsert">插入表格</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">要更改所選節點的文檔類型，先在列表中選擇合適的文檔類型。</key>
-    <key alias="changeDocTypeInstruction2">然後設置當前文檔類型到新文檔類型的各欄位間的對應映射關係並保存。</key>
-    <key alias="contentRepublished">內容已被重新發佈</key>
-    <key alias="currentProperty">當前屬性</key>
-    <key alias="currentType">當前類型</key>
-    <key alias="docTypeCannotBeChanged">不能改變文檔類型，因為沒有可替代的類型。</key>
-    <key alias="docTypeChanged">文檔類型已更改</key>
-    <key alias="mapProperties">要映射的欄位</key>
-    <key alias="mapToProperty">映射欄位</key>
-    <key alias="newTemplate">新範本</key>
-    <key alias="newType">新類型</key>
-    <key alias="none">無</key>
-    <key alias="selectedContent">內容</key>
-    <key alias="selectNewDocType">選擇新的文檔類型</key>
-    <key alias="successMessage">選中文檔的類型已被成功更改為[new type]，以下欄位被映射：</key>
-    <key alias="to">至</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成欄位映射，因為存在一個欄位映射至多欄位的問題。</key>
-    <key alias="validDocTypesNote">僅顯示可作為替代的文檔類型。</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">已發表</key>
@@ -166,7 +146,7 @@
     <key alias="childItems" version="7.0">子項目</key>
     <key alias="target" version="7.0">目標</key>
     <key alias="scheduledPublishServerTime">預計發表的時間（伺服器端）</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">這是什麼意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">這是什麼意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">點選以便上傳</key>
@@ -254,8 +234,8 @@
     <key alias="recycleBinDeleting">正在清空回收站，請不要關閉窗口。</key>
     <key alias="recycleBinIsEmpty">回收站已清空</key>
     <key alias="recycleBinWarning">從回收站刪除的項目將不可恢復</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>的網站服務目前出現些狀況，而我們無能為力。我們對此不便感到十分抱歉。]]></key>
-    <key alias="regexSearchHelp">查找規則運算式來驗證輸入，如: 'email、'zip-code'、'url'。</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>的網站服務目前出現些狀況，而我們無能為力。我們對此不便感到十分抱歉。]]></key>
+    <key alias="regexSearchHelp">查找規則運算式來驗證輸入，如: 'email、'zip-code'、'URL'。</key>
     <key alias="removeMacro">移除巨集</key>
     <key alias="requiredField">必填項目</key>
     <key alias="sitereindexed">網站已重建索引</key>
@@ -507,7 +487,7 @@
               <p>請編輯檔案"web.config" (例如使用Visual Studio或您喜歡的編輯器)，移動到檔案底部，並在名稱為"UmbracoDbDSN"的字串中設定資料庫連結資訊，並存檔。</p>
               <p>
               點選<strong>重試</strong>按鈕當上述步驟完成。<br />
-              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              在此查詢更多編輯web.config的資訊。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[要完成此步驟，您必須瞭解連結資料庫伺服器的重要資訊("connection string")。<br />
         若需要時，請聯繫您的網路公司。如果您在本地機器或伺服器安裝的話，您也許需要聯絡系統管理者。]]></key>
@@ -553,7 +533,7 @@
     <key alias="runwayFromScratch">我要從頭開始</key>
     <key alias="runwayFromScratchText"><![CDATA[
         您的網站目前完全沒有資料，所以如果您想要從頭開始並增添您自己的文檔種類和範本，現在正是絕佳時機。
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">學習該怎麼做</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">學習該怎麼做</a>)
         您晚點仍可以選擇安裝Runway，請至開發者區域選擇安裝。
       ]]></key>
     <key alias="runwayHeader">您剛剛安裝了一個乾淨的系統，要繼續嗎？</key>
@@ -619,7 +599,7 @@
     <key alias="instruction">下方登入</key>
     <key alias="signInWith">登入使用</key>
     <key alias="timeout">連線時間過了</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">忘記密碼？</key>
     <key alias="forgottenPasswordInstruction">一封內有重設密碼連結的電子郵件已經寄出給您</key>
     <key alias="requestPasswordResetConfirmation">一封內有重設密碼連結的電子郵件已經寄到此信箱</key>
@@ -834,7 +814,6 @@
     <key alias="tabs">選項卡</key>
     <key alias="contentTypeEnabled">主控文件類型啟動</key>
     <key alias="contentTypeUses">該文檔類型使用</key>
-    <key alias="asAContentMasterType">作為主控文件類型. 主控文件類型的標籤只能在主控文件類型裡修改。</key>
     <key alias="noPropertiesDefinedOnTab">沒有欄位設置在該標籤頁</key>
     <key alias="addIcon">增加圖示</key>
   </area>
@@ -1239,5 +1218,9 @@
     <key alias="disableError">停止轉址追蹤器錯誤，更多資訊請參閱您的紀錄檔。</key>
     <key alias="enabledConfirm">轉址追蹤器已開啟。</key>
     <key alias="enableError">啟動轉址追蹤器錯誤，更多資訊請參閱您的紀錄檔。</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">全選</key>
+    <key alias="deselectAllLogLevelFilters">取消全選</key>
   </area>
 </language>

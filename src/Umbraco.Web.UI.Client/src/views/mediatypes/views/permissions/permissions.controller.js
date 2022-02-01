@@ -1,18 +1,18 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
+    function PermissionsController($scope, $timeout, mediaTypeResource, iconHelper, contentTypeHelper, editorService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
-        var childNodeSelectorOverlayTitle = "";
 
         vm.mediaTypes = [];
         vm.selectedChildren = [];
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
+        vm.sortChildren = sortChildren;
         vm.toggle = toggle;
 
         /* ---------- INIT ---------- */
@@ -21,11 +21,7 @@
 
         function init() {
 
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
-                childNodeSelectorOverlayTitle = value;
-            });
-
-            mediaTypeResource.getAll().then(function(mediaTypes){
+            mediaTypeResource.getAll().then(mediaTypes => {
 
                 vm.mediaTypes = mediaTypes;
 
@@ -43,23 +39,25 @@
         }
 
         function addChild($event) {
-            var childNodeSelectorOverlay = {
-                view: "itempicker",
-                title: childNodeSelectorOverlayTitle,
-                availableItems: vm.mediaTypes,
-                selectedItems: vm.selectedChildren,
-                position: "target",
-                event: $event,
-                submit: function(model) {
-                    vm.selectedChildren.push(model.selectedItem);
-                    $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    overlayService.close();
+
+            var editor = {
+                multiPicker: true,
+                filterCssClass: 'not-allowed not-published',
+                filter: item => 
+                    !vm.mediaTypes.some(x => x.udi == item.udi) || vm.selectedChildren.some(x => x.udi === item.udi),                
+                submit: model => {
+                    model.selection.forEach(item => 
+                        mediaTypeResource.getById(item.id).then(contentType => {
+                            vm.selectedChildren.push(contentType);
+                            $scope.model.allowedContentTypes.push(item.id);
+                        }));
+
+                    editorService.close();
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => editorService.close()                
             };
-            overlayService.open(childNodeSelectorOverlay);
+
+            editorService.mediaTypePicker(editor);
         }
 
         function removeChild(selectedChild, index) {
@@ -69,6 +67,11 @@
            // remove from content type model
            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+        }
+
+        function sortChildren() {
+            // we need to wait until the next digest cycle for vm.selectedChildren to be updated
+            $timeout(() => $scope.model.allowedContentTypes = vm.selectedChildren.map(x => x.id));
         }
 
         /**
@@ -85,5 +88,5 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.MediaType.PermissionsController", PermissionsController);
+    angular.module('umbraco').controller('Umbraco.Editors.MediaType.PermissionsController', PermissionsController);
 })();

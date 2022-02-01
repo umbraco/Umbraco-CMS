@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Runtime.CompilerServices;
 using Umbraco.Core.Cache;
@@ -21,6 +22,8 @@ namespace Umbraco.Core
         private static List<Action<Composition, AppCaches, TypeLoader, IUmbracoDatabaseFactory>> _onEssentials;
         private static bool? _installMissingDatabase;
         private static bool? _installEmptyDatabase;
+        private static bool? _installUnattended;
+        private static bool? _upgradeUnattended;
 
         // reads a boolean appSetting
         private static bool BoolSetting(string key, bool missing) => ConfigurationManager.AppSettings[key]?.InvariantEquals("true") ?? missing;
@@ -37,24 +40,40 @@ namespace Umbraco.Core
         /// </remarks>
         public static bool InstallMissingDatabase
         {
-            get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallMissingDatabase", false);
-            set => _installEmptyDatabase = value;
+            get => _installMissingDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallMissingDatabase", false);
+            set => _installMissingDatabase = value;
+        }
+
+        [Obsolete("This setting is no longer used and will be removed in future versions. If a database connection string is configured and the database is empty Umbraco will be installed during the installation sequence.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static bool InstallEmptyDatabase
+        {
+            get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", true);
+            set => _installEmptyDatabase  = value;
         }
 
         /// <summary>
-        /// Gets a value indicating whether the runtime should enter Install level when the database is empty.
+        /// Gets a value indicating whether unattended installs are enabled.
         /// </summary>
         /// <remarks>
         /// <para>By default, when a database connection string is configured and it is possible to connect to
-        /// the database, but the database is empty, the runtime enters the BootFailed level. If this options
-        /// is set to true, it enters the Install level instead.</para>
-        /// <para>It is then up to the implementor, that is setting this value, to take over the installation
-        /// sequence.</para>
+        /// the database, but the database is empty, the runtime enters the <c>Install</c> level.
+        /// If this option is set to <c>true</c> an unattended install will be performed and the runtime enters
+        /// the <c>Run</c> level.</para>
         /// </remarks>
-        public static bool InstallEmptyDatabase
+        public static bool InstallUnattended
         {
-            get => _installMissingDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", false);
-            set => _installMissingDatabase = value;
+            get => _installUnattended ?? BoolSetting("Umbraco.Core.RuntimeState.InstallUnattended", false);
+            set => _installUnattended = value;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether unattended upgrade is enabled.
+        /// </summary>
+        public static bool UpgradeUnattended
+        {
+            get => _upgradeUnattended ?? BoolSetting("Umbraco.Core.RuntimeState.UpgradeUnattended", false);
+            set => _upgradeUnattended = value;
         }
 
         /// <summary>

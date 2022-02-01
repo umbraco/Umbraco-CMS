@@ -1,0 +1,38 @@
+<div class="umb-package-details">
+    <div class="umb-package-details__main-content">
+
+    </div>
+
+    <div class="umb-package-details__sidebar">
+        <umb-box data-element="node-info-general">
+            <umb-box-header title-key="general_general"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@content_createDate">
+                    {{node.createDateFormatted}} by {{ node.owner.name }}
+                </umb-control-group>
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-update-date" label="@content_updateDate">
+                    {{node.updateDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group data-element="node-info-member-type" label="@content_membertype">
+                    <umb-node-preview style="max-width: 100%; margin-bottom: 0px;"
+                                      icon="node.icon"
+                                      name="node.contentTypeName"
+                                      alias="node.contentTypeAlias"
+                                      allow-open="allowChangeMemberType"
+                                      on-open="openMemberType(memberType)">
+                    </umb-node-preview>
+                </umb-control-group>
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
+                    <div>{{ node.id }}</div>
+                    <small>{{ node.key }}</small>
+                </umb-control-group>
+
+            </umb-box-content>
+        </umb-box>
+    </div>
+
+</div>

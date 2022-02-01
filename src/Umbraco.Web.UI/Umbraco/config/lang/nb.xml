@@ -83,31 +83,11 @@
     <key alias="saveAndPublish">Lagre og publiser</key>
     <key alias="saveAndSchedule">Lagre og planlegge</key>
     <key alias="saveToPublish">Lagre og send til publisering</key>
-    <key alias="showPage">Forhåndsvis</key>
+    <key alias="saveAndPreview">Forhåndsvis</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktivert siden det ikke er angitt noen mal</key>
     <key alias="styleChoose">Velg formattering</key>
     <key alias="styleShow">Vis stiler</key>
     <key alias="tableInsert">Sett inn tabell</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">For å endre det valge innholdets dokumenttype, velger du først en ny dokumenttype som er gyldig på gjeldende plassering.</key>
-    <key alias="changeDocTypeInstruction2">Kontroller deretter at alle egenskaper blir overført riktig til den nye dokumenttypen og klikk på Lagre.</key>
-    <key alias="contentRepublished">Innholdet har blitt republisert.</key>
-    <key alias="currentProperty">Nåværende egenskap</key>
-    <key alias="currentType">Nåværende type</key>
-    <key alias="docTypeCannotBeChanged">Du kan ikke endre dokumenttype, ettersom det ikke er andre gyldige dokumenttyper på denne plasseringen.</key>
-    <key alias="docTypeChanged">Dokumenttype endret</key>
-    <key alias="mapProperties">Overfør egenskaper</key>
-    <key alias="mapToProperty">Overfør til egenskap</key>
-    <key alias="newTemplate">Ny mal</key>
-    <key alias="newType">Ny type</key>
-    <key alias="none">ingen</key>
-    <key alias="selectedContent">Innhold</key>
-    <key alias="selectNewDocType">Velg ny dokumenttype</key>
-    <key alias="successMessage">Dokumenttypen på det valgte innhold ble endret til [new type], og følgende egenskaper ble overført:</key>
-    <key alias="to">til</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Overføringen av egenskaper kunne ikke fullføres da en eller flere egenskaper er satt til å bli overført mer enn en gang.</key>
-    <key alias="validDocTypesNote">Kun andre dokumenttyper som er gyldige for denne plasseringen vises.</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Publisert</key>
@@ -240,8 +220,8 @@
     <key alias="recycleBinDeleting">Innholdet i papirkurven blir nå slettet. Vennligst ikke lukk dette vinduet mens denne operasjonen foregår</key>
     <key alias="recycleBinIsEmpty">Papirkurven er nå tom</key>
     <key alias="recycleBinWarning">Når elementer blir slettet fra papirkurven vil de være slettet for alltid</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
-    <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
+    <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Nettstedet er indeksert</key>
@@ -330,6 +310,7 @@
     <key alias="continue">Fortsett</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opprett</key>
+    <key alias="cropSection">Utsnitt</key>
     <key alias="database">Database</key>
     <key alias="date">Dato</key>
     <key alias="default">Standard</key>
@@ -397,7 +378,7 @@
     <key alias="update">Oppdater</key>
     <key alias="upgrade">Oppgrader</key>
     <key alias="upload">Last opp</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Bruker</key>
     <key alias="username">Brukernavn</key>
     <key alias="value">Verdi</key>
@@ -436,7 +417,7 @@
     <key alias="databaseHeader">Databasekonfigurasjon</key>
     <key alias="databaseInstall"><![CDATA[Klikk <strong>installer</strong>-knappen for å installere Umbraco %0% databasen]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% har nå blitt kopiert til din database. Trykk <strong>Neste</strong> for å fortsette.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mer informasjon om redigering av web.config her</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[For å fullføre dette steget, må du vite en del informasjon om din database server ("tilkoblingsstreng").<br/> Vennligst kontakt din ISP om nødvendig. Hvis du installerer på en lokal maskin eller server, må du kanskje skaffe informasjonen fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Trykk på knappen <strong>oppgrader</strong> for å oppgradere databasen din til Umbraco %0%</p> <p> Ikke vær urolig - intet innhold vil bli slettet og alt vil fortsette å virke etterpå! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Databasen din har blitt oppgradert til den siste utgaven, %0%.<br/>Trykk <strong>Neste</strong> for å fortsette.]]></key>
@@ -463,7 +444,7 @@
     <key alias="permissionsSettingUpPermissions">Konfigurerer mappetillatelser</key>
     <key alias="permissionsText"><![CDATA[Umbraco trenger skrive/endre tilgang til enkelte mapper for å kunne lagre filer som bilder og PDF-dokumenter. Den lagrer også midlertidig data (aka: hurtiglager) for å øke ytelsen på websiden din.]]></key>
     <key alias="runwayFromScratch">Jeg ønsker å starte fra bunnen.</key>
-    <key alias="runwayFromScratchText"><![CDATA[Din website er helt tom for øyeblikket. Dette er perfekt hvis du vil begynne helt forfra og lage dine egne dokumenttyper og maler. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan fortsatt velge å installere Runway senere. Vennligst gå til Utvikler-seksjonen og velg Pakker.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Din website er helt tom for øyeblikket. Dette er perfekt hvis du vil begynne helt forfra og lage dine egne dokumenttyper og maler. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan fortsatt velge å installere Runway senere. Vennligst gå til Utvikler-seksjonen og velg Pakker.]]></key>
     <key alias="runwayHeader">Du har akkurat satt opp en ren Umbraco plattform. Hva vil du gjøre nå?</key>
     <key alias="runwayInstalled">Runway er installert</key>
     <key alias="runwayInstalledText"><![CDATA[Du har nå fundamentet på plass. Velg hvilke moduler du ønsker å installer på toppen av det.<br/> Dette er vår liste av anbefalte moduler- Kryss av de du ønsker å installere, eller se den<a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulle listen av moduler</a> ]]></key>
@@ -508,7 +489,7 @@
     <key alias="instruction">Logg på nedenfor</key>
     <key alias="signInWith">Logg på med</key>
     <key alias="timeout">Din sesjon er utløpt</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
@@ -688,7 +669,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="tabs">Arkfaner</key>
     <key alias="contentTypeEnabled">Hovedinnholdstype aktivert</key>
     <key alias="contentTypeUses">Denne dokumenttypen bruker</key>
-    <key alias="asAContentMasterType">som hoveddokumenttype. Arkfaner fra hoveddokumenttyper vises ikke og kan kun endres på hoveddokumenttypen selv.</key>
     <key alias="noPropertiesDefinedOnTab">Ingen egenskaper definert i denne arkfanen. Klikk på "legg til ny egenskap" lenken i toppen for å opprette en ny egenskap.</key>
   </area>
   <area alias="sort">
@@ -937,5 +917,9 @@ Vennlig hilsen Umbraco roboten
     <key alias="yourProfile" version="7.0">Din profil</key>
     <key alias="yourHistory" version="7.0">Din historikk</key>
     <key alias="sessionExpires" version="7.0">Sesjonen utløper om</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Velg alle</key>
+    <key alias="deselectAllLogLevelFilters">Opphev alle</key>
   </area>
 </language>

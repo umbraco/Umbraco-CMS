@@ -104,7 +104,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Technically, it could be cached by datatype but let's keep things
         /// simple enough for now.</para>
         /// </remarks>
-        public IDataValueEditor GetValueEditor(object configuration)
+        public virtual IDataValueEditor GetValueEditor(object configuration)
         {
             // if an explicit value editor has been set (by the manifest parser)
             // then return it, and ignore the configuration, which is going to be
@@ -113,7 +113,7 @@ namespace Umbraco.Core.PropertyEditors
                 return ExplicitValueEditor;
 
             var editor = CreateValueEditor();
-            ((DataValueEditor) editor).Configuration = configuration; // TODO: casting is bad
+            ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
             return editor;
         }
 
@@ -163,7 +163,7 @@ namespace Umbraco.Core.PropertyEditors
         protected virtual IDataValueEditor CreateValueEditor()
         {
             if (Attribute == null)
-                throw new InvalidOperationException("The editor does not specify a view.");
+                throw new InvalidOperationException($"The editor is not attributed with {nameof(DataEditorAttribute)}");
 
             return new DataValueEditor(Attribute);
         }
@@ -175,7 +175,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             var editor = new ConfigurationEditor();
             // pass the default configuration if this is not a property value editor
-            if((Type & EditorType.PropertyValue) == 0)
+            if ((Type & EditorType.PropertyValue) == 0)
             {
                 editor.DefaultConfiguration = _defaultConfiguration;
             }
