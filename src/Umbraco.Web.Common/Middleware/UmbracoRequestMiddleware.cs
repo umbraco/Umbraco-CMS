@@ -207,9 +207,11 @@ namespace Umbraco.Cms.Web.Common.Middleware
             // Especially the DEBUG sent when debugging the application is annoying because it uses http, even when the https is available.
             if (request.Method == "GET" || request.Method == "POST")
             {
-                return new Uri($"{request.Scheme}://{request.Host}{request.PathBase}", UriKind.Absolute);
+                var url = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase);
 
+                return new Uri(url, UriKind.Absolute);
             }
+
             return null;
         }
 
