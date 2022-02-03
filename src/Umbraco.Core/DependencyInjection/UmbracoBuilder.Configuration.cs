@@ -90,6 +90,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<ContentDashboardSettings>()
                 .AddUmbracoOptions<HelpPageSettings>();
 
+            builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
+
             builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 
             return builder;

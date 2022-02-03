@@ -39,10 +39,6 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations
             // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
             fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>));
 
-            fixture.Customize<ConfigConnectionString>(
-                u => u.FromFactory<string, string, string>(
-                    (a, b, c) => new ConfigConnectionString(a, b, c)));
-
             fixture.Customize<IUmbracoVersion>(
                 u => u.FromFactory(
                     () => new UmbracoVersion()));
@@ -62,11 +58,6 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations
                     Options.Create(new GlobalSettings()),
                     Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                     Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
-
-            var configConnectionString = new ConfigConnectionString(
-                "ss",
-                "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Umbraco.mdf;Integrated Security=True");
-            fixture.Customize<ConfigConnectionString>(x => x.FromFactory(() => configConnectionString));
 
             var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
             fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));

@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             // TODO: we need to do a null check here since this could be entirely missing and we end up with a null ref
             // exception in the installer.
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
+            var databaseSettings = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
 
             var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
             if (hasConnString)

@@ -93,7 +93,7 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
 
     private void RebuildSchemaFirstTime(TestDbMeta meta)
     {
-        _databaseFactory.Configure(meta.ConnectionString, Core.Constants.DatabaseProviders.SqlServer);
+        _databaseFactory.Configure(meta.ToStronglyTypedConnectionString());
 
         using (var database = (UmbracoDatabase)_databaseFactory.CreateDatabase())
         {
