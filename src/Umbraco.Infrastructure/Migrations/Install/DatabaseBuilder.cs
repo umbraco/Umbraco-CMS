@@ -93,7 +93,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (string.IsNullOrWhiteSpace(connectionString) == false)
             {
-                providerName = ConfigConnectionString.ParseProviderName(connectionString);
+                // TODO: PMJ - SQLite/Generic
+                providerName = ConnectionStrings.DefaultProviderName;
             }
             else if (integratedAuth)
             {
@@ -190,10 +191,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private void Configure(string connectionString, string providerName, bool installMissingDatabase)
         {
             // Update existing connection string
-            var umbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString, providerName);
-            _connectionStrings.CurrentValue.UmbracoConnectionString = umbracoConnectionString;
+            var umbracoConnectionString = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
+            umbracoConnectionString.ConnectionString = connectionString;
+            umbracoConnectionString.ProviderName = providerName;
 
-            _databaseFactory.Configure(umbracoConnectionString.ConnectionString, umbracoConnectionString.ProviderName);
+            _databaseFactory.Configure(umbracoConnectionString);
 
             if (installMissingDatabase)
             {
@@ -228,11 +230,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <param name="databaseName">The name of the database</param>
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
-            var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            const string providerName = Constants.DbProviderNames.SqlServer;
+            ConnectionStrings umbracoConnectionString = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
+            var newConnectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
+            umbracoConnectionString.ConnectionString = newConnectionString;
+            umbracoConnectionString.ProviderName = ConnectionStrings.DefaultProviderName;
 
-            _configManipulator.SaveConnectionString(connectionString, providerName);
-            _databaseFactory.Configure(connectionString, providerName);
+            _configManipulator.SaveConnectionString(newConnectionString, ConnectionStrings.DefaultProviderName);
+            _databaseFactory.Configure(umbracoConnectionString);
         }
 
         /// <summary>

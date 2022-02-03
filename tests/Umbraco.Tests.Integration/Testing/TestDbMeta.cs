@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
@@ -36,5 +37,12 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public static TestDbMeta CreateWithoutConnectionString(string name, bool isEmpty) =>
             new TestDbMeta(name, isEmpty, null, Core.Constants.DatabaseProviders.SqlServer, null);
 
+        public ConnectionStrings ToStronglyTypedConnectionString() =>
+            new ConnectionStrings
+            {
+                Name = Name,
+                ConnectionString = ConnectionString,
+                ProviderName = Provider
+            };
     }
 }

@@ -95,9 +95,10 @@ namespace Umbraco.Cms.Infrastructure.Install
         /// <value>
         ///   <c>true</c> if this is a brand new install; otherwise, <c>false</c>.
         /// </value>
-        private bool IsBrandNewInstall => _connectionStrings.CurrentValue.UmbracoConnectionString?.IsConnectionStringConfigured() != true ||
-                    _databaseBuilder.IsDatabaseConfigured == false ||
-                    _databaseBuilder.CanConnectToDatabase == false ||
-                    _databaseBuilder.IsUmbracoInstalled() == false;
+        private bool IsBrandNewInstall =>
+            _connectionStrings.Get(Constants.System.UmbracoConnectionName).IsConnectionStringConfigured() == false ||
+            _databaseBuilder.IsDatabaseConfigured == false ||
+            _databaseBuilder.CanConnectToDatabase == false ||
+            _databaseBuilder.IsUmbracoInstalled() == false;
     }
 }

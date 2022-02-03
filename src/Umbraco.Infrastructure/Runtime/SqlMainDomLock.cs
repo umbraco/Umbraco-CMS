@@ -59,11 +59,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 _globalSettings,
+                connectionStrings,
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 dbProviderFactoryCreator,
                 databaseSchemaCreatorFactory,
-                npocoMappers,
-                connectionStrings.CurrentValue.UmbracoConnectionString.ConnectionString);
+                npocoMappers);
 
             MainDomKey = MainDomKeyPrefix + "-" + mainDomKeyGenerator.GenerateKey();
         }

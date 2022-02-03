@@ -113,7 +113,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
     private void RebuildSchemaFirstTime(TestDbMeta meta)
     {
         var dbFactory = _dbFactoryProvider.Create();
-        dbFactory.Configure(meta.ConnectionString, meta.Provider);
+        dbFactory.Configure(meta.ToStronglyTypedConnectionString());
 
         using var database = (UmbracoDatabase)dbFactory.CreateDatabase();
         database.LogCommands = true;

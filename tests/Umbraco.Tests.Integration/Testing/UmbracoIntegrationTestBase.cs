@@ -126,11 +126,11 @@ public abstract class UmbracoIntegrationTestBase
         // It's just been pulled from container and wasn't used to create test database
         Assert.IsFalse(factory.Configured);
 
-        factory.Configure(meta.ConnectionString, meta.Provider);
+        factory.Configure(meta.ToStronglyTypedConnectionString());
         state.DetermineRuntimeLevel();
     }
 
-        private void SetupTestDatabase(
+    private void SetupTestDatabase(
             TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
             IUmbracoDatabaseFactory databaseFactory,
             ILoggerFactory loggerFactory,
