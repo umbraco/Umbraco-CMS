@@ -58,9 +58,20 @@
             /// </remarks>
             public const string RecycleBinMediaPathPrefix = "-1,-21,";
 
+            /// <summary>
+            /// The default label data type identifier.
+            /// </summary>
             public const int DefaultLabelDataTypeId = -92;
 
+            /// <summary>
+            /// The key Umbraco uses to get the connection string.
+            /// </summary>
             public const string UmbracoConnectionName = "umbracoDbDSN";
+
+            /// <summary>
+            /// The keu Umbraco uses to get the connection string provider name.
+            /// </summary>
+            public const string UmbracoConnectionProviderName = "umbracoDbDSN_ProviderName";
         }
     }
 }

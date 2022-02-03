@@ -16,7 +16,10 @@ namespace Umbraco.Cms.Core.Configuration
 
         public JsonConfigManipulator(IConfiguration configuration) => _configuration = configuration;
 
-        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
+        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionName}";
+
+        public string UmbracoConnectionProviderPath { get; } = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionProviderName}";
+
         public void RemoveConnectionString()
         {
             var provider = GetJsonConfigurationProvider(UmbracoConnectionPath);
@@ -24,6 +27,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
 
             RemoveJsonKey(json, UmbracoConnectionPath);
+            RemoveJsonKey(json, UmbracoConnectionProviderPath);
 
             SaveJson(provider, json);
         }
@@ -145,6 +149,8 @@ namespace Umbraco.Cms.Core.Configuration
             writer.WriteStartObject();
             writer.WritePropertyName(Cms.Core.Constants.System.UmbracoConnectionName);
             writer.WriteValue(connectionString);
+            writer.WritePropertyName(Cms.Core.Constants.System.UmbracoConnectionProviderName);
+            writer.WriteValue(providerName);
             writer.WriteEndObject();
             writer.WriteEndObject();
 
