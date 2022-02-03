@@ -43,14 +43,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)
         {
-            // Register configuration validators.
+            // Register configuration validators
             builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
             builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
             builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
             builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
             builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
 
-            // Register configuration sections.
+            // Register Umbraco connection string configuration
+            builder.Services.AddOptions<UmbracoConnectionString>();
+            builder.Services.AddSingleton<IConfigureOptions<UmbracoConnectionString>, ConfigureNamedUmbracoConnectionStringOptions>();
+
+            // Register configuration sections
             builder
                 .AddUmbracoOptions<ModelsBuilderSettings>()
                 .AddUmbracoOptions<ConnectionStrings>()
