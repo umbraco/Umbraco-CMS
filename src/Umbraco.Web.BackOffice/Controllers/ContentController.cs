@@ -62,6 +62,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ActionCollection _actionCollection;
         private readonly ISqlContext _sqlContext;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IContentVersionService _contentVersionService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
         private readonly IScopeProvider _scopeProvider;
@@ -90,7 +91,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             IJsonSerializer serializer,
             IScopeProvider scopeProvider,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            IContentVersionService contentVersionService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _propertyEditors = propertyEditors;
@@ -109,6 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _actionCollection = actionCollection;
             _sqlContext = sqlContext;
             _authorizationService = authorizationService;
+            _contentVersionService = contentVersionService;
             _logger = loggerFactory.CreateLogger<ContentController>();
             _scopeProvider = scopeProvider;
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -164,27 +167,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IEnumerable<string> groupPermissions;
                 if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
                 {
-                    //create a string collection of the assigned letters
-                    var groupPermissionCodes = groupPermissions.ToArray();
-
-                    //check if there are no permissions assigned for this group save model, if that is the case we want to reset the permissions
-                    //for this group/node which will go back to the defaults
-                    if (groupPermissionCodes.Length == 0)
+                    if (groupPermissions is null)
                     {
                         _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                        continue;
                     }
-                    //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
-                    else if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
-                    {
-                        //only remove them if they are actually currently assigned
-                        if (contentPermissions.ContainsKey(userGroup.Id))
-                        {
-                            //remove these permissions from this node for this group since the ones being assigned are the same as the defaults
-                            _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
-                        }
-                    }
-                    //if they are different we need to update, otherwise there's nothing to update
-                    else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
+
+                    // Create a string collection of the assigned letters
+                    var groupPermissionCodes = groupPermissions.ToArray();
+                    // Check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
+                    if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
 
                         _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
@@ -2500,6 +2492,53 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (content == null) return NotFound();
 
             _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, content, notifyOptions);
+
+            return NoContent();
+        }
+
+        [HttpGet]
+        [JsonCamelCaseFormatter]
+        public IActionResult GetPagedContentVersions(
+            int contentId,
+            int pageNumber = 1,
+            int pageSize = 10,
+            string culture = null)
+        {
+            if (!string.IsNullOrEmpty(culture))
+            {
+                if (!_allLangs.Value.TryGetValue(culture, out _))
+                {
+                    return NotFound();
+                }
+            }
+
+            IEnumerable<ContentVersionMeta> results = _contentVersionService.GetPagedContentVersions(
+                contentId,
+                pageNumber - 1,
+                pageSize,
+                out var totalRecords,
+                culture);
+
+            var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize)
+            {
+                Items = results
+            };
+
+            return Ok(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
+        public IActionResult PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
+        {
+            IContent content = _contentService.GetVersion(versionId);
+
+            if (content == null || content.Id != contentId)
+            {
+                return NotFound();
+            }
+
+            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return NoContent();
         }

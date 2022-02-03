@@ -166,7 +166,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
-            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>();
+            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
+                new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>())
+            );
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
@@ -266,15 +268,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
+            builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
             builder.SetLogViewer<SerilogJsonLogViewer>();
             builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
                 factory.GetRequiredService<ILogViewerConfig>(),
                 factory.GetRequiredService<ILoggingConfiguration>(),
+                factory.GetRequiredService<ILogLevelLoader>(),
                 Log.Logger));
 
             return builder;
         }
-
 
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {

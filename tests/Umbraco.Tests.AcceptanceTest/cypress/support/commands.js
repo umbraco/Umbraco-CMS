@@ -27,6 +27,7 @@
 import {Command} from 'umbraco-cypress-testhelpers';
 import {Chainable} from './chainable';
 import { JsonHelper } from 'umbraco-cypress-testhelpers';
+require('cy-verify-downloads').addCustomCommand();
 new Chainable();
 new Command().registerCypressCommands();
 
@@ -57,9 +58,8 @@ Cypress.Commands.add('umbracoCreateLanguage', (culture, isMandatory = false, fal
     });   
 }); 
 
-Cypress.Commands.add('umbracoEnsureLanguageNotExists', (culture) => {
+Cypress.Commands.add('umbracoEnsureLanguageCultureNotExists', (culture) => {
     cy.getCookie('UMB-XSRF-TOKEN', { log: false }).then((token) => {
-        console.log('hit commands')
         cy.request({
           method: 'GET',
           url: '/umbraco/backoffice/umbracoapi/language/GetAllLanguages',

@@ -6,7 +6,6 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -18,22 +17,34 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
-    // TODO: We should update this to support both users and members. It means we would remove referential integrity from users
-    // and the user/member key would be a GUID (we also need to add a GUID to users)
-    internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository
+    internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository, IExternalLoginWithKeyRepository
     {
         public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ExternalLoginRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 
-        public void DeleteUserLogins(int memberId) => Database.Delete<ExternalLoginDto>("WHERE userId=@userId", new { userId = memberId });
+        /// <inheritdoc />
+        [Obsolete("Use method that takes guid as param")]
+        public void DeleteUserLogins(int memberId) => DeleteUserLogins(memberId.ToGuid());
 
-        public void Save(int userId, IEnumerable<IExternalLogin> logins)
+        /// <inheritdoc />
+        [Obsolete("Use method that takes guid as param")]
+        public void Save(int userId, IEnumerable<IExternalLogin> logins) => Save(userId.ToGuid(), logins);
+
+        /// <inheritdoc />
+        [Obsolete("Use method that takes guid as param")]
+        public void Save(int userId, IEnumerable<IExternalLoginToken> tokens) => Save(userId.ToGuid(), tokens);
+
+        /// <inheritdoc />
+        public void DeleteUserLogins(Guid userOrMemberKey) => Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
+
+        /// <inheritdoc />
+        public void Save(Guid userOrMemberKey, IEnumerable<IExternalLogin> logins)
         {
             var sql = Sql()
                 .Select<ExternalLoginDto>()
                 .From<ExternalLoginDto>()
-                .Where<ExternalLoginDto>(x => x.UserId == userId)
+                .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey)
                 .ForUpdate();
 
             // deduplicate the logins
@@ -71,10 +82,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (var u in toUpdate)
             {
-                Database.Update(ExternalLoginFactory.BuildDto(userId, u.Value, u.Key));
+                Database.Update(ExternalLoginFactory.BuildDto(userOrMemberKey, u.Value, u.Key));
             }
 
-            Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userId, i)));
+            Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userOrMemberKey, i)));
         }
 
         protected override IIdentityUserLogin PerformGet(int id)
@@ -217,11 +228,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(sql);
         }
 
-        public void Save(int userId, IEnumerable<IExternalLoginToken> tokens)
+        /// <inheritdoc />
+        public void Save(Guid userOrMemberKey, IEnumerable<IExternalLoginToken> tokens)
         {
             // get the existing logins (provider + id)
             var existingUserLogins = Database
-                .Fetch<ExternalLoginDto>(GetBaseQuery(false).Where<ExternalLoginDto>(x => x.UserId == userId))
+                .Fetch<ExternalLoginDto>(GetBaseQuery(false).Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey))
                 .ToDictionary(x => x.LoginProvider, x => x.Id);
 
             // deduplicate the tokens
@@ -231,7 +243,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             Sql<ISqlContext> sql = GetBaseTokenQuery(true)
                 .WhereIn<ExternalLoginDto>(x => x.LoginProvider, providers)
-                .Where<ExternalLoginDto>(x => x.UserId == userId);
+                .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
 
             var toUpdate = new Dictionary<int, (IExternalLoginToken externalLoginToken, int externalLoginId)>();
             var toDelete = new List<int>();
@@ -289,7 +301,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id)
             : Sql()
                 .Select<ExternalLoginTokenDto>()
-                .AndSelect<ExternalLoginDto>(x => x.LoginProvider, x => x.UserId)
+                .AndSelect<ExternalLoginDto>(x => x.LoginProvider, x => x.UserOrMemberKey)
                 .From<ExternalLoginTokenDto>()
                 .InnerJoin<ExternalLoginDto>()
                 .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id);

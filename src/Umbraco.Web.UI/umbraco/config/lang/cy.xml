@@ -5,7 +5,7 @@
     <link>https://www.method4.co.uk/</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Diwylliannau ac Enwau Gwesteia</key>
+    <key alias="assigndomain">Diwylliannau ac Enwau Gwesteia</key>
     <key alias="auditTrail">Trywydd Archwilio</key>
     <key alias="browse">Dewis Nod</key>
     <key alias="changeDocType">Newid Math o Ddogfen</key>
@@ -21,7 +21,7 @@
     <key alias="emptyRecycleBin">Gwagu bin ailgylchu</key>
     <key alias="enable">Galluogi</key>
     <key alias="exportDocumentType">Allforio Math o Ddogfen</key>
-    <key alias="importDocumentType">Mewnforio Math o Ddogfen</key>
+    <key alias="importdocumenttype">Mewnforio Math o Ddogfen</key>
     <key alias="importPackage">Mewnforio Pecyn</key>
     <key alias="liveEdit">Golygu mewn Cynfas</key>
     <key alias="logout">Gadael</key>

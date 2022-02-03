@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
     /// <summary>
     /// Configures the ImageSharp middleware options to use the registered configuration.
     /// </summary>
-    /// <seealso cref="Microsoft.Extensions.Options.IConfigureOptions&lt;SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions&gt;" />
+    /// <seealso cref="IConfigureOptions{ImageSharpMiddlewareOptions}" />
     public sealed class ImageSharpConfigurationOptions : IConfigureOptions<ImageSharpMiddlewareOptions>
     {
         /// <summary>
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
         public ImageSharpConfigurationOptions(Configuration configuration) => _configuration = configuration;
 
         /// <summary>
-        /// Invoked to configure a <typeparamref name="TOptions" /> instance.
+        /// Invoked to configure an <see cref="ImageSharpMiddlewareOptions" /> instance.
         /// </summary>
         /// <param name="options">The options instance to configure.</param>
         public void Configure(ImageSharpMiddlewareOptions options) => options.Configuration = _configuration;

@@ -7,6 +7,7 @@
     "e2e": "gulp testE2e",
     "build": "gulp build",
     "build:skip-tests": "gulp coreBuild",
+    "build:dev": "gulp buildDev",
     "dev": "gulp dev",
     "fastdev": "gulp fastdev",
     "watch": "gulp watch"
@@ -87,7 +88,6 @@
     "karma-spec-reporter": "0.0.32",
     "less": "3.10.3",
     "lodash": "4.17.21",
-    "marked": "^0.7.0",
     "merge-stream": "2.0.0",
     "run-sequence": "2.2.1"
   }
