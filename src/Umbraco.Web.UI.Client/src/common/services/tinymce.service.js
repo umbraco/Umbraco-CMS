@@ -655,8 +655,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 stateSelector: 'img[data-udi]',
                 onclick: function () {
 
-                    var selectedElm = editor.selection.getNode(),
-                        currentTarget,
+                  var selectedElm = editor.selection.getNode(),
+                    currentTarget;
 
                     if (selectedElm.nodeName === 'IMG') {
                         var img = $(selectedElm);
