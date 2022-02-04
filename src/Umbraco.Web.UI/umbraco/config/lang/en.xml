@@ -1292,6 +1292,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoResultsDescription">Please try searching for another package or browse through the categories
     </key>
     <key alias="packagesPopular">Popular</key>
+    <key alias="packagesPromoted">Promoted</key>
     <key alias="packagesNew">New releases</key>
     <key alias="packageHas">has</key>
     <key alias="packageKarmaPoints">karma points</key>
