@@ -333,5 +333,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             public DbType DbType { get; }
             public int Size { get; }
         }
+
+        /// <inheritdoc cref="Database.ExecuteScalar{T}(string,object[])"/>
+        public new T ExecuteScalar<T>(string sql, params object[] args)
+            => ExecuteScalar<T>(new Sql(sql, args));
+
+        /// <inheritdoc cref="Database.ExecuteScalar{T}(sql)"/>
+        public new T ExecuteScalar<T>(Sql sql)
+            => ExecuteScalar<T>(sql.SQL, CommandType.Text, sql.Arguments);
+
+        /// <inheritdoc cref="Database.ExecuteScalar{T}(string,CommandType,object[])"/>
+        /// <remarks>
+        /// Be nice if handled upstream <a href="https://github.com/schotime/NPoco/issues/653">GH issue</a>
+        /// </remarks>
+        public new T ExecuteScalar<T>(string sql, CommandType commandType, params object[] args)
+        {
+            if (SqlContext.SqlSyntax.ScalarMappers == null)
+            {
+                return base.ExecuteScalar<T>(sql, commandType, args);
+            }
+
+            if (!SqlContext.SqlSyntax.ScalarMappers.TryGetValue(typeof(T), out IScalarMapper mapper))
+            {
+                return base.ExecuteScalar<T>(sql, commandType, args);
+            }
+
+            var result = base.ExecuteScalar<object>(sql, commandType, args);
+            return (T)mapper.Map(result);
+        }
     }
 }

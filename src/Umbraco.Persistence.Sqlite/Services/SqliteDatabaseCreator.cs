@@ -1,5 +1,5 @@
-using System.Data.SQLite;
 using System.Diagnostics;
+using Microsoft.Data.Sqlite;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Persistence.Sqlite.Services;
@@ -33,10 +33,10 @@ public class SqliteDatabaseCreator : IDatabaseCreator
     /// </remarks>
     public void Create(string connectionString)
     {
-        using var connection = new SQLiteConnection(connectionString);
+        using var connection = new SqliteConnection(connectionString);
         connection.Open();
 
-        using SQLiteCommand command = connection.CreateCommand();
+        using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA journal_mode = wal;";
         command.ExecuteNonQuery();
 
