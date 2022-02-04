@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register Umbraco connection string configuration
             builder.Services.AddOptions<UmbracoConnectionString>();
-            builder.Services.AddSingleton<IConfigureOptions<UmbracoConnectionString>, ConfigureNamedUmbracoConnectionStringOptions>();
+            builder.Services.AddSingleton<IPostConfigureOptions<UmbracoConnectionString>, PostConfigureUmbracoConnectionStringOptions>();
 
             // Register configuration sections
             builder
