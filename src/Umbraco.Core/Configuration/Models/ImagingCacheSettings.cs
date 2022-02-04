@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         internal const string StaticBrowserMaxAge = "7.00:00:00";
         internal const string StaticCacheMaxAge = "365.00:00:00";
-        internal const int StaticCachedNameLength = 8;
+        internal const int StaticCacheHashLength = 8;
         internal const string StaticCacheFolder = Constants.SystemDirectories.TempData +  "/MediaCache";
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for length of the cached name.
         /// </summary>
-        [DefaultValue(StaticCachedNameLength)]
-        public uint CachedNameLength { get; set; } = StaticCachedNameLength;
+        [DefaultValue(StaticCacheHashLength)]
+        public uint CacheHashLength { get; set; } = StaticCacheHashLength;
 
         /// <summary>
         /// Gets or sets a value for the cache folder.

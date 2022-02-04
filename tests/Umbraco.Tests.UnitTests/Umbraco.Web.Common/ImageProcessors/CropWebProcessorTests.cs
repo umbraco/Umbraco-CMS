@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ImageProcessors
             var parser = new CommandParser(converters);
             CultureInfo culture = CultureInfo.InvariantCulture;
 
-            var commands = new Dictionary<string, string>
+            var commands = new CommandCollection
             {
                 { CropWebProcessor.Coordinates, "0.1,0.2,0.1,0.4" },  // left, top, right, bottom
             };

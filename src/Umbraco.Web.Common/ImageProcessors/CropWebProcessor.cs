@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         };
 
         /// <inheritdoc/>
-        public FormattedImage Process(FormattedImage image, ILogger logger, IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
+        public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
             RectangleF? coordinates = GetCoordinates(commands, parser, culture);
             if (coordinates != null)
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             return image;
         }
 
-        private static RectangleF? GetCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
+        private static RectangleF? GetCoordinates(CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
             float[] coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Coordinates), culture);
 
