@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                     false));
             builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-            builder.Services.AddUnique<ExamineIndexRebuilder>();
+            builder.Services.AddSingleton<ExamineIndexRebuilder>();
 
             builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();

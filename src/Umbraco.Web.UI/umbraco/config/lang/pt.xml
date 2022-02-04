@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Gerenciar hostnames</key>
+    <key alias="assigndomain">Gerenciar hostnames</key>
     <key alias="auditTrail">Caminho de Auditoria</key>
     <key alias="browse">Navegar o Nó</key>
     <key alias="copy">Copiar</key>
