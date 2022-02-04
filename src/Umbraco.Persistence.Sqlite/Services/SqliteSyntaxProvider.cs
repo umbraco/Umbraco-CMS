@@ -16,6 +16,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
+using Umbraco.Persistence.Sqlite.Mappers;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Persistence.Sqlite.Services;
@@ -27,11 +28,18 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ILogger<SqliteSyntaxProvider> _log;
+    private readonly IDictionary<Type, IScalarMapper> _scalarMappers;
 
     public SqliteSyntaxProvider(IOptions<GlobalSettings> globalSettings, ILogger<SqliteSyntaxProvider> log)
     {
         _globalSettings = globalSettings;
         _log = log;
+
+        _scalarMappers = new Dictionary<Type, IScalarMapper>
+        {
+            [typeof(Guid)] = new SqliteGuidScalarMapper(),
+            [typeof(Guid?)] = new SqliteNullableGuidScalarMapper(),
+        };
     }
 
     /// <inheritdoc />
@@ -449,6 +457,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return foundConstraints
             .Select(x => Tuple.Create(x.TableName, x.ColumnName, x.ConstraintName));
     }
+
+    public override IDictionary<Type, IScalarMapper> ScalarMappers => _scalarMappers;
 
     private class Constraint
     {

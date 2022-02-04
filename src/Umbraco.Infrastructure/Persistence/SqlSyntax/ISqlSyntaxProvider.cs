@@ -145,5 +145,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         void WriteLock(IDatabase db, params int[] lockIds);
 
         string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
+
+
+        IDictionary<Type, IScalarMapper> ScalarMappers { get; }
     }
 }

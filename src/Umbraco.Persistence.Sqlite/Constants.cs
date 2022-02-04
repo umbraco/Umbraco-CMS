@@ -8,5 +8,5 @@ public static class Constants
     /// <summary>
     /// SQLite provider name.
     /// </summary>
-    public const string ProviderName = "System.Data.SQLite";
+    public const string ProviderName = "Microsoft.Data.SQLite";
 }

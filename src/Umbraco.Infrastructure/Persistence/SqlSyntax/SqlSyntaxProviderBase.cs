@@ -265,6 +265,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
 
+        public virtual IDictionary<Type, IScalarMapper> ScalarMappers => null;
+
         public abstract void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
 
         public abstract void WriteLock(IDatabase db, TimeSpan timeout, int lockId);

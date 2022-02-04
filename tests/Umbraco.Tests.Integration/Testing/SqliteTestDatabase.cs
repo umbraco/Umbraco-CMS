@@ -2,17 +2,20 @@ using System;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NPoco;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Persistence.Sqlite.Mappers;
 using Umbraco.Persistence.Sqlite.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -76,7 +79,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     protected override void ResetTestDatabase(TestDbMeta meta) => Drop(meta);
 
-    protected override DbConnection GetConnection(TestDbMeta meta) => new SQLiteConnection(meta.ConnectionString);
+    protected override DbConnection GetConnection(TestDbMeta meta) => new SqliteConnection(meta.ConnectionString);
 
     protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
     {
@@ -92,22 +95,19 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         using var connection = GetConnection(meta);
         connection.Open();
 
-        using var transaction = connection.BeginTransaction();
+        // Get NPoco to handle all the type mappings (e.g. dates) for us.
+        var database = new Database(connection, DatabaseType.SQLite);
+        database.BeginTransaction();
+
+        database.Mappers.Add(new NullableDateMapper());
+        database.Mappers.Add(new SqlitePocoGuidMapper());
+
         foreach (UmbracoDatabase.CommandInfo dbCommand in _cachedDatabaseInitCommands)
         {
-            command.Connection = connection;
-            command.CommandText = dbCommand.Text;
-            command.Parameters.Clear();
-
-            foreach (UmbracoDatabase.ParameterInfo parameterInfo in dbCommand.Parameters)
-            {
-                AddParameter(command, parameterInfo);
-            }
-
-            command.ExecuteNonQuery();
+            database.Execute(dbCommand.Text, dbCommand.Parameters.Select(x => x.Value).ToArray());
         }
 
-        transaction.Commit();
+        database.CompleteTransaction();
     }
 
     private void RebuildSchemaFirstTime(TestDbMeta meta)
@@ -178,9 +178,11 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         var name = $"{DatabaseName}-{i}.sqlite";
         var path = Path.Combine(_settings.FilesPath, name);
 
-        var builder = new SQLiteConnectionStringBuilder
+        var builder = new SqliteConnectionStringBuilder()
         {
-            DataSource = path
+            DataSource = path,
+            Cache = SqliteCacheMode.Private,
+            Pooling = false // TODO: PMJ - Breaks if connection pooling is on, why?
         };
 
         return new TestDbMeta(name, empty, builder.ConnectionString, Persistence.Sqlite.Constants.ProviderName, path);

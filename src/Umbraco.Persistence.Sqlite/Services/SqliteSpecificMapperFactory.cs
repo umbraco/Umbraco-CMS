@@ -1,5 +1,6 @@
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Persistence.Sqlite.Mappers;
 
 namespace Umbraco.Persistence.Sqlite.Services;
 
@@ -12,5 +13,5 @@ public class SqliteSpecificMapperFactory : IProviderSpecificMapperFactory
     public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />
-    public NPocoMapperCollection Mappers => new NPocoMapperCollection(Array.Empty<IMapper>);
+    public NPocoMapperCollection Mappers => new NPocoMapperCollection(() => new[] { new SqlitePocoGuidMapper() });
 }
