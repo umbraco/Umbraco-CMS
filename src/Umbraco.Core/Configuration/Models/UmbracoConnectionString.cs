@@ -1,4 +1,5 @@
 using System.Data.Common;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
@@ -42,7 +43,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
                 ConnectionString = connectionString
             };
 
-            return Umbraco.Extensions.ConfigurationExtensions.ParseProviderName(builder);
+            return ConfigurationExtensions.ParseProviderName(builder);
         }
     }
 }

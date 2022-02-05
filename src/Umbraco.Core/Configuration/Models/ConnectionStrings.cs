@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// Typed configuration options for connection strings.
     /// </summary>
     [UmbracoOptions("ConnectionStrings", BindNonPublicProperties = true)]
-    public class ConnectionStrings
+    public class ConnectionStrings : UmbracoConnectionString
     {
         // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.
         // Attributes cannot be applied to map from keys that don't match, and have chosen to retain the key name
@@ -19,8 +19,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
 #pragma warning restore IDE1006 // Naming Styles
 #pragma warning restore SA1300  // Element should begin with upper-case letter
         {
-            get => UmbracoConnectionString?.ConnectionString;
-            set => UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, value);
+            get => ConnectionString;
+            set
+            {
+                ConnectionString = value;
+                ProviderName = ParseProviderName(value);
+                UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, ConnectionString, ProviderName);
+            }
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration
@@ -55,18 +56,6 @@ namespace Umbraco.Cms.Core.Configuration
         /// The provider name or <c>null</c> is the connection string is empty.
         /// </returns>
         public static string ParseProviderName(string connectionString)
-        {
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                return null;
-            }
-
-            var builder = new DbConnectionStringBuilder
-            {
-                ConnectionString = connectionString
-            };
-
-            return ConfigurationExtensions.ParseProviderName(builder);
-        }
+            => UmbracoConnectionString.ParseProviderName(connectionString);
     }
 }
