@@ -1,11 +1,14 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for connection strings.
     /// </summary>
+    [Obsolete("Use the named options UmbracoConnectionString model instead.")]
     [UmbracoOptions("ConnectionStrings", BindNonPublicProperties = true)]
     public class ConnectionStrings : UmbracoConnectionString
     {

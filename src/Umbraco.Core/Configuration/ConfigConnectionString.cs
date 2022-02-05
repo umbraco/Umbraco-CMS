@@ -5,6 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration
 {
+    [Obsolete("Use the named options UmbracoConnectionString model instead.")]
     public class ConfigConnectionString
     {
         public string Name { get; }
