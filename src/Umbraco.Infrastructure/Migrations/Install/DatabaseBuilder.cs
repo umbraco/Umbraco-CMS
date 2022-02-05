@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+        private readonly IOptionsMonitor<UmbracoConnectionString> _umbracoConnectionString;
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IConfigManipulator configManipulator,
             IOptionsMonitor<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<UmbracoConnectionString> connectionStrings,
             IMigrationPlanExecutor migrationPlanExecutor,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _configManipulator = configManipulator;
             _globalSettings = globalSettings;
-            _connectionStrings = connectionStrings;
+            _umbracoConnectionString = connectionStrings;
             _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         }
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (string.IsNullOrWhiteSpace(connectionString) == false)
             {
-                providerName = ConfigConnectionString.ParseProviderName(connectionString);
+                providerName = UmbracoConnectionString.ParseProviderName(connectionString);
             }
             else if (integratedAuth)
             {
@@ -197,11 +197,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void Configure(string connectionString, string providerName, bool installMissingDatabase)
         {
-            // Update existing connection string
-            var umbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString, providerName);
-            _connectionStrings.CurrentValue.UmbracoConnectionString = umbracoConnectionString;
+            if (string.IsNullOrEmpty(providerName))
+            {
+                providerName = UmbracoConnectionString.ParseProviderName(connectionString);
+            }
 
-            _databaseFactory.Configure(umbracoConnectionString.ConnectionString, umbracoConnectionString.ProviderName);
+            // Update existing connection string
+            _umbracoConnectionString.CurrentValue.ConnectionString = connectionString;
+            _umbracoConnectionString.CurrentValue.ProviderName = providerName;
+
+            _databaseFactory.Configure(connectionString, providerName);
 
             if (installMissingDatabase)
             {

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+        private readonly IOptionsMonitor<UmbracoConnectionString> _umbracoConnectionString;
         private readonly IMapperCollection _mappers;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public TestUmbracoDatabaseFactoryProvider(
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<UmbracoConnectionString> connectionStrings,
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         {
             _loggerFactory = loggerFactory;
             _globalSettings = globalSettings;
-            _connectionStrings = connectionStrings;
+            _umbracoConnectionString = connectionStrings;
             _mappers = mappers;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
@@ -44,14 +44,14 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         }
 
         public IUmbracoDatabaseFactory Create()
-            => new UmbracoDatabaseFactory(
-                _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
-                _loggerFactory,
-                _globalSettings,
-                _connectionStrings,
-                _mappers,
-                _dbProviderFactoryCreator,
-                _databaseSchemaCreatorFactory,
-                _npocoMappers);
+        => new UmbracoDatabaseFactory(
+            _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+            _loggerFactory,
+            _globalSettings,
+            _umbracoConnectionString,
+            _mappers,
+            _dbProviderFactoryCreator,
+            _databaseSchemaCreatorFactory,
+            _npocoMappers);
     }
 }

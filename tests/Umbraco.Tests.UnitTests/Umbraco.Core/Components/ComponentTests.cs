@@ -46,13 +46,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
             ILogger logger = loggerFactory.CreateLogger("GenericLogger");
             var globalSettings = new GlobalSettings();
-            var connectionStrings = new ConnectionStrings();
+            var umbracoConnectionString = new UmbracoConnectionString();
             var mapperCollection = new NPocoMapperCollection(() => new[] { new NullableDateMapper() });
             var f = new UmbracoDatabaseFactory(
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 Options.Create(globalSettings),
-                Mock.Of<IOptionsMonitor<ConnectionStrings>>(x => x.CurrentValue == connectionStrings),
+                Mock.Of<IOptionsMonitor<UmbracoConnectionString>>(x => x.CurrentValue == umbracoConnectionString),
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 TestHelper.DbProviderFactoryCreator,
                 new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()),
@@ -65,8 +65,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 Mock.Of<IMediaPathScheme>(),
                 Mock.Of<ILogger<MediaFileManager>>(),
                 Mock.Of<IShortStringHelper>(),
-                Mock.Of<IServiceProvider>(),
-                Options.Create(new ContentSettings()));
+                Mock.Of<IServiceProvider>());
             IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
             var scopeProvider = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileManager, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
 

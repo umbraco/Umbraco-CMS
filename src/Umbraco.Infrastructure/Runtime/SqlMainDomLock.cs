@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
@@ -25,19 +24,17 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class SqlMainDomLock : IMainDomLock
     {
-        private readonly string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
+        private readonly object _locker = new object();
+
+        private readonly string _lockId;
         private readonly ILogger<SqlMainDomLock> _logger;
-        private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoDatabase _db;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
-        private readonly object _locker = new object();
         private bool _hasTable = false;
         private bool _acquireWhenTablesNotAvailable = false;
 
@@ -45,53 +42,42 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<UmbracoConnectionString> connectionStrings,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IHostingEnvironment hostingEnvironment,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers)
+        {
+            // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
+            _lockId = Guid.NewGuid().ToString();
+            _logger = logger;
+            _sqlServerSyntax = new SqlServerSyntaxProvider(globalSettings);
+            _dbFactory = new UmbracoDatabaseFactory(
+                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                loggerFactory,
+                globalSettings,
+                connectionStrings,
+                new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
+                dbProviderFactoryCreator,
+                databaseSchemaCreatorFactory,
+                npocoMappers);
+
+            MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(hostingEnvironment)).GenerateHash<SHA1>();
+        }
+
+        [Obsolete("Use the ctor without duplicate connection string parameters (the connectionStringName is not used anymore).")]
+        public SqlMainDomLock(
+            ILogger<SqlMainDomLock> logger,
+            ILoggerFactory loggerFactory,
+            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<UmbracoConnectionString> connectionStrings,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IHostingEnvironment hostingEnvironment,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers,
             string connectionStringName)
+            : this(logger, loggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment, databaseSchemaCreatorFactory, npocoMappers)
         {
-            // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
-            _lockId = Guid.NewGuid().ToString();
-            _logger = logger;
-            _globalSettings = globalSettings;
-            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
-            _hostingEnvironment = hostingEnvironment;
-            _dbFactory = new UmbracoDatabaseFactory(
-                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
-                loggerFactory,
-                _globalSettings,
-                new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
-                dbProviderFactoryCreator,
-                databaseSchemaCreatorFactory,
-                npocoMappers,
-                connectionStringName);
-            MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
-        }
-
-        public SqlMainDomLock(
-            ILogger<SqlMainDomLock> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IHostingEnvironment hostingEnvironment,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers)
-        : this(
-            logger,
-            loggerFactory,
-            globalSettings,
-            connectionStrings,
-            dbProviderFactoryCreator,
-            hostingEnvironment,
-            databaseSchemaCreatorFactory,
-            npocoMappers,
-            connectionStrings.CurrentValue.UmbracoConnectionString.ConnectionString
-            )
-        {
-
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)

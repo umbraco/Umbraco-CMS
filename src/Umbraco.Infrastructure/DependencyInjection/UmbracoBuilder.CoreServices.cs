@@ -45,8 +45,8 @@ using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
-using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
@@ -221,7 +221,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
-                var connectionStrings = factory.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+                var umbracoConnectionString = factory.GetRequiredService<IOptionsMonitor<UmbracoConnectionString>>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
@@ -231,11 +231,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(
+                    ? new SqlMainDomLock(
                             loggerFactory.CreateLogger<SqlMainDomLock>(),
                             loggerFactory,
                             globalSettings,
-                            connectionStrings,
+                            umbracoConnectionString,
                             dbCreator,
                             hostingEnvironment,
                             databaseSchemaCreatorFactory,

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
@@ -73,63 +72,61 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         #region Constructors
 
-
-          /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory" /> class.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-          internal UmbracoDatabaseFactory(
-            ILogger<UmbracoDatabaseFactory> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<GlobalSettings> globalSettings,
-            IMapperCollection mappers,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers,
-            string connectionString)
+        internal UmbracoDatabaseFactory(
+          ILogger<UmbracoDatabaseFactory> logger,
+          ILoggerFactory loggerFactory,
+          IOptions<GlobalSettings> globalSettings,
+          IMapperCollection mappers,
+          IDbProviderFactoryCreator dbProviderFactoryCreator,
+          DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+          NPocoMapperCollection npocoMappers,
+          string connectionString,
+          string providerName)
         {
-            _globalSettings = globalSettings;
-            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
-            _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
-            _npocoMappers = npocoMappers;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
+            _globalSettings = globalSettings;
+            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
+            _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
+            _npocoMappers = npocoMappers;
 
-            if (connectionString is null)
-            {
-                logger.LogDebug("Missing connection string, defer configuration.");
-                return; // not configured
-            }
-
-            var configConnectionString = new ConfigConnectionString("Custom", connectionString);
-            // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
-            // so need to test the values too
-            if (configConnectionString.IsConnectionStringConfigured() == false)
+            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName))
             {
                 logger.LogDebug("Empty connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
-            Configure(configConnectionString.ConnectionString, configConnectionString.ProviderName);
+            Configure(connectionString, providerName);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
+        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory" /> class.
         /// </summary>
-        /// <remarks>Used by the other ctor and in tests.</remarks>
         public UmbracoDatabaseFactory(
             ILogger<UmbracoDatabaseFactory> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<UmbracoConnectionString> connectionStrings,
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers):
-            this(logger, loggerFactory, globalSettings, mappers, dbProviderFactoryCreator, databaseSchemaCreatorFactory, npocoMappers, connectionStrings?.CurrentValue?.UmbracoConnectionString?.ConnectionString)
+            NPocoMapperCollection npocoMappers)
+             : this(
+                   logger,
+                   loggerFactory,
+                   globalSettings,
+                   mappers,
+                   dbProviderFactoryCreator,
+                   databaseSchemaCreatorFactory,
+                   npocoMappers,
+                   connectionStrings?.CurrentValue?.ConnectionString,
+                   connectionStrings?.CurrentValue?.ProviderName)
         {
-
         }
 
         #endregion

@@ -20,18 +20,18 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger<DatabaseConfigureStep> _logger;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+        private readonly IOptionsMonitor<UmbracoConnectionString> _umbracoConnectionString;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptionsMonitor<ConnectionStrings> connectionStrings, ILogger<DatabaseConfigureStep> logger)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptionsMonitor<UmbracoConnectionString> connectionStrings, ILogger<DatabaseConfigureStep> logger)
         {
             _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings;
+            _umbracoConnectionString = connectionStrings;
             _logger = logger;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
         {
-            //if the database model is null then we will apply the defaults
+            // if the database model is null then we will apply the defaults
             if (database == null)
             {
                 database = new DatabaseModel();
@@ -123,27 +123,24 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override string View => ShouldDisplayView() ? base.View : "";
 
-
         public override bool RequiresExecution(DatabaseModel model) => ShouldDisplayView();
 
         private bool ShouldDisplayView()
         {
-            //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
-
-            if (databaseSettings.IsConnectionStringConfigured())
+            // If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
+            var umbracoConnectionString = _umbracoConnectionString.CurrentValue;
+            if (umbracoConnectionString.IsConnectionStringConfigured())
             {
                 try
                 {
-                    //Since a connection string was present we verify the db can connect and query
-                    _ = _databaseBuilder.ValidateSchema();
-
+                    // Since a connection string was present we verify the db can connect and query
+                    _databaseBuilder.ValidateSchema();
                     return false;
                 }
                 catch (Exception ex)
                 {
+                    // something went wrong, could not connect so probably need to reconfigure
                     _logger.LogError(ex, "An error occurred, reconfiguring...");
-                    //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }
             }

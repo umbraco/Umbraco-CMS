@@ -24,20 +24,20 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly IRuntimeState _runtime;
         private readonly ILogger<DatabaseUpgradeStep> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+        private readonly IOptionsMonitor<UmbracoConnectionString> _umbracoConnectionString;
 
         public DatabaseUpgradeStep(
             DatabaseBuilder databaseBuilder,
             IRuntimeState runtime,
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
-            IOptionsMonitor<ConnectionStrings> connectionStrings)
+            IOptionsMonitor<UmbracoConnectionString> connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _connectionStrings = connectionStrings;
+            _umbracoConnectionString = connectionStrings;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -66,28 +66,30 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override bool RequiresExecution(object model)
         {
-            //if it's properly configured (i.e. the versions match) then no upgrade necessary
+            // if it's properly configured (i.e. the versions match) then no upgrade necessary
             if (_runtime.Level == RuntimeLevel.Run)
+            {
                 return false;
+            }
 
+            // this step relies on the previous one completed - because it has stored some information we need
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the previous one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
             {
                 return false;
             }
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
-
-            if (databaseSettings.IsConnectionStringConfigured())
+            var umbracoConnectionString = _umbracoConnectionString.CurrentValue;
+            if (umbracoConnectionString.IsConnectionStringConfigured())
             {
                 // a connection string was present, determine whether this is an install/upgrade
                 // return true (upgrade) if there is an installed version, else false (install)
                 var result = _databaseBuilder.ValidateSchema();
+
                 return result.DetermineHasInstalledVersion();
             }
 
-            //no connection string configured, probably a fresh install
+            // no connection string configured, probably a fresh install
             return false;
         }
     }
