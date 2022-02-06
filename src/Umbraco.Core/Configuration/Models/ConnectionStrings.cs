@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions("ConnectionStrings", BindNonPublicProperties = true)]
     public class ConnectionStrings : UmbracoConnectionString
     {
+        private ConfigConnectionString _umbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, null);
+
         // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.
         // Attributes cannot be applied to map from keys that don't match, and have chosen to retain the key name
         // used in configuration for older Umbraco versions.
@@ -22,18 +24,23 @@ namespace Umbraco.Cms.Core.Configuration.Models
 #pragma warning restore IDE1006 // Naming Styles
 #pragma warning restore SA1300  // Element should begin with upper-case letter
         {
-            get => ConnectionString;
-            set
-            {
-                ConnectionString = value;
-                ProviderName = ParseProviderName(value);
-                UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, ConnectionString, ProviderName);
-            }
+            get => UmbracoConnectionString?.ConnectionString;
+            set => UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, value);
         }
 
         /// <summary>
-        /// Gets or sets a value for the Umbraco database connection string..
+        /// Gets or sets a value for the Umbraco database connection string.
         /// </summary>
-        public ConfigConnectionString UmbracoConnectionString { get; set; } = new ConfigConnectionString(Constants.System.UmbracoConnectionName, null);
+        public ConfigConnectionString UmbracoConnectionString
+        {
+            get => _umbracoConnectionString;
+            set
+            {
+                _umbracoConnectionString = value;
+
+                ConnectionString = value?.ConnectionString;
+                ProviderName = value?.ProviderName;
+            }
+        }
     }
 }
