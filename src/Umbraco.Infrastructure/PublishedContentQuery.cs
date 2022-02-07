@@ -249,31 +249,28 @@ namespace Umbraco.Cms.Infrastructure
 
             var query = umbIndex.Searcher.CreateQuery(IndexTypes.Content);
 
-            IQueryExecutor queryExecutor;
+            IOrdering ordering;
             if (culture == "*")
             {
                 // Search everything
-                queryExecutor = query.ManagedQuery(term);
+                ordering = query.ManagedQuery(term);
             }
             else if (string.IsNullOrWhiteSpace(culture))
             {
                 // Only search invariant
-                queryExecutor = query
+                ordering = query
                     .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
                     .And().ManagedQuery(term);
             }
             else
             {
                 // Only search the specified culture
-                var fields =
-                    umbIndex.GetCultureAndInvariantFields(culture)
-                        .ToArray(); // Get all index fields suffixed with the culture name supplied
-                queryExecutor = query.ManagedQuery(term, fields);
+                var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
+                ordering = query.ManagedQuery(term, fields);
             }
-            if (loadedFields != null && queryExecutor is IBooleanOperation booleanOperation)
-            {
-                queryExecutor = booleanOperation.SelectFields(loadedFields);
-            }
+
+            // Only select item ID field, because results are loaded from the published snapshot based on this single value
+            var queryExecutor = ordering.SelectField(ExamineFieldNames.ItemIdFieldName);
 
             var results = skip == 0 && take == 0
                 ? queryExecutor.Execute()
@@ -299,6 +296,12 @@ namespace Umbraco.Cms.Infrastructure
             if (take < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+            }
+
+            if (query is IOrdering ordering)
+            {
+                // Only select item ID field, because results are loaded from the published snapshot based on this single value
+                query = ordering.SelectField(ExamineFieldNames.ItemIdFieldName);
             }
 
             var results = skip == 0 && take == 0
@@ -330,8 +333,10 @@ namespace Umbraco.Cms.Infrastructure
             {
                 // We need to change the current culture to what is requested and then change it back
                 var originalContext = _variationContextAccessor.VariationContext;
-                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext.Culture))
+                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext?.Culture))
+                {
                     _variationContextAccessor.VariationContext = new VariationContext(_culture);
+                }
 
                 // Now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
                 return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor, originalContext);
