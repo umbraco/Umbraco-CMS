@@ -92,7 +92,7 @@
             scope.showLogoModal = function() {
                 $timeout.cancel(scope.logoModal.timer);
                 scope.logoModal.show = true;
-                scope.logoModal.text = "Umbraco version "+Umbraco.Sys.ServerVariables.application.version;
+                scope.logoModal.text = "version "+Umbraco.Sys.ServerVariables.application.version;
             }
             scope.hideLogoModal = function() {
                 $timeout.cancel(scope.logoModal.timer);
