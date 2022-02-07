@@ -3,7 +3,7 @@
 
     function AppHeaderDirective(eventsService, appState, userService, focusService, overlayService, $timeout) {
 
-        function link(scope) {
+        function link(scope, element) {
 
             var evts = [];
 
@@ -93,6 +93,12 @@
                 $timeout.cancel(scope.logoModal.timer);
                 scope.logoModal.show = true;
                 scope.logoModal.text = "version "+Umbraco.Sys.ServerVariables.application.version;
+                $timeout(function () {
+                    const anchorLink = element[0].querySelector('.umb-app-header__logo-modal a');
+                    if(anchorLink) {
+                        anchorLink.focus();
+                    }
+                });
             }
             scope.hideLogoModal = function() {
                 $timeout.cancel(scope.logoModal.timer);
