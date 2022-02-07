@@ -1,9 +1,9 @@
 (function () {
     "use strict";
 
-    function AppHeaderDirective(eventsService, appState, userService, focusService, backdropService, overlayService) {
+    function AppHeaderDirective(eventsService, appState, userService, focusService, overlayService, $timeout) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
 
             var evts = [];
 
@@ -83,6 +83,27 @@
 
                 overlayService.open(dialog);
             };
+
+            scope.logoTooltip = {
+                show: false,
+                text: "",
+                timer: null
+            };
+            scope.showLogoTooltip = function() {
+                $timeout.cancel(scope.logoTooltip.timer);
+                scope.logoTooltip.show = true;
+                scope.logoTooltip.text = "Umbraco version "+Umbraco.Sys.ServerVariables.application.version;
+            }
+            scope.onLogoMouseLeave = function() {
+                $timeout.cancel(scope.logoTooltip.timer);
+                scope.logoTooltip.timer = $timeout(function () {
+                    scope.logoTooltip.show = false;
+                }, 750);
+            }
+            scope.hideLogoTooltip = function() {
+                $timeout.cancel(scope.logoTooltip.timer);
+                scope.logoTooltip.show = false;
+            }
 
         }
 

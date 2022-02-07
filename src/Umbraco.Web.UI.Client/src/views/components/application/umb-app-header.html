@@ -1,11 +1,43 @@
 <div>
     <div class="umb-app-header">
-        <div class="umb-app-header__logo">
-            <img
-                src="assets/img/application/umbraco_logomark_white.svg"
-                alt="U"
-                title="Umbraco"
-            />
+        <div
+            class="umb-app-header__logo"
+            ng-mouseleave="onLogoMouseLeave()"
+            ng-blur="onLogoMouseLeave()"
+        >
+            <button
+                type="button"
+                class="btn-reset"
+                ng-click="showLogoTooltip()"
+            >
+                <img
+                    src="assets/img/application/umbraco_logomark_white.svg"
+                    alt="Umbraco"
+                />
+            </button>
+            <div
+                ng-blur="hideLogoTooltip()"
+                ng-mouseenter="showLogoTooltip()"
+                ng-mouseleave="onLogoMouseLeave()"
+                on-outside-click="hideLogoTooltip()"
+                class="umb-app-header__logo-tooltip"
+                ng-if="logoTooltip.show"
+            >
+                <img
+                    src="assets/img/application/umbraco_logo_large_blue.svg"
+                    alt="Umbraco — The Friendly CMS"
+                />
+                <small> {{logoTooltip.text}} </small>
+                <br /><br />
+                <a
+                    href="https://umbraco.com"
+                    title="Umbraco website"
+                    target="_blank"
+                    rel="noopener"
+                    ng-blur="hideLogoTooltip()"
+                    >Umbraco.com</a
+                >
+            </div>
         </div>
 
         <umb-sections ng-if="authenticated" sections="sections"> </umb-sections>

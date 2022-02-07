@@ -9,8 +9,49 @@
 
 .umb-app-header__logo {
     margin-right: 30px;
+    button {
+        img {
+            height: 30px;
+        }
+    }
+}
+
+.umb-app-header__logo-tooltip {
+    position: absolute;
+    z-index: 7500;
+    top: 50px;
+    left: 17px;
+    font-size: 13px;
+
+    border-radius: 6px;
+    
+    width: 160px;
+    padding: 20px 20px;
+    background-color:@white;
+    color: @blueExtraDark;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .14), 0 1px 6px 1px rgba(0, 0, 0, .14);
+    text-decoration: none;
+
+    text-align: center;
+
+    &::before {
+        content:'';
+        position: absolute;
+        transform: rotate(45deg);
+        background-color:@white;
+        top: -4px;
+        left: 14px;
+        width: 8px;
+        height: 8px;
+    }
+
     img {
-        height: 30px;
+        display: block;
+        height: auto;
+        width: 120px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 3px;
     }
 }
 
