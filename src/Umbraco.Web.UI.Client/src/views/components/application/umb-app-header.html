@@ -5,36 +5,32 @@
             ng-mouseleave="onLogoMouseLeave()"
             ng-blur="onLogoMouseLeave()"
         >
-            <button
-                type="button"
-                class="btn-reset"
-                ng-click="showLogoTooltip()"
-            >
+            <button type="button" class="btn-reset" ng-click="showLogoModal()">
                 <img
                     src="assets/img/application/umbraco_logomark_white.svg"
                     alt="Umbraco"
                 />
             </button>
             <div
-                ng-blur="hideLogoTooltip()"
-                ng-mouseenter="showLogoTooltip()"
+                ng-blur="hideLogoModal()"
+                ng-mouseenter="showLogoModal()"
                 ng-mouseleave="onLogoMouseLeave()"
-                on-outside-click="hideLogoTooltip()"
-                class="umb-app-header__logo-tooltip"
-                ng-if="logoTooltip.show"
+                on-outside-click="hideLogoModal()"
+                class="umb-app-header__logo-modal"
+                ng-if="logoModal.show"
             >
                 <img
                     src="assets/img/application/umbraco_logo_large_blue.svg"
                     alt="Umbraco — The Friendly CMS"
                 />
-                <small> {{logoTooltip.text}} </small>
+                <small> {{logoModal.text}} </small>
                 <br /><br />
                 <a
                     href="https://umbraco.com"
                     title="Umbraco website"
                     target="_blank"
                     rel="noopener"
-                    ng-blur="hideLogoTooltip()"
+                    ng-blur="hideLogoModal()"
                     >Umbraco.com</a
                 >
             </div>

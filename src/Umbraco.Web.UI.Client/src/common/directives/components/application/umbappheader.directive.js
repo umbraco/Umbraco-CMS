@@ -84,25 +84,25 @@
                 overlayService.open(dialog);
             };
 
-            scope.logoTooltip = {
+            scope.logoModal = {
                 show: false,
                 text: "",
                 timer: null
             };
-            scope.showLogoTooltip = function() {
-                $timeout.cancel(scope.logoTooltip.timer);
-                scope.logoTooltip.show = true;
-                scope.logoTooltip.text = "Umbraco version "+Umbraco.Sys.ServerVariables.application.version;
+            scope.showLogoModal = function() {
+                $timeout.cancel(scope.logoModal.timer);
+                scope.logoModal.show = true;
+                scope.logoModal.text = "Umbraco version "+Umbraco.Sys.ServerVariables.application.version;
             }
             scope.onLogoMouseLeave = function() {
-                $timeout.cancel(scope.logoTooltip.timer);
-                scope.logoTooltip.timer = $timeout(function () {
-                    scope.logoTooltip.show = false;
+                $timeout.cancel(scope.logoModal.timer);
+                scope.logoModal.timer = $timeout(function () {
+                    scope.logoModal.show = false;
                 }, 750);
             }
-            scope.hideLogoTooltip = function() {
-                $timeout.cancel(scope.logoTooltip.timer);
-                scope.logoTooltip.show = false;
+            scope.hideLogoModal = function() {
+                $timeout.cancel(scope.logoModal.timer);
+                scope.logoModal.show = false;
             }
 
         }
