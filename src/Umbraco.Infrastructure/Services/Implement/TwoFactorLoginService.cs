@@ -11,31 +11,41 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.Services
 {
+    /// <inheritdoc />
     public class TwoFactorLoginService : ITwoFactorLoginService
     {
         private readonly ITwoFactorLoginRepository _twoFactorLoginRepository;
         private readonly IScopeProvider _scopeProvider;
         private readonly IOptions<IdentityOptions> _identityOptions;
+        private readonly IOptions<BackOfficeIdentityOptions> _backOfficeIdentityOptions;
         private readonly IDictionary<string, ITwoFactorProvider> _twoFactorSetupGenerators;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TwoFactorLoginService"/> class.
+        /// </summary>
         public TwoFactorLoginService(
             ITwoFactorLoginRepository twoFactorLoginRepository,
             IScopeProvider scopeProvider,
             IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
-            IOptions<IdentityOptions> identityOptions)
+            IOptions<IdentityOptions> identityOptions,
+            IOptions<BackOfficeIdentityOptions> backOfficeIdentityOptions
+            )
         {
             _twoFactorLoginRepository = twoFactorLoginRepository;
             _scopeProvider = scopeProvider;
             _identityOptions = identityOptions;
-            _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x=>x.ProviderName);
+            _backOfficeIdentityOptions = backOfficeIdentityOptions;
+            _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x =>x.ProviderName);
         }
 
+        /// <inheritdoc />
         public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey);
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey)
         {
             return await GetEnabledProviderNamesAsync(userOrMemberKey);
@@ -47,26 +57,46 @@ namespace Umbraco.Cms.Core.Services
             var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
                 .Select(x => x.ProviderName).ToArray();
 
-            return providersOnUser.Where(x => _identityOptions.Value.Tokens.ProviderMap.ContainsKey(x));
+            return providersOnUser.Where(IsKnownProviderName);
         }
 
+        /// <summary>
+        /// The provider needs to be registered as either a member provider or backoffice provider to show up.
+        /// </summary>
+        private bool IsKnownProviderName(string providerName)
+        {
+            if (_identityOptions.Value.Tokens.ProviderMap.ContainsKey(providerName))
+            {
+                return true;
+            }
 
+            if (_backOfficeIdentityOptions.Value.Tokens.ProviderMap.ContainsKey(providerName))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <inheritdoc />
         public async Task<bool> IsTwoFactorEnabledAsync(Guid userOrMemberKey)
         {
             return (await GetEnabledProviderNamesAsync(userOrMemberKey)).Any();
         }
 
+        /// <inheritdoc />
         public async Task<string> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).FirstOrDefault(x=>x.ProviderName == providerName)?.Secret;
+            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).FirstOrDefault(x => x.ProviderName == providerName)?.Secret;
         }
 
+        /// <inheritdoc />
         public async Task<object> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
         {
             var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
 
-            //Dont allow to generate a new secrets if user already has one
+            // Dont allow to generate a new secrets if user already has one
             if (!string.IsNullOrEmpty(secret))
             {
                 return default;
@@ -82,14 +112,17 @@ namespace Umbraco.Cms.Core.Services
             return await generator.GetSetupDataAsync(userOrMemberKey, secret);
         }
 
+        /// <inheritdoc />
         public IEnumerable<string> GetAllProviderNames() => _twoFactorSetupGenerators.Keys;
+
+        /// <inheritdoc />
         public async Task<bool> DisableAsync(Guid userOrMemberKey, string providerName)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            return (await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName));
-
+            return await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName);
         }
 
+        /// <inheritdoc />
         public bool ValidateTwoFactorSetup(string providerName, string secret, string code)
         {
             if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider generator))
@@ -100,6 +133,7 @@ namespace Umbraco.Cms.Core.Services
             return generator.ValidateTwoFactorSetup(secret, code);
         }
 
+        /// <inheritdoc />
         public Task SaveAsync(TwoFactorLogin twoFactorLogin)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
@@ -107,7 +141,6 @@ namespace Umbraco.Cms.Core.Services
 
             return Task.CompletedTask;
         }
-
 
         /// <summary>
         /// Generates a new random unique secret.
