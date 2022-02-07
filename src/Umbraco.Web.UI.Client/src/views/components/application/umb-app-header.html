@@ -8,8 +8,11 @@
                 />
             </button>
             <div
-                ng-blur="hideLogoModal()"
+                tabindex="0"
                 on-outside-click="hideLogoModal()"
+                ng-click="stopClickEvent($event)"
+                ng-focus="keepLogoModal()"
+                ng-blur="hideLogoModal()"
                 class="umb-app-header__logo-modal"
                 ng-if="logoModal.show"
             >
@@ -24,6 +27,8 @@
                     title="Umbraco website"
                     target="_blank"
                     rel="noopener"
+                    ng-focus="keepLogoModal()"
+                    ng-blur="hideLogoModal()"
                     >Umbraco.com</a
                 >
             </div>
