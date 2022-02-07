@@ -19,7 +19,7 @@
             serverErrorMessage: null
         };
 
-        $scope.handleFiles = function (files, event) {
+        $scope.handleFiles = function (files, event, invalidFiles) {
             if (files) {
                 for (var i = 0; i < files.length; i++) {
                     upload(files[i]);
