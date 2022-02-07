@@ -94,15 +94,11 @@
                 scope.logoModal.show = true;
                 scope.logoModal.text = "Umbraco version "+Umbraco.Sys.ServerVariables.application.version;
             }
-            scope.onLogoMouseLeave = function() {
+            scope.hideLogoModal = function() {
                 $timeout.cancel(scope.logoModal.timer);
                 scope.logoModal.timer = $timeout(function () {
                     scope.logoModal.show = false;
-                }, 750);
-            }
-            scope.hideLogoModal = function() {
-                $timeout.cancel(scope.logoModal.timer);
-                scope.logoModal.show = false;
+                }, 100);
             }
 
         }

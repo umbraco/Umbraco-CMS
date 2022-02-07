@@ -1,10 +1,6 @@
 <div>
     <div class="umb-app-header">
-        <div
-            class="umb-app-header__logo"
-            ng-mouseleave="onLogoMouseLeave()"
-            ng-blur="onLogoMouseLeave()"
-        >
+        <div class="umb-app-header__logo" ng-blur="hideLogoModal()">
             <button type="button" class="btn-reset" ng-click="showLogoModal()">
                 <img
                     src="assets/img/application/umbraco_logomark_white.svg"
@@ -13,8 +9,6 @@
             </button>
             <div
                 ng-blur="hideLogoModal()"
-                ng-mouseenter="showLogoModal()"
-                ng-mouseleave="onLogoMouseLeave()"
                 on-outside-click="hideLogoModal()"
                 class="umb-app-header__logo-modal"
                 ng-if="logoModal.show"
@@ -30,6 +24,7 @@
                     title="Umbraco website"
                     target="_blank"
                     rel="noopener"
+                    ng-focus="showLogoModal()"
                     ng-blur="hideLogoModal()"
                     >Umbraco.com</a
                 >
