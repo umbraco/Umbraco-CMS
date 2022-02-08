@@ -41,6 +41,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
+using Umbraco.Persistence.SqlServer.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;

@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using Microsoft.Data.SqlClient;
 using NPoco;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Persistence
+namespace Umbraco.Persistence.SqlServer.Services
 {
     /// <summary>
     /// A bulk sql insert provider for Sql Server

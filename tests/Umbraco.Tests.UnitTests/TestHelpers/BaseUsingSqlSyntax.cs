@@ -15,6 +15,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
+using Umbraco.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 {

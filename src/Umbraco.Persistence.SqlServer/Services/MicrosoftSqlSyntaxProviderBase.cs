@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
+namespace Umbraco.Persistence.SqlServer.Services
 {
     /// <summary>
     /// Abstract class for defining MS sql implementations

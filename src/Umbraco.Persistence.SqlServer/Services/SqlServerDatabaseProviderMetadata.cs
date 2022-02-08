@@ -1,9 +1,9 @@
-using System;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Infrastructure.Persistence;
+namespace Umbraco.Persistence.SqlServer.Services;
 
 /// <summary>
 /// Provider metadata for SQL Server

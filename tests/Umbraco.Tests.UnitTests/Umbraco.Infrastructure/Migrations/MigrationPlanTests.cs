@@ -23,6 +23,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
+using Umbraco.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {

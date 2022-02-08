@@ -1,18 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
+using Umbraco.Persistence.SqlServer.Dtos;
+using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
+namespace Umbraco.Persistence.SqlServer.Services
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server.

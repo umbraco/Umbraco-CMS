@@ -1,11 +1,11 @@
-using System;
 using System.Runtime.Serialization;
 using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Infrastructure.Persistence;
+namespace Umbraco.Persistence.SqlServer.Services;
 
 /// <summary>
 /// Provider metadata for SQL Server LocalDb

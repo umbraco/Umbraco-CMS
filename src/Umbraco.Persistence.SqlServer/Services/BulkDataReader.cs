@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Cms.Infrastructure.Persistence
+namespace Umbraco.Persistence.SqlServer.Services
 {
     /// <summary>
     /// A base implementation of <see cref="IDataReader"/> that is suitable for <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>.

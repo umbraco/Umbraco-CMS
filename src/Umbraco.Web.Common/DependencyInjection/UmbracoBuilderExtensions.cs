@@ -144,8 +144,6 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
             builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
-            // Add supported databases
-            builder.AddUmbracoSqlServerSupport();
             builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
 
@@ -378,24 +376,6 @@ namespace Umbraco.Extensions
             {
                 options.AllowSynchronousIO = true;
             });
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds Sql Server support for Umbraco
-        /// </summary>
-        private static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
-        {
-            DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
-
-            builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
-            builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
-
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlLocalDbDatabaseProviderMetadata>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
 
             return builder;
         }

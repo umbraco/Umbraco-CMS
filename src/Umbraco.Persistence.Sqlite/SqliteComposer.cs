@@ -10,7 +10,5 @@ public class SqliteComposer : IComposer
 {
     /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
-    {
-        builder.AddUmbracoSqliteSupport();
-    }
+        => builder.AddUmbracoSqliteSupport();
 }
