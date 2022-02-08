@@ -316,7 +316,7 @@ stages:
                   displayName: "Publish test artifacts"
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                    artifact: 'Test artifacts - Windows'
+                    artifact: 'Test artifacts - Windows - Attempt #$(System.JobAttempt)'
 
           - job: Linux_Acceptance_tests_SqlServer
             displayName: Linux (SQL Server)
@@ -418,12 +418,12 @@ stages:
                   displayName: "Publish test artifacts"
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                      artifact: 'Test artifacts - Linux'
+                      artifact: 'Test artifacts - Linux (SQL Server) - Attempt #$(System.JobAttempt)'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish run log"
                   inputs:
                       targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
-                      artifact: Test Run logs - Linux
+                      artifact: 'Test Run logs - Linux (SQL Server) - Attempt #$(System.JobAttempt)'
 
           - job: Linux_Acceptance_tests_SQLite
             displayName: Linux (SQLite)
@@ -499,12 +499,12 @@ stages:
                   displayName: "Publish test artifacts"
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                      artifact: Test artifacts - Linux (SQLite)
+                      artifact: 'Test artifacts - Linux (SQLite) - Attempt #$(System.JobAttempt)'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish run log"
                   inputs:
                       targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
-                      artifact: Test Run logs - Linux (SQLite)
+                      artifact: 'Test Run logs - Linux (SQLite) - Attempt #$(System.JobAttempt)'
 
     - stage: Artifacts
       dependsOn: []
