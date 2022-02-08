@@ -17,6 +17,7 @@
     <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
     <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
   </ItemGroup>
+  
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
@@ -67,6 +68,10 @@
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
   <ItemGroup>
+    <PackageReference Include="GoogleAuthenticator" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="5.0.13" />
+    
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
