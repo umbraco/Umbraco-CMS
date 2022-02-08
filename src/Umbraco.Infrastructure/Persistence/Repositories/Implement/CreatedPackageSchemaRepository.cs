@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Delete<CreatedPackageSchemaDto>()
                 .Where<CreatedPackageSchemaDto>(x => x.Id == id);
 
-            _umbracoDatabase.Delete<CreatedPackageSchemaDto>(query);
+            _umbracoDatabase.Execute(query);
         }
 
         public bool SavePackage(PackageDefinition definition)
