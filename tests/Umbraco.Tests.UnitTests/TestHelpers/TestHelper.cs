@@ -61,8 +61,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
             {
             }
 
-            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = Mock.Of<IDbProviderFactoryCreator>();
-
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = Mock.Of<IBulkSqlInsertProvider>();
 
             public override IMarchal Marchal { get; } = Mock.Of<IMarchal>();
@@ -112,8 +110,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         public static IJsonSerializer JsonSerializer => s_testHelperInternal.JsonSerializer;
 
         public static IVariationContextAccessor VariationContextAccessor => s_testHelperInternal.VariationContextAccessor;
-
-        public static IDbProviderFactoryCreator DbProviderFactoryCreator => s_testHelperInternal.DbProviderFactoryCreator;
 
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => s_testHelperInternal.BulkSqlInsertProvider;
 

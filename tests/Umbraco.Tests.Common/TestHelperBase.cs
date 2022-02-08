@@ -86,8 +86,6 @@ namespace Umbraco.Cms.Tests.Common
 
         public IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
 
-        public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
-
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
 
         public abstract IMarchal Marchal { get; }
