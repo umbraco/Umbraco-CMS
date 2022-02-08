@@ -99,19 +99,19 @@
                         anchorLink.focus();
                     }
                 });
-            }
+            };
             scope.keepLogoModal = function() {
                 $timeout.cancel(scope.logoModal.timer);
-            }
+            };
             scope.hideLogoModal = function() {
                 $timeout.cancel(scope.logoModal.timer);
                 scope.logoModal.timer = $timeout(function () {
                     scope.logoModal.show = false;
                 }, 100);
-            }
+            };
             scope.stopClickEvent = function($event) {
                 $event.stopPropagation();
-            }
+            };
 
         }
 
