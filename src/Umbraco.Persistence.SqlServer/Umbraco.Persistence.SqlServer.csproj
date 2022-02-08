@@ -4,6 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <PackageId>Umbraco.Persistence.SqlServer</PackageId>
+    <Title>Umbraco.Persistence.SqlServer</Title>
+    <Description>Adds support for SQL Server to Umbraco CMS.</Description>
   </PropertyGroup>
 
   <ItemGroup>
