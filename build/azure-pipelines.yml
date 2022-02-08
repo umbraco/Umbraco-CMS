@@ -317,8 +317,9 @@ stages:
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                     artifact: 'Test artifacts - Windows'
-          - job: Linux_Acceptance_tests
-            displayName: Linux
+
+          - job: Linux_Acceptance_tests_SqlServer
+            displayName: Linux (SQL Server)
             variables:
                 - name: UmbracoDatabaseServer
                   value: localhost
@@ -423,6 +424,88 @@ stages:
                   inputs:
                       targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
                       artifact: Test Run logs - Linux
+
+          - job: Linux_Acceptance_tests_SQLite
+            displayName: Linux (SQLite)
+            variables:
+                - name: ConnectionStrings__umbracoDbDSN
+                  value: Data Source=|DataDirectory|/umbraco-cms-cypress.sqlite.db;Cache=Private;Foreign Keys=True
+                - name: ConnectionStrings__umbracoDbDSN_ProviderName
+                  value: Microsoft.Data.SQLite
+            pool:
+                vmImage: ubuntu-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net 6.x
+                  inputs:
+                      version: 6.x
+                - task: NodeTool@0
+                  displayName: Use Node $(nodeVersion)
+                  inputs:
+                      versionSpec: $(nodeVersion)
+                - task: Npm@1
+                  displayName: npm ci (Client)
+                  inputs:
+                      command: ci
+                      workingDir: src/Umbraco.Web.UI.Client
+                      verbose: false
+                - task: gulp@0
+                  displayName: gulp build
+                  inputs:
+                      gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
+                      targets: build
+                      workingDirectory: src/Umbraco.Web.UI.Client
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
+                - task: Bash@3
+                  displayName: dotnet run
+                  inputs:
+                    targetType: 'inline'
+                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
+                - task: Bash@3
+                  displayName: Generate Cypress.env.json
+                  inputs:
+                    targetType: 'inline'
+                    script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
+                  env:
+                    USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
+                    PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
+                - task: Npm@1
+                  name: PrepareTask
+                  displayName: npm ci (AcceptanceTest)
+                  inputs:
+                      command: ci
+                      workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
+                - task: Bash@3
+                  displayName: Run Cypress (Desktop)
+                  condition: always()
+                  continueOnError: true
+                  inputs:
+                      targetType: inline
+                      workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                - task: PublishTestResults@2
+                  condition: always()
+                  inputs:
+                      testResultsFormat: 'JUnit'
+                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+                      mergeTestResults: true
+                      testRunTitle: "Test results Desktop"
+              
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish test artifacts"
+                  inputs:
+                      targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
+                      artifact: Test artifacts - Linux (SQLite)
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish run log"
+                  inputs:
+                      targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
+                      artifact: Test Run logs - Linux (SQLite)
+
     - stage: Artifacts
       dependsOn: []
       jobs:
