@@ -23,6 +23,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseCreator, SqliteDatabaseCreator>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificMapperFactory, SqliteSpecificMapperFactory>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqliteDatabaseProviderMetadata>());
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);

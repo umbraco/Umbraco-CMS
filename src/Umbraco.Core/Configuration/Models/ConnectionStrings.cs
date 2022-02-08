@@ -17,6 +17,11 @@ public class ConnectionStrings
     /// </summary>
     public const string DataDirectoryPlaceholder = "|DataDirectory|";
 
+    /// <summary>
+    /// The postfix used to identify a connection strings provider setting.
+    /// </summary>
+    public const string ProviderNamePostfix = "_ProviderName";
+
     public string Name { get; set; }
 
     public string ConnectionString
