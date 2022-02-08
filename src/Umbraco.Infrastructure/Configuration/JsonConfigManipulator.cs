@@ -6,6 +6,7 @@ using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Core.Configuration
 {
@@ -143,8 +144,10 @@ namespace Umbraco.Cms.Core.Configuration
             writer.WriteStartObject();
             writer.WritePropertyName("ConnectionStrings");
             writer.WriteStartObject();
-            writer.WritePropertyName(Cms.Core.Constants.System.UmbracoConnectionName);
+            writer.WritePropertyName(Constants.System.UmbracoConnectionName);
             writer.WriteValue(connectionString);
+            writer.WritePropertyName($"{Constants.System.UmbracoConnectionName}{ConnectionStrings.ProviderNamePostfix}");
+            writer.WriteValue(providerName);
             writer.WriteEndObject();
             writer.WriteEndObject();
 
@@ -198,7 +201,7 @@ namespace Umbraco.Cms.Core.Configuration
                     }
                 }
 
-                return null; 
+                return null;
             }
         }
 

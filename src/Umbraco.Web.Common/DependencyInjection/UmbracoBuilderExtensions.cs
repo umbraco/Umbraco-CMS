@@ -147,6 +147,7 @@ namespace Umbraco.Extensions
             // Add supported databases
             builder.AddUmbracoSqlServerSupport();
             builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
 
             // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
@@ -391,6 +392,10 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
             builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
+
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlLocalDbDatabaseProviderMetadata>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
 
             return builder;
         }

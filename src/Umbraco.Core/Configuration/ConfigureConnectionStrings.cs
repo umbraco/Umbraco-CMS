@@ -13,10 +13,7 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
 
     private readonly IConfiguration _configuration;
 
-    /// <summary>
-    /// The postfix used to identify a connection strings provider setting.
-    /// </summary>
-    public const string ProviderNamePostfix = "_ProviderName";
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigureConnectionStrings"/> class.
@@ -41,6 +38,6 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
 
         options.Name = name;
         options.ConnectionString = _configuration.GetConnectionString(name);
-        options.ProviderName = _configuration.GetConnectionString($"{name}{ProviderNamePostfix}") ?? ConnectionStrings.DefaultProviderName;
+        options.ProviderName = _configuration.GetConnectionString($"{name}{ConnectionStrings.ProviderNamePostfix}") ?? ConnectionStrings.DefaultProviderName;
     }
 }
