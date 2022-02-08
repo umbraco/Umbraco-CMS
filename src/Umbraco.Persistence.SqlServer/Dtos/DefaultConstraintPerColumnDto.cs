@@ -1,6 +1,6 @@
 using NPoco;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
+namespace Umbraco.Persistence.SqlServer.Dtos
 {
     internal class DefaultConstraintPerColumnDto
     {

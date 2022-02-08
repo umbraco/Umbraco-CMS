@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
-    internal static class DefinitionFactory
+    public static class DefinitionFactory
     {
         public static TableDefinition GetTableDefinition(Type modelType, ISqlSyntaxProvider sqlSyntax)
         {

@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Persistence
+namespace Umbraco.Persistence.SqlServer.Services
 {
     /// <summary>
     /// A data reader used for reading collections of PocoData entity types

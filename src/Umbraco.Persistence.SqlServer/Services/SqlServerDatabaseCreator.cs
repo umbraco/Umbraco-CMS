@@ -1,9 +1,8 @@
-using System;
-using System.IO;
 using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Infrastructure.Persistence
+namespace Umbraco.Persistence.SqlServer.Services
 {
     public class SqlServerDatabaseCreator : IDatabaseCreator
     {

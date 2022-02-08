@@ -25,6 +25,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Extensions;
 using Umbraco.Persistence.Sqlite;
+using Umbraco.Persistence.SqlServer;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
@@ -126,6 +127,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
                 .AddExamine()
+                .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper);
 

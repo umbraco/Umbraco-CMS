@@ -138,41 +138,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             !ConnectionString.IsNullOrWhiteSpace() && !ProviderName.IsNullOrWhiteSpace() &&
             DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DbProviderFactory);
 
-        private void UpdateSqlServerDatabaseType()
-        {
-            // replace NPoco database type by a more efficient one
-            var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
-            var fromSettings = false;
-
-            if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
-                || !Enum<SqlServerSyntaxProvider.VersionName>.TryParse(setting.Substring("SqlServer.".Length), out var versionName, true))
-            {
-                versionName = ((SqlServerSyntaxProvider) _sqlSyntax).GetSetVersion(ConnectionString, ProviderName, _logger).ProductVersionName;
-            }
-            else
-            {
-                fromSettings = true;
-            }
-
-            switch (versionName)
-            {
-                case SqlServerSyntaxProvider.VersionName.V2008:
-                    _databaseType = DatabaseType.SqlServer2008;
-                    break;
-                case SqlServerSyntaxProvider.VersionName.V2012:
-                case SqlServerSyntaxProvider.VersionName.V2014:
-                case SqlServerSyntaxProvider.VersionName.V2016:
-                case SqlServerSyntaxProvider.VersionName.V2017:
-                case SqlServerSyntaxProvider.VersionName.V2019:
-                    _databaseType = DatabaseType.SqlServer2012;
-                    break;
-                // else leave unchanged
-            }
-
-            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
-                versionName, _databaseType, fromSettings ? "settings" : "detected");
-        }
-
         /// <inheritdoc />
         public ISqlContext SqlContext
         {
@@ -261,7 +226,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             if (_databaseType.IsSqlServer())
             {
-                UpdateSqlServerDatabaseType();
+                _databaseType = DatabaseType.SqlServer2012;
             }
 
             // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database

@@ -29,7 +29,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IUmbracoDatabase _db;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
@@ -50,7 +49,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _lockId = Guid.NewGuid().ToString();
             _logger = loggerFactory.CreateLogger<SqlMainDomLock>();
             _globalSettings = globalSettings;
-            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
 
             _dbFactory = new UmbracoDatabaseFactory(
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
@@ -72,13 +70,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 // if we aren't configured then we're in an install state, in which case we have no choice but to assume we can acquire
                 return true;
             }
-
-            if (!(_dbFactory.SqlContext.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
-            {
-                throw new NotSupportedException("SqlMainDomLock is only supported for Sql Server");
-            }
-
-            _sqlServerSyntax = sqlServerSyntaxProvider;
 
             _logger.LogDebug("Acquiring lock...");
 
@@ -104,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 try
                 {
                     // wait to get a write lock
-                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Cms.Core.Constants.Locks.MainDom);
+                    db.SqlContext.SqlSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Cms.Core.Constants.Locks.MainDom);
                 }
                 catch(SqlException ex)
                 {
@@ -230,7 +221,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
+                        db.SqlContext.SqlSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
 
                         if (!IsMainDomValue(_lockId, db))
                         {
@@ -319,7 +310,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                 // get a read lock
-                _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
+                db.SqlContext.SqlSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
 
                         // the row
                         var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
@@ -331,7 +322,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // which indicates that we
                     // can acquire it and it has shutdown.
 
-                    _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
+                    db.SqlContext.SqlSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
@@ -390,7 +381,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
-                _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
+                db.SqlContext.SqlSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
@@ -477,7 +468,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                                 db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                                 // get a write lock
-                                _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
+                                db.SqlContext.SqlSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                                 // When we are disposed, it means we have released the MainDom lock
                                 // and called all MainDom release callbacks, in this case

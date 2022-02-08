@@ -36,6 +36,7 @@ using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Extensions;
+using Umbraco.Persistence.SqlServer.Services;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 

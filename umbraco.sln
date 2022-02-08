@@ -130,6 +130,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchema", "src\JsonSchem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Persistence.Sqlite", "src\Umbraco.Persistence.Sqlite\Umbraco.Persistence.Sqlite.csproj", "{6C98975B-44D2-48E8-836A-8E718713B3F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Persistence.SqlServer", "src\Umbraco.Persistence.SqlServer\Umbraco.Persistence.SqlServer.csproj", "{A6324A60-0061-4492-BC42-D0BFAC256CA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -222,6 +224,12 @@ Global
 		{6C98975B-44D2-48E8-836A-8E718713B3F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6C98975B-44D2-48E8-836A-8E718713B3F4}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{6C98975B-44D2-48E8-836A-8E718713B3F4}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{A6324A60-0061-4492-BC42-D0BFAC256CA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6324A60-0061-4492-BC42-D0BFAC256CA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6324A60-0061-4492-BC42-D0BFAC256CA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6324A60-0061-4492-BC42-D0BFAC256CA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6324A60-0061-4492-BC42-D0BFAC256CA0}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6324A60-0061-4492-BC42-D0BFAC256CA0}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
