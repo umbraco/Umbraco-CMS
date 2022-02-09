@@ -17,9 +17,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
 
         private class TestPackageMigrationPlan : PackageMigrationPlan
         {
-            public TestPackageMigrationPlan() : base(TestPackageName)
+            private readonly bool _ignoreCurrentState = false;
+
+            public TestPackageMigrationPlan(bool ignoreCurrentState = false) : base(TestPackageName)
             {
+                _ignoreCurrentState = ignoreCurrentState;
             }
+
+            public override bool IgnoreCurrentState => _ignoreCurrentState;
 
             protected override void DefinePlan()
             {
@@ -28,12 +33,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
             }
         }
 
-        private PendingPackageMigrations GetPendingPackageMigrations()
+        private PendingPackageMigrations GetPendingPackageMigrations(bool ignoreCurrentState = false)
             => new PendingPackageMigrations(
                 Mock.Of<ILogger<PendingPackageMigrations>>(),
                 new PackageMigrationPlanCollection(() => new[]
                 {
-                    new TestPackageMigrationPlan()
+                    new TestPackageMigrationPlan(ignoreCurrentState)
                 }));
 
         [Test]
@@ -76,6 +81,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
             var registeredMigrations = new Dictionary<string, string>
             {
                 [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString().ToUpper()
+            };
+            IReadOnlyList<string> pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
+            Assert.AreEqual(1, pending.Count);
+        }
+
+        [Test]
+        public void GivenRegisteredMigration_WhenFinalStepMatchedAndStateIgnored_ThenPlanIsReturned()
+        {
+            PendingPackageMigrations pendingPackageMigrations = GetPendingPackageMigrations(ignoreCurrentState: true);
+            var registeredMigrations = new Dictionary<string, string>
+            {
+                [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step2.ToString()
             };
             IReadOnlyList<string> pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
             Assert.AreEqual(1, pending.Count);

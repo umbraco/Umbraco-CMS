@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Packaging
             {
                 string currentMigrationState = null;
                 var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
-                if (keyValues.TryGetValue(planKeyValueKey, out var value))
+                if (!plan.IgnoreCurrentState && keyValues.TryGetValue(planKeyValueKey, out var value))
                 {
                     currentMigrationState = value;
 
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Packaging
                 }
                 else
                 {
-                    // If there is nothing in the DB then we need to run
+                    // If ignoring state OR there is nothing in the DB then we need to run
                     pendingMigrations.Add(plan.Name);
                 }
 
