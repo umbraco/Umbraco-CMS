@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Security;
@@ -75,6 +76,15 @@ namespace Umbraco.Extensions
         {
             builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
             return umbracoBuilder;
+        }
+
+        public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(this BackOfficeIdentityBuilder identityBuilder, string providerName) where T : class, ITwoFactorProvider
+        {
+            identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();
+            identityBuilder.Services.AddSingleton<T>();
+            identityBuilder.AddTokenProvider<TwoFactorBackOfficeValidationProvider<T>>(providerName);
+
+            return identityBuilder;
         }
 
     }

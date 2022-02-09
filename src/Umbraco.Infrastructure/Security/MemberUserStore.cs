@@ -112,6 +112,9 @@ namespace Umbraco.Cms.Core.Security
                 // create the member
                 _memberService.Save(memberEntity);
 
+                //We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
+                _memberService.AssignRoles(new[] { memberEntity.Id },  user.Roles.Select(x => x.RoleId).ToArray());
+
                 if (!memberEntity.HasIdentity)
                 {
                     throw new DataException("Could not create the member, check logs for details");

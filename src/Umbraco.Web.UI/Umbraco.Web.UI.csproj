@@ -17,6 +17,7 @@
     <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
     <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
   </ItemGroup>
+  
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
