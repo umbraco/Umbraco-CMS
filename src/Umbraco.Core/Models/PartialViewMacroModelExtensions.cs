@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
 
             var attempt = partialViewMacroModel.MacroParameters[parameterAlias].TryConvertTo(typeof(T));
 
-            return attempt.Success ?? false ? (T?) attempt.Result : defaultValue;
+            return attempt.Success ? (T?) attempt.Result : defaultValue;
         }
 
         /// <summary>

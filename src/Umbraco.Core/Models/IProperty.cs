@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
-        IPropertyType? PropertyType { get; }
+        IPropertyType PropertyType { get; }
 
         /// <summary>
         /// Gets the list of values.

@@ -30,6 +30,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         protected ConfigurationEditor(List<ConfigurationField> fields)
         {
             Fields = fields;
+            _defaultConfiguration = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets the configuration as a typed object.
         /// </summary>
-        public static TConfiguration ConfigurationAs<TConfiguration>(object obj)
+        public static TConfiguration? ConfigurationAs<TConfiguration>(object? obj)
         {
             if (obj == null) return default;
             if (obj is TConfiguration configuration) return configuration;
@@ -60,7 +61,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Converts a configuration object into a serialized database value.
         /// </summary>
-        public static string ToDatabase(object configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        public static string? ToDatabase(object configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => configuration == null ? null : configurationEditorJsonSerializer.Serialize(configuration);
 
         /// <inheritdoc />
@@ -72,14 +73,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public virtual object DefaultConfigurationObject => DefaultConfiguration;
+        public virtual object? DefaultConfigurationObject => DefaultConfiguration;
 
         /// <inheritdoc />
         public virtual bool IsConfiguration(object obj) => obj is IDictionary<string, object>;
 
 
         /// <inheritdoc />
-        public virtual object FromDatabase(string configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        public virtual object FromDatabase(string? configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => string.IsNullOrWhiteSpace(configurationJson)
                 ? new Dictionary<string, object>()
                 : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson);
@@ -101,7 +102,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public virtual IDictionary<string, object> ToConfigurationEditor(object configuration)
+        public virtual IDictionary<string, object> ToConfigurationEditor(object? configuration)
         {
             // editors that do not override ToEditor/FromEditor have their configuration
             // as a dictionary of <string, object> and, by default, we merge their default
@@ -123,7 +124,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public virtual IDictionary<string, object> ToValueEditor(object configuration)
+        public virtual IDictionary<string, object>? ToValueEditor(object? configuration)
             => ToConfigurationEditor(configuration);
 
     }

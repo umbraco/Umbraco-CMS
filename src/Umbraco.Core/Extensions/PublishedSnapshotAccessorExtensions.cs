@@ -5,7 +5,7 @@ namespace Umbraco.Extensions
 {
     public static class PublishedSnapshotAccessorExtensions
     {
-        public static IPublishedSnapshot GetRequiredPublishedSnapshot(this IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public static IPublishedSnapshot? GetRequiredPublishedSnapshot(this IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             if (publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
             {

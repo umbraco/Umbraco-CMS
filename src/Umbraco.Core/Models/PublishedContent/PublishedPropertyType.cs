@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public bool? IsValue(object value, PropertyValueLevel level)
+        public bool? IsValue(object? value, PropertyValueLevel level)
         {
             if (!_initialized) Initialize();
 
@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object ConvertSourceToInter(IPublishedElement owner, object source, bool preview)
+        public object? ConvertSourceToInter(IPublishedElement owner, object? source, bool preview)
         {
             if (!_initialized) Initialize();
 
@@ -213,7 +213,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (!_initialized) Initialize();
 
@@ -224,7 +224,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (!_initialized) Initialize();
 

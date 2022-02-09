@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Cache
         public override void Remove(int id)
         {
             var userCache = AppCaches.IsolatedCaches.Get<IUser>();
-            if (userCache.Success.HasValue && userCache.Success.Value)
+            if (userCache.Success)
             {
                 userCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUser, int>(id));
                 userCache.Result?.ClearByKey(CacheKeys.UserContentStartNodePathsPrefix + id);

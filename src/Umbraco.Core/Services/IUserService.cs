@@ -62,10 +62,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection,
-            UserState[] userState = null,
-            string[] includeUserGroups = null,
-            string[] excludeUserGroups = null,
-            IQuery<IUser> filter = null);
+            UserState[]? userState = null,
+            string[]? includeUserGroups = null,
+            string[]? excludeUserGroups = null,
+            IQuery<IUser>? filter = null);
 
         /// <summary>
         /// Get paged users
@@ -83,9 +83,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection,
-            UserState[] userState = null,
-            string[] userGroups = null,
-            string filter = null);
+            UserState[]? userState = null,
+            string[]? userGroups = null,
+            string? filter = null);
 
         /// <summary>
         /// Deletes or disables a User
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
         /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
-        void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds);
+        void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds);
 
         /// <summary>
         /// Assigns the same permission set for a single user group to any number of entities
@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Core.Services
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        void Save(IUserGroup userGroup, int[] userIds = null);
+        void Save(IUserGroup userGroup, int[]? userIds = null);
 
         /// <summary>
         /// Deletes a UserGroup

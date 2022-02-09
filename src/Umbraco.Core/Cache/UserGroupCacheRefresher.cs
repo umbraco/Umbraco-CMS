@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Cache
         {
             ClearAllIsolatedCacheByEntityType<IUserGroup>();
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
-            if (userGroupCache.Success.HasValue && userGroupCache.Success.Value)
+            if (userGroupCache.Success)
             {
                 userGroupCache.Result?.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Cache
         public override void Remove(int id)
         {
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
-            if (userGroupCache.Success.HasValue && userGroupCache.Success.Value)
+            if (userGroupCache.Success)
             {
                 userGroupCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUserGroup, int>(id));
                 userGroupCache.Result?.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);

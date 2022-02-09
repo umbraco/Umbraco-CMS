@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public IList CreateModelList(string alias)
+        public IList? CreateModelList(string alias)
         {
             // fail fast
             if (_modelInfos == null)
@@ -118,7 +118,8 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
             ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
-            return ctor();
+            if(ctor is not null) return ctor();
+            return null;
         }
 
         /// <inheritdoc />

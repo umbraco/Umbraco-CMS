@@ -25,6 +25,6 @@ namespace Umbraco.Cms.Core.Routing
         /// e.g. a cdn URL provider will most likely always return an absolute URL.</para>
         /// <para>If the provider is unable to provide a URL, it returns <c>null</c>.</para>
         /// </remarks>
-        UrlInfo GetMediaUrl(IPublishedContent content, string propertyAlias, UrlMode mode, string culture, Uri current);
+        UrlInfo? GetMediaUrl(IPublishedContent content, string propertyAlias, UrlMode mode, string? culture, Uri current);
     }
 }

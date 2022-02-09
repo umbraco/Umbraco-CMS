@@ -167,9 +167,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             // create a dictionary of all roles (except internal roles) + "false"
             var result = _memberGroupService.GetAll()
-                .Select(x => x.Name)
+                .Select(x => x.Name!)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                .Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x, x => false);
 
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = _localizedTextService.Localize("content","membertype"),
                     Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
-                    View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
+                    View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label]?.GetValueEditor().View
                 },
                 GetLoginProperty(member, _localizedTextService),
                 new ContentPropertyDisplay

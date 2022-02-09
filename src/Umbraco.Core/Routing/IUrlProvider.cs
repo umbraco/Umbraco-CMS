@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it should return <c>null</c>.</para>
         /// </remarks>
-        UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current);
+        UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current);
 
         /// <summary>
         /// Gets the other URLs of a published content.

@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the entity.
         /// </summary>
-        public TEntity Entity { get; }
+        public TEntity? Entity { get; }
     }
 
     /// <inheritdoc />
@@ -127,28 +127,28 @@ namespace Umbraco.Cms.Core.Services
             /// </summary>
             /// <param name="eventMessages">The event messages produced by the operation.</param>
             /// <returns>A new attempt instance.</returns>
-            public static Attempt<OperationResult> Succeed(EventMessages eventMessages)
+            public static Attempt<OperationResult?> Succeed(EventMessages eventMessages)
             {
                 return Core.Attempt.Succeed(new OperationResult(OperationResultType.Success, eventMessages));
             }
 
-            public static Attempt<OperationResult<OperationResultType, TValue>> Succeed<TValue>(EventMessages eventMessages)
+            public static Attempt<OperationResult<OperationResultType, TValue>?> Succeed<TValue>(EventMessages eventMessages)
             {
                 return Core.Attempt.Succeed(new OperationResult<OperationResultType, TValue>(OperationResultType.Success, eventMessages));
             }
 
-            public static Attempt<OperationResult<OperationResultType, TValue>> Succeed<TValue>(EventMessages eventMessages, TValue value)
+            public static Attempt<OperationResult<OperationResultType, TValue>?> Succeed<TValue>(EventMessages eventMessages, TValue value)
             {
                 return Core.Attempt.Succeed(new OperationResult<OperationResultType, TValue>(OperationResultType.Success, eventMessages, value));
             }
 
-            public static Attempt<OperationResult<TStatusType>> Succeed<TStatusType>(TStatusType statusType, EventMessages eventMessages)
+            public static Attempt<OperationResult<TStatusType>?> Succeed<TStatusType>(TStatusType statusType, EventMessages eventMessages)
                 where TStatusType : struct
             {
                 return Core.Attempt.Succeed(new OperationResult<TStatusType>(statusType, eventMessages));
             }
 
-            public static Attempt<OperationResult<TStatusType, TValue>> Succeed<TStatusType, TValue>(TStatusType statusType, EventMessages eventMessages, TValue value)
+            public static Attempt<OperationResult<TStatusType, TValue>?> Succeed<TStatusType, TValue>(TStatusType statusType, EventMessages eventMessages, TValue value)
                 where TStatusType : struct
             {
                 return Core.Attempt.Succeed(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value));
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Core.Services
             /// </summary>
             /// <param name="eventMessages">The event messages produced by the operation.</param>
             /// <returns>A new attempt instance.</returns>
-            public static Attempt<OperationResult> NoOperation(EventMessages eventMessages)
+            public static Attempt<OperationResult?> NoOperation(EventMessages eventMessages)
             {
                 return Core.Attempt.Succeed(new OperationResult(OperationResultType.NoOperation, eventMessages));
             }
@@ -169,17 +169,17 @@ namespace Umbraco.Cms.Core.Services
             /// </summary>
             /// <param name="eventMessages">The event messages produced by the operation.</param>
             /// <returns>A new attempt instance.</returns>
-            public static Attempt<OperationResult> Cancel(EventMessages eventMessages)
+            public static Attempt<OperationResult?> Cancel(EventMessages eventMessages)
             {
                 return Core.Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages));
             }
 
-            public static Attempt<OperationResult<OperationResultType, TValue>> Cancel<TValue>(EventMessages eventMessages)
+            public static Attempt<OperationResult<OperationResultType, TValue>?> Cancel<TValue>(EventMessages eventMessages)
             {
                 return Core.Attempt.Fail(new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCancelledByEvent, eventMessages));
             }
 
-            public static Attempt<OperationResult<OperationResultType, TValue>> Cancel<TValue>(EventMessages eventMessages, TValue value)
+            public static Attempt<OperationResult<OperationResultType, TValue>?> Cancel<TValue>(EventMessages eventMessages, TValue value)
             {
                 return Core.Attempt.Fail(new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCancelledByEvent, eventMessages, value));
             }
@@ -201,7 +201,7 @@ namespace Umbraco.Cms.Core.Services
                 return Core.Attempt.Fail(new OperationResult<OperationResultType, TValue>(OperationResultType.FailedExceptionThrown, eventMessages), exception);
             }
 
-            public static Attempt<OperationResult<TStatusType>> Fail<TStatusType>(TStatusType statusType, EventMessages eventMessages)
+            public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(TStatusType statusType, EventMessages eventMessages)
                 where TStatusType : struct
             {
                 return Core.Attempt.Fail(new OperationResult<TStatusType>(statusType, eventMessages));
@@ -213,13 +213,13 @@ namespace Umbraco.Cms.Core.Services
                 return Core.Attempt.Fail(new OperationResult<TStatusType>(statusType, eventMessages), exception);
             }
 
-            public static Attempt<OperationResult<TStatusType, TValue>> Fail<TStatusType, TValue>(TStatusType statusType, EventMessages eventMessages)
+            public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(TStatusType statusType, EventMessages eventMessages)
                 where TStatusType : struct
             {
                 return Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages));
             }
 
-            public static Attempt<OperationResult<TStatusType, TValue>> Fail<TStatusType, TValue>(TStatusType statusType, EventMessages eventMessages, TValue value)
+            public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(TStatusType statusType, EventMessages eventMessages, TValue value)
                 where TStatusType : struct
             {
                 return Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value));
@@ -237,7 +237,7 @@ namespace Umbraco.Cms.Core.Services
                 return Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value), exception);
             }
 
-            public static Attempt<OperationResult<OperationResultType, TValue>> Cannot<TValue>(EventMessages eventMessages)
+            public static Attempt<OperationResult<OperationResultType, TValue>?> Cannot<TValue>(EventMessages eventMessages)
             {
                 return Core.Attempt.Fail(new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCannot, eventMessages));
             }

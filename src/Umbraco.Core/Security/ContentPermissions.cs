@@ -109,8 +109,8 @@ namespace Umbraco.Cms.Core.Security
         public ContentAccess CheckPermissions(
             int nodeId,
             IUser user,
-            out IUmbracoEntity entity,
-            IReadOnlyList<char> permissionsToCheck = null)
+            out IUmbracoEntity? entity,
+            IReadOnlyList<char>? permissionsToCheck = null)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -160,8 +160,8 @@ namespace Umbraco.Cms.Core.Security
         public ContentAccess CheckPermissions(
             int nodeId,
             IUser user,
-            out IContent contentItem,
-            IReadOnlyList<char> permissionsToCheck = null)
+            out IContent? contentItem,
+            IReadOnlyList<char>? permissionsToCheck = null)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Core.Security
                 : ContentAccess.Denied;
         }
 
-        private bool CheckPermissionsPath(string? path, IUser user, IReadOnlyList<char> permissionsToCheck = null)
+        private bool CheckPermissionsPath(string? path, IUser user, IReadOnlyList<char>? permissionsToCheck = null)
         {
             if (permissionsToCheck == null)
             {

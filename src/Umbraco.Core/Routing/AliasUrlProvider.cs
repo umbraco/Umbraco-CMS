@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             // determine whether the alias property varies
-            var varies = node.GetProperty(Constants.Conventions.Content.UrlAlias).PropertyType.VariesByCulture();
+            var varies = node.GetProperty(Constants.Conventions.Content.UrlAlias)!.PropertyType.VariesByCulture();
 
             if (domainUris == null)
             {

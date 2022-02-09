@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return DateTime.MinValue;
 
@@ -39,9 +39,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         // default ConvertSourceToObject just returns source ie a DateTime value
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // source should come from ConvertSource and be a DateTime already
+            if (inter is null)
+            {
+                return null;
+            }
             return XmlConvert.ToString((DateTime) inter, XmlDateTimeSerializationMode.Unspecified);
         }
     }

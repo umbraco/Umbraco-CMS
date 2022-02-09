@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.</para>
         /// </remarks>
         void Rebuild(
-            IReadOnlyCollection<int> contentTypeIds = null,
-            IReadOnlyCollection<int> mediaTypeIds = null,
-            IReadOnlyCollection<int> memberTypeIds = null);
+            IReadOnlyCollection<int>? contentTypeIds = null,
+            IReadOnlyCollection<int>? mediaTypeIds = null,
+            IReadOnlyCollection<int>? memberTypeIds = null);
 
         /* An IPublishedCachesService implementation can rely on transaction-level events to update
          * its internal, database-level data, as these events are purely internal. However, it cannot

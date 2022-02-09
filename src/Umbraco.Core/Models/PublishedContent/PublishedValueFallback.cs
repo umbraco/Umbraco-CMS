@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// </summary>
     public class PublishedValueFallback : IPublishedValueFallback
     {
-        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizationService? _localizationService;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             var visited = new HashSet<int>();
 
-            var language = culture is not null ? _localizationService.GetLanguageByIsoCode(culture) : null;
+            var language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
             if (language == null) return false;
 
             while (true)
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 if (visited.Contains(language2Id)) return false;
                 visited.Add(language2Id);
 
-                var language2 = _localizationService.GetLanguageById(language2Id);
+                var language2 = _localizationService?.GetLanguageById(language2Id);
                 if (language2 == null) return false;
                 var culture2 = language2.IsoCode;
 
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             var visited = new HashSet<int>();
 
-            var language = culture is not null ? _localizationService.GetLanguageByIsoCode(culture) : null;
+            var language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
             if (language == null) return false;
 
             while (true)
@@ -242,7 +242,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 if (visited.Contains(language2Id)) return false;
                 visited.Add(language2Id);
 
-                var language2 = _localizationService.GetLanguageById(language2Id);
+                var language2 = _localizationService?.GetLanguageById(language2Id);
                 if (language2 == null) return false;
                 var culture2 = language2.IsoCode;
 
@@ -268,7 +268,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             // TODO: _localizationService.GetXxx() is expensive, it deep clones objects
             // we want _localizationService.GetReadOnlyXxx() returning IReadOnlyLanguage which cannot be saved back = no need to clone
 
-            var language = culture is not null ? _localizationService.GetLanguageByIsoCode(culture) : null;
+            var language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
             if (language == null) return false;
 
             while (true)
@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 if (visited.Contains(language2Id)) return false;
                 visited.Add(language2Id);
 
-                var language2 = _localizationService.GetLanguageById(language2Id);
+                var language2 = _localizationService?.GetLanguageById(language2Id);
                 if (language2 == null) return false;
                 var culture2 = language2.IsoCode;
 

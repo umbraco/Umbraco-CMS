@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
         /// <param name="state">The clone state.</param>
         /// <param name="maxDepth">The clone maximum depth.</param>
         /// <remarks>Privately used for cloning a navigator.</remarks>
-        private NavigableNavigator(NavigableNavigator orig, State state = null, int maxDepth = -1)
+        private NavigableNavigator(NavigableNavigator orig, State? state = null, int maxDepth = -1)
             : this(orig._source, rootId: 0, maxDepth: orig._maxDepth)
         {
             _nameTable = orig._nameTable;
@@ -277,7 +277,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
         /// <summary>
         /// Gets the underlying content object.
         /// </summary>
-        public override object UnderlyingObject => _state.Content;
+        public override object? UnderlyingObject => _state.Content;
 
         /// <summary>
         /// Creates a new XPathNavigator positioned at the same node as this XPathNavigator.
@@ -310,11 +310,11 @@ namespace Umbraco.Cms.Core.Xml.XPath
         /// </summary>
         /// <returns>A new XPathNavigator using the same source and positioned at a new root.</returns>
         /// <remarks>The new root can be above this navigator's root.</remarks>
-        public XPathNavigator CloneWithNewRoot(int id, int maxDepth = int.MaxValue)
+        public XPathNavigator? CloneWithNewRoot(int id, int maxDepth = int.MaxValue)
         {
             DebugEnter("CloneWithNewRoot");
 
-            State state = null;
+            State? state = null;
 
             if (id <= 0)
             {
@@ -329,7 +329,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                 }
             }
 
-            NavigableNavigator clone = null;
+            NavigableNavigator? clone = null;
 
             if (state != null)
             {
@@ -369,10 +369,10 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         // - an XPathNavigator over a non-empty XML fragment
                         // - a non-Xml-whitespace string
                         // - null
-                        isEmpty = _state.Content.Value(_state.FieldIndex) == null;
+                        isEmpty = _state.Content?.Value(_state.FieldIndex) == null;
                         break;
                     case StatePosition.PropertyXml:
-                        isEmpty = _state.XmlFragmentNavigator.IsEmptyElement;
+                        isEmpty = _state.XmlFragmentNavigator?.IsEmptyElement ?? true;
                         break;
                     case StatePosition.Attribute:
                     case StatePosition.PropertyText:
@@ -400,7 +400,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.PropertyXml:
-                    isSame = _state.XmlFragmentNavigator.IsSamePosition(nav);
+                    isSame = _state.XmlFragmentNavigator?.IsSamePosition(nav) ?? false;
                     break;
                 case StatePosition.Attribute:
                 case StatePosition.Element:
@@ -426,7 +426,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             get
             {
                 DebugEnter("Name");
-                string name;
+                string? name;
 
                 switch (_state.Position)
                 {
@@ -435,10 +435,10 @@ namespace Umbraco.Cms.Core.Xml.XPath
                         break;
                     case StatePosition.Attribute:
                     case StatePosition.PropertyElement:
-                        name = _state.FieldIndex == -1 ? "id" : _state.CurrentFieldType.Name;
+                        name = _state.FieldIndex == -1 ? "id" : _state.CurrentFieldType?.Name;
                         break;
                     case StatePosition.Element:
-                        name = _state.Content.Type.Name;
+                        name = _state.Content?.Type.Name;
                         break;
                     case StatePosition.PropertyText:
                         name = string.Empty;
@@ -506,7 +506,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.PropertyXml:
-                    succ = _state.XmlFragmentNavigator.MoveToFirstAttribute();
+                    succ = _state.XmlFragmentNavigator?.MoveToFirstAttribute() ?? false;
                     break;
                 case StatePosition.Element:
                     _state.FieldIndex = -1;
@@ -541,7 +541,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.PropertyXml:
-                    succ = _state.XmlFragmentNavigator.MoveToFirstChild();
+                    succ = _state.XmlFragmentNavigator?.MoveToFirstChild() ?? false;
                     break;
                 case StatePosition.Attribute:
                 case StatePosition.PropertyText:
@@ -599,7 +599,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
 
         private bool MoveToFirstChildProperty()
         {
-            var valueForXPath = _state.Content.Value(_state.FieldIndex);
+            var valueForXPath = _state.Content?.Value(_state.FieldIndex);
 
             // value should be
             // - an XPathNavigator over a non-empty XML fragment
@@ -676,7 +676,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             var state = _state;
             while (state.Parent != null) // root state has no parent
                 state = state.Parent;
-            var navRootId = state.Content.Id;
+            var navRootId = state.Content?.Id;
 
             int contentId;
             if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out contentId))
@@ -704,7 +704,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                             _state = new State(state.Content, null, null, 0, StatePosition.Element);
                             while (content != null)
                             {
-                                _state = new State(content, _state, _state.Content.ChildIds, _state.Content.ChildIds.IndexOf(content.Id), StatePosition.Element);
+                                _state = new State(content, _state, _state.Content?.ChildIds, _state.Content?.ChildIds.IndexOf(content.Id) ?? -1, StatePosition.Element);
                                 content = s.Count == 0 ? null : s.Pop();
                             }
                             DebugState();
@@ -732,7 +732,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.PropertyXml:
-                    succ = _state.XmlFragmentNavigator.MoveToNext();
+                    succ = _state.XmlFragmentNavigator?.MoveToNext() ?? false;
                     break;
                 case StatePosition.Element:
                     succ = false;
@@ -791,7 +791,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.PropertyXml:
-                    succ = _state.XmlFragmentNavigator.MoveToPrevious();
+                    succ = _state.XmlFragmentNavigator?.MoveToPrevious() ?? false;
                     break;
                 case StatePosition.Element:
                     succ = false;
@@ -1029,7 +1029,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             get
             {
                 DebugEnter("Value");
-                string value;
+                string? value;
 
                 switch (_state.Position)
                 {
@@ -1041,11 +1041,11 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     case StatePosition.PropertyElement:
                         if (_state.FieldIndex == -1)
                         {
-                            value = _state.Content.Id.ToString(CultureInfo.InvariantCulture);
+                            value = _state.Content?.Id.ToString(CultureInfo.InvariantCulture);
                         }
                         else
                         {
-                            var valueForXPath = _state.Content.Value(_state.FieldIndex);
+                            var valueForXPath = _state.Content?.Value(_state.FieldIndex);
 
                             // value should be
                             // - an XPathNavigator over a non-empty XML fragment
@@ -1118,7 +1118,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             // initialize a new state
             // used for creating the very first state
             // and also when moving to a child element
-            public State(INavigableContent content, State parent, IList<int> siblings, int siblingIndex, StatePosition position)
+            public State(INavigableContent? content, State? parent, IList<int>? siblings, int siblingIndex, StatePosition position)
                 : this(position)
             {
                 Content = content;
@@ -1166,16 +1166,16 @@ namespace Umbraco.Cms.Core.Xml.XPath
             }
 
             // the parent state
-            public State Parent { get; private set; }
+            public State? Parent { get; private set; }
 
             // the depth
             public int Depth { get; }
 
             // the current content
-            private INavigableContent _content;
+            private INavigableContent? _content;
 
             // the current content
-            public INavigableContent Content
+            public INavigableContent? Content
             {
                 get
                 {
@@ -1193,14 +1193,14 @@ namespace Umbraco.Cms.Core.Xml.XPath
             // the current content child ids
             public IList<int> GetContentChildIds(int maxDepth)
             {
-                return Depth < maxDepth && _content.ChildIds != null ? _content.ChildIds : NoChildIds;
+                return Depth < maxDepth && _content?.ChildIds != null ? _content.ChildIds : NoChildIds;
             }
 
             // the index of the current content within Siblings
             public int SiblingIndex { get; set; }
 
             // the list of content identifiers for all children of the current content's parent
-            public IList<int> Siblings { get; }
+            public IList<int>? Siblings { get; }
 
             // the number of fields of the current content
             // properties include attributes and properties
@@ -1212,14 +1212,18 @@ namespace Umbraco.Cms.Core.Xml.XPath
 
             // the current field type
             // beware, no check on the index
-            public INavigableFieldType CurrentFieldType => Content.Type.FieldTypes[FieldIndex];
+            public INavigableFieldType? CurrentFieldType => Content?.Type.FieldTypes[FieldIndex];
 
             // gets or sets the xml fragment navigator
-            public XPathNavigator XmlFragmentNavigator { get; set; }
+            public XPathNavigator? XmlFragmentNavigator { get; set; }
 
             // gets a value indicating whether this state is at the same position as another one.
             public bool IsSamePosition(State other)
             {
+                if (other.XmlFragmentNavigator is null || XmlFragmentNavigator is null)
+                {
+                    return false;
+                }
                 return other.Position == Position
                     && (Position != StatePosition.PropertyXml || other.XmlFragmentNavigator.IsSamePosition(XmlFragmentNavigator))
                     && other.Content == Content

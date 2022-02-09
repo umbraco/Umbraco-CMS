@@ -16,11 +16,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public static class ValueTypes
     {
         // the auto, static, set of valid values
-        private static readonly HashSet<string> Values
-            = new HashSet<string>(typeof(ValueTypes)
+        private static readonly HashSet<string?> Values
+            = new HashSet<string?>(typeof(ValueTypes)
                 .GetFields(BindingFlags.Static | BindingFlags.Public)
                 .Where(x => x.IsLiteral && !x.IsInitOnly)
-                .Select(x => (string) x.GetRawConstantValue()));
+                .Select(x => (string?) x.GetRawConstantValue()));
 
         /// <summary>
         /// Date value.

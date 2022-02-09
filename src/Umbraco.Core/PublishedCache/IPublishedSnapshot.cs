@@ -56,6 +56,6 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <para>Forcing to false means no preview. Forcing to true means 'full' preview if the snapshot is not already previewing;
         /// otherwise the snapshot keeps previewing according to whatever settings it is using already.</para>
         /// <para>Stops forcing preview when disposed.</para></remarks>
-        IDisposable ForcedPreview(bool preview, Action<bool> callback = null);
+        IDisposable ForcedPreview(bool preview, Action<bool>? callback = null);
     }
 }

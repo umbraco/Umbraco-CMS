@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core
         {
         }
 
-        public EventMessages EventMessages
+        public EventMessages? EventMessages
         {
             get { return Value; }
             set { Value = value; }

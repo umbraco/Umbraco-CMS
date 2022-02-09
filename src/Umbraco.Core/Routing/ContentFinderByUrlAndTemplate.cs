@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // look for node corresponding to the rest of the route
             var route = frequest.Domain != null ? (frequest.Domain.ContentId + path) : path;
-            IPublishedContent node = FindContent(frequest, route);
+            IPublishedContent? node = FindContent(frequest, route);
 
             if (node == null)
             {

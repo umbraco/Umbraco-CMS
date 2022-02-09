@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="parentId"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null);
+        IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null);
 
         /// <summary>
         /// Gets a <see cref="IDictionaryItem"/> by its <see cref="Int32"/> id

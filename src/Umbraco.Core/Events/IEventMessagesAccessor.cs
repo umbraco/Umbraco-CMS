@@ -2,6 +2,6 @@
 {
     public interface IEventMessagesAccessor
     {
-        EventMessages EventMessages { get; set; }
+        EventMessages? EventMessages { get; set; }
     }
 }

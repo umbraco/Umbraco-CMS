@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Templates
         public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias) => await RenderMacroAsync(contentId, alias, new { });
 
         /// <inheritdoc/>
-        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, object parameters) => await RenderMacroAsync(contentId, alias, parameters?.ToDictionary<object>());
+        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, object parameters) => await RenderMacroAsync(contentId, alias, parameters.ToDictionary<object>());
 
         /// <inheritdoc/>
         public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object> parameters)

@@ -37,7 +37,7 @@ namespace Umbraco.Extensions
 
             var result = val.TryConvertTo<T>();
 
-            return result.Success.HasValue && result.Success.Value ? result.Result : defaultIfNotFound;
+            return result.Success ? result.Result : defaultIfNotFound;
         }
     }
 }

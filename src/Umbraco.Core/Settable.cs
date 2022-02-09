@@ -8,15 +8,18 @@ namespace Umbraco.Cms.Core
     /// <typeparam name="T">The type of the value</typeparam>
     public class Settable<T>
     {
-        private T _value;
+        private T? _value;
 
         /// <summary>
         /// Assigns a value to this <see cref="Settable{T}"/> instance.
         /// </summary>
         /// <param name="value">The value.</param>
-        public void Set(T value)
+        public void Set(T? value)
         {
-            HasValue = true;
+            if (value is not null)
+            {
+                HasValue = true;
+            }
             _value = value;
         }
 
@@ -50,7 +53,7 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <remarks>An exception is thrown if the HasValue property is false.</remarks>
         /// <exception cref="InvalidOperationException">No value has been assigned to this instance.</exception>
-        public T Value
+        public T? Value
         {
             get
             {
@@ -66,7 +69,7 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <returns>The value assigned to this <see cref="Settable{T}"/> instance, if a value has been assigned,
         /// else the default value of <typeparamref name="T"/>.</returns>
-        public T ValueOrDefault()
+        public T? ValueOrDefault()
         {
             return HasValue ? _value : default(T);
         }
@@ -78,15 +81,15 @@ namespace Umbraco.Cms.Core
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value assigned to this <see cref="Settable{T}"/> instance, if a value has been assigned,
         /// else <paramref name="defaultValue" />.</returns>
-        public T ValueOrDefault(T defaultValue)
+        public T? ValueOrDefault(T defaultValue)
         {
             return HasValue ? _value : defaultValue;
         }
 
         /// <inheritdoc />
-        public override string ToString()
+        public override string? ToString()
         {
-            return HasValue ? _value.ToString() : "void";
+            return HasValue ? _value?.ToString() : "void";
         }
     }
 }

@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 var config = propertyEditor == null
                     ? new Dictionary<string, object>()
-                    : dataType.Editor.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
+                    : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
 
                 mappedProperties.Add(new TPropertyType
                 {

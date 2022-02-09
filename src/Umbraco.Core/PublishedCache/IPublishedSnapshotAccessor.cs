@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Core.PublishedCache
     /// </summary>
     public interface IPublishedSnapshotAccessor
     {
-        bool TryGetPublishedSnapshot(out IPublishedSnapshot publishedSnapshot);
+        bool TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot);
     }
 }

@@ -43,7 +43,7 @@ namespace Umbraco.Extensions
         {
             var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
-                .Where(x => x.Success ?? false)
+                .Where(x => x.Success)
                 .Select(x=>x.Result)
                 .Reverse()
                 .ToArray();
@@ -365,7 +365,7 @@ namespace Umbraco.Extensions
         /// returns <see langword="false"/>.</returns>
         public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
 
-        public static string IfNullOrWhiteSpace(this string str, string defaultValue)
+        public static string? IfNullOrWhiteSpace(this string str, string? defaultValue)
         {
             return str.IsNullOrWhiteSpace() ? defaultValue : str;
         }

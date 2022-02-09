@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     public class RawValueProperty : PublishedPropertyBase
     {
         private readonly object _sourceValue; //the value in the db
-        private readonly Lazy<object> _objectValue;
+        private readonly Lazy<object?> _objectValue;
         private readonly Lazy<object?> _xpathValue;
 
         // RawValueProperty does not (yet?) support variants,
@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             _sourceValue = sourceValue;
 
-            var interValue = new Lazy<object>(() => PropertyType.ConvertSourceToInter(content, _sourceValue, isPreviewing));
-            _objectValue = new Lazy<object>(() => PropertyType.ConvertInterToObject(content, PropertyCacheLevel.Unknown, interValue.Value, isPreviewing));
-            _xpathValue = new Lazy<object?>(() => PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, interValue.Value, isPreviewing));
+            var interValue = new Lazy<object?>(() => PropertyType.ConvertSourceToInter(content, _sourceValue, isPreviewing));
+            _objectValue = new Lazy<object?>(() => PropertyType.ConvertInterToObject(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
+            _xpathValue = new Lazy<object?>(() => PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
         }
     }
 }

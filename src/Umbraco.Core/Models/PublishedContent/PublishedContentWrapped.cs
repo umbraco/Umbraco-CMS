@@ -122,10 +122,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         #region Properties
 
         /// <inheritdoc cref="IPublishedElement.Properties"/>
-        public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
+        public virtual IEnumerable<IPublishedProperty>? Properties => _content.Properties;
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
-        public virtual IPublishedProperty GetProperty(string alias)
+        public virtual IPublishedProperty? GetProperty(string alias)
         {
             return _content.GetProperty(alias);
         }

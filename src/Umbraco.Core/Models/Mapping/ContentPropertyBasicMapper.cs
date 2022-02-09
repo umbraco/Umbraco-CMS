@@ -34,13 +34,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <returns></returns>
         public virtual void Map(IProperty property, TDestination dest, MapperContext context)
         {
-            var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
+            var editor = property.PropertyType is not null ? _propertyEditors[property.PropertyType.PropertyEditorAlias] : null;
             if (editor == null)
             {
                 _logger.LogError(
-                    new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"),
+                    new NullReferenceException("The property editor with alias " + property.PropertyType?.PropertyEditorAlias + " does not exist"),
                     "No property editor '{PropertyEditorAlias}' found, converting to a Label",
-                    property.PropertyType.PropertyEditorAlias);
+                    property.PropertyType?.PropertyEditorAlias);
 
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
 
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             dest.Alias = property.Alias;
             dest.PropertyEditor = editor;
             dest.Editor = editor.Alias;
-            dest.DataTypeKey = property.PropertyType.DataTypeKey;
+            dest.DataTypeKey = property.PropertyType!.DataTypeKey;
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.

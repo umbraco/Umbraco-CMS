@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Semver
         private SemVersion(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException("info");
-            var semVersion = Parse(info.GetString("SemVersion"));
+            var semVersion = Parse(info.GetString("SemVersion")!);
             Major = semVersion.Major;
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Core.Semver
         /// version string was not valid.</param>
         /// <param name="strict">If set to <c>true</c> minor and patch version are required, else they default to 0.</param>
         /// <returns><c>False</c> when a invalid version string is passed, otherwise <c>true</c>.</returns>
-        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
+        public static bool TryParse(string version, out SemVersion? semver, bool strict = false)
         {
             try
             {
@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Core.Semver
         /// <param name="build">The build text.</param>
         /// <returns>The new version object.</returns>
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
-            string prerelease = null, string build = null)
+            string? prerelease = null, string? build = null)
         {
             return new SemVersion(
                 major ?? this.Major,
@@ -313,9 +313,9 @@ namespace Umbraco.Cms.Core.Semver
         ///  Zero This instance occurs in the same position in the sort order as <paramref name="obj" />. i
         ///  Greater than zero This instance follows <paramref name="obj" /> in the sort order.
         /// </returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
-            return CompareTo((SemVersion)obj);
+            return CompareTo((SemVersion?)obj);
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace Umbraco.Cms.Core.Semver
         ///  Zero This instance occurs in the same position in the sort order as <paramref name="other" />. i
         ///  Greater than zero This instance follows <paramref name="other" /> in the sort order.
         /// </returns>
-        public int CompareTo(SemVersion other)
+        public int CompareTo(SemVersion? other)
         {
             if (ReferenceEquals(other, null))
                 return 1;
@@ -434,7 +434,7 @@ namespace Umbraco.Cms.Core.Semver
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(obj, null))
                 return false;

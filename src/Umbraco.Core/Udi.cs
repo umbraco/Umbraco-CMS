@@ -42,9 +42,9 @@ namespace Umbraco.Cms.Core
         /// </summary>
         public string EntityType { get; private set; }
 
-        public int CompareTo(Udi other)
+        public int CompareTo(Udi? other)
         {
-            return string.Compare(UriValue.ToString(), other.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
+            return string.Compare(UriValue.ToString(), other?.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
         public override string ToString()
@@ -143,10 +143,10 @@ namespace Umbraco.Cms.Core
             return this;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var other = obj as Udi;
-            return other != null && GetType() == other.GetType() && UriValue == other.UriValue;
+            return other is not null && GetType() == other.GetType() && UriValue == other.UriValue;
         }
 
         public override int GetHashCode()

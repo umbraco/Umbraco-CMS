@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets or sets the value editor configuration.
         /// </summary>
-        public virtual object Configuration { get; set; }
+        public virtual object? Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets the editor view.
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </remarks>
         [Required]
         [DataMember(Name = "view")]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         /// <summary>
         /// The value type which reflects how it is validated and stored in the database
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(object value, bool required, string format)
         {
-            List<ValidationResult> results = null;
+            List<ValidationResult>? results = null;
             var r = Validators.SelectMany(v => v.Validate(value, ValueType, Configuration)).ToList();
             if (r.Any()) { results = r; }
 
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal Attempt<object> TryConvertValueToCrlType(object value)
+        internal Attempt<object?> TryConvertValueToCrlType(object? value)
         {
             // if (value is JValue)
             //     value = value.ToString();
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     //when we compare the values for dirty tracking we'll be comparing an int -> long and they will not match.
                     var result = value.TryConvertTo(valueType);
                     return result.Success && result.Result != null
-                        ? Attempt<object>.Succeed((int)(long)result.Result)
+                        ? Attempt<object?>.Succeed((int)(long)result.Result)
                         : result;
 
                 case ValueStorageType.Decimal:
@@ -218,10 +218,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         ///  If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
         ///  value to the DB will fail when it tries to validate the value type.
         ///  </remarks>
-        public virtual object FromEditor(ContentPropertyData editorValue, object currentValue)
+        public virtual object? FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             //if it's json but it's empty json, then return null
-            if (ValueType.InvariantEquals(ValueTypes.Json) && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
+            if (ValueType.InvariantEquals(ValueTypes.Json) && editorValue.Value != null && (editorValue.Value.ToString()?.DetectIsEmptyJson() ?? true))
             {
                 return null;
             }
@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(IProperty property, string? culture = null, string? segment = null)
+        public virtual object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return string.Empty;
@@ -259,7 +259,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
                     //to a real json object so we can pass the true json object directly to angular!
                     var asString = val.ToString();
-                    if (asString.DetectIsJson())
+                    if (asString?.DetectIsJson() ?? false)
                     {
                         try
                         {
@@ -333,7 +333,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public XNode ConvertDbToXml(IPropertyType propertyType, object value)
+        public XNode ConvertDbToXml(IPropertyType propertyType, object? value)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (value == null || value.ToString().IsNullOrWhiteSpace())
@@ -359,7 +359,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a string.
         /// </summary>
-        public virtual string ConvertDbToString(IPropertyType propertyType, object value)
+        public virtual string ConvertDbToString(IPropertyType propertyType, object? value)
         {
             if (value == null)
                 return string.Empty;

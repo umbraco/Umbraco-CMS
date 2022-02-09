@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        public IPublishedSnapshot PublishedSnapshot
+        public IPublishedSnapshot? PublishedSnapshot
         {
             get
             {
@@ -25,20 +25,20 @@ namespace Umbraco.Cms.Core.PublishedCache
                 {
                     return null;
                 }
-                return umbracoContext.PublishedSnapshot;
+                return umbracoContext?.PublishedSnapshot;
             }
 
             set => throw new NotSupportedException(); // not ok to set
         }
 
-        public bool TryGetPublishedSnapshot(out IPublishedSnapshot publishedSnapshot)
+        public bool TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
         {
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 publishedSnapshot = null;
                 return false;
             }
-            publishedSnapshot = umbracoContext.PublishedSnapshot;
+            publishedSnapshot = umbracoContext?.PublishedSnapshot;
 
             return publishedSnapshot is not null;
         }

@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets a value indicating the requested content.
         /// </summary>
-        IPublishedContent PublishedContent { get; }
+        IPublishedContent? PublishedContent { get; }
 
         /// <summary>
         /// Gets a value indicating whether the current published content has been obtained
@@ -37,14 +37,14 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets the template assigned to the request (if any)
         /// </summary>
-        ITemplate Template { get; }
+        ITemplate? Template { get; }
 
         /// <summary>
         /// Gets the content request's domain.
         /// </summary>
         /// <remarks>Is a DomainAndUri object ie a standard Domain plus the fully qualified uri. For example,
         /// the <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
-        DomainAndUri Domain { get; }
+        DomainAndUri? Domain { get; }
 
         /// <summary>
         /// Gets the content request's culture.
@@ -53,12 +53,12 @@ namespace Umbraco.Cms.Core.Routing
         /// This will get mapped to a CultureInfo eventually but CultureInfo are expensive to create so we want to leave that up to the
         /// localization middleware to do. See https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Middleware/Localization/src/RequestLocalizationMiddleware.cs#L165.
         /// </remarks>
-        string Culture { get; }
+        string? Culture { get; }
 
         /// <summary>
         /// Gets the url to redirect to, when the content request triggers a redirect.
         /// </summary>
-        string RedirectUrl { get; }
+        string? RedirectUrl { get; }
 
         /// <summary>
         /// Gets the content request http response status code.
@@ -70,12 +70,12 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets a list of Extensions to append to the Response.Cache object.
         /// </summary>
-        IReadOnlyList<string> CacheExtensions { get; }
+        IReadOnlyList<string>? CacheExtensions { get; }
 
         /// <summary>
         /// Gets a dictionary of Headers to append to the Response object.
         /// </summary>
-        IReadOnlyDictionary<string, string> Headers { get; }
+        IReadOnlyDictionary<string, string>? Headers { get; }
 
         /// <summary>
         /// Gets a value indicating whether the no-cache value should be added to the Cache-Control header

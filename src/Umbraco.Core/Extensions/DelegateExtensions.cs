@@ -20,7 +20,7 @@ namespace Umbraco.Extensions
             do
             {
                 var result = task();
-                if (result.Success.HasValue && result.Success.Value) { return result; }
+                if (result.Success) { return result; }
                 Thread.Sleep((int)pause.TotalMilliseconds);
             }
             while (stopwatch.Elapsed < timeout);
@@ -38,7 +38,7 @@ namespace Umbraco.Extensions
             {
                 attempts++;
                 var result = task(attempts);
-                if (result.Success.HasValue && result.Success.Value) { return result; }
+                if (result.Success) { return result; }
                 Thread.Sleep((int)pause.TotalMilliseconds);
             }
             while (attempts < totalAttempts);

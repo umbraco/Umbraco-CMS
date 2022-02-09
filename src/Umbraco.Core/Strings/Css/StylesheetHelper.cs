@@ -41,15 +41,19 @@ namespace Umbraco.Cms.Core.Strings.Css
             return rules;
         }
 
-        public static string ReplaceRule(string input, string oldRuleName, StylesheetRule? rule)
+        public static string? ReplaceRule(string? input, string oldRuleName, StylesheetRule? rule)
         {
             var contents = input;
-            var ruleRegex = new Regex(string.Format(RuleRegexFormat, oldRuleName.EscapeRegexSpecialCharacters()), RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            contents = ruleRegex.Replace(contents, rule != null ? rule.ToString() : "");
+            if (contents is not null)
+            {
+                var ruleRegex = new Regex(string.Format(RuleRegexFormat, oldRuleName.EscapeRegexSpecialCharacters()), RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                contents = ruleRegex.Replace(contents, rule != null ? rule.ToString() : "");
+            }
+
             return contents;
         }
 
-        public static string AppendRule(string input, StylesheetRule rule)
+        public static string AppendRule(string? input, StylesheetRule rule)
         {
             var contents = input;
             contents += Environment.NewLine + Environment.NewLine + rule;

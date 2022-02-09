@@ -26,8 +26,16 @@ namespace Umbraco.Extensions
         /// </summary>
         public static void TouchCulture(this IContentBase content, string? culture)
         {
-            if (culture.IsNullOrWhiteSpace()) return;
-            if (!content.CultureInfos?.TryGetValue(culture!, out var infos) ?? true) return;
+            if (culture.IsNullOrWhiteSpace() || content.CultureInfos is null)
+            {
+                return;
+            }
+
+            if (!content.CultureInfos.TryGetValue(culture!, out var infos))
+            {
+                return;
+            }
+
             content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.Now);
         }
 
@@ -46,7 +54,12 @@ namespace Umbraco.Extensions
             {
                 foreach(var culture in content.EditedCultures.ToList())
                 {
-                    if (!content.CultureInfos?.TryGetValue(culture, out var editedInfos) ?? true)
+                    if (content.CultureInfos is null)
+                    {
+                        continue;
+                    }
+
+                    if (!content.CultureInfos.TryGetValue(culture, out var editedInfos))
                     {
                         continue;
                     }
@@ -69,7 +82,11 @@ namespace Umbraco.Extensions
 
             foreach (var culture in content.PublishedCultures.ToList())
             {
-                if (!content.PublishCultureInfos?.TryGetValue(culture, out ContentCultureInfos publishInfos) ?? true)
+                if (content.PublishCultureInfos is null)
+                {
+                    continue;
+                }
+                if (!content.PublishCultureInfos.TryGetValue(culture, out ContentCultureInfos publishInfos))
                 {
                     continue;
                 }
@@ -131,12 +148,12 @@ namespace Umbraco.Extensions
             foreach (var property in content.Properties)
             {
                 // each property type may or may not support the variation
-                if (!property.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                if (!property.PropertyType?.SupportsVariation(culture, "*", wildcards: true) ?? false)
                     continue;
 
                 foreach (var pvalue in property.Values)
-                    if (property.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
-                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    if ((property.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) ?? false) &&
+                        (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
                     {
                         property.SetValue(null, pvalue.Culture, pvalue.Segment);
                     }
@@ -146,14 +163,14 @@ namespace Umbraco.Extensions
             var otherProperties = other.Properties;
             foreach (var otherProperty in otherProperties)
             {
-                if (!otherProperty.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                if (!otherProperty.PropertyType?.SupportsVariation(culture, "*", wildcards: true) ?? true)
                     continue;
 
                 var alias = otherProperty.PropertyType.Alias;
                 foreach (var pvalue in otherProperty.Values)
                 {
                     if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
-                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                        (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
                     {
                         var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                         content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);

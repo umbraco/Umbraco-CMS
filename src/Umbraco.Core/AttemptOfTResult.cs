@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core
     public struct Attempt<TResult>
     {
         // private - use Succeed() or Fail() methods to create attempts
-        private Attempt(bool? success, TResult? result, Exception? exception)
+        private Attempt(bool success, TResult? result, Exception? exception)
         {
             Success = success;
             Result = result;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core
         /// <summary>
         /// Gets a value indicating whether this <see cref="Attempt{TResult}"/> was successful.
         /// </summary>
-        public bool? Success { get; }
+        public bool Success { get; }
 
         /// <summary>
         /// Gets the exception associated with an unsuccessful attempt.
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core
         /// <summary>
         /// Gets the attempt result, if successful, else a default value.
         /// </summary>
-        public TResult? ResultOr(TResult? value) => Success.HasValue && Success.Value ? Result : value;
+        public TResult? ResultOr(TResult? value) => Success ? Result : value;
 
         // optimize, use a singleton failed attempt
         private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);

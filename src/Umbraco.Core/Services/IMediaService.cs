@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IMediaService : IContentServiceBase<IMedia>
     {
-        int CountNotTrashed(string contentTypeAlias = null);
-        int Count(string mediaTypeAlias = null);
-        int CountChildren(int parentId, string mediaTypeAlias = null);
-        int CountDescendants(int parentId, string mediaTypeAlias = null);
+        int CountNotTrashed(string? contentTypeAlias = null);
+        int Count(string? mediaTypeAlias = null);
+        int CountChildren(int parentId, string? mediaTypeAlias = null);
+        int CountDescendants(int parentId, string? mediaTypeAlias = null);
 
         IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
         IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null);
+            IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null);
+            IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets paged documents of a content
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null);
+            IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets paged documents for specified content types
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null);
+            IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects, which reside at the first level / root
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null);
+            IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Moves an <see cref="IMedia"/> object to a new location

@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.IO
         /// <para>If an <paramref name="oldpath"/> is provided then that file (and associated thumbnails if any) is deleted
         /// before the new file is saved, and depending on the media path scheme, the folder may be reused for the new file.</para>
         /// </remarks>
-        public string StoreFile(IContentBase content, IPropertyType propertyType, string filename, Stream filestream, string? oldpath)
+        public string StoreFile(IContentBase content, IPropertyType? propertyType, string filename, Stream filestream, string? oldpath)
         {
             if (content == null)
             {

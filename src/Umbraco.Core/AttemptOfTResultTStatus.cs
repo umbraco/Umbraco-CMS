@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core
         /// <summary>
         /// Gets the exception associated with an unsuccessful attempt.
         /// </summary>
-        public Exception Exception { get; }
+        public Exception? Exception { get; }
 
         /// <summary>
         /// Gets the attempt result.
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core
         public TStatus Status { get; }
 
         // private - use Succeed() or Fail() methods to create attempts
-        private Attempt(bool success, TResult result, TStatus status, Exception exception)
+        private Attempt(bool success, TResult result, TStatus status, Exception? exception)
         {
             Success = success;
             Result = result;
@@ -44,9 +44,9 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <param name="status">The status of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<TResult, TStatus> Succeed(TStatus status)
+        public static Attempt<TResult?, TStatus> Succeed(TStatus status)
         {
-            return new Attempt<TResult, TStatus>(true, default(TResult), status, null);
+            return new Attempt<TResult?, TStatus>(true, default(TResult), status, null);
         }
 
         /// <summary>
@@ -65,9 +65,9 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <param name="status">The status of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult, TStatus> Fail(TStatus status)
+        public static Attempt<TResult?, TStatus> Fail(TStatus status)
         {
-            return new Attempt<TResult, TStatus>(false, default(TResult), status, null);
+            return new Attempt<TResult?, TStatus>(false, default(TResult), status, null);
         }
 
         /// <summary>
@@ -76,9 +76,9 @@ namespace Umbraco.Cms.Core
         /// <param name="status">The status of the attempt.</param>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult, TStatus> Fail(TStatus status, Exception exception)
+        public static Attempt<TResult?, TStatus> Fail(TStatus status, Exception exception)
         {
-            return new Attempt<TResult, TStatus>(false, default(TResult), status, exception);
+            return new Attempt<TResult?, TStatus>(false, default(TResult), status, exception);
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace Umbraco.Cms.Core
         /// <param name="succStatus">The status of the successful attempt.</param>
         /// <param name="failStatus">The status of the failed attempt.</param>
         /// <returns>The attempt.</returns>
-        public static Attempt<TResult, TStatus> If(bool condition, TStatus succStatus, TStatus failStatus)
+        public static Attempt<TResult?, TStatus> If(bool condition, TStatus succStatus, TStatus failStatus)
         {
-            return new Attempt<TResult, TStatus>(condition, default(TResult), condition ? succStatus : failStatus, null);
+            return new Attempt<TResult?, TStatus>(condition, default(TResult), condition ? succStatus : failStatus, null);
         }
 
         /// <summary>

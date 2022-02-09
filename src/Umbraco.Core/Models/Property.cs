@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Core.Models
                     return ((IEnumerable)o).Cast<object>().UnsortedSequenceEqual(enumerable.Cast<object>());
 
                 return o.Equals(o1);
-            }, o => o.GetHashCode());
+            }, o => o!.GetHashCode());
 
         /// <summary>
         /// Returns the PropertyType, which this Property is based on
@@ -460,21 +460,21 @@ namespace Umbraco.Cms.Core.Models
                     if (s.IsNullOrWhiteSpace())
                         return true; // assume empty means null
                     var convInt = value.TryConvertTo<int>();
-                    if (convInt.Success.HasValue && convInt.Success.Value)
+                    if (convInt.Success)
                     {
                         converted = convInt.Result;
                         return true;
                     }
 
                     if (throwOnError)
-                        ThrowTypeException(value, typeof(int), Alias);
+                        ThrowTypeException(value, typeof(int), Alias ?? string.Empty);
                     return false;
 
                 case ValueStorageType.Decimal:
                     if (s.IsNullOrWhiteSpace())
                         return true; // assume empty means null
                     var convDecimal = value.TryConvertTo<decimal>();
-                    if (convDecimal.Success.HasValue && convDecimal.Success.Value)
+                    if (convDecimal.Success)
                     {
                         // need to normalize the value (change the scaling factor and remove trailing zeros)
                         // because the underlying database is going to mess with the scaling factor anyways.
@@ -483,21 +483,21 @@ namespace Umbraco.Cms.Core.Models
                     }
 
                     if (throwOnError)
-                        ThrowTypeException(value, typeof(decimal), Alias);
+                        ThrowTypeException(value, typeof(decimal), Alias ?? string.Empty);
                     return false;
 
                 case ValueStorageType.Date:
                     if (s.IsNullOrWhiteSpace())
                         return true; // assume empty means null
                     var convDateTime = value.TryConvertTo<DateTime>();
-                    if (convDateTime.Success.HasValue && convDateTime.Success.Value)
+                    if (convDateTime.Success)
                     {
                         converted = convDateTime.Result;
                         return true;
                     }
 
                     if (throwOnError)
-                        ThrowTypeException(value, typeof(DateTime), Alias);
+                        ThrowTypeException(value, typeof(DateTime), Alias ?? string.Empty);
                     return false;
 
                 default:

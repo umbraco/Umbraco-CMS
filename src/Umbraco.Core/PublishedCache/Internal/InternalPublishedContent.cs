@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
             ContentType = contentType;
         }
 
-        private Dictionary<string, PublishedCultureInfo> _cultures;
+        private Dictionary<string, PublishedCultureInfo>? _cultures;
 
         private Dictionary<string, PublishedCultureInfo> GetCultures() => new Dictionary<string, PublishedCultureInfo> { { string.Empty, new PublishedCultureInfo(string.Empty, Name, UrlSegment, UpdateDate) } };
 
@@ -56,9 +56,9 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public PublishedItemType ItemType => PublishedItemType.Content;
 
-        public bool IsDraft(string culture = null) => false;
+        public bool IsDraft(string? culture = null) => false;
 
-        public bool IsPublished(string culture = null) => true;
+        public bool IsPublished(string? culture = null) => true;
 
         public int ParentId { get; set; }
 
@@ -74,11 +74,11 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public IEnumerable<IPublishedProperty> Properties { get; set; }
 
-        public IPublishedProperty GetProperty(string alias) => Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
+        public IPublishedProperty? GetProperty(string alias) => Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
 
-        public IPublishedProperty GetProperty(string alias, bool recurse)
+        public IPublishedProperty? GetProperty(string alias, bool recurse)
         {
-            IPublishedProperty property = GetProperty(alias);
+            IPublishedProperty? property = GetProperty(alias);
             if (recurse == false)
             {
                 return property;
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
             return property;
         }
 
-        public object this[string alias]
+        public object? this[string alias]
         {
             get
             {

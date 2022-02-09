@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// Gets or sets the name of the installed package.
         /// </summary>
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the version of the installed package.

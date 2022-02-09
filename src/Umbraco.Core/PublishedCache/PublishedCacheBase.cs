@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PublishedCache
 {
     public abstract class PublishedCacheBase : IPublishedCache
     {
-        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IVariationContextAccessor? _variationContextAccessor;
 
         public PublishedCacheBase(IVariationContextAccessor variationContextAccessor)
         {
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
-        public IEnumerable<IPublishedContent> GetAtRoot(string culture = null)
+        public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null)
         {
             return GetAtRoot(PreviewDefault, culture);
         }
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             // this is probably not super-efficient, but works
             // some cache implementation may want to override it, though
             return GetAtRoot()
-                .SelectMany(x => x.DescendantsOrSelf(_variationContextAccessor))
+                .SelectMany(x => x.DescendantsOrSelf(_variationContextAccessor!))
                 .Where(x => x.ContentType.Id == contentType.Id);
         }
     }

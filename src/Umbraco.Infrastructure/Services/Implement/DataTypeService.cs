@@ -270,11 +270,15 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(int id)
+        public IDataType GetDataType(int? id)
         {
+            if (id is null)
+            {
+                return null;
+            }
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var dataType = _dataTypeRepository.Get(id);
+                var dataType = _dataTypeRepository.Get(id.Value);
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
                 return dataType;
             }

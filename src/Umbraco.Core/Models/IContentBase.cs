@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.Models
         /// Sets the (edited) value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        void SetValue(string propertyTypeAlias, object value, string? culture = null, string? segment = null);
+        void SetValue(string propertyTypeAlias, object? value, string? culture = null, string? segment = null);
 
     }
 }

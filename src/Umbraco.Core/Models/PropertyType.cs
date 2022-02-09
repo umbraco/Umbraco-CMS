@@ -17,19 +17,19 @@ namespace Umbraco.Cms.Core.Models
     {
         private readonly IShortStringHelper _shortStringHelper;
         private readonly bool _forceValueStorageType;
-        private string _name;
+        private string? _name;
         private string _alias;
-        private string _description;
+        private string? _description;
         private int _dataTypeId;
         private Guid _dataTypeKey;
-        private Lazy<int> _propertyGroupId;
+        private Lazy<int>? _propertyGroupId;
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
-        private bool _mandatory;
-        private string _mandatoryMessage;
+        private bool? _mandatory;
+        private string? _mandatoryMessage;
         private int _sortOrder;
-        private string _validationRegExp;
-        private string _validationRegExpMessage;
+        private string? _validationRegExp;
+        private string? _validationRegExpMessage;
         private ContentVariation _variations;
         private bool _labelOnTop;
 
@@ -47,12 +47,13 @@ namespace Umbraco.Cms.Core.Models
             _propertyEditorAlias = dataType.EditorAlias;
             _valueStorageType = dataType.DatabaseType;
             _variations = ContentVariation.Nothing;
+            _alias = string.Empty;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string? propertyTypeAlias)
+        public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string propertyTypeAlias)
             : this(shortStringHelper, dataType)
         {
             _alias = SanitizeAlias(propertyTypeAlias);
@@ -79,13 +80,13 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <remarks>Set <paramref name="forceValueStorageType"/> to true to force the value storage type. Values assigned to
         /// the property, eg from the underlying datatype, will be ignored.</remarks>
-        public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
+        public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string? propertyTypeAlias = null)
         {
             _shortStringHelper = shortStringHelper;
             _propertyEditorAlias = propertyEditorAlias;
             _valueStorageType = valueStorageType;
             _forceValueStorageType = forceValueStorageType;
-            _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
+            _alias = propertyTypeAlias == null ? string.Empty : SanitizeAlias(propertyTypeAlias);
             _variations = ContentVariation.Nothing;
         }
 
@@ -109,7 +110,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -120,12 +121,12 @@ namespace Umbraco.Cms.Core.Models
         public virtual string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias!, nameof(Alias));
         }
 
         /// <inheritdoc />
         [DataMember]
-        public string Description
+        public string? Description
         {
             get => _description;
             set => SetPropertyValueAndDetectChanges(value, ref _description, nameof(Description));
@@ -151,7 +152,7 @@ namespace Umbraco.Cms.Core.Models
         public string PropertyEditorAlias
         {
             get => _propertyEditorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, nameof(PropertyEditorAlias));
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias!, nameof(PropertyEditorAlias));
         }
 
         /// <inheritdoc />
@@ -169,7 +170,7 @@ namespace Umbraco.Cms.Core.Models
         /// <inheritdoc />
         [DataMember]
         [DoNotClone]
-        public Lazy<int> PropertyGroupId
+        public Lazy<int>? PropertyGroupId
         {
             get => _propertyGroupId;
             set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));
@@ -177,7 +178,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public bool Mandatory
+        public bool? Mandatory
         {
             get => _mandatory;
             set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
@@ -186,7 +187,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public string MandatoryMessage
+        public string? MandatoryMessage
         {
             get => _mandatoryMessage;
             set => SetPropertyValueAndDetectChanges(value, ref _mandatoryMessage, nameof(MandatoryMessage));
@@ -210,7 +211,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public string ValidationRegExp
+        public string? ValidationRegExp
         {
             get => _validationRegExp;
             set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
@@ -221,7 +222,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
         /// </summary>
         [DataMember]
-        public string ValidationRegExpMessage
+        public string? ValidationRegExpMessage
         {
             get => _validationRegExpMessage;
             set => SetPropertyValueAndDetectChanges(value, ref _validationRegExpMessage, nameof(ValidationRegExpMessage));
@@ -235,7 +236,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public bool SupportsVariation(string culture, string segment, bool wildcards = false)
+        public bool SupportsVariation(string? culture, string? segment, bool wildcards = false)
         {
             // exact validation: cannot accept a 'null' culture if the property type varies
             //  by culture, and likewise for segment
@@ -246,21 +247,21 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Sanitizes a property type alias.
         /// </summary>
-        private string? SanitizeAlias(string? value)
+        private string SanitizeAlias(string value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
             // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
             // which is used internally
 
-            return value?.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix) ?? false
+            return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
                 ? value
-                : value?.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
+                : value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
         }
 
         /// <inheritdoc />
         public bool Equals(PropertyType? other)
         {
-            return other != null && (base.Equals(other) || Alias.InvariantEquals(other.Alias));
+            return other != null && (base.Equals(other) || (Alias?.InvariantEquals(other.Alias) ?? false));
         }
 
         /// <inheritdoc />
@@ -270,10 +271,10 @@ namespace Umbraco.Cms.Core.Models
             int baseHash = base.GetHashCode();
 
             //Get hash code for the Alias field.
-            int hashAlias = Alias.ToLowerInvariant().GetHashCode();
+            int? hashAlias = Alias?.ToLowerInvariant().GetHashCode();
 
             //Calculate the hash code for the product.
-            return baseHash ^ hashAlias;
+            return baseHash ^ hashAlias ?? baseHash;
         }
 
         /// <inheritdoc />

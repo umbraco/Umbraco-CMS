@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Models
         protected override void SetItem(int index, PropertyGroup item)
         {
             var oldItem = index >= 0 ? this[index] : item;
-            
+
             base.SetItem(index, item);
 
             oldItem.Collection = null;
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Models
 
         protected override string GetKeyForItem(PropertyGroup item) => item.Alias;
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         /// <summary>
         /// Clears all <see cref="CollectionChanged"/> event handlers

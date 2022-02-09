@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Routing
         public RouteDirection RouteDirection { get; }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is RouteRequestOptions options && Equals(options);
+        public override bool Equals(object? obj) => obj is RouteRequestOptions options && Equals(options);
 
         /// <inheritdoc/>
         public bool Equals(RouteRequestOptions other) => RouteDirection == other.RouteDirection;

@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
+            string orderBy, Direction orderDirection, string? memberTypeAlias = null, string filter = "");
 
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
         /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
         /// <returns><see cref="System.int"/> with number of Members</returns>
-        int Count(string memberTypeAlias = null);
+        int Count(string? memberTypeAlias = null);
 
         /// <summary>
         /// Checks if a Member with the id exists

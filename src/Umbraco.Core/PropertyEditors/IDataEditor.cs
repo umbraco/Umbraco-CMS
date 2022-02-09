@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets the name of the editor.
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Gets the icon of the editor.
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets the configuration for the value editor.
         /// </summary>
-        IDictionary<string, object> DefaultConfiguration { get; }
+        IDictionary<string, object>? DefaultConfiguration { get; }
 
         /// <summary>
         /// Gets an editor to edit the value editor configuration.

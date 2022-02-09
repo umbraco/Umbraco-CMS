@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="url">The Umbraco redirect URL route.</param>
         /// <param name="culture">The culture of the request.</param>
         /// <returns>The most recent redirect URLs corresponding to the route.</returns>
-        IRedirectUrl GetMostRecentRedirectUrl(string url, string culture);
+        IRedirectUrl GetMostRecentRedirectUrl(string url, string? culture);
 
         /// <summary>
         /// Gets all redirect URLs for a content item.

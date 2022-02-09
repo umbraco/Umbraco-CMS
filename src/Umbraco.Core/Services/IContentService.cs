@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets documents in the recycle bin.
         /// </summary>
         IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+            IQuery<IContent>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets child documents of a parent.
@@ -180,7 +180,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+            IQuery<IContent>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+            IQuery<IContent>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets paged documents of a content
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+            IQuery<IContent> filter, Ordering? ordering = null);
 
         /// <summary>
         /// Gets paged documents for specified content types
@@ -216,27 +216,27 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+            IQuery<IContent> filter, Ordering? ordering = null);
 
         /// <summary>
         /// Counts documents of a given document type.
         /// </summary>
-        int Count(string documentTypeAlias = null);
+        int Count(string? documentTypeAlias = null);
 
         /// <summary>
         /// Counts published documents of a given document type.
         /// </summary>
-        int CountPublished(string documentTypeAlias = null);
+        int CountPublished(string? documentTypeAlias = null);
 
         /// <summary>
         /// Counts child documents of a given parent, of a given document type.
         /// </summary>
-        int CountChildren(int parentId, string documentTypeAlias = null);
+        int CountChildren(int parentId, string? documentTypeAlias = null);
 
         /// <summary>
         /// Counts descendant documents of a given parent, of a given document type.
         /// </summary>
-        int CountDescendants(int parentId, string documentTypeAlias = null);
+        int CountDescendants(int parentId, string? documentTypeAlias = null);
 
         /// <summary>
         /// Gets a value indicating whether a document has children.
@@ -250,7 +250,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, ContentScheduleCollection contentSchedule = null);
+        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, ContentScheduleCollection? contentSchedule = null);
 
         /// <summary>
         /// Saves documents.

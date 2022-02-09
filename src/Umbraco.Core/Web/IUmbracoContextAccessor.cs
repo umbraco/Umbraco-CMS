@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Web
     /// </summary>
     public interface IUmbracoContextAccessor
     {
-        bool TryGetUmbracoContext(out IUmbracoContext umbracoContext);
+        bool TryGetUmbracoContext(out IUmbracoContext? umbracoContext);
         void Clear();
         void Set(IUmbracoContext umbracoContext);
     }

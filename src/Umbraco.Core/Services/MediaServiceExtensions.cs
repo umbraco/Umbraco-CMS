@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
             foreach (var udi in ids)
             {
                 var guidUdi = udi as GuidUdi;
-                if (guidUdi == null)
+                if (guidUdi is null)
                     throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by media");
                 guids.Add(guidUdi);
             }
@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
         public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
         {
             var guidUdi = parentId as GuidUdi;
-            if (guidUdi == null)
+            if (guidUdi is null)
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by media");
             var parent = mediaService.GetById(guidUdi.Guid);
             return mediaService.CreateMedia(name, parent, mediaTypeAlias, userId);

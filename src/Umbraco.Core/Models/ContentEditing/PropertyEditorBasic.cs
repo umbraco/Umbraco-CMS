@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class PropertyEditorBasic
     {
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
     }
 }

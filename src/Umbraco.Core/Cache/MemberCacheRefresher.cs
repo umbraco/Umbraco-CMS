@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Cache
             foreach (var p in payloads)
             {
                 _idKeyMap.ClearCache(p.Id);
-                if (memberCache.Success.HasValue && memberCache.Success.Value)
+                if (memberCache.Success)
                 {
                     memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
                     memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));

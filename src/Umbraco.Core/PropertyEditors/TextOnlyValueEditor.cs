@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:
-                    return val.ToString();
+                    return val.ToString() ?? string.Empty;
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
                 case ValueStorageType.Date:

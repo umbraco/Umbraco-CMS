@@ -15,7 +15,7 @@ namespace Umbraco.Extensions
             {
                 throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
             }
-            return umbracoContext;
+            return umbracoContext!;
         }
     }
 }

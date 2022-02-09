@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Events
         /// <param name="notification">The notification object.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>A task that represents the publish operation.</returns>
-        Task? PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+        Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : INotification;
 
         /// <summary>

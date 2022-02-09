@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Sync
         /// <summary>
         /// Gets or sets the ids data value.
         /// </summary>
-        public string JsonIds { get; set; }
+        public string? JsonIds { get; set; }
 
         /// <summary>
         /// Gets or sets the number of Ids contained in the JsonIds json value.
@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Core.Sync
         /// <summary>
         /// Gets or sets the payload data value.
         /// </summary>
-        public string JsonPayload { get; set; }
+        public string? JsonPayload { get; set; }
 
         protected bool Equals(RefreshInstruction other) =>
             RefreshType == other.RefreshType
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.Sync
                 && string.Equals(JsonIds, other.JsonIds)
                 && string.Equals(JsonPayload, other.JsonPayload);
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is null)
             {

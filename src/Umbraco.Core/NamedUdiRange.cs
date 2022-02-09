@@ -29,6 +29,6 @@
         /// <summary>
         /// Gets or sets the name of the range.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

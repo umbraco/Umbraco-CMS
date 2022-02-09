@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 _logger.LogWarning("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", source.EditorAlias);
             }
 
-            target.View = paramEditor.GetValueEditor().View;
+            target.View = paramEditor?.GetValueEditor().View;
 
             // sets the parameter configuration to be the default configuration editor's configuration,
             // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor, ie
@@ -80,8 +80,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // on editors, ToValueEditor expects the actual strongly typed configuration - not the
             // dictionary thing returned by DefaultConfiguration
 
-            var configurationEditor = paramEditor.GetConfigurationEditor();
-            target.Configuration = configurationEditor.ToValueEditor(configurationEditor.DefaultConfigurationObject);
+            var configurationEditor = paramEditor?.GetConfigurationEditor();
+            target.Configuration = configurationEditor?.ToValueEditor(configurationEditor.DefaultConfigurationObject);
         }
     }
 }

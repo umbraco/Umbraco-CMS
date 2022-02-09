@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Trees
         /// <param name="hasSeparator"></param>
         /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on its alias</param>
         /// <param name="opensDialog">Whether or not this action opens a dialog</param>
-        public MenuItem Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
+        public MenuItem? Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
         {
             var item = CreateMenuItem<T>(textService, hasSeparator, opensDialog);
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Trees
             return null;
         }
 
-        private MenuItem CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
+        private MenuItem? CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
         {
             var item = _actionCollection.GetAction<T>();

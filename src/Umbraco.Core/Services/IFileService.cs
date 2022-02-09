@@ -24,8 +24,8 @@ namespace Umbraco.Cms.Core.Services
 
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
-        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId);
         bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId);
         bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
@@ -253,7 +253,7 @@ namespace Umbraco.Cms.Core.Services
         /// </returns>
         Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId);
 
-        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId);
+        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a template by its alias

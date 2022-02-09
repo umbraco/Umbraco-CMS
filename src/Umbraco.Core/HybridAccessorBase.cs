@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core
 
         private readonly IRequestCache _requestCache;
         private string? _itemKey;
-        protected string ItemKey => _itemKey ??= GetType().FullName;
+        protected string ItemKey => _itemKey ??= GetType().FullName!;
 
         // read
         // http://blog.stephencleary.com/2013/04/implicit-async-context-asynclocal.html

@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Cache
                     AppCaches.RuntimeCache.ClearByKey(alias);
 
                 var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
-                if (macroRepoCache.Success.HasValue && macroRepoCache.Success.Value)
+                if (macroRepoCache.Success)
                 {
                     macroRepoCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
                 }

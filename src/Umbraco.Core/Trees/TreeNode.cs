@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Trees
         /// The tree nodetype which refers to the type of node rendered in the tree
         /// </summary>
         [DataMember(Name = "nodeType")]
-        public string NodeType { get; set; }
+        public string? NodeType { get; set; }
 
         /// <summary>
         /// Optional: The Route path for the editor for this node
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Trees
         /// If this is not set, then the route path will be automatically determined by: {section}/edit/{id}
         /// </remarks>
         [DataMember(Name = "routePath")]
-        public string RoutePath { get; set; }
+        public string? RoutePath { get; set; }
 
         /// <summary>
         /// The JSON URL to load the nodes children
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Trees
                     return true;
                 }
 
-                if (Icon.StartsWith(".."))
+                if (Icon!.StartsWith(".."))
                     return false;
 
 

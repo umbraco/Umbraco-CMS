@@ -175,26 +175,26 @@ namespace Umbraco.Cms.Core.Services
         /// Gets children of an entity.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets descendants of an entity.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets descendants of entities.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null);
 
         // TODO: Do we really need this? why not just pass in -1
         /// <summary>
         /// Gets descendants of root.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null, bool includeTrashed = true);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null, bool includeTrashed = true);
 
         /// <summary>
         /// Gets the object type of an entity.

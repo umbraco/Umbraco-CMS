@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>Contains one <c>IPublishedProperty</c> for each property defined for the content type, including
         /// inherited properties. Some properties may have no value.</remarks>
-        IEnumerable<IPublishedProperty> Properties { get; }
+        IEnumerable<IPublishedProperty>? Properties { get; }
 
         /// <summary>
         /// Gets a property identified by its alias.
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>otherwise return a property -- that may have no value (ie <c>HasValue</c> is <c>false</c>).</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        IPublishedProperty GetProperty(string alias);
+        IPublishedProperty? GetProperty(string alias);
 
         #endregion
     }

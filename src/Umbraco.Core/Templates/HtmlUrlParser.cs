@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Templates
             {
                 // find all relative URLs (ie. URLs that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

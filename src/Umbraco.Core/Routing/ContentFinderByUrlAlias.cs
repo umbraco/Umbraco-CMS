@@ -48,13 +48,13 @@ namespace Umbraco.Cms.Core.Routing
             {
                 return false;
             }
-            IPublishedContent node = null;
+            IPublishedContent? node = null;
 
             // no alias if "/"
             if (frequest.Uri.AbsolutePath != "/")
             {
                 node = FindContentByAlias(
-                    umbracoContext.Content,
+                    umbracoContext!.Content,
                     frequest.Domain != null ? frequest.Domain.ContentId : 0,
                     frequest.Culture,
                     frequest.AbsolutePathDecoded);
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Routing
             return node != null;
         }
 
-        private IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private IPublishedContent? FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string? culture, string alias)
         {
             if (alias == null)
             {
@@ -101,9 +101,9 @@ namespace Umbraco.Cms.Core.Routing
                     return false;
                 }
 
-                IPublishedProperty p = c.GetProperty(propertyAlias);
-                var varies = p.PropertyType.VariesByCulture();
-                string v;
+                IPublishedProperty? p = c.GetProperty(propertyAlias);
+                var varies = p!.PropertyType.VariesByCulture();
+                string? v;
                 if (varies)
                 {
                     if (!c.HasCulture(culture))
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Routing
 
             foreach (IPublishedContent rootContent in cache.GetAtRoot())
             {
-                IPublishedContent c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+                IPublishedContent? c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
                 if (c != null)
                 {
                     return c;

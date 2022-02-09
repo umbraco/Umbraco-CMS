@@ -4,14 +4,14 @@ namespace Umbraco.Cms.Core.Models.Membership
 {
     public class UserProfile : IProfile, IEquatable<UserProfile>
     {
-        public UserProfile(int id, string name)
+        public UserProfile(int id, string? name)
         {
             Id = id;
             Name = name;
         }
 
         public int Id { get; private set; }
-        public string Name { get; private set; }
+        public string? Name { get; private set; }
 
         public bool Equals(UserProfile? other)
         {

@@ -37,15 +37,15 @@ namespace Umbraco.Extensions
             string? culture = null,
             string? segment = null)
         {
-            if (!content.Properties.TryGetValue(propertyTypeAlias, out IProperty property))
+            if (!content.Properties.TryGetValue(propertyTypeAlias, out IProperty? property))
             {
                 mediaFilePath = null;
                 return false;
             }
 
             if (!mediaUrlGenerators.TryGetMediaPath(
-                property.PropertyType.PropertyEditorAlias,
-                property.GetValue(culture, segment),
+                property?.PropertyType?.PropertyEditorAlias,
+                property?.GetValue(culture, segment),
                 out mediaFilePath))
             {
                 return false;
@@ -112,15 +112,15 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This is a bit of a hack because we need to type check!
         /// </remarks>
-        internal static bool HasChildren(IContentBase content, ServiceContext services)
+        internal static bool? HasChildren(IContentBase content, ServiceContext services)
         {
             if (content is IContent)
             {
-                return services.ContentService.HasChildren(content.Id);
+                return services.ContentService?.HasChildren(content.Id);
             }
             if (content is IMedia)
             {
-                return services.MediaService.HasChildren(content.Id);
+                return services.MediaService?.HasChildren(content.Id);
             }
             return false;
         }
@@ -133,7 +133,7 @@ namespace Umbraco.Extensions
         /// <param name="editorAlias"></param>
         /// <returns></returns>
         public static IEnumerable<IProperty> GetPropertiesByEditor(this IContentBase content, string editorAlias)
-            => content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == editorAlias);
+            => content.Properties.Where(x => x.PropertyType?.PropertyEditorAlias == editorAlias);
 
 
         #region IContent
@@ -224,8 +224,8 @@ namespace Umbraco.Extensions
         public static IEnumerable<IProperty> GetNonGroupedProperties(this IContentBase content)
         {
             return content.Properties
-                .Where(x => x.PropertyType.PropertyGroupId == null)
-                .OrderBy(x => x.PropertyType.SortOrder);
+                .Where(x => x.PropertyType?.PropertyGroupId == null)
+                .OrderBy(x => x.PropertyType?.SortOrder);
         }
 
         /// <summary>

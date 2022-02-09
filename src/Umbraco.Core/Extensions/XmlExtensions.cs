@@ -254,7 +254,7 @@ namespace Umbraco.Extensions
             }
 
             Attempt<T> result = attribute.Value.TryConvertTo<T>();
-            if (result.Success.HasValue && result.Success.Value)
+            if (result.Success)
             {
                 return result.Result;
             }
@@ -272,7 +272,7 @@ namespace Umbraco.Extensions
 
             var val = xml.Attribute(attributeName)?.Value;
             var result = val.TryConvertTo<T>();
-            if (result.Success.HasValue && result.Success.Value)
+            if (result.Success)
                 return result.Result;
 
             return default(T);
@@ -288,7 +288,7 @@ namespace Umbraco.Extensions
 
             var val = xml.Attributes[attributeName]?.Value;
             var result = val.TryConvertTo<T>();
-            if (result.Success.HasValue && result.Success.Value)
+            if (result.Success)
                 return result.Result;
 
             return default(T);

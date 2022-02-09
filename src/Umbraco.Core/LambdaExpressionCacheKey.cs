@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core
         {
             ReturnType = returnType;
             ExpressionAsString = expression;
-            ArgTypes = new HashSet<string>(argTypes);
+            ArgTypes = new HashSet<string?>(argTypes);
             _toString = null;
         }
 
@@ -23,26 +23,26 @@ namespace Umbraco.Cms.Core
         {
             ReturnType = obj.ReturnType.FullName;
             ExpressionAsString = obj.ToString();
-            ArgTypes = new HashSet<string>(obj.Parameters.Select(x => x.Type.FullName));
+            ArgTypes = new HashSet<string?>(obj.Parameters.Select(x => x.Type.FullName));
             _toString = null;
         }
 
         /// <summary>
         /// The argument type names of the <see cref="LambdaExpression"/>
         /// </summary>
-        public readonly HashSet<string> ArgTypes;
+        public readonly HashSet<string?> ArgTypes;
 
         /// <summary>
         /// The return type of the <see cref="LambdaExpression"/>
         /// </summary>
-        public readonly string ReturnType;
+        public readonly string? ReturnType;
 
         /// <summary>
         /// The original string representation of the <see cref="LambdaExpression"/>
         /// </summary>
         public readonly string ExpressionAsString;
 
-        private string _toString;
+        private string? _toString;
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core
         /// <returns>
         ///     <c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(obj, null)) return false;
             var casted = (LambdaExpressionCacheKey)obj;

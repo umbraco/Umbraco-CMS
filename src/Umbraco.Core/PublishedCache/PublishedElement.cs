@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         // initializes a new instance of the PublishedElement class
         // within the context of a published snapshot service (eg a published content property value)
         public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
-            PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+            PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
         {
             if (key == Guid.Empty) throw new ArgumentException("Empty guid.");
             if (values == null) throw new ArgumentNullException(nameof(values));
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             values = GetCaseInsensitiveValueDictionary(values);
 
             _propertiesArray = contentType
-                .PropertyTypes
+                .PropertyTypes?
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.Alias, out var value);
@@ -72,14 +72,14 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         #region Properties
 
-        private readonly IPublishedProperty[] _propertiesArray;
+        private readonly IPublishedProperty[]? _propertiesArray;
 
-        public IEnumerable<IPublishedProperty> Properties => _propertiesArray;
+        public IEnumerable<IPublishedProperty>? Properties => _propertiesArray;
 
-        public IPublishedProperty GetProperty(string alias)
+        public IPublishedProperty? GetProperty(string alias)
         {
             var index = ContentType.GetPropertyIndex(alias);
-            var property = index < 0 ? null : _propertiesArray[index];
+            var property = index < 0 ? null : _propertiesArray?[index];
             return property;
         }
 

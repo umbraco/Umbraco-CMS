@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Routing
                 return false;
             }
 
-            IPublishedContent content = umbracoContext.Content.GetById(redirectUrl.ContentId);
+            IPublishedContent? content = umbracoContext?.Content.GetById(redirectUrl.ContentId);
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Routing
             // Appending any querystring from the incoming request to the redirect URL
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content.Id, url);
+            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content?.Id, url);
 
             frequest
                 .SetRedirectPermanent(url)

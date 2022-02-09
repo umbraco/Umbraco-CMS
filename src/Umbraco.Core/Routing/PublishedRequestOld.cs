@@ -18,15 +18,15 @@ namespace Umbraco.Cms.Core.Routing
 
         private bool _readonly; // after prepared
         private bool _is404;
-        private DomainAndUri _domain;
-        private CultureInfo _culture;
-        private IPublishedContent _publishedContent;
-        private IPublishedContent _initialPublishedContent; // found by finders before 404, redirects, etc
+        private DomainAndUri? _domain;
+        private CultureInfo? _culture;
+        private IPublishedContent? _publishedContent;
+        private IPublishedContent? _initialPublishedContent; // found by finders before 404, redirects, etc
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
         /// </summary>
-        public PublishedRequestOld(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri uri = null)
+        public PublishedRequestOld(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri? uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <remarks>The initial requested content is the content that was found by the finders,
         /// before anything such as 404, redirect... took place.</remarks>
-        public IPublishedContent InitialPublishedContent => _initialPublishedContent;
+        public IPublishedContent? InitialPublishedContent => _initialPublishedContent;
 
         /// <summary>
         /// Gets value indicating whether the current published content is the initial one.
@@ -209,12 +209,12 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets or sets the template model to use to display the requested content.
         /// </summary>
-        public ITemplate Template { get; }
+        public ITemplate? Template { get; }
 
         /// <summary>
         /// Gets the alias of the template to use to display the requested content.
         /// </summary>
-        public string TemplateAlias => Template?.Alias;
+        public string? TemplateAlias => Template?.Alias;
 
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <remarks>Is a DomainAndUri object ie a standard Domain plus the fully qualified uri. For example,
         /// the <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
-        public DomainAndUri Domain
+        public DomainAndUri? Domain
         {
             get { return _domain; }
             set
@@ -285,7 +285,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets or sets the URL to redirect to, when the content request triggers a redirect.
         /// </summary>
-        public string RedirectUrl { get; private set; }
+        public string? RedirectUrl { get; private set; }
 
         /// <summary>
         /// Indicates that the content request should trigger a redirect (302).
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <remarks>Does not actually set the http response status description, only registers that the response
         /// should use the specified description. The description will or will not be used, in due time.</remarks>
-        public string ResponseStatusDescription { get; private set; }
+        public string? ResponseStatusDescription { get; private set; }
 
         /// <summary>
         /// Sets the http response status code, along with an optional associated description.
@@ -355,7 +355,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <remarks>Does not actually set the http response status code and description, only registers that
         /// the response should use the specified code and description. The code and description will or will
         /// not be used, in due time.</remarks>
-        public void SetResponseStatus(int code, string description = null)
+        public void SetResponseStatus(int code, string? description = null)
         {
             EnsureWriteable();
 

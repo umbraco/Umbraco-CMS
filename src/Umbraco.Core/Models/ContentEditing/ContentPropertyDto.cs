@@ -13,7 +13,7 @@
 
         public bool? IsRequired { get; set; }
 
-        public bool LabelOnTop { get; set; }
+        public bool? LabelOnTop { get; set; }
 
         public string? IsRequiredMessage { get; set; }
 

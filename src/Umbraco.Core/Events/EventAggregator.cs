@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Events
             => _serviceFactory = serviceFactory;
 
         /// <inheritdoc/>
-        public Task? PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+        public Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : INotification
         {
             // TODO: Introduce codegen efficient Guard classes to reduce noise.

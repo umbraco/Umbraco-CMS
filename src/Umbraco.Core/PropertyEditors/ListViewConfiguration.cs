@@ -60,10 +60,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 
         [ConfigurationField("icon", "Content app icon", "views/propertyeditors/listview/icon.prevalues.html", Description = "The icon of the listview content app")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [ConfigurationField("tabName", "Content app name", "textstring", Description = "The name of the listview content app (default if empty: 'Child Items')")]
-        public string TabName { get; set; }
+        public string? TabName { get; set; }
 
         [ConfigurationField("showContentFirst", "Show Content App First", "boolean", Description = "Enable this to show the content app by default instead of the list view app")]
         public bool ShowContentFirst { get; set; }
@@ -75,13 +75,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public class Property
         {
             [DataMember(Name = "alias")]
-            public string Alias { get; set; }
+            public string? Alias { get; set; }
 
             [DataMember(Name = "header")]
-            public string Header { get; set; }
+            public string? Header { get; set; }
 
             [DataMember(Name = "nameTemplate")]
-            public string Template { get; set; }
+            public string? Template { get; set; }
 
             [DataMember(Name = "isSystem")]
             public int IsSystem { get; set; } // TODO: bool
@@ -91,13 +91,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public class Layout
         {
             [DataMember(Name = "name")]
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
             [DataMember(Name = "path")]
-            public string Path { get; set; }
+            public string? Path { get; set; }
 
             [DataMember(Name = "icon")]
-            public string Icon { get; set; }
+            public string? Icon { get; set; }
 
             [DataMember(Name = "isSystem")]
             public int IsSystem { get; set; } // TODO: bool

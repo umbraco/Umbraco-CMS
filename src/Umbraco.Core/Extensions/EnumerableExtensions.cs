@@ -81,7 +81,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="TSource">Source type</typeparam>
         /// <typeparam name="TKey">Key type</typeparam>
         /// <returns>the unique list</returns>
-        public static IEnumerable<TSource> LegacyDistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        public static IEnumerable<TSource> LegacyDistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource?, TKey> keySelector)
             where TKey : IEquatable<TKey>
         {
             return source.Distinct(DelegateEqualityComparer<TSource>.CompareMember(keySelector));
@@ -303,7 +303,7 @@ namespace Umbraco.Extensions
         ///
         /// There's a few answers, this one seems the best for it's simplicity and based on the comment of Eamon
         /// </remarks>
-        public static bool UnsortedSequenceEqual<T>(this IEnumerable<T> source, IEnumerable<T> other)
+        public static bool UnsortedSequenceEqual<T>(this IEnumerable<T>? source, IEnumerable<T>? other)
         {
             if (source == null && other == null) return true;
             if (source == null || other == null) return false;

@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Cache
                     if (payload.ChangeTypes == TreeChangeTypes.Remove)
                        _idKeyMap.ClearCache(payload.Id);
 
-                    if (!mediaCache.Success.HasValue || !mediaCache.Success.Value) continue;
+                    if (!mediaCache.Success) continue;
 
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense

@@ -31,6 +31,11 @@ namespace Umbraco.Cms.Core.Models
 
         public bool SupportsPublishing { get; }
 
+        // This baseclass calling is needed, else compiler will complain about nullability
+
+        /// <inheritdoc/>
+        public bool IsReadOnly => ((ICollection<IPropertyType>)this).IsReadOnly;
+
         /// <summary>
         /// Resets the collection to only contain the <see cref="IPropertyType"/> instances referenced in the <paramref name="properties"/> parameter.
         /// </summary>
@@ -115,9 +120,9 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Item_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var propType = (IPropertyType)sender;
+            var propType = (IPropertyType?)sender;
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, propType, propType));
         }
 
@@ -149,10 +154,10 @@ namespace Umbraco.Cms.Core.Models
 
         protected override string GetKeyForItem(IPropertyType item)
         {
-            return item.Alias;
+            return item.Alias!;
         }
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         /// <summary>
         /// Clears all <see cref="CollectionChanged"/> event handlers

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         private readonly object _locker = new object();
-        private Dictionary<IPropertyValueConverter, Type[]> _defaultConverters;
+        private Dictionary<IPropertyValueConverter, Type[]>? _defaultConverters;
 
         private Dictionary<IPropertyValueConverter, Type[]> DefaultConverters
         {
@@ -42,6 +42,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
             => DefaultConverters.ContainsKey(converter);
 
         internal bool Shadows(IPropertyValueConverter shadowing, IPropertyValueConverter shadowed)
-            => DefaultConverters.TryGetValue(shadowing, out Type[] types) && types.Contains(shadowed.GetType());
+            => DefaultConverters.TryGetValue(shadowing, out Type[]? types) && types.Contains(shadowed.GetType());
     }
 }

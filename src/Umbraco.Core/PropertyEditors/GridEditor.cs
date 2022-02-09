@@ -11,25 +11,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public GridEditor()
         {
             Config = new Dictionary<string, object>();
+            Alias = string.Empty;
         }
 
         [DataMember(Name = "name", IsRequired = true)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "nameTemplate")]
-        public string NameTemplate { get; set; }
+        public string? NameTemplate { get; set; }
 
         [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; set; }
 
         [DataMember(Name = "view", IsRequired = true)]
-        public string View{ get; set; }
+        public string? View{ get; set; }
 
         [DataMember(Name = "render")]
-        public string Render { get; set; }
+        public string? Render { get; set; }
 
         [DataMember(Name = "icon", IsRequired = true)]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [DataMember(Name = "config")]
         public IDictionary<string, object> Config { get; set; }
@@ -46,7 +47,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// true if the specified object  is equal to the current object; otherwise, false.
         /// </returns>
         /// <param name="obj">The object to compare with the current object. </param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

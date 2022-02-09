@@ -95,18 +95,18 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// Same as <see cref="XmlNamespaceManager"/>.
         /// </summary>
-        public override string LookupNamespace(string prefix)
+        public override string? LookupNamespace(string prefix)
         {
-            var key = NameTable.Get(prefix);
+            var key = NameTable?.Get(prefix);
             return key == null ? null : base.LookupNamespace(key);
         }
 
         /// <summary>
         /// Same as <see cref="XmlNamespaceManager"/>.
         /// </summary>
-        public override string LookupPrefix(string uri)
+        public override string? LookupPrefix(string uri)
         {
-            var key = NameTable.Get(uri);
+            var key = NameTable?.Get(uri);
             return key == null ? null : base.LookupPrefix(key);
         }
 
@@ -135,9 +135,9 @@ namespace Umbraco.Cms.Core.Xml
         /// </summary>
         /// <param name="xpath">The expression to compile</param>
         /// <returns>A compiled <see cref="XPathExpression"/>.</returns>
-        public static XPathExpression Compile(string xpath)
+        public static XPathExpression? Compile(string xpath)
         {
-            return new XmlDocument().CreateNavigator().Compile(xpath);
+            return new XmlDocument().CreateNavigator()?.Compile(xpath);
         }
 
         #endregion Public Members
@@ -194,10 +194,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// See <see cref="XsltContext"/>. Not used in our implementation.
         /// </summary>
-        public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] argTypes)
-        {
-            return null;
-        }
+        public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] argTypes) => throw new NotImplementedException();
 
         /// <summary>
         /// Resolves the dynamic variables added to the context. See <see cref="XsltContext"/>.
@@ -205,8 +202,8 @@ namespace Umbraco.Cms.Core.Xml
         public override IXsltContextVariable ResolveVariable(string prefix, string name)
         {
             IXsltContextVariable var;
-            _variables.TryGetValue(name, out var);
-            return var;
+            _variables.TryGetValue(name, out var!);
+            return var!;
         }
 
         #endregion Variable Handling Code

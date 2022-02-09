@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot(string culture = null);
+        IEnumerable<IPublishedContent> GetAtRoot(string? culture = null);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.

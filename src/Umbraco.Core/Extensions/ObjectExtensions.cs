@@ -79,7 +79,7 @@ namespace Umbraco.Extensions
         {
             Attempt<object?> result = TryConvertTo(input, typeof(T));
 
-            if (result.Success.HasValue && result.Success.Value)
+            if (result.Success)
             {
                 return Attempt<T>.Succeed((T?)result.Result);
             }
@@ -173,7 +173,7 @@ namespace Umbraco.Extensions
                         var inner = input.TryConvertTo(underlying);
 
                         // And if successful, fall on through to rewrap in a nullable; if failed, pass on the exception
-                        if (inner.Success.HasValue && inner.Success.Value)
+                        if (inner.Success)
                         {
                             input = inner.Result; // Now fall on through...
                         }
@@ -608,10 +608,10 @@ namespace Umbraco.Extensions
         /// <param name="value"></param>
         /// <param name="type">The Type can only be a primitive type or Guid and byte[] otherwise an exception is thrown</param>
         /// <returns></returns>
-        public static string? ToXmlString(this object value, Type type)
+        public static string ToXmlString(this object value, Type type)
         {
             if (value == null) return string.Empty;
-            if (type == typeof(string)) return (value.ToString().IsNullOrWhiteSpace() ? "" : value.ToString());
+            if (type == typeof(string)) return (value.ToString().IsNullOrWhiteSpace() ? "" : value.ToString()!);
             if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
             if (type == typeof(byte)) return XmlConvert.ToString((byte)value);
             if (type == typeof(char)) return XmlConvert.ToString((char)value);
@@ -640,7 +640,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string? ToXmlString<T>(this object value)
+        public static string ToXmlString<T>(this object value)
         {
             return value.ToXmlString(typeof (T));
         }

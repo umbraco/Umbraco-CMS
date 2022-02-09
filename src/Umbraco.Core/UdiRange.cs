@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core
 
         public static UdiRange Parse(string s)
         {
-            Uri uri;
+            Uri? uri;
 
             if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
                 || Uri.TryCreate(s, UriKind.Absolute, out uri) == false)

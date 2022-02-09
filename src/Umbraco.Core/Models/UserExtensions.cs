@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Models
             return ContentPermissions.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
         }
 
-        public static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService, AppCaches appCaches)
+        public static bool HasPathAccess(this IUser user, IMedia? media, IEntityService entityService, AppCaches appCaches)
         {
             if (media == null) throw new ArgumentNullException(nameof(media));
             return ContentPermissions.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
@@ -153,10 +153,17 @@ namespace Umbraco.Cms.Core.Models
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
             var result = runtimeCache.GetCacheItem(cacheKey, () =>
             {
-                var gsn = user.Groups.Select(x => x.StartContentId).Distinct().ToArray();
+                // This returns a nullable array even though we're checking if items have value and there cannot be null
+                // We use Cast<int> to recast into non-nullable array
+                var gsn = user.Groups.Where(x => x.StartContentId is not null).Select(x => x.StartContentId).Distinct().Cast<int>().ToArray();
                 var usn = user.StartContentIds;
-                var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
-                return vals;
+                if (usn is not null)
+                {
+                    var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
+                    return vals;
+                }
+
+                return null;
             }, TimeSpan.FromMinutes(2), true);
 
             return result;
@@ -175,10 +182,15 @@ namespace Umbraco.Cms.Core.Models
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
             var result = runtimeCache.GetCacheItem(cacheKey, () =>
             {
-                var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
+                var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId!.Value).Distinct().ToArray();
                 var usn = user.StartMediaIds;
-                var vals = CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
-                return vals;
+                if (usn is not null)
+                {
+                    var vals = CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
+                    return vals;
+                }
+
+                return null;
             }, TimeSpan.FromMinutes(2), true);
 
             return result;

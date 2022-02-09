@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         void DetermineRuntimeLevel();
 
-        void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null);
+        void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null);
 
         /// <summary>
         /// Returns any state data that was collected during startup

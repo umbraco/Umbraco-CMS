@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
                 if (!CheckUserAccessByRules(currentUser, _sectionService, dashboard.AccessRules))
                     continue;
 
-                if (dashboard.View.InvariantEndsWith(".ascx"))
+                if (dashboard.View?.InvariantEndsWith(".ascx") ?? false)
                     throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
 
                 var dashboards = new List<IDashboard> { dashboard };
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Services
             var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);
 
             var hasAccess = true;
-            string[] assignedUserGroups = null;
+            string[]? assignedUserGroups = null;
 
             // if there are no grant rules, then access is granted by default, unless denied
             // otherwise, grant rules determine if access can be granted at all
@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Core.Services
 
         private static (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
         {
-            IAccessRule[] denyRules = null, grantRules = null, grantBySectionRules = null;
+            IAccessRule[]? denyRules = null, grantRules = null, grantBySectionRules = null;
 
             var groupedRules = rules.GroupBy(x => x.Type);
             foreach (var group in groupedRules)

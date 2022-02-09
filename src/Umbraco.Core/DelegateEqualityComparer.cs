@@ -9,18 +9,18 @@ namespace Umbraco.Cms.Core
     /// <typeparam name="T"></typeparam>
     public class DelegateEqualityComparer<T> : IEqualityComparer<T>
     {
-        private readonly Func<T, T, bool> _equals;
+        private readonly Func<T?, T?, bool> _equals;
         private readonly Func<T, int> _getHashcode;
 
         #region Implementation of IEqualityComparer<in T>
 
-        public DelegateEqualityComparer(Func<T, T, bool> equals, Func<T, int> getHashcode)
+        public DelegateEqualityComparer(Func<T?, T?, bool> equals, Func<T, int> getHashcode)
         {
             _getHashcode = getHashcode;
             _equals = equals;
         }
 
-        public static DelegateEqualityComparer<T> CompareMember<TMember>(Func<T, TMember> memberExpression) where TMember : IEquatable<TMember>
+        public static DelegateEqualityComparer<T> CompareMember<TMember>(Func<T?, TMember> memberExpression) where TMember : IEquatable<TMember>
         {
             return new DelegateEqualityComparer<T>(
                 (x, y) => memberExpression.Invoke(x).Equals((TMember)memberExpression.Invoke(y)),
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core
         /// true if the specified objects are equal; otherwise, false.
         /// </returns>
         /// <param name="x">The first object of type <paramref name="T"/> to compare.</param><param name="y">The second object of type <paramref name="T"/> to compare.</param>
-        public bool Equals(T x, T y)
+        public bool Equals(T? x, T? y)
         {
             return _equals.Invoke(x, y);
         }

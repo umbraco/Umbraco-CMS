@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Models.Entities
             _hasIdentity = false;
         }
 
-        public virtual bool Equals(EntityBase other)
+        public virtual bool Equals(EntityBase? other)
         {
             return other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));
         }

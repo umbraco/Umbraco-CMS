@@ -171,7 +171,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="pageSize"></param>
         /// <param name="totalChildren"></param>
         /// <returns></returns>
-        IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering ordering = null);
+        IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
 
         /// <summary>
         /// Gets the Child object from a Relation as an <see cref="IUmbracoEntity"/>

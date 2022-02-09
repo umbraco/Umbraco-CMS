@@ -63,6 +63,6 @@ namespace Umbraco.Cms.Core.Configuration
         /// <para>The semantic version is the value of the <see cref="AssemblyInformationalVersionAttribute"/>.</para>
         /// <para>It is the full version of Umbraco, including comments.</para>
         /// </remarks>
-        public SemVersion? SemanticVersion { get; }
+        public SemVersion SemanticVersion { get; }
     }
 }

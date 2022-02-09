@@ -27,7 +27,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="principal"></param>
         /// <returns></returns>
-        public static ClaimsIdentity GetUmbracoIdentity(this IPrincipal principal)
+        public static ClaimsIdentity? GetUmbracoIdentity(this IPrincipal principal)
         {
             //If it's already a UmbracoBackOfficeIdentity
             if (principal.Identity is ClaimsIdentity claimsIdentity
@@ -41,10 +41,14 @@ namespace Umbraco.Extensions
             // We can have assigned more identities if it is a preview request.
             if (principal is ClaimsPrincipal claimsPrincipal )
             {
-                claimsIdentity = claimsPrincipal.Identities.FirstOrDefault(x=>x.IsBackOfficeAuthenticationType());
-                if (claimsIdentity.VerifyBackOfficeIdentity(out backOfficeIdentity))
+                var identity = claimsPrincipal.Identities.FirstOrDefault(x => x.IsBackOfficeAuthenticationType());
+                if (identity is not null)
                 {
-                    return backOfficeIdentity;
+                    claimsIdentity = identity;
+                    if (claimsIdentity.VerifyBackOfficeIdentity(out backOfficeIdentity))
+                    {
+                        return backOfficeIdentity;
+                    }
                 }
             }
 
@@ -78,7 +82,7 @@ namespace Umbraco.Extensions
             var ticketExpires = claimsPrincipal.FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
             if (ticketExpires.IsNullOrWhiteSpace()) return 0;
 
-            var utcExpired = DateTimeOffset.Parse(ticketExpires, null, DateTimeStyles.RoundtripKind);
+            var utcExpired = DateTimeOffset.Parse(ticketExpires!, null, DateTimeStyles.RoundtripKind);
 
             var secondsRemaining = utcExpired.Subtract(now).TotalSeconds;
             return secondsRemaining;

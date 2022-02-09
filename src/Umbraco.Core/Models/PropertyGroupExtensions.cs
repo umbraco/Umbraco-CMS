@@ -4,18 +4,18 @@ namespace Umbraco.Cms.Core.Models
     {
         private const char AliasSeparator = '/';
 
-        internal static string GetLocalAlias(string alias)
+        internal static string? GetLocalAlias(string alias)
         {
             var lastIndex = alias?.LastIndexOf(AliasSeparator) ?? -1;
             if (lastIndex != -1)
             {
-                return alias.Substring(lastIndex + 1);
+                return alias?.Substring(lastIndex + 1);
             }
 
             return alias;
         }
 
-        internal static string GetParentAlias(string alias)
+        internal static string? GetParentAlias(string? alias)
         {
             var lastIndex = alias?.LastIndexOf(AliasSeparator) ?? -1;
             if (lastIndex == -1)
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models
                 return null;
             }
 
-            return alias.Substring(0, lastIndex);
+            return alias?.Substring(0, lastIndex);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Models
         /// <returns>
         /// The local alias.
         /// </returns>
-        public static string GetLocalAlias(this PropertyGroup propertyGroup) => GetLocalAlias(propertyGroup.Alias);
+        public static string? GetLocalAlias(this PropertyGroup propertyGroup) => GetLocalAlias(propertyGroup.Alias);
 
         /// <summary>
         /// Updates the local alias.
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Models
         /// <returns>
         /// The parent alias.
         /// </returns>
-        public static string GetParentAlias(this PropertyGroup propertyGroup) => GetParentAlias(propertyGroup.Alias);
+        public static string? GetParentAlias(this PropertyGroup propertyGroup) => GetParentAlias(propertyGroup.Alias);
 
         /// <summary>
         /// Updates the parent alias.
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Models
             var localAlias = propertyGroup.GetLocalAlias();
             if (string.IsNullOrEmpty(parentAlias))
             {
-                propertyGroup.Alias = localAlias;
+                propertyGroup.Alias = localAlias!;
             }
             else
             {

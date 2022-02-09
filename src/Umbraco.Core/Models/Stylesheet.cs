@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
-        public override string Content
+        public override string? Content
         {
             get { return base.Content; }
             set

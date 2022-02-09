@@ -38,7 +38,7 @@ namespace Umbraco.Extensions
                 }
 
                 var valueConverted = value.TryConvertTo<T>();
-                if (valueConverted.Success.HasValue && valueConverted.Success.Value)
+                if (valueConverted.Success)
                 {
                     return valueConverted.Result;
                 }
@@ -63,7 +63,7 @@ namespace Umbraco.Extensions
             }
 
             var noValueConverted = noValue.TryConvertTo<T>();
-            if (noValueConverted.Success.HasValue && noValueConverted.Success.Value)
+            if (noValueConverted.Success)
             {
                 return noValueConverted.Result;
             }

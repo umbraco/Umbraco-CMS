@@ -66,14 +66,14 @@ namespace Umbraco.Cms.Core
                         }
 
 
-                        var propInfo = member.Member as PropertyInfo;
+                        var propInfo = member!.Member as PropertyInfo;
                         if (propInfo == null)
                             throw new ArgumentException(string.Format(
                                 "Expression '{0}' refers to a field, not a property.",
                                 propertyLambda));
 
                         if (type != propInfo.ReflectedType &&
-                            !type.IsSubclassOf(propInfo.ReflectedType))
+                            !type.IsSubclassOf(propInfo.ReflectedType!))
                             throw new ArgumentException(string.Format(
                                 "Expression '{0}' refers to a property that is not from type {1}.",
                                 propertyLambda,
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core
                     });
         }
 
-        public static (MemberInfo, string) FindProperty(LambdaExpression lambda)
+        public static (MemberInfo, string?) FindProperty(LambdaExpression lambda)
         {
             void Throw()
             {
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core
 
             Expression expr = lambda;
             var loop = true;
-            string alias = null;
+            string? alias = null;
             while (loop)
             {
                 switch (expr.NodeType)
@@ -109,11 +109,11 @@ namespace Umbraco.Cms.Core
                         if (method.DeclaringType != typeof(SqlExtensionsStatics) || method.Name != "Alias" || !(callExpr.Arguments[1] is ConstantExpression aliasExpr))
                             Throw();
                         expr = callExpr.Arguments[0];
-                        alias = aliasExpr.Value.ToString();
+                        alias = aliasExpr.Value?.ToString();
                         break;
                     case ExpressionType.MemberAccess:
                         var memberExpr = (MemberExpression) expr;
-                        if (memberExpr.Expression.NodeType != ExpressionType.Parameter && memberExpr.Expression.NodeType != ExpressionType.Convert)
+                        if (memberExpr.Expression?.NodeType != ExpressionType.Parameter && memberExpr.Expression?.NodeType != ExpressionType.Convert)
                             Throw();
                         return (memberExpr.Member, alias);
                     default:
@@ -125,22 +125,22 @@ namespace Umbraco.Cms.Core
             throw new Exception("Configuration for members is only supported for top-level individual members on a type.");
         }
 
-        public static IDictionary<string, object> GetMethodParams<T1, T2>(Expression<Func<T1, T2>> fromExpression)
+        public static IDictionary<string, object?>? GetMethodParams<T1, T2>(Expression<Func<T1, T2>> fromExpression)
         {
             if (fromExpression == null) return null;
             var body = fromExpression.Body as MethodCallExpression;
             if (body == null)
-                return new Dictionary<string, object>();
+                return new Dictionary<string, object?>();
 
-            var rVal = new Dictionary<string, object>();
-            var parameters = body.Method.GetParameters().Select(x => x.Name).ToArray();
+            var rVal = new Dictionary<string, object?>();
+            var parameters = body.Method.GetParameters().Select(x => x.Name).Where(x => x is not null).ToArray();
             var i = 0;
             foreach (var argument in body.Arguments)
             {
                 var lambda = Expression.Lambda(argument, fromExpression.Parameters);
                 var d = lambda.Compile();
                 var value = d.DynamicInvoke(new object[1]);
-                rVal.Add(parameters[i], value);
+                rVal.Add(parameters[i]!, value);
                 i++;
             }
             return rVal;
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core
         /// <param name="fromExpression">From expression.</param>
         /// <returns>The <see cref="MethodInfo"/> or null if <paramref name="fromExpression"/> is null or cannot be converted to <see cref="MethodCallExpression"/>.</returns>
         /// <remarks></remarks>
-        public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> fromExpression)
+        public static MethodInfo? GetMethodInfo<T>(Expression<Action<T>> fromExpression)
         {
             if (fromExpression == null) return null;
             var body = fromExpression.Body as MethodCallExpression;
@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Core
         /// <typeparam name="TReturn">The return type of the method.</typeparam>
         /// <param name="fromExpression">From expression.</param>
         /// <returns></returns>
-        public static MethodInfo GetMethodInfo<TReturn>(Expression<Func<TReturn>> fromExpression)
+        public static MethodInfo? GetMethodInfo<TReturn>(Expression<Func<TReturn>> fromExpression)
         {
             if (fromExpression == null) return null;
             var body = fromExpression.Body as MethodCallExpression;
@@ -180,11 +180,11 @@ namespace Umbraco.Cms.Core
         /// <typeparam name="T2">The type of the 2.</typeparam>
         /// <param name="fromExpression">From expression.</param>
         /// <returns></returns>
-        public static MethodInfo GetMethodInfo<T1, T2>(Expression<Func<T1, T2>> fromExpression)
+        public static MethodInfo? GetMethodInfo<T1, T2>(Expression<Func<T1, T2>> fromExpression)
         {
             if (fromExpression == null) return null;
 
-            MethodCallExpression me;
+            MethodCallExpression? me;
             switch (fromExpression.Body.NodeType)
             {
                 case ExpressionType.Convert:
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Core
         /// <param name="expression">The expression.</param>
         /// <returns>The <see cref="MethodInfo"/> or null if <paramref name="expression"/> cannot be converted to <see cref="MethodCallExpression"/>.</returns>
         /// <remarks></remarks>
-        public static MethodInfo GetMethod(Expression expression)
+        public static MethodInfo? GetMethod(Expression expression)
         {
             if (expression == null) return null;
             return IsMethod(expression) ? (((MethodCallExpression)expression).Method) : null;
@@ -220,11 +220,11 @@ namespace Umbraco.Cms.Core
         /// <param name="fromExpression">From expression.</param>
         /// <returns>The <see cref="MemberInfo"/> or null if <paramref name="fromExpression"/> cannot be converted to <see cref="MemberExpression"/>.</returns>
         /// <remarks></remarks>
-        public static MemberInfo GetMemberInfo<T, TReturn>(Expression<Func<T, TReturn>> fromExpression)
+        public static MemberInfo? GetMemberInfo<T, TReturn>(Expression<Func<T, TReturn>> fromExpression)
         {
             if (fromExpression == null) return null;
 
-            MemberExpression me;
+            MemberExpression? me;
             switch (fromExpression.Body.NodeType)
             {
                 case ExpressionType.Convert:
@@ -283,7 +283,7 @@ namespace Umbraco.Cms.Core
         /// <param name="expression">The expression.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static MemberInfo GetMember(Expression expression)
+        public static MemberInfo? GetMember(Expression expression)
         {
             if (expression == null) return null;
             return IsMember(expression) ? (((MemberExpression)expression).Member) : null;
@@ -361,7 +361,7 @@ namespace Umbraco.Cms.Core
         /// <param name="arguments">The arguments.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static object GetFirstValueFromArguments(IEnumerable<Expression> arguments)
+        public static object? GetFirstValueFromArguments(IEnumerable<Expression> arguments)
         {
             if (arguments == null) return false;
             return

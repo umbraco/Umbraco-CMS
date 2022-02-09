@@ -310,7 +310,7 @@ namespace Umbraco.Cms.Core.Models
         public object? GetValue(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false)
         {
             return Properties.TryGetValue(propertyTypeAlias, out var property)
-                ? property.GetValue(culture, segment, published)
+                ? property?.GetValue(culture, segment, published)
                 : null;
         }
 
@@ -320,17 +320,17 @@ namespace Umbraco.Cms.Core.Models
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
 
-            var convertAttempt = property.GetValue(culture, segment, published).TryConvertTo<TValue>();
-            return convertAttempt.Success is not null && convertAttempt.Success.Value ? convertAttempt.Result : default;
+            var convertAttempt = property?.GetValue(culture, segment, published).TryConvertTo<TValue>();
+            return convertAttempt?.Success is not null && (convertAttempt?.Success ?? false) ? convertAttempt.Value.Result : default;
         }
 
         /// <inheritdoc />
-        public void SetValue(string propertyTypeAlias, object value, string? culture = null, string? segment = null)
+        public void SetValue(string propertyTypeAlias, object? value, string? culture = null, string? segment = null)
         {
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
-            property.SetValue(value, culture, segment);
+            property?.SetValue(value, culture, segment);
 
             //bump the culture to be flagged for updating
             this.TouchCulture(culture);
@@ -435,7 +435,7 @@ namespace Umbraco.Cms.Core.Models
                 return _currentCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 
-            return Properties.Contains(propertyName) && Properties[propertyName].IsDirty();
+            return Properties.Contains(propertyName) && (Properties[propertyName]?.IsDirty() ?? false);
         }
 
         /// <inheritdoc />
@@ -462,7 +462,7 @@ namespace Umbraco.Cms.Core.Models
                 return _previousCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 
-            return Properties.Contains(propertyName) && Properties[propertyName].WasDirty();
+            return Properties.Contains(propertyName) && (Properties[propertyName]?.WasDirty() ?? false);
         }
 
         /// <inheritdoc />

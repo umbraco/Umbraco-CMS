@@ -28,13 +28,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public string? View { get; set; }
 
         [DataMember(Name = "config")]
-        public IDictionary<string, object> Config { get; set; }
+        public IDictionary<string, object>? Config { get; set; }
 
         [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
 
         [DataMember(Name = "labelOnTop")]
-        public bool LabelOnTop { get; set; }
+        public bool? LabelOnTop { get; set; }
 
         [DataMember(Name = "validation")]
         public PropertyTypeValidation Validation { get; set; }

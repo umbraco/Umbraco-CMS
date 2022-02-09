@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core
             return eventMessages;
         }
 
-        public EventMessages GetOrDefault()
+        public EventMessages? GetOrDefault()
         {
             return _eventMessagesAccessor.EventMessages;
         }

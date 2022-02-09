@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Name of the RelationType
         /// </summary>
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));

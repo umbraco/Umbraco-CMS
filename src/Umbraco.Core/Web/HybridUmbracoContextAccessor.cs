@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Web
         /// <summary>
         /// Tries to get the <see cref="UmbracoContext"/> object.
         /// </summary>
-        public bool TryGetUmbracoContext(out IUmbracoContext umbracoContext)
+        public bool TryGetUmbracoContext(out IUmbracoContext? umbracoContext)
         {
             umbracoContext = Value;
 

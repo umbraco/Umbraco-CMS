@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             throw new NotImplementedException();
         }
 
-        public IDataValueEditor GetValueEditor(object configuration)
+        public IDataValueEditor GetValueEditor(object? configuration)
         {
             throw new NotImplementedException();
         }

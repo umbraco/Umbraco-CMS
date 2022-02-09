@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Telemetry
         }
 
         /// <inheritdoc/>
-        public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
+        public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
         {
             if (TryGetTelemetryId(out Guid telemetryId) is false)
             {

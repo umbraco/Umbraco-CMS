@@ -27,11 +27,11 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the document.
         /// </summary>
-        public IContent Content => Entity;
+        public IContent? Content => Entity;
 
         /// <summary>
         /// Gets or sets the invalid properties, if the status failed due to validation.
         /// </summary>
-        public IEnumerable<IProperty> InvalidProperties { get; set; }
+        public IEnumerable<IProperty>? InvalidProperties { get; set; }
     }
 }

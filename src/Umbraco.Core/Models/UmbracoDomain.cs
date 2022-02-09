@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models
         public string DomainName
         {
             get => _domainName;
-            set => SetPropertyValueAndDetectChanges(value, ref _domainName, nameof(DomainName));
+            set => SetPropertyValueAndDetectChanges(value, ref _domainName!, nameof(DomainName));
         }
 
         [DataMember]
@@ -49,6 +49,6 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Readonly value of the language ISO code for the domain
         /// </summary>
-        public string LanguageIsoCode { get; set; }
+        public string? LanguageIsoCode { get; set; }
     }
 }

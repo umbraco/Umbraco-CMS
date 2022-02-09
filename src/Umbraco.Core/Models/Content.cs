@@ -233,12 +233,12 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc/>
-        public string? GetPublishName(string culture)
+        public string? GetPublishName(string? culture)
         {
             if (culture.IsNullOrWhiteSpace()) return PublishName;
             if (!ContentType.VariesByCulture()) return null;
             if (_publishInfos == null) return null;
-            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
+            return _publishInfos.TryGetValue(culture!, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />

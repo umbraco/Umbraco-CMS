@@ -59,7 +59,7 @@ namespace Umbraco.Extensions
             foreach (var udi in ids)
             {
                 var guidUdi = udi as GuidUdi;
-                if (guidUdi == null)
+                if (guidUdi is null)
                     throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
                 guids.Add(guidUdi);
             }
@@ -79,7 +79,7 @@ namespace Umbraco.Extensions
         public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var guidUdi = parentId as GuidUdi;
-            if (guidUdi == null)
+            if (guidUdi is null)
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
             var parent = contentService.GetById(guidUdi.Guid);
             return contentService.Create(name, parent, contentTypeAlias, userId);

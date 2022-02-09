@@ -265,9 +265,9 @@ namespace Umbraco.Cms.Core.Models
                 if (a.Success == false)
                     return a.Result;
 
-                return Properties[Constants.Conventions.Member.Comments].GetValue() == null
+                return Properties[Constants.Conventions.Member.Comments]?.GetValue() == null
                     ? string.Empty
-                    : Properties[Constants.Conventions.Member.Comments].GetValue()?.ToString();
+                    : Properties[Constants.Conventions.Member.Comments]?.GetValue()?.ToString();
             }
             set
             {
@@ -276,7 +276,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(Comments)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.Comments].SetValue(value);
+                Properties[Constants.Conventions.Member.Comments]?.SetValue(value);
             }
         }
 
@@ -297,12 +297,12 @@ namespace Umbraco.Cms.Core.Models
                     true);
                 if (a.Success == false)
                     return a.Result;
-                if (Properties[Constants.Conventions.Member.IsApproved].GetValue() == null)
+                if (Properties[Constants.Conventions.Member.IsApproved]?.GetValue() == null)
                     return true;
-                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].GetValue().TryConvertTo<bool>();
-                if (tryConvert.Success ?? false)
+                var tryConvert = Properties[Constants.Conventions.Member.IsApproved]?.GetValue().TryConvertTo<bool>();
+                if (tryConvert?.Success ?? false)
                 {
-                    return tryConvert.Result;
+                    return tryConvert?.Result ?? false;
                 }
                 //if the property exists but it cannot be converted, we will assume true
                 return true;
@@ -314,7 +314,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(IsApproved)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.IsApproved].SetValue(value);
+                Properties[Constants.Conventions.Member.IsApproved]?.SetValue(value);
             }
         }
 
@@ -333,12 +333,12 @@ namespace Umbraco.Cms.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsLockedOut, nameof(IsLockedOut), false);
                 if (a.Success == false)
                     return a.Result;
-                if (Properties[Constants.Conventions.Member.IsLockedOut].GetValue() == null)
+                if (Properties[Constants.Conventions.Member.IsLockedOut]?.GetValue() == null)
                     return false;
-                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].GetValue().TryConvertTo<bool>();
-                if (tryConvert.Success ?? false)
+                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut]?.GetValue().TryConvertTo<bool>();
+                if (tryConvert?.Success ?? false)
                 {
-                    return tryConvert.Result;
+                    return tryConvert?.Result ?? false;
                 }
                 return false;
                 // TODO: Use TryConvertTo<T> instead
@@ -350,7 +350,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(IsLockedOut)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.IsLockedOut].SetValue(value);
+                Properties[Constants.Conventions.Member.IsLockedOut]?.SetValue(value);
             }
         }
 
@@ -369,12 +369,12 @@ namespace Umbraco.Cms.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLoginDate, nameof(LastLoginDate), default(DateTime));
                 if (a.Success == false)
                     return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLoginDate].GetValue() == null)
+                if (Properties[Constants.Conventions.Member.LastLoginDate]?.GetValue() == null)
                     return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].GetValue().TryConvertTo<DateTime>();
-                if (tryConvert.Success ?? false)
+                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate]?.GetValue().TryConvertTo<DateTime>();
+                if (tryConvert?.Success ?? false)
                 {
-                    return tryConvert.Result;
+                    return tryConvert?.Result ?? default(DateTime);
                 }
                 return default(DateTime);
                 // TODO: Use TryConvertTo<T> instead
@@ -386,7 +386,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(LastLoginDate)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.LastLoginDate].SetValue(value);
+                Properties[Constants.Conventions.Member.LastLoginDate]?.SetValue(value);
             }
         }
 
@@ -405,12 +405,12 @@ namespace Umbraco.Cms.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastPasswordChangeDate, nameof(LastPasswordChangeDate), default(DateTime));
                 if (a.Success == false)
                     return a.Result;
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue() == null)
+                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate]?.GetValue() == null)
                     return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue().TryConvertTo<DateTime>();
-                if (tryConvert.Success ?? false)
+                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate]?.GetValue().TryConvertTo<DateTime>();
+                if (tryConvert?.Success ?? false)
                 {
-                    return tryConvert.Result;
+                    return tryConvert?.Result ?? default(DateTime);
                 }
                 return default(DateTime);
                 // TODO: Use TryConvertTo<T> instead
@@ -422,7 +422,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(LastPasswordChangeDate)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.LastPasswordChangeDate].SetValue(value);
+                Properties[Constants.Conventions.Member.LastPasswordChangeDate]?.SetValue(value);
             }
         }
 
@@ -441,12 +441,12 @@ namespace Umbraco.Cms.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLockoutDate, nameof(LastLockoutDate), default(DateTime));
                 if (a.Success == false)
                     return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].GetValue() == null)
+                if (Properties[Constants.Conventions.Member.LastLockoutDate]?.GetValue() == null)
                     return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].GetValue().TryConvertTo<DateTime>();
-                if (tryConvert.Success ?? false)
+                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate]?.GetValue().TryConvertTo<DateTime>();
+                if (tryConvert?.Success ?? false)
                 {
-                    return tryConvert.Result;
+                    return tryConvert?.Result ?? default(DateTime);
                 }
                 return default(DateTime);
                 // TODO: Use TryConvertTo<T> instead
@@ -458,7 +458,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(LastLockoutDate)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.LastLockoutDate].SetValue(value);
+                Properties[Constants.Conventions.Member.LastLockoutDate]?.SetValue(value);
             }
         }
 
@@ -478,12 +478,12 @@ namespace Umbraco.Cms.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.FailedPasswordAttempts, nameof(FailedPasswordAttempts), 0);
                 if (a.Success == false)
                     return a.Result;
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue() == null)
+                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts]?.GetValue() == null)
                     return default(int);
-                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue().TryConvertTo<int>();
-                if (tryConvert.Success ?? false)
+                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts]?.GetValue().TryConvertTo<int>();
+                if (tryConvert?.Success ?? false)
                 {
-                    return tryConvert.Result;
+                    return tryConvert?.Result ?? default(int);
                 }
                 return default(int);
                 // TODO: Use TryConvertTo<T> instead
@@ -495,7 +495,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(FailedPasswordAttempts)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.FailedPasswordAttempts].SetValue(value);
+                Properties[Constants.Conventions.Member.FailedPasswordAttempts]?.SetValue(value);
             }
         }
 

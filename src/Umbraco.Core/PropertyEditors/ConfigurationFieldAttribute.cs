@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public class ConfigurationFieldAttribute : Attribute
     {
-        private Type _type;
+        private Type? _type;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationField"/> class.
@@ -62,22 +62,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <remarks>When null or empty, the <see cref="ConfigurationEditor"/> should derive a key
         /// from the name of the property marked with this attribute.</remarks>
-        public string Key { get; }
+        public string? Key { get; }
 
         /// <summary>
         /// Gets the friendly name of the field.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Gets or sets the view to use to render the field editor.
         /// </summary>
-        public string View { get; }
+        public string? View { get; }
 
         /// <summary>
         /// Gets or sets the description of the field.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the field editor should be displayed without its label.
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// unless specified otherwise through this property.</para>
         /// <para>The specified type must inherit from <see cref="ConfigurationField"/>.</para>
         /// </remarks>
-        public Type Type
+        public Type? Type
         {
             get => _type;
             set

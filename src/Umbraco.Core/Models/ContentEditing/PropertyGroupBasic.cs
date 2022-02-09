@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [Required]
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required]
         [DataMember(Name = "alias")]

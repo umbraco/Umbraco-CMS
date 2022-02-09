@@ -19,7 +19,7 @@ namespace Umbraco.Extensions
         /// <param name="urlSegmentProviders"></param>
         /// <param name="culture">The culture.</param>
         /// <returns>The URL segment.</returns>
-        public static string GetUrlSegment(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null)
+        public static string? GetUrlSegment(this IContentBase content, IShortStringHelper shortStringHelper, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string? culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
@@ -38,6 +38,6 @@ namespace Umbraco.Extensions
             return url;
         }
 
-        private static DefaultUrlSegmentProvider s_defaultUrlSegmentProvider;
+        private static DefaultUrlSegmentProvider? s_defaultUrlSegmentProvider;
     }
 }

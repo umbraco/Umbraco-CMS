@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Security
             Errors = errors ?? Enumerable.Empty<string>();
         }
 
-        public string AuthenticationType { get; set; }
-        public IEnumerable<string> Errors { get; set; }
+        public string? AuthenticationType { get; set; }
+        public IEnumerable<string>? Errors { get; set; }
     }
 }

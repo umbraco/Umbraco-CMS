@@ -7,7 +7,7 @@
         /// </summary>
         /// <param name="dataEditor"></param>
         /// <returns>A value indicating whether the converter supports a datatype.</returns>
-        bool IsForEditor(IDataEditor dataEditor);
+        bool IsForEditor(IDataEditor? dataEditor);
 
         /// <summary>
         ///
