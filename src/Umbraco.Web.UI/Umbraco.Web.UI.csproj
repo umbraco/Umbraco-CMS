@@ -20,6 +20,15 @@
   
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
+
+    <RuntimeHostConfigurationOption
+      Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))"
+      Include="System.Globalization.AppLocalIcu"
+      Value="68.2.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="App_Plugins" />
     <Folder Include="Views" />
   </ItemGroup>
@@ -92,7 +101,7 @@
     <Message Text="-CheckPreconditions-" Importance="high" />
     <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
     <Message Text="BellePath:       $(BellePath)" Importance="high" />
-    
+
     <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
     <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip Belle because $(BellePath) exists." Importance="High" Condition="Exists('$(BellePath)')" />
