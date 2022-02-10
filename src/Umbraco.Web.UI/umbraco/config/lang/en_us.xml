@@ -2549,11 +2549,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelUsedByDocuments">Used in Documents</key>
     <key alias="labelUsedByMembers">Used in Members</key>
     <key alias="labelUsedByMedia">Used in Media</key>
-    <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item</key>
+    <key alias="labelUsedDocuments">Used Documents</key>
+    <key alias="labelUsedMedia">Used Media</key>
+    <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item.</key>
     <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item.</key>
     <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being used in a member.</key>
     <key alias="deleteWarning">This item or its descendants is being used. Deleting can lead to broken links on your website.</key>
     <key alias="unpublishWarning">This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
+    <key alias="listViewDialogWarning">The following items you are trying to %0% are used by other content.</key>
   </area>
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Delete Saved Search</key>
