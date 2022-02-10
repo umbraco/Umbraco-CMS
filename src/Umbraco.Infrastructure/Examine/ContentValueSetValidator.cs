@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 // explicit scope since we may be in a background thread
                 using (_scopeProvider.CreateScope(autoComplete: true))
                 {
-                    if (_publicAccessService.IsProtected(path))
+                    if (_publicAccessService.IsProtected(path).Success)
                     {
                         return false;
                     }

@@ -419,7 +419,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private ContentItemDisplay GetEmptyInner(IContentType contentType, int parentId)
         {
-            var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
             var mapped = MapToDisplay(emptyContent);
 
             return CleanContentItemDisplay(mapped);
@@ -451,7 +451,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = new List<ContentItemDisplay>();
             var backOfficeSecurity = _backofficeSecurityAccessor.BackOfficeSecurity;
 
-            var userId = backOfficeSecurity.GetUserId().ResultOr(0);
+            var userId = backOfficeSecurity.GetUserId().Result ?? 0;
             var currentUser = backOfficeSecurity.CurrentUser;
             // We know that if the ID is less than 0 the parent is null.
             // Since this is called with parent ID it's safe to assume that the parent is the same for all the content types.
@@ -670,9 +670,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
-            _contentService.SaveBlueprint(blueprint, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            _contentService.SaveBlueprint(blueprint, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -1649,7 +1649,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return HandleContentNotFound(id);
             }
 
-            var publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -1701,7 +1701,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //if the current item is in the recycle bin
             if (foundContent.Trashed == false)
             {
-                var moveResult = _contentService.MoveToRecycleBin(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+                var moveResult = _contentService.MoveToRecycleBin(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
                 if (moveResult.Success == false)
                 {
                     return ValidationProblem();
@@ -1709,7 +1709,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var deleteResult = _contentService.Delete(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+                var deleteResult = _contentService.Delete(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
                 if (deleteResult.Success == false)
                 {
                     return ValidationProblem();
@@ -1731,7 +1731,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionEmptyRecycleBin)]
         public IActionResult EmptyRecycleBin()
         {
-            _contentService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            _contentService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
 
             return Ok(_localizedTextService.Localize("defaultdialogs", "recycleBinIsEmpty"));
         }
@@ -1804,7 +1804,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             var toMove = toMoveResult.Value;
 
-            _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
             return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
@@ -1830,7 +1830,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return toCopyResult.Result;
             }
             var toCopy = toCopyResult.Value;
-            var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
             return Content(c.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
@@ -1862,7 +1862,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (model.Cultures.Length == 0 || model.Cultures.Length == languageCount)
             {
                 //this means that the entire content item will be unpublished
-                var unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+                var unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
                 var content = MapToDisplayWithSchedule(foundContent);
 
@@ -1885,7 +1885,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var results = new Dictionary<string, PublishResult>();
                 foreach (var c in model.Cultures)
                 {
-                    var result = _contentService.Unpublish(foundContent, culture: c, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+                    var result = _contentService.Unpublish(foundContent, culture: c, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
                     results[c] = result;
                     if (result.Result == PublishResultType.SuccessUnpublishMandatoryCulture)
                     {
@@ -2544,7 +2544,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
             return NoContent();
         }
@@ -2609,7 +2609,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
-            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
             if (rollbackResult.Success)
                 return Ok();

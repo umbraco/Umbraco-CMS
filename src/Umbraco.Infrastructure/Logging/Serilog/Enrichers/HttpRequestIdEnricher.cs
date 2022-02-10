@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
         {
             if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            Guid requestId;
+            Guid? requestId;
             if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId, _requestCache))
                 return;
 

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// <returns>
         /// An <see cref="T:System.ComponentModel.ICustomTypeDescriptor"/> that can provide metadata for the type.
         /// </returns>
-        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType, object instance)
+        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType, object? instance)
         {
             return new ExifFileTypeDescriptor(base.GetTypeDescriptor(objectType, instance), instance);
         }

@@ -562,7 +562,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
-            _packageDataInstallation.ImportDocumentType(element, userId);
+            if (userId is not null)
+            {
+                _packageDataInstallation.ImportDocumentType(element, userId.Value);
+            }
 
             // Try to clean up the temporary file.
             try

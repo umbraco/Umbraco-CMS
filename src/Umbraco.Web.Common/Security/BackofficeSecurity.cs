@@ -38,8 +38,12 @@ namespace Umbraco.Cms.Web.Common.Security
                         //Check again
                         if (_currentUser == null)
                         {
-                            Attempt<int> id = GetUserId();
-                            _currentUser = id ? _userService.GetUserById(id.Result) : null;
+                            Attempt<int?> id = GetUserId();
+                            if (id.Success && id.Result is not null)
+                            {
+                                _currentUser = id.Success ? _userService.GetUserById(id.Result.Value) : null;
+                            }
+
                         }
                     }
                 }
@@ -49,10 +53,10 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public Attempt<int> GetUserId()
+        public Attempt<int?> GetUserId()
         {
             ClaimsIdentity identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
-            return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(identity.GetId());
+            return identity == null ? Attempt.Fail<int?>() : Attempt.Succeed(identity.GetId());
         }
 
         /// <inheritdoc />

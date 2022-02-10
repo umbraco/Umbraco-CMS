@@ -244,8 +244,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AppendUserModifiedHeader]
         public IActionResult PostSetAvatar(IList<IFormFile> file)
         {
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            var result = userId.ResultOr(0);
             //borrow the logic from the user controller
-            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
         }
 
         /// <summary>
@@ -285,7 +287,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
-            var identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString(CultureInfo.InvariantCulture));
+            var identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0)?.ToString(CultureInfo.InvariantCulture));
 
             // deduplicate in case there are duplicates (there shouldn't be now since we have a unique constraint on the external logins
             // but there didn't used to be)

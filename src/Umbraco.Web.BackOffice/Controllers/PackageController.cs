@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpDelete]
         public IActionResult DeleteCreatedPackage(int packageId)
         {
-            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
 
             return Ok();
         }
@@ -112,11 +112,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 return ValidationErrorResult.CreateNotificationValidationErrorResult(
                     $"Package migration failed on package {packageName} with error: {ex.Message}. Check log for full details.");
-            }            
+            }
         }
 
         [HttpGet]
-        public IActionResult DownloadCreatedPackage(int id) 
+        public IActionResult DownloadCreatedPackage(int id)
         {
             var package = _packagingService.GetCreatedPackageById(id);
             if (package == null)

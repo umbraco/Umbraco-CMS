@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 ContentTypeId = contentTypeId,
                 DataTypeId = propertyType.DataTypeId,
                 Description = propertyType.Description,
-                Mandatory = propertyType.Mandatory,
+                Mandatory = propertyType.Mandatory ?? false,
                 MandatoryMessage = propertyType.MandatoryMessage,
                 Name = propertyType.Name,
                 SortOrder = propertyType.SortOrder,

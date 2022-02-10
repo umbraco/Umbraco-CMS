@@ -180,7 +180,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var enumType = paramType.GetEnumeratedType();
 
                     var converted = requestParam.TryConvertTo(enumType ?? paramType);
-                    if (converted)
+                    if (converted.Success)
                     {
                         foundCandidate = MatchByType(paramType, context);
                         if (foundCandidate.HasValue)

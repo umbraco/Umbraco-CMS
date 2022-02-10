@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
             if (editor == null) throw new InvalidOperationException("No property editor found by alias " + propertyType.PropertyEditorAlias);
 
-            return ValidatePropertyValue(editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
+            return ValidatePropertyValue(editor, dataType, postedValue, propertyType.Mandatory ?? false, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
         }
 
         /// <inheritdoc />
@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
             var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
             var valueEditor = editor.GetValueEditor(configuration);
-            return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
+            return !valueEditor.Validate(value, propertyType.Mandatory ?? false, propertyType.ValidationRegExp).Any();
         }
     }
 }

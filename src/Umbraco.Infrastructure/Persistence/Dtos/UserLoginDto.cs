@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("userId")]
         [ForeignKey(typeof(UserDto), Name = "FK_" + TableName + "_umbracoUser_id")]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         /// <summary>
         /// Tracks when the session is created

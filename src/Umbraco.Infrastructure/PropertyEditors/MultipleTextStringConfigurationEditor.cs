@@ -45,8 +45,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             return new MultipleTextStringConfiguration
             {
-                Minimum = min ? min.Result : 0,
-                Maximum = max ? max.Result : 0
+                Minimum = min.Success ? min.Result : 0,
+                Maximum = max.Success ? max.Result : 0
             };
         }
 

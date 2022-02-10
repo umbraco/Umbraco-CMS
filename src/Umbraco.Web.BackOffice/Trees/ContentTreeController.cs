@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                 node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
 
-                if (_publicAccessService.IsProtected(entity.Path))
+                if (_publicAccessService.IsProtected(entity.Path).Success)
                     node.SetProtectedStyle();
 
                 return node;

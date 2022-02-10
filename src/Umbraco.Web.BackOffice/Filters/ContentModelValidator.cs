@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             if (property.DataType is null) throw new InvalidOperationException($"{nameof(property)}.{nameof(property.DataType)} cannot be null");
 
             foreach (var validationResult in PropertyValidationService.ValidatePropertyValue(
-                editor, property.DataType, postedValue, property.IsRequired,
+                editor, property.DataType, postedValue, property.IsRequired ?? false,
                 property.ValidationRegExp, property.IsRequiredMessage, property.ValidationRegExpMessage))
             {
                 AddPropertyError(model, modelWithProperties, editor, property, validationResult, modelState);

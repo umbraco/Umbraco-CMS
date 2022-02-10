@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         //if it's a boolean property type but a string is found, try to do a conversion
                         var converted = sBool.TryConvertTo<bool>();
-                        if (converted)
+                        if (converted.Success)
                             o[field.PropertyName] = converted.Result;
                     }
                     else

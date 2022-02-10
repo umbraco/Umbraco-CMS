@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0;
             var result = _auditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
             var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)

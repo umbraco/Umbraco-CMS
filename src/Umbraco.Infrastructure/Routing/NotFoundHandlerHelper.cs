@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Routing
                 // but until then we need to look it up in the db. For now we've implemented a cached service for
                 // converting Int -> Guid and vice versa.
                 Attempt<int> found = entityService.GetId(errorPage.ContentKey, UmbracoObjectTypes.Document);
-                if (found)
+                if (found.Success)
                 {
                     return found.Result;
                 }

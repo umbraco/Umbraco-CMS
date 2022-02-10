@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
-                    return asInt ? asInt.Result : int.MinValue;
+                    return asInt.Success ? asInt.Result : int.MinValue;
                 })
                 .Where(x => x != int.MinValue && x != dataType.Id)
                 .ToArray();

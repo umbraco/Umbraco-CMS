@@ -369,7 +369,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (currentCulture.Name.Length > 2) return currentCulture;
 
             var attempt = _fileSources.Value.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
-            return attempt ? attempt.Result : currentCulture;
+            return attempt.Success ? attempt.Result : currentCulture;
         }
 
         private string GetFromDictionarySource(CultureInfo culture, string area, string key,

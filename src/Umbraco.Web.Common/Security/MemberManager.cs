@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Web.Common.Security
             foreach (var path in paths)
             {
                 //this is a cached call
-                result[path] = _publicAccessService.IsProtected(path);
+                result[path] = _publicAccessService.IsProtected(path).Success;
             }
             return Task.FromResult((IReadOnlyDictionary<string, bool>)result);
         }

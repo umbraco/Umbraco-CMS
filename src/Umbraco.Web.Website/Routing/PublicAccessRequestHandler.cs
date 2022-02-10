@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
                 Attempt<PublicAccessEntry> publicAccessAttempt = _publicAccessService.IsProtected(path);
 
-                if (publicAccessAttempt)
+                if (publicAccessAttempt.Success)
                 {
                     _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
 

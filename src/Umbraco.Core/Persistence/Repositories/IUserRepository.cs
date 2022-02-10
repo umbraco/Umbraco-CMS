@@ -95,13 +95,13 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <returns>
         /// A non cached <see cref="IUser"/> instance
         /// </returns>
-        IUser Get(int id, bool includeSecurityData);
+        IUser Get(int? id, bool includeSecurityData);
 
         IProfile GetProfile(string username);
         IProfile GetProfile(int id);
         IDictionary<UserState, int> GetUserStates();
 
-        Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true);
+        Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true);
         bool ValidateLoginSession(int userId, Guid sessionId);
         int ClearLoginSessions(int userId);
         int ClearLoginSessions(TimeSpan timespan);

@@ -135,7 +135,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            var emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
             var mapped = _umbracoMapper.Map<MediaItemDisplay>(emptyContent);
 
             //remove the listview app if it exists
@@ -452,7 +452,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //if the current item is in the recycle bin
             if (foundMedia.Trashed == false)
             {
-                var moveResult = _mediaService.MoveToRecycleBin(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+                var moveResult = _mediaService.MoveToRecycleBin(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
                 if (moveResult == false)
                 {
                     return ValidationProblem();
@@ -460,7 +460,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var deleteResult = _mediaService.Delete(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+                var deleteResult = _mediaService.Delete(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
                 if (deleteResult == false)
                 {
                     return ValidationProblem();
@@ -495,7 +495,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
 
-            var moveResult = _mediaService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            var moveResult = _mediaService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
 
             if (sourceParentID == destinationParentID)
             {
@@ -568,7 +568,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //save the item
-            var saveStatus = _mediaService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            var saveStatus = _mediaService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
 
             //return the updated model
             var display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
@@ -617,7 +617,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult EmptyRecycleBin()
         {
-            _mediaService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            _mediaService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
 
             return Ok(_localizedTextService.Localize("defaultdialogs", "recycleBinIsEmpty"));
         }

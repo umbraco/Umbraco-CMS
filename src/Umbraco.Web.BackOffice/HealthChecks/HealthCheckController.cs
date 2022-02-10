@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Web.BackOffice.HealthChecks
             return check.ExecuteAction(action);
         }
 
-        private HealthCheck GetCheckById(Guid id)
+        private HealthCheck GetCheckById(Guid? id)
         {
             HealthCheck check = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)

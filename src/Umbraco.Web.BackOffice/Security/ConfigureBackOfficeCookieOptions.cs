@@ -173,7 +173,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         // generate a session id and assign it
                         // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
                         Guid session = _runtimeState.Level == RuntimeLevel.Run
-                            ? _userService.CreateLoginSession(backOfficeIdentity.GetId(), _ipResolver.GetCurrentRequestIpAddress())
+                            ? _userService.CreateLoginSession(backOfficeIdentity.GetId().Value, _ipResolver.GetCurrentRequestIpAddress())
                             : Guid.NewGuid();
 
                         // add our session claim

@@ -35,7 +35,15 @@ namespace Umbraco.Cms.Core
         /// <summary>
         /// Gets the attempt result, if successful, else a default value.
         /// </summary>
-        public TResult? ResultOr(TResult? value) => Success ? Result : value;
+        public TResult ResultOr(TResult value)
+        {
+            if (Success && Result is not null)
+            {
+                return Result;
+            }
+
+            return value;
+        }
 
         // optimize, use a singleton failed attempt
         private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);

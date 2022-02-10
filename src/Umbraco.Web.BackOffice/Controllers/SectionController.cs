@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public async Task<ActionResult<IEnumerable<Section>>> GetSections()
         {
-            var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
 
             var sectionModels = sections.Select(_umbracoMapper.Map<Section>).ToArray();
 

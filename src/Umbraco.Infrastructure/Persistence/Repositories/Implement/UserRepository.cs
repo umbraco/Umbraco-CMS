@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <returns>
         /// A non cached <see cref="IUser"/> instance
         /// </returns>
-        public IUser Get(int id, bool includeSecurityData)
+        public IUser Get(int? id, bool includeSecurityData)
         {
             return GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
         }
@@ -194,7 +194,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
         }
 
-        public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
+        public Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true)
         {
             var now = DateTime.UtcNow;
             var dto = new UserLoginDto

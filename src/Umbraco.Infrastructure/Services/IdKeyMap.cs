@@ -215,7 +215,7 @@ namespace Umbraco.Cms.Core.Services
         public Attempt<Udi> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
             var keyAttempt = GetKeyForId(id, umbracoObjectType);
-            return keyAttempt
+            return keyAttempt.Success
                 ? Attempt.Succeed<Udi>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
                 : Attempt<Udi>.Fail();
         }

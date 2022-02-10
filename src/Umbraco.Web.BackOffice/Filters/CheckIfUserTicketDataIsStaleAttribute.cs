@@ -118,7 +118,13 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    IUser user = _userService.GetUserById(identity.GetId());
+                    var id = identity.GetId();
+                    if (id is null)
+                    {
+                        return;
+                    }
+
+                    IUser user = _userService.GetUserById(id.Value);
                     if (user == null)
                     {
                         return;
