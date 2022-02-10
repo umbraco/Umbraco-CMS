@@ -386,6 +386,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
             isTrashed: $scope.isTrashed,
+            selection: $scope.selection,
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
             submitButtonStyle: "danger",
             submit: function (model) {
@@ -495,8 +496,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
             submitButtonStyle: "warning",
+            selection: $scope.selection,
             submit: function (model) {
-
                 // create a comma separated array of selected cultures
                 let selectedCultures = [];
                 if (model.languages && model.languages.length > 0) {
@@ -506,7 +507,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                         }
                     });
                 }
-
                 performUnpublish(selectedCultures);
                 overlayService.close();
             },
