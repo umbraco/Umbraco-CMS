@@ -5,15 +5,31 @@
      * A component to render a table for the tracked references of an item
      */
 
-    function umbTrackedReferencesTableController()
+    function umbTrackedReferencesTableController(udiParser)
     {
         var vm = this;
 
         vm.changePageNumber = changePageNumber;
+        vm.getUrl = getUrl;
 
         function changePageNumber(pageNumber) {
             vm.onPageChanged({ 'pageNumber' : pageNumber });
         }
+
+        function getUrl(itemUdi, itemId) {
+            // extract the entity type from the udi
+            var udi = udiParser.parse(itemUdi);
+
+            if (udi) {
+                var entityType = udi.entityType;
+
+                if(udi.entityType === "document") {
+                    entityType = "content";
+                }
+                return "#/" + entityType + "/" + entityType + "/edit/" + itemId;
+            }
+	          return "#";
+	      };
     }
 
     var umbTrackedReferencesTableComponent = {
