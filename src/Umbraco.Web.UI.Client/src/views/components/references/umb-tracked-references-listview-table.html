@@ -13,17 +13,17 @@
         <div class="umb-table-body">
             <div class="umb-table-row" ng-repeat="item in vm.items" ng-click="vm.openItem(item)">
                 <div class="umb-table-cell"><i class="umb-table-body__icon {{item.icon}}"></i></div>
-                <div class="umb-table-cell umb-table__name">{{item.name}}</div>
+                <div class="umb-table-cell umb-table__name umb-table-body__link">{{item.name}}</div>
             </div>
         </div>
+    </div>
 
-        <!-- Pagination -->
-        <div class="flex justify-center">
-            <umb-pagination ng-if="vm.totalPages"
-                            page-number="vm.pageNumber"
-                            total-pages="vm.totalPages"
-                            on-change="vm.changePageNumber(pageNumber)">
-            </umb-pagination>
-        </div>
+    <!-- Pagination -->
+    <div class="flex justify-center">
+        <umb-pagination ng-if="vm.totalPages"
+                        page-number="vm.pageNumber"
+                        total-pages="vm.totalPages"
+                        on-change="vm.changePageNumber(pageNumber)">
+        </umb-pagination>
     </div>
 </div>
