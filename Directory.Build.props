@@ -3,11 +3,5 @@
     <!-- Package references and additional files which are consumed by all projects -->
     <ItemGroup>
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" IsImplicitlyDefined="true" />
-        <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
     </ItemGroup>
-
-    <!-- Specify rule set for all projects -->
-    <PropertyGroup>
-        <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)codeanalysis.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
 </Project>
