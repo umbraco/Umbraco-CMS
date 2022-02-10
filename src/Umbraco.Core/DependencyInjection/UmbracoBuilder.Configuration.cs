@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,6 +63,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
                     {
                         options.UmbracoMediaPhysicalRootPath = options.UmbracoMediaPath;
                     }
+                }))
+                .AddUmbracoOptions<TelemetrySettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
+                {
+                    // Set metrics based on specified or default basic level
+                    options.Set(options.Level ?? TelemetryLevel.Basic);
                 }))
                 .AddUmbracoOptions<HealthChecksSettings>()
                 .AddUmbracoOptions<HostingSettings>()

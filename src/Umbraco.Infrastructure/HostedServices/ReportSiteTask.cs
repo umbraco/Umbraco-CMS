@@ -47,8 +47,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData telemetryReportData) is false)
             {
-                _logger.LogWarning("No telemetry marker found");
-
                 return;
             }
 

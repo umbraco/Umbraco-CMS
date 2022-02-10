@@ -20,9 +20,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         [TestCase("", false)]
         public void OnlyParsesIfValidId(string guidString, bool shouldSucceed)
         {
+            var telemetryOptions = CreateTelemetryOptions(TelemetryLevel.Basic);
             var globalSettings = CreateGlobalSettings(guidString);
             var version = CreateUmbracoVersion(9, 1, 1);
-            var sut = new TelemetryService(globalSettings, Mock.Of<IManifestParser>(), version);
+            var sut = new TelemetryService(telemetryOptions, globalSettings, Mock.Of<IManifestParser>(), version);
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -41,10 +42,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         [Test]
         public void ReturnsSemanticVersionWithoutBuild()
         {
+            var telemetryOptions = CreateTelemetryOptions(TelemetryLevel.Basic);
             var globalSettings = CreateGlobalSettings();
             var version = CreateUmbracoVersion(9, 1, 1, "-rc", "-ad2f4k2d");
 
-            var sut = new TelemetryService(globalSettings, Mock.Of<IManifestParser>(), version);
+            var sut = new TelemetryService(telemetryOptions, globalSettings, Mock.Of<IManifestParser>(), version);
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -55,6 +57,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         [Test]
         public void CanGatherPackageTelemetry()
         {
+            var telemetryOptions = CreateTelemetryOptions(TelemetryLevel.Basic);
             var globalSettings = CreateGlobalSettings();
             var version = CreateUmbracoVersion(9, 1, 1);
             var versionPackageName = "VersionPackage";
@@ -66,7 +69,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = noVersionPackageName }
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(globalSettings, manifestParser, version);
+            var sut = new TelemetryService(telemetryOptions, globalSettings, manifestParser, version);
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -87,6 +90,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         [Test]
         public void RespectsAllowPackageTelemetry()
         {
+            var telemetryOptions = CreateTelemetryOptions(TelemetryLevel.Basic);
             var globalSettings = CreateGlobalSettings();
             var version = CreateUmbracoVersion(9, 1, 1);
             PackageManifest[] manifests =
@@ -95,7 +99,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = "TrackingAllowed", AllowPackageTelemetry = true }
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(globalSettings, manifestParser, version);
+            var sut = new TelemetryService(telemetryOptions, globalSettings, manifestParser, version);
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -107,12 +111,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             });
         }
 
-
-        private IManifestParser CreateManifestParser(IEnumerable<PackageManifest> manifests)
+        private IOptionsMonitor<TelemetrySettings> CreateTelemetryOptions(TelemetryLevel level)
         {
-            var manifestParserMock = new Mock<IManifestParser>();
-            manifestParserMock.Setup(x => x.GetManifests()).Returns(manifests);
-            return manifestParserMock.Object;
+            var telemetryOptions = new TelemetrySettings();
+            telemetryOptions.Set(level);
+
+            return Mock.Of<IOptionsMonitor<TelemetrySettings>>(x => x.CurrentValue == telemetryOptions);
+        }
+
+        private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString = null)
+        {
+            var globalSettings = new GlobalSettings
+            {
+                Id = guidString ?? Guid.NewGuid().ToString()
+            };
+
+            return Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
         }
 
         private IUmbracoVersion CreateUmbracoVersion(int major, int minor, int patch, string prerelease = "", string build = "")
@@ -121,15 +135,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             return Mock.Of<IUmbracoVersion>(x => x.SemanticVersion == version);
         }
 
-        private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString = null)
+        private IManifestParser CreateManifestParser(IEnumerable<PackageManifest> manifests)
         {
-            if (guidString is null)
-            {
-                guidString = Guid.NewGuid().ToString();
-            }
-
-            var globalSettings = new GlobalSettings { Id = guidString };
-            return Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
+            var manifestParserMock = new Mock<IManifestParser>();
+            manifestParserMock.Setup(x => x.GetManifests()).Returns(manifests);
+            return manifestParserMock.Object;
         }
     }
 }
