@@ -32,7 +32,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
          * @param {Object} args optional args object
          * @param {Int} args.pageSize the pagesize of the returned list (default 25)
          * @param {Int} args.pageNumber the current page index (default 1)
-         * @param {Int} args.entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @param {String} args.entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -82,7 +82,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
          * </pre>
          *
          * @param {int} id Id of the item to query for tracked references
-         * @param {string} entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @param {String} entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -99,6 +99,55 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                         }
                     )),
                 "Failed to check for references in child nodes");
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.trackedReferencesResource#checkLinkedItems
+         * @methodOf umbraco.resources.trackedReferencesResource
+         *
+         * @description
+         * Checks if any of the items are used in a relation and returns a page list, so you can see which items are being used
+         *
+         * ##usage
+         * <pre>
+         * var ids = [123,3453,2334,2343];
+         * var options = {
+         *      pageSize : 25,
+         *      pageNumber : 1,
+         *      entityType : 'DOCUMENT'
+         *  };
+         *  
+         * trackedReferencesResource.checkLinkedItems(ids, options)
+         *    .then(function(data) {
+         *        console.log(data);
+         *    });
+         * </pre>
+         * 
+         * @param {Array} ids array of the selected items ids to query for references
+         * @param {Object} options optional options object
+         * @param {Int} options.pageSize the pagesize of the returned list (default 25)
+         * @param {Int} options.pageNumber the current page index (default 1)
+         * @param {String} options.entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        checkLinkedItems: function (ids, options) {
+            var query = `entityType=${options.entityType}&pageNumber=${options.pageNumber}&pageSize=${options.pageSize}`;
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "trackedReferencesApiBaseUrl",
+                        "CheckLinkedItems",
+                        query),
+                        {
+                            ids: ids,
+                            entityType: options.entityType,
+                            pageNumber: options.pageNumber,
+                            pageSize: options.pageSize
+                        }),
+                "Failed to check for references of nodes with ids " + ids);
         }
     }
 }
