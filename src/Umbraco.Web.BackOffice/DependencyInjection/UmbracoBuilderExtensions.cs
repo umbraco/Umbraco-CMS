@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -54,7 +55,8 @@ namespace Umbraco.Extensions
                 .AddCoreNotifications()
                 .AddLogViewer()
                 .AddExamine()
-                .AddExamineIndexes();
+                .AddExamineIndexes()
+                .AddControllersWithAmbiguousConstructors();
 
         public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {
@@ -116,6 +118,19 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IIconService, IconService>();
             builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
             builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds explicit registrations for controllers with ambiguous constructors to prevent downstream issues for
+        /// users who wish to use <see cref="Microsoft.AspNetCore.Mvc.Controllers.ServiceBasedControllerActivator"/>
+        /// </summary>
+        public static IUmbracoBuilder AddControllersWithAmbiguousConstructors(
+            this IUmbracoBuilder builder)
+        {
+            builder.Services.TryAddTransient(sp =>
+                ActivatorUtilities.CreateInstance<CurrentUserController>(sp));
 
             return builder;
         }

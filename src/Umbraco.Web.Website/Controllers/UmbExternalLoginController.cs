@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
@@ -29,6 +31,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
     {
         private readonly IMemberManager _memberManager;
         private readonly ITwoFactorLoginService _twoFactorLoginService;
+        private readonly IOptions<SecuritySettings> _securitySettings;
         private readonly ILogger<UmbExternalLoginController> _logger;
         private readonly IMemberSignInManagerExternalLogins _memberSignInManager;
 
@@ -42,7 +45,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
             IPublishedUrlProvider publishedUrlProvider,
             IMemberSignInManagerExternalLogins memberSignInManager,
             IMemberManager memberManager,
-            ITwoFactorLoginService twoFactorLoginService)
+            ITwoFactorLoginService twoFactorLoginService,
+            IOptions<SecuritySettings> securitySettings)
             : base(
                 umbracoContextAccessor,
                 databaseFactory,
@@ -55,6 +59,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             _memberSignInManager = memberSignInManager;
             _memberManager = memberManager;
             _twoFactorLoginService = twoFactorLoginService;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -95,7 +100,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
             else
             {
-                SignInResult result = await _memberSignInManager.ExternalLoginSignInAsync(loginInfo, false);
+                SignInResult result = await _memberSignInManager.ExternalLoginSignInAsync(loginInfo, false, _securitySettings.Value.MemberBypassTwoFactorForExternalLogins);
 
                 if (result == SignInResult.Success)
                 {

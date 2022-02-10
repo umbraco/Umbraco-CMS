@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Security
     public class TwoFactorBackOfficeValidationProvider<TTwoFactorSetupGenerator> : TwoFactorValidationProvider<BackOfficeIdentityUser, TTwoFactorSetupGenerator>
         where TTwoFactorSetupGenerator : ITwoFactorProvider
     {
-        protected TwoFactorBackOfficeValidationProvider(IDataProtectionProvider dataProtectionProvider, IOptions<DataProtectionTokenProviderOptions> options, ILogger<TwoFactorBackOfficeValidationProvider<TTwoFactorSetupGenerator>> logger, ITwoFactorLoginService twoFactorLoginService, TTwoFactorSetupGenerator generator) : base(dataProtectionProvider, options, logger, twoFactorLoginService, generator)
+        public TwoFactorBackOfficeValidationProvider(IDataProtectionProvider dataProtectionProvider, IOptions<DataProtectionTokenProviderOptions> options, ILogger<TwoFactorBackOfficeValidationProvider<TTwoFactorSetupGenerator>> logger, ITwoFactorLoginService twoFactorLoginService, TTwoFactorSetupGenerator generator) : base(dataProtectionProvider, options, logger, twoFactorLoginService, generator)
         {
         }
 
