@@ -2,6 +2,6 @@
 <Project>
     <!-- Package references and additional files which are consumed by all projects -->
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" IsImplicitlyDefined="true" />
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" IsImplicitlyDefined="true" />
     </ItemGroup>
 </Project>
