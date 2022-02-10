@@ -1,0 +1,31 @@
+<div>
+    <h5 class="mt0" style="margin-bottom: 20px;">
+        {{vm.title}}
+    </h5>
+
+    <div class="umb-table" ng-if="vm.items">
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell"></div>
+                <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name"></localize></div>              
+                <!--<div class="umb-table-cell"><localize key="general_language"></localize></div>-->
+            </div>
+        </div>
+        <div class="umb-table-body">
+            <div class="umb-table-row" ng-repeat="item in vm.items" ng-click="vm.openItem(item)">
+                <div class="umb-table-cell"><i class="umb-table-body__icon {{item.icon}}"></i></div>
+                <div class="umb-table-cell umb-table__name">{{item.name}}</div>                
+                <!--<div class="umb-table-cell" ><span ng-bind="vm.getLanguageLabel(item.culture)"></span></div>-->
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center">
+            <umb-pagination ng-if="vm.totalPages"
+                            page-number="vm.pageNumber"
+                            total-pages="vm.totalPages"
+                            on-change="vm.changePageNumber(pageNumber)">
+            </umb-pagination>
+        </div>
+    </div>
+</div>
