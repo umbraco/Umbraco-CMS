@@ -11,7 +11,6 @@
 
         vm.changePageNumber = changePageNumber;
         vm.openItem = openItem;
-        //vm.getLanguageLabel = getLanguageLabel;
 
         function changePageNumber(pageNumber) {
             vm.onPageChanged({ 'pageNumber' : pageNumber });
@@ -20,7 +19,6 @@
         function openItem(item) {
             var editorModel = {
                 id: item.id,
-                //culture: item.culture,
                 submit: function (model) {
                     editorService.close();
                 },
@@ -52,34 +50,7 @@
                 editorService.memberEditor(editorModel);
                 return;
             }
-            
         }
-
-        //function getLanguageLabel(culture) {
-        //    if (vm.languages.length > 0) {
-
-        //        var lang = _.find(vm.languages,
-        //            function (l) {
-        //                return l.culture.toLowerCase() === culture.toLowerCase();
-        //            });
-
-        //        if (lang) {
-        //            return lang.name;
-        //        }
-        //    }
-
-        //    return culture;
-        //}
-
-
-        //function init() { 
-        //    languageResource.getAll().then(function (data) {
-        //        vm.languages = data;
-        //        //vm.totalPages = Math.ceil(vm.relations.length / vm.pageSize);
-        //    });
-        //}
-
-        //init();
     }
 
     var umbTrackedReferencesListViewTableComponent = {
