@@ -41,5 +41,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes);
 
         IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes);
+
+        IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] itemIds, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes);
     }
 }

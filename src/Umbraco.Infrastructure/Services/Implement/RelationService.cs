@@ -351,6 +351,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc/>
+        public IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] ids, long pageIndex, int pageSize, out long totalItems, params UmbracoObjectTypes[] entityTypes)
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            return _relationRepository.GetPagedEntitiesForItemsInRelation(ids, pageIndex, pageSize, out totalItems, entityTypes.Select(x => x.GetGuid()).ToArray());
+        }
+
         /// <inheritdoc />
         public IRelation Relate(int parentId, int childId, IRelationType relationType)
         {

@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -98,6 +99,45 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return false;
+        }
+
+        /// <summary>
+        ///     Get entities of the items in relation from selected integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="entityType"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        /// <remarks>
+        ///     We allow for POST because there could be quite a lot of ids
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public PagedResult<EntityBasic> CheckLinkedItems([FromJsonPath] int[] ids, string entityType, int pageNumber = 1, int pageSize = 100)
+        {
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+            }
+
+            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            var udiType = ObjectTypes.GetUdiType(objectType);
+
+            var relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
+
+            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
+            {
+                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
+                {
+                    Id = rel.Id,
+                    Key = rel.Key,
+                    Udi = Udi.Create(udiType, rel.Key),
+                    Icon = rel.ContentTypeIcon,
+                    Name = rel.Name,
+                    Alias = rel.ContentTypeAlias
+                })
+            };
         }
     }
 }

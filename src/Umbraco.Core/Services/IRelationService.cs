@@ -269,6 +269,17 @@ namespace Umbraco.Cms.Core.Services
         IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations);
 
         /// <summary>
+        /// Returns paged entities for only the items used in a relation
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalItems"></param>
+        /// <param name="entityTypes"></param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
+        IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] ids, long pageIndex, int pageSize, out long totalItems, params UmbracoObjectTypes[] entityTypes);
+
+        /// <summary>
         /// Relates two objects by their entity Ids.
         /// </summary>
         /// <param name="parentId">Id of the parent</param>

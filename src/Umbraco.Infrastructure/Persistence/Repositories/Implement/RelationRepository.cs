@@ -240,6 +240,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             });
         }
 
+        public IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] itemIds, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        {
+            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
+            {
+                SqlJoinRelations(sql);
+
+                sql.WhereIn<RelationDto>(rel => rel.ChildId, itemIds);
+                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == node.NodeId);
+            });
+        }
+
         public void Save(IEnumerable<IRelation> relations)
         {
             foreach (var hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
