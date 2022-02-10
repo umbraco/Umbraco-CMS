@@ -15,14 +15,9 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
 
-      <RuntimeHostConfigurationOption 
-        Condition="$(RuntimeIdentifier.StartsWith('win')) Or ($([MSBuild]::IsOSPlatform('windows')) And '$(RuntimeIdentifier)' == '')" 
-        Include="System.Globalization.AppLocalIcu" 
-        Value="68.2.0.9" />
-
-      <RuntimeHostConfigurationOption 
-        Condition="$(RuntimeIdentifier.StartsWith('linux')) Or ($([MSBuild]::IsOSPlatform('linux')) And '$(RuntimeIdentifier)' == '')" 
-        Include="System.Globalization.AppLocalIcu" 
+      <RuntimeHostConfigurationOption
+        Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))"
+        Include="System.Globalization.AppLocalIcu"
         Value="68.2.0.9" />
     </ItemGroup>
 
