@@ -25,6 +25,8 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private string _localTempPath;
         private UrlMode _urlProviderMode;
 
+        private static bool? s_isCaseSensitiveFileSystem;
+
         public AspNetCoreHostingEnvironment(
             IServiceProvider serviceProvider,
             IOptionsMonitor<HostingSettings> hostingSettings,
@@ -200,5 +202,16 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         }
     }
 
+    /// <inheritdoc/>
+    public bool IsCaseSensitiveFileSystem()
+    {
+        if (!s_isCaseSensitiveFileSystem.HasValue)
+        {
+            var tmp = Path.GetTempPath();
 
+            s_isCaseSensitiveFileSystem = !Directory.Exists(tmp.ToUpper()) || !Directory.Exists(tmp.ToLower());
+        }
+
+        return s_isCaseSensitiveFileSystem.Value;
+    }
 }
