@@ -108,11 +108,15 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                     // and then check the legacy directory. It does mean on windows it'll do a double lookup, but this
                     // was the simplest option
                     var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIconsLower}");
-                    
-                    if (!Directoty.Exists(iconPath))
+                    var iconPathExists = Directory.Exists(iconPath);
+
+                    if (!iconPathExists)
+                    {
                         iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIcons}");
-                        
-                    if (Directory.Exists(iconPath))
+                        iconPathExists = Directory.Exists(iconPath);
+                    }
+
+                    if (iconPathExists)
                     {
                         var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
                         icons.UnionWith(dirIcons);
