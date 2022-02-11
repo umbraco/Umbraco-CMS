@@ -99,13 +99,13 @@
       <div class="umb-group-builder__property-tags -right">
 
           <div class="umb-group-builder__property-tag" ng-if="vm.property.inherited">
-              <umb-icon icon="icon-merge"></umb-icon>
+              <umb-icon icon="icon-merge" class="umb-group-builder__property-tag-icon"></umb-icon>
               <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom">Inherited from</localize></span>
               {{vm.property.contentTypeName}}
           </div>
 
           <div class="umb-group-builder__property-tag" ng-if="vm.property.locked">
-              <umb-icon icon="icon-lock"></umb-icon>
+              <umb-icon icon="icon-lock" class="umb-group-builder__property-tag-icon"></umb-icon>
               <localize key="general_locked">Locked</localize>
           </div>
 
