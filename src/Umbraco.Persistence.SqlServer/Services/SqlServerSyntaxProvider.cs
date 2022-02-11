@@ -32,7 +32,7 @@ namespace Umbraco.Persistence.SqlServer.Services
             _logger = logger;
         }
 
-        public override string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
+        public override string ProviderName => Constants.ProviderName;
 
         public ServerVersionInfo? ServerVersion { get; private set; }
 
@@ -109,7 +109,7 @@ namespace Umbraco.Persistence.SqlServer.Services
 
         private static VersionName MapProductVersion(string productVersion)
         {
-            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split(Constants.CharArrays.Period)[0];
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split(Cms.Core.Constants.CharArrays.Period)[0];
             switch (firstPart)
             {
                 case "??":

@@ -11,7 +11,7 @@ namespace Umbraco.Persistence.SqlServer.Services
     /// </summary>
     public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
-        public string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
+        public string ProviderName => Constants.ProviderName;
 
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {

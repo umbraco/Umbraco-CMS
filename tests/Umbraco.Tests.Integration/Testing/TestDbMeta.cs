@@ -31,11 +31,11 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         }
 
         public static TestDbMeta CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString) =>
-            new TestDbMeta(name, isEmpty, ConstructConnectionString(masterConnectionString, name), Core.Constants.DatabaseProviders.SqlServer, null);
+            new TestDbMeta(name, isEmpty, ConstructConnectionString(masterConnectionString, name), Persistence.SqlServer.Constants.ProviderName, null);
 
         // LocalDb mdf funtimes
         public static TestDbMeta CreateWithoutConnectionString(string name, bool isEmpty) =>
-            new TestDbMeta(name, isEmpty, null, Core.Constants.DatabaseProviders.SqlServer, null);
+            new TestDbMeta(name, isEmpty, null, Persistence.SqlServer.Constants.ProviderName, null);
 
         public ConnectionStrings ToStronglyTypedConnectionString() =>
             new ConnectionStrings
