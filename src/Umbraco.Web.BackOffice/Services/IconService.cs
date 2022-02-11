@@ -7,6 +7,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -110,7 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                     var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIconsLower}");
                     var iconPathExists = Directory.Exists(iconPath);
 
-                    if (!iconPathExists)
+                    if (!iconPathExists && FileSystemUtility.IsCaseSensitiveFileSystem())
                     {
                         iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIcons}");
                         iconPathExists = Directory.Exists(iconPath);
