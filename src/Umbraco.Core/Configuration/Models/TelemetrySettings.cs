@@ -18,20 +18,20 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public TelemetryLevel? Level { get; set; }
 
         /// <summary>
-        /// Gets or sets the system information metrics.
+        /// Gets the system information metrics.
         /// </summary>
         /// <value>
         /// The system information metrics.
         /// </value>
-        public IDictionary<SystemInformationMetric, bool> SystemInformation { get; set; }
+        public IDictionary<SystemInformationMetric, bool> SystemInformation { get; } = new Dictionary<SystemInformationMetric, bool>();
 
         /// <summary>
-        /// Gets or sets the usage information metrics.
+        /// Gets the usage information metrics.
         /// </summary>
         /// <value>
         /// The usage information metrics.
         /// </value>
-        public IDictionary<UsageInformationMetric, bool> UsageInformation { get; set; }
+        public IDictionary<UsageInformationMetric, bool> UsageInformation { get; } = new Dictionary<UsageInformationMetric, bool>();
     }
 
     /// <summary>
@@ -138,34 +138,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
     public static class TelemetrySettingsExtensions
     {
         /// <summary>
-        /// Determines whether any metric is enabled.
-        /// </summary>
-        /// <param name="telemetrySettings">The telemetry settings.</param>
-        /// <returns>
-        ///   <c>true</c> if any metric is enabled; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsEnabled(this TelemetrySettings telemetrySettings)
-        {
-            foreach (SystemInformationMetric key in Enum.GetValues(typeof(SystemInformationMetric)))
-            {
-                if (telemetrySettings.IsEnabled(key))
-                {
-                    return true;
-                }
-            }
-
-            foreach (UsageInformationMetric key in Enum.GetValues(typeof(UsageInformationMetric)))
-            {
-                if (telemetrySettings.IsEnabled(key))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Sets the metrics based on the specified telemetry level.
         /// </summary>
         /// <param name="telemetrySettings">The telemetry settings.</param>
@@ -175,21 +147,21 @@ namespace Umbraco.Cms.Core.Configuration.Models
             if (level != TelemetryLevel.Off)
             {
                 // Set default basic telemetry metrics
-                telemetrySettings.Set(SystemInformationMetric.UmbracoVersion, true);
-                telemetrySettings.Set(SystemInformationMetric.PackageVersions, true);
+                telemetrySettings.TrySet(SystemInformationMetric.UmbracoVersion, true);
+                telemetrySettings.TrySet(SystemInformationMetric.PackageVersions, true);
             }
 
             if (level == TelemetryLevel.Detailed)
             {
                 // Set detailed telemetry metrics
-                foreach (SystemInformationMetric key in Enum.GetValues(typeof(SystemInformationMetric)))
+                foreach (SystemInformationMetric metric in Enum.GetValues(typeof(SystemInformationMetric)))
                 {
-                    telemetrySettings.Set(key, true);
+                    telemetrySettings.TrySet(metric, true);
                 }
 
-                foreach (UsageInformationMetric key in Enum.GetValues(typeof(UsageInformationMetric)))
+                foreach (UsageInformationMetric metric in Enum.GetValues(typeof(UsageInformationMetric)))
                 {
-                    telemetrySettings.Set(key, true);
+                    telemetrySettings.TrySet(metric, true);
                 }
             }
         }
@@ -198,46 +170,96 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Sets the specified metric.
         /// </summary>
         /// <param name="telemetrySettings">The telemetry settings.</param>
-        /// <param name="key">The metric.</param>
+        /// <param name="metric">The metric.</param>
         /// <param name="value">If set to <c>true</c> enables the metric.</param>
-        public static void Set(this TelemetrySettings telemetrySettings, SystemInformationMetric key, bool value)
-        {
-            telemetrySettings.SystemInformation ??= new Dictionary<SystemInformationMetric, bool>();
-            telemetrySettings.SystemInformation[key] = value;
-        }
+        public static void Set(this TelemetrySettings telemetrySettings, SystemInformationMetric metric, bool value)
+            => telemetrySettings.SystemInformation[metric] = value;
 
         /// <summary>
         /// Sets the specified metric.
         /// </summary>
         /// <param name="telemetrySettings">The telemetry settings.</param>
-        /// <param name="key">The metric.</param>
+        /// <param name="metric">The metric.</param>
         /// <param name="value">If set to <c>true</c> enables the metric.</param>
-        public static void Set(this TelemetrySettings telemetrySettings, UsageInformationMetric key, bool value)
+        public static void Set(this TelemetrySettings telemetrySettings, UsageInformationMetric metric, bool value)
+            => telemetrySettings.UsageInformation[metric] = value;
+
+        /// <summary>
+        /// Sets the specified metric if it hasn't already been set.
+        /// </summary>
+        /// <param name="telemetrySettings">The telemetry settings.</param>
+        /// <param name="metric">The metric.</param>
+        /// <param name="value">If set to <c>true</c> enables the metric.</param>
+        public static void TrySet(this TelemetrySettings telemetrySettings, SystemInformationMetric metric, bool value)
         {
-            telemetrySettings.UsageInformation ??= new Dictionary<UsageInformationMetric, bool>();
-            telemetrySettings.UsageInformation[key] = value;
+            if (!telemetrySettings.SystemInformation.ContainsKey(metric))
+            {
+                telemetrySettings.SystemInformation[metric] = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the specified metric if it hasn't already been set.
+        /// </summary>
+        /// <param name="telemetrySettings">The telemetry settings.</param>
+        /// <param name="metric">The metric.</param>
+        /// <param name="value">If set to <c>true</c> enables the metric.</param>
+        public static void TrySet(this TelemetrySettings telemetrySettings, UsageInformationMetric metric, bool value)
+        {
+            if (!telemetrySettings.UsageInformation.ContainsKey(metric))
+            {
+                telemetrySettings.UsageInformation[metric] = value;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether any metric is enabled.
+        /// </summary>
+        /// <param name="telemetrySettings">The telemetry settings.</param>
+        /// <returns>
+        ///   <c>true</c> if any metric is enabled; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsEnabled(this TelemetrySettings telemetrySettings)
+        {
+            foreach (SystemInformationMetric metric in Enum.GetValues(typeof(SystemInformationMetric)))
+            {
+                if (telemetrySettings.IsEnabled(metric))
+                {
+                    return true;
+                }
+            }
+
+            foreach (UsageInformationMetric metric in Enum.GetValues(typeof(UsageInformationMetric)))
+            {
+                if (telemetrySettings.IsEnabled(metric))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
         /// Determines whether the specified metric is enabled.
         /// </summary>
         /// <param name="telemetrySettings">The telemetry settings.</param>
-        /// <param name="key">The metric.</param>
+        /// <param name="metric">The metric.</param>
         /// <returns>
         ///   <c>true</c> if the specified metric is enabled; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsEnabled(this TelemetrySettings telemetrySettings, SystemInformationMetric key)
-            => telemetrySettings.SystemInformation?.TryGetValue(key, out bool value) == true && value;
+        public static bool IsEnabled(this TelemetrySettings telemetrySettings, SystemInformationMetric metric)
+            => telemetrySettings.SystemInformation.TryGetValue(metric, out bool value) && value;
 
         /// <summary>
         /// Determines whether the specified metric is enabled.
         /// </summary>
         /// <param name="telemetrySettings">The telemetry settings.</param>
-        /// <param name="key">The metric.</param>
+        /// <param name="metric">The metric.</param>
         /// <returns>
         ///   <c>true</c> if the specified metric is enabled; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsEnabled(this TelemetrySettings telemetrySettings, UsageInformationMetric key)
-            => telemetrySettings.UsageInformation?.TryGetValue(key, out bool value) == true && value;
+        public static bool IsEnabled(this TelemetrySettings telemetrySettings, UsageInformationMetric metric)
+            => telemetrySettings.UsageInformation.TryGetValue(metric, out bool value) && value;
     }
 }
