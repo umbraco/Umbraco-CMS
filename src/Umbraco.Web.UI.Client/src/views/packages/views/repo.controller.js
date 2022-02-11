@@ -25,7 +25,7 @@
         vm.search = search;
         vm.installCompleted = false;
         vm.highlightedPackageCollections = [];
-        vm.labels = [];
+        vm.labels = {};
 
         var defaultSort = "Latest";
         var currSort = defaultSort;
@@ -50,7 +50,8 @@
             vm.loading = true;
             localizationService.localizeMany(["packager_packagesPopular", "packager_packagesPromoted"])
                 .then(function (labels) {
-                    vm.labels = labels;
+                    vm.labels.popularPackages = labels[0];
+                    vm.labels.promotedPackages = labels[1];
 
                     var popularPackages, promotedPackages;
                     $q.all([
@@ -62,11 +63,11 @@
                             }),
                         ourPackageRepositoryResource.getPopular(10)
                             .then(function (pack) {
-                                 popularPackages = { title: vm.labels[0], packages: pack.packages };
+                                popularPackages = { title: vm.labels.popularPackages, packages: pack.packages };
                             }),
                         ourPackageRepositoryResource.getPromoted(20)
                             .then(function (pack) {
-                                promotedPackages = { title: vm.labels[1], packages: pack.packages };
+                                promotedPackages = { title: vm.labels.promotedPackages, packages: pack.packages };
                             }),
                         ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
                             .then(function (pack) {
@@ -111,11 +112,11 @@
             $q.all([
                 ourPackageRepositoryResource.getPopular(10, searchCategory)
                     .then(function (pack) {
-                        popularPackages = { title: vm.labels[0], packages: pack.packages };
+                        popularPackages = { title: vm.labels.popularPackages, packages: pack.packages };
                     }),
                 ourPackageRepositoryResource.getPromoted(20, searchCategory)
                     .then(function (pack) {
-                        promotedPackages = { title: vm.labels[1], packages: pack.packages };
+                        promotedPackages = { title: vm.labels.promotedPackages, packages: pack.packages };
                     }),
                 ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort, searchCategory, vm.searchQuery)
                     .then(function (pack) {
