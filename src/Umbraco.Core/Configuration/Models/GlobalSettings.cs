@@ -129,6 +129,11 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool DisableElectionForSingleServer { get; set; } = StaticDisableElectionForSingleServer;
 
         /// <summary>
+        /// Gets or sets a value for the database factory server version.
+        /// </summary>
+        public string DatabaseFactoryServerVersion { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets a value for the main dom lock.
         /// </summary>
         public string MainDomLock { get; set; } = string.Empty;

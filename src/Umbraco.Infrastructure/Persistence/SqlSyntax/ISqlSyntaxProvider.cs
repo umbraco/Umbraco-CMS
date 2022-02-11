@@ -15,6 +15,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
+        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString);
+
         string ProviderName { get; }
 
         string EscapeString(string val);

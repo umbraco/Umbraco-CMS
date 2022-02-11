@@ -47,14 +47,14 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool RequiresConnectionTest => false;
 
     /// <inheritdoc />
-    public bool ForceCreateDatabase => false;
+    public bool ForceCreateDatabase => true;
 
     /// <inheritdoc />
     public string GenerateConnectionString(DatabaseModel databaseModel)
     {
         var builder = new SqlConnectionStringBuilder
         {
-            DataSource = @"(localdb)\MSSQLLocalDB;",
+            DataSource = @"(localdb)\MSSQLLocalDB",
             AttachDBFilename = @$"{ConnectionStrings.DataDirectoryPlaceholder}\{databaseModel.DatabaseName}.mdf",
             IntegratedSecurity = true
         };

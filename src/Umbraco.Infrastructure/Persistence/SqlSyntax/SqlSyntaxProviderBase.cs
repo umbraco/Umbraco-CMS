@@ -138,6 +138,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return dbTypeMap.Create();
         }
 
+        public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString) => current;
+
         public abstract string ProviderName { get; }
 
         public virtual string EscapeString(string val)
