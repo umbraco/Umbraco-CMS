@@ -12,13 +12,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
@@ -77,28 +80,55 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
         }
 
-        public override IHostBuilder CreateHostBuilder()
+        protected override IHostBuilder CreateHostBuilder()
         {
-            IHostBuilder builder = base.CreateHostBuilder();
-            builder.ConfigureWebHost(builder =>
-            {
-                 // need to configure the IWebHostEnvironment too
-                 builder.ConfigureServices((c, s) => c.HostingEnvironment = TestHelper.GetWebHostEnvironment());
+            /* It is important that ConfigureWebHost is called before ConfigureServices, this is consistent with the host setup
+             * found in Program.cs and avoids nasty surprises.
+             *
+             * e.g. the registration for RefreshingRazorViewEngine requires that IWebHostEnvironment is registered
+             * at the point in time that the service collection is snapshotted.
+             */
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((context, configBuilder) =>
+                {
+                    context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
+                    configBuilder.Sources.Clear();
+                    configBuilder.AddInMemoryCollection(InMemoryConfiguration);
 
-                 // call startup
-                 builder.Configure(app => Configure(app));
-            })
-            .UseDefaultServiceProvider(cfg =>
-            {
-                // These default to true *if* WebHostEnvironment.EnvironmentName == Development
-                // When running tests, EnvironmentName used to be null on the mock that we register into services.
-                // Enable opt in for tests so that validation occurs regardless of environment name.
-                // Would be nice to have this on for UmbracoIntegrationTest also but requires a lot more effort to resolve issues.
-                cfg.ValidateOnBuild = true;
-                cfg.ValidateScopes = true;
-            });
+                    Configuration = configBuilder.Build();
+                })
+                .ConfigureWebHost(builder =>
+                {
+                    // need to configure the IWebHostEnvironment too
+                    builder.ConfigureServices((c, s) => c.HostingEnvironment = TestHelper.GetWebHostEnvironment());
 
-            return builder;
+                    // call startup
+                    builder.Configure(app => Configure(app));
+                })
+                .ConfigureServices((_, services) =>
+                {
+                    ConfigureServices(services);
+                    ConfigureTestSpecificServices(services);
+                    services.AddUnique(CreateLoggerFactory());
+
+                    if (!TestOptions.Boot)
+                    {
+                        // If boot is false, we don't want the CoreRuntime hosted service to start
+                        // So we replace it with a Mock
+                        services.AddUnique(Mock.Of<IRuntime>());
+                    }
+                })
+                .UseDefaultServiceProvider(cfg =>
+                {
+                    // These default to true *if* WebHostEnvironment.EnvironmentName == Development
+                    // When running tests, EnvironmentName used to be null on the mock that we register into services.
+                    // Enable opt in for tests so that validation occurs regardless of environment name.
+                    // Would be nice to have this on for UmbracoIntegrationTest also but requires a lot more effort to resolve issues.
+                    cfg.ValidateOnBuild = true;
+                    cfg.ValidateScopes = true;
+                });
+
+            return hostBuilder;
         }
 
         /// <summary>
@@ -157,7 +187,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
 
-        public override void ConfigureServices(IServiceCollection services)
+        private void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 

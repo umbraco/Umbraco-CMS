@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             UseTestDatabase(Services);
         }
 
-        private ILoggerFactory CreateLoggerFactory()
+        protected ILoggerFactory CreateLoggerFactory()
         {
             try
             {
@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         /// <summary>
         /// Create the Generic Host and execute startup ConfigureServices/Configure calls
         /// </summary>
-        public virtual IHostBuilder CreateHostBuilder()
+        protected virtual IHostBuilder CreateHostBuilder()
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
 
@@ -180,9 +180,10 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
                     Configuration = configBuilder.Build();
                 })
-                .ConfigureServices((hostContext, services) =>
+                .ConfigureServices((_, services) =>
                 {
                     ConfigureServices(services);
+                    ConfigureTestSpecificServices(services);
                     services.AddUnique(CreateLoggerFactory());
 
                     if (!TestOptions.Boot)
@@ -192,10 +193,15 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                         services.AddUnique(Mock.Of<IRuntime>());
                     }
                 });
+
             return hostBuilder;
         }
 
-        public virtual void ConfigureServices(IServiceCollection services)
+        protected virtual void ConfigureTestSpecificServices(IServiceCollection services)
+        {
+        }
+
+        private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(TestHelper.DbProviderFactoryCreator);
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
