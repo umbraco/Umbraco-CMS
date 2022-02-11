@@ -1,6 +1,8 @@
 using System.IO;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Cms.Core.Hosting
+namespace Umbraco.Extensions
 {
     public static class HostingEnvironmentExtensions
     {
