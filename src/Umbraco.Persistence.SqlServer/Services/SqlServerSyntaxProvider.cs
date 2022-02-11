@@ -19,15 +19,22 @@ namespace Umbraco.Persistence.SqlServer.Services
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
         private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly ILogger<SqlServerSyntaxProvider> _logger;
 
         public SqlServerSyntaxProvider(IOptions<GlobalSettings> globalSettings)
+            : this(globalSettings, StaticApplicationLogging.CreateLogger<SqlServerSyntaxProvider>())
+        {
+        }
+
+        public SqlServerSyntaxProvider(IOptions<GlobalSettings> globalSettings, ILogger<SqlServerSyntaxProvider> logger)
         {
             _globalSettings = globalSettings;
+            _logger = logger;
         }
 
         public override string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
 
-        public ServerVersionInfo ServerVersion { get; private set; }
+        public ServerVersionInfo? ServerVersion { get; private set; }
 
         public enum VersionName
         {
@@ -53,6 +60,22 @@ namespace Umbraco.Persistence.SqlServer.Services
             Enterprise = 3,// Also developer edition
             Express = 4,
             Azure = 5
+        }
+
+        public override DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString)
+        {
+            var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
+            var fromSettings = false;
+
+            if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
+                                             || !Enum<SqlServerSyntaxProvider.VersionName>.TryParse(setting.Substring("SqlServer.".Length), out var versionName, true))
+            {
+                versionName = GetSetVersion(connectionString, ProviderName, _logger).ProductVersionName;
+            }
+
+            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
+
+            return DatabaseType.SqlServer2012;
         }
 
         public class ServerVersionInfo

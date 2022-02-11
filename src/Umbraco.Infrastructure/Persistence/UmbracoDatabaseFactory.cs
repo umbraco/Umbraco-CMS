@@ -224,10 +224,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             _bulkSqlInsertProvider = _dbProviderFactoryCreator.CreateBulkSqlInsertProvider(ProviderName);
 
-            if (_databaseType.IsSqlServer())
-            {
-                _databaseType = DatabaseType.SqlServer2012;
-            }
+            _databaseType = _sqlSyntax.GetUpdatedDatabaseType(_databaseType, ConnectionString);
 
             // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
             // so that everything NPoco is properly cached for the lifetime of the application
