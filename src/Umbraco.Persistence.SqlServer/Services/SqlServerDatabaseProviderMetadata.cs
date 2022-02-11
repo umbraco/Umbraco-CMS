@@ -21,7 +21,7 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     public string DisplayName => "Microsoft SQL Server";
 
     /// <inheritdoc />
-    public string ProviderName => Constants.DbProviderNames.SqlServer;
+    public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />
     public bool SupportsQuickInstall => false;

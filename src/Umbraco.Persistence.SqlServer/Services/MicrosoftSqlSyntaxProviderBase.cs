@@ -39,7 +39,7 @@ namespace Umbraco.Persistence.SqlServer.Services
             if (tableName.Contains(".") == false)
                 return $"[{tableName}]";
 
-            var tableNameParts = tableName.Split(Constants.CharArrays.Period, 2);
+            var tableNameParts = tableName.Split(Cms.Core.Constants.CharArrays.Period, 2);
             return $"[{tableNameParts[0]}].[{tableNameParts[1]}]";
         }
 

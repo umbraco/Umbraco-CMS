@@ -22,7 +22,7 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
     public string DisplayName => "Microsoft SQL Azure";
 
     /// <inheritdoc />
-    public string ProviderName => Constants.DbProviderNames.SqlServer;
+    public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />
     public bool SupportsQuickInstall => false;

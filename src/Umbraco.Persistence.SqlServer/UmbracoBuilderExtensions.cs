@@ -27,8 +27,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
 
-        DbProviderFactories.UnregisterFactory(Cms.Core.Constants.DbProviderNames.SqlServer);
-        DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
+        DbProviderFactories.UnregisterFactory(Constants.ProviderName);
+        DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);
 
         return builder;
     }

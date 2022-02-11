@@ -23,7 +23,7 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     public string DisplayName => "Microsoft SQL Server Express (LocalDB)";
 
     /// <inheritdoc />
-    public string ProviderName => Constants.DbProviderNames.SqlServer;
+    public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />
     public bool SupportsQuickInstall => true;

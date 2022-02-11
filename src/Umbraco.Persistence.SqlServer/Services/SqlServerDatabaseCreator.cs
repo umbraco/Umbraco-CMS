@@ -6,7 +6,7 @@ namespace Umbraco.Persistence.SqlServer.Services
 {
     public class SqlServerDatabaseCreator : IDatabaseCreator
     {
-        public string ProviderName => Constants.DatabaseProviders.SqlServer;
+        public string ProviderName => Constants.ProviderName;
 
         public void Create(string connectionString)
         {
