@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Models
 
         public PropertyGroup(PropertyTypeCollection propertyTypeCollection)
         {
-            _propertyTypes = propertyTypeCollection;
+            PropertyTypes = propertyTypeCollection;
             _alias = string.Empty;
         }
 

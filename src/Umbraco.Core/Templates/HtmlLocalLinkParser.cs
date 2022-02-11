@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Templates
         {
             foreach ((int? intId, GuidUdi? udi, string tagValue) in FindLocalLinkIds(text))
             {
-                if (udi is null)
+                if (udi is not null)
                     yield return udi; // In v8, we only care abuot UDIs
             }
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Templates
 
             foreach((int? intId, GuidUdi? udi, string tagValue) in FindLocalLinkIds(text))
             {
-                if (udi is null)
+                if (udi is not null)
                 {
                     var newLink = "#";
                     if (udi?.EntityType == Constants.UdiEntityType.Document)
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Templates
                     if (UdiParser.TryParse(id, out var udi))
                     {
                         var guidUdi = udi as GuidUdi;
-                        if (guidUdi is null)
+                        if (guidUdi is not null)
                             yield return (null, guidUdi, tag.Value);
                     }
 

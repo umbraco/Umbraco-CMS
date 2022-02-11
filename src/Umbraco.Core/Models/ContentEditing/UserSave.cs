@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class UserSave : EntityBasic, IValidatableObject
     {
         [DataMember(Name = "changePassword", IsRequired = true)]
-        public ChangingPasswordModel ChangePassword { get; set; }
+        public ChangingPasswordModel? ChangePassword { get; set; }
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
@@ -41,10 +41,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public IEnumerable<string> UserGroups { get; set; }
 
         [DataMember(Name = "startContentIds")]
-        public int[] StartContentIds { get; set; }
+        public int[]? StartContentIds { get; set; }
 
         [DataMember(Name = "startMediaIds")]
-        public int[] StartMediaIds { get; set; }
+        public int[]? StartMediaIds { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

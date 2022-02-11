@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public ContentTypeSort(int id, int sortOrder)
         {
-            Id = new Lazy<int>(() => default);
+            Id = new Lazy<int>(() => id);
             SortOrder = sortOrder;
         }
 

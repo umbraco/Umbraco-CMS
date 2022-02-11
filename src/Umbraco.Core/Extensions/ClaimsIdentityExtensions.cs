@@ -299,7 +299,7 @@ namespace Umbraco.Extensions
             var firstValue = identity.FindFirstValue(ClaimTypes.NameIdentifier);
             if (firstValue is not null)
             {
-                int.Parse(firstValue, CultureInfo.InvariantCulture);
+                return int.Parse(firstValue, CultureInfo.InvariantCulture);
             }
 
             return null;

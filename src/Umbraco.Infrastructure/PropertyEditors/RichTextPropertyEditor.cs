@@ -172,6 +172,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
                     yield return new UmbracoEntityReference(udi);
 
+                var udis = _localLinkParser.FindUdisFromLocalLinks(asString);
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
                     yield return new UmbracoEntityReference(udi);
 

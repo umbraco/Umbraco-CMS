@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Models.Email
             Subject = subject;
             Body = body;
             IsBodyHtml = isBodyHtml;
-            Attachments = attachments.ToList();
+            Attachments = attachments?.ToList();
         }
 
     }
