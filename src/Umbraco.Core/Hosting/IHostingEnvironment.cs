@@ -86,10 +86,5 @@ namespace Umbraco.Cms.Core.Hosting
         /// Ensures that the application know its main Url.
         /// </summary>
         void EnsureApplicationMainUrl(Uri currentApplicationUrl);
-
-        /// <summary>
-        /// Check to see if the system is a case sensitive filesytem
-        /// </summary>
-        bool IsCaseSensitiveFileSystem();
     }
 }
