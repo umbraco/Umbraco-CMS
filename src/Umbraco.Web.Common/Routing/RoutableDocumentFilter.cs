@@ -195,7 +195,8 @@ namespace Umbraco.Cms.Web.Common.Routing
             var routeValues = new RouteValueDictionary();
 
             // To get the matchedEndpoint of the provide url
-            RouteEndpoint matchedEndpoint = routeEndpoints
+            RouteEndpoint matchedEndpoint = routeEndpoints?
+                .Where(e => e.RoutePattern.RawText != null)
                 .Where(e => new TemplateMatcher(
                         TemplateParser.Parse(e.RoutePattern.RawText),
                         new RouteValueDictionary())
