@@ -514,7 +514,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
             List<XElement> documentTypes = isSingleDocTypeImport
                 ? unsortedDocumentTypes.ToList()
-                : graph.GetSortedItems().Select(x => x.Item).ToList();
+                : graph.GetSortedItems(throwOnMissing: false).Select(x => x.Item).ToList();
 
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
