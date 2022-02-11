@@ -10,10 +10,7 @@ namespace Umbraco.Cms.Core.Configuration;
 /// </summary>
 public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrings>
 {
-
     private readonly IConfiguration _configuration;
-
-
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigureConnectionStrings"/> class.
