@@ -10,8 +10,6 @@ namespace Umbraco.Extensions
 {
     public static class ConnectionStringExtensions
     {
-
-
         public static bool IsConnectionStringConfigured(this ConnectionStrings connectionString)
             => connectionString != null &&
             !string.IsNullOrWhiteSpace(connectionString.ConnectionString) &&
