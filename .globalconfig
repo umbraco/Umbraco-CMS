@@ -64,7 +64,6 @@ dotnet_diagnostic.SA1407.severity = warning # ArithmeticExpressionsMustDeclarePr
 dotnet_diagnostic.SA1400.severity = warning # AccessModifierMustBeDeclared
 dotnet_diagnostic.SA1119.severity = warning # StatementMustNotUseUnnecessaryParenthesis
 dotnet_diagnostic.SA1649.severity = warning # FileNameMustMatchTypeName
-dotnet_diagnostic.SA1210.severity = warning # UsingDirectivesMustBeOrderedAlphabeticallyByNamespace
 dotnet_diagnostic.SA1121.severity = warning # UseBuiltInTypeAlias
 dotnet_diagnostic.SA1132.severity = warning # DoNotCombineFields
 dotnet_diagnostic.SA1134.severity = warning # AttributesMustNotShareLine
