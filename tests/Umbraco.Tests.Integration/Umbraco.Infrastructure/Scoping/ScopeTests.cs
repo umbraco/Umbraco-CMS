@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Castle.Core.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -16,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
@@ -28,15 +30,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [SetUp]
         public void SetUp() => Assert.IsNull(ScopeProvider.AmbientScope); // gone
 
-        protected override AppCaches GetAppCaches()
+
+        protected override void ConfigureTestSpecificServices(IServiceCollection services)
         {
             // Need to have a mockable request cache for tests
             var appCaches = new AppCaches(
                 NoAppCache.Instance,
                 Mock.Of<IRequestCache>(x => x.IsAvailable == false),
                 new IsolatedCaches(_ => NoAppCache.Instance));
-            return appCaches;
+
+            services.AddUnique(appCaches);
         }
+
 
         [Test]
         public void GivenUncompletedScopeOnChildThread_WhenTheParentCompletes_TheTransactionIsRolledBack()

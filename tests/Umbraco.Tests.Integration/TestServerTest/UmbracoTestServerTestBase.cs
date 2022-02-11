@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -17,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -35,14 +31,17 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
-    public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
+    public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
     {
-        [SetUp]
-        public override void Setup()
-        {
-            InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = null;
-            InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
+        protected HttpClient Client { get; private set; }
 
+        protected LinkGenerator LinkGenerator { get; private set; }
+
+        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
+
+        [SetUp]
+        public void Setup()
+        {
             /*
              * It's worth noting that our usage of WebApplicationFactory is non-standard,
              * the intent is that your Startup.ConfigureServices is called just like
@@ -53,9 +52,12 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              * This is currently a pain to refactor towards due to UmbracoBuilder+TypeFinder+TypeLoader setup but
              * we should get there one day.
              *
+             * However we need to separate the testing framework we provide for downstream projects from our own tests.
+             * We cannot use the Umbraco.Web.UI startup yet as that is not available downstream.
+             *
              * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
              */
-            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder, BeforeHostStart);
+            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
 
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
@@ -71,64 +73,12 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { }));
             });
 
-
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = false
             });
 
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
-        }
-
-        protected override IHostBuilder CreateHostBuilder()
-        {
-            /* It is important that ConfigureWebHost is called before ConfigureServices, this is consistent with the host setup
-             * found in Program.cs and avoids nasty surprises.
-             *
-             * e.g. the registration for RefreshingRazorViewEngine requires that IWebHostEnvironment is registered
-             * at the point in time that the service collection is snapshotted.
-             */
-            IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
-                .ConfigureAppConfiguration((context, configBuilder) =>
-                {
-                    context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
-                    configBuilder.Sources.Clear();
-                    configBuilder.AddInMemoryCollection(InMemoryConfiguration);
-
-                    Configuration = configBuilder.Build();
-                })
-                .ConfigureWebHost(builder =>
-                {
-                    // need to configure the IWebHostEnvironment too
-                    builder.ConfigureServices((c, s) => c.HostingEnvironment = TestHelper.GetWebHostEnvironment());
-
-                    // call startup
-                    builder.Configure(app => Configure(app));
-                })
-                .ConfigureServices((_, services) =>
-                {
-                    ConfigureServices(services);
-                    ConfigureTestSpecificServices(services);
-                    services.AddUnique(CreateLoggerFactory());
-
-                    if (!TestOptions.Boot)
-                    {
-                        // If boot is false, we don't want the CoreRuntime hosted service to start
-                        // So we replace it with a Mock
-                        services.AddUnique(Mock.Of<IRuntime>());
-                    }
-                })
-                .UseDefaultServiceProvider(cfg =>
-                {
-                    // These default to true *if* WebHostEnvironment.EnvironmentName == Development
-                    // When running tests, EnvironmentName used to be null on the mock that we register into services.
-                    // Enable opt in for tests so that validation occurs regardless of environment name.
-                    // Would be nice to have this on for UmbracoIntegrationTest also but requires a lot more effort to resolve issues.
-                    cfg.ValidateOnBuild = true;
-                    cfg.ValidateScopes = true;
-                });
-
-            return hostBuilder;
         }
 
         /// <summary>
@@ -139,7 +89,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            string url = LinkGenerator.GetUmbracoApiService(methodSelector);
+            var url = LinkGenerator.GetUmbracoApiService(methodSelector);
             return PrepareUrl(url);
         }
 
@@ -151,7 +101,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         protected string PrepareSurfaceControllerUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : SurfaceController
         {
-            string url = LinkGenerator.GetUmbracoSurfaceUrl(methodSelector);
+            var url = LinkGenerator.GetUmbracoSurfaceUrl(methodSelector);
             return PrepareUrl(url);
         }
 
@@ -181,17 +131,67 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             return url;
         }
 
-        protected HttpClient Client { get; private set; }
+        private IHostBuilder CreateHostBuilder()
+        {
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((context, configBuilder) =>
+                {
+                    context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
+                    configBuilder.Sources.Clear();
+                    configBuilder.AddInMemoryCollection(InMemoryConfiguration);
 
-        protected LinkGenerator LinkGenerator { get; private set; }
+                    Configuration = configBuilder.Build();
+                })
+                /* It is important that ConfigureWebHost is called before ConfigureServices, this is consistent with the host setup
+                 * found in Program.cs and avoids nasty surprises.
+                 *
+                 * e.g. the registration for RefreshingRazorViewEngine requires that IWebHostEnvironment is registered
+                 * at the point in time that the service collection is snapshotted.
+                 */
+                .ConfigureWebHost(builder =>
+                {
+                    // need to configure the IWebHostEnvironment too
+                    builder.ConfigureServices((c, s) => c.HostingEnvironment = TestHelper.GetWebHostEnvironment());
 
-        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
+                    // call startup
+                    builder.Configure(Configure);
+                })
+                .ConfigureServices((_, services) =>
+                {
+                    ConfigureServices(services);
+                    ConfigureTestSpecificServices(services);
+
+                    if (!TestOptions.Boot)
+                    {
+                        // If boot is false, we don't want the CoreRuntime hosted service to start
+                        // So we replace it with a Mock
+                        services.AddUnique(Mock.Of<IRuntime>());
+                    }
+                })
+                .UseDefaultServiceProvider(cfg =>
+                {
+                    // These default to true *if* WebHostEnvironment.EnvironmentName == Development
+                    // When running tests, EnvironmentName used to be null on the mock that we register into services.
+                    // Enable opt in for tests so that validation occurs regardless of environment name.
+                    // Would be nice to have this on for UmbracoIntegrationTest also but requires a lot more effort to resolve issues.
+                    cfg.ValidateOnBuild = true;
+                    cfg.ValidateScopes = true;
+                });
+
+            return hostBuilder;
+        }
+
+        protected virtual IServiceProvider Services => Factory.Services;
+
+        protected virtual T GetRequiredService<T>() => Factory.Services.GetRequiredService<T>();
 
         private void ConfigureServices(IServiceCollection services)
         {
+            services.AddUnique(CreateLoggerFactory());
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
+
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
                 hostingEnvironment,
@@ -234,8 +234,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .Build();
         }
 
-        public override void Configure(IApplicationBuilder app)
+        private void Configure(IApplicationBuilder app)
         {
+            UseTestDatabase(app);
+
             app.UseUmbraco()
                 .WithMiddleware(u =>
                 {

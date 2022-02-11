@@ -31,15 +31,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
-        protected override AppCaches GetAppCaches()
+        protected override void ConfigureTestSpecificServices(IServiceCollection services)
         {
             // this is what's created core web runtime
-            var result = new AppCaches(
+            var appCaches = new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
-            return result;
+            services.AddUnique(appCaches);
         }
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
