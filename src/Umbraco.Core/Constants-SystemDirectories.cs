@@ -45,9 +45,9 @@ namespace Umbraco.Cms.Core
 
             public const string AppPlugins = "/App_Plugins";
 
-            [Obsolete("Use AppPluginIconsLower")]
+            [Obsolete("Use PluginIcons instead")]
             public const string AppPluginIcons = "/Backoffice/Icons";
-            public const string AppPluginIconsLower = "/backoffice/icons";
+            public const string PluginIcons = "/backoffice/icons";
             
             public const string CreatedPackages = "/created-packages";
 
