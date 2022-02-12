@@ -32,6 +32,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for length of the cached name.
         /// </summary>
+        [Obsolete("Use CacheHashLength instead")]
+        public uint CachedNameLength { get => CacheHashLength; set { CacheHashLength = value; } }
+
+        /// <summary>
+        /// Gets or sets a value for length of the cached name.
+        /// </summary>
         [DefaultValue(StaticCacheHashLength)]
         public uint CacheHashLength { get; set; } = StaticCacheHashLength;
 

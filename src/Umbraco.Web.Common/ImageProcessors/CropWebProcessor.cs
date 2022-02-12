@@ -27,6 +27,19 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         };
 
         /// <inheritdoc/>
+        [Obsolete("Use the method taking a CommandCollection instead")]
+        public FormattedImage Process(FormattedImage image, ILogger logger, IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
+        {
+            var collection = new CommandCollection();
+            foreach (KeyValuePair<string, string> command in commands)
+            {
+                collection.Add(command.Key, command.Value);
+            }
+
+            return Process(image, logger, collection, parser, culture);
+        }
+
+        /// <inheritdoc/>
         public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
             RectangleF? coordinates = GetCoordinates(commands, parser, culture);
