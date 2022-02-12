@@ -107,10 +107,6 @@ public abstract class UmbracoIntegrationTestBase
         return NullLoggerFactory.Instance;
     }
 
-    protected virtual void ConfigureTestSpecificServices(IServiceCollection services)
-    {
-    }
-
     protected void UseTestDatabase(IApplicationBuilder app)
         => UseTestDatabase(app.ApplicationServices);
 

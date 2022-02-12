@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public void SetUp() => Assert.IsNull(ScopeProvider.AmbientScope); // gone
 
 
-        protected override void ConfigureTestSpecificServices(IServiceCollection services)
+        protected override void ConfigureTestServices(IServiceCollection services)
         {
             // Need to have a mockable request cache for tests
             var appCaches = new AppCaches(

@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                         context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
 
                         ConfigureServices(services);
-                        ConfigureTestSpecificServices(services);
+                        ConfigureTestServices(services);
 
                         if (!TestOptions.Boot)
                         {
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected virtual T GetRequiredService<T>() => Factory.Services.GetRequiredService<T>();
 
-        private void ConfigureServices(IServiceCollection services)
+        protected void ConfigureServices(IServiceCollection services)
         {
             services.AddUnique(CreateLoggerFactory());
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
@@ -228,7 +228,14 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .Build();
         }
 
-        private void Configure(IApplicationBuilder app)
+        /// <summary>
+        ///  Hook for registering test doubles.
+        /// </summary>
+        protected virtual void ConfigureTestServices(IServiceCollection services)
+        {
+        }
+
+        protected void Configure(IApplicationBuilder app)
         {
             UseTestDatabase(app);
 

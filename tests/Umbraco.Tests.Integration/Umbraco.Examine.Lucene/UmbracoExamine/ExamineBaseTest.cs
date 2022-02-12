@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
 
         protected IRuntimeState RunningRuntimeState { get; } = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
-        protected override void ConfigureTestSpecificServices(IServiceCollection services)
+        protected override void ConfigureTestServices(IServiceCollection services)
             => services.AddSingleton<IndexInitializer>();
 
         /// <summary>

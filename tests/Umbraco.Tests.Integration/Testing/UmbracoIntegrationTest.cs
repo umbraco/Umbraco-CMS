@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .ConfigureServices((_, services) =>
                 {
                     ConfigureServices(services);
-                    ConfigureTestSpecificServices(services);
+                    ConfigureTestServices(services);
 
                     if (!TestOptions.Boot)
                     {
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             return hostBuilder;
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        protected void ConfigureServices(IServiceCollection services)
         {
             services.AddUnique(CreateLoggerFactory());
             services.AddSingleton(TestHelper.DbProviderFactoryCreator);
@@ -143,7 +143,20 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             builder.Build();
         }
 
+        /// <summary>
+        ///  Hook for altering UmbracoBuilder setup
+        /// </summary>
+        /// <remarks>
+        /// Can also be used for registering test doubles.
+        /// </remarks>
         protected virtual void CustomTestSetup(IUmbracoBuilder builder)
+        {
+        }
+
+        /// <summary>
+        ///  Hook for registering test doubles.
+        /// </summary>
+        protected virtual void ConfigureTestServices(IServiceCollection services)
         {
         }
 
