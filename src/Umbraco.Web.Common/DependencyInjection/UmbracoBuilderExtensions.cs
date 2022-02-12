@@ -383,6 +383,16 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Adds support for acquiring MainDom on a AppService slot.
+        /// </summary>
+        public static IUmbracoBuilder AddAzureAppServiceSlotSupport(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreAzureAppServiceSlotHostingEnvironment>();
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds SqlCe support for Umbraco
         /// </summary>
         private static IUmbracoBuilder AddUmbracoSqlCeSupport(this IUmbracoBuilder builder)
