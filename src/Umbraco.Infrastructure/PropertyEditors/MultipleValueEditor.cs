@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -65,7 +65,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             var values = json.Select(item => item.Value<string>()).ToArray();
-
             if (values.Length == 0)
             {
                 return null;

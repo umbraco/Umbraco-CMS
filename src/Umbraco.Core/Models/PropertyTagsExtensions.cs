@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -75,8 +75,7 @@ namespace Umbraco.Extensions
                         var updatedTags = currentTags.Union(trimmedTags).ToArray();
                         var updatedValue = updatedTags.Length == 0 ? null : serializer.Serialize(updatedTags);
                         property.SetValue(updatedValue, culture); // json array
-                         break;
-                        property.SetValue(serializer.Serialize(currentTags.Union(trimmedTags).ToArray()), culture); // json array
+                        break;
                 }
             }
             else
@@ -88,7 +87,8 @@ namespace Umbraco.Extensions
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(serializer.Serialize(trimmedTags), culture); // json array
+                        var updatedValue = trimmedTags.Length == 0 ? null : serializer.Serialize(trimmedTags);
+                        property.SetValue(updatedValue, culture); // json array
                         break;
                 }
             }

@@ -21,14 +21,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     /// </summary>
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropperValue>))]
     [TypeConverter(typeof(ImageCropperValueTypeConverter))]
-    [DataContract(Name="imageCropDataSet")]
+    [DataContract(Name = "imageCropDataSet")]
     public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValue>
     {
         /// <summary>
         /// Gets or sets the value source image.
         /// </summary>
-        [DataMember(Name="src")]
-        public string Src { get; set;}
+        [DataMember(Name = "src")]
+        public string Src { get; set; }
 
         /// <summary>
         /// Gets or sets the value focal point.
@@ -44,9 +44,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override string ToString()
-        {
-            return Crops != null ? (Crops.Any() ? JsonConvert.SerializeObject(this) : Src) : string.Empty;
-        }
+            => HasCrops() || HasFocalPoint() ? JsonConvert.SerializeObject(this, Formatting.None) : Src;
 
         /// <inheritdoc />
         public string ToHtmlString() => Src;
@@ -178,12 +176,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// Removes redundant crop data/default focal point.
         /// </summary>
         /// <param name="value">The image cropper value.</param>
-        /// <returns>
-        /// The cleaned up value.
-        /// </returns>
         public static void Prune(JObject value)
         {
-            if (value is null) throw new ArgumentNullException(nameof(value));
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
 
             if (value.TryGetValue("crops", out var crops))
             {
@@ -252,8 +248,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 // properties are, practically, readonly
                 // ReSharper disable NonReadonlyMemberInGetHashCode
                 var hashCode = Src?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ (FocalPoint?.GetHashCode() ?? 0);
-                hashCode = (hashCode*397) ^ (Crops?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (FocalPoint?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Crops?.GetHashCode() ?? 0);
                 return hashCode;
                 // ReSharper restore NonReadonlyMemberInGetHashCode
             }
@@ -298,7 +294,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 {
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
-                    return (Left.GetHashCode()*397) ^ Top.GetHashCode();
+                    return (Left.GetHashCode() * 397) ^ Top.GetHashCode();
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }
             }
@@ -352,9 +348,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
                     var hashCode = Alias?.GetHashCode() ?? 0;
-                    hashCode = (hashCode*397) ^ Width;
-                    hashCode = (hashCode*397) ^ Height;
-                    hashCode = (hashCode*397) ^ (Coordinates?.GetHashCode() ?? 0);
+                    hashCode = (hashCode * 397) ^ Width;
+                    hashCode = (hashCode * 397) ^ Height;
+                    hashCode = (hashCode * 397) ^ (Coordinates?.GetHashCode() ?? 0);
                     return hashCode;
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }
@@ -409,9 +405,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
                     var hashCode = X1.GetHashCode();
-                    hashCode = (hashCode*397) ^ Y1.GetHashCode();
-                    hashCode = (hashCode*397) ^ X2.GetHashCode();
-                    hashCode = (hashCode*397) ^ Y2.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Y1.GetHashCode();
+                    hashCode = (hashCode * 397) ^ X2.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Y2.GetHashCode();
                     return hashCode;
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }

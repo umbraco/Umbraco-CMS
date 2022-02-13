@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Tests.Common;
 
@@ -52,7 +53,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.Serv
             VerifyServerTouched();
         }
 
-        private TouchServerTask CreateTouchServerTask(RuntimeLevel runtimeLevel = RuntimeLevel.Run, string applicationUrl = ApplicationUrl)
+        [Test]
+        public async Task Does_Not_Execute_When_Role_Accessor_Is_Not_Elected()
+        {
+            TouchServerTask sut = CreateTouchServerTask(useElection: false);
+            await sut.PerformExecuteAsync(null);
+            VerifyServerNotTouched();
+        }
+
+        private TouchServerTask CreateTouchServerTask(RuntimeLevel runtimeLevel = RuntimeLevel.Run, string applicationUrl = ApplicationUrl, bool useElection = true)
         {
             var mockRequestAccessor = new Mock<IHostingEnvironment>();
             mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl).Returns(!string.IsNullOrEmpty(applicationUrl) ? new Uri(ApplicationUrl) : null);
@@ -72,12 +81,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.Serv
                 }
             };
 
+            IServerRoleAccessor roleAccessor = useElection
+                ? new ElectedServerRoleAccessor(_mockServerRegistrationService.Object)
+                : new SingleServerRoleAccessor();
+
             return new TouchServerTask(
                 mockRunTimeState.Object,
                 _mockServerRegistrationService.Object,
                 mockRequestAccessor.Object,
                 mockLogger.Object,
-                new TestOptionsMonitor<GlobalSettings>(settings));
+                new TestOptionsMonitor<GlobalSettings>(settings),
+                roleAccessor);
         }
 
         private void VerifyServerNotTouched() => VerifyServerTouchedTimes(Times.Never());

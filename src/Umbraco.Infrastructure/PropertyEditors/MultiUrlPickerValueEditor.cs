@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             try
             {
-                var links = JsonConvert.DeserializeObject<List<MultiUrlPickerValueEditor.LinkDto>>(value);
+                var links = JsonConvert.DeserializeObject<List<LinkDto>>(value);
 
                 var documentLinks = links.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
                 var mediaLinks = links.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media);
@@ -158,11 +158,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 var links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
                 if (links.Count == 0)
+                {
                     return null;
+                }
 
                 return JsonConvert.SerializeObject(
                     from link in links
-                    select new MultiUrlPickerValueEditor.LinkDto
+                    select new LinkDto
                     {
                         Name = link.Name,
                         QueryString = link.QueryString,

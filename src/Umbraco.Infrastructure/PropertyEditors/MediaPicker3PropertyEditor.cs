@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -157,7 +157,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
             }
 
-
             /// <summary>
             /// Model/DTO that represents the JSON that the MediaPicker3 stores.
             /// </summary>
@@ -175,7 +174,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 [DataMember(Name = "focalPoint")]
                 public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
-
 
                 /// <summary>
                 /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
@@ -214,9 +212,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 /// Removes redundant crop data/default focal point.
                 /// </summary>
                 /// <param name="value">The media with crops DTO.</param>
-                /// <returns>
-                /// The cleaned up value.
-                /// </returns>
                 /// <remarks>
                 /// Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the prune method.
                 /// </remarks>
