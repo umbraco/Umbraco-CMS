@@ -14,9 +14,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Events
     [TestFixture]
     public class EventAggregatorTests : UmbracoTestServerTestBase
     {
-        public override void ConfigureServices(IServiceCollection services)
+        protected override void ConfigureTestServices(IServiceCollection services)
         {
-            base.ConfigureServices(services);
             services.AddScoped<EventAggregatorTestScopedService>();
             services.AddTransient<INotificationHandler<EventAggregatorTestNotification>, EventAggregatorTestNotificationHandler>();
         }

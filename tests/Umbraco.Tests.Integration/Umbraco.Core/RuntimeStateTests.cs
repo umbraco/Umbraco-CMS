@@ -24,14 +24,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class RuntimeStateTests : UmbracoIntegrationTest
     {
-        private protected IRuntimeState RuntimeState { get; private set; }
-
-        public override void Configure(IApplicationBuilder app)
-        {
-            base.Configure(app);
-
-            RuntimeState = Services.GetRequiredService<IRuntimeState>();
-        }
+        private IRuntimeState RuntimeState => Services.GetRequiredService<IRuntimeState>();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
