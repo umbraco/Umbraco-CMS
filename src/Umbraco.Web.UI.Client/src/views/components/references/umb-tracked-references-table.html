@@ -17,7 +17,7 @@
                 <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
-                <div class="umb-table-cell umb-table-cell--nano umb-table-body__link"><a ng-href="{{vm.getUrl(reference.udi, reference.id)}}"><localize key="general_open">Open</localize></a></div>
+                <div class="umb-table-cell umb-table-cell--nano umb-table-body__link" ng-click="vm.close()"><a ng-href="{{vm.getUrl(reference.udi, reference.id)}}"><localize key="general_open">Open</localize></a></div>
             </div>
         </div>
     </div>
