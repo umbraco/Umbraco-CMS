@@ -468,7 +468,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                 case nameof(StringExtensions.InvariantStartsWith):
                 case nameof(StringExtensions.InvariantEndsWith):
                 case nameof(StringExtensions.InvariantContains):
-                case nameof(StringExtensions.InvariantEquals):                
+                case nameof(StringExtensions.InvariantEquals):
 
                     string compareValue;
 
@@ -629,7 +629,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                     if (m.Arguments.Count == 2)
                     {
                         var n1 = Visit(m.Arguments[0]);
-                        var f = m.Arguments[2];
+                        var f = m.Arguments[1];
                         if (!(f is Expression<Func<string, string>> fl))
                             throw new NotSupportedException("Expression is not a proper lambda.");
                         var ff = fl.Compile();
