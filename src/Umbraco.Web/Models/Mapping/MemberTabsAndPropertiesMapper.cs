@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -54,83 +53,37 @@ namespace Umbraco.Web.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            if (provider.IsUmbracoMembershipProvider() == false)
+            // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
+            var isLockedOutPropertyAlias = Constants.Conventions.Member.IsLockedOut;
+            if (provider.IsUmbracoMembershipProvider() &&
+                provider is IUmbracoMemberTypeMembershipProvider umbracoProvider)
             {
-                // it's a generic provider so update the locked out property based on our known constant alias
-                var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
-                if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-                {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
-                }
-            }
-            else
-            {
-                var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
-
                 // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                 // if we just had all of the membership provider fields on the member table :(
                 // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-                var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
-                if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-                {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
-                }
+                isLockedOutPropertyAlias = umbracoProvider.LockPropertyTypeAlias;
             }
 
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (umbracoContext != null
-                && umbracoContext.Security.CurrentUser != null
-                && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == isLockedOutPropertyAlias);
+            if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
-                var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", source.ContentTypeId);
-
-                // Replace the doctype property
-                var docTypeProperty = resolved.SelectMany(x => x.Properties)
-                    .First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                docTypeProperty.Value = new List<object>
-                {
-                    new
-                    {
-                        linkText = source.ContentType.Name,
-                        url = memberTypeLink,
-                        target = "_self",
-                        icon = Constants.Icons.ContentType
-                    }
-                };
-                docTypeProperty.View = "urllist";
+                isLockedOutProperty.Readonly = true;
             }
 
             return resolved;
         }
 
-        protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
+        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext context)
         {
-            var member = (IMember)content;
             var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
-            var genericProperties = new List<ContentPropertyDisplay>
+            var properties = new List<ContentPropertyDisplay>
             {
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
-                    Label = _localizedTextService.Localize("general/id"),
-                    Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
-                    View = "idwithguid"
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
-                    Label = _localizedTextService.Localize("content/membertype"),
-                    Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
-                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
-                },
                 GetLoginProperty(_memberService, member, _localizedTextService),
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
-                    Label = _localizedTextService.Localize("general/email"),
+                    Label = _localizedTextService.Localize("general","email"),
                     Value = member.Email,
                     View = "email",
                     Validation = {Mandatory = true}
@@ -138,35 +91,34 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
-                    Label = _localizedTextService.Localize("password"),
-                    // NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
+                    Label = _localizedTextService.Localize(null,"password"),
+                    // NOTE: The value here is a JSON value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
                     // only when creating a new member and we want to have a generated password pre-filled.
                     Value = new Dictionary<string, object>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
-                        {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
-                        {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
+                        { "generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null) },
+                        { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) },
                     },
-                    // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
-                    // initialize the dictionary with the configuration from the default membership provider
+                    // Initialize the dictionary with the configuration from the default membership provider
                     Config = new Dictionary<string, object>(membersProvider.GetConfiguration(_userService))
                     {
-                        // the password change toggle will only be displayed if there is already a password assigned.
-                        {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+                        // The password change toggle will only be displayed if there is already a password assigned.
+                        { "hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false }
                     }
                 },
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
-                    Label = _localizedTextService.Localize("content/membergroup"),
+                    Label = _localizedTextService.Localize("content","membergroup"),
                     Value = GetMemberGroupValue(member.Username),
                     View = "membergroups",
                     Config = new Dictionary<string, object> {{"IsRequired", true}}
                 }
             };
 
-            return genericProperties;
+            return properties;
         }
 
         /// <summary>
@@ -223,7 +175,7 @@ namespace Umbraco.Web.Models.Mapping
             var prop = new ContentPropertyDisplay
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-                Label = localizedText.Localize("login"),
+                Label = localizedText.Localize(null,"login"),
                 Value = member.Username
             };
 

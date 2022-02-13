@@ -1375,6 +1375,65 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, published.Result);
         }
 
+        // V9 - Tests.Integration
+        [Test]
+        public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_True()
+        {
+            const int rootNodeId = NodeDto.NodeIdSeed + 2;
+
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(rootNodeId);
+            contentService.SaveAndPublish(content);
+
+            content.Properties[0].SetValue("Foo", culture: string.Empty);
+            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.Save(content);
+
+            // Act
+            var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsTrue(result.Content.Published);
+                Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+
+                // We changed property data
+                Assert.IsTrue(result.Content.Edited, "result.Content.Edited");
+            });
+        }
+
+        // V9 - Tests.Integration
+        [Test]
+        public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_False()
+        {
+            const int rootNodeId = NodeDto.NodeIdSeed + 2;
+
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(rootNodeId);
+            contentService.SaveAndPublish(content);
+
+            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.Save(content);
+
+            // Act
+            var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsTrue(result.Content.Published);
+                Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+
+                // We didn't change any property data
+                Assert.IsFalse(result.Content.Edited, "result.Content.Edited");
+            });
+        }
+
         [Test]
         public void Cannot_Publish_Culture_Awaiting_Release()
         {
@@ -2176,7 +2235,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(rollback2);
 
             Assert.IsTrue(rollback2.Published);
-            Assert.IsFalse(rollback2.Edited); // all changes cleared!
+            Assert.IsTrue(rollback2.Edited); // Still edited, change of behaviour
 
             Assert.AreEqual("Jane Doe", rollback2.GetValue<string>("author"));
             Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
@@ -2195,7 +2254,7 @@ namespace Umbraco.Tests.Services
             content.CopyFrom(rollto);
             content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
             contentService.Save(content);
-            Assert.IsFalse(content.Edited);
+            Assert.IsTrue(content.Edited); // Still edited, change of behaviour
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue("author"));
         }
@@ -2470,7 +2529,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
             Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
-            Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
+            Assert.That(sut.GetValue("mediapicker3"), Is.EqualTo("[{\"key\": \"8f78ce9e-8fe0-4500-a52d-4c4f35566ba9\",\"mediaKey\": \"44CB39C8-01E5-45EB-9CF8-E70AAF2D1691\",\"crops\": [],\"focalPoint\": {\"left\": 0.5,\"top\": 0.5}}]"));
             Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
             Assert.That(sut.GetValue<string>("multiUrlPicker"), Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));

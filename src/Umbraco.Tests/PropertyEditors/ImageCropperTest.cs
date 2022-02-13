@@ -82,8 +82,20 @@ namespace Umbraco.Tests.PropertyEditors
 
                 var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
 
+                var imageCropperConfiguration = new ImageCropperConfiguration()
+                {
+                    Crops = new[]
+                    {
+                        new ImageCropperConfiguration.Crop()
+                        {
+                            Alias = "thumb",
+                            Width = 100,
+                            Height = 100
+                        }
+                    }
+                };
                 var dataTypeService = new TestObjects.TestDataTypeService(
-                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>())) { Id = 1 });
+                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>())) { Id = 1, Configuration = imageCropperConfiguration });
 
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
 

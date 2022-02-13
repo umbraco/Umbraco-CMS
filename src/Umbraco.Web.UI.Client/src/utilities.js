@@ -33,8 +33,9 @@
     /**
      * Facade to angular.extend
      * Use this with Angular objects, for vanilla JS objects, use Object.assign()
+     * This is an alias as it to allow passing an unknown number of arguments
      */
-    const extend = (dst, src) => angular.extend(dst, src);
+    const extend = angular.extend;
 
     /**
      * Equivalent to angular.isFunction
@@ -109,7 +110,7 @@
      * Not equivalent to angular.forEach. But like the angularJS method this does not fail on null or undefined.
      */
     const forEach = (obj, iterator) => {
-        if (obj) {
+        if (obj && isArray(obj)) {
             return obj.forEach(iterator);
         }
         return obj;

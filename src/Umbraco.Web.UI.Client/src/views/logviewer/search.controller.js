@@ -24,7 +24,7 @@
             },
             {
                 name: 'Information',
-                logTypeColor: 'success' 
+                logTypeColor: 'success'
             },
             {
                 name: 'Warning',
@@ -44,7 +44,7 @@
             enabled: false,
             interval: 0,
             promise: null,
-            
+
             defaultButton: {
                 labelKey: "logViewer_polling",
                 handler: function() {
@@ -124,7 +124,6 @@
         vm.logOptions.orderDirection = 'Descending';
 
         vm.fromDatePickerConfig = {
-            pickDate: true,
             pickTime: true,
             useSeconds: false,
             useCurrent: false,
@@ -138,7 +137,6 @@
         };
 
         vm.toDatePickerConfig = {
-            pickDate: true,
             pickTime: true,
             useSeconds: false,
             format: "YYYY-MM-DD HH:mm",
@@ -156,6 +154,8 @@
         vm.search = search;
         vm.getFilterName = getFilterName;
         vm.setLogLevelFilter = setLogLevelFilter;
+        vm.selectAllLogLevelFilters = selectAllLogLevelFilters;
+        vm.deselectAllLogLevelFilters = deselectAllLogLevelFilters;
         vm.toggleOrderBy = toggleOrderBy;
         vm.selectSearch = selectSearch;
         vm.resetSearch = resetSearch;
@@ -259,7 +259,7 @@
         }
 
         function setLogTypeColor(logItems) {
-            logItems.forEach(logItem => 
+            logItems.forEach(logItem =>
                 logItem.logTypeColor = vm.logLevels.find(x => x.name === logItem.Level).logTypeColor);
         }
 
@@ -291,6 +291,24 @@
                 var index = vm.logOptions.logLevels.indexOf(logLevel.name);
                 vm.logOptions.logLevels.splice(index, 1);
             }
+
+            getLogs();
+        }
+
+        function updateAllLogLevelFilterCheckboxes(bool) {
+            vm.logLevels.forEach(logLevel => logLevel.selected = bool);
+        }
+
+        function selectAllLogLevelFilters() {
+            vm.logOptions.logLevels = vm.logLevels.map(logLevel => logLevel.name);
+            updateAllLogLevelFilterCheckboxes(true);
+
+            getLogs();
+        }
+
+        function deselectAllLogLevelFilters() {
+            vm.logOptions.logLevels = [];
+            updateAllLogLevelFilterCheckboxes(false);
 
             getLogs();
         }

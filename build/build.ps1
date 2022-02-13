@@ -91,6 +91,7 @@
   {
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\belle.log"
+	
 
     Write-Host "Compile Belle"
     Write-Host "Logging to $log"
@@ -352,6 +353,14 @@
       "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
       > $null
     if (-not $?) { throw "Failed to zip UmbracoCms." }
+	
+    Write-Host "Zip cms cloud"
+	$this.CopyFile("$($this.SolutionRoot)\build\NuSpecs\tools\Web.config.cloud.xdt", "$tmp\WebApp\Web.config.install.xdt")
+    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.$($this.Version.Semver).Cloud.zip" `
+      "$tmp\WebApp\*" `
+      "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
+      > $null
+    if (-not $?) { throw "Failed to zip UmbracoCms." }
   })
 
   $ubuild.DefineMethod("PrepareBuild",
@@ -553,7 +562,6 @@
   # run
   if (-not $get)
   {
-cd
     if ($command.Length -eq 0)
     {
       $command = @( "Build" )

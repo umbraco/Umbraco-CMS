@@ -266,9 +266,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+            var pageIndex = skip / take;
+
+            return MapDtosToContent(Database.Page<DocumentDto>(pageIndex+1, take, sql).Items, true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, false, true).Skip(skip).Take(take);
+                false, false, false, true);
         }
 
         public override IContent GetVersion(int versionId)
@@ -520,6 +522,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IContent entity)
         {
             var isEntityDirty = entity.IsDirty();
+            var editedSnapshot = entity.Edited;
 
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
@@ -592,6 +595,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup; 
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
@@ -603,6 +610,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     contentVersionDto.Id = 0; // want a new id
                     contentVersionDto.Current = true; // current version
                     contentVersionDto.Text = entity.Name;
+                    contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                     Database.Insert(contentVersionDto);
                     entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
@@ -620,6 +628,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // also impacts 'edited'
                 if (!publishing && entity.PublishName != entity.Name)
                     edited = true;
+
+                // To establish the new value of "edited" we compare all properties publishedValue to editedValue and look
+                // for differences.
+                //
+                // If we SaveAndPublish but the publish fails (e.g. already scheduled for release)
+                // we have lost the publishedValue on IContent (in memory vs database) so we cannot correctly make that comparison.
+                //
+                // This is a slight change to behaviour, historically a publish, followed by change & save, followed by undo change & save
+                // would change edited back to false.
+                if (!publishing && editedSnapshot)
+                {
+                    edited = true;
+                }
 
                 if (entity.ContentType.VariesByCulture())
                 {
@@ -912,6 +933,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public override int RecycleBinId => Constants.System.RecycleBinContent;
 
+        public bool RecycleBinSmells()
+        {
+            var cache = _appCaches.RuntimeCache;
+            var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
+
         #endregion
 
         #region Read Repository implementation for Guid keys
@@ -1154,7 +1184,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                     {
                         content[i] = (Content)cached;
@@ -1319,7 +1349,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var result = new Dictionary<int, ContentScheduleCollection>();
 
-            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, 2000, batch => Sql()
+            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, Constants.Sql.MaxParameterCount, batch => Sql()
                 .Select<ContentScheduleDto>()
                 .From<ContentScheduleDto>()
                 .WhereIn<ContentScheduleDto>(x => x.NodeId, batch));
@@ -1368,7 +1398,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             if (versions.Count == 0) return new Dictionary<int, List<ContentVariation>>();
 
-            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, 2000, batch
+            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, Constants.Sql.MaxParameterCount, batch
                 => Sql()
                     .Select<ContentVersionCultureVariationDto>()
                     .From<ContentVersionCultureVariationDto>()
@@ -1397,7 +1427,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var ids = temps.Select(x => x.Id);
 
-            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, 2000, batch =>
+            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
                 Sql()
                     .Select<DocumentCultureVariationDto>()
                     .From<DocumentCultureVariationDto>()

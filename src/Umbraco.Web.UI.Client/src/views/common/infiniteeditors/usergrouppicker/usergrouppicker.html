@@ -18,7 +18,7 @@
                 <umb-box-content>
 
                     <umb-search-filter
-                        input-id="composition-search"
+                        input-id="usergroup-search"
                         model="searchTerm"
                         label-key="placeholders_filter"
                         text="Type to filter..."
@@ -36,7 +36,7 @@
                             </button>
 
                             <div class="umb-user-group-picker-list-item__icon">
-                                <i ng-if="!userGroup.selected" class="{{userGroup.icon}}" aria-hidden="true"></i>
+                                <umb-icon icon="{{userGroup.icon}}" ng-if="!userGroup.selected"></umb-icon>
                                 <umb-checkmark ng-if="userGroup.selected" checked="userGroup.selected" size="xs"></umb-checkmark>
                             </div>
 

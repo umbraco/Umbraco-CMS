@@ -25,6 +25,7 @@ namespace Umbraco.Web.Scheduling
 
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
+        private readonly IContentVersionService _service;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _logger;
         private readonly IScopeProvider _scopeProvider;
@@ -38,18 +39,26 @@ namespace Umbraco.Web.Scheduling
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
         private BackgroundTaskRunner<IBackgroundTask> _fileCleanupRunner;
         private BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _contentVersionCleanupRunner;
 
         private bool _started;
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        public SchedulerComponent(IRuntimeState runtime,
-            IContentService contentService, IAuditService auditService,
-            HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger)
+        public SchedulerComponent(
+            IRuntimeState runtime,
+            IContentService contentService,
+            IContentVersionService service,
+            IAuditService auditService,
+            HealthCheckCollection healthChecks,
+            HealthCheckNotificationMethodCollection notifications,
+            IScopeProvider scopeProvider,
+            IUmbracoContextFactory umbracoContextFactory,
+            IProfilingLogger logger)
         {
             _runtime = runtime;
             _contentService = contentService;
+            _service = service;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _logger = logger;
@@ -68,6 +77,7 @@ namespace Umbraco.Web.Scheduling
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger);
             _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger);
             _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger);
+            _contentVersionCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("ContentVersionCleanup", _logger);
 
             // we will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
@@ -107,6 +117,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(settings));
                 tasks.Add(RegisterTempFileCleanup());
+                tasks.Add(RegisterContentVersionCleanup(settings));
 
                 var healthCheckConfig = Current.Configs.HealthChecks();
                 if (healthCheckConfig.NotificationSettings.Enabled)
@@ -178,6 +189,24 @@ namespace Umbraco.Web.Scheduling
                 TimeSpan.FromDays(1), //files that are over a day old
                 _runtime, _logger);
             _fileCleanupRunner.TryAdd(task);
+            return task;
+        }
+
+        private IBackgroundTask RegisterContentVersionCleanup(IUmbracoSettingsSection settings)
+        {
+            // content version cleanup
+            // install on all, will only run on non-replica servers.
+            var task = new ContentVersionCleanup(
+                _contentVersionCleanupRunner,
+                DefaultDelayMilliseconds,
+                OneHourMilliseconds,
+                _runtime,
+                _logger,
+                settings.Content.ContentVersionCleanupPolicyGlobalSettings,
+                _service);
+
+            _contentVersionCleanupRunner.TryAdd(task);
+
             return task;
         }
     }

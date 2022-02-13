@@ -82,6 +82,7 @@
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
+    <key alias="notify">Allow access to setup notifications for content nodes</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Content</key>
@@ -174,6 +175,8 @@
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
     <key alias="custom">%0%</key>
+    <key alias="contentversionpreventcleanup">Cleanup disabled for version: %0%</key>
+    <key alias="contentversionenablecleanup">Cleanup enabled for version: %0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -187,27 +190,9 @@
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
     <key alias="smallCustom">Custom</key>
+    <key alias="smallContentVersionPreventCleanup">Save</key>
+    <key alias="smallContentVersionEnableCleanup">Save</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">To change the Document Type for the selected content, first select from the list of valid types for this location.</key>
-    <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
-    <key alias="contentRepublished">The content has been re-published.</key>
-    <key alias="currentProperty">Current Property</key>
-    <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The Document Type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
-    <key alias="docTypeChanged">Document Type Changed</key>
-    <key alias="mapProperties">Map Properties</key>
-    <key alias="mapToProperty">Map to Property</key>
-    <key alias="newTemplate">New Template</key>
-    <key alias="newType">New Type</key>
-    <key alias="none">none</key>
-    <key alias="selectedContent">Content</key>
-    <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The Document Type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
-    <key alias="to">to</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
-    <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
   </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
@@ -272,6 +257,7 @@
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Unpublished</key>
+    <key alias="notCreated">Not created</key>
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
@@ -293,6 +279,7 @@
     <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the Element Type will be used.</key>
     <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
+    <key alias="nestedContentNoGroups">The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -322,6 +309,7 @@
     <key alias="notReadyToPublish">We are not ready to Publish</key>
     <key alias="readyToPublish">Ready to publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
+    <key alias="resetFocalPoint">Reset focal point</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
     <key alias="createEmpty">Create new</key>
@@ -329,7 +317,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Select a Content Template</key>
     <key alias="createdBlueprintHeading">Content Template created</key>
@@ -342,6 +330,7 @@
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="dragFilesHereToUpload">You can drag files here to upload</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
     <key alias="moveFailed">Failed to move media</key>
@@ -362,6 +351,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Failed to copy media type</key>
      <key alias="moveFailed">Failed to move media type</key>
+     <key alias="autoPickMediaType">Auto pick</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Failed to copy member type</key>
@@ -453,7 +443,7 @@
     <key alias="assignDomain">Manage hostnames</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
-    <key alias="confirmdeleteXofX">Are you sure you want to delete %0% based on %1%</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
     <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
@@ -539,10 +529,12 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
-    <key alias="tabClipboard">Clipboard</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -821,6 +813,9 @@
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
     <key alias="avatar">Avatar for</key>
+    <key alias="header">Header</key>
+    <key alias="systemField">system field</key>
+    <key alias="lastUpdated">Last Updated</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1117,7 +1112,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       %6%
 
       Have a nice day!
-
       Cheers from the Umbraco robot
     ]]></key>
     <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
@@ -1288,6 +1282,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
     <key alias="installStateCompleted">Please click 'Finish' to complete installation and reload the page.</key>
     <key alias="installStateUploading">Uploading package...</key>
+    <key alias="verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
@@ -1354,6 +1349,18 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>
+    <key alias="openMedia">Open in Media Library</key>
+    <key alias="changeMedia">Change Media Item</key>
+    <key alias="resetMediaCrop">Reset media crop</key>
+    <key alias="editMediaEntryLabel">Edit %0% on %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">Discard creation?</key>
+    <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="confirmCancelMediaEntryHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
+    <key alias="confirmRemoveMediaEntryMessage">Remove?</key>
+    <key alias="confirmRemoveAllMediaEntryMessage">Remove all medias?</key>
+    <key alias="tabClipboard">Clipboard</key>
+    <key alias="notAllowed">Not allowed</key>
+    <key alias="openMediaPicker">Open media picker</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
@@ -1376,7 +1383,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="changes">Changes</key>
     <key alias="created">Created</key>
     <key alias="currentVersion">Current version</key>
-    <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
+    <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
@@ -1412,7 +1419,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
-    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
+    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Import" button (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
@@ -1484,6 +1491,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
     <key alias="memberGroupSavedHeader">Member Group saved</key>
+    <key alias="memberGroupNameDuplicate">Another Member Group with the same name already exists</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
@@ -1571,9 +1579,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       ]]></key>
     <key alias="sectionName">Section Name</key>
     <key alias="sectionMandatory">Section is mandatory</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
             If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.
-        </key>
+    ]]></key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
     <key alias="copyToClipboard">copy to clipboard</key>
@@ -1620,6 +1628,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="clickToInsertMacro">Click to insert macro</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
@@ -1647,11 +1656,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
     <key alias="areAdded">are added</key>
-        <key alias="warning">Warning</key>
-        <key alias="youAreDeleting">You are deleting the row configuration</key>
-        <key alias="deletingARow">
-            Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.
-        </key>
+    <key alias="warning">Warning</key>
+    <key alias="warningText"><![CDATA[<p>Modifying a row configuration name will result in loss of data for any existing content that is based on this configuration.</p> <p><strong>Modifying only the label will not result in data loss.</strong></p>]]></key>
+    <key alias="youAreDeleting">You are deleting the row configuration</key>
+    <key alias="deletingARow">Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying a layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
@@ -1720,6 +1730,15 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
+    <key alias="removeChildNode">You are removing the child node</key>
+    <key alias="removeChildNodeWarning">Removing a child node will limit the editors options to create different content types beneath a node.</key>
+    <key alias="usingEditor">using this editor will get updated with the new settings.</key>
+    <key alias="historyCleanupHeading">History cleanup</key>
+    <key alias="historyCleanupDescription">Allow overriding the global history cleanup settings.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
+    <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -1806,7 +1825,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       http://%3%
 
       Have a nice day!
-
       Cheers from the Umbraco robot
     ]]></key>
     <key alias="noTranslators">No translator users found. Please create a translator user before you start sending content to translation</key>
@@ -2317,6 +2335,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
+    <key alias="maxAmount">Maximum amount</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2335,6 +2354,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="logViewer">
       <key alias="deleteSavedSearch">Delete Saved Search</key>
       <key alias="logLevels">Log Levels</key>
+      <key alias="selectAllLogLevelFilters">Select all</key>
+      <key alias="deselectAllLogLevelFilters">Deselect all</key>
       <key alias="savedSearches">Saved Searches</key>
       <key alias="saveSearch">Save Search</key>
       <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
@@ -2378,6 +2399,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForArrayOfItems">Collection of %0%</key>
     <key alias="labelForRemoveAllEntries">Remove all items</key>
     <key alias="labelForClearClipboard">Clear clipboard</key>
   </area>
@@ -2386,7 +2408,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Wait</key>
     <key alias="refreshStatus">Refresh status</key>
     <key alias="memoryCache">Memory Cache</key>
     <key alias="memoryCacheDescription">
@@ -2544,6 +2565,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="addBlock">Add content</key>
+    <key alias="addThis">Add %0%</key>
     <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
   </area>
   <area alias="contentTemplatesDashboard">

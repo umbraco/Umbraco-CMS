@@ -9,43 +9,51 @@
     color: @gray-5;
 }
 
-.umb-upload-local__dropzone {
-    position: relative;
-    width: 500px;
-    height: 300px;
-    border: 2px dashed @ui-action-border;
-    border-radius: 3px;
-    background: @white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 30px;
-    transition: 100ms box-shadow ease, 100ms border ease;
-    
-    &.drag-over {
-        border-color: @ui-action-border-hover;
-        border-style: solid;
-        box-shadow: 0 3px 8px rgba(0,0,0, .1);
+.umb-upload-local {
+
+    &__dropzone {
+        position: relative;
+        width: 500px;
+        height: 300px;
+        border: 2px dashed @ui-action-border;
+        border-radius: 3px;
+        background: @white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
         transition: 100ms box-shadow ease, 100ms border ease;
+
+        &.drag-over {
+            border-color: @ui-action-border-hover;
+            border-style: solid;
+            box-shadow: 0 3px 8px rgba(0,0,0, .1);
+            transition: 100ms box-shadow ease, 100ms border ease;
+        }
+
+        .umb-icon {
+            display: block;
+            color: @ui-action-type;
+            font-size: 6.75rem;
+            line-height: 1;
+            margin: 0 auto;
+        }
+
+        .umb-info-local-item {
+            margin: 20px;
+        }
     }
-}
 
-.umb-upload-local__dropzone i {
-    display: block;
-    color: @ui-action-type;
-    font-size: 110px;
-    line-height: 1;
-}
+    &__select-file {
+        font-weight: bold;
+        color: @ui-action-type;
+        cursor: pointer;
 
-.umb-upload-local__select-file {
-    font-weight: bold;
-    color: @ui-action-type;
-    cursor: pointer;
-
-    &:hover {
-        text-decoration: underline;
-        color: @ui-action-type-hover;
+        &:hover {
+            text-decoration: underline;
+            color: @ui-action-type-hover;
+        }
     }
 }
 
@@ -115,8 +123,4 @@
 
 .umb-info-local-item {
     margin-bottom: 20px;
-}
-
-.umb-upload-local__dropzone .umb-info-local-item {
-    margin:20px;
 }

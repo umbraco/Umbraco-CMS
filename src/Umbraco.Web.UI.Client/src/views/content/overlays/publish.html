@@ -7,7 +7,7 @@
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.missingMandatoryVariants.length === 0">
 
         <div class="mb3">
-            <p><localize key="content_variantsToPublish"></localize></p>
+            <p><localize key="content_variantsToPublish">Which variants would you like to publish?</localize></p>
         </div>
 
         <div class="umb-list-item"
@@ -30,7 +30,7 @@
                         <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                             <umb-variant-state variant="variant"></umb-variant-state>
                             <span ng-if="variant.isMandatory"> - </span>
-                            <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.state !== 'Published' && variant.state !== 'PublishedPendingChanges' && variant.publish === false) }"><localize key="general_mandatory"></localize></span>
+                            <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.state !== 'Published' && variant.state !== 'PublishedPendingChanges' && variant.publish === false) }"><localize key="general_mandatory">Mandatory</localize></span>
                         </span>
                         <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                             <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
@@ -46,13 +46,13 @@
         </div>
         <br/>
         <div class="mb3" ng-if="vm.isNew === true">
-            <p><localize key="content_variantsWillBeSaved"></localize></p>
+            <p><localize key="content_variantsWillBeSaved">All new variants will be saved.</localize></p>
         </div>
     </div>
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.missingMandatoryVariants.length !== 0">
         <div class="mb3">
-            <p><localize key="content_publishRequiresVariants"></localize></p>
+            <p><localize key="content_publishRequiresVariants">The following variants is required for publishing to take place:</localize></p>
         </div>
 
         <div class="umb-list-item" ng-repeat="variant in vm.missingMandatoryVariants track by variant.compositeId">
@@ -69,7 +69,7 @@
                 <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                     <umb-variant-state variant="variant"></umb-variant-state>
                     <span ng-if="variant.isMandatory"> - </span>
-                    <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="languages_mandatoryLanguage"></localize></span>
+                    <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="languages_mandatoryLanguage">Mandatory language</localize></span>
                 </span>
                 <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                     <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>

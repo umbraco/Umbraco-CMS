@@ -57,7 +57,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         *       Do stuff...
         *    });
         * </pre>
-        * 
+        *
         * @returns {Promise} resourcePromise object.
         *
         */
@@ -642,6 +642,24 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
+
+        getScaffolds: function(parentId, aliases){
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmptyByAliases"),
+                        { parentId: parentId, contentTypeAliases: aliases }
+                    ),
+                    'Failed to retrieve data for empty content item aliases ' + aliases.join(", ")
+                ).then(function(result) {
+                    Object.keys(result).map(function(key){
+                        result[key] = umbDataFormatter.formatContentGetData(result[key]);
+                    });
+
+                    return $q.when(result);
+                });
+        },
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#getScaffoldByKey
@@ -685,6 +703,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data for empty content item id ' + contentTypeKey)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
+        },
+
+        getScaffoldByKeys: function (parentId, scaffoldKeys) {
+
+            return umbRequestHelper.resourcePromise(
+                    $http.post(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetEmptyByKeys"),
+                        { contentTypeKeys: scaffoldKeys, parentId: parentId }
+                    ),
+                    'Failed to retrieve data for empty content items ids' + scaffoldKeys.join(", "))
+                .then(function (result) {
+                    Object.keys(result).map(function(key) {
+                        result[key] = umbDataFormatter.formatContentGetData(result[key]);
+                    });
+
+                    return $q.when(result);
                 });
         },
 
@@ -776,7 +813,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct
@@ -786,7 +823,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            
+
             //converts the value to a js bool
             function toBool(v) {
                 if (Utilities.isNumber(v)) {
@@ -1305,6 +1342,77 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     })
                 ),
                 "Failed to remove public access for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getPagedContentVersions
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns a paged array of previous version id's, given a node id, pageNumber, pageSize and a culture
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getPagedContentVersions(id, pageNumber, pageSize, culture)
+          *    .then(function(versions) {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} id Id of node
+          * @param {Int} pageNumber page number
+          * @param {Int} pageSize page size 
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object containing the versions
+          *
+          */
+        getPagedContentVersions: function (contentId, pageNumber, pageSize, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPagedContentVersions", {
+                        contentId: contentId,
+                        pageNumber: pageNumber,
+                        pageSize: pageSize,
+                        culture: culture
+                    })
+                ),
+                "Failed to get versions for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#contentVersionPreventCleanup
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Enables or disabled clean up of a version
+          *
+          * ##usage
+          * <pre>
+          * contentResource.contentVersionPreventCleanup(contentId, versionId, preventCleanup)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId Id of node
+          * @param {Int} versionId Id of version
+          * @param {Int} preventCleanup Boolean to toggle clean up prevention
+          *
+          */
+        contentVersionPreventCleanup: function (contentId, versionId, preventCleanup) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSetContentVersionPreventCleanup", {
+                        contentId: contentId,
+                        versionId: versionId,
+                        preventCleanup: preventCleanup
+                    })
+                ),
+                "Failed to toggle prevent cleanup of version with id " + versionId
             );
         }
     };

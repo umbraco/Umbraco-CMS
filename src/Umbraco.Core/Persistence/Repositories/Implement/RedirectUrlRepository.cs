@@ -37,8 +37,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[] ids)
         {
-            if (ids.Length > 2000)
-                throw new NotSupportedException("This repository does not support more than 2000 ids.");
+            if (ids.Length > Constants.Sql.MaxParameterCount)
+                throw new NotSupportedException($"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
+
             var sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             return dtos.WhereNotNull().Select(Map);

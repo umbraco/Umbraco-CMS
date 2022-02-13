@@ -19,7 +19,15 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateSimpleContent(IContentType contentType)
         {
-            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+            var content = new Content("Home", -1, contentType)
+            {
+                Level = 1,
+                SortOrder = 1,
+                CreatorId = 0,
+                WriterId = 0,
+                Key = Guid.NewGuid()
+            };
+
             object obj =
                 new
                     {
@@ -130,7 +138,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             content.SetValue("ddl", "1234");
             content.SetValue("chklist", "randomc");
             content.SetValue("contentPicker", Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C")).ToString());
-            content.SetValue("mediaPicker", Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691")).ToString());
+            content.SetValue("mediaPicker3", "[{\"key\": \"8f78ce9e-8fe0-4500-a52d-4c4f35566ba9\",\"mediaKey\": \"44CB39C8-01E5-45EB-9CF8-E70AAF2D1691\",\"crops\": [],\"focalPoint\": {\"left\": 0.5,\"top\": 0.5}}]");
             content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
             content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
             content.SetValue("tags", "this,is,tags");

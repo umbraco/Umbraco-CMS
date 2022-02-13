@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Scoping;
@@ -109,6 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             MapTemplates(contentTypes);
             MapComposition(contentTypes);
             MapGroupsAndProperties(contentTypes);
+            MapHistoryCleanup(contentTypes);
 
             // finalize
             foreach (var contentType in contentTypes.Values)
@@ -117,6 +119,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return contentTypes.Values;
+        }
+
+        private void MapHistoryCleanup(Dictionary<int, IContentTypeComposition> contentTypes)
+        {
+            // get templates
+            var sql1 = Sql()
+                .Select<ContentVersionCleanupPolicyDto>()
+                .From<ContentVersionCleanupPolicyDto>()
+                .OrderBy<ContentVersionCleanupPolicyDto>(x => x.ContentTypeId);
+
+            var contentVersionCleanupPolicyDtos = Database.Fetch<ContentVersionCleanupPolicyDto>(sql1);
+
+            var contentVersionCleanupPolicyDictionary =
+                contentVersionCleanupPolicyDtos.ToDictionary(x => x.ContentTypeId);
+            foreach (var c in contentTypes.Values)
+            {
+                if (!(c is ContentType contentType)) continue;
+
+                var historyCleanup = new HistoryCleanup();
+
+                if (contentVersionCleanupPolicyDictionary.TryGetValue(contentType.Id, out var versionCleanup))
+                {
+                    historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
+                    historyCleanup.KeepAllVersionsNewerThanDays = versionCleanup.KeepAllVersionsNewerThanDays;
+                    historyCleanup.KeepLatestVersionPerDayForDays = versionCleanup.KeepLatestVersionPerDayForDays;
+                }
+
+                contentType.HistoryCleanup = historyCleanup;
+            }
         }
 
         private void MapTemplates(Dictionary<int, IContentTypeComposition> contentTypes)
@@ -145,7 +176,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     templateDtoIx++;
                     if (!templates.TryGetValue(allowedDto.TemplateNodeId, out var template)) continue;
                     allowedTemplates.Add(template);
-                    
+
                     if (allowedDto.IsDefault)
                         defaultTemplateId = template.Id;
                 }
@@ -249,14 +280,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // ensure builtin properties
                 if (contentType is MemberType memberType)
                 {
-                    // ensure that the group exists (ok if it already exists)
-                    memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
-
                     // ensure that property types exist (ok if they already exist)
                     foreach (var (alias, propertyType) in builtinProperties)
                     {
-                        var added = memberType.AddPropertyType(propertyType, Constants.Conventions.Member.StandardPropertiesGroupName);
-
+                        var added = memberType.AddPropertyType(propertyType, Constants.Conventions.Member.StandardPropertiesGroupAlias, Constants.Conventions.Member.StandardPropertiesGroupName);
                         if (added)
                         {
                             var access = new MemberTypePropertyProfileAccess(false, false, false);
@@ -272,9 +299,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return new PropertyGroup(new PropertyTypeCollection(isPublishing))
             {
                 Id = dto.Id,
+                Key = dto.UniqueId,
+                Type = (PropertyGroupType)dto.Type,
                 Name = dto.Text,
-                SortOrder = dto.SortOrder,
-                Key = dto.UniqueId
+                Alias = dto.Alias,
+                SortOrder = dto.SortOrder
             };
         }
 

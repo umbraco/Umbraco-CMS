@@ -259,7 +259,7 @@ namespace Umbraco.Core.Models.Identity
         {
             get
             {
-                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now;
+                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() > DateTime.Now;
                 return isLocked;
             }
         }

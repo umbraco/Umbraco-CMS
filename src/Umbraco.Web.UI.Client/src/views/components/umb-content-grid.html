@@ -12,13 +12,13 @@
            ng-href="{{'#' + item.editPath}}"
            ng-click="clickItemName(item, $event, $index)"
            ng-class="{'-light': !item.published && item.updater != null}">
-            <i class="umb-content-grid__icon {{ item.icon }}" aria-hidden="true"></i>
-            <span>{{ item.name }}</span>
+            <umb-icon icon="{{item.icon}}" class="umb-content-grid__icon"></umb-icon>
+            <span>{{item.name}}</span>
         </a>
 
         <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published && item.updater != null}">
             <li class="umb-content-grid__details-item" ng-if="item.state">
-                <div class="umb-content-grid__details-label"><localize key="general_status"></localize>:</div>
+                <div class="umb-content-grid__details-label"><localize key="general_status">Status</localize>:</div>
                 <div class="umb-content-grid__details-value"><umb-variant-state variant="item"></umb-variant-state></div>
             </li>
             <li class="umb-content-grid__details-item" ng-repeat="property in contentProperties">

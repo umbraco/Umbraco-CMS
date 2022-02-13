@@ -328,7 +328,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<DocumentTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles", "contentTypeSavedHeader"),
                             string.Empty);
 
             return display;
@@ -576,43 +576,53 @@ namespace Umbraco.Web.Editors
             var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote);
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
-            var destFileName = root + "\\" + fileName;
-            try
+            var destFileName = Path.Combine(root, fileName);
+            if (Path.GetFullPath(destFileName).StartsWith(Path.GetFullPath(root)))
             {
-                // due to a bug before 8.7.0 we didn't delete temp files, so we need to make sure to delete before
-                // moving else you get errors and the upload fails without a message in the UI (there's a JS error)
-                if(System.IO.File.Exists(destFileName))
-                    System.IO.File.Delete(destFileName);
-
-                // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
-                // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
-                // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
-                System.IO.File.Move(result.FileData[0].LocalFileName, destFileName);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error<ContentTypeController, string>(ex, "Error uploading udt file to App_Data: {File}", destFileName);
-            }
-
-            if (ext.InvariantEquals("udt"))
-            {
-                model.TempFileName = Path.Combine(root, fileName);
-
-                var xd = new XmlDocument
+                try
                 {
-                    XmlResolver = null
-                };
-                xd.Load(model.TempFileName);
+                    // due to a bug before 8.7.0 we didn't delete temp files, so we need to make sure to delete before
+                    // moving else you get errors and the upload fails without a message in the UI (there's a JS error)
+                    if(System.IO.File.Exists(destFileName))
+                        System.IO.File.Delete(destFileName);
 
-                model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
-                model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
+                    // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
+                    // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
+                    // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
+                    System.IO.File.Move(result.FileData[0].LocalFileName, destFileName);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error<ContentTypeController, string>(ex, "Error uploading udt file to App_Data: {File}", destFileName);
+                }
+
+                if (ext.InvariantEquals("udt"))
+                {
+                    model.TempFileName = destFileName;
+
+                    var xd = new XmlDocument
+                    {
+                        XmlResolver = null
+                    };
+                    xd.Load(model.TempFileName);
+
+                    model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
+                    model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
+                }
+                else
+                {
+                    model.Notifications.Add(new Notification(
+                        Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
+                        Services.TextService.Localize("media", "disallowedFileType"),
+                        NotificationStyle.Warning));
+                }
             }
             else
             {
                 model.Notifications.Add(new Notification(
-                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                    Services.TextService.Localize("media/disallowedFileType"),
-                    NotificationStyle.Warning));
+                                        Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
+                                        Services.TextService.Localize("media", "invalidFileName"),
+                                        NotificationStyle.Warning));
             }
 
             return model;
