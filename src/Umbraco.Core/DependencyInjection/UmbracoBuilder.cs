@@ -37,6 +37,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
+using Umbraco.Cms.Core.Telemetry.DataCollectors;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -263,6 +264,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ITelemetryService, TelemetryService>();
+            Services.AddSingleton<ITelemetryDataCollector, UmbracoVersionTelemetryDataCollector>();
+            Services.AddSingleton<ITelemetryDataCollector, PackageVersionsTelemetryDataCollector>();
+            Services.AddSingleton<ITelemetryDataCollector, SystemInformationTelemetryDataCollector>();
+            Services.AddSingleton<ITelemetryDataCollector, UsageInformationTelemetryDataCollector>();
 
             // Register a noop IHtmlSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();

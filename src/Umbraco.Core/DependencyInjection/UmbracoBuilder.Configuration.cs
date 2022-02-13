@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
+using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
@@ -15,7 +16,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
     /// </summary>
     public static partial class UmbracoBuilderExtensions
     {
-
         private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>> configure = null)
             where TOptions : class
         {
@@ -28,8 +28,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             var optionsBuilder = builder.Services.AddOptions<TOptions>()
                 .Bind(
                     builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
-                    o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties
-                )
+                    o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
                 .ValidateDataAnnotations();
 
             configure?.Invoke(optionsBuilder);

@@ -30,5 +30,14 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// </remarks>
         [DataMember(Name = "packages")]
         public IEnumerable<PackageTelemetry> Packages { get; set; }
+
+        /// <summary>
+        /// Gets the telemetry data.
+        /// </summary>
+        /// <value>
+        /// The telemetry data.
+        /// </value>
+        [DataMember(Name = "data")]
+        public IDictionary<TelemetryData, object> Data { get; } = new Dictionary<TelemetryData, object>();
     }
 }

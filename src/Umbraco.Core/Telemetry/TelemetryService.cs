@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Telemetry.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Telemetry
 {
@@ -14,8 +11,7 @@ namespace Umbraco.Cms.Core.Telemetry
     {
         private readonly IOptionsMonitor<TelemetrySettings> _telemetrySettings;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-        private readonly IManifestParser _manifestParser;
-        private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IEnumerable<ITelemetryDataCollector> _telemetryDataCollectors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelemetryService" /> class.
@@ -23,38 +19,19 @@ namespace Umbraco.Cms.Core.Telemetry
         public TelemetryService(
             IOptionsMonitor<TelemetrySettings> telemetrySettings,
             IOptionsMonitor<GlobalSettings> globalSettings,
-            IManifestParser manifestParser,
-            IUmbracoVersion umbracoVersion)
+            IEnumerable<ITelemetryDataCollector> telemetryDataCollectors)
         {
             _telemetrySettings = telemetrySettings;
             _globalSettings = globalSettings;
-            _manifestParser = manifestParser;
-            _umbracoVersion = umbracoVersion;
+            _telemetryDataCollectors = telemetryDataCollectors;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TelemetryService" /> class.
-        /// </summary>
-        [Obsolete("Use ctor with all params")]
-        public TelemetryService(
-            IOptionsMonitor<GlobalSettings> globalSettings,
-            IManifestParser manifestParser,
-            IUmbracoVersion umbracoVersion)
-            : this(null, globalSettings, manifestParser, umbracoVersion)
-        { }
 
         /// <inheritdoc/>
         public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
         {
-            TelemetrySettings telemetryOptions = _telemetrySettings?.CurrentValue;
-            if (telemetryOptions == null)
-            {
-                // Added for backwards compatibility (remove in V10)
-                telemetryOptions = new TelemetrySettings();
-                telemetryOptions.Set(TelemetryLevel.Basic);
-            }
+            TelemetrySettings telemetrySettings = _telemetrySettings.CurrentValue;
 
-            if (telemetryOptions.IsEnabled() is false ||
+            if (telemetrySettings.IsEnabled() is false ||
                 TryGetTelemetryId(out Guid telemetryId) is false)
             {
                 telemetryReportData = null;
@@ -66,14 +43,27 @@ namespace Umbraco.Cms.Core.Telemetry
                 Id = telemetryId
             };
 
-            if (telemetryOptions.IsEnabled(SystemInformationMetric.UmbracoVersion))
+            // Collect telemetry data
+            foreach (var collector in _telemetryDataCollectors)
             {
-                telemetryReportData.Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+                foreach (var telemetryData in collector.Data)
+                {
+                    if (telemetrySettings.IsEnabled(telemetryData))
+                    {
+                        telemetryReportData.Data[telemetryData] = collector.Collect(telemetryData);
+                    }
+                }
             }
 
-            if (telemetryOptions.IsEnabled(SystemInformationMetric.PackageVersions))
+            // Populate existing fields for backwards compatibility
+            if (telemetryReportData.Data.TryGetValue(TelemetryData.UmbracoVersion, out var umbracoVersion))
             {
-                telemetryReportData.Packages = GetPackageTelemetry();
+                telemetryReportData.Version = umbracoVersion as string;
+            }
+
+            if (telemetryReportData.Data.TryGetValue(TelemetryData.PackageVersions, out var packageVersions))
+            {
+                telemetryReportData.Packages = packageVersions as IEnumerable<PackageTelemetry>;
             }
 
             return true;
@@ -91,28 +81,6 @@ namespace Umbraco.Cms.Core.Telemetry
 
             telemetryId = parsedTelemetryId;
             return true;
-        }
-
-        private IEnumerable<PackageTelemetry> GetPackageTelemetry()
-        {
-            List<PackageTelemetry> packages = new ();
-            IEnumerable<PackageManifest> manifests = _manifestParser.GetManifests();
-
-            foreach (PackageManifest manifest in manifests)
-            {
-                if (manifest.AllowPackageTelemetry is false)
-                {
-                    continue;
-                }
-
-                packages.Add(new PackageTelemetry
-                {
-                    Name = manifest.PackageName,
-                    Version = manifest.Version ?? string.Empty
-                });
-            }
-
-            return packages;
         }
     }
 }

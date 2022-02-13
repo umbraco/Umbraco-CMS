@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Telemetry.Models;
 namespace Umbraco.Cms.Core.Telemetry
 {
     /// <summary>
-    /// Service which gathers the data for telemetry reporting
+    /// Service which gathers the data for telemetry reporting.
     /// </summary>
     public interface ITelemetryService
     {
