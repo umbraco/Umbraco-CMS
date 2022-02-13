@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
     <LangVersion>8</LangVersion>
     <PackageId>Umbraco.Cms.PublishedCache.NuCache</PackageId>
