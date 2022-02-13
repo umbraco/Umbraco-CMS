@@ -751,7 +751,7 @@ namespace Umbraco.Cms.Core.Packaging
             var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
             File.Delete(packagesFile);
             var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
-            Directory.Delete(packagesFolder);
+            Directory.Delete(packagesFolder, true);
         }
     }
 }
