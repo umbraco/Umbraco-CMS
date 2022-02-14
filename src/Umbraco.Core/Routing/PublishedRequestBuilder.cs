@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Routing
         public IPublishedRequestBuilder SetDomain(DomainAndUri domain)
         {
             Domain = domain;
-            SetCulture(domain.Culture);
+            SetCulture(domain?.Culture);
             return this;
         }
 

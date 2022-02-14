@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Core.Routing
             return BuildRequest(builder);
         }
 
-        private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder)
+        private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder, bool skipContentFinders = false)
         {
             // if request builder was already flagged to redirect then return
             // whoever called us is in charge of actually redirecting
@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Core.Routing
             // This could be manually assigned with a custom route handler, etc...
             // which in turn could call this method
             // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
-            if (!builder.HasPublishedContent())
+            if (!builder.HasPublishedContent() && !skipContentFinders)
             {
                 _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", builder.Uri.AbsolutePath);
 
@@ -232,11 +232,15 @@ namespace Umbraco.Cms.Core.Routing
 
             IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
+            // ensure we keep the previous domain and culture
+            builder.SetDomain(request.Domain);
+            builder.SetCulture(request.Culture);
+
             // set to the new content (or null if specified)
             builder.SetPublishedContent(publishedContent);
 
             // re-route
-            await RouteRequestInternalAsync(builder);
+            await RouteRequestInternalAsync(builder, true);
 
             // return if we are redirect
             if (builder.IsRedirect())
@@ -250,11 +254,6 @@ namespace Umbraco.Cms.Core.Routing
                 // means the engine could not find a proper document to handle 404
                 // restore the saved content so we know it exists
                 builder.SetPublishedContent(content);
-            }
-
-            if (!builder.HasDomain())
-            {
-                FindDomain(builder);
             }
 
             return BuildRequest(builder);
