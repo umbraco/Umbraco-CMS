@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -18,16 +18,39 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly ILogger<ReportSiteTask> _logger;
         private readonly ITelemetryService _telemetryService;
+        private readonly IJsonSerializer _jsonSerializer;
         private static HttpClient s_httpClient;
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
-            ITelemetryService telemetryService)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            ITelemetryService telemetryService,
+            IJsonSerializer jsonSerializer)
+            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(0))
         {
             _logger = logger;
             _telemetryService = telemetryService;
-            s_httpClient = new HttpClient();
+            _jsonSerializer = jsonSerializer;
+
+            s_httpClient = new HttpClient()
+            {
+#if DEBUG
+                // Send data to DEBUG telemetry service
+                BaseAddress = new Uri("https://telemetry.rainbowsrock.net/")
+#else
+                // Send data to LIVE telemetry
+                BaseAddress = new Uri("https://telemetry.umbraco.com/")
+#endif
+            };
+
+            s_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+        }
+
+        [Obsolete("Use ctor with all params")]
+        public ReportSiteTask(
+            ILogger<ReportSiteTask> logger,
+            ITelemetryService telemetryService)
+            : this(logger, telemetryService, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
+        {
         }
 
         [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
@@ -52,32 +75,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
             try
             {
-                if (s_httpClient.BaseAddress is null)
-                {
-                    // Send data to LIVE telemetry
-                    s_httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
-
-                    // Set a low timeout - no need to use a larger default timeout for this POST request
-                    s_httpClient.Timeout = new TimeSpan(0, 0, 1);
-
-#if DEBUG
-                    // Send data to DEBUG telemetry service
-                    s_httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
-#endif
-                }
-
-                s_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
-                    request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json");
+                    request.Content = new StringContent(_jsonSerializer.Serialize(telemetryReportData), Encoding.UTF8, "application/json");
 
-                    // Make a HTTP Post to telemetry service
-                    // https://telemetry.umbraco.com/installs/
-                    // Fire & Forget, do not need to know if its a 200, 500 etc
-                    using (HttpResponseMessage response = await s_httpClient.SendAsync(request))
-                    {
-                    }
+                    // Make an HTTP POST to telemetry service (fire & forget, do not need to know if it's a 200, 500, etc.)
+                    using HttpResponseMessage response = await s_httpClient.SendAsync(request);
                 }
             }
             catch

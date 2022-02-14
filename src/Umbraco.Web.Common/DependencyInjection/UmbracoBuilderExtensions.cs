@@ -34,6 +34,7 @@ using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -184,7 +185,8 @@ namespace Umbraco.Extensions
             builder.Services.AddHostedService(provider =>
                 new ReportSiteTask(
                     provider.GetRequiredService<ILogger<ReportSiteTask>>(),
-                    provider.GetRequiredService<ITelemetryService>()));
+                    provider.GetRequiredService<ITelemetryService>(),
+                    provider.GetRequiredService<IJsonSerializer>()));
             return builder;
         }
 
