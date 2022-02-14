@@ -17,7 +17,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Persistence.SqlServer.Services;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.Common.TestHelpers
 {

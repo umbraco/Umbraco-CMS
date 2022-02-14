@@ -20,8 +20,8 @@
                 <dependency id="Umbraco.Cms.Web.Website" version="[$version$]" />
                 <dependency id="Umbraco.Cms.Web.BackOffice" version="[$version$]" />
                 <dependency id="Umbraco.Cms.StaticAssets" version="[$version$]" />
-                <dependency id="Umbraco.Persistence.SqlServer" version="[$version$]" />
-                <dependency id="Umbraco.Persistence.Sqlite" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Persistence.SqlServer" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Persistence.Sqlite" version="[$version$]" />
             </group>
         </dependencies>
         <!--

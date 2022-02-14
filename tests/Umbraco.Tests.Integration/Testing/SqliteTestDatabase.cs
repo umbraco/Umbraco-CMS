@@ -15,8 +15,8 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
-using Umbraco.Persistence.Sqlite.Mappers;
-using Umbraco.Persistence.Sqlite.Services;
+using Umbraco.Cms.Persistence.Sqlite.Mappers;
+using Umbraco.Cms.Persistence.Sqlite.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 

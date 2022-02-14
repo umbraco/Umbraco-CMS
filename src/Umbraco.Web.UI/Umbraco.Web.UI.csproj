@@ -11,12 +11,12 @@
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
-    <ProjectReference Include="../Umbraco.Persistence.SqlServer/Umbraco.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="../Umbraco.Persistence.Sqlite/Umbraco.Persistence.Sqlite.csproj" />
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
   </ItemGroup>
 
 

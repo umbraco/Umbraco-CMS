@@ -9,7 +9,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Persistence.SqlServer.Services;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Tests.Benchmarks
 {
