@@ -356,6 +356,7 @@ namespace Umbraco.Web.Editors
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"loginLogoImage", Current.Configs.Settings().Content.LoginLogoImage },
+                        {"hideBackOfficeLogo", Current.Configs.Settings().Content.HideBackOfficeLogo },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
