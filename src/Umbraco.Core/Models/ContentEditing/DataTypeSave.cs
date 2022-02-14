@@ -38,12 +38,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets or sets the persisted data type.
         /// </summary>
         [IgnoreDataMember]
-        public IDataType PersistedDataType { get; set; }
+        public IDataType? PersistedDataType { get; set; }
 
         /// <summary>
         /// Gets or sets the property editor.
         /// </summary>
         [IgnoreDataMember]
-        public IDataEditor PropertyEditor { get; set; }
+        public IDataEditor? PropertyEditor { get; set; }
     }
 }

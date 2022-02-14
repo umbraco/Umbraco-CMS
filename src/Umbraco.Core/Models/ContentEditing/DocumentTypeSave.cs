@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The default template to assign (template alias)
         /// </summary>
         [DataMember(Name = "defaultTemplate")]
-        public string DefaultTemplate { get; set; }
+        public string? DefaultTemplate { get; set; }
 
         /// <summary>
         /// Custom validation
