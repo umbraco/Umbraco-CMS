@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public string Email { get; set; }
 
         [DataMember(Name = "username")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [DataMember(Name = "message")]
         public string Message { get; set; }
