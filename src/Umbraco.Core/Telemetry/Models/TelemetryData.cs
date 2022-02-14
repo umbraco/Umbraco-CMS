@@ -36,9 +36,8 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         Framework,
 
         /// <summary>
-        /// The hosting server and version.
+        /// The hosting server.
         /// </summary>
-        // TODO: Implement a collector
         Server,
 
         /// <summary>
