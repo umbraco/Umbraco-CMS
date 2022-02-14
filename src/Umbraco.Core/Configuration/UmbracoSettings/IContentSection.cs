@@ -36,6 +36,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string LoginBackgroundImage { get; }
 
         string LoginLogoImage { get; }
-        bool HideBackofficeLogo { get; }
+        bool HideBackOfficeLogo { get; }
     }
 }

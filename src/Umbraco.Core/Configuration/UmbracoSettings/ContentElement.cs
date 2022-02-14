@@ -47,7 +47,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal InnerTextConfigurationElement<string> LoginLogoImage => GetOptionalTextElement("loginLogoImage", "assets/img/application/umbraco_logo_white.svg");
 
         [ConfigurationProperty("hideBackofficeLogo")]
-        internal InnerTextConfigurationElement<bool> HideBackofficeLogo => GetOptionalTextElement("hideBackofficeLogo", false);
+        internal InnerTextConfigurationElement<bool> HideBackOfficeLogo => GetOptionalTextElement("hideBackofficeLogo", false);
 
         string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 
@@ -74,6 +74,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IContentSection.LoginBackgroundImage => LoginBackgroundImage;
 
         string IContentSection.LoginLogoImage => LoginLogoImage;
-        bool IContentSection.HideBackofficeLogo => HideBackofficeLogo;
+        bool IContentSection.HideBackOfficeLogo => HideBackOfficeLogo;
     }
 }
