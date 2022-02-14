@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions;
+using Umbraco.Cms.Infrastructure.Logging.Viewer;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
@@ -16,6 +17,11 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         {
             Func<LogEvent, bool> filter;
 
+            // Our custom Serilog Functions to extend Serilog.Expressions
+            // In this case we are plugging the gap for the missing Has()
+            // function from porting away from Serilog.Filters.Expressions to Serilog.Expressions
+            var customSerilogFunctions = new StaticMemberNameResolver(typeof(SerilogExpressionsFunctions));
+
             if (string.IsNullOrEmpty(filterExpression))
             {
                 return;
@@ -29,7 +35,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             else // check if it's a valid expression
             {
                 // If the expression evaluates then make it into a filter
-                if (SerilogExpression.TryCompile(filterExpression, out CompiledExpression compiled, out var error))
+                if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression compiled, out var error))
                 {
                     //filter = evt => true.Equals(eval(evt));
                     filter = evt =>
