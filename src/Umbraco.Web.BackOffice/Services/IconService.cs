@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                     var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.PluginIcons}");
                     var iconPathExists = Directory.Exists(iconPath);
 
-                    if (!iconPathExists && _hostingEnvironment.IsCaseSensitiveFileSystem())
+                    if (!iconPathExists)
                     {
                         iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIcons}");
                         iconPathExists = Directory.Exists(iconPath);
