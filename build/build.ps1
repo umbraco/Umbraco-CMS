@@ -418,7 +418,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.Sqlite", "Umbraco.Persistence.SqlServer"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Cms.Persistence.Sqlite", "Umbraco.Cms.Persistence.SqlServer"))
     if ($this.OnError()) { return }
   })
 

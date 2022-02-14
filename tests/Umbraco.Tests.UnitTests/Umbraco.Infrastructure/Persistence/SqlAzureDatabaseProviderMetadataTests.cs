@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Persistence.SqlServer.Services;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence
 {

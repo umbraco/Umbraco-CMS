@@ -32,11 +32,11 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Extensions;
-using Umbraco.Persistence.SqlServer.Services;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 

@@ -22,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Persistence.SqlServer\Umbraco.Persistence.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
 </Project>

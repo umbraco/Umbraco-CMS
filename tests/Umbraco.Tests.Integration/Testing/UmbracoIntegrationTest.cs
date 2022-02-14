@@ -20,12 +20,12 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.Sqlite;
+using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Extensions;
-using Umbraco.Persistence.Sqlite;
-using Umbraco.Persistence.SqlServer;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
