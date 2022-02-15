@@ -18,7 +18,7 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Empty recycle bin</key>
+    <key alias="emptyrecyclebin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importdocumenttype">Import Document Type</key>
