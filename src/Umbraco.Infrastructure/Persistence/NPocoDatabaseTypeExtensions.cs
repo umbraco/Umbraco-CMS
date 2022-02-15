@@ -15,12 +15,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         }
 
         [Obsolete("Usage of this method indicates a code smell.")]
-        public static bool IsSqlCe(this DatabaseType databaseType)
-        {
-            return databaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType;
-        }
-
-        [Obsolete("Usage of this method indicates a code smell.")]
         public static bool IsSqlite(this DatabaseType databaseType)
         {
             return databaseType is NPoco.DatabaseTypes.SQLiteDatabaseType;

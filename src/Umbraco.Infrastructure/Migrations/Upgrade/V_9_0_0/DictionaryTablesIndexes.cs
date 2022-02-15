@@ -109,22 +109,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         {
             string columnSpecification;
 
-            // If using SQL CE, we don't have access to COUNT (DISTINCT *) or CONCAT, so will need to do this by querying all records.
-            if (DatabaseType.IsSqlCe())
-            {
-                columnSpecification = columns.Length == 1
-                    ? StringConvertedAndQuotedColumnName(columns[0])
-                    : $"{string.Join(" + ", columns.Select(x => StringConvertedAndQuotedColumnName(x)))}";
-
-                var allRecordsQuery = Database.SqlContext.Sql()
-                    .Select(columnSpecification)
-                    .From<TDto>();
-
-                var allRecords = Database.Fetch<string>(allRecordsQuery);
-
-                return allRecords.Distinct().Count();
-            }
-
             columnSpecification = columns.Length == 1
                 ? QuoteColumnName(columns[0])
                 : $"CONCAT({string.Join(",", columns.Select(QuoteColumnName))})";

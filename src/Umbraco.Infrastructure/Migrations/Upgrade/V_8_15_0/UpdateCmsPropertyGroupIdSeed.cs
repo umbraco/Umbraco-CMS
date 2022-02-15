@@ -10,10 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0
 
         protected override void Migrate()
         {
-            if (DatabaseType.IsSqlCe())
-            {
-                Database.Execute(Sql("ALTER TABLE [cmsPropertyTypeGroup] ALTER COLUMN [id] IDENTITY (56,1)"));
-            }
+            // NOOP - was sql ce only
         }
     }
 }
