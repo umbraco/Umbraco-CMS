@@ -149,17 +149,17 @@ namespace Umbraco.Extensions
             {
                 builder.Services
             };
-            //
-            // // Replace the default with our custom engine
-            // builder.Services.AddSingleton<IRazorViewEngine>(
-            //     s => new RefreshingRazorViewEngine(
-            //             () =>
-            //             {
-            //                 // re-create the original container so that a brand new IRazorPageActivator
-            //                 // is produced, if we don't re-create the container then it will just return the same instance.
-            //                 ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-            //                 return recreatedServices.GetRequiredService<IRazorViewEngine>();
-            //             }, s.GetRequiredService<InMemoryModelFactory>()));
+
+            // Replace the default with our custom engine
+            builder.Services.AddSingleton<IRazorViewEngine>(
+                s => new RefreshingRazorViewEngine(
+                        () =>
+                        {
+                            // re-create the original container so that a brand new IRazorPageActivator
+                            // is produced, if we don't re-create the container then it will just return the same instance.
+                            ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
+                            return recreatedServices.GetRequiredService<IRazorViewEngine>();
+                        }, s.GetRequiredService<InMemoryModelFactory>()));
 
             return builder;
         }
