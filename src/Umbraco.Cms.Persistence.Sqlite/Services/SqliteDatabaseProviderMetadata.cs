@@ -19,6 +19,9 @@ public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
     public string DisplayName => "SQLite";
 
     /// <inheritdoc />
+    public string DefaultDatabaseName => Core.Constants.System.UmbracoDefaultDatabaseName;
+
+    /// <inheritdoc />
     public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />

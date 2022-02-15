@@ -25,6 +25,12 @@ public interface IDatabaseProviderMetadata
     string DisplayName { get; }
 
     /// <summary>
+    /// Gets the default database name for the provider.
+    /// </summary>
+    [DataMember(Name = "defaultDatabaseName")]
+    string DefaultDatabaseName { get; }
+
+    /// <summary>
     /// Gets the database factory provider name.
     /// </summary>
     [DataMember(Name = "providerName")]

@@ -22,10 +22,11 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
       $scope.installer.current.model.integratedAuth = false;
       $scope.installer.current.model.databaseProviderMetadataId = newValue.id;
       $scope.installer.current.model.providerName = newValue.providerName;
+      $scope.installer.current.model.databaseName = newValue.defaultDatabaseName;
     });
 
     $scope.isCustom = function() {
-        return $scope.selectedDbMeta.displayName === 'Custom';  
+        return $scope.selectedDbMeta.displayName === 'Custom';
     }
 
 
