@@ -20,7 +20,8 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             // Our custom Serilog Functions to extend Serilog.Expressions
             // In this case we are plugging the gap for the missing Has()
             // function from porting away from Serilog.Filters.Expressions to Serilog.Expressions
-            var customSerilogFunctions = new StaticMemberNameResolver(typeof(SerilogExpressionsFunctions));
+            // Along with patching support for the more verbose built in property names
+            var customSerilogFunctions = new SerilogLegacyNameResolver(typeof(SerilogExpressionsFunctions));
 
             if (string.IsNullOrEmpty(filterExpression))
             {
@@ -37,7 +38,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
                 // If the expression evaluates then make it into a filter
                 if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression compiled, out var error))
                 {
-                    //filter = evt => true.Equals(eval(evt));
                     filter = evt =>
                     {
                         LogEventPropertyValue result = compiled(evt);
