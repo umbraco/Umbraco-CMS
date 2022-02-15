@@ -681,7 +681,7 @@ namespace Umbraco.Cms.Core.Packaging
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
             }
 
-            IStylesheet stylesheet = _fileService.GetStylesheet(path);
+            IStylesheet? stylesheet = _fileService.GetStylesheet(path);
             if (stylesheet == null)
             {
                 return null;

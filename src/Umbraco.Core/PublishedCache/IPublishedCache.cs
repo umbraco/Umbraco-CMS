@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IPublishedContent GetById(bool preview, int contentId);
+        IPublishedContent? GetById(bool preview, int contentId);
 
         /// <summary>
         /// Gets a content identified by its unique identifier.
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IPublishedContent GetById(int contentId);
+        IPublishedContent? GetById(int contentId);
 
         /// <summary>
         /// Gets a content identified by its unique identifier.

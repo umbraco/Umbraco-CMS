@@ -24,9 +24,9 @@ namespace Umbraco.Cms.Core.PublishedCache
             PreviewDefault = previewDefault;
         }
 
-        public abstract IPublishedContent GetById(bool preview, int contentId);
+        public abstract IPublishedContent? GetById(bool preview, int contentId);
 
-        public IPublishedContent GetById(int contentId)
+        public IPublishedContent? GetById(int contentId)
             => GetById(PreviewDefault, contentId);
 
         public abstract IPublishedContent GetById(bool preview, Guid contentId);

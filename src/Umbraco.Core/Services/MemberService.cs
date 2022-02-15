@@ -359,7 +359,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember GetByProviderKey(object id)
+        public IMember? GetByProviderKey(object id)
         {
             var asGuid = id.TryConvertTo<Guid>();
             if (asGuid.Success)

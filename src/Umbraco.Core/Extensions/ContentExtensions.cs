@@ -90,7 +90,7 @@ namespace Umbraco.Extensions
         /// <param name="entity"></param>
         public static void SanitizeEntityPropertiesForXmlStorage(this IContentBase entity)
         {
-            entity.Name = entity.Name?.ToValidXmlString();
+            entity.Name = entity.Name.ToValidXmlString();
             foreach (var property in entity.Properties)
             {
                 foreach (var propertyValue in property.Values)
@@ -181,14 +181,14 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this content item.
         /// </summary>
-        public static IProfile GetCreatorProfile(this IContentBase content, IUserService userService)
+        public static IProfile? GetCreatorProfile(this IContentBase content, IUserService userService)
         {
             return userService.GetProfileById(content.CreatorId);
         }
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
-        public static IProfile GetWriterProfile(this IContent content, IUserService userService)
+        public static IProfile? GetWriterProfile(this IContent content, IUserService userService)
         {
             return userService.GetProfileById(content.WriterId);
         }
@@ -196,7 +196,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
-        public static IProfile GetWriterProfile(this IMedia content, IUserService userService)
+        public static IProfile? GetWriterProfile(this IMedia content, IUserService userService)
         {
             return userService.GetProfileById(content.WriterId);
         }
@@ -207,7 +207,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
-        public static IProfile GetCreatorProfile(this IMedia media, IUserService userService)
+        public static IProfile? GetCreatorProfile(this IMedia media, IUserService userService)
         {
             return userService.GetProfileById(media.CreatorId);
         }

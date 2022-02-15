@@ -23,12 +23,12 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <summary>
         /// Gets the <see cref="IPublishedMemberCache"/>.
         /// </summary>
-        IPublishedMemberCache Members { get; }
+        IPublishedMemberCache? Members { get; }
 
         /// <summary>
         /// Gets the <see cref="IDomainCache"/>.
         /// </summary>
-        IDomainCache Domains { get; }
+        IDomainCache? Domains { get; }
 
         /// <summary>
         /// Gets the snapshot-level cache.
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <remarks>
         /// <para>The snapshot-level cache belongs to this snapshot only.</para>
         /// </remarks>
-        IAppCache SnapshotCache { get; }
+        IAppCache? SnapshotCache { get; }
 
         /// <summary>
         /// Gets the elements-level cache.
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <para>The elements-level cache is shared by all snapshots relying on the same elements,
         /// ie all snapshots built on top of unchanging content / media / etc.</para>
         /// </remarks>
-        IAppCache ElementsCache { get; }
+        IAppCache? ElementsCache { get; }
 
         /// <summary>
         /// Forces the preview mode.

@@ -14,11 +14,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         {
             AdditionalData = new Dictionary<string, object>();
             Alias = string.Empty;
+            Name = string.Empty;
         }
 
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]

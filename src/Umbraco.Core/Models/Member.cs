@@ -15,8 +15,8 @@ namespace Umbraco.Cms.Core.Models
     public class Member : ContentBase, IMember
     {
         private IDictionary<string, object?>? _additionalData;
-        private string? _username;
-        private string? _email;
+        private string _username;
+        private string _email;
         private string? _rawPasswordValue;
         private string? _passwordConfig;
         private DateTime? _emailConfirmedDate;
@@ -187,20 +187,20 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Username
         /// </summary>
         [DataMember]
-        public string? Username
+        public string Username
         {
             get => _username;
-            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
+            set => SetPropertyValueAndDetectChanges(value, ref _username!, nameof(Username));
         }
 
         /// <summary>
         /// Gets or sets the Email
         /// </summary>
         [DataMember]
-        public string? Email
+        public string Email
         {
             get => _email;
-            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
+            set => SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
         }
 
         [DataMember]

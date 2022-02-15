@@ -228,6 +228,6 @@ namespace Umbraco.Cms.Core.IO
         }
 
         /// <inheritdoc />
-        public IFileProvider Create() => _innerFileSystem.TryCreateFileProvider(out IFileProvider fileProvider) ? fileProvider : null;
+        public IFileProvider? Create() => _innerFileSystem.TryCreateFileProvider(out IFileProvider? fileProvider) ? fileProvider : null;
     }
 }

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models.Membership
     /// </summary>
     public interface IReadOnlyUserGroup
     {
-        string? Name { get; }
+        string Name { get; }
         string? Icon { get; }
         int Id { get; }
         int? StartContentId { get; }

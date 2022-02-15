@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets the name of the editor.
         /// </summary>
-        string? Name { get; }
+        string Name { get; }
 
         /// <summary>
         /// Gets the icon of the editor.

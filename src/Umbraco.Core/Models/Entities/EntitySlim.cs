@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <inheritdoc />
         [DataMember]

@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public string GetRouteById(int contentId, string? culture = null) => throw new NotImplementedException();
 
-        public override IPublishedContent GetById(bool preview, int contentId) => _content.ContainsKey(contentId) ? _content[contentId] : null;
+        public override IPublishedContent? GetById(bool preview, int contentId) => _content.ContainsKey(contentId) ? _content[contentId] : null;
 
         public override IPublishedContent GetById(bool preview, Guid contentId) => throw new NotImplementedException();
 

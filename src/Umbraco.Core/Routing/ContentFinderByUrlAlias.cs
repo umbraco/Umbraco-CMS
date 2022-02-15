@@ -102,9 +102,9 @@ namespace Umbraco.Cms.Core.Routing
                 }
 
                 IPublishedProperty? p = c.GetProperty(propertyAlias);
-                var varies = p!.PropertyType.VariesByCulture();
+                var varies = p!.PropertyType?.VariesByCulture();
                 string? v;
-                if (varies)
+                if (varies ?? false)
                 {
                     if (!c.HasCulture(culture))
                     {
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Routing
             // but the only solution is to entirely refactor URL providers to stop being dynamic
             if (rootNodeId > 0)
             {
-                IPublishedContent rootNode = cache.GetById(rootNodeId);
+                IPublishedContent? rootNode = cache.GetById(rootNodeId);
                 return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
             }
 

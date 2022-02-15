@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Core.Media.Exif
     internal class JPEGFile : ImageFile
     {
         #region Member Variables
-        private JPEGSection jfifApp0;
-        private JPEGSection jfxxApp0;
-        private JPEGSection exifApp1;
+        private JPEGSection? jfifApp0;
+        private JPEGSection? jfxxApp0;
+        private JPEGSection? exifApp1;
         private uint makerNoteOffset;
         private long exifIFDFieldOffset, gpsIFDFieldOffset, interopIFDFieldOffset, firstIFDFieldOffset;
         private long thumbOffsetLocation, thumbSizeLocation;
