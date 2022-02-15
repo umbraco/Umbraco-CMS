@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Install.UserController">
   <h1>Install Umbraco</h1>
-  <p>Enter your name, email and password to install Umbraco with its default settings, alternatively you can customize your installation</p>
+  <p>Enter your name, email and password for this Umbraco installation.</p>
   <form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndInstall();">
     <div class="row">
       <div class="span8">
@@ -40,10 +40,10 @@
         </div>
       </div>
     </div>
-    <div class="row" ng-if="installer.current.model.quickInstallSettings">
+    <div class="row" ng-if="installer.current.model.quickInstallSettings" ng-style="{'opacity': myForm.$invalid ? '0.4' : ''}">
+      <legend>Database Configuration</legend>
       <div class="span8">
         <div class="pull-right">
-          <legend>Quick install defaults</legend>
           <div class="span12">
             <div class="control-group">
               <label class="control-label" for="dbType">Database type</label>
@@ -60,6 +60,13 @@
               </div>
             </div>
           </div>
+          <div class="span12">
+            <div class="control-group">
+              <div class="controls">
+                <button ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable" class="btn btn-info control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Change Database Configuration</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -68,8 +75,7 @@
         <div class="pull-right">
           <div class="control-group" ng-class="{disabled:myForm.$invalid}">
             <div class="controls">
-              <input ng-if="installer.current.model.quickInstallSettings" type="submit" ng-disabled="myForm.$invalid" value="Install" class="btn btn-success" />
-              <button ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable" class="btn btn-info control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Customize</button>
+              <input ng-if="installer.current.model.quickInstallSettings" type="submit" ng-disabled="myForm.$invalid" value="Quick install" class="btn btn-success" />
               <button ng-if="!installer.current.model.quickInstallSettings" class="btn btn-primary control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Next</button>
             </div>
           </div>
