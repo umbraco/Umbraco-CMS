@@ -20,6 +20,9 @@ public class CustomConnectionStringDatabaseProviderMetadata : IDatabaseProviderM
     public string DisplayName => "Custom";
 
     /// <inheritdoc />
+    public string DefaultDatabaseName => string.Empty;
+
+    /// <inheritdoc />
     public string ProviderName => null;
 
     /// <inheritdoc />

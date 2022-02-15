@@ -56,7 +56,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
                 return new
                 {
-                    databaseName = DatabaseModel.DefaultDatabaseName,
                     databases = options
                 };
             }

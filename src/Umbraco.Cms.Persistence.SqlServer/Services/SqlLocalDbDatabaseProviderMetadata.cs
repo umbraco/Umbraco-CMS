@@ -22,6 +22,9 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     public string DisplayName => "Microsoft SQL Server Express (LocalDB)";
 
     /// <inheritdoc />
+    public string DefaultDatabaseName => Core.Constants.System.UmbracoDefaultDatabaseName;
+
+    /// <inheritdoc />
     public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />

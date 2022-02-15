@@ -118,11 +118,22 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             get
             {
+                var quickInstallSettings = _databaseProviderMetadata
+                    .Where(x => x.SupportsQuickInstall)
+                    .Where(x => x.IsAvailable)
+                    .OrderBy(x => x.SortOrder)
+                    .Select(x => new
+                    {
+                        displayName = x.DisplayName,
+                        defaultDatabaseName = x.DefaultDatabaseName,
+                    })
+                    .FirstOrDefault();
+
                 return new
                 {
                     minCharLength = _passwordConfiguration.RequiredLength,
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
-                    quickInstallAvailable = _databaseProviderMetadata.Where(x => x.SupportsQuickInstall).Any(x => x.IsAvailable),
+                    quickInstallSettings,
                     customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
                 };
             }

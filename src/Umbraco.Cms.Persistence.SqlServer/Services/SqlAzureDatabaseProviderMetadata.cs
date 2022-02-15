@@ -21,6 +21,9 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
     public string DisplayName => "Microsoft SQL Azure";
 
     /// <inheritdoc />
+    public string DefaultDatabaseName => string.Empty;
+
+    /// <inheritdoc />
     public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />

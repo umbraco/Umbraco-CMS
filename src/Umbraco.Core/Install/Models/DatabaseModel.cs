@@ -6,8 +6,6 @@ namespace Umbraco.Cms.Core.Install.Models
     [DataContract(Name = "database", Namespace = "")]
     public class DatabaseModel
     {
-        public const string DefaultDatabaseName = "umbraco-cms";
-
         [DataMember(Name = "databaseProviderMetadataId")]
         public Guid DatabaseProviderMetadataId { get; set; }
 
@@ -18,7 +16,7 @@ namespace Umbraco.Cms.Core.Install.Models
         public string Server { get; set; }
 
         [DataMember(Name = "databaseName")]
-        public string DatabaseName { get; set; } = DefaultDatabaseName;
+        public string DatabaseName { get; set; }
 
         [DataMember(Name = "login")]
         public string Login { get; set; }
