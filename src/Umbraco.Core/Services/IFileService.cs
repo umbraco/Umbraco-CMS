@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IFileService : IService
     {
-        IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
+        IEnumerable<string?> GetPartialViewSnippetNames(params string[] filterNames);
         void CreatePartialViewFolder(string folderPath);
         void CreatePartialViewMacroFolder(string folderPath);
         void DeletePartialViewFolder(string folderPath);
@@ -22,14 +22,14 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An enumerable list of <see cref="IPartialView"/> objects</returns>
         IEnumerable<IPartialView> GetPartialViews(params string[] names);
 
-        IPartialView GetPartialView(string path);
-        IPartialView GetPartialViewMacro(string path);
+        IPartialView? GetPartialView(string path);
+        IPartialView? GetPartialViewMacro(string path);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId);
         bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId);
         bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView?> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets the content of a partial view as a stream.
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="path">Path of the stylesheet incl. extension</param>
         /// <returns>A <see cref="IStylesheet"/> object</returns>
-        IStylesheet GetStylesheet(string path);
+        IStylesheet? GetStylesheet(string path);
 
         /// <summary>
         /// Saves a <see cref="IStylesheet"/>
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
         /// <returns>A <see cref="IScript"/> object</returns>
-        IScript GetScript(string name);
+        IScript? GetScript(string name);
 
         /// <summary>
         /// Saves a <see cref="Script"/>
@@ -212,21 +212,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
-        ITemplate GetTemplate(string alias);
+        ITemplate GetTemplate(string? alias);
 
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        ITemplate GetTemplate(int id);
+        ITemplate? GetTemplate(int id);
 
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its guid identifier.
         /// </summary>
         /// <param name="id">The guid identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        ITemplate GetTemplate(Guid id);
+        ITemplate? GetTemplate(Guid id);
 
         /// <summary>
         /// Gets the template descendants
@@ -251,7 +251,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId);
 
         ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
 

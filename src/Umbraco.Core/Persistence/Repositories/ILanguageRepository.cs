@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <remarks>
         /// <para>This can be optimized and bypass all deep cloning.</para>
         /// </remarks>
-        int? GetIdByIsoCode(string isoCode, bool throwOnNotFound = true);
+        int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true);
 
         /// <summary>
         /// Gets a language ISO code from its identifier.

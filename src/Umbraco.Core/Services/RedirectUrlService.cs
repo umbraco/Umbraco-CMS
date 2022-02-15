@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IRedirectUrl GetMostRecentRedirectUrl(string url, string culture)
+        public IRedirectUrl GetMostRecentRedirectUrl(string url, string? culture)
         {
             if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentRedirectUrl(url);
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

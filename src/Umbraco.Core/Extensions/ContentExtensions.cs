@@ -310,7 +310,7 @@ namespace Umbraco.Extensions
                 return property;
 
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
-            var propertyType = contentType.CompositionPropertyTypes
+            var propertyType = contentType?.CompositionPropertyTypes
                 .FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             if (propertyType == null)
                 throw new Exception("No property type exists with alias " + propertyTypeAlias + ".");
@@ -339,7 +339,7 @@ namespace Umbraco.Extensions
         public static string StoreFile(this IContentBase content, MediaFileManager mediaFileManager, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
-            var propertyType = contentType
+            var propertyType = contentType?
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             if (propertyType == null)
                 throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");

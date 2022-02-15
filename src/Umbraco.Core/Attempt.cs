@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core
         /// <param name="result">The result of the attempt.</param>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult> Fail<TResult>(TResult result, Exception exception)
+        public static Attempt<TResult?> Fail<TResult>(TResult result, Exception exception)
         {
             return Attempt<TResult>.Fail(result, exception);
         }

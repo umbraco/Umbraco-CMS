@@ -12,28 +12,28 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IRelation"/></param>
         /// <returns>A <see cref="IRelation"/> object</returns>
-        IRelation GetById(int id);
+        IRelation? GetById(int id);
 
         /// <summary>
         /// Gets a <see cref="IRelationType"/> by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IRelationType"/></param>
         /// <returns>A <see cref="IRelationType"/> object</returns>
-        IRelationType GetRelationTypeById(int id);
+        IRelationType? GetRelationTypeById(int id);
 
         /// <summary>
         /// Gets a <see cref="IRelationType"/> by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IRelationType"/></param>
         /// <returns>A <see cref="IRelationType"/> object</returns>
-        IRelationType GetRelationTypeById(Guid id);
+        IRelationType? GetRelationTypeById(Guid id);
 
         /// <summary>
         /// Gets a <see cref="IRelationType"/> by its Alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="IRelationType"/></param>
         /// <returns>A <see cref="IRelationType"/> object</returns>
-        IRelationType GetRelationTypeByAlias(string alias);
+        IRelationType? GetRelationTypeByAlias(string alias);
 
         /// <summary>
         /// Gets all <see cref="IRelation"/> objects
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="childId">The id of the child item.</param>
         /// <param name="relationType">The RelationType.</param>
         /// <returns>The relation or null</returns>
-        IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
+        IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
 
         /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by the Name of the <see cref="IRelationType"/>

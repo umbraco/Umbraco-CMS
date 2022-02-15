@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="id">Id to use for retrieval</param>
         /// <returns><see cref="IMembershipUser"/></returns>
-        T GetByProviderKey(object id);
+        IUser? GetByProviderKey(object id);
 
         /// <summary>
         /// Get an <see cref="IMembershipUser"/> by email
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IMembershipUser"/></returns>
-        T GetByEmail(string email);
+        IUser? GetByEmail(string email);
 
         /// <summary>
         /// Get an <see cref="IMembershipUser"/> by username

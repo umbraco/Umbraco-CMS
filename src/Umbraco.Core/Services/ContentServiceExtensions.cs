@@ -26,17 +26,21 @@ namespace Umbraco.Extensions
             var result = new List<string>();
             var content = contentService.GetById(id);
 
-            foreach (var contentProperty in content.Properties)
+            if (content is not null)
             {
-                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
+                foreach (var contentProperty in content.Properties)
                 {
-                    var value = contentProperty.GetValue(culture)?.ToString();
-                    if (!string.IsNullOrEmpty(value))
+                    if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
                     {
-                        result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                        var value = contentProperty.GetValue(culture)?.ToString();
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                        }
                     }
                 }
             }
+
             return result;
         }
 

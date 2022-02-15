@@ -59,15 +59,19 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var memberType = _memberTypeService.Get(source.ContentTypeId);
 
-            IgnoreProperties = memberType.CompositionPropertyTypes
-                .Where(x => x.HasIdentity == false)
-                .Select(x => x.Alias)
-                .ToArray();
+            if (memberType is not null)
+            {
+
+                IgnoreProperties = memberType.CompositionPropertyTypes
+                    .Where(x => x.HasIdentity == false)
+                    .Select(x => x.Alias)
+                    .ToArray();
+            }
 
             var resolved = base.Map(source, context);
 
             // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
-            var isLockedOutProperty = resolved.Where(x => x.Properties is not null).SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
+            var isLockedOutProperty = resolved.Where(x => x.Properties is not null).SelectMany(x => x.Properties!).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
                 isLockedOutProperty.Readonly = true;
@@ -115,7 +119,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var prop in result)
             {
                 // check if this property is flagged as sensitive
-                var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
+                var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
                 // check permissions for viewing sensitive data
                 if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false))
                 {

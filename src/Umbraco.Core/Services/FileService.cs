@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IStylesheet GetStylesheet(string path)
+        public IStylesheet? GetStylesheet(string path)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                IStylesheet stylesheet = _stylesheetRepository.Get(path);
+                IStylesheet? stylesheet = _stylesheetRepository.Get(path);
                 if (stylesheet == null)
                 {
                     scope.Complete();
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IScript GetScript(string name)
+        public IScript? GetScript(string name)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -220,7 +220,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                IScript script = _scriptRepository.Get(path);
+                IScript? script = _scriptRepository.Get(path);
                 if (script == null)
                 {
                     scope.Complete();
@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        public Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId)
         {
             var template = new Template(_shortStringHelper, contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
@@ -322,7 +322,7 @@ namespace Umbraco.Cms.Core.Services
 
             // check that the template hasn't been created on disk before creating the content type
             // if it exists, set the new template content to the existing file content
-            string content = GetViewContent(contentTypeAlias);
+            string? content = GetViewContent(contentTypeAlias);
             if (content != null)
             {
                 template.Content = content;
@@ -330,7 +330,7 @@ namespace Umbraco.Cms.Core.Services
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias);
+                var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
                 if (scope.Notifications.PublishCancelable(savingEvent))
                 {
                     scope.Complete();
@@ -356,7 +356,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="masterTemplate"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId)
+        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId)
         {
             if (name == null)
             {
@@ -418,7 +418,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
-        public ITemplate GetTemplate(string alias)
+        public ITemplate GetTemplate(string? alias)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -431,7 +431,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">The identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        public ITemplate GetTemplate(int id)
+        public ITemplate? GetTemplate(int id)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -444,7 +444,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">The guid identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        public ITemplate GetTemplate(Guid id)
+        public ITemplate? GetTemplate(Guid id)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -566,14 +566,14 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private string GetViewContent(string fileName)
+        private string? GetViewContent(string? fileName)
         {
             if (fileName.IsNullOrWhiteSpace())
             {
                 throw new ArgumentNullException(nameof(fileName));
             }
 
-            if (!fileName.EndsWith(".cshtml"))
+            if (!fileName!.EndsWith(".cshtml"))
             {
                 fileName = $"{fileName}.cshtml";
             }
@@ -622,7 +622,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Partial Views
 
-        public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
+        public IEnumerable<string?> GetPartialViewSnippetNames(params string[] filterNames)
         {
             var snippetPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/");
             var files = Directory.GetFiles(snippetPath, "*.cshtml")
@@ -631,8 +631,8 @@ namespace Umbraco.Cms.Core.Services
                 .ToArray();
 
             //Ensure the ones that are called 'Empty' are at the top
-            var empty = files.Where(x => Path.GetFileName(x).InvariantStartsWith("Empty"))
-                .OrderBy(x => x.Length)
+            var empty = files.Where(x => Path.GetFileName(x)?.InvariantStartsWith("Empty") ?? false)
+                .OrderBy(x => x?.Length)
                 .ToArray();
 
             return empty.Union(files.Except(empty));
@@ -664,7 +664,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IPartialView GetPartialView(string path)
+        public IPartialView? GetPartialView(string path)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -672,7 +672,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IPartialView GetPartialViewMacro(string path)
+        public IPartialView? GetPartialViewMacro(string path)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -680,13 +680,13 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId) =>
             CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
 
-        public Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId) =>
             CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
 
-        private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string snippetName = null, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string? snippetName = null, int userId = Constants.Security.SuperUserId)
         {
             string partialViewHeader;
             switch (partialViewType)
@@ -701,7 +701,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(partialViewType));
             }
 
-            string partialViewContent = null;
+            string? partialViewContent = null;
             if (snippetName.IsNullOrWhiteSpace() == false)
             {
                 //create the file
@@ -711,7 +711,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new InvalidOperationException("Could not load snippet with name " + snippetName);
                 }
 
-                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result!)))
                 {
                     var snippetContent = snippetFile.ReadToEnd().Trim();
 
@@ -767,7 +767,7 @@ namespace Umbraco.Cms.Core.Services
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
-                IPartialView partialView = repository.Get(path);
+                IPartialView? partialView = repository.Get(path);
                 if (partialView == null)
                 {
                     scope.Complete();
@@ -792,13 +792,13 @@ namespace Umbraco.Cms.Core.Services
             return true;
         }
 
-        public Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
             SavePartialView(partialView, PartialViewType.PartialView, userId);
 
-        public Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
             SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
-        private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
@@ -807,7 +807,7 @@ namespace Umbraco.Cms.Core.Services
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
-                    return Attempt<IPartialView>.Fail();
+                    return Attempt<IPartialView?>.Fail();
                 }
 
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
@@ -828,9 +828,9 @@ namespace Umbraco.Cms.Core.Services
             return headerMatch.Replace(contents, string.Empty);
         }
 
-        internal Attempt<string> TryGetSnippetPath(string fileName)
+        internal Attempt<string> TryGetSnippetPath(string? fileName)
         {
-            if (fileName.EndsWith(".cshtml") == false)
+            if (fileName?.EndsWith(".cshtml") == false)
             {
                 fileName += ".cshtml";
             }
@@ -963,7 +963,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new InvalidOperationException("Could not load snippet with name " + snippetName);
             }
 
-            using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+            using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result!)))
             {
                 var snippetContent = snippetFile.ReadToEnd().Trim();
 
@@ -985,7 +985,7 @@ namespace Umbraco.Cms.Core.Services
 
         #endregion
 
-        private void Audit(AuditType type, int userId, int objectId, string entityType) => _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
+        private void Audit(AuditType type, int userId, int objectId, string? entityType) => _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
         // TODO: Method to change name and/or alias of view template
     }

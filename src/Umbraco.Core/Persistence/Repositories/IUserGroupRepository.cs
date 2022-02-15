@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="userGroup"></param>
         /// <param name="userIds"></param>
-        void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds);
+        void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[]? userIds);
 
         /// <summary>
         /// Gets explicitly defined permissions for the group for specified entities
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <param name="groupId">Id of group</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
-        void ReplaceGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds);
+        void ReplaceGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds);
 
         /// <summary>
         /// Assigns the same permission set for a single group to any number of entities

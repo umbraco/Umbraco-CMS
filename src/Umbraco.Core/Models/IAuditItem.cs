@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the audited entity type.
         /// </summary>
-        string EntityType { get; }
+        string? EntityType { get; }
 
         /// <summary>
         /// Gets the audit user identifier.

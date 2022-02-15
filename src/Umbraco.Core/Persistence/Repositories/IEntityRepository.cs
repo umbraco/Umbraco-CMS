@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         UmbracoObjectTypes GetObjectType(Guid key);
         int ReserveId(Guid key);
 
-        IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids);
+        IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids);
         IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys);
 
         bool Exists(int id);
@@ -54,6 +54,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <param name="ordering"></param>
         /// <returns></returns>
         IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter, Ordering ordering);
+            IQuery<IUmbracoEntity>? filter, Ordering? ordering);
     }
 }

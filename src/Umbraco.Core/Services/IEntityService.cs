@@ -136,14 +136,14 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the parent of an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim GetParent(int id);
+        IEntitySlim? GetParent(int id);
 
         /// <summary>
         /// Gets the parent of an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
         /// <param name="objectType">The object type of the parent.</param>
-        IEntitySlim GetParent(int id, UmbracoObjectTypes objectType);
+        IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType);
 
         /// <summary>
         /// Gets the children of an entity.
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the CLR type of an entity.
         /// </summary>
-        Type GetEntityType(int id);
+        Type? GetEntityType(int id);
 
         /// <summary>
         /// Gets the integer identifier corresponding to a unique Guid identifier.

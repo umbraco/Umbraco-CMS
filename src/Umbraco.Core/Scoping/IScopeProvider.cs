@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Scoping
         IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher scopedNotificationPublisher = null,
+            IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false);
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Scoping
         IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher scopedNotificationPublisher = null,
+            IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null);
 
         /// <summary>

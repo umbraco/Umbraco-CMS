@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private ContentVersionCleanupPolicySettings GetOverridePolicy(
+        private ContentVersionCleanupPolicySettings? GetOverridePolicy(
             ContentVersionMeta version,
             IDictionary<int, ContentVersionCleanupPolicySettings> overrides)
         {

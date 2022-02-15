@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Services
         public XElement Serialize(
             IMedia media,
             bool withDescendants = false,
-            Action<IMedia, XElement> onMediaItemSerialized = null)
+            Action<IMedia, XElement>? onMediaItemSerialized = null)
         {
             if (_mediaService == null) throw new ArgumentNullException(nameof(_mediaService));
             if (_dataTypeService == null) throw new ArgumentNullException(nameof(_dataTypeService));
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Services
             var nodeName = media.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             const bool published = false; // always false for media
-            string urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
+            string? urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
             XElement xml = SerializeContentBase(media, urlValue, nodeName, published);
 
 
@@ -594,7 +594,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
-        private XElement SerializeContentBase(IContentBase contentBase, string urlValue, string nodeName, bool published)
+        private XElement SerializeContentBase(IContentBase contentBase, string? urlValue, string nodeName, bool published)
         {
             var xml = new XElement(nodeName,
                 new XAttribute("id", contentBase.Id.ToInvariantString()),
@@ -657,7 +657,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         // exports an IMedia item descendants.
-        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement> onMediaItemSerialized)
+        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement>? onMediaItemSerialized)
         {
             foreach (var child in children)
             {

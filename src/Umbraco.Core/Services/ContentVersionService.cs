@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
         {
             var entry = new AuditItem(
                 objectId,

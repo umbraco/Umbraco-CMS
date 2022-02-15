@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
     public static partial class UmbracoBuilderExtensions
     {
 
-        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>> configure = null)
+        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
             where TOptions : class
         {
             var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();

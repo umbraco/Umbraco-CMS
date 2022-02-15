@@ -49,9 +49,9 @@ namespace Umbraco.Cms.Core.Services
             IDataType dataType,
             object postedValue,
             bool isRequired,
-            string validationRegExp,
-            string isRequiredMessage,
-            string validationRegExpMessage)
+            string? validationRegExp,
+            string? isRequiredMessage,
+            string? validationRegExpMessage)
         {
             // Retrieve default messages used for required and regex validatation.  We'll replace these
             // if set with custom ones if they've been provided for a given property.
@@ -82,13 +82,17 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact impact)
+        public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
         {
             // select invalid properties
             invalidProperties = content.Properties.Where(x =>
             {
                 var propertyTypeVaries = x.PropertyType.VariesByCulture();
 
+                if (impact is null)
+                {
+                    return false;
+                }
                 // impacts invariant = validate invariant property, invariant culture
                 if (impact.ImpactsOnlyInvariantCulture)
                     return !(propertyTypeVaries || IsPropertyValid(x, null));
@@ -115,7 +119,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
+        public bool IsPropertyValid(IProperty property, string? culture = "*", string segment = "*")
         {
             //NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
             // The underlying Property._pvalue and Property._vvalues are not exposed but we can re-create these values ourselves which is what it's doing.

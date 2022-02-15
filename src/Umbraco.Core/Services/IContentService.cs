@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a blueprint.
         /// </summary>
-        IContent GetBlueprintById(int id);
+        IContent? GetBlueprintById(int id);
 
         /// <summary>
         /// Gets a blueprint.
         /// </summary>
-        IContent GetBlueprintById(Guid id);
+        IContent? GetBlueprintById(Guid id);
 
         /// <summary>
         /// Gets blueprints for a content type.
@@ -60,12 +60,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a document.
         /// </summary>
-        IContent GetById(int id);
+        IContent? GetById(int id);
 
         /// <summary>
         /// Gets a document.
         /// </summary>
-        IContent GetById(Guid key);
+        IContent? GetById(Guid key);
 
         /// <summary>
         /// Gets publish/unpublish schedule for a content node.
@@ -99,12 +99,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the parent of a document.
         /// </summary>
-        IContent GetParent(int id);
+        IContent? GetParent(int id);
 
         /// <summary>
         /// Gets the parent of a document.
         /// </summary>
-        IContent GetParent(IContent content);
+        IContent? GetParent(IContent content);
 
         /// <summary>
         /// Gets ancestor documents of a document.
@@ -310,7 +310,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// <para>Recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId);
+        IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Copies a document.
@@ -318,7 +318,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// <para>Optionally recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
+        IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Moves a document to the recycle bin.
@@ -510,7 +510,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
+        IContent Create(string name, IContent? parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates and saves a document.

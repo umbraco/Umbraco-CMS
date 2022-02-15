@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Models.Membership
     /// </summary>
     public interface IMembershipUser : IEntity
     {
-        string? Username { get; set; }
-        string? Email { get; set; }
+        string Username { get; set; }
+        string Email { get; set; }
         DateTime? EmailConfirmedDate { get; set; }
 
         /// <summary>

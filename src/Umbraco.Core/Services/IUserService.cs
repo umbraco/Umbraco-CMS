@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
-        IProfile GetProfileById(int id);
+        IProfile? GetProfileById(int id);
 
         /// <summary>
         /// Gets a profile by username
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser GetUserById(int id);
+        IUser? GetUserById(int id);
 
         /// <summary>
         /// Gets a users by Id
@@ -226,14 +226,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="name">Name of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupByAlias(string name);
+        IUserGroup? GetUserGroupByAlias(string name);
 
         /// <summary>
         /// Gets a UserGroup by its Id
         /// </summary>
         /// <param name="id">Id of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupById(int id);
+        IUserGroup? GetUserGroupById(int id);
 
         /// <summary>
         /// Saves a UserGroup

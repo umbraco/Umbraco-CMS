@@ -33,9 +33,9 @@ namespace Umbraco.Cms.Core
                 var name = value.ToString();
 
                 IntToValue[Convert.ToInt32(value)] = value;
-                ValueToName[value] = name;
-                SensitiveNameToValue[name] = value;
-                InsensitiveNameToValue[name.ToLowerInvariant()] = value;
+                ValueToName[value] = name!;
+                SensitiveNameToValue[name!] = value;
+                InsensitiveNameToValue[name!.ToLowerInvariant()] = value;
             }
         }
 

@@ -230,7 +230,7 @@ namespace Umbraco.Extensions
         /// <param name="impact"></param>
         /// <returns>A value indicating whether it was possible to publish the names and values for the specified
         /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
-        public static bool PublishCulture(this IContent content, CultureImpact impact)
+        public static bool PublishCulture(this IContent content, CultureImpact? impact)
         {
             if (impact == null) throw new ArgumentNullException(nameof(impact));
 

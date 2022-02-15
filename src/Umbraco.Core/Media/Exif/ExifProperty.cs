@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Media.Exif
     {
         protected ExifTag mTag;
         protected IFD mIFD;
-        protected string mName;
+        protected string? mName;
 
         /// <summary>
         /// Gets the Exif tag associated with this property.

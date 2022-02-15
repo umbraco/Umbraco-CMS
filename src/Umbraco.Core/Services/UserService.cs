@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id"><see cref="System.int"/> Id</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetById(int id)
+        public IUser? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -167,7 +167,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetByProviderKey(object id)
+        public IUser? GetByProviderKey(object id)
         {
             var asInt = id.TryConvertTo<int>();
             return asInt.Success ? GetById(asInt.Result) : null;
@@ -178,7 +178,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetByEmail(string email)
+        public IUser? GetByEmail(string email)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -517,22 +517,22 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] userGroups = null, string filter = null)
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
         {
-            IQuery<IUser> filterQuery = null;
+            IQuery<IUser>? filterQuery = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                filterQuery = Query<IUser>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                filterQuery = Query<IUser>().Where(x => x.Name.Contains(filter!) || x.Username.Contains(filter!));
             }
 
             return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null, filterQuery);
         }
 
-        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] includeUserGroups = null, string[] excludeUserGroups = null, IQuery<IUser> filter = null)
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? includeUserGroups = null, string[]? excludeUserGroups = null, IQuery<IUser>? filter = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                Expression<Func<IUser, object>> sort;
+                Expression<Func<IUser, object?>> sort;
                 switch (orderBy.ToUpperInvariant())
                 {
                     case "USERNAME":
@@ -631,7 +631,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
-        public IProfile GetProfileById(int id)
+        public IProfile? GetProfileById(int id)
         {
             //This is called a TON. Go get the full user from cache which should already be IProfile
             var fullUser = GetUserById(id);
@@ -658,7 +658,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetUserById(int id)
+        public IUser? GetUserById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -700,7 +700,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="groupId">Id of the group</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/> If nothing is specified all permissions are removed.</param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-        public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
         {
             if (entityIds.Length == 0)
                 return;
@@ -713,8 +713,11 @@ namespace Umbraco.Cms.Core.Services
                 scope.Complete();
 
                 var assigned = permissions?.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
-                var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
-                scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
+                if (assigned is not null)
+                {
+                    var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
+                    scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
+                }
             }
         }
 
@@ -772,7 +775,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        public IUserGroup GetUserGroupByAlias(string alias)
+        public IUserGroup? GetUserGroupByAlias(string alias)
         {
             if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value cannot be null or whitespace.", "alias");
 
@@ -789,7 +792,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        public IUserGroup GetUserGroupById(int id)
+        public IUserGroup? GetUserGroupById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -806,7 +809,7 @@ namespace Umbraco.Cms.Core.Services
         /// than all users will be removed from this group and only these users will be added
         /// </param>
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup userGroup, int[] userIds = null)
+        public void Save(IUserGroup userGroup, int[]? userIds = null)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -957,11 +960,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
-        public EntityPermissionSet GetPermissionsForPath(IUser user, string path)
+        public EntityPermissionSet GetPermissionsForPath(IUser user, string? path)
         {
-            var nodeIds = path.GetIdsFromPathReversed();
+            var nodeIds = path?.GetIdsFromPathReversed();
 
-            if (nodeIds.Length == 0 || user is null)
+            if (nodeIds is null || nodeIds.Length == 0 || user is null)
                 return EntityPermissionSet.Empty();
 
             //collect all permissions structures for all nodes for all groups belonging to the user
@@ -1039,7 +1042,7 @@ namespace Umbraco.Cms.Core.Services
                 //iterate deepest to shallowest
                 foreach (var pathId in pathIds)
                 {
-                    EntityPermission[] permissionsForNodeAndGroup;
+                    EntityPermission[]? permissionsForNodeAndGroup;
                     if (byGroup.Value.TryGetValue(pathId, out permissionsForNodeAndGroup) == false)
                         continue;
 
@@ -1088,7 +1091,7 @@ namespace Umbraco.Cms.Core.Services
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <returns></returns>
-        internal static EntityPermission GetPermissionsForPathForGroup(
+        internal static EntityPermission? GetPermissionsForPathForGroup(
             IEnumerable<EntityPermission> pathPermissions,
             int[] pathIds,
             bool fallbackToDefaultPermissions = false)
@@ -1099,7 +1102,7 @@ namespace Umbraco.Cms.Core.Services
             //then the permissions assigned to the path will be the 'deepest' node found that has permissions
             foreach (var id in pathIds)
             {
-                EntityPermission permission;
+                EntityPermission? permission;
                 if (permissionsByEntityId.TryGetValue(id, out permission))
                 {
                     //don't return the default permissions if that is the one assigned here (we'll do that below if nothing was found)

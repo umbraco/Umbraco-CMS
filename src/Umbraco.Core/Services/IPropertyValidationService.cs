@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Validates the content item's properties pass validation rules
         /// </summary>
-        bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact impact);
+        bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact);
 
         /// <summary>
         /// Gets a value indicating whether the property has valid values.

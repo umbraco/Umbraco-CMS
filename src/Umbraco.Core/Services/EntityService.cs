@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IEntityRepository _entityRepository;
         private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
-        private IQuery<IUmbracoEntity> _queryRootEntity;
+        private IQuery<IUmbracoEntity>? _queryRootEntity;
         private readonly IIdKeyMap _idKeyMap;
 
         public EntityService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
@@ -28,13 +28,13 @@ namespace Umbraco.Cms.Core.Services
 
             _objectTypes = new Dictionary<string, UmbracoObjectTypes>
             {
-                { typeof (IDataType).FullName, UmbracoObjectTypes.DataType },
-                { typeof (IContent).FullName, UmbracoObjectTypes.Document },
-                { typeof (IContentType).FullName, UmbracoObjectTypes.DocumentType },
-                { typeof (IMedia).FullName, UmbracoObjectTypes.Media },
-                { typeof (IMediaType).FullName, UmbracoObjectTypes.MediaType },
-                { typeof (IMember).FullName, UmbracoObjectTypes.Member },
-                { typeof (IMemberType).FullName, UmbracoObjectTypes.MemberType },
+                { typeof (IDataType).FullName!, UmbracoObjectTypes.DataType },
+                { typeof (IContent).FullName!, UmbracoObjectTypes.Document },
+                { typeof (IContentType).FullName!, UmbracoObjectTypes.DocumentType },
+                { typeof (IMedia).FullName!, UmbracoObjectTypes.Media },
+                { typeof (IMediaType).FullName!, UmbracoObjectTypes.MediaType },
+                { typeof (IMember).FullName!, UmbracoObjectTypes.Member },
+                { typeof (IMemberType).FullName!, UmbracoObjectTypes.MemberType },
             };
         }
 
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Services
         #endregion
 
         // gets the object type, throws if not supported
-        private UmbracoObjectTypes GetObjectType(Type type)
+        private UmbracoObjectTypes GetObjectType(Type ?type)
         {
             if (type?.FullName == null || !_objectTypes.TryGetValue(type.FullName, out var objType))
                 throw new NotSupportedException($"Type \"{type?.FullName ?? "<null>"}\" is not supported here.");
@@ -230,7 +230,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual IEntitySlim GetParent(int id)
+        public virtual IEntitySlim? GetParent(int id)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -242,7 +242,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual IEntitySlim GetParent(int id, UmbracoObjectTypes objectType)
+        public virtual IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -298,7 +298,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null)
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -310,7 +310,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null)
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -336,7 +336,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null)
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
         {
             totalRecords = 0;
 
@@ -379,7 +379,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null, bool includeTrashed = true)
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null, bool includeTrashed = true)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -418,7 +418,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual Type GetEntityType(int id)
+        public virtual Type? GetEntityType(int id)
         {
             var objectType = GetObjectType(id);
             return objectType.GetClrType();
@@ -443,7 +443,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[] ids)
+        public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[]? ids)
         {
             var entityType = objectType.GetClrType();
             GetObjectType(entityType);

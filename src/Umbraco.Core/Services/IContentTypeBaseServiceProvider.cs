@@ -22,6 +22,6 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the content type of an <see cref="IContentBase"/> object.
         /// </summary>
-        IContentTypeComposition GetContentTypeOf(IContentBase contentBase);
+        IContentTypeComposition? GetContentTypeOf(IContentBase contentBase);
     }
 }

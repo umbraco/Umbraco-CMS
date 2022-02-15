@@ -426,19 +426,19 @@ namespace Umbraco.Cms.Core.Xml.XPath
             get
             {
                 DebugEnter("Name");
-                string? name;
+                string name;
 
                 switch (_state.Position)
                 {
                     case StatePosition.PropertyXml:
-                        name = _state.XmlFragmentNavigator.Name;
+                        name = _state.XmlFragmentNavigator?.Name ?? string.Empty;
                         break;
                     case StatePosition.Attribute:
                     case StatePosition.PropertyElement:
-                        name = _state.FieldIndex == -1 ? "id" : _state.CurrentFieldType?.Name;
+                        name = _state.FieldIndex == -1 ? "id" : _state.CurrentFieldType?.Name ?? string.Empty;
                         break;
                     case StatePosition.Element:
-                        name = _state.Content?.Type.Name;
+                        name = _state.Content?.Type.Name ?? string.Empty;
                         break;
                     case StatePosition.PropertyText:
                         name = string.Empty;
@@ -854,7 +854,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             switch (_state.Position)
             {
                 case StatePosition.PropertyXml:
-                    succ = _state.XmlFragmentNavigator.MoveToNextAttribute();
+                    succ = _state.XmlFragmentNavigator?.MoveToNextAttribute() ?? false;
                     break;
                 case StatePosition.Attribute:
                     if (_state.FieldIndex == _lastAttributeIndex)
@@ -913,9 +913,9 @@ namespace Umbraco.Cms.Core.Xml.XPath
                     succ = true;
                     break;
                 case StatePosition.PropertyXml:
-                    if (_state.XmlFragmentNavigator.MoveToParent() == false)
+                    if (_state.XmlFragmentNavigator?.MoveToParent() == false)
                         throw new InvalidOperationException("Could not move to parent in fragment.");
-                    if (_state.XmlFragmentNavigator.NodeType == XPathNodeType.Root)
+                    if (_state.XmlFragmentNavigator?.NodeType == XPathNodeType.Root)
                     {
                         _state.XmlFragmentNavigator = null;
                         _state.Position = StatePosition.PropertyElement;
@@ -989,7 +989,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                 switch (_state.Position)
                 {
                     case StatePosition.PropertyXml:
-                        type = _state.XmlFragmentNavigator.NodeType;
+                        type = _state.XmlFragmentNavigator?.NodeType ?? XPathNodeType.Root;
                         break;
                     case StatePosition.Attribute:
                         type = XPathNodeType.Attribute;
@@ -1029,19 +1029,19 @@ namespace Umbraco.Cms.Core.Xml.XPath
             get
             {
                 DebugEnter("Value");
-                string? value;
+                string value;
 
                 switch (_state.Position)
                 {
                     case StatePosition.PropertyXml:
-                        value = _state.XmlFragmentNavigator.Value;
+                        value = _state.XmlFragmentNavigator?.Value ?? string.Empty;
                         break;
                     case StatePosition.Attribute:
                     case StatePosition.PropertyText:
                     case StatePosition.PropertyElement:
                         if (_state.FieldIndex == -1)
                         {
-                            value = _state.Content?.Id.ToString(CultureInfo.InvariantCulture);
+                            value = _state.Content?.Id.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
                         }
                         else
                         {
@@ -1141,7 +1141,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                 Depth = other.Depth;
 
                 if (Position == StatePosition.PropertyXml)
-                    XmlFragmentNavigator = other.XmlFragmentNavigator.Clone();
+                    XmlFragmentNavigator = other.XmlFragmentNavigator?.Clone();
 
                 // NielsK did
                 //Parent = other.Parent;

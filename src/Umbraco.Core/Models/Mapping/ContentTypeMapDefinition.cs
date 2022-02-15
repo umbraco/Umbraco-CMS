@@ -702,7 +702,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 return Enumerable.Empty<string>();
             }
 
-            IContentType parent = _contentTypeService.Get(source.ParentId);
+            IContentType? parent = _contentTypeService.Get(source.ParentId);
             if (parent == null)
             {
                 return Enumerable.Empty<string>();
