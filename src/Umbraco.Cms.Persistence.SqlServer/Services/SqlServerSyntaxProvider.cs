@@ -455,5 +455,90 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
                                  GetQuotedTableName(index.TableName), columns, includeColumns);
         }
+
+
+        public override Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql)
+        {
+            // go find the first FROM clause, and append the lock hint
+            Sql s = sql;
+            var updated = false;
+
+            while (s != null)
+            {
+                var sqlText = SqlInspector.GetSqlText(s);
+                if (sqlText.StartsWith("FROM ", StringComparison.OrdinalIgnoreCase))
+                {
+                    SqlInspector.SetSqlText(s, sqlText + " WITH (UPDLOCK)");
+                    updated = true;
+                    break;
+                }
+
+                s = SqlInspector.GetSqlRhs(sql);
+            }
+
+            if (updated)
+                SqlInspector.Reset(sql);
+
+            return sql;
+        }
+
+        public override Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql)
+            => sql.Append(" WITH (UPDLOCK) ");
+
+        public override Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
+            Sql<ISqlContext> sql,
+            Func<Sql<ISqlContext>,
+            Sql<ISqlContext>> nestedJoin,
+            string? alias = null)
+        {
+            Type type = typeof(TDto);
+
+            var tableName = GetQuotedTableName(type.GetTableName());
+            var join = tableName;
+
+            if (alias != null)
+            {
+                var quotedAlias = GetQuotedTableName(alias);
+                join += " " + quotedAlias;
+            }
+
+            var nestedSql = new Sql<ISqlContext>(sql.SqlContext);
+            nestedSql = nestedJoin(nestedSql);
+
+            Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin = sql.LeftJoin(join);
+            sql.Append(nestedSql);
+            return sqlJoin;
+        }
+
+        #region Sql Inspection
+
+        private static SqlInspectionUtilities _sqlInspector;
+
+        private static SqlInspectionUtilities SqlInspector => _sqlInspector ?? (_sqlInspector = new SqlInspectionUtilities());
+
+        private class SqlInspectionUtilities
+        {
+            private readonly Func<Sql, string> _getSqlText;
+            private readonly Action<Sql, string> _setSqlText;
+            private readonly Func<Sql, Sql> _getSqlRhs;
+            private readonly Action<Sql, string> _setSqlFinal;
+
+            public SqlInspectionUtilities()
+            {
+                (_getSqlText, _setSqlText) = ReflectionUtilities.EmitFieldGetterAndSetter<Sql, string>("_sql");
+                _getSqlRhs = ReflectionUtilities.EmitFieldGetter<Sql, Sql>("_rhs");
+                _setSqlFinal = ReflectionUtilities.EmitFieldSetter<Sql, string>("_sqlFinal");
+            }
+
+            public string GetSqlText(Sql sql) => _getSqlText(sql);
+
+            public void SetSqlText(Sql sql, string sqlText) => _setSqlText(sql, sqlText);
+
+            public Sql GetSqlRhs(Sql sql) => _getSqlRhs(sql);
+
+            public void Reset(Sql sql) => _setSqlFinal(sql, null);
+        }
+
+        #endregion
     }
 }

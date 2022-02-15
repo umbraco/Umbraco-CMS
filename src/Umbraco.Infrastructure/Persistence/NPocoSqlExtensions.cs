@@ -431,38 +431,11 @@ namespace Umbraco.Extensions
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
         /// <remarks>Nested statement produces LEFT JOIN xxx JOIN yyy ON ... ON ...</remarks>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null)
-        {
-            var type = typeof(TDto);
-
-            var tableName = sql.SqlContext.SqlSyntax.GetQuotedTableName(type.GetTableName());
-            var join = tableName;
-            string quotedAlias = null;
-
-            if (alias != null)
-            {
-                quotedAlias = sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
-                join += " " + quotedAlias;
-            }
-
-            var nestedSql = new Sql<ISqlContext>(sql.SqlContext);
-            nestedSql = nestedJoin(nestedSql);
-
-            // HACK: SQLite
-            if (sql.SqlContext.DatabaseType.IsSqlite())
-            {
-                Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin = sql.LeftJoin("(" + join);
-                sql.Append(nestedSql);
-                sql.Append($") {quotedAlias ?? tableName}");
-                return sqlJoin;
-            }
-            else
-            {
-                Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin = sql.LeftJoin(join);
-                sql.Append(nestedSql);
-                return sqlJoin;
-            }
-        }
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(
+            this Sql<ISqlContext> sql,
+            Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
+            string alias = null) =>
+            sql.SqlContext.SqlSyntax.LeftJoinWithNestedJoin<TDto>(sql, nestedJoin, alias);
 
         /// <summary>
         /// Appends a RIGHT JOIN clause to the Sql statement.
@@ -1068,77 +1041,14 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="sql">The Sql statement.</param>
         /// <returns>The Sql statement.</returns>
-        /// <remarks>NOTE: This method will not work for all queries, only simple ones!</remarks>
+        /// <remarks>
+        /// NOTE: This method will not work for all queries, only simple ones!
+        /// </remarks>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
-        {
-            if (sql.SqlContext.DatabaseType.IsSqlite())
-            {
-                // HACK: SQLite
-                return sql;
-            }
-            // go find the first FROM clause, and append the lock hint
-            Sql s = sql;
-            var updated = false;
+            => sql.SqlContext.SqlSyntax.InsertForUpdateHint(sql);
 
-            while (s != null)
-            {
-                var sqlText = SqlInspector.GetSqlText(s);
-                if (sqlText.StartsWith("FROM ", StringComparison.OrdinalIgnoreCase))
-                {
-                    SqlInspector.SetSqlText(s, sqlText + " WITH (UPDLOCK)");
-                    updated = true;
-                    break;
-                }
-
-                s = SqlInspector.GetSqlRhs(sql);
-            }
-
-            if (updated)
-                SqlInspector.Reset(sql);
-
-            return sql;
-        }
-
-        public static Sql<ISqlContext> AppendUpdlockHint(this Sql<ISqlContext> sql)
-        {
-            if (sql.SqlContext.DatabaseType.IsSqlServer())
-            {
-                sql.Append(" WITH (UPDLOCK) ");
-            }
-
-            return sql;
-        }
-
-        #endregion
-
-        #region Sql Inspection
-
-        private static SqlInspectionUtilities _sqlInspector;
-
-        private static SqlInspectionUtilities SqlInspector => _sqlInspector ?? (_sqlInspector = new SqlInspectionUtilities());
-
-        private class SqlInspectionUtilities
-        {
-            private readonly Func<Sql, string> _getSqlText;
-            private readonly Action<Sql, string> _setSqlText;
-            private readonly Func<Sql, Sql> _getSqlRhs;
-            private readonly Action<Sql, string> _setSqlFinal;
-
-            public SqlInspectionUtilities()
-            {
-                (_getSqlText, _setSqlText) = ReflectionUtilities.EmitFieldGetterAndSetter<Sql, string>("_sql");
-                _getSqlRhs = ReflectionUtilities.EmitFieldGetter<Sql, Sql>("_rhs");
-                _setSqlFinal = ReflectionUtilities.EmitFieldSetter<Sql, string>("_sqlFinal");
-            }
-
-            public string GetSqlText(Sql sql) => _getSqlText(sql);
-
-            public void SetSqlText(Sql sql, string sqlText) => _setSqlText(sql, sqlText);
-
-            public Sql GetSqlRhs(Sql sql) => _getSqlRhs(sql);
-
-            public void Reset(Sql sql) => _setSqlFinal(sql, null);
-        }
+        public static Sql<ISqlContext> AppendForUpdateHint(this Sql<ISqlContext> sql)
+            => sql.SqlContext.SqlSyntax.AppendForUpdateHint(sql);
 
         #endregion
 
@@ -1207,7 +1117,7 @@ namespace Umbraco.Extensions
                 .ToArray();
         }
 
-        private static string GetTableName(this Type type)
+        public static string GetTableName(this Type type)
         {
             // TODO: returning string.Empty for now
             // BUT the code bits that calls this method cannot deal with string.Empty so we

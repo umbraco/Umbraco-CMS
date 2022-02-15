@@ -148,6 +148,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
 
+        /// <summary>
+        /// Appends the relevant ForUpdate hint.
+        /// </summary>
+        Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql);
+
+        /// <summary>
+        /// Appends the relevant ForUpdate hint.
+        /// </summary>
+        Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql);
+
+        /// <summary>
+        /// Handles left join with nested join
+        /// </summary>
+        Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
+            Sql<ISqlContext> sql,
+            Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
+            string alias = null);
 
         IDictionary<Type, IScalarMapper> ScalarMappers { get; }
     }

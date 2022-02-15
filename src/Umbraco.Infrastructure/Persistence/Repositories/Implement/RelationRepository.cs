@@ -365,7 +365,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)
         {
-            // HACK: SQLite
+            // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
             if (Database.DatabaseType.IsSqlite())
             {
                 var query = Sql().Append(@"delete from umbracoRelation");
