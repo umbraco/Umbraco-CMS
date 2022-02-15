@@ -105,8 +105,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 foreach (var dir in appPlugins.EnumerateDirectories())
                 {
                     // AppPluginIcons path was previoulsy the wrong case, so we first check for the prefered directory 
-                    // and then check the legacy directory. It does mean on windows it'll do a double lookup, but this
-                    // was the simplest option
+                    // and then check the legacy directory.
                     var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.PluginIcons}");
                     var iconPathExists = Directory.Exists(iconPath);
 
