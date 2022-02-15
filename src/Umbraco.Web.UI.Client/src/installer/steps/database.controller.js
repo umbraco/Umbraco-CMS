@@ -6,13 +6,11 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
     $scope.dbs = $scope.installer.current.model.databases;
     window.dbs = $scope.dbs;
 
-    // for custom connection string.
     $scope.providerNames = _.chain(dbs)
         .map('providerName')
         .filter(x => x)
         .uniq()
         .value();
-
 
     if (!$scope.selectedDbMeta) {
         $scope.selectedDbMeta = $scope.dbs[0];
