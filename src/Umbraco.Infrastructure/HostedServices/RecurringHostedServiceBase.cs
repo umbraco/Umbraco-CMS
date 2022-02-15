@@ -79,6 +79,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            _period = Timeout.InfiniteTimeSpan;
             _timer?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }

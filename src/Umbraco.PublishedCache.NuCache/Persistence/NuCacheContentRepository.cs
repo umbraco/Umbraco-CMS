@@ -18,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -694,7 +695,7 @@ AND cmsContentNu.nodeId IS NULL
             }
         }
 
-        public ContentNodeKit GetMediaSource(IScope scope, int id)
+        public ContentNodeKit GetMediaSource(IDatabaseScope scope, int id)
         {
             var sql = SqlMediaSourcesSelect()
                 .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))

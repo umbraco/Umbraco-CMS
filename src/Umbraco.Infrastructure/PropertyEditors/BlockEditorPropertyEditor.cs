@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 MapBlockItemData(blockEditorData.BlockValue.SettingsData);
 
                 // return json
-                return JsonConvert.SerializeObject(blockEditorData.BlockValue);
+                return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
             }
 
             #endregion

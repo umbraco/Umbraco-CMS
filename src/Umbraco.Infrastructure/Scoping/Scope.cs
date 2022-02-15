@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Core.Collections;
 using Umbraco.Extensions;
 
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Core.Scoping
     ///     Implements <see cref="IScope" />.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IScope
+    internal class Scope : IDatabaseScope
     {
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;
@@ -29,7 +30,6 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly IsolationLevel _isolationLevel;
         private readonly object _lockQueueLocker = new();
         private readonly ILogger<Scope> _logger;
-        private readonly MediaFileManager _mediaFileManager;
         private readonly RepositoryCacheMode _repositoryCacheMode;
         private readonly bool? _scopeFileSystem;
 
@@ -39,11 +39,9 @@ namespace Umbraco.Cms.Core.Scoping
         private IUmbracoDatabase _database;
 
         private bool _disposed;
-        private IEventDispatcher _eventDispatcher;
         private ICompletable _fscope;
 
         private IsolatedCaches _isolatedCaches;
-        private EventMessages _messages;
         private IScopedNotificationPublisher _notificationPublisher;
 
         private StackQueue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
@@ -59,7 +57,6 @@ namespace Umbraco.Cms.Core.Scoping
         private Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -68,7 +65,6 @@ namespace Umbraco.Cms.Core.Scoping
             bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
@@ -76,14 +72,12 @@ namespace Umbraco.Cms.Core.Scoping
         {
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
-            _mediaFileManager = mediaFileManager;
             _eventAggregator = eventAggregator;
             _logger = logger;
             Context = scopeContext;
 
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
-            _eventDispatcher = eventDispatcher;
             _notificationPublisher = notificationPublisher;
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
@@ -141,12 +135,6 @@ namespace Umbraco.Cms.Core.Scoping
                         nameof(repositoryCacheMode));
                 }
 
-                // cannot specify a dispatcher!
-                if (_eventDispatcher != null)
-                {
-                    throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
-                }
-
                 // Only the outermost scope can specify the notification publisher
                 if (_notificationPublisher != null)
                 {
@@ -179,7 +167,6 @@ namespace Umbraco.Cms.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -187,13 +174,12 @@ namespace Umbraco.Cms.Core.Scoping
             IScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, null,
-                scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher,
+            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, null,
+                scopeContext, detachable, isolationLevel, repositoryCacheMode, 
                 scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
         {
         }
@@ -202,25 +188,24 @@ namespace Umbraco.Cms.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, parent,
-                null, false, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher,
+            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, parent,
+                null, false, isolationLevel, repositoryCacheMode, notificationPublisher,
                 scopeFileSystems, callContext, autoComplete)
         {
         }
 
         internal Dictionary<Guid, Dictionary<int, int>> ReadLocks => _readLocksDictionary;
+
         internal Dictionary<Guid, Dictionary<int, int>> WriteLocks => _writeLocksDictionary;
 
         // a value indicating whether to force call-context
@@ -308,15 +293,6 @@ namespace Umbraco.Cms.Core.Scoping
                 }
 
                 return ParentScope.DatabaseOrNull;
-            }
-        }
-
-        public EventMessages MessagesOrNull
-        {
-            get
-            {
-                EnsureNotDisposed();
-                return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
             }
         }
 
@@ -430,43 +406,6 @@ namespace Umbraco.Cms.Core.Scoping
                     _database = null;
                     throw;
                 }
-            }
-        }
-
-        /// <inheritdoc />
-        public EventMessages Messages
-        {
-            get
-            {
-                EnsureNotDisposed();
-                if (ParentScope != null)
-                {
-                    return ParentScope.Messages;
-                }
-
-                return _messages ??= new EventMessages();
-
-                // TODO: event messages?
-                // this may be a problem: the messages collection will be cleared at the end of the scope
-                // how shall we process it in controllers etc? if we don't want the global factory from v7?
-                // it'd need to be captured by the controller
-                //
-                // + rename // EventMessages = ServiceMessages or something
-            }
-        }
-
-        /// <inheritdoc />
-        public IEventDispatcher Events
-        {
-            get
-            {
-                EnsureNotDisposed();
-                if (ParentScope != null)
-                {
-                    return ParentScope.Events;
-                }
-
-                return _eventDispatcher ??= new QueuingEventDispatcher(_mediaFileManager);
             }
         }
 
@@ -840,7 +779,7 @@ namespace Umbraco.Cms.Core.Scoping
                 completed = false;
             }
 
-            TryFinally(() =>
+            void HandleScopedFileSystems()
             {
                 if (_scopeFileSystem == true)
                 {
@@ -852,15 +791,17 @@ namespace Umbraco.Cms.Core.Scoping
                     _fscope.Dispose();
                     _fscope = null;
                 }
-            }, () =>
+            }
+
+            void HandleScopedNotifications()
             {
-                // deal with events
                 if (onException == false)
                 {
-                    _eventDispatcher?.ScopeExit(completed);
                     _notificationPublisher?.ScopeExit(completed);
                 }
-            }, () =>
+            }
+
+            void HandleScopeContext()
             {
                 // if *we* created it, then get rid of it
                 if (_scopeProvider.AmbientContext == Context)
@@ -875,7 +816,9 @@ namespace Umbraco.Cms.Core.Scoping
                         _scopeProvider.PopAmbientScopeContext();
                     }
                 }
-            }, () =>
+            }
+
+            void HandleDetachedScopes()
             {
                 if (Detachable)
                 {
@@ -897,25 +840,35 @@ namespace Umbraco.Cms.Core.Scoping
                     OrigScope = null;
                     OrigContext = null;
                 }
-            });
+            }
+
+            TryFinally(
+                HandleScopedFileSystems,
+                HandleScopedNotifications,
+                HandleScopeContext,
+                HandleDetachedScopes
+            );
         }
 
-        private static void TryFinally(params Action[] actions) => TryFinally(0, actions);
-
-        private static void TryFinally(int index, Action[] actions)
+        private static void TryFinally(params Action[] actions)
         {
-            if (index == actions.Length)
+            var exceptions = new List<Exception>();
+
+            foreach (Action action in actions)
             {
-                return;
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
 
-            try
+            if (exceptions.Any())
             {
-                actions[index]();
-            }
-            finally
-            {
-                TryFinally(index + 1, actions);
+                throw new AggregateException(exceptions);
             }
         }
 

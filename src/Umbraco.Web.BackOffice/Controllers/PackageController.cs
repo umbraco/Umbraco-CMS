@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ModelState.IsValid == false)
                 return ValidationProblem(ModelState);
 
-            //save it
+            // Save it
             if (!_packagingService.SaveCreatedPackage(model))
             {
                 return ValidationProblem(
@@ -78,9 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             : $"The package with id {model.Id} was not found");
             }
 
-            _packagingService.ExportCreatedPackage(model);
-
-            //the packagePath will be on the model
+            // The packagePath will be on the model
             return model;
         }
 

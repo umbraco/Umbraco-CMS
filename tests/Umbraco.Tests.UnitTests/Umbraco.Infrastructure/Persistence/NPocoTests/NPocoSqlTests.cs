@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;

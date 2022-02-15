@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -78,7 +79,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
+                ScopeAccessor.AmbientScope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
 
                 var sut = new DocumentVersionRepository(ScopeAccessor);
                 var results = sut.GetDocumentVersionsEligibleForCleanup();
@@ -113,7 +114,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             ContentService.SaveAndPublish(content);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var query = scope.SqlContext.Sql();
+                var query = ScopeAccessor.AmbientScope.SqlContext.Sql();
 
                 query.Select<ContentVersionDto>()
                     .From<ContentVersionDto>();
@@ -121,7 +122,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var sut = new DocumentVersionRepository(ScopeAccessor);
                 sut.DeleteVersions(new []{1,2,3});
 
-                var after = scope.Database.Fetch<ContentVersionDto>(query);
+                var after = ScopeAccessor.AmbientScope.Database.Fetch<ContentVersionDto>(query);
 
                 Assert.Multiple(() =>
                 {

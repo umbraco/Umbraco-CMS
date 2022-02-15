@@ -4,19 +4,16 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -40,14 +37,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
-        protected override void BeforeHostStart(IHost host)
-        {
-            base.BeforeHostStart(host);
-
-            // Ensure that the events are bound on each test
-            PublishedSnapshotServiceEventHandler eventBinder = host.Services.GetRequiredService<PublishedSnapshotServiceEventHandler>();
-            eventBinder.Initialize();
-        }
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -57,8 +46,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 options.NuCacheSerializerType = NuCacheSerializerType.JSON;
             });
-
-
         }
 
         private void AssertJsonStartsWith(int id, string expected)
@@ -75,7 +62,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 Sql<ISqlContext> selectJson = SqlContext.Sql().Select<ContentNuDto>().From<ContentNuDto>().Where<ContentNuDto>(x => x.NodeId == id && !x.Published);
-                ContentNuDto dto = scope.Database.Fetch<ContentNuDto>(selectJson).FirstOrDefault();
+                ContentNuDto dto = ScopeAccessor.AmbientScope.Database.Fetch<ContentNuDto>(selectJson).FirstOrDefault();
                 Assert.IsNotNull(dto);
                 string json = dto.Data;
                 return json;

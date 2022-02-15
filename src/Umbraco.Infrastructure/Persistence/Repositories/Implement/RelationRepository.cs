@@ -9,12 +9,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
@@ -26,9 +26,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
-        private readonly IEntityRepository _entityRepository;
+        private readonly IEntityRepositoryExtended _entityRepository;
 
-        public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepository entityRepository)
+        public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepositoryExtended entityRepository)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         {
             _relationTypeRepository = relationTypeRepository;

@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             try
             {
-                var links = JsonConvert.DeserializeObject<List<MultiUrlPickerValueEditor.LinkDto>>(value);
+                var links = JsonConvert.DeserializeObject<List<LinkDto>>(value);
 
                 var documentLinks = links.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
                 var mediaLinks = links.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media);
@@ -141,6 +141,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new JsonSerializerSettings
         {
+            Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore
         };
 
@@ -150,22 +151,28 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             if (string.IsNullOrEmpty(value))
             {
-                return string.Empty;
+                return null;
             }
 
             try
             {
+                var links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
+                if (links.Count == 0)
+                {
+                    return null;
+                }
+
                 return JsonConvert.SerializeObject(
-                    from link in JsonConvert.DeserializeObject<List<LinkDisplay>>(value)
-                    select new MultiUrlPickerValueEditor.LinkDto
+                    from link in links
+                    select new LinkDto
                     {
                         Name = link.Name,
                         QueryString = link.QueryString,
                         Target = link.Target,
                         Udi = link.Udi,
                         Url = link.Udi == null ? link.Url : null, // only save the URL for external links
-                    }, LinkDisplayJsonSerializerSettings
-                    );
+                    },
+                    LinkDisplayJsonSerializerSettings);
             }
             catch (Exception ex)
             {

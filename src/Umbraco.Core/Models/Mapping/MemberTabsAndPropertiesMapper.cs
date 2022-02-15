@@ -66,14 +66,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
-            // if we just had all of the membership provider fields on the member table :(
-            // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-            var isLockedOutProperty = resolved.Where(x => x.Properties is not null).SelectMany(x => x.Properties!).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
+            // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
+            var isLockedOutProperty = resolved.Where(x => x.Properties is not null).SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
-                isLockedOutProperty.View = "readonlyvalue";
-                isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
+                isLockedOutProperty.Readonly = true;
             }
 
             return resolved;
@@ -192,20 +189,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             var properties = new List<ContentPropertyDisplay>
             {
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
-                    Label = _localizedTextService.Localize("general","id"),
-                    Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
-                    View = "idwithguid"
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
-                    Label = _localizedTextService.Localize("content","membertype"),
-                    Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
-                    View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label]?.GetValueEditor().View
-                },
                 GetLoginProperty(member, _localizedTextService),
                 new ContentPropertyDisplay
                 {
@@ -213,7 +196,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Label = _localizedTextService.Localize("general","email"),
                     Value = member.Email,
                     View = "email",
-                    Validation = {Mandatory = true}
+                    Validation = { Mandatory = true }
                 },
                 new ContentPropertyDisplay
                 {
@@ -222,12 +205,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Value = new Dictionary<string, object?>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
-                        {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
+                        { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
                     },
-                    // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
-                    // Initialize the dictionary with the configuration from the default membership provider
-                    Config = GetPasswordConfig(member)
+                    Config = GetPasswordConfig(member) // Initialize the dictionary with the configuration from the default membership provider
                 },
                 new ContentPropertyDisplay
                 {
@@ -235,7 +216,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Label = _localizedTextService.Localize("content","membergroup"),
                     Value = GetMemberGroupValue(member.Username),
                     View = "membergroups",
-                    Config = new Dictionary<string, object> {{"IsRequired", true}}
+                    Config = new Dictionary<string, object>
+                    {
+                        { "IsRequired", true }
+                    }
                 }
             };
 

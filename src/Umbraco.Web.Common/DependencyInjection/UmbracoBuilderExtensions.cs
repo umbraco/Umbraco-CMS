@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -109,7 +109,6 @@ namespace Umbraco.Extensions
             var appCaches = AppCaches.Create(requestCache);
 
             services.ConfigureOptions<ConfigureKestrelServerOptions>();
-            services.ConfigureOptions<ConfigureIISServerOptions>();
             services.ConfigureOptions<ConfigureFormOptions>();
 
             IProfiler profiler = GetWebProfiler(config);
@@ -148,7 +147,7 @@ namespace Umbraco.Extensions
             // Add supported databases
             builder.AddUmbracoSqlServerSupport();
             builder.AddUmbracoSqlCeSupport();
-            builder.Services.AddUnique<DatabaseSchemaCreatorFactory>();
+            builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
 
             // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
@@ -200,7 +199,7 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<WebProfilerHtml>();
+            builder.Services.AddSingleton<WebProfilerHtml>();
 
             builder.Services.AddMiniProfiler(options =>
             {
@@ -286,7 +285,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
 
             builder.Services.AddUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
-            builder.Services.AddUnique<SmidgeHelperAccessor>();
+            builder.Services.AddSingleton<SmidgeHelperAccessor>();
             builder.Services.AddTransient<IPreProcessor, SmidgeNuglifyJs>();
             builder.Services.ConfigureOptions<SmidgeOptionsSetup>();
 
@@ -332,7 +331,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
             builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
-            builder.Services.AddUnique<PartialViewMacroEngine>();
+            builder.Services.AddSingleton<PartialViewMacroEngine>();
 
             // register the umbraco context factory
 
@@ -343,12 +342,12 @@ namespace Umbraco.Extensions
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
-            builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
-            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
-            builder.Services.AddUnique<UmbracoRequestMiddleware>();
-            builder.Services.AddUnique<BootFailedMiddleware>();
+            builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
+            builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();
+            builder.Services.AddSingleton<UmbracoRequestMiddleware>();
+            builder.Services.AddSingleton<BootFailedMiddleware>();
 
-            builder.Services.AddUnique<UmbracoJsonModelBinder>();
+            builder.Services.AddSingleton<UmbracoJsonModelBinder>();
 
             builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
             builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();

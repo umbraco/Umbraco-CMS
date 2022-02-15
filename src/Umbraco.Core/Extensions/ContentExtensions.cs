@@ -367,7 +367,7 @@ namespace Umbraco.Extensions
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
         /// <param name="serializer"></param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        internal static XElement ToDeepXml(this IContent content, IEntityXmlSerializer serializer)
+        public static XElement ToDeepXml(this IContent content, IEntityXmlSerializer serializer)
         {
             return serializer.Serialize(content, false, true);
         }

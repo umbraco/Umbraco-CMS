@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
 {

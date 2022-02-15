@@ -1,14 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -27,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             // create a few lock objects
             using (var scope = ScopeProvider.CreateScope())
             {
-                var database = scope.Database;
+                var database = ScopeAccessor.AmbientScope.Database;
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 1, Name = "Lock.1" });
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 2, Name = "Lock.2" });
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 3, Name = "Lock.3" });
@@ -121,7 +120,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var db = scope.Database;
+                var db = ScopeAccessor.AmbientScope.Database;
                 try
                 {
                     db.EnableSqlCount = true;
@@ -297,7 +296,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     Console.WriteLine($"[{id1}] WAIT {id1}");
                     scope.EagerWriteLock(id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
-                    WriteLocks(scope.Database);
+                    WriteLocks(ScopeAccessor.AmbientScope.Database);
                     myEv.Set();
 
                     if (id1 == 1)
@@ -312,7 +311,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     Console.WriteLine($"[{id1}] WAIT {id2}");
                     scope.EagerWriteLock(id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
-                    WriteLocks(scope.Database);
+                    WriteLocks(ScopeAccessor.AmbientScope.Database);
                 }
                 catch (Exception e)
                 {
@@ -483,7 +482,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var realDb = (Database)scope.Database;
+                var realDb = (Database)ScopeAccessor.AmbientScope.Database;
                 realDb.CommandTimeout = 1000;
 
                 Console.WriteLine("Write lock A");
@@ -505,7 +504,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     Console.WriteLine($"[{id}] WAIT {id}");
                     scope.EagerWriteLock(id);
                     Console.WriteLine($"[{id}] GRANT {id}");
-                    WriteLocks(scope.Database);
+                    WriteLocks(ScopeAccessor.AmbientScope.Database);
                     myEv.Set();
                     otherEv.WaitOne();
                 }

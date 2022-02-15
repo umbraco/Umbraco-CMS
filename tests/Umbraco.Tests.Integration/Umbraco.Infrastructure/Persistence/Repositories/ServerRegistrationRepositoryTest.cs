@@ -3,14 +3,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 

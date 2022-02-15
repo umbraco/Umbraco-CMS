@@ -28,11 +28,14 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -171,7 +174,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<UmbracoRequestPaths>();
 
-            Services.AddUnique<InstallStatusTracker>();
+            Services.AddSingleton<InstallStatusTracker>();
 
             // by default, register a noop factory
             Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
@@ -179,7 +182,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
 
-            Services.AddUnique<UriUtility>();
+            Services.AddSingleton<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
             Services.AddUnique<IUserDataService, UserDataService>();
@@ -194,14 +197,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
-            Services.AddUnique<HtmlLocalLinkParser>();
-            Services.AddUnique<HtmlImageSourceParser>();
-            Services.AddUnique<HtmlUrlParser>();
+            Services.AddSingleton<HtmlLocalLinkParser>();
+            Services.AddSingleton<HtmlImageSourceParser>();
+            Services.AddSingleton<HtmlUrlParser>();
 
             // register properties fallback
             Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
 
-            Services.AddUnique<UmbracoFeatures>();
+            Services.AddSingleton<UmbracoFeatures>();
 
             // register published router
             Services.AddUnique<IPublishedRouter, PublishedRouter>();
@@ -226,13 +229,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             Services.AddUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
-            Services.AddUnique<LegacyPasswordSecurity>();
-            Services.AddUnique<UserEditorAuthorizationHelper>();
-            Services.AddUnique<ContentPermissions>();
-            Services.AddUnique<MediaPermissions>();
+            Services.AddSingleton<LegacyPasswordSecurity>();
+            Services.AddSingleton<UserEditorAuthorizationHelper>();
+            Services.AddSingleton<ContentPermissions>();
+            Services.AddSingleton<MediaPermissions>();
 
-            Services.AddUnique<PropertyEditorCollection>();
-            Services.AddUnique<ParameterEditorCollection>();
+            Services.AddSingleton<PropertyEditorCollection>();
+            Services.AddSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar
             Services.AddUnique<IServerRoleAccessor>(f =>
@@ -240,7 +243,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 GlobalSettings globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
                 var singleServer = globalSettings.DisableElectionForSingleServer;
                 return singleServer
-                    ? (IServerRoleAccessor)new SingleServerRoleAccessor()
+                    ? new SingleServerRoleAccessor()
                     : new ElectedServerRoleAccessor(f.GetRequiredService<IServerRegistrationService>());
             });
 
@@ -263,6 +266,50 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ITelemetryService, TelemetryService>();
+
+            Services.AddUnique<IKeyValueService, KeyValueService>();
+            Services.AddUnique<IPublicAccessService, PublicAccessService>();
+            Services.AddUnique<IContentVersionService, ContentVersionService>();
+            Services.AddUnique<IUserService, UserService>();
+            Services.AddUnique<ILocalizationService, LocalizationService>();
+            Services.AddUnique<IMacroService, MacroService>();
+            Services.AddUnique<IMemberGroupService, MemberGroupService>();
+            Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
+            Services.AddUnique<IConsentService, ConsentService>();
+            Services.AddUnique<IPropertyValidationService, PropertyValidationService>();
+            Services.AddUnique<IDomainService, DomainService>();
+            Services.AddUnique<ITagService, TagService>();
+            Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
+            Services.AddUnique<IMemberService, MemberService>();
+            Services.AddUnique<IMediaService, MediaService>();
+            Services.AddUnique<IContentTypeService, ContentTypeService>();
+            Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
+            Services.AddUnique<IMediaTypeService, MediaTypeService>();
+            Services.AddUnique<IFileService, FileService>();
+            Services.AddUnique<IEntityService, EntityService>();
+            Services.AddUnique<IRelationService, RelationService>();
+            Services.AddUnique<IMemberTypeService, MemberTypeService>();
+            Services.AddUnique<INotificationService, NotificationService>();
+            Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
+                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ILoggerFactory>(),
+                factory.GetRequiredService<IEventMessagesFactory>(),
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>()
+            ));
+            Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
+            Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
+            Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
+                factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
+                factory.GetRequiredService<ILogger<LocalizedTextService>>()));
+
+            Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
+
+            Services.AddSingleton<ConflictingPackageData>();
+            Services.AddSingleton<CompiledPackageXmlParser>();
+
+            // Register a noop IHtmlSanitizer to be replaced
+            Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
         }
     }
 }

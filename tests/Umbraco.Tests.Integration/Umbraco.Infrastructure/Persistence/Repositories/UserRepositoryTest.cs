@@ -21,6 +21,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -192,7 +193,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                IQuery<IUser> query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
+                IQuery<IUser> query = ScopeProvider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1");
                 IEnumerable<IUser> result = repository.Get(query);
 
                 // Assert
@@ -273,7 +274,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IUser[] users = CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                IQuery<IUser> query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                IQuery<IUser> query = ScopeProvider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 int result = repository.Count(query);
 
                 // Assert
@@ -290,12 +291,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 UserRepository repository = CreateRepository(provider);
 
                 IUser[] users = CreateAndCommitMultipleUsers(repository);
-                IQuery<IUser> query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                IQuery<IUser> query = provider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     // Act
                     IEnumerable<IUser> result = repository.GetPagedResultsByQuery(
@@ -306,15 +307,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         user => user.Id,
                         Direction.Ascending,
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
-                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
+                        filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
 
                     // Assert
                     Assert.AreEqual(2, totalRecs);
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -331,8 +332,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     // Act
                     IEnumerable<IUser> result = repository.GetPagedResultsByQuery(
@@ -344,15 +345,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         Direction.Ascending,
                         includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
-                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
+                        filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
                     // Assert
                     Assert.AreEqual(1, totalRecs);
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -404,7 +405,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Guid sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
 
                 // manually update this record to be in the past
-                scope.Database.Execute(scope.SqlContext.Sql()
+                ScopeAccessor.AmbientScope.Database.Execute(ScopeAccessor.AmbientScope.SqlContext.Sql()
                     .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
                     .Where<UserLoginDto>(x => x.SessionId == sessionId));
 

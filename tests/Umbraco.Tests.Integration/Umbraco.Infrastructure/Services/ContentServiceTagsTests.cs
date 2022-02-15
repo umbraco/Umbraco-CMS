@@ -624,15 +624,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.AreEqual(4, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(4, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content.Id, propTypeId = propertyTypeId }));
 
-                Assert.AreEqual(3, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(3, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = child1.Id, propTypeId = propertyTypeId }));
 
-                Assert.AreEqual(2, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(2, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = child2.Id, propTypeId = propertyTypeId }));
 
@@ -667,7 +667,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.AreEqual(4, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(4, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content.Id, propTypeId = propertyTypeId }));
                 scope.Complete();
@@ -696,7 +696,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.AreEqual(4, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(4, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content.Id, propTypeId = propertyTypeId }));
 
@@ -727,7 +727,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.AreEqual(5, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(5, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content.Id, propTypeId = propertyTypeId }));
 
@@ -758,7 +758,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                Assert.AreEqual(2, scope.Database.ExecuteScalar<int>(
+                Assert.AreEqual(2, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content.Id, propTypeId = propertyTypeId }));
 

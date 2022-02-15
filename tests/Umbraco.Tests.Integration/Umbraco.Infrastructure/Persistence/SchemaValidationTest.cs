@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var schema = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
+                var schema = new DatabaseSchemaCreator(ScopeAccessor.AmbientScope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
                 result = schema.ValidateSchema(DatabaseSchemaCreator.OrderedTables);
             }
 

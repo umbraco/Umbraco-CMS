@@ -31,15 +31,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
-        protected override AppCaches GetAppCaches()
+        protected override void ConfigureTestServices(IServiceCollection services)
         {
             // this is what's created core web runtime
-            var result = new AppCaches(
+            var appCaches = new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
-            return result;
+            services.AddUnique(appCaches);
         }
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -318,20 +318,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public static string GetCacheIdKey<T>(object id) => $"{GetCacheTypeKey<T>()}{id}";
 
         public static string GetCacheTypeKey<T>() => $"uRepo_{typeof(T).Name}_";
-
-        public class PassiveEventDispatcher : QueuingEventDispatcherBase
-        {
-            public PassiveEventDispatcher()
-                : base(false)
-            {
-            }
-
-            protected override void ScopeExitCompleted()
-            {
-                // do nothing
-            }
-        }
-
+        
         public class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()

@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -109,7 +108,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return ((EntityContainerRepository) _dataTypeContainerRepository).Get(containerId);
+                return _dataTypeContainerRepository.Get(containerId);
             }
         }
 
@@ -117,7 +116,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return ((EntityContainerRepository) _dataTypeContainerRepository).Get(name, level);
+                return _dataTypeContainerRepository.Get(name, level);
             }
         }
 

@@ -523,7 +523,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(),
                 It.IsAny<IScopedNotificationPublisher>(),
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
@@ -618,20 +617,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                         Id = 77,
                         Properties = new List<ContentPropertyDisplay>()
                         {
-                            new ContentPropertyDisplay()
-                            {
-                                Alias = "_umb_id",
-                                View = "idwithguid",
-                                Value = new []
-                                {
-                                    "123",
-                                    "guid"
-                                }
-                            },
-                            new ContentPropertyDisplay()
-                            {
-                                Alias = "_umb_doctype"
-                            },
                             new ContentPropertyDisplay()
                             {
                                 Alias = "_umb_login"

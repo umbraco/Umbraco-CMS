@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var mockScope = new Mock<IScope>();
             var mockScopeProvider = new Mock<IScopeProvider>();
             mockScopeProvider
-                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(mockScope.Object);
 
             return new MemberUserStore(
@@ -37,7 +37,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider.Object),
                 mockScopeProvider.Object,
                 new IdentityErrorDescriber(),
-                Mock.Of<IPublishedSnapshotAccessor>());
+                Mock.Of<IPublishedSnapshotAccessor>(),
+                Mock.Of<IExternalLoginWithKeyService>(),
+                Mock.Of<ITwoFactorLoginService>()
+                );
         }
 
         [Test]

@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture and Hostnames</key>
+    <key alias="assigndomain">Culture and Hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
@@ -21,7 +21,7 @@
     <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="importDocumentType">Import Document Type</key>
+    <key alias="importdocumenttype">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>
     <key alias="logout">Exit</key>
@@ -2372,6 +2372,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
+    <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is set to <strong>%0%</strong>.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultFalse">The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set.</key>
     <key alias="clickJackingCheckHeaderFound">
       <![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
     <key alias="clickJackingCheckHeaderNotFound">
