@@ -12,11 +12,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> ImageFileTypes { get; }
 
         IEnumerable<IImagingAutoFillUploadField> ImageAutoFillProperties { get; }
-        
+
         bool ResolveUrlsFromTextString { get; }
 
         IEnumerable<IContentErrorPage> Error404Collection { get; }
-        
+
         string PreviewBadge { get; }
 
         MacroErrorBehaviour MacroErrorBehaviour { get; }
@@ -36,5 +36,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string LoginBackgroundImage { get; }
 
         string LoginLogoImage { get; }
+        bool HideBackOfficeLogo { get; }
     }
 }
