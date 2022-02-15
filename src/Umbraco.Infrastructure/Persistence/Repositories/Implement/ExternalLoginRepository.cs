@@ -296,7 +296,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             => forUpdate ? Sql()
                 .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))
                 .From<ExternalLoginTokenDto>()
-                .AppendUpdlockHint() // ensure these table values are locked for updates, the ForUpdate ext method does not work here
+                .AppendForUpdateHint() // ensure these table values are locked for updates, the ForUpdate ext method does not work here
                 .InnerJoin<ExternalLoginDto>()
                 .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id)
             : Sql()

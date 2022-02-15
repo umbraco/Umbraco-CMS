@@ -456,6 +456,33 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             .Select(x => Tuple.Create(x.TableName, x.ColumnName, x.ConstraintName));
     }
 
+    public override Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
+        Sql<ISqlContext> sql,
+        Func<Sql<ISqlContext>,
+        Sql<ISqlContext>> nestedJoin,
+        string? alias = null)
+    {
+        Type type = typeof(TDto);
+
+        var tableName = GetQuotedTableName(type.GetTableName());
+        var join = tableName;
+        string? quotedAlias = null;
+
+        if (alias != null)
+        {
+            quotedAlias = GetQuotedTableName(alias);
+            join += " " + quotedAlias;
+        }
+
+        var nestedSql = new Sql<ISqlContext>(sql.SqlContext);
+        nestedSql = nestedJoin(nestedSql);
+
+        Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin = sql.LeftJoin("(" + join);
+        sql.Append(nestedSql);
+        sql.Append($") {quotedAlias ?? tableName}");
+        return sqlJoin;
+    }
+
     public override IDictionary<Type, IScalarMapper> ScalarMappers => _scalarMappers;
 
     private class Constraint

@@ -267,6 +267,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
 
+        public virtual Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql) => sql;
+
+        public virtual Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql) => sql;
+
+        public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null);
+
+
         public virtual IDictionary<Type, IScalarMapper> ScalarMappers => null;
 
         public abstract void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
