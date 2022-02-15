@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         try
                         {
-                            var json = _jsonSerializer.Deserialize<dynamic>(asString);
+                            var json = _jsonSerializer.Deserialize<dynamic>(stringValue);
                             return json;
                         }
                         catch
