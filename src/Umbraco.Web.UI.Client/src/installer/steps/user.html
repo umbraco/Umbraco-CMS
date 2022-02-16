@@ -67,14 +67,14 @@
           </div>
         </div>
       </div>
+      <legend></legend>
     </div>
     <div class="row">
-      <legend></legend>
       <div class="span8">
         <div class="pull-right">
           <div class="control-group" ng-class="{disabled:myForm.$invalid}">
             <div class="controls">
-              <input ng-if="installer.current.model.quickInstallSettings" type="submit" ng-disabled="myForm.$invalid" value="Quick install" class="btn btn-success" />
+              <input ng-if="installer.current.model.quickInstallSettings" type="submit" ng-disabled="myForm.$invalid" value="Install" class="btn btn-success" />
               <button ng-if="!installer.current.model.quickInstallSettings" class="btn btn-primary control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Next</button>
             </div>
           </div>
