@@ -45,18 +45,16 @@
       <div class="span8">
         <div class="pull-right">
           <div class="span12">
-            <div class="control-group">
+            <div class="control-group" style="margin-bottom: 10px;">
               <label class="control-label" for="dbType">Database type</label>
               <div class="controls">
-                <input type="text" id="dbType" value="{{installer.current.model.quickInstallSettings.displayName}}" readonly />
+                <div class="input-readonly-text">{{installer.current.model.quickInstallSettings.displayName}}</div>
               </div>
             </div>
-          </div>
-          <div class="span12">
             <div class="control-group">
               <label class="control-label" for="Sql_databaseName">Database name</label>
               <div class="controls">
-                <input type="text" id="Sql_databaseName" value="{{installer.current.model.quickInstallSettings.defaultDatabaseName}}" readonly />
+                <div class="input-readonly-text">{{installer.current.model.quickInstallSettings.defaultDatabaseName}}</div>
               </div>
             </div>
           </div>
@@ -71,6 +69,7 @@
       </div>
     </div>
     <div class="row">
+      <legend></legend>
       <div class="span8">
         <div class="pull-right">
           <div class="control-group" ng-class="{disabled:myForm.$invalid}">
