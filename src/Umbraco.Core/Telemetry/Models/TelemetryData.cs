@@ -46,6 +46,11 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         EnvironmentName,
 
         /// <summary>
+        /// The Umbraco runtime level.
+        /// </summary>
+        RuntimeLevel,
+
+        /// <summary>
         /// The total amount of content (draft and published).
         /// </summary>
         ContentCount,

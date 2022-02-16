@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
     /// <seealso cref="Umbraco.Cms.Core.Telemetry.ITelemetryDataCollector" />
     internal class UsageInformationTelemetryDataCollector : ITelemetryDataCollector
     {
+        private readonly IRuntimeState _runtimeState;
         private readonly IContentService _contentService;
         private readonly IDomainService _domainService;
         private readonly IMediaService _mediaService;
@@ -25,6 +26,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         /// Initializes a new instance of the <see cref="UsageInformationTelemetryDataCollector" /> class.
         /// </summary>
         public UsageInformationTelemetryDataCollector(
+            IRuntimeState runtimeState,
             IContentService contentService,
             IDomainService domainService,
             IMediaService mediaService,
@@ -33,6 +35,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
             IDataTypeService dataTypeService,
             IMacroService macroService)
         {
+            _runtimeState = runtimeState;
             _contentService = contentService;
             _domainService = domainService;
             _mediaService = mediaService;
@@ -43,20 +46,29 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         }
 
         /// <inheritdoc/>
-        public IEnumerable<TelemetryData> Data => new[]
+        public IEnumerable<TelemetryData> Data => _runtimeState.Level switch
         {
-            TelemetryData.ContentCount,
-            TelemetryData.DomainCount,
-            TelemetryData.MediaCount,
-            TelemetryData.MemberCount,
-            TelemetryData.Languages,
-            TelemetryData.PropertyEditors,
-            TelemetryData.MacroCount
+            RuntimeLevel.Run => new[]
+            {
+                TelemetryData.RuntimeLevel,
+                TelemetryData.ContentCount,
+                TelemetryData.DomainCount,
+                TelemetryData.MediaCount,
+                TelemetryData.MemberCount,
+                TelemetryData.Languages,
+                TelemetryData.PropertyEditors,
+                TelemetryData.MacroCount
+            },
+            _ => new[]
+            {
+                TelemetryData.RuntimeLevel
+            }
         };
 
         /// <inheritdoc/>
         public object Collect(TelemetryData telemetryData) => telemetryData switch
         {
+            TelemetryData.RuntimeLevel => _runtimeState.Level,
             TelemetryData.ContentCount => GetContentCount(),
             TelemetryData.DomainCount => GetDomainCount(),
             TelemetryData.MediaCount => GetMediaCount(),
