@@ -9,10 +9,17 @@
 
 .umb-app-header__logo {
     margin-right: 30px;
+    flex-shrink: 0;
     button {
         img {
             height: 30px;
         }
+    }
+    
+}
+@media (max-width: 1279px) {
+    .umb-app-header__logo {
+        display: none;
     }
 }
 

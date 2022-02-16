@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml.XPath;
 using Examine.Search;
@@ -8,31 +8,46 @@ using Umbraco.Cms.Core.Xml;
 namespace Umbraco.Cms.Core
 {
     /// <summary>
-    /// Query methods used for accessing strongly typed content in templates
+    /// Query methods used for accessing strongly typed content in templates.
     /// </summary>
     public interface IPublishedContentQuery
     {
         IPublishedContent Content(int id);
+
         IPublishedContent Content(Guid id);
+
         IPublishedContent Content(Udi id);
+
         IPublishedContent Content(object id);
+
         IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
+
         IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
+
         IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids);
 
         IEnumerable<IPublishedContent> Content(IEnumerable<object> ids);
+
         IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars);
+
         IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
+
         IEnumerable<IPublishedContent> ContentAtRoot();
 
         IPublishedContent Media(int id);
+
         IPublishedContent Media(Guid id);
+
         IPublishedContent Media(Udi id);
 
         IPublishedContent Media(object id);
+
         IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
+
         IEnumerable<IPublishedContent> Media(IEnumerable<object> ids);
+
         IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);
+
         IEnumerable<IPublishedContent> MediaAtRoot();
 
         /// <summary>
@@ -44,7 +59,7 @@ namespace Umbraco.Cms.Core
         /// <param name="totalRecords">The total amount of records.</param>
         /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
         /// <param name="indexName">The name of the index to search (defaults to <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).</param>
-        /// <param name="loadedFields">The fields to load in the results of the search (defaults to all fields loaded).</param>
+        /// <param name="loadedFields">This parameter is no longer used, because the results are loaded from the published snapshot using the single item ID field.</param>
         /// <returns>
         /// The search results.
         /// </returns>
