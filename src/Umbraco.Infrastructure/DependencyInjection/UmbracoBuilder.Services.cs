@@ -122,10 +122,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : appPlugins.GetDirectories()
-                    // The plugin lang folder was previously looked for as `Lang` with uppercase L but this causes inconsistencies
-                    // and problems on Linux, so we attempt something of a case-insensitive lookup instead. This is required in case
-                    // plugin developers have already released packages with the `Lang` folder, but we really want to suggest `lang` 
-                    // is better
+                    // Check for both Lang & lang to support case sensitive file systems.
                     .SelectMany(x => x.GetDirectories("?ang", SearchOption.AllDirectories).Where(x => x.Name.InvariantEquals("lang")))
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
