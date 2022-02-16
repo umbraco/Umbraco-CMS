@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -9,25 +10,40 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class RelationService : RepositoryService, IRelationService
+    public class RelationService : RepositoryService, IRelationWithRelationTypesService
     {
         private readonly IEntityService _entityService;
-        private readonly IRelationRepository _relationRepository;
+        private readonly IRelationWithRelationTypesRepository _relationRepository;
         private readonly IRelationTypeRepository _relationTypeRepository;
         private readonly IAuditRepository _auditRepository;
 
         public RelationService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
-            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
+            IRelationWithRelationTypesRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
             : base(uowProvider, loggerFactory, eventMessagesFactory)
         {
             _relationRepository = relationRepository;
             _relationTypeRepository = relationTypeRepository;
             _auditRepository = auditRepository;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+        }
+
+        [Obsolete("Use ctor injecting IRelationWithRelationTypesRepository instead")]
+        public RelationService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
+            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
+            : this (
+                  uowProvider,
+                  loggerFactory,
+                  eventMessagesFactory,
+                  entityService,
+                  StaticServiceProvider.Instance.GetRequiredService<IRelationWithRelationTypesRepository>(),
+                  relationTypeRepository,
+                  auditRepository)
+        {
         }
 
         /// <inheritdoc />

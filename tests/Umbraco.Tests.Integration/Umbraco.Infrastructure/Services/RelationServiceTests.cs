@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private IMediaService MediaService => GetRequiredService<IMediaService>();
 
-        private IRelationService RelationService => GetRequiredService<IRelationService>();
+        private IRelationWithRelationTypesService RelationService => GetRequiredService<IRelationWithRelationTypesService>();
 
         [Test]
         public void Get_Paged_Relations_By_Relation_Type()

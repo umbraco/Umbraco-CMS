@@ -132,6 +132,9 @@ namespace Umbraco.Extensions
             builder.Services.TryAddTransient(sp =>
                 ActivatorUtilities.CreateInstance<CurrentUserController>(sp));
 
+            builder.Services.TryAddTransient(sp =>
+                ActivatorUtilities.CreateInstance<TrackedReferencesController>(sp));
+
             return builder;
         }
     }

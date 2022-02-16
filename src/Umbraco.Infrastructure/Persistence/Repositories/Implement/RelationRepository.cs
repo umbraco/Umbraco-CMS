@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Relation"/>
     /// </summary>
-    internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
+    internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationWithRelationTypesRepository
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
         private readonly IEntityRepository _entityRepository;
