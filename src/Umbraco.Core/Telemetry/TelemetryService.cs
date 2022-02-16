@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Core.Telemetry
     internal class TelemetryService : ITelemetryService
     {
         private readonly IOptionsMonitor<TelemetrySettings> _telemetrySettings;
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IEnumerable<ITelemetryDataCollector> _telemetryDataCollectors;
 
         /// <summary>
@@ -18,11 +17,9 @@ namespace Umbraco.Cms.Core.Telemetry
         /// </summary>
         public TelemetryService(
             IOptionsMonitor<TelemetrySettings> telemetrySettings,
-            IOptionsMonitor<GlobalSettings> globalSettings,
             IEnumerable<ITelemetryDataCollector> telemetryDataCollectors)
         {
             _telemetrySettings = telemetrySettings;
-            _globalSettings = globalSettings;
             _telemetryDataCollectors = telemetryDataCollectors;
         }
 
