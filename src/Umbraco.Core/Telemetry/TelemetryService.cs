@@ -30,18 +30,13 @@ namespace Umbraco.Cms.Core.Telemetry
         public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
         {
             TelemetrySettings telemetrySettings = _telemetrySettings.CurrentValue;
-
-            if (telemetrySettings.IsEnabled() is false ||
-                TryGetTelemetryId(out Guid telemetryId) is false)
+            if (telemetrySettings.IsEnabled() is false)
             {
                 telemetryReportData = null;
                 return false;
             }
 
-            telemetryReportData = new TelemetryReportData
-            {
-                Id = telemetryId
-            };
+            telemetryReportData = new TelemetryReportData();
 
             // Collect telemetry data
             foreach (var collector in _telemetryDataCollectors)
@@ -56,6 +51,11 @@ namespace Umbraco.Cms.Core.Telemetry
             }
 
             // Populate existing fields for backwards compatibility
+            if (telemetryReportData.Data.TryGetValue(TelemetryData.TelemetryId, out var telemetryId))
+            {
+                telemetryReportData.Id = telemetryId as Guid? ?? Guid.Empty;
+            }
+
             if (telemetryReportData.Data.TryGetValue(TelemetryData.UmbracoVersion, out var umbracoVersion))
             {
                 telemetryReportData.Version = umbracoVersion as string;
@@ -66,20 +66,6 @@ namespace Umbraco.Cms.Core.Telemetry
                 telemetryReportData.Packages = packageVersions as IEnumerable<PackageTelemetry>;
             }
 
-            return true;
-        }
-
-        private bool TryGetTelemetryId(out Guid telemetryId)
-        {
-            // Parse telemetry string as a GUID & verify its a GUID and not some random string
-            // since users may have messed with or decided to empty the app setting or put in something random
-            if (Guid.TryParse(_globalSettings.CurrentValue.Id, out var parsedTelemetryId) is false)
-            {
-                telemetryId = Guid.Empty;
-                return false;
-            }
-
-            telemetryId = parsedTelemetryId;
             return true;
         }
     }

@@ -6,6 +6,11 @@ namespace Umbraco.Cms.Core.Telemetry.Models
     public enum TelemetryData
     {
         /// <summary>
+        /// The telemetry identifier (to help correlate multiple reports).
+        /// </summary>
+        TelemetryId,
+
+        /// <summary>
         /// The Umbraco version.
         /// </summary>
         UmbracoVersion,

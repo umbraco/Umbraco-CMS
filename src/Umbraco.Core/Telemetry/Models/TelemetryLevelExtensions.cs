@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
             TelemetryLevel.Off => Enumerable.Empty<TelemetryData>(),
             TelemetryLevel.Basic => new[]
             {
+                TelemetryData.TelemetryId,
                 TelemetryData.UmbracoVersion,
                 TelemetryData.PackageVersions
             },
