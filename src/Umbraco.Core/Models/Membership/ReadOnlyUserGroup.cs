@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         public ReadOnlyUserGroup(int id, string? name, string? icon, int? startContentId, int? startMediaId, string @alias,
             IEnumerable<string> allowedSections, IEnumerable<string>? permissions)
         {
-            Name = name;
+            Name = name ?? string.Empty;
             Icon = icon;
             Id = id;
             Alias = alias;
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         public int Id { get; private set; }
-        public string? Name { get; private set; }
+        public string Name { get; private set; }
         public string? Icon { get; private set; }
         public int? StartContentId { get; private set; }
         public int? StartMediaId { get; private set; }

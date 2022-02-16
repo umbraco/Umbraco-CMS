@@ -17,7 +17,7 @@ namespace Umbraco.Extensions
         {
             var strId = identity.GetUserId();
             var converted = strId.TryConvertTo<T>();
-            return converted.ResultOr(default);
+            return converted.Result ?? default;
         }
 
         /// <summary>
@@ -62,11 +62,11 @@ namespace Umbraco.Extensions
             return username;
         }
 
-        public static string GetEmail(this IIdentity identity)
+        public static string? GetEmail(this IIdentity identity)
         {
             if (identity == null) throw new ArgumentNullException(nameof(identity));
 
-            string email = null;
+            string? email = null;
             if (identity is ClaimsIdentity claimsIdentity)
             {
                 email = claimsIdentity.FindFirstValue(ClaimTypes.Email);

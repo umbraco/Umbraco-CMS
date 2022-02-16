@@ -70,8 +70,11 @@ namespace Umbraco.Cms.Core.Models
                     .Select(group =>
                     {
                         group = (PropertyGroup) group.DeepClone();
-                        foreach (var property in group.PropertyTypes)
-                            AcquireProperty(property);
+                        if (group.PropertyTypes is not null)
+                        {
+                            foreach (var property in group.PropertyTypes)
+                                AcquireProperty(property);
+                        }
                         return group;
                     }));
             }
@@ -273,7 +276,7 @@ namespace Umbraco.Cms.Core.Models
 
             // add property to group
             propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);
-            group.PropertyTypes.Add(propertyType);
+            group.PropertyTypes?.Add(propertyType);
 
             return true;
         }

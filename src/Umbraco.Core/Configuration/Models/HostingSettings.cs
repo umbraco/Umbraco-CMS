@@ -35,6 +35,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value specifying the name of the site.
         /// </summary>
-        public string SiteName { get; set; }
+        public string? SiteName { get; set; }
     }
 }

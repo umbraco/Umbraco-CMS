@@ -598,7 +598,7 @@ namespace Umbraco.Cms.Core
             if (!method.IsStatic)
             {
                 parameters = new Type[lambdaParameters.Length + 1];
-                parameters[0] = lambdaDeclaring ?? method.DeclaringType;
+                parameters[0] = lambdaDeclaring ?? method.DeclaringType!;
                 Array.Copy(lambdaParameters, 0, parameters, 1, lambdaParameters.Length);
             }
 
@@ -718,7 +718,7 @@ namespace Umbraco.Cms.Core
             var types = new Type[parameters.Length + (withDeclaring ? 1 : 0)];
             var i = 0;
             if (withDeclaring)
-                types[i++] = method.DeclaringType;
+                types[i++] = method.DeclaringType!;
             foreach (var parameter in parameters)
                 types[i++] = parameter.ParameterType;
             return types;

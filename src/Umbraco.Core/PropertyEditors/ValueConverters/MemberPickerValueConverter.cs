@@ -59,12 +59,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             if (source is int id)
             {
-                IMember m = _memberService.GetById(id);
+                IMember? m = _memberService.GetById(id);
                 if (m == null)
                 {
                     return null;
                 }
-                member = publishedSnapshot?.Members.Get(m);
+                member = publishedSnapshot?.Members?.Get(m);
                 if (member != null)
                 {
                     return member;
@@ -76,13 +76,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 if (sourceUdi is null)
                     return null;
 
-                IMember m = _memberService.GetByKey(sourceUdi.Guid);
+                IMember? m = _memberService.GetByKey(sourceUdi.Guid);
                 if (m == null)
                 {
                     return null;
                 }
 
-                member = publishedSnapshot?.Members.Get(m);
+                member = publishedSnapshot?.Members?.Get(m);
 
                 if (member != null)
                 {

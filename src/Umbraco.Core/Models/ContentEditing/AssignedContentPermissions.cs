@@ -16,6 +16,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The assigned permissions to the content item organized by permission group name
         /// </summary>
         [DataMember(Name = "permissions")]
-        public IDictionary<string, IEnumerable<Permission>> AssignedPermissions { get; set; }
+        public IDictionary<string, IEnumerable<Permission>>? AssignedPermissions { get; set; }
     }
 }

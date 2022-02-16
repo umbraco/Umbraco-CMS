@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Count
 
-        public int Count(string mediaTypeAlias = null)
+        public int Count(string? mediaTypeAlias = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public int CountNotTrashed(string mediaTypeAlias = null)
+        public int CountNotTrashed(string? mediaTypeAlias = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public int CountChildren(int parentId, string mediaTypeAlias = null)
+        public int CountChildren(int parentId, string? mediaTypeAlias = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public int CountDescendants(int parentId, string mediaTypeAlias = null)
+        public int CountDescendants(int parentId, string? mediaTypeAlias = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Services
             var media = new Core.Models.Media(name, parentId, mediaType);
             using (var scope = ScopeProvider.CreateScope())
             {
-                CreateMedia(scope, media, parent, userId, false);
+                CreateMedia(scope, media, parent!, userId, false);
                 scope.Complete();
             }
 
@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -288,7 +288,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void CreateMedia(IScope scope, Core.Models.Media media, IMedia parent, int userId, bool withIdentity)
+        private void CreateMedia(IScope scope, Core.Models.Media media, IMedia? parent, int userId, bool withIdentity)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -323,7 +323,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetById(int id)
+        public IMedia? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="key">Guid key of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetById(Guid key)
+        public IMedia? GetById(Guid key)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -381,7 +381,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -399,7 +399,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -477,10 +477,10 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetAncestors(IMedia media)
+        public IEnumerable<IMedia> GetAncestors(IMedia? media)
         {
             //null check otherwise we get exceptions
-            if (media.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IMedia>();
+            if (media is null || media.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IMedia>();
 
             var rootId = Cms.Core.Constants.System.RootString;
             var ids = media.Path.Split(Constants.CharArrays.Comma)
@@ -499,7 +499,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IMedia> filter = null, Ordering ordering = null)
+            IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -518,7 +518,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IMedia> filter = null, Ordering ordering = null)
+            IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (ordering == null)
                 ordering = Ordering.By("Path");
@@ -542,7 +542,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private IQuery<IMedia> GetPagedDescendantQuery(string mediaPath)
+        private IQuery<IMedia> GetPagedDescendantQuery(string? mediaPath)
         {
             var query = Query<IMedia>();
             if (!mediaPath.IsNullOrWhiteSpace())
@@ -551,7 +551,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IMedia> filter, Ordering ordering)
+            IQuery<IMedia>? filter, Ordering ordering)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -565,7 +565,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
-        public IMedia GetParent(int id)
+        public IMedia? GetParent(int id)
         {
             // intentionally not locking
             var media = GetById(id);
@@ -577,12 +577,13 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
-        public IMedia GetParent(IMedia media)
+        public IMedia? GetParent(IMedia? media)
         {
-            if (media.ParentId == Cms.Core.Constants.System.Root || media.ParentId == Cms.Core.Constants.System.RecycleBinMedia)
+            var parentId = media?.ParentId;
+            if (parentId is null || media?.ParentId == Cms.Core.Constants.System.Root || media?.ParentId == Cms.Core.Constants.System.RecycleBinMedia)
                 return null;
 
-            return GetById(media.ParentId);
+            return GetById(parentId.Value);
         }
 
         /// <summary>
@@ -601,7 +602,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null)
+            IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -653,7 +654,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        public Attempt<OperationResult> Save(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Save(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -700,7 +701,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
             IMedia[] mediasA = medias.ToArray();
@@ -747,7 +748,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public Attempt<OperationResult> Delete(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Delete(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
 
@@ -883,7 +884,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
             var moves = new List<(IMedia, string)>();
@@ -925,7 +926,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        public Attempt<OperationResult> Move(IMedia media, int parentId, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
 
@@ -942,7 +943,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
 
-                IMedia parent = parentId == Cms.Core.Constants.System.Root ? null : GetById(parentId);
+                IMedia? parent = parentId == Cms.Core.Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Cms.Core.Constants.System.Root && (parent == null || parent.Trashed))
                 {
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
@@ -976,7 +977,7 @@ namespace Umbraco.Cms.Core.Services
 
         // MUST be called from within WriteLock
         // trash indicates whether we are trashing, un-trashing, or not changing anything
-        private void PerformMoveLocked(IMedia media, int parentId, IMedia parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
+        private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
         {
             media.ParentId = parentId;
 
@@ -1163,7 +1164,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Media), message));
         }
@@ -1172,7 +1173,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region File Management
 
-        public Stream GetMediaFileContentStream(string filepath)
+        public Stream? GetMediaFileContentStream(string filepath)
         {
             if (_mediaFileManager.FileSystem.FileExists(filepath) == false)
                 return null;

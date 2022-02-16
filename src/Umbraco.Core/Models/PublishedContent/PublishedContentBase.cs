@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract IPublishedContent Parent { get; }
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
+        public virtual IEnumerable<IPublishedContent>? Children => this.Children(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }

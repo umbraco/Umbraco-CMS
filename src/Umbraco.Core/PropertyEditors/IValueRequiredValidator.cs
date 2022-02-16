@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <remarks>
         /// <para>This is used to validate values when the property type specifies that a value is required.</para>
         /// </remarks>
-        IEnumerable<ValidationResult> ValidateRequired(object value, string valueType);
+        IEnumerable<ValidationResult> ValidateRequired(object? value, string valueType);
     }
 }

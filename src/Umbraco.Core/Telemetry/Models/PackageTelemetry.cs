@@ -21,6 +21,6 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// This may be an empty string if no version is specified, or if package telemetry has been restricted.
         /// </remarks>
         [DataMember(Name = "version")]
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 }

@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         }
 
         /// <inheritdoc cref="IValueValidator.Validate"/>
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
         {
             if (_regex == null)
             {

@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Core.Install.Models
     public class Package
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [DataMember(Name = "thumbnail")]
-        public string Thumbnail { get; set; }
+        public string? Thumbnail { get; set; }
         [DataMember(Name = "id")]
         public Guid Id { get; set; }
     }

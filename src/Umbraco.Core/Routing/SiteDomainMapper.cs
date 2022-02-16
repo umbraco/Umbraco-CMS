@@ -246,7 +246,7 @@ namespace Umbraco.Cms.Core.Routing
 
         /// <inheritdoc />
         public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris,
-            Uri current, bool excludeDefault, string? culture, string defaultCulture)
+            Uri current, bool excludeDefault, string? culture, string? defaultCulture)
         {
             // TODO: ignoring cultures entirely?
 

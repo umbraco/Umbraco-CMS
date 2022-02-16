@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.Templates
 
             var html = (await _macroRenderer.RenderAsync(alias, content, macroProps)).Text;
 
-            return new HtmlEncodedString(html);
+            return new HtmlEncodedString(html!);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     public class InstallationRepository : IInstallationRepository
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private static HttpClient _httpClient;
+        private static HttpClient? _httpClient;
         private const string RestApiInstallUrl = "https://our.umbraco.com/umbraco/api/Installation/Install";
 
         public InstallationRepository(IJsonSerializer jsonSerializer)

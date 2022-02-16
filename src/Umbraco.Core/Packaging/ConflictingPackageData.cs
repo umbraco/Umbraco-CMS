@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Packaging
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
         }
 
-        public IEnumerable<IFile>? FindConflictingStylesheets(IEnumerable<XElement>? stylesheetNodes)
+        public IEnumerable<IFile?>? FindConflictingStylesheets(IEnumerable<XElement>? stylesheetNodes)
         {
             return stylesheetNodes?
                 .Select(n =>
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Packaging
                 .Where(v => v != null);
         }
 
-        public IEnumerable<IMacro>? FindConflictingMacros(IEnumerable<XElement>? macroNodes)
+        public IEnumerable<IMacro?>? FindConflictingMacros(IEnumerable<XElement>? macroNodes)
         {
             return macroNodes?
                 .Select(n =>

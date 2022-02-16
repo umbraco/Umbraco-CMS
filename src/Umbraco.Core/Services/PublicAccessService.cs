@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns>Returns null if no entry is found</returns>
-        public PublicAccessEntry GetEntryForContent(IContent content)
+        public PublicAccessEntry? GetEntryForContent(IContent content)
         {
             return GetEntryForContent(content.Path.EnsureEndsWith("," + content.Id));
         }

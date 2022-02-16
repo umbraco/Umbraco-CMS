@@ -6,11 +6,11 @@ namespace Umbraco.Cms.Core.Strings.Css
 {
     public class StylesheetRule
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
-        public string Selector { get; set; }
+        public string Selector { get; set; } = null!;
 
-        public string Styles { get; set; }
+        public string Styles { get; set; } = null!;
 
         public override string ToString()
         {
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Strings.Css
             {
                 // since we already have a string builder in play here, we'll append to it the "hard" way
                 // instead of using string interpolation (for increased performance)
-                foreach (var style in Styles.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var style in Styles?.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
                 {
                     sb.Append("\t").Append(style.StripNewLines().Trim()).Append(";").Append(Environment.NewLine);
                 }

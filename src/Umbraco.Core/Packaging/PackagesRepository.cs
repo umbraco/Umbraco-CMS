@@ -333,7 +333,7 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                IDictionaryItem di = _languageService.GetDictionaryItemById(outInt);
+                IDictionaryItem? di = _languageService.GetDictionaryItemById(outInt);
 
                 if (di == null)
                 {
@@ -404,14 +404,17 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                XElement? macroXml = GetMacroXml(outInt, out IMacro macro);
+                XElement? macroXml = GetMacroXml(outInt, out IMacro? macro);
                 if (macroXml == null)
                 {
                     continue;
                 }
 
                 macros.Add(macroXml);
-                packagedMacros.Add(macro);
+                if (macro is not null)
+                {
+                    packagedMacros.Add(macro);
+                }
             }
 
             root.Add(macros);
@@ -659,7 +662,7 @@ namespace Umbraco.Cms.Core.Packaging
 
         // TODO: Delete this
         /// <summary>
-        private XElement? GetMacroXml(int macroId, out IMacro macro)
+        private XElement? GetMacroXml(int macroId, out IMacro? macro)
         {
             macro = _macroService.GetById(macroId);
             if (macro == null)

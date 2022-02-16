@@ -9,6 +9,6 @@
         /// <summary>
         /// The media file's path/URL
         /// </summary>
-        string MediaPath { get; }
+        string? MediaPath { get; }
     }
 }

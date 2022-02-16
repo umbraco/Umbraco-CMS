@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
             WriterId = CreatorId = 0;
             CreateDate = UpdateDate = DateTime.Now;
             Version = Guid.Empty;
-
+            Path = string.Empty;
             ContentType = contentType;
         }
 
@@ -34,11 +34,11 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public int SortOrder { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ??= GetCultures();
 
-        public string UrlSegment { get; set; }
+        public string? UrlSegment { get; set; }
 
         public int WriterId { get; set; }
 
@@ -62,19 +62,19 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public int ParentId { get; set; }
 
-        public IEnumerable<int> ChildIds { get; set; }
+        public IEnumerable<int>? ChildIds { get; set; }
 
-        public IPublishedContent Parent { get; set; }
+        public IPublishedContent? Parent { get; set; }
 
-        public IEnumerable<IPublishedContent> Children { get; set; }
+        public IEnumerable<IPublishedContent>? Children { get; set; }
 
-        public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
+        public IEnumerable<IPublishedContent>? ChildrenForAllCultures => Children;
 
         public IPublishedContentType ContentType { get; set; }
 
-        public IEnumerable<IPublishedProperty> Properties { get; set; }
+        public IEnumerable<IPublishedProperty>? Properties { get; set; }
 
-        public IPublishedProperty? GetProperty(string alias) => Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
+        public IPublishedProperty? GetProperty(string alias) => Properties?.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
 
         public IPublishedProperty? GetProperty(string alias, bool recurse)
         {
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
                 return property;
             }
 
-            IPublishedContent content = this;
+            IPublishedContent? content = this;
             while (content != null && (property == null || property.HasValue() == false))
             {
                 content = content.Parent;

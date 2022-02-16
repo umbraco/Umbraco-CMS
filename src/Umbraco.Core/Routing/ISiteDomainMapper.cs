@@ -40,6 +40,6 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>The <paramref name="culture"/> may be null, but when non-null, it can be used
         /// to help pick the best matches.</para>
         /// </remarks>
-        IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string defaultCulture);
+        IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string? defaultCulture);
     }
 }

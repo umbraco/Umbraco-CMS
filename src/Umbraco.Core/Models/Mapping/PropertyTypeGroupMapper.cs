@@ -205,11 +205,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return groups.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<TPropertyType> MapProperties(IEnumerable<IPropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
+        private IEnumerable<TPropertyType> MapProperties(IEnumerable<IPropertyType>? properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<TPropertyType>();
 
-            foreach (var p in properties.Where(x => x.DataTypeId != 0).OrderBy(x => x.SortOrder))
+            foreach (var p in properties?.Where(x => x.DataTypeId != 0).OrderBy(x => x.SortOrder) ?? Enumerable.Empty<IPropertyType>())
             {
                 var propertyEditorAlias = p.PropertyEditorAlias;
                 var propertyEditor = _propertyEditors[propertyEditorAlias];

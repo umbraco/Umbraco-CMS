@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models
         /// The tour alias
         /// </summary>
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
 
         /// <summary>
         /// If the tour is completed

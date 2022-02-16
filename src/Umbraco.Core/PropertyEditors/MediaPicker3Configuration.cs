@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         [ConfigurationField("filter", "Accepted types", "treesourcetypepicker",
             Description = "Limit to specific types")]
-        public string Filter { get; set; }
+        public string? Filter { get; set; }
 
         [ConfigurationField("multiple", "Pick multiple items", "boolean", Description = "Outputs a IEnumerable")]
         public bool Multiple { get; set; }
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         [ConfigurationField("startNodeId", "Start node", "mediapicker")]
-        public Udi StartNodeId { get; set; }
+        public Udi? StartNodeId { get; set; }
 
         [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
@@ -40,16 +40,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public bool EnableLocalFocalPoint { get; set; }
 
         [ConfigurationField("crops", "Image Crops", "views/propertyeditors/mediapicker3/prevalue/mediapicker3.crops.html", Description = "Local crops, stored on document")]
-        public CropConfiguration[] Crops { get; set; }
+        public CropConfiguration[]? Crops { get; set; }
 
         [DataContract]
         public class CropConfiguration
         {
             [DataMember(Name = "alias")]
-            public string Alias { get; set; }
+            public string? Alias { get; set; }
 
             [DataMember(Name = "label")]
-            public string Label { get; set; }
+            public string? Label { get; set; }
 
             [DataMember(Name = "width")]
             public int Width { get; set; }

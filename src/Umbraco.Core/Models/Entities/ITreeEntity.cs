@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets or sets the name of the entity.
         /// </summary>
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the user who created this entity.
@@ -37,7 +37,7 @@
         /// <summary>
         /// Gets or sets the path to the entity.
         /// </summary>
-        string? Path { get; set; }
+        string Path { get; set; }
 
         /// <summary>
         /// Gets or sets the sort order of the entity.

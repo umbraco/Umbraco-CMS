@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [Required]
         [RegularExpression(@"^([a-zA-Z]\w.*)$", ErrorMessage = "Invalid alias")]
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [DataMember(Name = "description")]
         public string? Description { get; set; }

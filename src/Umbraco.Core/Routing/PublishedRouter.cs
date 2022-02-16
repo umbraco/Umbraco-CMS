@@ -272,8 +272,8 @@ namespace Umbraco.Cms.Core.Routing
             // note - we are not handling schemes nor ports here.
             _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IDomainCache domainsCache = umbracoContext.PublishedSnapshot.Domains;
-            var domains = domainsCache.GetAll(includeWildcards: false).ToList();
+            IDomainCache? domainsCache = umbracoContext.PublishedSnapshot.Domains;
+            var domains = domainsCache?.GetAll(includeWildcards: false).ToList();
 
             // determines whether a domain corresponds to a published document, since some
             // domains may exist but on a document that has been unpublished - as a whole - or
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Core.Routing
             bool IsPublishedContentDomain(Domain domain)
             {
                 // just get it from content cache - optimize there, not here
-                IPublishedContent domainDocument = umbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
+                IPublishedContent? domainDocument = umbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
 
                 // not published - at all
                 if (domainDocument == null)
@@ -300,9 +300,9 @@ namespace Umbraco.Cms.Core.Routing
                 return domainDocument.Cultures.ContainsKey(domain.Culture);
             }
 
-            domains = domains.Where(IsPublishedContentDomain).ToList();
+            domains = domains?.Where(IsPublishedContentDomain).ToList();
 
-            var defaultCulture = domainsCache.DefaultCulture;
+            var defaultCulture = domainsCache?.DefaultCulture;
 
             // try to find a domain matching the current request
             DomainAndUri? domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
@@ -351,7 +351,7 @@ namespace Umbraco.Cms.Core.Routing
             _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            Domain? domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
+            Domain? domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
             if (domain != null)
@@ -693,7 +693,7 @@ namespace Umbraco.Cms.Core.Routing
                 throw new InvalidOperationException("The template is not set, the page cannot render.");
             }
 
-            ITemplate template = _fileService.GetTemplate(templateId.Value);
+            ITemplate? template = _fileService.GetTemplate(templateId.Value);
             if (template == null)
             {
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");

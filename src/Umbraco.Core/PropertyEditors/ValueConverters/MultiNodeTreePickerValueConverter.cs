@@ -104,12 +104,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                                 case Constants.UdiEntityType.Member:
                                     multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id =>
                                     {
-                                        IMember m = _memberService.GetByKey(guidUdi.Guid);
+                                        IMember? m = _memberService.GetByKey(guidUdi.Guid);
                                         if (m == null)
                                         {
                                             return null;
                                         }
-                                        IPublishedContent? member = publishedSnapshot?.Members.Get(m);
+                                        IPublishedContent? member = publishedSnapshot?.Members?.Get(m);
                                         return member;
                                     });
                                     break;

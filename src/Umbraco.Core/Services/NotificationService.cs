@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        public void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
+        public void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string? action, string? actionName, Uri siteUri,
             Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
             Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
         {
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.Services
             } while (id > 0);
         }
 
-        private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
+        private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
@@ -287,7 +287,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
         private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IContentBase oldDoc,
-            string actionName,
+            string? actionName,
             Uri siteUri,
             Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
             Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
@@ -314,14 +314,14 @@ namespace Umbraco.Cms.Core.Services
                     {
                         // TODO: doesn't take into account variants
 
-                        var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
+                        var newText = p.GetValue() != null ? p.GetValue()?.ToString() : "";
                         var oldText = newText;
 
                         // check if something was changed and display the changes otherwise display the fields
                         if (oldDoc.Properties.Contains(p.PropertyType.Alias))
                         {
                             var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                            oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
+                            oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : "";
 
                             // replace HTML with char equivalent
                             ReplaceHtmlSymbols(ref oldText);
@@ -350,25 +350,29 @@ namespace Umbraco.Cms.Core.Services
                 {
                     //Create the HTML based summary (ul of culture names)
 
-                    var culturesChanged = content.CultureInfos.Values.Where(x => x.WasDirty())
+                    var culturesChanged = content.CultureInfos?.Values.Where(x => x.WasDirty())
                         .Select(x => x.Culture)
                         .Select(_localizationService.GetLanguageByIsoCode)
                         .WhereNotNull()
                         .Select(x => x.CultureName);
                     summary.Append("<ul>");
-                    foreach (var culture in culturesChanged)
+                    if (culturesChanged is not null)
                     {
-                        summary.Append("<li>");
-                        summary.Append(culture);
-                        summary.Append("</li>");
+                        foreach (var culture in culturesChanged)
+                        {
+                            summary.Append("<li>");
+                            summary.Append(culture);
+                            summary.Append("</li>");
+                        }
                     }
+
                     summary.Append("</ul>");
                 }
                 else
                 {
                     //Create the text based summary (csv of culture names)
 
-                    var culturesChanged = string.Join(", ", content.CultureInfos.Values.Where(x => x.WasDirty())
+                    var culturesChanged = string.Join(", ", content.CultureInfos!.Values.Where(x => x.WasDirty())
                         .Select(x => x.Culture)
                         .Select(_localizationService.GetLanguageByIsoCode)
                         .WhereNotNull()
@@ -407,7 +411,7 @@ namespace Umbraco.Cms.Core.Services
                 string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
                 summary.ToString());
 
-            var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp.From;
+            var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp?.From;
 
             var subject = createSubject((mailingUser, subjectVars));
             var body = "";
@@ -458,10 +462,10 @@ namespace Umbraco.Cms.Core.Services
         /// Replaces the HTML symbols with the character equivalent.
         /// </summary>
         /// <param name="oldString">The old string.</param>
-        private static void ReplaceHtmlSymbols(ref string oldString)
+        private static void ReplaceHtmlSymbols(ref string? oldString)
         {
             if (oldString.IsNullOrWhiteSpace()) return;
-            oldString = oldString.Replace("&nbsp;", " ");
+            oldString = oldString!.Replace("&nbsp;", " ");
             oldString = oldString.Replace("&rsquo;", "'");
             oldString = oldString.Replace("&amp;", "&");
             oldString = oldString.Replace("&ldquo;", "“");
@@ -490,7 +494,7 @@ namespace Umbraco.Cms.Core.Services
 
         private class NotificationRequest
         {
-            public NotificationRequest(EmailMessage mail, string action, string userName, string email)
+            public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
             {
                 Mail = mail;
                 Action = action;
@@ -500,11 +504,11 @@ namespace Umbraco.Cms.Core.Services
 
             public EmailMessage Mail { get; }
 
-            public string Action { get; }
+            public string? Action { get; }
 
-            public string UserName { get; }
+            public string? UserName { get; }
 
-            public string Email { get; }
+            public string? Email { get; }
         }
 
         private void Process(BlockingCollection<NotificationRequest> notificationRequests)
@@ -514,7 +518,7 @@ namespace Umbraco.Cms.Core.Services
                 _logger.LogDebug("Begin processing notifications.");
                 while (true)
                 {
-                    NotificationRequest request;
+                    NotificationRequest? request;
                     while (notificationRequests.TryTake(out request, 8 * 1000)) // stay on for 8s
                     {
                         try

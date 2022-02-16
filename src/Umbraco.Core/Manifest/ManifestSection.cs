@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Core.Manifest
     public class ManifestSection : ISection
     {
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

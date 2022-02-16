@@ -11,14 +11,14 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
-        public Func<int, ILanguage>? GetLanguage { get; set; }
+        public Func<int, ILanguage?>? GetLanguage { get; set; }
 
         private ILanguage? _language;
         private string? _value;
         //note: this will be memberwise cloned
         private int _languageId;
 
-        public DictionaryTranslation(ILanguage language, string value)
+        public DictionaryTranslation(ILanguage language, string? value)
         {
             if (language == null) throw new ArgumentNullException("language");
             _language = language;

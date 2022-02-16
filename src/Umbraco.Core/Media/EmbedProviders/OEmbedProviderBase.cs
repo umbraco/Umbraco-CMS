@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
             _jsonSerializer = jsonSerializer;
         }
 
-        private static HttpClient _httpClient;
+        private static HttpClient? _httpClient;
 
         public abstract string ApiEndpoint { get; }
 

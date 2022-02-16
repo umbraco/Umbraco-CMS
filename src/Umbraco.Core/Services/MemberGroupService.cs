@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IMemberGroup GetById(int id)
+        public IMemberGroup? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

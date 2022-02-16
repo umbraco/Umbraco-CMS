@@ -13,6 +13,6 @@
         /// <summary>
         /// Gets or sets the path of the entity.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; set; } = null!;
     }
 }

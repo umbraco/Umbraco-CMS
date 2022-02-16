@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Core.Models
     {
         [Required]
         [DataMember(Name = "email", IsRequired = true)]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
     }
 }

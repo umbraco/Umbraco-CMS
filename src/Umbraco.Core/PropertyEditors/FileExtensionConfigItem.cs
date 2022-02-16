@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public int Id { get; set; }
 
         [DataMember(Name = "value")]
-        public string Value { get; set; }
+        public string? Value { get; set; }
     }
 }

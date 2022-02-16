@@ -163,17 +163,20 @@ namespace Umbraco.Extensions
             var otherProperties = other.Properties;
             foreach (var otherProperty in otherProperties)
             {
-                if (!otherProperty.PropertyType?.SupportsVariation(culture, "*", wildcards: true) ?? true)
+                if (!otherProperty?.PropertyType?.SupportsVariation(culture, "*", wildcards: true) ?? true)
                     continue;
 
-                var alias = otherProperty.PropertyType.Alias;
-                foreach (var pvalue in otherProperty.Values)
+                var alias = otherProperty?.PropertyType.Alias;
+                if (otherProperty is not null && alias is not null)
                 {
-                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
-                        (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
+                    foreach (var pvalue in otherProperty.Values)
                     {
-                        var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                        content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                        if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                            (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
+                        {
+                            var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                            content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                        }
                     }
                 }
             }

@@ -49,17 +49,27 @@ namespace Umbraco.Cms.Core.Services
             if (item == null) throw new ArgumentNullException(nameof(item));
             if (language == null) throw new ArgumentNullException(nameof(language));
 
-            var existing = item.Translations.FirstOrDefault(x => x.Language.Id == language.Id);
+            var existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
             if (existing != null)
             {
                 existing.Value = value;
             }
             else
             {
-                item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                if (item.Translations is not null)
                 {
-                    new DictionaryTranslation(language, value)
-                };
+                    item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                    {
+                        new DictionaryTranslation(language, value)
+                    };
+                }
+                else
+                {
+                    item.Translations = new List<IDictionaryTranslation>
+                    {
+                        new DictionaryTranslation(language, value)
+                    };
+                }
             }
         }
 
@@ -70,7 +80,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="parentId"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null)
+        public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -121,7 +131,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        public IDictionaryItem GetDictionaryItemById(int id)
+        public IDictionaryItem? GetDictionaryItemById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -292,7 +302,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="Language"/></param>
         /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageById(int id)
+        public ILanguage? GetLanguageById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -444,7 +454,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void Audit(AuditType type, string message, int userId, int objectId, string entityType)
+        private void Audit(AuditType type, string message, int userId, int objectId, string? entityType)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
         }
@@ -455,14 +465,18 @@ namespace Umbraco.Cms.Core.Services
         /// if developers have a lot of dictionary items and translations, the caching and cloning size gets much larger because of
         /// the large object graphs. So now we don't cache or clone the attached ILanguage
         /// </summary>
-        private void EnsureDictionaryItemLanguageCallback(IDictionaryItem d)
+        private void EnsureDictionaryItemLanguageCallback(IDictionaryItem? d)
         {
             var item = d as DictionaryItem;
             if (item == null) return;
 
             item.GetLanguage = GetLanguageById;
-            foreach (var trans in item.Translations.OfType<DictionaryTranslation>())
-                trans.GetLanguage = GetLanguageById;
+            var translations = item.Translations?.OfType<DictionaryTranslation>();
+            if (translations is not null)
+            {
+                foreach (var trans in translations)
+                    trans.GetLanguage = GetLanguageById;
+            }
         }
 
         public Dictionary<string, Guid> GetDictionaryItemKeyMap()

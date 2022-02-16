@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models
         /// The password value
         /// </summary>
         [DataMember(Name = "newPassword")]
-        public string NewPassword { get; set; }
+        public string? NewPassword { get; set; }
 
         /// <summary>
         /// The old password - used to change a password when: EnablePasswordRetrieval = false

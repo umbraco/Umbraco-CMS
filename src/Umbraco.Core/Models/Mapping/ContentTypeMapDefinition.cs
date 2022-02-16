@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 targetWithHistoryCleanup.HistoryCleanup = source.HistoryCleanup;
             }
 
-            target.AllowedTemplates = source.AllowedTemplates
+            target.AllowedTemplates = source.AllowedTemplates?
                 .Where(x => x != null)
                 .Select(_fileService.GetTemplate)
                 .Where(x => x != null)
@@ -349,7 +349,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             //sync templates
             IEnumerable<string?> destAllowedTemplateAliases = target.AllowedTemplates.Select(x => x.Alias);
             //if the dest is set and it's the same as the source, then don't change
-            if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
+            if (source.AllowedTemplates is not null && destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
             {
                 IEnumerable<ITemplate> templates = _fileService.GetTemplates(source.AllowedTemplates.ToArray());
                 target.AllowedTemplates = source.AllowedTemplates

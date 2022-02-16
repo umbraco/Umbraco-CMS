@@ -90,7 +90,7 @@ namespace Umbraco.Extensions
         /// <param name="entity"></param>
         public static void SanitizeEntityPropertiesForXmlStorage(this IContentBase entity)
         {
-            entity.Name = entity.Name.ToValidXmlString();
+            entity.Name = entity.Name?.ToValidXmlString();
             foreach (var property in entity.Properties)
             {
                 foreach (var propertyValue in property.Values)
@@ -238,7 +238,7 @@ namespace Umbraco.Extensions
         {
             //get the properties for the current tab
             return content.Properties
-                .Where(property => propertyGroup.PropertyTypes
+                .Where(property => propertyGroup.PropertyTypes is not null && propertyGroup.PropertyTypes
                     .Select(propertyType => propertyType.Id)
                     .Contains(property.PropertyTypeId));
         }

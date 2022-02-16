@@ -23,6 +23,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// so the app will need to go fetch the individual tree node in order to be able to load it's action list (menu)
         /// </remarks>
         [DataMember(Name = "treeNodeUrl")]
-        public string TreeNodeUrl { get; set; }
+        public string? TreeNodeUrl { get; set; }
     }
 }

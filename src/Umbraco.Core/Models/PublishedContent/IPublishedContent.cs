@@ -133,17 +133,17 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// Gets the parent of the content item.
         /// </summary>
         /// <remarks>The parent of root content is <c>null</c>.</remarks>
-        IPublishedContent Parent { get; }
+        IPublishedContent? Parent { get; }
 
         /// <summary>
         /// Gets the children of the content item that are available for the current culture.
         /// </summary>
-        IEnumerable<IPublishedContent> Children { get; }
+        IEnumerable<IPublishedContent>? Children { get; }
 
         /// <summary>
         /// Gets all the children of the content item, regardless of whether they are available for the current culture.
         /// </summary>
-        IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
+        IEnumerable<IPublishedContent>? ChildrenForAllCultures { get; }
 
         #endregion
     }

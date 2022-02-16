@@ -6,13 +6,13 @@ namespace Umbraco.Cms.Core.Install.Models
     public class UserModel
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [DataMember(Name = "password")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         [DataMember(Name = "subscribeToNewsLetter")]
         public bool SubscribeToNewsLetter { get; set; }

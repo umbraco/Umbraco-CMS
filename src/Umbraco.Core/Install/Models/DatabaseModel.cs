@@ -9,21 +9,21 @@ namespace Umbraco.Cms.Core.Install.Models
         public DatabaseType DatabaseType { get; set; } = DatabaseType.SqlServer;
 
         [DataMember(Name = "server")]
-        public string Server { get; set; }
+        public string? Server { get; set; }
 
         [DataMember(Name = "databaseName")]
-        public string DatabaseName { get; set; }
+        public string? DatabaseName { get; set; }
 
         [DataMember(Name = "login")]
-        public string Login { get; set; }
+        public string? Login { get; set; }
 
         [DataMember(Name = "password")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         [DataMember(Name = "integratedAuth")]
         public bool IntegratedAuth { get; set; }
 
         [DataMember(Name = "connectionString")]
-        public string ConnectionString { get; set; }
+        public string? ConnectionString { get; set; }
     }
 }

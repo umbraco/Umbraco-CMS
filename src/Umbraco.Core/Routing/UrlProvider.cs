@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Routing
 
         #region GetUrl
 
-        private IPublishedContent GetDocument(int id)
+        private IPublishedContent? GetDocument(int id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             return umbracoContext.Content.GetById(id);
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
+        public string GetUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
         {
             if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                 return "#";

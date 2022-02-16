@@ -70,14 +70,14 @@ namespace Umbraco.Cms.Core.Routing
         public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IPublishedContent node = umbracoContext.Content.GetById(id);
+            IPublishedContent? node = umbracoContext.Content.GetById(id);
             if (node == null)
             {
                 yield break;
             }
 
             // look for domains, walking up the tree
-            IPublishedContent n = node;
+            IPublishedContent? n = node;
             IEnumerable<DomainAndUri>? domainUris =
                 DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id,
                     current, false);

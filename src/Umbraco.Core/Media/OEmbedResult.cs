@@ -4,6 +4,6 @@
     {
         public OEmbedStatus OEmbedStatus { get; set; }
         public bool SupportsDimensions { get; set; }
-        public string Markup { get; set; }
+        public string? Markup { get; set; }
     }
 }

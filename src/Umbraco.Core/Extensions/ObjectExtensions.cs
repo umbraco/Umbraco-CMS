@@ -538,10 +538,8 @@ namespace Umbraco.Extensions
                 {
                     return "[{0}]".InvariantFormat(obj);
                 }
-                if (obj is IEnumerable)
+                if (obj is IEnumerable enumerable)
                 {
-                    var enumerable = (obj as IEnumerable);
-
                     var items = (from object enumItem in enumerable let value = GetEnumPropertyDebugString(enumItem, levels) where value != null select value).Take(10).ToList();
 
                     return items.Any()

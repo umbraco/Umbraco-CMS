@@ -77,22 +77,22 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>If culture is null, uses the default culture for the installation instead. Otherwise,
         /// will try with the specified culture, else return null.</para>
         /// </remarks>
-        internal static DomainAndUri? DomainForNode(IDomainCache domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, string? culture = null)
+        internal static DomainAndUri? DomainForNode(IDomainCache? domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, string? culture = null)
         {
             // be safe
             if (nodeId <= 0)
                 return null;
 
             // get the domains on that node
-            var domains = domainCache.GetAssigned(nodeId).ToArray();
+            var domains = domainCache?.GetAssigned(nodeId).ToArray();
 
             // none?
-            if (domains.Length == 0)
+            if (domains is null || domains.Length == 0)
                 return null;
 
             // else filter
             // it could be that none apply (due to culture)
-            return SelectDomain(domains, current, culture, domainCache.DefaultCulture, siteDomainMapper.MapDomain);
+            return SelectDomain(domains, current, culture, domainCache?.DefaultCulture, siteDomainMapper.MapDomain);
         }
 
         /// <summary>
@@ -106,24 +106,24 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domains that
         /// best match the specified uri, else it returns null.</remarks>
-        internal static IEnumerable<DomainAndUri>? DomainsForNode(IDomainCache domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, bool excludeDefault = true)
+        internal static IEnumerable<DomainAndUri>? DomainsForNode(IDomainCache? domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, bool excludeDefault = true)
         {
             // be safe
             if (nodeId <= 0)
                 return null;
 
             // get the domains on that node
-            var domains = domainCache.GetAssigned(nodeId).ToArray();
+            var domains = domainCache?.GetAssigned(nodeId).ToArray();
 
             // none?
-            if (domains.Length == 0)
+            if (domains is null || domains.Length == 0)
                 return null;
 
             // get the domains and their uris
             var domainAndUris = SelectDomains(domains, current).ToArray();
 
             // filter
-            return siteDomainMapper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache.DefaultCulture).ToArray();
+            return siteDomainMapper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache?.DefaultCulture).ToArray();
         }
 
         #endregion
@@ -148,19 +148,19 @@ namespace Umbraco.Cms.Core.Routing
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        public static DomainAndUri? SelectDomain(IEnumerable<Domain> domains, Uri uri, string? culture = null, string? defaultCulture = null, Func<IReadOnlyCollection<DomainAndUri>, Uri, string?, string?, DomainAndUri?>? filter = null)
+        public static DomainAndUri? SelectDomain(IEnumerable<Domain>? domains, Uri uri, string? culture = null, string? defaultCulture = null, Func<IReadOnlyCollection<DomainAndUri>, Uri, string?, string?, DomainAndUri?>? filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
             // we need to order so example.com/foo matches before example.com/
-            var domainsAndUris = domains
+            var domainsAndUris = domains?
                 .Where(d => d.IsWildcard == false)
                 .Select(d => new DomainAndUri(d, uri))
                 .OrderByDescending(d => d.Uri.ToString())
                 .ToList();
 
             // nothing = no magic, return null
-            if (domainsAndUris.Count == 0)
+            if (domainsAndUris is null || domainsAndUris.Count == 0)
                 return null;
 
             // sanitize cultures
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
         /// <returns>The deepest wildcard Domain in the path, or null.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
-        public static Domain? FindWildcardDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId)
+        public static Domain? FindWildcardDomainInPath(IEnumerable<Domain>? domains, string path, int? rootNodeId)
         {
             var stopNodeId = rootNodeId ?? -1;
 
@@ -353,7 +353,7 @@ namespace Umbraco.Cms.Core.Routing
                        .Reverse()
                        .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard))
+                       .Select(id => domains?.FirstOrDefault(d => d.ContentId == id && d.IsWildcard))
                        .FirstOrDefault(domain => domain != null);
         }
 

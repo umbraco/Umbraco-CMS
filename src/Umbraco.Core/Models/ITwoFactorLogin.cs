@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.Models
 {
     public interface ITwoFactorLogin: IEntity, IRememberBeingDirty
     {
-        string ProviderName { get; }
-        string Secret { get; }
+        string? ProviderName { get; }
+        string? Secret { get; }
         Guid UserOrMemberKey { get; }
     }
 }

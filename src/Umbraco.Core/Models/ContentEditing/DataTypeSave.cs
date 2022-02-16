@@ -26,13 +26,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "selectedEditor", IsRequired = true)]
         [Required]
-        public string EditorAlias { get; set; }
+        public string? EditorAlias { get; set; }
 
         /// <summary>
         /// Gets or sets the datatype configuration fields.
         /// </summary>
         [DataMember(Name = "preValues")]
-        public IEnumerable<DataTypeConfigurationFieldSave> ConfigurationFields { get; set; }
+        public IEnumerable<DataTypeConfigurationFieldSave>? ConfigurationFields { get; set; }
 
         /// <summary>
         /// Gets or sets the persisted data type.

@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
         public static Expression<Func<T, bool>> BuildCondition<T>(this QueryCondition condition, string parameterAlias)
         {
             object constraintValue;
-            switch (condition.Property.Type.ToLowerInvariant())
+            switch (condition.Property.Type?.ToLowerInvariant())
             {
                 case "string":
                     constraintValue = condition.ConstraintValue;

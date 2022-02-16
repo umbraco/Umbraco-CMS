@@ -14,12 +14,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         {
             AdditionalData = new Dictionary<string, object>();
             Alias = string.Empty;
-            Name = string.Empty;
+            Path = string.Empty;
         }
 
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The path of the entity
         /// </summary>
         [DataMember(Name = "path")]
-        public string? Path { get; set; }
+        public string Path { get; set; }
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>

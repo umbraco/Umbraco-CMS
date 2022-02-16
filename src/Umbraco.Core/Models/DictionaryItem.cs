@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryItem : EntityBase, IDictionaryItem
     {
-        public Func<int, ILanguage>? GetLanguage { get; set; }
+        public Func<int, ILanguage?>? GetLanguage { get; set; }
         private Guid? _parentId;
         private string _itemKey;
         private IEnumerable<IDictionaryTranslation>? _translations;

@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models
         private string? _name;
         private string _alias;
         private int _sortOrder;
-        private PropertyTypeCollection _propertyTypes;
+        private PropertyTypeCollection? _propertyTypes;
 
         public PropertyGroup(bool isPublishing)
             : this(new PropertyTypeCollection(isPublishing))
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [DataMember]
         [DoNotClone]
-        public PropertyTypeCollection PropertyTypes
+        public PropertyTypeCollection? PropertyTypes
         {
             get => _propertyTypes;
             set
@@ -122,13 +122,16 @@ namespace Umbraco.Cms.Core.Models
 
                 _propertyTypes = value;
 
-                // since we're adding this collection to this group,
-                // we need to ensure that all the lazy values are set.
-                foreach (var propertyType in _propertyTypes)
-                    propertyType.PropertyGroupId = new Lazy<int>(() => Id);
+                if (_propertyTypes is not null)
+                {
+                    // since we're adding this collection to this group,
+                    // we need to ensure that all the lazy values are set.
+                    foreach (var propertyType in _propertyTypes)
+                        propertyType.PropertyGroupId = new Lazy<int>(() => Id);
 
-                OnPropertyChanged(nameof(PropertyTypes));
-                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                    OnPropertyChanged(nameof(PropertyTypes));
+                    _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                }
             }
         }
 

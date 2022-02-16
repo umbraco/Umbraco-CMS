@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "idSortOrder", IsRequired = true)]
         [Required]
-        public int[] IdSortOrder { get; set; }
+        public int[]? IdSortOrder { get; set; }
 
     }
 

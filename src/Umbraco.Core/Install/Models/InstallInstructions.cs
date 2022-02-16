@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Install.Models
     public class InstallInstructions
     {
         [DataMember(Name = "instructions")]
-        public IDictionary<string, object> Instructions { get; set; }
+        public IDictionary<string, object>? Instructions { get; set; }
 
         [DataMember(Name = "installId")]
         public Guid InstallId { get; set; }

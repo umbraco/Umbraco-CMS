@@ -256,7 +256,7 @@ namespace Umbraco.Cms.Core.Models
         {
             get
             {
-                return _noGroupPropertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
+                return _noGroupPropertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes!));
             }
         }
 
@@ -351,14 +351,14 @@ namespace Umbraco.Cms.Core.Models
 
             // get old group
             var oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
-                x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+                x.PropertyTypes?.Any(y => y.Alias == propertyTypeAlias) ?? false);
 
             // set new group
             propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
 
             // remove from old group, if any - add to new group, if any
-            oldPropertyGroup?.PropertyTypes.RemoveItem(propertyTypeAlias);
-            newPropertyGroup?.PropertyTypes.Add(propertyType);
+            oldPropertyGroup?.PropertyTypes?.RemoveItem(propertyTypeAlias);
+            newPropertyGroup?.PropertyTypes?.Add(propertyType);
 
             return true;
         }
@@ -372,7 +372,7 @@ namespace Umbraco.Cms.Core.Models
             //check through each property group to see if we can remove the property type by alias from it
             foreach (var propertyGroup in PropertyGroups)
             {
-                if (propertyGroup.PropertyTypes.RemoveItem(alias))
+                if (propertyGroup.PropertyTypes?.RemoveItem(alias) ?? false)
                 {
                     if (!HasPropertyTypeBeenRemoved)
                     {
@@ -409,11 +409,14 @@ namespace Umbraco.Cms.Core.Models
             // first remove the group
             PropertyGroups.Remove(group);
 
-            // Then re-assign the group's properties to no group
-            foreach (var property in group.PropertyTypes)
+            if (group.PropertyTypes is not null)
             {
-                property.PropertyGroupId = null;
-                _noGroupPropertyTypes.Add(property);
+                // Then re-assign the group's properties to no group
+                foreach (var property in group.PropertyTypes)
+                {
+                    property.PropertyGroupId = null;
+                    _noGroupPropertyTypes.Add(property);
+                }
             }
 
             OnPropertyChanged(nameof(PropertyGroups));
@@ -457,12 +460,16 @@ namespace Umbraco.Cms.Core.Models
             foreach (var propertyGroup in PropertyGroups)
             {
                 propertyGroup.ResetDirtyProperties();
-                foreach (var propertyType in propertyGroup.PropertyTypes)
+                if (propertyGroup.PropertyTypes is not null)
                 {
-                    propertyType.ResetDirtyProperties();
-                    propertiesReset.Add(propertyType.Id);
+                    foreach (var propertyType in propertyGroup.PropertyTypes)
+                    {
+                        propertyType.ResetDirtyProperties();
+                        propertiesReset.Add(propertyType.Id);
+                    }
                 }
             }
+
             //then loop through our property type collection since some might not exist on a property group
             //but don't re-reset ones we've already done.
             foreach (var propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))

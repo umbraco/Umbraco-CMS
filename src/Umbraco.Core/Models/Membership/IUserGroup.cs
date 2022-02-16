@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <summary>
         /// The name
         /// </summary>
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// The set of default permissions

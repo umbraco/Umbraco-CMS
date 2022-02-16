@@ -31,6 +31,6 @@ namespace Umbraco.Cms.Core.Configuration
         /// Gets the allowed addresses to retrieve data for the content dashboard.
         /// </summary>
         /// <value>The URLs.</value>
-        public string[] ContentDashboardUrlAllowlist { get; set; }
+        public string[]? ContentDashboardUrlAllowlist { get; set; }
     }
 }

@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class ContentDomainsAndCulture
     {
         [DataMember(Name = "domains")]
-        public IEnumerable<DomainDisplay> Domains { get; set; }
+        public IEnumerable<DomainDisplay>? Domains { get; set; }
 
         [DataMember(Name = "language")]
-        public string Language { get;  set; }
+        public string? Language { get;  set; }
     }
 }

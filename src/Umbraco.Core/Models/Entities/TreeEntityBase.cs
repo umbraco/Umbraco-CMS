@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         private bool _hasParentId;
         private ITreeEntity? _parent;
         private int _level;
-        private string? _path;
+        private string _path = String.Empty;
         private int _sortOrder;
         private bool _trashed;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         public string? Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         /// <inheritdoc />
@@ -81,10 +81,10 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public string? Path
+        public string Path
         {
             get => _path;
-            set => SetPropertyValueAndDetectChanges(value, ref _path, nameof(Path));
+            set => SetPropertyValueAndDetectChanges(value, ref _path!, nameof(Path));
         }
 
         /// <inheritdoc />

@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         public UserGroup(IShortStringHelper shortStringHelper)
         {
             _alias = string.Empty;
+            _name = string.Empty;
             _shortStringHelper = shortStringHelper;
             _sectionCollection = new List<string>();
         }

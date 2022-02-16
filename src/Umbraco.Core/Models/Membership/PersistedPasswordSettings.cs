@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// PBKDF2 with HMAC-SHA256, 128-bit salt, 256-bit subkey, 10000 iterations.
         /// </remarks>
         [DataMember(Name = "hashAlgorithm")]
-        public string HashAlgorithm { get; set; }
+        public string? HashAlgorithm { get; set; }
     }
 }

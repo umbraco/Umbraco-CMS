@@ -81,10 +81,10 @@ namespace Umbraco.Cms.Core.Services
         Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentContainerId, Guid key, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer? GetContainer(int containerId);
-        EntityContainer GetContainer(Guid containerId);
-        IEnumerable<EntityContainer> GetContainers(int[] containerIds);
-        IEnumerable<EntityContainer> GetContainers(TItem contentType);
-        IEnumerable<EntityContainer> GetContainers(string folderName, int level);
+        EntityContainer? GetContainer(Guid containerId);
+        IEnumerable<EntityContainer>? GetContainers(int[] containerIds);
+        IEnumerable<EntityContainer>? GetContainers(TItem contentType);
+        IEnumerable<EntityContainer>? GetContainers(string folderName, int level);
         Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 

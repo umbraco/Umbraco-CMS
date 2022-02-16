@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif
@@ -264,7 +265,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">
         ///    <paramref name="key"/> is null.</exception>
-        public bool TryGetValue (ExifTag key, out ExifProperty value)
+        public bool TryGetValue (ExifTag key, [MaybeNullWhen(false)] out ExifProperty value)
         {
             return items.TryGetValue (key, out value);
         }

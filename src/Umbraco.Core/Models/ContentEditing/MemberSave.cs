@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "username", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string? Username { get; set; }
+        public string Username { get; set; } = null!;
 
         [DataMember(Name = "email", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         [EmailAddress]
-        public string? Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [DataMember(Name = "password")]
         public ChangingPasswordModel? Password { get; set; }
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
             var prop = Properties.FirstOrDefault(x => x.Alias == alias);
             if (prop == null) return default;
             var converted = prop.Value.TryConvertTo<T>();
-            return converted.ResultOr(default);
+            return converted.Result ?? default;
         }
     }
 }

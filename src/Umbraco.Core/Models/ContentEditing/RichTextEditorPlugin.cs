@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class RichTextEditorPlugin
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

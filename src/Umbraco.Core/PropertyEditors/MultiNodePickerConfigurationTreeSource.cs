@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class MultiNodePickerConfigurationTreeSource
     {
         [DataMember(Name = "type")]
-        public string ObjectType { get; set; }
+        public string? ObjectType { get; set; }
 
         [DataMember(Name = "query")]
-        public string StartNodeQuery { get; set; }
+        public string? StartNodeQuery { get; set; }
 
         [DataMember(Name = "id")]
-        public Udi StartNodeId { get; set; }
+        public Udi? StartNodeId { get; set; }
     }
 }

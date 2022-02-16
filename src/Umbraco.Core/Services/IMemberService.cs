@@ -113,14 +113,14 @@ namespace Umbraco.Cms.Core.Services
         /// and the user id in the membership provider.</remarks>
         /// <param name="id"><see cref="Guid"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember GetByKey(Guid id);
+        IMember? GetByKey(Guid id);
 
         /// <summary>
         /// Gets a Member by its integer id
         /// </summary>
         /// <param name="id"><see cref="System.int"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember GetById(int id);
+        IMember? GetById(int id);
 
         /// <summary>
         /// Gets all Members for the specified MemberType alias

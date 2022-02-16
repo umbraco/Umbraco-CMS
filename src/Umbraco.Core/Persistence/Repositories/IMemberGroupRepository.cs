@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        IEnumerable<IMemberGroup> GetMemberGroupsForMember(string username);
+        IEnumerable<IMemberGroup> GetMemberGroupsForMember(string? username);
 
         void ReplaceRoles(int[] memberIds, string[] roleNames);
 
@@ -46,6 +46,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 
         void DissociateRoles(int[] memberIds, string[] roleNames);
 
-        
+
     }
 }

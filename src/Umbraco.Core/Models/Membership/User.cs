@@ -30,6 +30,8 @@ namespace Umbraco.Cms.Core.Models.Membership
             _startMediaIds = new int[] { };
             //cannot be null
             _rawPasswordValue = "";
+            _username = string.Empty;
+            _email = string.Empty;
         }
 
         /// <summary>
@@ -105,10 +107,10 @@ namespace Umbraco.Cms.Core.Models.Membership
         private int[]? _startMediaIds;
         private int _failedLoginAttempts;
 
-        private string? _username;
+        private string _username;
         private DateTime? _emailConfirmedDate;
         private DateTime? _invitedDate;
-        private string? _email;
+        private string _email;
         private string? _rawPasswordValue;
         private string? _passwordConfig;
         private IEnumerable<string>? _allowedSections;
@@ -142,17 +144,17 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string? Username
+        public string Username
         {
             get => _username;
-            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
+            set => SetPropertyValueAndDetectChanges(value, ref _username!, nameof(Username));
         }
 
         [DataMember]
-        public string? Email
+        public string Email
         {
             get => _email;
-            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
+            set => SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
         }
 
         [IgnoreDataMember]

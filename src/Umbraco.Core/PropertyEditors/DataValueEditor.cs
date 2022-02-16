@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public string ValueType { get; set; }
 
         /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object value, bool required, string format)
+        public IEnumerable<ValidationResult> Validate(object? value, bool required, string? format)
         {
             List<ValidationResult>? results = null;
             var r = Validators.SelectMany(v => v.Validate(value, ValueType, Configuration)).ToList();
@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The result of the conversion attempt.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">ValueType was out of range.</exception>
-        internal Attempt<object?> TryConvertValueToCrlType(object value)
+        internal Attempt<object?> TryConvertValueToCrlType(object? value)
         {
             // Ensure empty string values are converted to null
             if (value is string s && string.IsNullOrWhiteSpace(s))
@@ -270,11 +270,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     // If it is a string type, we will attempt to see if it is JSON stored data, if it is we'll try to convert
                     // to a real JSON object so we can pass the true JSON object directly to Angular!
                     var stringValue = value as string ?? value.ToString();
-                    if (stringValue.DetectIsJson())
+                    if (stringValue!.DetectIsJson())
                     {
                         try
                         {
-                            var json = _jsonSerializer.Deserialize<dynamic>(stringValue);
+                            var json = _jsonSerializer.Deserialize<dynamic>(stringValue!);
                             return json;
                         }
                         catch

@@ -13,11 +13,11 @@
         /// <summary>
         /// Gets the content type icon.
         /// </summary>
-        string ContentTypeIcon { get; }
+        string? ContentTypeIcon { get; }
 
         /// <summary>
         /// Gets the content type thumbnail.
         /// </summary>
-        string ContentTypeThumbnail { get; }
+        string? ContentTypeThumbnail { get; }
     }
 }

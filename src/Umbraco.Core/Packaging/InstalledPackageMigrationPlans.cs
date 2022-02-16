@@ -15,13 +15,13 @@ namespace Umbraco.Cms.Core.Packaging
         /// This can be used to determine if the package advertises any migrations
         /// </remarks>
         [DataMember(Name = "finalMigrationId")]
-        public string FinalMigrationId { get; set; }
+        public string? FinalMigrationId { get; set; }
 
         /// <summary>
         /// If the package has migrations, this will be it's current migration Id
         /// </summary>
         [DataMember(Name = "currentMigrationId")]
-        public string CurrentMigrationId { get; set; }
+        public string? CurrentMigrationId { get; set; }
     }
 
 }

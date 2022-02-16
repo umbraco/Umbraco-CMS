@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models
 
     public class NotificationEmailSubjectParams
     {
-        public NotificationEmailSubjectParams(string siteUrl, string action, string itemName)
+        public NotificationEmailSubjectParams(string siteUrl, string? action, string? itemName)
         {
             SiteUrl = siteUrl ?? throw new ArgumentNullException(nameof(siteUrl));
             Action = action ?? throw new ArgumentNullException(nameof(action));

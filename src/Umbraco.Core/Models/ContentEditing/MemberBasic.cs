@@ -9,10 +9,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class MemberBasic : ContentItemBasic<ContentPropertyBasic>
     {
         [DataMember(Name = "username")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [DataMember(Name = "email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [DataMember(Name = "properties")]
         public override IEnumerable<ContentPropertyBasic> Properties

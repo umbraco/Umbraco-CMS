@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class RedirectUrlSearchResult
     {
         [DataMember(Name = "searchResults")]
-        public IEnumerable<ContentRedirectUrl> SearchResults { get; set; }
+        public IEnumerable<ContentRedirectUrl>? SearchResults { get; set; }
 
         [DataMember(Name = "totalCount")]
         public long TotalCount { get; set; }

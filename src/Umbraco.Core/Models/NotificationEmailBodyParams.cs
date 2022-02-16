@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Models
 {
     public class NotificationEmailBodyParams
     {
-        public NotificationEmailBodyParams(string recipientName, string action, string itemName, string itemId, string itemUrl, string editedUser, string siteUrl, string summary)
+        public NotificationEmailBodyParams(string? recipientName, string? action, string? itemName, string itemId, string itemUrl, string? editedUser, string siteUrl, string summary)
         {
             RecipientName = recipientName ?? throw new ArgumentNullException(nameof(recipientName));
             Action = action ?? throw new ArgumentNullException(nameof(action));

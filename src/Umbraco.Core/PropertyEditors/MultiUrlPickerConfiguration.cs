@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public int MaxNumber { get; set; }
 
         [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay.")]
-        public string OverlaySize { get; set; }
+        public string? OverlaySize { get; set; }
 
         [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore user start nodes", "boolean",

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Core.Manifest
@@ -23,7 +24,7 @@ namespace Umbraco.Cms.Core.Manifest
             // see Create above, target is either DataEditor (parameter) or ConfiguredDataEditor (property)
 
             if (!(target is AccessRule accessRule))
-                throw new Exception("panic.");
+                throw new PanicException("panic.");
 
             GetRule(accessRule, jobject, "grant", AccessRuleType.Grant);
             GetRule(accessRule, jobject, "deny", AccessRuleType.Deny);

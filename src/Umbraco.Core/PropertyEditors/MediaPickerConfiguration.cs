@@ -15,7 +15,7 @@
         public bool DisableFolderSelect { get; set; }
 
         [ConfigurationField("startNodeId", "Start node", "mediapicker")]
-        public Udi StartNodeId { get; set; }
+        public Udi? StartNodeId { get; set; }
 
         [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",

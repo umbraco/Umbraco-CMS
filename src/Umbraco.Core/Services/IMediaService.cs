@@ -65,14 +65,14 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+        IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
         /// </summary>
         /// <param name="id">Id of the Content to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia GetById(int id);
+        IMedia? GetById(int id);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -146,14 +146,14 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
         /// <returns>True if moving succeeded, otherwise False</returns>
-        Attempt<OperationResult> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
@@ -191,28 +191,28 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> Delete(IMedia media, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> Delete(IMedia media, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        Attempt<OperationResult> Save(IMedia media, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
         /// </summary>
         /// <param name="key">Guid key of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia GetById(Guid key);
+        IMedia? GetById(Guid key);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Level
@@ -285,14 +285,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
-        IMedia GetParent(int id);
+        IMedia? GetParent(int id);
 
         /// <summary>
         /// Gets the parent of the current media as an <see cref="IMedia"/> item.
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
-        IMedia GetParent(IMedia media);
+        IMedia? GetParent(IMedia media);
 
         /// <summary>
         /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
@@ -338,7 +338,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>
         /// <returns>The content of the media.</returns>
-        Stream GetMediaFileContentStream(string filepath);
+        Stream? GetMediaFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a media.

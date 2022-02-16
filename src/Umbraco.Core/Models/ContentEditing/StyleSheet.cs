@@ -6,9 +6,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class Stylesheet
     {
         [DataMember(Name="name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "path")]
-        public string Path { get; set; }
+        public string? Path { get; set; }
     }
 }

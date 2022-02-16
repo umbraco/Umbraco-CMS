@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class InternalPublishedProperty : IPublishedProperty
     {
-        public IPublishedPropertyType? PropertyType { get; set; }
+        public IPublishedPropertyType PropertyType { get; set; } = null!;
 
         public string Alias { get; set; } = string.Empty;
 

@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public string GetValue(string key)
+        public string? GetValue(string key)
         {
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {

@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         private readonly string _header;
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
-        private static HttpClient s_httpClient;
+        private static HttpClient? s_httpClient;
 
         [Obsolete("Use ctor without value.")]
         protected BaseHttpHeaderCheck(

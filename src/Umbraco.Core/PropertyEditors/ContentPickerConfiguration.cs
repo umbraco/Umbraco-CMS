@@ -6,7 +6,7 @@
         public bool ShowOpenButton { get; set; }
 
         [ConfigurationField("startNodeId", "Start node", "treepicker")] // + config in configuration editor ctor
-        public Udi StartNodeId { get; set; }
+        public Udi? StartNodeId { get; set; }
 
         [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",

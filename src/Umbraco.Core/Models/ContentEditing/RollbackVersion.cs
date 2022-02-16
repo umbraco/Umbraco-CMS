@@ -16,6 +16,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int VersionAuthorId { get; set; }
 
         [DataMember(Name = "versionAuthorName")]
-        public string VersionAuthorName { get; set; }
+        public string? VersionAuthorName { get; set; }
     }
 }

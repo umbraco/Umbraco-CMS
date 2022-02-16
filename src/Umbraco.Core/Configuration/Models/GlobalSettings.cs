@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <remarks>
         /// If the value is a virtual path, it's resolved relative to the webroot.
         /// </remarks>
-        public string UmbracoMediaPhysicalRootPath { get; set; }
+        public string UmbracoMediaPhysicalRootPath { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.

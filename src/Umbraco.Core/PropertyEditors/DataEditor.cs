@@ -39,6 +39,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             if (Attribute == null)
             {
                 Alias = string.Empty;
+                Name = string.Empty;
                 return;
             }
 
@@ -67,7 +68,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         /// <inheritdoc />
         [DataMember(Name = "name", IsRequired = true)]
-        public string? Name { get; internal set; }
+        public string Name { get; internal set; }
 
         /// <inheritdoc />
         [DataMember(Name = "icon")]

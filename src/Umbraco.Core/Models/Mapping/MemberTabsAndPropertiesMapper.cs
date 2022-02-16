@@ -181,7 +181,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             // else update the dictionary to "true" for the user roles (except internal roles)
-            foreach (var userRole in userRoles.Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
+            foreach (var userRole in userRoles.Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
             {
                 result[userRole] = true;
             }

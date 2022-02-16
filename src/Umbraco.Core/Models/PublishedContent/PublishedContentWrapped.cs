@@ -109,13 +109,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         #region Tree
 
         /// <inheritdoc />
-        public virtual IPublishedContent Parent => _content.Parent;
+        public virtual IPublishedContent? Parent => _content.Parent;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
+        public virtual IEnumerable<IPublishedContent>? Children => _content.Children;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
+        public virtual IEnumerable<IPublishedContent>? ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
         #endregion
 

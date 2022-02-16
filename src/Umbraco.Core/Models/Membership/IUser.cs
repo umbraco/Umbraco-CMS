@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Membership
     {
         UserState UserState { get; }
 
-        string Name { get; set; }
+        string? Name { get; set; }
         int SessionTimeout { get; set; }
         int[]? StartContentIds { get; set; }
         int[]? StartMediaIds { get; set; }

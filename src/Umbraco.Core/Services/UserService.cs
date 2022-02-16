@@ -522,7 +522,7 @@ namespace Umbraco.Cms.Core.Services
             IQuery<IUser>? filterQuery = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                filterQuery = Query<IUser>().Where(x => x.Name.Contains(filter!) || x.Username.Contains(filter!));
+                filterQuery = Query<IUser>().Where(x => (x.Name != null && x.Name.Contains(filter!)) || x.Username.Contains(filter!));
             }
 
             return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null, filterQuery);
@@ -1005,7 +1005,7 @@ namespace Umbraco.Cms.Core.Services
                 .GroupBy(x => x.UserGroupId);
 
             return new EntityPermissionCollection(
-                permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions)));
+                permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions)).Where(x => x is not null)!);
         }
 
         /// <summary>

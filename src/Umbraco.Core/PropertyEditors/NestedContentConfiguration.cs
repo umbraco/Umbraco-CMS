@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class NestedContentConfiguration
     {
         [ConfigurationField("contentTypes", "Element Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the Element Types to use as models for the items.")]
-        public ContentType[] ContentTypes { get; set; }
+        public ContentType[]? ContentTypes { get; set; }
 
         [ConfigurationField("minItems", "Min Items", "number", Description = "Minimum number of items allowed.")]
         public int? MinItems { get; set; }
@@ -31,13 +31,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public class ContentType
         {
             [DataMember(Name = "ncAlias")]
-            public string Alias { get; set; }
+            public string? Alias { get; set; }
 
             [DataMember(Name = "ncTabAlias")]
-            public string TabAlias { get; set; }
+            public string? TabAlias { get; set; }
 
             [DataMember(Name = "nameTemplate")]
-            public string Template { get; set; }
+            public string? Template { get; set; }
         }
     }
 }
