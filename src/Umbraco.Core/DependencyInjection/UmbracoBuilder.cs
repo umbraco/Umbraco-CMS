@@ -268,6 +268,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<ITelemetryDataCollector, PackageVersionsTelemetryDataCollector>();
             Services.AddSingleton<ITelemetryDataCollector, SystemInformationTelemetryDataCollector>();
             Services.AddSingleton<ITelemetryDataCollector, UsageInformationTelemetryDataCollector>();
+            Services.AddSingleton<ITelemetryDataCollector, SettingsTelemetryDataCollector>();
 
             // Register a noop IHtmlSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();

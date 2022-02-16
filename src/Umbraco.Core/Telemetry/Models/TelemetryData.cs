@@ -83,6 +83,16 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// <summary>
         /// The total amount of macros.
         /// </summary>
-        MacroCount
+        MacroCount,
+
+        /// <summary>
+        /// The customized global settings (default UI language, HTTPS, timeouts and whether non-default paths are configured).
+        /// </summary>
+        CustomGlobalSettings,
+
+        /// <summary>
+        /// The Models Builder mode.
+        /// </summary>
+        ModelsBuilderMode
     }
 }
