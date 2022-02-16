@@ -9,15 +9,10 @@
     {
         var vm = this;
 
-        vm.referencedContentTitle = "Used Documents";
-        vm.referencedMediaTitle = "Used Media";
+        vm.referencedItemsTitle = "Items in use";
 
-        localizationService.localize("references_labelUsedDocuments").then(function (value) {
-            vm.referencedContentTitle = value;
-        });
-
-        localizationService.localize("references_labelUsedMedia").then(function (value) {
-            vm.referencedMediaTitle = value;
+        localizationService.localize("references_labelUsedItems").then(function (value) {
+            vm.referencedItemsTitle = value;
         });
       
         vm.changeContentPageNumber = changeContentPageNumber;
