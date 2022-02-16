@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -24,19 +23,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IRelationWithRelationTypesService _relationService;
         private readonly IEntityService _entityService;
 
-        [ActivatorUtilitiesConstructor]
         public TrackedReferencesController(IRelationWithRelationTypesService relationService, IEntityService entityService)
         {
             _relationService = relationService;
             _entityService = entityService;
-        }
-
-        [Obsolete("Use ctor injecting IRelationWithRelationTypesService instead")]
-        public TrackedReferencesController(IRelationService relationService, IEntityService entityService)
-            : this (
-                  StaticServiceProvider.Instance.GetRequiredService<IRelationWithRelationTypesService>(),
-                  entityService)
-        {
         }
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
