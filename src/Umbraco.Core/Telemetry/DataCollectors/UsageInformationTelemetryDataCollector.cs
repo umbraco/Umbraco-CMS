@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
                 HasFallback = x.FallbackLanguageId.HasValue
             });
 
-        private object GetPropertyEditors()
+        private IDictionary<string, int> GetPropertyEditors()
             => _dataTypeService.GetAll().GroupBy(x => x.EditorAlias).ToDictionary(x => x.Key, x => x.Count());
 
         private object GetMacroCount()

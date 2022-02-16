@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             ILogger<ReportSiteTask> logger,
             ITelemetryService telemetryService,
             IJsonSerializer jsonSerializer)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(0))
+            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
             _telemetryService = telemetryService;
@@ -42,7 +43,11 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 #endif
             };
 
-            s_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+            // Ensure requests are not stored in any caches
+            s_httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue()
+            {
+                NoStore = true
+            };
         }
 
         [Obsolete("Use ctor with all params")]

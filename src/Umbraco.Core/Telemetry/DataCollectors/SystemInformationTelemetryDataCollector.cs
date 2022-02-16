@@ -35,8 +35,8 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         public object Collect(TelemetryData telemetryData) => telemetryData switch
         {
             TelemetryData.OS => RuntimeInformation.OSDescription,
-            TelemetryData.OSArchitecture => RuntimeInformation.OSArchitecture.ToString(),
-            TelemetryData.ProcessArchitecture => RuntimeInformation.ProcessArchitecture.ToString(),
+            TelemetryData.OSArchitecture => RuntimeInformation.OSArchitecture,
+            TelemetryData.ProcessArchitecture => RuntimeInformation.ProcessArchitecture,
             TelemetryData.Framework => RuntimeInformation.FrameworkDescription,
             TelemetryData.Server => GetServer(),
             TelemetryData.EnvironmentName => _hostEnvironment.EnvironmentName,
