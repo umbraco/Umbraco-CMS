@@ -306,7 +306,7 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
-                    if (IsDirectory(virtualPath, SystemDirectories.PartialViews))
+                    if (IsDirectory(virtualPath, SystemDirectories.PartialViews, Current.FileSystems.PartialViewsFileSystem))
                     {
                         Services.FileService.DeletePartialViewFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -318,7 +318,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View or folder found with the specified path");
 
                 case Core.Constants.Trees.PartialViewMacros:
-                    if (IsDirectory(virtualPath, SystemDirectories.MacroPartials))
+                    if (IsDirectory(virtualPath, SystemDirectories.MacroPartials, Current.FileSystems.MacroPartialsFileSystem))
                     {
                         Services.FileService.DeletePartialViewMacroFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -330,7 +330,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
                 case Core.Constants.Trees.Scripts:
-                    if (IsDirectory(virtualPath, SystemDirectories.Scripts))
+                    if (IsDirectory(virtualPath, SystemDirectories.Scripts, Current.FileSystems.ScriptsFileSystem))
                     {
                         Services.FileService.DeleteScriptFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -343,7 +343,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                 case Core.Constants.Trees.Stylesheets:
-                    if (IsDirectory(virtualPath, SystemDirectories.Css))
+                    if (IsDirectory(virtualPath, SystemDirectories.Css, Current.FileSystems.StylesheetsFileSystem))
                     {
                         Services.FileService.DeleteStyleSheetFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -634,14 +634,23 @@ namespace Umbraco.Web.Editors
             return value;
         }
 
-        private bool IsDirectory(string virtualPath, string systemDirectory)
+        private bool IsDirectory(string virtualPath, string systemDirectory, IFileSystem fileSystem)
         {
             var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
-            var dirInfo = new DirectoryInfo(path);
 
-            // If you turn off indexing in Windows this will have the attribute:
-            // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
-            return (dirInfo.Attributes & FileAttributes.Directory) != 0;
+            // If it's a physical filesystem check with directory info
+            if (fileSystem.CanAddPhysical)
+            {
+                var dirInfo = new DirectoryInfo(path);
+
+                // If you turn off indexing in Windows this will have the attribute:
+                // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
+                return (dirInfo.Attributes & FileAttributes.Directory) != 0;
+            }
+
+            // Otherwise check the filesystem abstraction to see if the folder exists
+            // Since this is used for delete, it presumably exists if we're trying to delete it
+            return fileSystem.DirectoryExists(path);
         }
 
         // this is an internal class for passing stylesheet data from the client to the controller while editing
