@@ -158,10 +158,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
             // Ensure empty string and JSON values are converted to null
-            if (value is string stringValue &&
-                (string.IsNullOrWhiteSpace(stringValue) || (ValueType.InvariantEquals(ValueTypes.Json) && stringValue.DetectIsEmptyJson())))
+            if (value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
             {
                 value = null;
+            }
+            else if (value is not string && ValueType.InvariantEquals(ValueTypes.Json))
+            {
+                // Only serialize value when it's not already a string
+                var jsonValue = _jsonSerializer.Serialize(value);
+                if (jsonValue.DetectIsEmptyJson())
+                {
+                    value = null;
+                }
+                else
+                {
+                    value = jsonValue;
+                }
             }
 
             // Convert the string to a known type
