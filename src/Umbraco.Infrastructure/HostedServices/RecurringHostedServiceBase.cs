@@ -24,6 +24,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringHostedServiceBase"/> class.
@@ -77,7 +78,24 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             return Task.CompletedTask;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                     _timer?.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
         /// <inheritdoc/>
-        public void Dispose() => _timer?.Dispose();
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

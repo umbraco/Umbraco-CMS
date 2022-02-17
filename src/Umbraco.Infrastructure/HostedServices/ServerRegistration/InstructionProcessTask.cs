@@ -54,5 +54,15 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 
             return Task.CompletedTask;
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_messenger is IDisposable disposable)
+            {
+                disposable?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }
