@@ -26,11 +26,17 @@ namespace Umbraco.Cms.Core.Notifications
         /// </summary>
         public string TreeAlias { get; }
 
-        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString, string treeAlias)
+        /// <summary>
+        /// Gets id of the node rendered
+        /// </summary>
+        public string Id { get; }
+
+        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString, string treeAlias, string id)
         {
             Nodes = nodes;
             QueryString = queryString;
             TreeAlias = treeAlias;
+            Id = id;
         }
     }
 }

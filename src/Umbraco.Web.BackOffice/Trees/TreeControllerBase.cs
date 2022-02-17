@@ -181,7 +181,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     node.RoutePath = "#";
 
             //raise the event
-            await _eventAggregator.PublishAsync(new TreeNodesRenderingNotification(nodes, queryStrings, TreeAlias));
+            await _eventAggregator.PublishAsync(new TreeNodesRenderingNotification(nodes, queryStrings, TreeAlias, id));
 
             return nodes;
         }
