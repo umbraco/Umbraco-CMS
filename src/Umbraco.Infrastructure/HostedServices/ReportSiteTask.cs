@@ -82,7 +82,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
-                    request.Content = new StringContent(_jsonSerializer.Serialize(telemetryReportData), Encoding.UTF8, "application/json");
+                    string content = _jsonSerializer.Serialize(telemetryReportData);
+                    request.Content = new StringContent(content, Encoding.UTF8, "application/json");
 
                     // Make an HTTP POST to telemetry service (fire & forget, do not need to know if it's a 200, 500, etc.)
                     using HttpResponseMessage response = await s_httpClient.SendAsync(request);

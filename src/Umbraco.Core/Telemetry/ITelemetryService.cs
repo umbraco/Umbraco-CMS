@@ -8,8 +8,12 @@ namespace Umbraco.Cms.Core.Telemetry
     public interface ITelemetryService
     {
         /// <summary>
-        /// Try and get the <see cref="TelemetryReportData"/>
+        /// Creates a new <see cref="TelemetryReportData" /> if telemetry can be collected.
         /// </summary>
+        /// <param name="telemetryReportData">The telemetry report data.</param>
+        /// <returns>
+        ///   <c>true</c> if telemetry data could be collected; otherwise, <c>false</c>.
+        /// </returns>
         bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData);
     }
 }

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
     /// <summary>
     /// Serializable class containing information about an installed package.
     /// </summary>
-    [DataContract(Name = "packageTelemetry")]
+    [DataContract]
     public class PackageTelemetry
     {
         /// <summary>

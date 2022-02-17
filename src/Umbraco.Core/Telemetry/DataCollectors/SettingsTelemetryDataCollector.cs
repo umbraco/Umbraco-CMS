@@ -42,27 +42,46 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
             TelemetryData.ModelsBuilderMode => _modelsBuilderSettings.CurrentValue.ModelsMode,
             _ => throw new NotSupportedException()
         };
-        private object GetCustomGlobalSettings()
+
+        private CustomGlobalSettings GetCustomGlobalSettings()
         {
             var globalSettings = _globalSettings.CurrentValue;
 
-            return new
+            return new()
             {
-                globalSettings.TimeOut,
-                globalSettings.DefaultUILanguage,
-                globalSettings.HideTopLevelNodeFromPath,
-                globalSettings.UseHttps,
+                TimeOut = globalSettings.TimeOut,
+                DefaultUILanguage = globalSettings.DefaultUILanguage,
+                HideTopLevelNodeFromPath = globalSettings.HideTopLevelNodeFromPath,
+                UseHttps = globalSettings.UseHttps,
                 UmbracoPath = globalSettings.UmbracoPath != GlobalSettings.StaticUmbracoPath,
                 IconsPath = globalSettings.IconsPath != GlobalSettings.StaticIconsPath,
                 UmbracoCssPath = globalSettings.UmbracoCssPath != GlobalSettings.StaticUmbracoCssPath,
                 UmbracoScriptsPath = globalSettings.UmbracoScriptsPath != GlobalSettings.StaticUmbracoScriptsPath,
                 UmbracoMediaPath = globalSettings.UmbracoMediaPath != GlobalSettings.StaticUmbracoMediaPath,
                 UmbracoMediaPhysicalRootPath = globalSettings.UmbracoMediaPhysicalRootPath != GlobalSettings.StaticUmbracoMediaPath,
-                globalSettings.MainDomLock,
-                globalSettings.IsSmtpServerConfigured,
-                globalSettings.IsPickupDirectoryLocationConfigured,
-                globalSettings.SqlWriteLockTimeOut
+                MainDomLock = globalSettings.MainDomLock,
+                IsSmtpServerConfigured = globalSettings.IsSmtpServerConfigured,
+                IsPickupDirectoryLocationConfigured = globalSettings.IsPickupDirectoryLocationConfigured,
+                SqlWriteLockTimeOut = globalSettings.SqlWriteLockTimeOut
             };
+        }
+
+        private class CustomGlobalSettings
+        {
+            public TimeSpan TimeOut { get; set; }
+            public string DefaultUILanguage { get; set; }
+            public bool HideTopLevelNodeFromPath { get; set; }
+            public bool UseHttps { get; set; }
+            public bool UmbracoPath { get; set; }
+            public bool IconsPath { get; set; }
+            public bool UmbracoCssPath { get; set; }
+            public bool UmbracoScriptsPath { get; set; }
+            public bool UmbracoMediaPath { get; set; }
+            public bool UmbracoMediaPhysicalRootPath { get; set; }
+            public string MainDomLock { get; set; }
+            public bool IsSmtpServerConfigured { get; set; }
+            public bool IsPickupDirectoryLocationConfigured { get; set; }
+            public TimeSpan SqlWriteLockTimeOut { get; set; }
         }
     }
 }
