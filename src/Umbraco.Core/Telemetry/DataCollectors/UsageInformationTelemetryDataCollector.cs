@@ -22,6 +22,23 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         private readonly IDataTypeService _dataTypeService;
         private readonly IMacroService _macroService;
 
+        private static readonly IEnumerable<TelemetryData> s_data_run = new[]
+        {
+            TelemetryData.RuntimeLevel,
+            TelemetryData.ContentCount,
+            TelemetryData.DomainCount,
+            TelemetryData.MediaCount,
+            TelemetryData.MemberCount,
+            TelemetryData.Languages,
+            TelemetryData.PropertyEditors,
+            TelemetryData.MacroCount
+        };
+
+        private static readonly IEnumerable<TelemetryData> s_data = new[]
+        {
+            TelemetryData.RuntimeLevel
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UsageInformationTelemetryDataCollector" /> class.
         /// </summary>
@@ -48,21 +65,8 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         /// <inheritdoc/>
         public IEnumerable<TelemetryData> Data => _runtimeState.Level switch
         {
-            RuntimeLevel.Run => new[]
-            {
-                TelemetryData.RuntimeLevel,
-                TelemetryData.ContentCount,
-                TelemetryData.DomainCount,
-                TelemetryData.MediaCount,
-                TelemetryData.MemberCount,
-                TelemetryData.Languages,
-                TelemetryData.PropertyEditors,
-                TelemetryData.MacroCount
-            },
-            _ => new[]
-            {
-                TelemetryData.RuntimeLevel
-            }
+            RuntimeLevel.Run => s_data_run,
+            _ => s_data
         };
 
         /// <inheritdoc/>

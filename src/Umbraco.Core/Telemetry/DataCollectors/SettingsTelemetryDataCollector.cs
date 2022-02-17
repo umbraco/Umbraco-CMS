@@ -15,6 +15,12 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
 
+        private static readonly IEnumerable<TelemetryData> s_data = new[]
+        {
+            TelemetryData.CustomGlobalSettings,
+            TelemetryData.ModelsBuilderMode
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsTelemetryDataCollector" /> class.
         /// </summary>
@@ -27,11 +33,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         }
 
         /// <inheritdoc/>
-        public IEnumerable<TelemetryData> Data => new[]
-        {
-            TelemetryData.CustomGlobalSettings,
-            TelemetryData.ModelsBuilderMode
-        };
+        public IEnumerable<TelemetryData> Data => s_data;
 
         /// <inheritdoc/>
         public object Collect(TelemetryData telemetryData) => telemetryData switch

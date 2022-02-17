@@ -14,16 +14,18 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
     {
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
+        private static readonly IEnumerable<TelemetryData> s_data = new[]
+        {
+            TelemetryData.TelemetryId
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TelemetryIdTelemetryDataCollector" /> class.
         /// </summary>
         public TelemetryIdTelemetryDataCollector(IOptionsMonitor<GlobalSettings> globalSettings) => _globalSettings = globalSettings;
 
         /// <inheritdoc/>
-        public IEnumerable<TelemetryData> Data => new[]
-        {
-            TelemetryData.TelemetryId
-        };
+        public IEnumerable<TelemetryData> Data => s_data;
 
         /// <inheritdoc/>
         public object Collect(TelemetryData telemetryData) => telemetryData switch

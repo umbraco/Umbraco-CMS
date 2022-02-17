@@ -13,16 +13,18 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
     {
         private readonly IManifestParser _manifestParser;
 
+        private static readonly IEnumerable<TelemetryData> s_data = new[]
+        {
+            TelemetryData.PackageVersions
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageVersionsTelemetryDataCollector" /> class.
         /// </summary>
         public PackageVersionsTelemetryDataCollector(IManifestParser manifestParser) => _manifestParser = manifestParser;
 
         /// <inheritdoc/>
-        public IEnumerable<TelemetryData> Data => new[]
-        {
-            TelemetryData.PackageVersions
-        };
+        public IEnumerable<TelemetryData> Data => s_data;
 
         /// <inheritdoc/>
         public object Collect(TelemetryData telemetryData) => telemetryData switch

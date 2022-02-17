@@ -15,13 +15,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
     {
         private readonly IHostEnvironment _hostEnvironment;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SystemInformationTelemetryDataCollector" /> class.
-        /// </summary>
-        public SystemInformationTelemetryDataCollector(IHostEnvironment hostEnvironment) => _hostEnvironment = hostEnvironment;
-
-        /// <inheritdoc/>
-        public IEnumerable<TelemetryData> Data => new[]
+        private static readonly IEnumerable<TelemetryData> s_data = new[]
         {
             TelemetryData.OS,
             TelemetryData.OSArchitecture,
@@ -30,6 +24,14 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
             TelemetryData.Server,
             TelemetryData.EnvironmentName
         };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SystemInformationTelemetryDataCollector" /> class.
+        /// </summary>
+        public SystemInformationTelemetryDataCollector(IHostEnvironment hostEnvironment) => _hostEnvironment = hostEnvironment;
+
+        /// <inheritdoc/>
+        public IEnumerable<TelemetryData> Data => s_data;
 
         /// <inheritdoc/>
         public object Collect(TelemetryData telemetryData) => telemetryData switch

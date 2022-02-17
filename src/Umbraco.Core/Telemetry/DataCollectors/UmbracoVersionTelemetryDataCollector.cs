@@ -14,16 +14,18 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
     {
         private readonly IUmbracoVersion _umbracoVersion;
 
+        private static readonly IEnumerable<TelemetryData> s_data = new[]
+        {
+            TelemetryData.UmbracoVersion
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoVersionTelemetryDataCollector" /> class.
         /// </summary>
         public UmbracoVersionTelemetryDataCollector(IUmbracoVersion umbracoVersion) => _umbracoVersion = umbracoVersion;
 
         /// <inheritdoc/>
-        public IEnumerable<TelemetryData> Data => new[]
-        {
-            TelemetryData.UmbracoVersion
-        };
+        public IEnumerable<TelemetryData> Data => s_data;
 
         /// <inheritdoc/>
         public object Collect(TelemetryData telemetryData) => telemetryData switch
