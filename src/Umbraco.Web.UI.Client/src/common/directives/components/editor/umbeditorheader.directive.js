@@ -161,12 +161,14 @@ Use this directive to construct a header inside the main editor window.
                 name: "",
                 navigation: [
                     {
+                        "alias": "section1",
                         "name": "Section 1",
                         "icon": "icon-document-dashed-line",
                         "view": "/App_Plugins/path/to/html.html",
                         "active": true
                     },
                     {
+                        "alias": "section2",
                         "name": "Section 2",
                         "icon": "icon-list",
                         "view": "/App_Plugins/path/to/html.html",
