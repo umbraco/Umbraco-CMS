@@ -213,6 +213,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             //FINAL
             To<AddContentVersionCleanupFeature>("{8BAF5E6C-DCB7-41AE-824F-4215AE4F1F98}");
+            To<NoopMigration>("{03482BB0-CF13-475C-845E-ECB8319DBE3C}");
         }
     }
 }
