@@ -1,0 +1,17 @@
+<div ng-controller="umbracopackage__1ContentAppController as vm">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div ng-if="!vm.loading">
+        <umb-box>
+            <umb-box-header title-key="UmbracoPackage.1_contentAppHeader"
+                            description-key="UmbracoPackage.1_contentAppDesc">
+            </umb-box-header>
+            <umb-box-content>
+                <h4>{{vm.message}}</h4>
+            </umb-box-content>
+
+        </umb-box>
+    </div>
+
+</div>
