@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -158,17 +157,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <exception cref="System.ArgumentOutOfRangeException">ValueType was out of range.</exception>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
-            // Ensure empty string values are converted to null
-            if (value is string s && string.IsNullOrWhiteSpace(s))
+            // Ensure empty string and JSON values are converted to null
+            if (value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
             {
                 value = null;
             }
-
-            // Ensure JSON is serialized properly (without indentation or converted to null when empty)
-            if (value is not null && ValueType.InvariantEquals(ValueTypes.Json))
+            else if (value is not string && ValueType.InvariantEquals(ValueTypes.Json))
             {
+                // Only serialize value when it's not already a string
                 var jsonValue = _jsonSerializer.Serialize(value);
-
                 if (jsonValue.DetectIsEmptyJson())
                 {
                     value = null;
