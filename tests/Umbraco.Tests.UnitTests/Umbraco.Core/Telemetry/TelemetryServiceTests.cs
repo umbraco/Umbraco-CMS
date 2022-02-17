@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             });
             var telemetryDataCollectors = new[]
             {
-                new TelemetryIdTelemetryDataCollector(globalSettings)
+                new MetadataTelemetryDataCollector(globalSettings)
             };
 
             var telemetryService = new TelemetryService(telemetryOptions, telemetryDataCollectors);

@@ -7,22 +7,23 @@ using Umbraco.Cms.Core.Telemetry.Models;
 namespace Umbraco.Cms.Core.Telemetry.DataCollectors
 {
     /// <summary>
-    /// Collects telemetry identifier telemetry data.
+    /// Collects telemetry metadata.
     /// </summary>
     /// <seealso cref="Umbraco.Cms.Core.Telemetry.ITelemetryDataCollector" />
-    internal class TelemetryIdTelemetryDataCollector : ITelemetryDataCollector
+    internal class MetadataTelemetryDataCollector : ITelemetryDataCollector
     {
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
         private static readonly IEnumerable<TelemetryData> s_data = new[]
         {
-            TelemetryData.TelemetryId
+            TelemetryData.TelemetryId,
+            TelemetryData.Network
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TelemetryIdTelemetryDataCollector" /> class.
+        /// Initializes a new instance of the <see cref="MetadataTelemetryDataCollector" /> class.
         /// </summary>
-        public TelemetryIdTelemetryDataCollector(IOptionsMonitor<GlobalSettings> globalSettings) => _globalSettings = globalSettings;
+        public MetadataTelemetryDataCollector(IOptionsMonitor<GlobalSettings> globalSettings) => _globalSettings = globalSettings;
 
         /// <inheritdoc/>
         public IEnumerable<TelemetryData> Data => s_data;
@@ -31,6 +32,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         public object Collect(TelemetryData telemetryData) => telemetryData switch
         {
             TelemetryData.TelemetryId => GetTelemetryId(),
+            TelemetryData.Network => true,
             _ => throw new NotSupportedException()
         };
 

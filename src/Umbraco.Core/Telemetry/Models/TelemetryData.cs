@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         TelemetryId,
 
         /// <summary>
+        /// Process network information (IP location and network ASN).
+        /// </summary>
+        Network,
+
+        /// <summary>
         /// The Umbraco version.
         /// </summary>
         UmbracoVersion,

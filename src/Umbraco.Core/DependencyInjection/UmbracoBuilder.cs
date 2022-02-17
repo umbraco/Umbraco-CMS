@@ -264,7 +264,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ITelemetryService, TelemetryService>();
-            Services.AddSingleton<ITelemetryDataCollector, TelemetryIdTelemetryDataCollector>();
+            Services.AddSingleton<ITelemetryDataCollector, MetadataTelemetryDataCollector>();
             Services.AddSingleton<ITelemetryDataCollector, UmbracoVersionTelemetryDataCollector>();
             Services.AddSingleton<ITelemetryDataCollector, PackageVersionsTelemetryDataCollector>();
             Services.AddSingleton<ITelemetryDataCollector, SystemInformationTelemetryDataCollector>();

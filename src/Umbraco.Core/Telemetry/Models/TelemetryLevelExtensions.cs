@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
             TelemetryLevel.Basic => new[]
             {
                 TelemetryData.TelemetryId,
+                TelemetryData.Network,
                 TelemetryData.UmbracoVersion,
                 TelemetryData.PackageVersions
             },
