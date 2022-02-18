@@ -136,5 +136,25 @@ namespace Umbraco.Extensions
 
             return new Uri(routingSettings.UmbracoApplicationUrl);
         }
+
+        /// <summary>
+        /// Gets the Umbraco `ufprt` encrypted string from the current request
+        /// </summary>
+        /// <param name="request">The current request</param>
+        /// <returns>The extracted `ufprt` token.</returns>
+        public static string GetUfprt(this HttpRequest request)
+        {
+            if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal))
+            {
+                return formVal.ToString();
+            }
+
+            if (request.Query.TryGetValue("ufprt", out StringValues queryVal))
+            {
+                return queryVal.ToString();
+            }
+
+            return null;
+        }
     }
 }
