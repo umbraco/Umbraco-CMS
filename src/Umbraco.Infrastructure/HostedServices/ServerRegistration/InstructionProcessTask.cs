@@ -57,9 +57,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 
         protected override void Dispose(bool disposing)
         {
-            if (_messenger is IDisposable disposable)
+            if (!_disposedValue)
             {
-                disposable?.Dispose();
+                if (disposing && _messenger is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+                
+                _disposedValue = true;
             }
 
             base.Dispose(disposing);
