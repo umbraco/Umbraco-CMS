@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <inheritdoc />
         public void Configure(CookieAuthenticationOptions options)
         {
-            options.SlidingExpiration = true;
+            options.SlidingExpiration = false;
             options.ExpireTimeSpan = _globalSettings.TimeOut;
             options.Cookie.Domain = _securitySettings.AuthCookieDomain;
             options.Cookie.Name = _securitySettings.AuthCookieName;
@@ -150,8 +151,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     // ensure the thread culture is set
                     backOfficeIdentity.EnsureCulture();
 
-                    await EnsureValidSessionId(ctx);
-                    await securityStampValidator.ValidateAsync(ctx);
                     EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
                     // add or update a claim to track when the cookie expires, we use this to track time remaining
@@ -163,6 +162,16 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         Constants.Security.BackOfficeAuthenticationType,
                         backOfficeIdentity));
 
+                    await securityStampValidator.ValidateAsync(ctx);
+
+                    // This might have been called from GetRemainingTimeoutSeconds, in this case we don't want to ensure valid session
+                    if (IsRemainingSecondsRequest(ctx))
+                    {
+                        return;
+                    }
+
+                    ctx.ShouldRenew = true;
+                    await EnsureValidSessionId(ctx);
                 },
                 OnSigningIn = ctx =>
                 {
@@ -275,6 +284,22 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     context.ShouldRenew = true;
                 }
             }
+        }
+
+        private bool IsRemainingSecondsRequest(CookieValidatePrincipalContext context)
+        {
+            var routeValues = context.HttpContext.Request.RouteValues;
+            if (routeValues.TryGetValue("controller", out var controllerName) &&
+                routeValues.TryGetValue("action", out var action))
+            {
+                if (controllerName?.ToString() == nameof(AuthenticationController).TrimEnd("Controller")
+                    && action?.ToString() == nameof(AuthenticationController.GetRemainingTimeoutSeconds))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
