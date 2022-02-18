@@ -165,11 +165,21 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     await securityStampValidator.ValidateAsync(ctx);
 
                     // This might have been called from GetRemainingTimeoutSeconds, in this case we don't want to ensure valid session
+                    // since that in it self will keep the session valid since we renew the lastVerified date.
+                    // Similarly don't renew the token
                     if (IsRemainingSecondsRequest(ctx))
                     {
                         return;
                     }
 
+                    // We have to manually specify Issued and Expires,
+                    // because the SecurityStampValidator refreshes the principal every 30 minutes,
+                    // When the principal is refreshed the Issued is update to time of refresh, however, the Expires remains unchanged
+                    // When we then try and renew, the difference of issued and expires effectively becomes the new ExpireTimeSpan
+                    // meaning we effectively lose 30 minutes of our ExpireTimeSpan for EVERY principal refresh if we don't
+                    // https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Cookies/src/CookieAuthenticationHandler.cs#L115
+                    ctx.Properties.IssuedUtc = _systemClock.UtcNow;
+                    ctx.Properties.ExpiresUtc = _systemClock.UtcNow.Add(_globalSettings.TimeOut);
                     ctx.ShouldRenew = true;
                     await EnsureValidSessionId(ctx);
                 },
@@ -235,7 +245,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     }
 
                     return Task.CompletedTask;
-                }
+                },
             };
         }
 
