@@ -145,12 +145,12 @@ namespace Umbraco.Extensions
         /// <returns>The extracted `ufprt` token.</returns>
         public static string GetUfprt(this HttpRequest request)
         {
-            if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal))
+            if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal) && formVal != StringValues.Empty)
             {
                 return formVal.ToString();
             }
 
-            if (request.Query.TryGetValue("ufprt", out StringValues queryVal))
+            if (request.Query.TryGetValue("ufprt", out StringValues queryVal) && queryVal != StringValues.Empty)
             {
                 return queryVal.ToString();
             }
