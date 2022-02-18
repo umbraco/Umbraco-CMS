@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _databaseBuilder = databaseBuilder;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(object model)
+        public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             if (_runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
@@ -40,14 +40,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
             if (result.RequiresUpgrade == false)
             {
-                return Task.FromResult<InstallSetupResult>(null);
+                return Task.FromResult<InstallSetupResult?>(null);
             }
 
             // Upgrade is required, so set the flag for the next step
             return Task.FromResult(new InstallSetupResult(new Dictionary<string, object>
             {
                 { "upgrade", true}
-            }));
+            }))!;
         }
 
         public override bool RequiresExecution(object model) => true;

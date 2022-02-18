@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 content.PasswordConfiguration = dto.PasswordConfig;
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
-                
+
                 // TODO: missing names?
 
                 content.Path = nodeDto.Path;
@@ -297,7 +297,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
             // try to get a path from the string being stored for media
             // TODO: only considering umbracoFile
 
-            string path = null;
+            string? path = null;
 
             if (entity.Properties.TryGetValue(Cms.Core.Constants.Conventions.Media.File, out var property)
                 && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath))

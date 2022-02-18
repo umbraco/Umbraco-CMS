@@ -20,6 +20,6 @@ namespace Umbraco.Cms.Core.Models.Packaging
         /// <summary>
         /// The serialized version of the content
         /// </summary>
-        public XElement? XmlData { get; set; }
+        public XElement XmlData { get; set; } = null!;
     }
 }

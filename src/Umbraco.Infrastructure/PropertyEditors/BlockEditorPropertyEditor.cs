@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
@@ -190,12 +190,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
 
-                BlockEditorData blockEditorData;
+                BlockEditorData? blockEditorData;
                 try
                 {
                     blockEditorData = _blockEditorValues.DeserializeAndClean(editorValue.Value);
@@ -258,9 +258,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _textService = textService;
             }
 
-            public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+            public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
             {
-                var blockConfig = (BlockListConfiguration)dataTypeConfiguration;
+                var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
                 if (blockConfig == null) yield break;
 
                 var validationLimit = blockConfig.ValidationLimit;
@@ -360,18 +360,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _logger = logger;
             }
 
-            private IContentType GetElementType(BlockItemData item)
+            private IContentType? GetElementType(BlockItemData item)
             {
                 _contentTypes.Value.TryGetValue(item.ContentTypeKey, out var contentType);
                 return contentType;
             }
 
-            public BlockEditorData DeserializeAndClean(object propertyValue)
+            public BlockEditorData? DeserializeAndClean(object? propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return null;
 
-                var blockEditorData = _dataConverter.Deserialize(propertyValue.ToString());
+                var blockEditorData = _dataConverter.Deserialize(propertyValue.ToString()!);
 
                 if (blockEditorData.BlockValue.ContentData.Count == 0)
                 {

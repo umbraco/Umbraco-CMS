@@ -102,11 +102,11 @@ namespace Umbraco.Cms.Core.Manifest
             // }
             // and we need to turn this into a list of IPropertyValidator
             // so, rewrite the json structure accordingly
-            if (jobject["editor"]["validation"] is JObject validation)
-                jobject["editor"]["validation"] = RewriteValidators(validation);
+            if (jobject["editor"]?["validation"] is JObject validation)
+                jobject["editor"]!["validation"] = RewriteValidators(validation);
 
-            if(jobject["editor"]["view"] is JValue view)
-                jobject["editor"]["view"] = RewriteVirtualUrl(view);
+            if(jobject["editor"]?["view"] is JValue view)
+                jobject["editor"]!["view"] = RewriteVirtualUrl(view);
 
             var prevalues = jobject["prevalues"] as JObject;
             var defaultConfig = jobject["defaultConfig"] as JObject;
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Manifest
             }
         }
 
-        private string RewriteVirtualUrl(JValue view)
+        private string? RewriteVirtualUrl(JValue view)
         {
             return _ioHelper.ResolveRelativeOrVirtualUrl(view.Value as string);
         }
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.Manifest
 
                 // move the 'view' property
                 jobject["editor"] = new JObject { ["view"] = jobject["view"] };
-                jobject.Property("view").Remove();
+                jobject.Property("view")?.Remove();
             }
 
             // in the manifest, default configuration is named 'config', rename
@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Core.Manifest
             }
 
             if(jobject["editor"]?["view"] is JValue view) // We need to null check, if view do not exists, then editor do not exists
-                jobject["editor"]["view"] = RewriteVirtualUrl(view);
+                jobject["editor"]!["view"] = RewriteVirtualUrl(view);
         }
 
         private static JArray RewriteValidators(JObject validation)

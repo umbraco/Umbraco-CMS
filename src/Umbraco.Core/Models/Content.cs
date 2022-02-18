@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, string? culture = null)
+        public Content(string? name, int parentId, IContentType? contentType, string? culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
 
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string? culture = null)
+        public Content(string? name, int parentId, IContentType? contentType, PropertyCollection properties, string? culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));

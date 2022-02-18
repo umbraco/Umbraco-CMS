@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("path")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]

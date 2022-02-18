@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>The model CLR type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
         /// <para>For the actual CLR type, see <see cref="ClrType"/>.</para>
         /// </remarks>
-        Type? ModelClrType { get; }
+        Type ModelClrType { get; }
 
         /// <summary>
         /// Gets the property CLR type.

@@ -277,7 +277,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             return string.Format("Get{0}", clrName);
         }
 
-        private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)
+        private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string? mixinClrName = null)
         {
             var mixinStatic = mixinClrName != null;
 
@@ -489,7 +489,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
 
             // takes care eg of "System.Int32" vs. "int"
-            if (TypesMap.TryGetValue(s, out string typeName))
+            if (TypesMap.TryGetValue(s, out string? typeName))
             {
                 sb.Append(typeName);
                 return;
@@ -499,7 +499,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             // so if we want Umbraco.Core.Models.IPublishedContent
             // and using Umbraco.Core.Models, then we just need IPublishedContent
             typeName = s;
-            string typeUsing = null;
+            string? typeUsing = null;
             var p = typeName.LastIndexOf('.');
             if (p > 0)
             {

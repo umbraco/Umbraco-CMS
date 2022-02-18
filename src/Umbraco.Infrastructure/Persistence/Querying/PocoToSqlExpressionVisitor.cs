@@ -13,9 +13,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
     internal class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
     {
         private readonly PocoData _pd;
-        private readonly string _alias;
+        private readonly string? _alias;
 
-        public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string alias)
+        public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias)
             : base(sqlContext.SqlSyntax)
         {
             _pd = sqlContext.PocoDataFactory.ForType(typeof(TDto));
@@ -98,10 +98,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
     internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
     {
         private readonly PocoData _pocoData1, _pocoData2;
-        private readonly string _alias1, _alias2;
+        private readonly string? _alias1, _alias2;
         private string _parameterName1, _parameterName2;
 
-        public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string alias1, string alias2)
+        public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias1, string? alias2)
             : base(sqlContext.SqlSyntax)
         {
             _pocoData1 = sqlContext.PocoDataFactory.ForType(typeof (TDto1));

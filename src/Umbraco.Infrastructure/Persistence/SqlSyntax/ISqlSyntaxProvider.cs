@@ -24,9 +24,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
         string GetConcat(params string[] args);
 
-        string GetQuotedTableName(string tableName);
-        string GetQuotedColumnName(string columnName);
-        string GetQuotedName(string name);
+        string GetQuotedTableName(string? tableName);
+        string GetQuotedColumnName(string? columnName);
+        string GetQuotedName(string? name);
         bool DoesTableExist(IDatabase db, string tableName);
         string GetIndexType(IndexTypes indexTypes);
         string GetSpecialDbType(SpecialDbType dbType);

@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _migrationPlanExecutor = migrationPlanExecutor;
             _keyValueService = keyValueService;
             _eventAggregator = eventAggregator;
-            _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);            
+            _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             {
                 foreach (var migrationName in plansToRun)
                 {
-                    if (!_packageMigrationPlans.TryGetValue(migrationName, out PackageMigrationPlan plan))
+                    if (!_packageMigrationPlans.TryGetValue(migrationName, out PackageMigrationPlan? plan))
                     {
                         throw new InvalidOperationException("Cannot find package migration plan " + migrationName);
                     }

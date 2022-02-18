@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Packaging
         public bool ContentLoadChildNodes { get; set; }
 
         [DataMember(Name = "contentNodeId")]
-        public string ContentNodeId { get; set; } = string.Empty;
+        public string? ContentNodeId { get; set; }
 
         [DataMember(Name = "macros")]
         public IList<string> Macros { get; set; } = new List<string>();

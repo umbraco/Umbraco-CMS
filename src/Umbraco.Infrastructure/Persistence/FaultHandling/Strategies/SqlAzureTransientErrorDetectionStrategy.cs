@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
         {
             if (ex != null)
             {
-                SqlException sqlException;
+                SqlException? sqlException;
                 if ((sqlException = ex as SqlException) != null)
                 {
                     // Enumerate through all errors found in the exception.

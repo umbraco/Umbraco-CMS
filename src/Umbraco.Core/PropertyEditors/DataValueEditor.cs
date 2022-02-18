@@ -24,17 +24,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [DataContract]
     public class DataValueEditor : IDataValueEditor
     {
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly ILocalizedTextService? _localizedTextService;
+        private readonly IShortStringHelper? _shortStringHelper;
+        private readonly IJsonSerializer? _jsonSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
         public DataValueEditor(
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer) // for tests, and manifest
+            ILocalizedTextService? localizedTextService,
+            IShortStringHelper? shortStringHelper,
+            IJsonSerializer? jsonSerializer) // for tests, and manifest
         {
             _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;

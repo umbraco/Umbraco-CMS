@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _logger = logger;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
+        public override Task<InstallSetupResult?> ExecuteAsync(DatabaseModel database)
         {
             //if the database model is null then we will apply the defaults
             if (database == null)
@@ -53,14 +53,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
             ConfigureConnection(database);
 
-            return Task.FromResult<InstallSetupResult>(null);
+            return Task.FromResult<InstallSetupResult?>(null);
         }
 
         private void ConfigureConnection(DatabaseModel database)
         {
             if (database.ConnectionString.IsNullOrWhiteSpace() == false)
             {
-                _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString);
+                _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString!);
             }
             else if (database.DatabaseType == DatabaseType.SqlLocalDb)
             {
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }
             else
             {
-                var password = database.Password.Replace("'", "''");
+                var password = database.Password?.Replace("'", "''");
                 password = string.Format("'{0}'", password);
 
                 _databaseBuilder.ConfigureDatabaseConnection(database.Server, database.DatabaseName, database.Login, password, database.DatabaseType.ToString());

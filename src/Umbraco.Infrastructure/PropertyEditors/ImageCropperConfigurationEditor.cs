@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCropperConfiguration>
     {
         /// <inheritdoc />
-        public override IDictionary<string, object> ToValueEditor(object configuration)
+        public override IDictionary<string, object> ToValueEditor(object? configuration)
         {
             var d = base.ToValueEditor(configuration);
             if (!d.ContainsKey("focalPoint")) d["focalPoint"] = new { left = 0.5, top = 0.5 };

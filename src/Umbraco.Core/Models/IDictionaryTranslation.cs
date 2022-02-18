@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the translated text
         /// </summary>
         [DataMember]
-        string? Value { get; set; }
+        string Value { get; set; }
     }
 }

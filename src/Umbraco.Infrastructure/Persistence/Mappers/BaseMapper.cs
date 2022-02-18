@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
         private readonly object _definedLock = new object();
         private readonly MapperConfigurationStore _maps;
 
-        private ISqlSyntaxProvider _sqlSyntax;
+        private ISqlSyntaxProvider? _sqlSyntax;
         private bool _defined;
 
         protected BaseMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)

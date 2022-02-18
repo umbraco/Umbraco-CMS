@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
         }
 
-        public override async Task<InstallSetupResult> ExecuteAsync(UserModel user)
+        public override async Task<InstallSetupResult?> ExecuteAsync(UserModel user)
         {
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
             admin.Email = user.Email.Trim();
-            admin.Name = user.Name.Trim();
+            admin.Name = user.Name?.Trim();
             admin.Username = user.Email.Trim();
 
             _userService.Save(admin);
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 installState = (installState | InstallState.HasConnectionString) & ~InstallState.Unknown;
             }
 
-            var connStringConfigured = databaseSettings.IsConnectionStringConfigured();
+            var connStringConfigured = databaseSettings?.IsConnectionStringConfigured() ?? false;
             if (connStringConfigured)
             {
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
@@ -158,7 +158,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
 
             var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings?.ProviderName);
-            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings.ConnectionString, factory);
+            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings?.ConnectionString, factory);
             if (canConnect)
             {
                 installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;

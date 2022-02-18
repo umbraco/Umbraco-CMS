@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Models
         /// type, and they should be the same.</para>
         /// <para>Think before using!</para>
         /// </remarks>
-        public void SetLazyConfiguration(string configurationJson)
+        public void SetLazyConfiguration(string? configurationJson)
         {
             _hasConfiguration = false;
             _configuration = null;

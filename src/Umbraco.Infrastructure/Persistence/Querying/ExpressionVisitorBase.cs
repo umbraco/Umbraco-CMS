@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         /// <param name="expression">The expression</param>
         /// <returns>The SQL statement corresponding to the expression.</returns>
         /// <remarks>Also populates the SQL parameters.</remarks>
-        public virtual string Visit(Expression expression)
+        public virtual string Visit(Expression? expression)
         {
             if (expression == null) return string.Empty;
 
@@ -145,11 +145,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return cachedExpression.VisitResult;
         }
 
-        protected abstract string VisitMemberAccess(MemberExpression m);
+        protected abstract string VisitMemberAccess(MemberExpression? m);
 
-        protected virtual string VisitLambda(LambdaExpression lambda)
+        protected virtual string VisitLambda(LambdaExpression? lambda)
         {
-            if (lambda.Body.NodeType == ExpressionType.MemberAccess &&
+            if (lambda?.Body.NodeType == ExpressionType.MemberAccess &&
                 lambda.Body is MemberExpression memberExpression && memberExpression.Expression != null)
                 {
                     //This deals with members that are boolean (i.e. x => IsTrashed )
@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return Visit(lambda.Body);
         }
 
-        protected virtual string VisitBinary(BinaryExpression b)
+        protected virtual string VisitBinary(BinaryExpression? b)
         {
             var left = string.Empty;
             var right = string.Empty;
@@ -202,24 +202,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             {
                 // deal with (x == true|false) - most common
                 if (b.Right is ConstantExpression constRight && constRight.Type == typeof(bool))
-                    return (bool) constRight.Value ? VisitNotNot(b.Left) : VisitNot(b.Left);
+                    return (bool) constRight.Value! ? VisitNotNot(b.Left) : VisitNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false == x) - why not
                 if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof(bool))
-                    return (bool) constLeft.Value ? VisitNotNot(b.Right) : VisitNot(b.Right);
+                    return (bool) constLeft.Value! ? VisitNotNot(b.Right) : VisitNot(b.Right);
                 left = Visit(b.Left);
             }
             else if (operand == "<>")
             {
                 // deal with (x != true|false) - most common
                 if (b.Right is ConstantExpression constRight && constRight.Type == typeof (bool))
-                    return (bool) constRight.Value ? VisitNot(b.Left) : VisitNotNot(b.Left);
+                    return (bool) constRight.Value! ? VisitNot(b.Left) : VisitNotNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false != x) - why not
                 if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof (bool))
-                    return (bool) constLeft.Value ? VisitNot(b.Right) : VisitNotNot(b.Right);
+                    return (bool) constLeft.Value! ? VisitNot(b.Right) : VisitNotNot(b.Right);
                 left = Visit(b.Left);
             }
             else
@@ -293,14 +293,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             }
         }
 
-        protected virtual string VisitParameter(ParameterExpression p)
+        protected virtual string? VisitParameter(ParameterExpression p)
         {
             return p.Name;
         }
 
-        protected virtual string VisitConstant(ConstantExpression c)
+        protected virtual string VisitConstant(ConstantExpression? c)
         {
-            if (c.Value == null)
+            if (c?.Value == null)
                 return "null";
 
             SqlParameters.Add(c.Value);
@@ -468,7 +468,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                 case nameof(StringExtensions.InvariantStartsWith):
                 case nameof(StringExtensions.InvariantEndsWith):
                 case nameof(StringExtensions.InvariantContains):
-                case nameof(StringExtensions.InvariantEquals):                
+                case nameof(StringExtensions.InvariantEquals):
 
                     string compareValue;
 
@@ -482,7 +482,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var member = Expression.Convert(methodArgs[0], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
-                        compareValue = getter().ToString();
+                        compareValue = getter().ToString()!;
                     }
                     else
                     {
@@ -499,7 +499,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var colTypeArg = methodArgs.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
                         if (colTypeArg != null)
                         {
-                            colType = (TextColumnType)((ConstantExpression)colTypeArg).Value;
+                            colType = (TextColumnType)((ConstantExpression)colTypeArg).Value!;
                         }
                     }
 
@@ -515,7 +515,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var member = Expression.Convert(methodArgs[0], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
-                        searchValue = getter().ToString();
+                        searchValue = getter().ToString()!;
                     }
                     else
                     {
@@ -536,7 +536,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var member = Expression.Convert(methodArgs[1], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
-                        replaceValue = getter().ToString();
+                        replaceValue = getter().ToString()!;
                     }
                     else
                     {

@@ -29,14 +29,14 @@ namespace Umbraco.Cms.Core.Models.Email
         public bool HasAttachments => Attachments != null && Attachments.Count > 0;
 
         public NotificationEmailModel(
-            NotificationEmailAddress from,
-            IEnumerable<NotificationEmailAddress> to,
-            IEnumerable<NotificationEmailAddress> cc,
-            IEnumerable<NotificationEmailAddress> bcc,
-            IEnumerable<NotificationEmailAddress> replyTo,
-            string subject,
-            string body,
-            IEnumerable<EmailMessageAttachment> attachments,
+            NotificationEmailAddress? from,
+            IEnumerable<NotificationEmailAddress?>? to,
+            IEnumerable<NotificationEmailAddress>? cc,
+            IEnumerable<NotificationEmailAddress>? bcc,
+            IEnumerable<NotificationEmailAddress>? replyTo,
+            string? subject,
+            string? body,
+            IEnumerable<EmailMessageAttachment>? attachments,
             bool isBodyHtml)
         {
             From = from;

@@ -185,7 +185,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 

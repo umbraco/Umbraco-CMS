@@ -46,20 +46,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         private static List<LanguageTextDto> BuildLanguageTextDtos(IDictionaryItem entity)
         {
             var list = new List<LanguageTextDto>();
-            foreach (var translation in entity.Translations)
+            if (entity.Translations is not null)
             {
-                var text = new LanguageTextDto
-                               {
-                                   LanguageId = translation.LanguageId,
-                                   UniqueId = translation.Key,
-                                   Value = translation.Value
-                               };
+                foreach (var translation in entity.Translations)
+                {
+                    var text = new LanguageTextDto
+                    {
+                        LanguageId = translation.LanguageId,
+                        UniqueId = translation.Key,
+                        Value = translation.Value!,
+                    };
 
-                if (translation.HasIdentity)
-                    text.PrimaryKey = translation.Id;
+                    if (translation.HasIdentity)
+                        text.PrimaryKey = translation.Id;
 
-                list.Add(text);
+                    list.Add(text);
+                }
             }
+
             return list;
         }
     }

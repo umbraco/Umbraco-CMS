@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 Alias = entity.Alias,
                 ChildObjectType = entity.ChildObjectType,
                 Dual = entity.IsBidirectional,
-                Name = entity.Name,
+                Name = entity.Name ?? string.Empty,
                 ParentObjectType = entity.ParentObjectType,
                 UniqueId = entity.Key
             };

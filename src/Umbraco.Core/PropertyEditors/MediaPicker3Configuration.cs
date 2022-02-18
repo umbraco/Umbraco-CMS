@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public class CropConfiguration
         {
             [DataMember(Name = "alias")]
-            public string? Alias { get; set; }
+            public string Alias { get; set; }
 
             [DataMember(Name = "label")]
             public string? Label { get; set; }

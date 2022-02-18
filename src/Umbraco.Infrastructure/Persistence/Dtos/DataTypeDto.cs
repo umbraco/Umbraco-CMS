@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("config")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Configuration { get; set; }
+        public string? Configuration { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]

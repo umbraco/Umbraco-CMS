@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             keepAliveSettings.OnChange(x => _keepAliveSettings = x);
         }
 
-        public override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object? state)
         {
             if (_keepAliveSettings.DisableKeepAliveTask)
             {
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 }
 
                 // If the config is an absolute path, just use it
-                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
+                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl!, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
 
                 try
                 {

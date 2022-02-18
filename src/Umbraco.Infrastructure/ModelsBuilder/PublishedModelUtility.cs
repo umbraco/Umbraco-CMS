@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             }
         }
 
-        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
+        public static IPublishedPropertyType? GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
         //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
             // fixme therefore, missing a check on TModel here

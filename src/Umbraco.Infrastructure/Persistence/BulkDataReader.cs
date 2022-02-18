@@ -877,7 +877,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <seealso cref="IDataRecord.GetBytes(Int32,Int64,Byte[],Int32,Int32)"/>
         public long GetBytes(int i,
                              long fieldOffset,
-                             byte[] buffer,
+                             byte[]? buffer,
                              int bufferoffset,
                              int length)
         {
@@ -966,14 +966,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <seealso cref="IDataRecord.GetChars(Int32,Int64,Char[],Int32,Int32)"/>
         public long GetChars(int i,
                              long fieldoffset,
-                             char[] buffer,
+                             char[]? buffer,
                              int bufferoffset,
                              int length)
         {
             object data = GetValue(i);
 
-            string dataAsString = data as string;
-            char[] dataAsCharArray = data as char[];
+            string? dataAsString = data as string;
+            char[]? dataAsCharArray = data as char[];
 
             if (dataAsString != null)
             {

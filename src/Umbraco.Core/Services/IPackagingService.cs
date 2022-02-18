@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId"></param>
         InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
 
-        InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId);
+        InstallationSummary InstallCompiledPackageData(XDocument? packageXml, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Returns the advertised installed packages

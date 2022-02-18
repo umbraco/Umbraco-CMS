@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
         private TimeSpan _period;
         private readonly TimeSpan _delay;
-        private Timer _timer;
+        private Timer? _timer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringHostedServiceBase"/> class.
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// Executes the task.
         /// </summary>
         /// <param name="state">The task state.</param>
-        public async void ExecuteAsync(object state)
+        public async void ExecuteAsync(object? state)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
         }
 
-        public abstract Task PerformExecuteAsync(object state);
+        public abstract Task PerformExecuteAsync(object? state);
 
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)

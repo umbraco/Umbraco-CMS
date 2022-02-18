@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Models
         /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
         /// </param>
         /// <param name="contentType"></param>
-        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
+        public Member(string? name, string email, string username, string rawPasswordValue, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
             _email = email;

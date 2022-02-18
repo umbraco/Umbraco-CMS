@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
         private bool EnsureDirectories(string[] dirs, out IEnumerable<string> errors, bool writeCausesRestart = false)
         {
-            List<string> temp = null;
+            List<string>? temp = null;
             var success = true;
             foreach (var dir in dirs)
             {
@@ -99,13 +99,13 @@ namespace Umbraco.Cms.Infrastructure.Install
                 success = false;
             }
 
-            errors = success ? Enumerable.Empty<string>() : temp;
+            errors = success ? Enumerable.Empty<string>() : temp ?? Enumerable.Empty<string>();
             return success;
         }
 
         private bool EnsureFiles(string[] files, out IEnumerable<string> errors)
         {
-            List<string> temp = null;
+            List<string>? temp = null;
             var success = true;
             foreach (var file in files)
             {
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 success = false;
             }
 
-            errors = success ? Enumerable.Empty<string>() : temp;
+            errors = success ? Enumerable.Empty<string>() : temp ?? Enumerable.Empty<string>();
             return success;
         }
 
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
         private bool EnsureCanCreateSubDirectories(IEnumerable<string> dirs, out IEnumerable<string> errors)
         {
-            List<string> temp = null;
+            List<string>? temp = null;
             var success = true;
             foreach (var dir in dirs)
             {
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 success = false;
             }
 
-            errors = success ? Enumerable.Empty<string>() : temp;
+            errors = success ? Enumerable.Empty<string>() : temp ?? Enumerable.Empty<string>();
             return success;
         }
 

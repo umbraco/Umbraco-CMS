@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 return Task.CompletedTask;
             }
 
-            IUmbracoDatabase database = null;
+            IUmbracoDatabase? database = null;
             try
             {
                 using (database = _databaseFactory.CreateDatabase())

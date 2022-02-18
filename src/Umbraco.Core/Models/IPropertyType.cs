@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets of sets the name of the property type.
         /// </summary>
-        string? Name { get; set; }
+        string Name { get; set; }
 
         /// <summary>
         /// Gets of sets the alias of the property type.

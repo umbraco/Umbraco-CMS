@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         /// Overrides the default naming of a PrimaryKey constraint:
         /// PK_tableName
         /// </remarks>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the names of the columns for this PrimaryKey.
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         /// Should only be used if the PrimaryKey spans over multiple columns.
         /// Usage: [nodeId], [otherColumn]
         /// </remarks>
-        public string OnColumns { get; set; }
+        public string? OnColumns { get; set; }
 
         /// <summary>
         /// Gets or sets the Identity Seed, which is used for Sql Ce databases.

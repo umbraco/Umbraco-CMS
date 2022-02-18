@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.Scoping
             Enlist<object>(key, null, (completed, item) => action(completed), priority);
         }
 
-        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100)
+        public T Enlist<T>(string key, Func<T> creator, Action<bool, T>? action = null, int priority = 100)
         {
             var enlistedObjects = _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 

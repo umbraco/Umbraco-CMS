@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _installHelper = installHelper;
         }
 
-        public override async Task<InstallSetupResult> ExecuteAsync(object model)
+        public override async Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             //reports the ended install
             await _installHelper.SetInstallStatusAsync(true, "");

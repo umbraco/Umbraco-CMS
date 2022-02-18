@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Core.Logging.Viewer
     //Log Expression Filters (pass in filter exp string)
     internal class ExpressionFilter : ILogFilter
     {
-        private readonly Func<LogEvent, bool> _filter;
+        private readonly Func<LogEvent, bool>? _filter;
         private const string ExpressionOperators = "()+=*<>%-";
 
-        public ExpressionFilter(string filterExpression)
+        public ExpressionFilter(string? filterExpression)
         {
-            Func<LogEvent, bool> filter;
+            Func<LogEvent, bool>? filter;
 
             if (string.IsNullOrEmpty(filterExpression))
             {
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             return _filter == null || _filter(e);
         }
 
-        private Func<LogEvent, bool> PerformMessageLikeFilter(string filterExpression)
+        private Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression)
         {
             var filterSearch = $"@Message like '%{FilterLanguage.EscapeLikeExpressionContent(filterExpression)}%'";
             if (FilterLanguage.TryCreateFilter(filterSearch, out var eval, out _))

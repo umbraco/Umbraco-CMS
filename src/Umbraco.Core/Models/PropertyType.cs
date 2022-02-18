@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models
     {
         private readonly IShortStringHelper _shortStringHelper;
         private readonly bool _forceValueStorageType;
-        private string? _name;
+        private string _name;
         private string _alias;
         private string? _description;
         private int _dataTypeId;
@@ -48,6 +48,7 @@ namespace Umbraco.Cms.Core.Models
             _valueStorageType = dataType.DatabaseType;
             _variations = ContentVariation.Nothing;
             _alias = string.Empty;
+            _name = string.Empty;
         }
 
         /// <summary>
@@ -110,10 +111,10 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public string? Name
+        public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         /// <inheritdoc />

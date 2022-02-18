@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        public CompositePackageManifest CombinedManifest
+        public CompositePackageManifest? CombinedManifest
             => _cache.GetCacheItem<CompositePackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
             {
                 IEnumerable<PackageManifest> manifests = GetManifests();
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Core.Manifest
             {
                 if (manifest.Scripts != null)
                 {
-                    if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets> scriptsPerBundleOption))
+                    if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? scriptsPerBundleOption))
                     {
                         scriptsPerBundleOption = new List<ManifestAssets>();
                         scripts[manifest.BundleOptions] = scriptsPerBundleOption;
@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Core.Manifest
 
                 if (manifest.Stylesheets != null)
                 {
-                    if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets> stylesPerBundleOption))
+                    if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? stylesPerBundleOption))
                     {
                         stylesPerBundleOption = new List<ManifestAssets>();
                         stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Manifest
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
                 if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
-                if (manifest.Sections != null) sections.AddRange(manifest.Sections.LegacyDistinctBy(x => x.Alias.ToLowerInvariant()));
+                if (manifest.Sections != null) sections.AddRange(manifest.Sections.LegacyDistinctBy(x => x!.Alias.ToLowerInvariant()));
             }
 
             return new CompositePackageManifest(
@@ -217,17 +217,17 @@ namespace Umbraco.Cms.Core.Manifest
                 new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here
-            for (var i = 0; i < manifest.Scripts.Length; i++)
-                manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
+            for (var i = 0; i < manifest!.Scripts.Length; i++)
+                manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i])!;
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
-                manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
+                manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
             foreach (var contentApp in manifest.ContentApps)
             {
                 contentApp.View = _ioHelper.ResolveRelativeOrVirtualUrl(contentApp.View);
             }
             foreach (var dashboard in manifest.Dashboards)
             {
-                dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
+                dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
             }
             foreach (var gridEditor in manifest.GridEditors)
             {

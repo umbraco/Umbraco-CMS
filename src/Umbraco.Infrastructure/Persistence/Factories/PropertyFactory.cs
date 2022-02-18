@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
             return properties;
         }
 
-        private static PropertyDataDto BuildDto(int versionId, IProperty property, int? languageId, string segment, object value)
+        private static PropertyDataDto BuildDto(int versionId, IProperty property, int? languageId, string? segment, object? value)
         {
             var dto = new PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
 
@@ -103,12 +103,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <returns></returns>
         public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<IProperty> properties,
             ILanguageRepository languageRepository, out bool edited,
-            out HashSet<string> editedCultures)
+            out HashSet<string>? editedCultures)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
             edited = false;
             editedCultures = null; // don't allocate unless necessary
-            string defaultCulture = null; //don't allocate unless necessary
+            string? defaultCulture = null; //don't allocate unless necessary
 
             var entityVariesByCulture = contentVariation.VariesByCulture();
 
@@ -132,11 +132,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
                         // deal with published value
                         if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
-                            propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
+                            propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue?.Segment, propertyValue?.PublishedValue));
 
                         // deal with edit value
-                        if (propertyValue.EditedValue != null || isSegmentValue)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
+                        if (propertyValue?.EditedValue != null || isSegmentValue)
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue?.Culture), propertyValue?.Segment, propertyValue?.EditedValue));
 
                         // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the
                         // administrator has previously changed the property type to be variant vs invariant.
@@ -150,15 +150,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                             continue;
 
                         // use explicit equals here, else object comparison fails at comparing eg strings
-                        var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
+                        var sameValues = propertyValue?.PublishedValue == null ? propertyValue?.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
 
                         edited |= !sameValues;
 
                         if (entityVariesByCulture && !sameValues)
                         {
-                            if (isCultureValue)
+                            if (isCultureValue && propertyValue?.Culture is not null)
                             {
-                                editedCultures.Add(propertyValue.Culture); // report culture as edited
+                                editedCultures?.Add(propertyValue.Culture); // report culture as edited
                             }
                             else if (isInvariantValue)
                             {
@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                                 if (defaultCulture == null)
                                     defaultCulture = languageRepository.GetDefaultIsoCode();
 
-                                editedCultures.Add(defaultCulture);
+                                editedCultures?.Add(defaultCulture);
                             }
                         }
                     }

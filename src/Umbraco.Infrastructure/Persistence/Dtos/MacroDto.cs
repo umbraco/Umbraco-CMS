@@ -28,11 +28,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("macroAlias")]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroPropertyAlias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
 
         [Column("macroName")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("macroCacheByPage")]
         [Constraint(Default = "1")]
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("macroSource")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        public string MacroSource { get; set; }
+        public string MacroSource { get; set; } = null!;
 
         [Column("macroType")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
@@ -56,6 +56,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "Macro")]
-        public List<MacroPropertyDto> MacroPropertyDtos { get; set; }
+        public List<MacroPropertyDto>? MacroPropertyDtos { get; set; }
     }
 }

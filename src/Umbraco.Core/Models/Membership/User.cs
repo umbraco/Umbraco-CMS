@@ -72,8 +72,8 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <param name="userGroups"></param>
         /// <param name="startContentIds"></param>
         /// <param name="startMediaIds"></param>
-        public User(GlobalSettings globalSettings, int id, string name, string email, string username,
-            string rawPasswordValue, string passwordConfig,
+        public User(GlobalSettings globalSettings, int id, string? name, string? email, string? username,
+            string? rawPasswordValue, string? passwordConfig,
             IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
             : this(globalSettings)
         {
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         private DateTime? _emailConfirmedDate;
         private DateTime? _invitedDate;
         private string _email;
-        private string? _rawPasswordValue;
+        private string _rawPasswordValue;
         private string? _passwordConfig;
         private IEnumerable<string>? _allowedSections;
         private HashSet<IReadOnlyUserGroup> _userGroups;
@@ -158,7 +158,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [IgnoreDataMember]
-        public string? RawPasswordValue
+        public string RawPasswordValue
         {
             get => _rawPasswordValue;
             set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));

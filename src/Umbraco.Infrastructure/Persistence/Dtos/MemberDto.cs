@@ -38,12 +38,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("passwordConfig")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
-        public string PasswordConfig { get; set; }
+        public string? PasswordConfig { get; set; }
 
         [Column("securityStampToken")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(255)]
-        public string SecurityStampToken { get; set; }
+        public string? SecurityStampToken { get; set; }
 
         [Column("emailConfirmedDate")]
         [NullSetting(NullSetting = NullSettings.Null)]

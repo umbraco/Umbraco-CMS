@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Length(400)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userOrMemberKey", Name = "IX_" + TableName + "_LoginProvider")]
-        public string LoginProvider { get; set; }
+        public string LoginProvider { get; set; } = null!;
 
         /// <summary>
         /// Stores the key the provider uses to lookup the login
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Length(4000)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.NonClustered, ForColumns = "loginProvider,providerKey", Name = "IX_" + TableName + "_ProviderKey")]
-        public string ProviderKey { get; set; }
+        public string ProviderKey { get; set; } = null!;
 
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -52,6 +52,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("userData")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string UserData { get; set; }
+        public string? UserData { get; set; }
     }
 }

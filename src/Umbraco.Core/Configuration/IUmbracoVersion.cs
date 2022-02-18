@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Core.Configuration
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        Version? Version { get; }
+        Version Version { get; }
 
         /// <summary>
         /// Gets the semantic version comments of the Umbraco code.
         /// </summary>
-        string? Comment { get; }
+        string Comment { get; }
 
         /// <summary>
         /// Gets the assembly version of the Umbraco code.

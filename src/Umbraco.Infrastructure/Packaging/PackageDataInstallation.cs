@@ -1118,7 +1118,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
                 var parentId = -1;
-                if (importedFolders.ContainsKey(dataTypeDefinitionName))
+                if (dataTypeDefinitionName is not null && importedFolders.ContainsKey(dataTypeDefinitionName))
                     parentId = importedFolders[dataTypeDefinitionName];
 
                 var definition = _dataTypeService.GetDataType(dataTypeDefinitionId);

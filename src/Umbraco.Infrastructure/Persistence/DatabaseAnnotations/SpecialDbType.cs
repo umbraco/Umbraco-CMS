@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         public static SpecialDbType NCHAR { get; } = new SpecialDbType(SpecialDbTypes.NCHAR);
         public static SpecialDbType NVARCHARMAX { get; } = new SpecialDbType(SpecialDbTypes.NVARCHARMAX);
 
-        public override bool Equals(object obj) => obj is SpecialDbType types && Equals(types);
+        public override bool Equals(object? obj) => obj is SpecialDbType types && Equals(types);
         public bool Equals(SpecialDbType other) => _dbType == other._dbType;
         public override int GetHashCode() => 1038481724 + EqualityComparer<string>.Default.GetHashCode(_dbType);
 

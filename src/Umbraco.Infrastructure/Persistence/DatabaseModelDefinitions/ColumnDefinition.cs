@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
         public virtual string PrimaryKeyColumns { get; set; }//When the primary key spans multiple columns
         public virtual bool IsNullable { get; set; }
         public virtual bool IsUnique { get; set; }
-        public virtual string TableName { get; set; }
+        public virtual string? TableName { get; set; }
         public virtual ModificationType ModificationType { get; set; }
     }
 }

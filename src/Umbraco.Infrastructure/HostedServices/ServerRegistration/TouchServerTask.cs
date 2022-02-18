@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             _serverRoleAccessor = serverRoleAccessor;
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 
             try
             {
-                _serverRegistrationService.TouchServer(serverAddress, _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
+                _serverRegistrationService.TouchServer(serverAddress!, _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
             }
             catch (Exception ex)
             {

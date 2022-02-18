@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _isAvailable = new Lazy<bool>(DetermineIsAvailable);
         }
 
-        public void Add(AuditType type, int userId, int objectId, string entityType, string comment, string parameters = null)
+        public void Add(AuditType type, int userId, int objectId, string entityType, string comment, string? parameters = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -98,8 +98,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
-            AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null)
+            AuditType[]? auditTypeFilter = null,
+            IQuery<IAuditItem>? customFilter = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Optional filter to be applied
         /// </param>
         /// <returns></returns>
-        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, AuditType[] auditTypeFilter = null, IQuery<IAuditItem> customFilter = null)
+        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, AuditType[]? auditTypeFilter = null, IQuery<IAuditItem>? customFilter = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));

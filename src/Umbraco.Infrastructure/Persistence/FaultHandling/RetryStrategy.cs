@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
         /// <param name="name">The name of the retry strategy.</param>
         /// <param name="firstFastRetry">a value indicating whether or not the very first retry attempt will be made immediately
         /// whereas the subsequent retries will remain subject to retry interval.</param>
-        protected RetryStrategy(string name, bool firstFastRetry)
+        protected RetryStrategy(string? name, bool firstFastRetry)
         {
             this.Name = name;
             this.FastFirstRetry = firstFastRetry;
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
         /// <summary>
         /// Gets the name of the retry strategy.
         /// </summary>
-        public string Name { get; private set; }
+        public string? Name { get; private set; }
 
         /// <summary>
         /// Returns the corresponding ShouldRetry delegate.

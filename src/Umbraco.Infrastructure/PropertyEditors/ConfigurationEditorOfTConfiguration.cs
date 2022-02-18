@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             => obj is TConfiguration;
 
         /// <inheritdoc />
-        public override object FromDatabase(string configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        public override object FromDatabase(string? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         {
             try
             {
@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override IDictionary<string, object> ToConfigurationEditor(object configuration)
+        public sealed override IDictionary<string, object> ToConfigurationEditor(object? configuration)
         {
             return ToConfigurationEditor((TConfiguration) configuration);
         }

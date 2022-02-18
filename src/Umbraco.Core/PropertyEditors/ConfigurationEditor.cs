@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Converts a configuration object into a serialized database value.
         /// </summary>
-        public static string? ToDatabase(object configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        public static string? ToDatabase(object? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => configuration == null ? null : configurationEditorJsonSerializer.Serialize(configuration);
 
         /// <inheritdoc />

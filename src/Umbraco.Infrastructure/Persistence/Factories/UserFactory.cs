@@ -74,24 +74,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 TourData = entity.TourData
             };
 
-            foreach (var startNodeId in entity.StartContentIds)
+            if (entity.StartContentIds is not null)
             {
-                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                foreach (var startNodeId in entity.StartContentIds)
                 {
-                    StartNode = startNodeId,
-                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Content,
-                    UserId = entity.Id
-                });
+                    dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                    {
+                        StartNode = startNodeId,
+                        StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Content,
+                        UserId = entity.Id
+                    });
+                }
             }
 
-            foreach (var startNodeId in entity.StartMediaIds)
+            if (entity.StartMediaIds is not null)
             {
-                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                foreach (var startNodeId in entity.StartMediaIds)
                 {
-                    StartNode = startNodeId,
-                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Media,
-                    UserId = entity.Id
-                });
+                    dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                    {
+                        StartNode = startNodeId,
+                        StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Media,
+                        UserId = entity.Id
+                    });
+                }
             }
 
             if (entity.HasIdentity)

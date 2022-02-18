@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="Tag"/> class.
         /// </summary>
-        public Tag(int id, string group, string text, int? languageId = null)
+        public Tag(int id, string? group, string? text, int? languageId = null)
         {
             Id = id;
             Text = text;

@@ -89,10 +89,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <param name="type">The type.</param>
         /// <param name="map">The model types map.</param>
         /// <returns>The actual CLR type name.</returns>
-        public static string? MapToName(Type type, Dictionary<string, string> map)
+        public static string MapToName(Type type, Dictionary<string, string> map)
             => MapToName(type, map, false);
 
-        private static string? MapToName(Type type, Dictionary<string, string> map, bool dictionaryIsInvariant)
+        private static string MapToName(Type type, Dictionary<string, string> map, bool dictionaryIsInvariant)
         {
             // it may be that senders forgot to send an invariant dictionary (garbage-in)
             if (!dictionaryIsInvariant)
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             if (type.IsGenericType == false)
-                return type.FullName;
+                return type.FullName!;
             var def = type.GetGenericTypeDefinition();
             if (def == null)
                 throw new PanicException($"The type {type} has not generic type definition");

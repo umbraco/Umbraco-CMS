@@ -46,10 +46,10 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public abstract TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        public abstract TEntity? Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
 
         /// <inheritdoc />
-        public abstract TEntity GetCached(TId id);
+        public abstract TEntity? GetCached(TId id);
 
         /// <inheritdoc />
         public abstract bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll);
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Cache
         public abstract void Delete(TEntity entity, Action<TEntity> persistDeleted);
 
         /// <inheritdoc />
-        public abstract TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        public abstract TEntity?[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll);
 
         /// <inheritdoc />
         public abstract void ClearAll();

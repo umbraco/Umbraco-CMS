@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         // internal for tests
-        internal string ReplaceBlockListUdis(string rawJson, Func<Guid> createGuid = null)
+        internal string ReplaceBlockListUdis(string rawJson, Func<Guid>? createGuid = null)
         {
             // used so we can test nicely
             if (createGuid == null)

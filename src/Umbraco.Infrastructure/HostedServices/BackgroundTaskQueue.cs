@@ -31,10 +31,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         }
 
         /// <inheritdoc/>
-        public async Task<Func<CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken)
+        public async Task<Func<CancellationToken, Task>?> DequeueAsync(CancellationToken cancellationToken)
         {
             await _signal.WaitAsync(cancellationToken);
-            _workItems.TryDequeue(out Func<CancellationToken, Task> workItem);
+            _workItems.TryDequeue(out Func<CancellationToken, Task>? workItem);
 
             return workItem;
         }

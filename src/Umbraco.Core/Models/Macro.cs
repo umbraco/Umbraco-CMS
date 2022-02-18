@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource)
+        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string? name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource)
             : this(shortStringHelper)
         {
             Id = id;

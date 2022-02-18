@@ -28,19 +28,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// Gets or sets the value source image.
         /// </summary>
         [DataMember(Name = "src")]
-        public string Src { get; set; }
+        public string? Src { get; set; }
 
         /// <summary>
         /// Gets or sets the value focal point.
         /// </summary>
         [DataMember(Name = "focalPoint")]
-        public ImageCropperFocalPoint FocalPoint { get; set; }
+        public ImageCropperFocalPoint? FocalPoint { get; set; }
 
         /// <summary>
         /// Gets or sets the value crops.
         /// </summary>
         [DataMember(Name = "crops")]
-        public IEnumerable<ImageCropperCrop> Crops { get; set; }
+        public IEnumerable<ImageCropperCrop>? Crops { get; set; }
 
         /// <inheritdoc />
         public override string ToString()
@@ -315,7 +315,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             public int Height { get; set; }
 
             [DataMember(Name = "coordinates")]
-            public ImageCropperCropCoordinates Coordinates { get; set; }
+            public ImageCropperCropCoordinates? Coordinates { get; set; }
 
             #region IEquatable
 

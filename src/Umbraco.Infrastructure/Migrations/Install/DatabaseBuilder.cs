@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <summary>
         /// Verifies whether a it is possible to connect to a database.
         /// </summary>
-        public bool CanConnect(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
+        public bool CanConnect(string databaseType, string? connectionString, string server, string database, string login, string password, bool integratedAuth)
         {
             // we do not test SqlCE or LocalDB connections
             if (databaseType.InvariantContains("SqlCe") || databaseType.InvariantContains("SqlLocalDb"))

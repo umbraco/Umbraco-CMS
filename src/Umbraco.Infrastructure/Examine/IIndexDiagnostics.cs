@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <returns>
         /// A successful attempt if it is healthy, else a failed attempt with a message if unhealthy
         /// </returns>
-        Attempt<string> IsHealthy();
+        Attempt<string?> IsHealthy();
 
         /// <summary>
         /// A key/value collection of diagnostic properties for the index

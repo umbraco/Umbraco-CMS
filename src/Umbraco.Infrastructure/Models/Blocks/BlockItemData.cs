@@ -17,14 +17,14 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// not serialized, manually set and used during internally
         /// </summary>
         [JsonIgnore]
-        public string ContentTypeAlias { get; set; }
+        public string? ContentTypeAlias { get; set; }
 
         [JsonProperty("udi")]
         [JsonConverter(typeof(UdiJsonConverter))]
-        public Udi Udi { get; set; }
+        public Udi? Udi { get; set; }
 
         [JsonIgnore]
-        public Guid Key => Udi != null ? ((GuidUdi)Udi).Guid : throw new InvalidOperationException("No Udi assigned");
+        public Guid Key => Udi is not null ? ((GuidUdi)Udi).Guid : throw new InvalidOperationException("No Udi assigned");
 
         /// <summary>
         /// The remaining properties will be serialized to a dictionary

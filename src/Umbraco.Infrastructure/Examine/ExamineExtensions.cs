@@ -66,7 +66,7 @@ namespace Umbraco.Extensions
                 if (int.TryParse(result.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentId) &&
                     result.Values.TryGetValue(ExamineFieldNames.CategoryFieldName, out var indexType))
                 {
-                    IPublishedContent content;
+                    IPublishedContent? content;
                     switch (indexType)
                     {
                         case IndexTypes.Content:

@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IShortStringHelper _shortStringHelper;
         private readonly PackageMigrationSettings _packageMigrationSettings;
 
-        private bool _executed;        
+        private bool _executed;
 
         public ImportPackageBuilderExpression(
             IPackagingService packagingService,
@@ -53,9 +53,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <summary>
         ///     The type of the migration which dictates the namespace of the embedded resource
         /// </summary>
-        public Type EmbeddedResourceMigrationType { get; set; }
+        public Type? EmbeddedResourceMigrationType { get; set; }
 
-        public XDocument PackageDataManifest { get; set; }
+        public XDocument? PackageDataManifest { get; set; }
 
         public override void Execute()
         {
@@ -85,10 +85,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (PackageMigrationResource.TryGetEmbeddedPackageDataManifest(
                     EmbeddedResourceMigrationType,
-                    out XDocument xml, out ZipArchive zipPackage))
+                    out XDocument? xml, out ZipArchive? zipPackage))
                 {
                     // first install the package
-                    installationSummary = _packagingService.InstallCompiledPackageData(xml);
+                    installationSummary = _packagingService.InstallCompiledPackageData(xml!);
 
                     if (zipPackage is not null)
                     {
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         using (zipPackage)
                         {
                             // then we need to save each file to the saved media items
-                            var mediaWithFiles = xml.XPathSelectElements(
+                            var mediaWithFiles = xml!.XPathSelectElements(
                                     "./umbPackage/MediaItems/MediaSet//*[@id][@mediaFilePath]")
                                 .ToDictionary(
                                     x => x.AttributeValue<Guid>("key"),
@@ -111,8 +111,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                 if (mediaWithFiles.TryGetValue(media.Key, out var mediaFilePath))
                                 {
                                     // this is a media item that has a file, so find that file in the zip
-                                    var entryPath = $"media{mediaFilePath.EnsureStartsWith('/')}";
-                                    ZipArchiveEntry mediaEntry = zipPackage.GetEntry(entryPath);
+                                    var entryPath = $"media{mediaFilePath!.EnsureStartsWith('/')}";
+                                    ZipArchiveEntry? mediaEntry = zipPackage.GetEntry(entryPath);
                                     if (mediaEntry == null)
                                     {
                                         throw new InvalidOperationException(
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                             _shortStringHelper,
                                             _contentTypeBaseServiceProvider,
                                             Constants.Conventions.Media.File,
-                                            Path.GetFileName(mediaFilePath),
+                                            Path.GetFileName(mediaFilePath)!,
                                             mediaStream);
                                     }
 

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Events
             : this(migrationTypes, null, configuredVersion, targetVersion, productName, canCancel)
         { }
 
-        internal MigrationEventArgs(IList<Type> migrationTypes, IMigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
+        internal MigrationEventArgs(IList<Type> migrationTypes, IMigrationContext? migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
             : base(migrationTypes, canCancel)
         {
             MigrationContext = migrationContext;
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Returns all migrations that were used in the migration runner
         /// </summary>
-        public IList<Type> MigrationsTypes => EventObject;
+        public IList<Type>? MigrationsTypes => EventObject;
 
         /// <summary>
         /// Gets the origin version of the migration, i.e. the one that is currently installed.
@@ -48,16 +48,16 @@ namespace Umbraco.Cms.Core.Events
         /// Gets the migration context.
         /// </summary>
         /// <remarks>Is only available after migrations have run, for post-migrations.</remarks>
-        internal IMigrationContext MigrationContext { get; }
+        internal IMigrationContext? MigrationContext { get; }
 
-        public bool Equals(MigrationEventArgs other)
+        public bool Equals(MigrationEventArgs? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && ConfiguredSemVersion.Equals(other.ConfiguredSemVersion) && MigrationContext.Equals(other.MigrationContext) && string.Equals(ProductName, other.ProductName) && TargetSemVersion.Equals(other.TargetSemVersion);
+            return base.Equals(other) && ConfiguredSemVersion.Equals(other.ConfiguredSemVersion) && (MigrationContext?.Equals(other.MigrationContext) ?? false) && string.Equals(ProductName, other.ProductName) && TargetSemVersion.Equals(other.TargetSemVersion);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -71,7 +71,10 @@ namespace Umbraco.Cms.Core.Events
             {
                 int hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ ConfiguredSemVersion.GetHashCode();
-                hashCode = (hashCode * 397) ^ MigrationContext.GetHashCode();
+                if (MigrationContext is not null)
+                {
+                    hashCode = (hashCode * 397) ^ MigrationContext.GetHashCode();
+                }
                 hashCode = (hashCode * 397) ^ ProductName.GetHashCode();
                 hashCode = (hashCode * 397) ^ TargetSemVersion.GetHashCode();
                 return hashCode;

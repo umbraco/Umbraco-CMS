@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
 
                 if (dto.NodeDto.ParentId > 0)
-                    template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
+                    template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId.Value);
 
                 // reset dirty initial properties (U4-1946)
                 template.ResetDirtyProperties(false);
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                                   NodeId = entity.Id,
                                   Level = 1,
                                   NodeObjectType = nodeObjectTypeId,
-                                  ParentId = entity.MasterTemplateId.Value,
+                                  ParentId = entity.MasterTemplateId?.Value,
                                   Path = entity.Path,
                                   Text = entity.Name,
                                   Trashed = false,

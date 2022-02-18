@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        CompositePackageManifest CombinedManifest { get; }
+        CompositePackageManifest? CombinedManifest { get; }
 
         /// <summary>
         /// Parses a manifest.

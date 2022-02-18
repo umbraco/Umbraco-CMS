@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// An optional package name. If not specified then the directory name is used.
         /// </summary>
         [DataMember(Name = "name")]
-        public string? PackageName
+        public string PackageName
         {
             get
             {
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// using system directory separators.</para>
         /// </remarks>
         [IgnoreDataMember]
-        public string? Source { get; set; }
+        public string Source { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the version of the package

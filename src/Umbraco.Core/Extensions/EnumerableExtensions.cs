@@ -332,7 +332,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T> items)
+        public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T>? items)
         {
             return items ?? Enumerable.Empty<T>();
         }

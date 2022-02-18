@@ -48,11 +48,11 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <param name="name"></param>
         /// <param name="permissions"></param>
         /// <param name="icon"></param>
-        public UserGroup(IShortStringHelper shortStringHelper, int userCount, string alias, string name, IEnumerable<string> permissions, string icon)
+        public UserGroup(IShortStringHelper shortStringHelper, int userCount, string? alias, string? name, IEnumerable<string> permissions, string? icon)
             : this(shortStringHelper)
         {
             UserCount = userCount;
-            _alias = alias;
+            _alias = alias ?? string.Empty;
             _name = name;
             _permissions = permissions;
             _icon = icon;

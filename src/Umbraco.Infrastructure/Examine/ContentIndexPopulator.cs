@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <summary>
         /// This is a static query, it's parameters don't change so store statically
         /// </summary>
-        private IQuery<IContent> _publishedQuery;
+        private IQuery<IContent>? _publishedQuery;
         private IQuery<IContent> PublishedQuery => _publishedQuery ??= _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
 
         private readonly bool _publishedValuesOnly;

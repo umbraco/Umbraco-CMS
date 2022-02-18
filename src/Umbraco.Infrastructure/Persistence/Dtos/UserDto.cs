@@ -34,16 +34,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public bool NoConsole { get; set; }
 
         [Column("userName")]
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         [Column("userLogin")]
         [Length(125)]
         [Index(IndexTypes.NonClustered)]
-        public string Login { get; set; }
+        public string? Login { get; set; }
 
         [Column("userPassword")]
         [Length(500)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         /// <summary>
         /// This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
@@ -51,20 +51,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("passwordConfig")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
-        public string PasswordConfig { get; set; }
+        public string? PasswordConfig { get; set; }
 
         [Column("userEmail")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(10)]
-        public string UserLanguage { get; set; }
+        public string? UserLanguage { get; set; }
 
         [Column("securityStampToken")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(255)]
-        public string SecurityStampToken { get; set; }
+        public string? SecurityStampToken { get; set; }
 
         [Column("failedLoginAttempts")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("avatar")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
-        public string Avatar { get; set; }
+        public string? Avatar { get; set; }
 
         /// <summary>
         /// A Json blob stored for recording tour data for a user
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("tourData")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string TourData { get; set; }
+        public string? TourData { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]

@@ -38,6 +38,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// An exception associated with the log event, or null.
         /// </summary>
-        public string Exception { get; set; }
+        public string? Exception { get; set; }
     }
 }

@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             return logs;
         }
 
-        private bool TryRead(LogEventReader reader, out LogEvent evt)
+        private bool TryRead(LogEventReader reader, out LogEvent? evt)
         {
             try
             {

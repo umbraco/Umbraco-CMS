@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
         /// <param name="alias">An optional alias for the table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
+        public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string? alias = null)
         {
             var (s, a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
@@ -41,7 +41,7 @@ namespace Umbraco.Extensions
         /// <param name="alias1">An optional alias for Dto 1 table.</param>
         /// <param name="alias2">An optional alias for Dto 2 table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> Where<TDto1, TDto2>(this Sql<ISqlContext> sql, Expression<Func<TDto1, TDto2, bool>> predicate, string alias1 = null, string alias2 = null)
+        public static Sql<ISqlContext> Where<TDto1, TDto2>(this Sql<ISqlContext> sql, Expression<Func<TDto1, TDto2, bool>> predicate, string? alias1 = null, string? alias2 = null)
         {
             var (s, a) = sql.SqlContext.VisitDto(predicate, alias1, alias2);
             return sql.Where(s, a);
@@ -167,7 +167,7 @@ namespace Umbraco.Extensions
         /// <param name="field">Expression specifying the field.</param>
         /// <param name="tableAlias">An optional alias for the table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> WhereNotNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string tableAlias = null)
+        public static Sql<ISqlContext> WhereNotNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string? tableAlias = null)
         {
             return sql.WhereNull(field, tableAlias, true);
         }
@@ -181,7 +181,7 @@ namespace Umbraco.Extensions
         /// <param name="tableAlias">An optional alias for the table.</param>
         /// <param name="not">A value indicating whether to NOT NULL.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> WhereNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string tableAlias = null, bool not = false)
+        public static Sql<ISqlContext> WhereNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string? tableAlias = null, bool not = false)
         {
             var column = sql.GetColumns(columnExpressions: new[] { field }, tableAlias: tableAlias, withAlias: false).First();
             return sql.Where("(" + column + " IS " + (not ? "NOT " : "") + "NULL)");
@@ -198,7 +198,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="alias">An optional table alias</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> From<TDto>(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext> From<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
             var type = typeof (TDto);
             var tableName = type.GetTableName();
@@ -353,7 +353,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> CrossJoin<TDto>(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext> CrossJoin<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
             var type = typeof(TDto);
             var tableName = type.GetTableName();
@@ -370,7 +370,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoin<TDto>(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoin<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
             var type = typeof(TDto);
             var tableName = type.GetTableName();
@@ -387,7 +387,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
             var type = typeof(TDto);
             var tableName = type.GetTableName();
@@ -406,7 +406,7 @@ namespace Umbraco.Extensions
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
         /// <remarks>Nested statement produces LEFT JOIN xxx JOIN yyy ON ... ON ...</remarks>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null)
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null)
         {
             var type = typeof(TDto);
             var tableName = type.GetTableName();
@@ -428,7 +428,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> RightJoin<TDto>(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> RightJoin<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
             var type = typeof(TDto);
             var tableName = type.GetTableName();
@@ -497,7 +497,7 @@ namespace Umbraco.Extensions
         /// <param name="aliasLeft">An optional alias for Dto 1 table.</param>
         /// <param name="aliasRight">An optional alias for Dto 2 table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> On<TDto1, TDto2>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, bool>> predicate, string aliasLeft = null, string aliasRight = null)
+        public static Sql<ISqlContext> On<TDto1, TDto2>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, bool>> predicate, string? aliasLeft = null, string? aliasRight = null)
         {
             var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlJoin.SqlContext, aliasLeft, aliasRight);
             var onExpression = expresionist.Visit(predicate);
@@ -516,7 +516,7 @@ namespace Umbraco.Extensions
         /// <param name="aliasRight">An optional alias for Dto 2 table.</param>
         /// <param name="aliasOther">An optional alias for Dto 3 table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> On<TDto1, TDto2, TDto3>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, TDto3, bool>> predicate, string aliasLeft = null, string aliasRight = null, string aliasOther = null)
+        public static Sql<ISqlContext> On<TDto1, TDto2, TDto3>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, TDto3, bool>> predicate, string? aliasLeft = null, string? aliasRight = null, string? aliasOther = null)
         {
             var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3>(sqlJoin.SqlContext, aliasLeft, aliasRight, aliasOther);
             var onExpression = expresionist.Visit(predicate);
@@ -545,7 +545,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The origin sql.</param>
         /// <param name="alias">An optional alias.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> SelectCount(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext> SelectCount(this Sql<ISqlContext> sql, string? alias = null)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             var text = "COUNT(*)";
@@ -704,7 +704,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The origin sql.</param>
         /// <param name="alias">An optional alias.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> AndSelectCount(this Sql<ISqlContext> sql, string alias = null)
+        public static Sql<ISqlContext> AndSelectCount(this Sql<ISqlContext> sql, string? alias = null)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             var text = ", COUNT(*)";
@@ -736,7 +736,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// <para>If <paramref name="fields"/> is empty, all columns are counted.</para>
         /// </remarks>
-        public static Sql<ISqlContext> AndSelectCount<TDto>(this Sql<ISqlContext> sql, string alias = null, params Expression<Func<TDto, object>>[] fields)
+        public static Sql<ISqlContext> AndSelectCount<TDto>(this Sql<ISqlContext> sql, string? alias = null, params Expression<Func<TDto, object>>[] fields)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             var sqlSyntax = sql.SqlContext.SqlSyntax;
@@ -821,7 +821,7 @@ namespace Umbraco.Extensions
             /// <param name="field">An expression specifying the referencing field.</param>
             /// <param name="reference">An optional expression representing a nested reference selection.</param>
             /// <returns>A SqlRef statement.</returns>
-            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>> field, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> reference = null)
+            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>> field, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? reference = null)
                 => Select(field, null, reference);
 
             /// <summary>
@@ -832,7 +832,7 @@ namespace Umbraco.Extensions
             /// <param name="tableAlias">The referenced Dto table alias.</param>
             /// <param name="reference">An optional expression representing a nested reference selection.</param>
             /// <returns>A SqlRef statement.</returns>
-            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>> field, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> reference = null)
+            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>> field, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? reference = null)
             {
                 var property = field == null ? null : ExpressionHelper.FindProperty(field).Item1 as PropertyInfo;
                 return Select(property, tableAlias, reference);
@@ -848,7 +848,7 @@ namespace Umbraco.Extensions
             /// <remarks>
             /// <para>The referencing property has to be a <c>List{<typeparamref name="TRefDto"/>}</c>.</para>
             /// </remarks>
-            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> field, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> reference = null)
+            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> field, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? reference = null)
                 => Select(field, null, reference);
 
             /// <summary>
@@ -862,13 +862,13 @@ namespace Umbraco.Extensions
             /// <remarks>
             /// <para>The referencing property has to be a <c>List{<typeparamref name="TRefDto"/>}</c>.</para>
             /// </remarks>
-            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> field, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> reference = null)
+            public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> field, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? reference = null)
             {
                 var property = field == null ? null : ExpressionHelper.FindProperty(field).Item1 as PropertyInfo;
                 return Select(property, tableAlias, reference);
             }
 
-            private SqlRef<TDto> Select<TRefDto>(PropertyInfo propertyInfo, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> nested = null)
+            private SqlRef<TDto> Select<TRefDto>(PropertyInfo propertyInfo, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? nested = null)
             {
                 var referenceName = propertyInfo?.Name ?? typeof (TDto).Name;
                 if (Prefix != null) referenceName = Prefix + PocoData.Separator + referenceName;
@@ -1095,13 +1095,13 @@ namespace Umbraco.Extensions
 
         #region Utilities
 
-        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true)
+        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object>>[]? columnExpressions = null, bool withAlias = true)
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
             var queryColumns = pd.QueryColumns.ToList();
 
-            Dictionary<string, string> aliases = null;
+            Dictionary<string, string>? aliases = null;
 
             if (columnExpressions != null && columnExpressions.Length > 0)
             {
@@ -1109,8 +1109,8 @@ namespace Umbraco.Extensions
                 {
                     (var member, var alias) = ExpressionHelper.FindProperty(x);
                     var field = member as PropertyInfo;
-                    var fieldName = field.GetColumnName();
-                    if (alias != null)
+                    var fieldName = field?.GetColumnName();
+                    if (alias != null && fieldName is not null)
                     {
                         if (aliases == null)
                             aliases = new Dictionary<string, string>();
@@ -1139,7 +1139,7 @@ namespace Umbraco.Extensions
                 .ToArray();
         }
 
-        private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)
+        private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null)
         {
             tableName = dbType.EscapeTableName(tableName);
             columnName = dbType.EscapeSqlIdentifier(columnName);

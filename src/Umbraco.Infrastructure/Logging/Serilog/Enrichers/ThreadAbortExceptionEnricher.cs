@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
             var timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
             if (timeoutField == null) return false;
 
-            return (bool)timeoutField.GetValue(abort.ExceptionState);
+            return (bool?)timeoutField.GetValue(abort.ExceptionState) ?? false;
         }
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
             if (!(exception is ThreadAbortException abort)) return false;
 
             var stacktrace = abort.StackTrace;
-            return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
+            return stacktrace?.Contains("System.Threading.Monitor.ReliableEnter") ?? false;
         }
 
 

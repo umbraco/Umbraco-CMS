@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Scoping
         private ICompletable _fscope;
 
         private IsolatedCaches _isolatedCaches;
-        private IScopedNotificationPublisher _notificationPublisher;
+        private IScopedNotificationPublisher? _notificationPublisher;
 
         private StackQueue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
 
@@ -60,12 +60,12 @@ namespace Umbraco.Cms.Core.Scoping
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
-            Scope parent,
-            IScopeContext scopeContext,
+            Scope? parent,
+            IScopeContext? scopeContext,
             bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher notificationPublisher = null,
+            IScopedNotificationPublisher? notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
@@ -174,12 +174,12 @@ namespace Umbraco.Cms.Core.Scoping
             IScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher scopedNotificationPublisher = null,
+            IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
             : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, null,
-                scopeContext, detachable, isolationLevel, repositoryCacheMode, 
+                scopeContext, detachable, isolationLevel, repositoryCacheMode,
                 scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
         {
         }
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Core.Scoping
             Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher notificationPublisher = null,
+            IScopedNotificationPublisher? notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
@@ -257,7 +257,7 @@ namespace Umbraco.Cms.Core.Scoping
         public IScopeContext OrigContext { get; set; }
 
         // the context (for attaching & detaching only)
-        public IScopeContext Context { get; }
+        public IScopeContext? Context { get; }
 
         public IsolationLevel IsolationLevel
         {

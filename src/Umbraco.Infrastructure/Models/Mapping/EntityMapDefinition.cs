@@ -42,12 +42,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (source is IContentEntitySlim contentSlim)
             {
-                source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
+                source.AdditionalData!["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
             }
 
             if (source is IDocumentEntitySlim documentSlim)
             {
-                source.AdditionalData["IsPublished"] = documentSlim.Published;
+                source.AdditionalData!["IsPublished"] = documentSlim.Published;
             }
 
             if (source is IMediaEntitySlim mediaSlim)
@@ -61,7 +61,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // it works fine for now, but it's something to keep in mind in the future
             foreach(var kvp in source.AdditionalData)
             {
-                target.AdditionalData[kvp.Key] = kvp.Value;
+                if (kvp.Value is not null)
+                {
+                    target.AdditionalData[kvp.Key] = kvp.Value;
+                }
             }
 
             target.AdditionalData.Add("IsContainer", source.IsContainer);
@@ -243,7 +246,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
         }
 
-        private static string MapContentTypeIcon(IEntitySlim entity)
+        private static string? MapContentTypeIcon(IEntitySlim entity)
         {
             switch (entity)
             {

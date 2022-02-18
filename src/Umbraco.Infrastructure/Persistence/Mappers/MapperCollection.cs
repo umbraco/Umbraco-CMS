@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Extensions;
 
@@ -44,6 +45,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             }
         }
 
-        public bool TryGetMapper(Type type, out BaseMapper mapper) => _index.Value.TryGetValue(type, out mapper);
+        public bool TryGetMapper(Type type,[MaybeNullWhen(false)] out BaseMapper mapper) => _index.Value.TryGetValue(type, out mapper);
     }
 }

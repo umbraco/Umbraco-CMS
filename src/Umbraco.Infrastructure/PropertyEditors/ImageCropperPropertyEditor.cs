@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             contentSettings.OnChange(x => _contentSettings = x);
         }
 
-        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
         {
             if (propertyEditorAlias == Alias &&
                 GetFileSrcFromPropertyValue(value, out _, false) is var mediaPathValue &&

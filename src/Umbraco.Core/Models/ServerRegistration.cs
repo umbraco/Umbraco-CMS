@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="accessed">The date and time the registration was last accessed.</param>
         /// <param name="isActive">A value indicating whether the registration is active.</param>
         /// <param name="isMaster">A value indicating whether the registration is master.</param>
-        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isSchedulingPublisher)
+        public ServerRegistration(int id, string? serverAddress, string? serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isSchedulingPublisher)
         {
             UpdateDate = accessed;
             CreateDate = registered;

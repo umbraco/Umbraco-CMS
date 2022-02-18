@@ -31,12 +31,12 @@ namespace Umbraco.Cms.Core.Configuration
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        public Version? Version { get; }
+        public Version Version { get; }
 
         /// <summary>
         /// Gets the semantic version comments of the Umbraco code.
         /// </summary>
-        public string? Comment => SemanticVersion?.Prerelease;
+        public string Comment => SemanticVersion.Prerelease;
 
         /// <summary>
         /// Gets the assembly version of the Umbraco code.

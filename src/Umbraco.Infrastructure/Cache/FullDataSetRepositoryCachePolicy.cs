@@ -114,27 +114,27 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity? Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // get all from the cache, then look for the entity
             var all = GetAllCached(performGetAll);
-            var entity = all.FirstOrDefault(x => _entityGetId(x).Equals(id));
+            var entity = all.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
 
             // see note in InsertEntities - what we get here is the original
             // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
-            return (TEntity)entity?.DeepClone();
+            return (TEntity?)entity?.DeepClone();
         }
 
         /// <inheritdoc />
-        public override TEntity GetCached(TId id)
+        public override TEntity? GetCached(TId id)
         {
             // get all from the cache -- and only the cache, then look for the entity
             var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
-            var entity = all?.FirstOrDefault(x => _entityGetId(x).Equals(id));
+            var entity = all?.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
 
             // see note in InsertEntities - what we get here is the original
             // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
-            return (TEntity) entity?.DeepClone();
+            return (TEntity?) entity?.DeepClone();
         }
 
         /// <inheritdoc />
@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Core.Cache
         {
             // get all as one set, then look for the entity
             var all = GetAllCached(performGetAll);
-            return all.Any(x => _entityGetId(x).Equals(id));
+            return all.Any(x => _entityGetId(x)?.Equals(id) ?? false);
         }
 
         /// <inheritdoc />

@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        public TTarget Map<TTarget>(object source)
+        public TTarget? Map<TTarget>(object source)
             => Map<TTarget>(source, new MapperContext(this));
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>The target object.</returns>
-        public TTarget Map<TTarget>(object source, Action<MapperContext> f)
+        public TTarget? Map<TTarget>(object source, Action<MapperContext> f)
         {
             var context = new MapperContext(this);
             f(context);
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>The target object.</returns>
-        public TTarget Map<TTarget>(object source, MapperContext context)
+        public TTarget? Map<TTarget>(object source, MapperContext context)
             => Map<TTarget>(source, source?.GetType(), context);
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        public TTarget Map<TSource, TTarget>(TSource source)
+        public TTarget? Map<TSource, TTarget>(TSource source)
             => Map<TSource, TTarget>(source, new MapperContext(this));
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>The target object.</returns>
-        public TTarget Map<TSource, TTarget>(TSource source, Action<MapperContext> f)
+        public TTarget? Map<TSource, TTarget>(TSource source, Action<MapperContext> f)
         {
             var context = new MapperContext(this);
             f(context);
@@ -193,10 +193,10 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>The target object.</returns>
-        public TTarget Map<TSource, TTarget>(TSource source, MapperContext context)
+        public TTarget? Map<TSource, TTarget>(TSource? source, MapperContext context)
             => Map<TTarget>(source, typeof(TSource), context);
 
-        private TTarget Map<TTarget>(object source, Type sourceType, MapperContext context)
+        private TTarget? Map<TTarget>(object? source, Type? sourceType, MapperContext context)
         {
             if (source == null)
                 return default;
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Core.Mapping
             throw new InvalidOperationException($"Don't know how to map {typeof(TSource).FullName} to {typeof(TTarget).FullName}.");
         }
 
-        private Func<object, MapperContext, object> GetCtor(Type sourceType, Type targetType)
+        private Func<object, MapperContext, object>? GetCtor(Type sourceType, Type targetType)
         {
             if (_ctors.TryGetValue(sourceType, out var sourceCtor) && sourceCtor.TryGetValue(targetType, out var ctor))
                 return ctor;

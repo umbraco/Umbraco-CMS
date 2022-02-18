@@ -23,17 +23,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("userGroupAlias")]
         [Length(200)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupAlias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [Column("userGroupName")]
         [Length(200)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupName")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("userGroupDefaultPermissions")]
         [Length(50)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string DefaultPermissions { get; set; }
+        public string? DefaultPermissions { get; set; }
 
         [Column("createDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("icon")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [Column("startContentId")]
         [NullSetting(NullSetting = NullSettings.Null)]

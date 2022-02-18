@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// Get the Serilog minimum-level and UmbracoFile-level values from the config file.
         /// </summary>
-        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevels()
+        public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels()
         {
             return _logLevelLoader.GetLogLevelsFromSinks();
         }
@@ -96,8 +96,8 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         public PagedResult<LogMessage> GetLogs(LogTimePeriod logTimePeriod,
             int pageNumber = 1, int pageSize = 100,
             Direction orderDirection = Direction.Descending,
-            string filterExpression = null,
-            string[] logLevels = null)
+            string? filterExpression = null,
+            string[]? logLevels = null)
         {
             var expression = new ExpressionFilter(filterExpression);
             var filteredLogs = GetLogs(logTimePeriod, expression, 0, int.MaxValue);

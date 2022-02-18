@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             File.WriteAllText(errFile, sb.ToString());
         }
 
-        public string GetLastError()
+        public string? GetLastError()
         {
             var errFile = GetErrFile();
             if (errFile == null)
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             }
         }
 
-        private string GetErrFile()
+        private string? GetErrFile()
         {
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))

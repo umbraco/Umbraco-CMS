@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string? name, int parentId, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
+        protected ContentBase(string? name, int parentId, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Models
             SetParent(parent);
         }
 
-        private ContentBase(string? name, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
+        private ContentBase(string? name, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
         {
             ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 

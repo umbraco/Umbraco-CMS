@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public short Type { get; set; }
 
         [Column("text")]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [Column("alias")]
         public string Alias { get; set; }
@@ -42,6 +42,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "PropertyTypeGroupId")]
-        public List<PropertyTypeDto> PropertyTypeDtos { get; set; }
+        public List<PropertyTypeDto>? PropertyTypeDtos { get; set; }
     }
 }

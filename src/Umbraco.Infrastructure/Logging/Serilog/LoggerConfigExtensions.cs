@@ -111,15 +111,15 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static LoggerConfiguration UmbracoFile(this LoggerSinkConfiguration configuration,
             string path,
-            ITextFormatter formatter = null,
+            ITextFormatter? formatter = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
-            LoggingLevelSwitch levelSwitch = null,
+            LoggingLevelSwitch? levelSwitch = null,
             long? fileSizeLimitBytes = 1073741824,
             TimeSpan? flushToDiskInterval = null,
             RollingInterval rollingInterval = RollingInterval.Day,
             bool rollOnFileSizeLimit = false,
             int? retainedFileCountLimit = 31,
-            Encoding encoding = null
+            Encoding? encoding = null
    )
         {
 

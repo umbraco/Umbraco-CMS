@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Cache
             }
             else
             {
-                return EntityTypeCacheKey + id.ToString().ToUpperInvariant();
+                return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
             }
         }
 
@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity? Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             var cacheKey = GetEntityCacheKey(id);
             var fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity GetCached(TId id)
+        public override TEntity? GetCached(TId id)
         {
             var cacheKey = GetEntityCacheKey(id);
             return Cache.GetCacheItem<TEntity>(cacheKey);
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity?[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             if (ids.Length > 0)
             {
@@ -222,9 +222,12 @@ namespace Umbraco.Cms.Core.Cache
                     if (_options.GetAllCacheValidateCount)
                     {
                         // need to validate the count, get the actual count and return if ok
-                        var totalCount = _options.PerformCount();
-                        if (entities.Length == totalCount)
-                            return entities;
+                        if (_options.PerformCount is not null)
+                        {
+                            var totalCount = _options.PerformCount();
+                            if (entities.Length == totalCount)
+                                return entities;
+                        }
                     }
                     else
                     {

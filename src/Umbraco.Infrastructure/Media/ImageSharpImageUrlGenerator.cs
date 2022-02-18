@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Media
         internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes) => SupportedImageFileTypes = supportedImageFileTypes;
 
         /// <inheritdoc/>
-        public string GetImageUrl(ImageUrlGenerationOptions options)
+        public string? GetImageUrl(ImageUrlGenerationOptions options)
         {
             if (options == null)
             {

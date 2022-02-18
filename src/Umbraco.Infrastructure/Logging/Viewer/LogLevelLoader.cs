@@ -18,24 +18,24 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// Get the Serilog level values of the global minimum and the UmbracoFile one from the config file.
         /// </summary>
-        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevelsFromSinks()
+        public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevelsFromSinks()
         {
-            var configuredLogLevels = new Dictionary<string, LogEventLevel>
+            var configuredLogLevels = new Dictionary<string, LogEventLevel?>
             {
                 { "Global", GetGlobalMinLogLevel() },
                 { "UmbracoFile", _umbracoFileConfig.RestrictedToMinimumLevel }
             };
 
-            return new ReadOnlyDictionary<string, LogEventLevel>(configuredLogLevels);
+            return new ReadOnlyDictionary<string, LogEventLevel?>(configuredLogLevels);
         }
 
         /// <summary>
         /// Get the Serilog minimum-level value from the config file.
         /// </summary>
-        public LogEventLevel GetGlobalMinLogLevel()
+        public LogEventLevel? GetGlobalMinLogLevel()
         {
             var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
-            return (LogEventLevel)logLevel;
+            return (LogEventLevel?)logLevel;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Manifest
 
         protected override IValueValidator Create(Type objectType, string path, JObject jObject)
         {
-            var type = jObject["type"].Value<string>();
+            var type = jObject["type"]?.Value<string>();
             if (string.IsNullOrWhiteSpace(type))
                 throw new InvalidOperationException("Could not get the type of the validator.");
 

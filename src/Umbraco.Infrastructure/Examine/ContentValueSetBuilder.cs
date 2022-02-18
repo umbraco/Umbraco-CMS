@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 var isVariant = c.ContentType.VariesByCulture();
 
                 var urlValue = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders); //Always add invariant urlName
-                var values = new Dictionary<string, IEnumerable<object>>
+                var values = new Dictionary<string, IEnumerable<object?>>
                 {
                     {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {UmbracoExamineFieldNames.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
@@ -86,8 +86,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},                  //Always add invariant urlName
                     {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},
-                    {"creatorName", (creatorIds.TryGetValue(c.CreatorId, out var creatorProfile) ? creatorProfile.Name : "??").Yield() },
-                    {"writerName", (writerIds.TryGetValue(c.WriterId, out var writerProfile) ? writerProfile.Name : "??").Yield() },
+                    {"creatorName", (creatorIds.TryGetValue(c.CreatorId, out var creatorProfile) ? creatorProfile.Name! : "??").Yield() },
+                    {"writerName", (writerIds.TryGetValue(c.WriterId, out var writerProfile) ? writerProfile.Name! : "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
                     {"templateID", new object[] {c.TemplateId ?? 0}},
                     {UmbracoExamineFieldNames.VariesByCultureFieldName, new object[] {"n"}},

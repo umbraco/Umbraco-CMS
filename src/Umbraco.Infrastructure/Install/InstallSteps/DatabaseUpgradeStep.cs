@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _connectionStrings = connectionStrings;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(object model)
+        public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 }
             }
 
-            return Task.FromResult((InstallSetupResult)null);
+            return Task.FromResult((InstallSetupResult?)null);
         }
 
         public override bool RequiresExecution(object model)

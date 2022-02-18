@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Segment")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(SegmentLength)]
-        public string Segment { get; set; }
+        public string? Segment { get; set; }
 
         [Column("intValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -62,19 +62,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("varcharValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(VarcharLength)]
-        public string VarcharValue { get; set; }
+        public string? VarcharValue { get; set; }
 
         [Column("textValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string TextValue { get; set; }
+        public string? TextValue { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "PropertyTypeId")]
-        public PropertyTypeDto PropertyTypeDto { get; set; }
+        public PropertyTypeDto? PropertyTypeDto { get; set; }
 
         [Ignore]
-        public object Value
+        public object? Value
         {
             get
             {
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
             return Id == other.Id;
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             return
                 !ReferenceEquals(null, other) // other is not null
