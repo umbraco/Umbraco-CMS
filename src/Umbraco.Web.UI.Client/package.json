@@ -1,10 +1,13 @@
 {
+  "name": "ui",
   "private": true,
   "scripts": {
     "test": "gulp runTests",
     "unit": "gulp runUnit",
     "e2e": "gulp testE2e",
     "build": "gulp build",
+    "build:skip-tests": "gulp coreBuild",
+    "build:dev": "gulp buildDev",
     "dev": "gulp dev",
     "fastdev": "gulp fastdev",
     "watch": "gulp watch"
@@ -42,7 +45,7 @@
     "lazyload-js": "1.0.0",
     "moment": "2.22.2",
     "ng-file-upload": "12.2.13",
-    "nouislider": "15.4.0",
+    "nouislider": "15.5.0",
     "npm": "^6.14.7",
     "spectrum-colorpicker2": "2.0.8",
     "tinymce": "4.9.11",
@@ -85,7 +88,6 @@
     "karma-spec-reporter": "0.0.32",
     "less": "3.10.3",
     "lodash": "4.17.21",
-    "marked": "^0.7.0",
     "merge-stream": "2.0.0",
     "run-sequence": "2.2.1"
   }

@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using System.ComponentModel;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal
 {
+    // TODO: Only used in unit tests, needs to be moved to test project
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class InternalPublishedProperty : IPublishedProperty
     {
         public IPublishedPropertyType PropertyType { get; set; }

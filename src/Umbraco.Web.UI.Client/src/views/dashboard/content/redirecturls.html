@@ -95,18 +95,31 @@
 
     </div>
 
-    <umb-empty-state
-        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading"
-        position="center">
-        <div><localize key="redirectUrls_noRedirects">No redirects have been made</localize></div>
-        <small class="faded"><localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page</localize></small>
-    </umb-empty-state>
+    <umb-box ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading">
+        <umb-box-content class="block-form">
 
-    <umb-empty-state
-        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length > 0 && !vm.dashboard.loading"
-        position="center">
-        <localize key="general_searchNoResult"></localize>
-    </umb-empty-state>
+            <umb-empty-state size="small">
+                <div>
+                    <localize key="redirectUrls_noRedirects">No redirects have been made</localize>
+                </div>
+                <small class="faded">
+                    <localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will
+                        automatically be made to the new page</localize>
+                </small>
+            </umb-empty-state>
+
+        </umb-box-content>
+    </umb-box>
+
+    <umb-box ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length > 0 && !vm.dashboard.loading">
+        <umb-box-content class="block-form">
+
+            <umb-empty-state size="small">
+                <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
+            </umb-empty-state>
+
+        </umb-box-content>
+    </umb-box>
 
     <div class="flex justify-center items-center">
         <umb-pagination

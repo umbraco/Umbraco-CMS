@@ -129,7 +129,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
          *    });
          * </pre>
          * 
-         * @param {Int} contentTypeId id of the content item to retrive allowed child types for
+         * @param {Int} contentTypeId id of the content item to retrieve allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */

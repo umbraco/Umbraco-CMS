@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -26,6 +26,7 @@
             public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
             public const string ConfigCustomErrorsMode = ConfigCustomErrorsPrefix + "Mode";
             public const string ConfigActiveDirectory = ConfigPrefix + "ActiveDirectory";
+            public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
             public const string ConfigContent = ConfigPrefix + "Content";
             public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
             public const string ConfigExceptionFilter = ConfigPrefix + "ExceptionFilter";
@@ -52,6 +53,9 @@
             public const string ConfigWebRouting = ConfigPrefix + "WebRouting";
             public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
             public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
+            public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
+            public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
+            public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         }
     }
 }

@@ -175,13 +175,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public IPublishedContent PublishedModel => GetModel(ref _publishedModel, _publishedData);
 
         public ContentNodeKit ToKit()
-            => new ContentNodeKit
-                {
-                    Node = this,
-                    ContentTypeId = ContentType.Id,
-
-                    DraftData = _draftData,
-                    PublishedData = _publishedData
-                };
+            => new ContentNodeKit(this, ContentType.Id, _draftData, _publishedData);
     }
 }
