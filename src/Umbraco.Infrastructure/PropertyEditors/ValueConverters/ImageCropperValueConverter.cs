@@ -42,12 +42,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         };
 
         /// <inheritdoc />
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
-            var sourceString = source.ToString();
+            var sourceString = source.ToString()!;
 
-            ImageCropperValue value;
+            ImageCropperValue? value;
             try
             {
                 value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, ImageCropperValueJsonSerializerSettings);
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 value = new ImageCropperValue { Src = sourceString };
             }
 
-            value?.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>());
+            value?.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>()!);
 
             return value;
         }

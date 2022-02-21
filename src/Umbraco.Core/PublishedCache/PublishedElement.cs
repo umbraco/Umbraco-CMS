@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.PublishedCache
     {
         // initializes a new instance of the PublishedElement class
         // within the context of a published snapshot service (eg a published content property value)
-        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object>? values, bool previewing,
             PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
         {
             if (key == Guid.Empty) throw new ArgumentException("Empty guid.");

@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Core.Models
     /// </summary>
     public class ImageUrlGenerationOptions
     {
-        public ImageUrlGenerationOptions(string imageUrl) => ImageUrl = imageUrl;
+        public ImageUrlGenerationOptions(string? imageUrl) => ImageUrl = imageUrl;
 
-        public string ImageUrl { get; }
+        public string? ImageUrl { get; }
 
         public int? Width { get; set; }
 

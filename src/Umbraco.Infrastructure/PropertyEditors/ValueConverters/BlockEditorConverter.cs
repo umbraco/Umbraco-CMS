@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             _publishedModelFactory = publishedModelFactory;
         }
 
-        public IPublishedElement ConvertToElement(BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+        public IPublishedElement? ConvertToElement(BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
 

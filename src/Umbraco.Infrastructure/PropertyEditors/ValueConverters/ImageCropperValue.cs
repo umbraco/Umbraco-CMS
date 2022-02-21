@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// Gets or sets the value source image.
         /// </summary>
         [DataMember(Name = "src")]
-        public string? Src { get; set; }
+        public string? Src { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the value focal point.
@@ -43,16 +43,16 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public IEnumerable<ImageCropperCrop>? Crops { get; set; }
 
         /// <inheritdoc />
-        public override string ToString()
+        public override string? ToString()
             => HasCrops() || HasFocalPoint() ? JsonConvert.SerializeObject(this, Formatting.None) : Src;
 
         /// <inheritdoc />
-        public string ToHtmlString() => Src;
+        public string? ToHtmlString() => Src;
 
         /// <summary>
         /// Gets a crop.
         /// </summary>
-        public ImageCropperCrop GetCrop(string alias)
+        public ImageCropperCrop? GetCrop(string alias)
         {
             if (Crops == null)
                 return null;
@@ -62,13 +62,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        public ImageUrlGenerationOptions GetCropBaseOptions(string url, ImageCropperCrop crop, bool preferFocalPoint)
+        public ImageUrlGenerationOptions GetCropBaseOptions(string? url, ImageCropperCrop? crop, bool preferFocalPoint)
         {
-            if ((preferFocalPoint && HasFocalPoint()) || (crop != null && crop.Coordinates == null && HasFocalPoint()))
+            if ((preferFocalPoint && HasFocalPoint()) || (crop is not null && crop.Coordinates is null && HasFocalPoint()))
             {
-                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Left, FocalPoint.Top) };
+                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint!.Left, FocalPoint.Top) };
             }
-            else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
+            else if (crop is not null && crop.Coordinates is not null && preferFocalPoint == false)
             {
                 return new ImageUrlGenerationOptions(url) { Crop = new ImageUrlGenerationOptions.CropCoordinates(crop.Coordinates.X1, crop.Coordinates.Y1, crop.Coordinates.X2, crop.Coordinates.Y2) };
             }
@@ -81,17 +81,17 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <summary>
         /// Gets the value image URL for a specified crop.
         /// </summary>
-        public string GetCropUrl(string alias, IImageUrlGenerator imageUrlGenerator, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
+        public string? GetCropUrl(string alias, IImageUrlGenerator imageUrlGenerator, bool useCropDimensions = true, bool useFocalPoint = false, string? cacheBusterValue = null)
         {
             var crop = GetCrop(alias);
 
             // could not find a crop with the specified, non-empty, alias
-            if (crop == null && !string.IsNullOrWhiteSpace(alias))
+            if (crop is null && !string.IsNullOrWhiteSpace(alias))
                 return null;
 
             var options = GetCropBaseOptions(null, crop, useFocalPoint || string.IsNullOrWhiteSpace(alias));
 
-            if (crop != null && useCropDimensions)
+            if (crop is not null && useCropDimensions)
             {
                 options.Width = crop.Width;
                 options.Height = crop.Height;
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <summary>
         /// Gets the value image URL for a specific width and height.
         /// </summary>
-        public string GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue = null)
+        public string? GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, string? cacheBusterValue = null)
         {
             var options = GetCropBaseOptions(null, null, false);
 
@@ -151,12 +151,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 foreach (var incomingCrop in incomingCrops)
                 {
                     var crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
-                    if (crop == null)
+                    if (crop is null)
                     {
                         // Add incoming crop
                         crops.Add(incomingCrop);
                     }
-                    else if (crop.Coordinates == null)
+                    else if (crop.Coordinates is null)
                     {
                         // Use incoming crop coordinates
                         crop.Coordinates = incomingCrop.Coordinates;
@@ -187,16 +187,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 {
                     foreach (var crop in crops.Values<JObject>().ToList())
                     {
-                        if (crop.TryGetValue("coordinates", out var coordinates) == false || coordinates.HasValues == false)
+                        if (crop?.TryGetValue("coordinates", out var coordinates) == false)
                         {
-                            // Remove crop without coordinates
-                            crop.Remove();
-                            continue;
+                            if (coordinates!.HasValues)
+                            {
+                                // Remove crop without coordinates
+                                crop.Remove();
+                                continue;
+                            }
                         }
 
                         // Width/height are already stored in the crop configuration
-                        crop.Remove("width");
-                        crop.Remove("height");
+                        crop?.Remove("width");
+                        crop?.Remove("height");
                     }
                 }
 
@@ -218,14 +221,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         #region IEquatable
 
         /// <inheritdoc />
-        public bool Equals(ImageCropperValue other)
+        public bool Equals(ImageCropperValue? other)
             => ReferenceEquals(this, other) || Equals(this, other);
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || obj is ImageCropperValue other && Equals(this, other);
 
-        private static bool Equals(ImageCropperValue left, ImageCropperValue right)
+        private static bool Equals(ImageCropperValue left, ImageCropperValue? right)
             => ReferenceEquals(left, right) // deals with both being null, too
                 || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                    && string.Equals(left.Src, right.Src)
@@ -269,14 +272,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             #region IEquatable
 
             /// <inheritdoc />
-            public bool Equals(ImageCropperFocalPoint other)
+            public bool Equals(ImageCropperFocalPoint? other)
                 => ReferenceEquals(this, other) || Equals(this, other);
 
             /// <inheritdoc />
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
                 => ReferenceEquals(this, obj) || obj is ImageCropperFocalPoint other && Equals(this, other);
 
-            private static bool Equals(ImageCropperFocalPoint left, ImageCropperFocalPoint right)
+            private static bool Equals(ImageCropperFocalPoint left, ImageCropperFocalPoint? right)
                 => ReferenceEquals(left, right) // deals with both being null, too
                    || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                        && left.Left == right.Left
@@ -306,7 +309,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public class ImageCropperCrop : IEquatable<ImageCropperCrop>
         {
             [DataMember(Name = "alias")]
-            public string Alias { get; set; }
+            public string Alias { get; set; } = string.Empty;
 
             [DataMember(Name = "width")]
             public int Width { get; set; }
@@ -320,14 +323,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             #region IEquatable
 
             /// <inheritdoc />
-            public bool Equals(ImageCropperCrop other)
+            public bool Equals(ImageCropperCrop? other)
                 => ReferenceEquals(this, other) || Equals(this, other);
 
             /// <inheritdoc />
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
                 => ReferenceEquals(this, obj) || obj is ImageCropperCrop other && Equals(this, other);
 
-            private static bool Equals(ImageCropperCrop left, ImageCropperCrop right)
+            private static bool Equals(ImageCropperCrop left, ImageCropperCrop? right)
                 => ReferenceEquals(left, right) // deals with both being null, too
                     || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                        && string.Equals(left.Alias, right.Alias)
@@ -377,14 +380,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             #region IEquatable
 
             /// <inheritdoc />
-            public bool Equals(ImageCropperCropCoordinates other)
+            public bool Equals(ImageCropperCropCoordinates? other)
                 => ReferenceEquals(this, other) || Equals(this, other);
 
             /// <inheritdoc />
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
                 => ReferenceEquals(this, obj) || obj is ImageCropperCropCoordinates other && Equals(this, other);
 
-            private static bool Equals(ImageCropperCropCoordinates left, ImageCropperCropCoordinates right)
+            private static bool Equals(ImageCropperCropCoordinates left, ImageCropperCropCoordinates? right)
                 => ReferenceEquals(left, right) // deals with both being null, too
                    || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                       && left.X1 == right.X1

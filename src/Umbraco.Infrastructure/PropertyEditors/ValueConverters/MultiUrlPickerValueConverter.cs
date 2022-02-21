@@ -35,21 +35,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override bool IsConverter(IPublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType) =>
-            propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber == 1 ?
+            propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber == 1 ?
                 typeof(Link) :
                 typeof(IEnumerable<Link>);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
-        public override bool? IsValue(object value, PropertyValueLevel level) => value?.ToString() != "[]";
+        public override bool? IsValue(object? value, PropertyValueLevel level) => value?.ToString() != "[]";
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview) => source?.ToString();
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString()!;
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             using (_proflog.DebugDuration<MultiUrlPickerValueConverter>($"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
             {
-                var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber;
+                var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber;
 
                 if (inter == null)
                 {
@@ -57,14 +57,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 var links = new List<Link>();
-                var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
+                var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString()!);
                 var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 foreach (var dto in dtos)
                 {
                     var type = LinkType.External;
                     var url = dto.Url;
 
-                    if (dto.Udi != null)
+                    if (dto.Udi is not null)
                     {
                         type = dto.Udi.EntityType == Constants.UdiEntityType.Media
                             ? LinkType.Media

@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// </example>
     public class ModelType : Type
     {
-        private ModelType(string contentTypeAlias)
+        private ModelType(string? contentTypeAlias)
         {
             if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
             if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// </summary>
         /// <param name="alias">The published element type alias.</param>
         /// <returns>The model type for the published element type.</returns>
-        public static ModelType For(string alias)
+        public static ModelType For(string? alias)
             => new ModelType(alias);
 
         /// <summary>

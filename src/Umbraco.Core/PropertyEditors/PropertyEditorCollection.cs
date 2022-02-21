@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Manifest;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public virtual IDataEditor? this[string? alias]
             => this.SingleOrDefault(x => x.Alias == alias);
 
-        public virtual bool TryGet(string? alias, out IDataEditor? editor)
+        public virtual bool TryGet(string? alias, [MaybeNullWhen(false)] out IDataEditor editor)
         {
             editor = this.FirstOrDefault(x => x.Alias == alias);
             return editor != null;

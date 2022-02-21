@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return false;
 
             var config = publishedProperty.DataType.ConfigurationAs<NestedContentConfiguration>();
-            return config.MinItems == 1 && config.MaxItems == 1;
+            return config?.MinItems == 1 && config.MaxItems == 1;
         }
 
         public static bool IsNestedMany(IPublishedPropertyType publishedProperty)
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return IsNested(publishedProperty) && !IsNestedSingle(publishedProperty);
         }
 
-        protected IPublishedElement ConvertToElement(JObject sourceObject, PropertyCacheLevel referenceCacheLevel, bool preview)
+        protected IPublishedElement? ConvertToElement(JObject sourceObject, PropertyCacheLevel referenceCacheLevel, bool preview)
         {
             var elementTypeAlias = sourceObject[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
             if (string.IsNullOrEmpty(elementTypeAlias))
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
             var propertyValues = sourceObject.ToObject<Dictionary<string, object>>();
 
-            if (!propertyValues.TryGetValue("key", out var keyo)
+            if (propertyValues is null || !propertyValues.TryGetValue("key", out var keyo)
                 || !Guid.TryParse(keyo.ToString(), out var key))
                 key = Guid.Empty;
 

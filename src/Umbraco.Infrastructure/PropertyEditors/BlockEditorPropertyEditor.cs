@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 var val = property.GetValue(culture, segment);
                 var valEditors = new Dictionary<int, IDataValueEditor>();
 
-                BlockEditorData blockEditorData;
+                BlockEditorData? blockEditorData;
                 try
                 {
                     blockEditorData = _blockEditorValues.DeserializeAndClean(val);

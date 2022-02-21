@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
-        public DataEditor(IDataValueEditorFactory? dataValueEditorFactory, EditorType type = EditorType.PropertyValue)
+        public DataEditor(IDataValueEditorFactory dataValueEditorFactory, EditorType type = EditorType.PropertyValue)
         {
 
             // defaults
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; set; }
 
-        protected IDataValueEditorFactory? DataValueEditorFactory { get; }
+        protected IDataValueEditorFactory DataValueEditorFactory { get; }
 
         /// <inheritdoc />
         [IgnoreDataMember]

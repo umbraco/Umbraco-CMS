@@ -11,7 +11,7 @@ namespace Umbraco.Extensions
         /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPicker3Configuration configuration)
+        public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPicker3Configuration? configuration)
         {
             var crops = new List<ImageCropperValue.ImageCropperCrop>();
 

@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns>
         ///     <c>true</c> if [is type assignable from] [the specified contract]; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsTypeAssignableFrom(Type contract, Type implementation)
+        public static bool IsTypeAssignableFrom(Type contract, Type? implementation)
         {
             return contract.IsAssignableFrom(implementation);
         }

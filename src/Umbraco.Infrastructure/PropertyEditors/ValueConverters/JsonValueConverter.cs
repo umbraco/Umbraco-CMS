@@ -54,10 +54,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
-            var sourceString = source.ToString();
+            var sourceString = source.ToString()!;
 
             if (sourceString.DetectIsJson())
             {

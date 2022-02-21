@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         ///   "stringValue":"Some String","numericValue":125,"otherNumeric":null
         /// </remarks>
         [JsonExtensionData]
-        public Dictionary<string, object> RawPropertyValues { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object?> RawPropertyValues { get; set; } = new Dictionary<string, object?>();
 
         /// <summary>
         /// Used during deserialization to convert the raw property data into data with a property type context
