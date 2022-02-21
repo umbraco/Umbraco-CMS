@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets of sets a value indicating whether a value for this property type is required.
         /// </summary>
-        bool? Mandatory { get; set; }
+        bool Mandatory { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the label of this property type should be displayed on top.

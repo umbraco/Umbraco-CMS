@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
         private Lazy<int>? _propertyGroupId;
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
-        private bool? _mandatory;
+        private bool _mandatory;
         private string? _mandatoryMessage;
         private int _sortOrder;
         private string? _validationRegExp;
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public bool? Mandatory
+        public bool Mandatory
         {
             get => _mandatory;
             set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));

@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             base.Map(originalProp, dest, context);
 
-            var config = DataTypeService.GetDataType(originalProp.PropertyType?.DataTypeId).Configuration;
+            var config = originalProp.PropertyType is null ? null : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
             // TODO: IDataValueEditor configuration - general issue
             // GetValueEditor() returns a non-configured IDataValueEditor
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             dest.LabelOnTop = originalProp.PropertyType?.LabelOnTop;
 
             //add the validation information
-            dest.Validation.Mandatory = originalProp.PropertyType?.Mandatory;
+            dest.Validation.Mandatory = originalProp.PropertyType?.Mandatory ?? false;
             dest.Validation.MandatoryMessage = originalProp.PropertyType?.MandatoryMessage;
             dest.Validation.Pattern = originalProp.PropertyType?.ValidationRegExp;
             dest.Validation.PatternMessage = originalProp.PropertyType?.ValidationRegExpMessage;

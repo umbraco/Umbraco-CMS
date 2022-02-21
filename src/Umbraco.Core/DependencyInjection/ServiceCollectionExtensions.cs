@@ -14,8 +14,22 @@ namespace Umbraco.Extensions
         /// Removes all previous registrations for the type <typeparamref name="TService"/>.
         /// </remarks>
         public static void AddUnique<TService, TImplementing>(
+            this IServiceCollection services)
+            where TService : class
+            where TImplementing : class, TService
+        {
+            AddUnique<TService, TImplementing>(services, ServiceLifetime.Singleton);
+        }
+
+        /// <summary>
+        /// Adds a service of type <typeparamref name="TService"/> with an implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <remarks>
+        /// Removes all previous registrations for the type <typeparamref name="TService"/>.
+        /// </remarks>
+        public static void AddUnique<TService, TImplementing>(
             this IServiceCollection services,
-            ServiceLifetime lifetime = ServiceLifetime.Singleton)
+            ServiceLifetime lifetime)
             where TService : class
             where TImplementing : class, TService
         {

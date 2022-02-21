@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class PropertyTypeValidation
     {
         [DataMember(Name = "mandatory")]
-        public bool? Mandatory { get; set; }
+        public bool Mandatory { get; set; }
 
         [DataMember(Name = "mandatoryMessage")]
         public string? MandatoryMessage { get; set; }

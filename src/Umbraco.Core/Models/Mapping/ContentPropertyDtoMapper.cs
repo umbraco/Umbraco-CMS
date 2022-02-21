@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             dest.ValidationRegExpMessage = property.PropertyType?.ValidationRegExpMessage;
             dest.Description = property.PropertyType?.Description;
             dest.Label = property.PropertyType?.Name;
-            dest.DataType = DataTypeService.GetDataType(property.PropertyType?.DataTypeId);
+            dest.DataType = property.PropertyType is null ? null : DataTypeService.GetDataType(property.PropertyType.DataTypeId);
             dest.LabelOnTop = property.PropertyType?.LabelOnTop;
         }
     }
