@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Telemetry.Models
 {
     /// <summary>
     /// Serializable class containing telemetry information.
     /// </summary>
+    [DataContract]
     public class TelemetryReportData : Dictionary<TelemetryData, object>
     {
         /// <summary>

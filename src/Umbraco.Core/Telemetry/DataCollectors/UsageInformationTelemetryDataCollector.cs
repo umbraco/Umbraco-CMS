@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry.Models;
@@ -135,41 +136,69 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
             };
         }
 
+        [DataContract]
         private class ContentCount
         {
+            [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "published")]
             public int Published { get; set; }
         }
 
+        [DataContract]
         private class DomainCount
         {
+            [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "wildcards")]
             public int Wildcards { get; set; }
         }
 
+        [DataContract]
         private class MediaCount
         {
+            [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "notTrashed")]
             public int NotTrashed { get; set; }
         }
 
+        [DataContract]
         private class MemberCount
         {
+            [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "approved")]
             public int Approved { get; set; }
+
+            [DataMember(Name = "lockedOut")]
             public int LockedOut { get; set; }
         }
 
+        [DataContract]
         private class Language
         {
+            [DataMember(Name = "isDefault")]
             public bool IsDefault { get; set; }
+
+            [DataMember(Name = "isMandatory")]
             public bool IsMandatory { get; set; }
+
+            [DataMember(Name = "hasFallback")]
             public bool HasFallback { get; set; }
         }
 
+        [DataContract]
         private class MacroCount
         {
+            [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "useInEditor")]
             public int UseInEditor { get; set; }
         }
     }

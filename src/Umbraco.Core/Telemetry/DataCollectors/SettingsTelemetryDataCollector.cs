@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Telemetry.Models;
@@ -66,21 +67,49 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
             };
         }
 
+        [DataContract]
         private class CustomGlobalSettings
         {
+            [DataMember(Name = "timeOut")]
             public TimeSpan TimeOut { get; set; }
+
+            [DataMember(Name = "defaultUILanguage")]
             public string DefaultUILanguage { get; set; }
+
+            [DataMember(Name = "hideTopLevelNodeFromPath")]
             public bool HideTopLevelNodeFromPath { get; set; }
+
+            [DataMember(Name = "useHttps")]
             public bool UseHttps { get; set; }
+
+            [DataMember(Name = "umbracoPath")]
             public bool UmbracoPath { get; set; }
+
+            [DataMember(Name = "iconsPath")]
             public bool IconsPath { get; set; }
+
+            [DataMember(Name = "umbracoCssPath")]
             public bool UmbracoCssPath { get; set; }
+
+            [DataMember(Name = "umbracoScriptsPath")]
             public bool UmbracoScriptsPath { get; set; }
+
+            [DataMember(Name = "umbracoMediaPath")]
             public bool UmbracoMediaPath { get; set; }
+
+            [DataMember(Name = "umbracoMediaPhysicalRootPath")]
             public bool UmbracoMediaPhysicalRootPath { get; set; }
+
+            [DataMember(Name = "mainDomLock")]
             public string MainDomLock { get; set; }
+
+            [DataMember(Name = "isSmtpServerConfigured")]
             public bool IsSmtpServerConfigured { get; set; }
+
+            [DataMember(Name = "isPickupDirectoryLocationConfigured")]
             public bool IsPickupDirectoryLocationConfigured { get; set; }
+
+            [DataMember(Name = "sqlWriteLockTimeOut")]
             public TimeSpan SqlWriteLockTimeOut { get; set; }
         }
     }
