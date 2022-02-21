@@ -172,6 +172,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         return;
                     }
 
+                    // This relies on IssuedUtc, so call it before updating it.
+                    await EnsureValidSessionId(ctx);
+
                     // We have to manually specify Issued and Expires,
                     // because the SecurityStampValidator refreshes the principal every 30 minutes,
                     // When the principal is refreshed the Issued is update to time of refresh, however, the Expires remains unchanged
@@ -181,7 +184,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     ctx.Properties.IssuedUtc = _systemClock.UtcNow;
                     ctx.Properties.ExpiresUtc = _systemClock.UtcNow.Add(_globalSettings.TimeOut);
                     ctx.ShouldRenew = true;
-                    await EnsureValidSessionId(ctx);
                 },
                 OnSigningIn = ctx =>
                 {
