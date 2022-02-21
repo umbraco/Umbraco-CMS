@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Deploy.Core.Configuration.DeployConfiguration;
 using Umbraco.Deploy.Core.Configuration.DeployProjectConfiguration;
@@ -88,6 +89,8 @@ namespace JsonSchema
                 public LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
 
                 public ContentDashboardSettings ContentDashboard { get; set; }
+
+                public HelpPageSettings HelpPage { get; set; }
             }
 
             /// <summary>

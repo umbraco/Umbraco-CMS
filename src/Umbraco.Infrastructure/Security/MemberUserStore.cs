@@ -29,6 +29,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly IScopeProvider _scopeProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IExternalLoginWithKeyService _externalLoginService;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberUserStore"/> class for the members identity store
@@ -37,7 +38,9 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="mapper">The mapper for properties</param>
         /// <param name="scopeProvider">The scope provider</param>
         /// <param name="describer">The error describer</param>
+        /// <param name="publishedSnapshotAccessor">The published snapshot accessor</param>
         /// <param name="externalLoginService">The external login service</param>
+        /// <param name="twoFactorLoginService">The two factor login service</param>
         [ActivatorUtilitiesConstructor]
         public MemberUserStore(
             IMemberService memberService,
@@ -45,7 +48,8 @@ namespace Umbraco.Cms.Core.Security
             IScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IExternalLoginWithKeyService externalLoginService
+            IExternalLoginWithKeyService externalLoginService,
+            ITwoFactorLoginService twoFactorLoginService
             )
             : base(describer)
         {
@@ -54,9 +58,10 @@ namespace Umbraco.Cms.Core.Security
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _externalLoginService = externalLoginService;
+            _twoFactorLoginService = twoFactorLoginService;
         }
 
-        [Obsolete("Use ctor with IExternalLoginWithKeyService param")]
+        [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
@@ -64,19 +69,19 @@ namespace Umbraco.Cms.Core.Security
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IExternalLoginService externalLoginService)
-            : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>())
+            : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(), StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
         {
 
         }
 
-        [Obsolete("Use ctor with IExternalLoginWithKeyService param")]
+        [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
             IScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor)
-            : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>())
+            : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(), StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
         {
 
         }
@@ -106,6 +111,9 @@ namespace Umbraco.Cms.Core.Security
 
                 // create the member
                 _memberService.Save(memberEntity);
+
+                //We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
+                _memberService.AssignRoles(new[] { memberEntity.Id },  user.Roles.Select(x => x.RoleId).ToArray());
 
                 if (!memberEntity.HasIdentity)
                 {
@@ -677,6 +685,35 @@ namespace Umbraco.Cms.Core.Security
             None,
             LoginOnly,
             FullSave
+        }
+
+        /// <summary>
+        /// Overridden to support Umbraco's own data storage requirements
+        /// </summary>
+        /// <remarks>
+        /// The base class's implementation of this calls into FindTokenAsync, RemoveUserTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+        /// tracking ORMs like EFCore.
+        /// </remarks>
+        /// <inheritdoc />
+        public override Task<string> GetTokenAsync(MemberIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+
+            return Task.FromResult(token?.Value);
+        }
+
+        /// <inheritdoc />
+        public override async Task<bool> GetTwoFactorEnabledAsync(MemberIdentityUser user,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await _twoFactorLoginService.IsTwoFactorEnabledAsync(user.Key);
         }
     }
 }

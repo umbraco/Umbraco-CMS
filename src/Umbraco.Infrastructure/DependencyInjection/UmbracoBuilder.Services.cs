@@ -75,6 +75,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 ));
             builder.Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
             builder.Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
+            builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             builder.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
             builder.Services.AddUnique<IConsentService, ConsentService>();
             builder.Services.AddTransient(SourcesFactory);

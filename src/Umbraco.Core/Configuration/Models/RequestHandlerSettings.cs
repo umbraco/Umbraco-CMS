@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticConvertUrlsToAscii = "try";
         internal const bool StaticEnableDefaultCharReplacements = true;
 
-        internal static readonly CharItem[] DefaultCharCollection =
+        internal static readonly Umbraco.Cms.Core.Configuration.Models.CharItem[] DefaultCharCollection =
         {
             new () { Char = " ", Replacement = "-" },
             new () { Char = "\"", Replacement = string.Empty },
@@ -84,6 +84,16 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Add additional character replacements, or override defaults
         /// </summary>
-        public IEnumerable<CharItem> UserDefinedCharCollection { get; set; }
+        public IEnumerable<Umbraco.Cms.Core.Configuration.Models.CharItem> UserDefinedCharCollection { get; set; }
+
+        [Obsolete("Use CharItem in the Umbraco.Cms.Core.Configuration.Models namespace instead. Scheduled for removal in V10.")]
+        public class CharItem : IChar
+        {
+            /// <inheritdoc/>
+            public string Char { get; set; }
+
+            /// <inheritdoc/>
+            public string Replacement { get; set; }
+        }
     }
 }

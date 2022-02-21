@@ -173,12 +173,12 @@ function entityResource($q, $http, umbRequestHelper) {
              $http.post(
                  umbRequestHelper.getApiUrl(
                      "entityApiBaseUrl",
-                     "GetUrlsByUdis",
+                     "GetUrlsByIds",
                      query),
                  {
-                     udis: udis
+                     ids: ids
                  }),
-             'Failed to retrieve url map for udis ' + udis);
+             'Failed to retrieve url map for ids ' + ids);
         },
 
         getUrlByUdi: function (udi, culture) {
