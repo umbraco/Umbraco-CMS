@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using System.Security.Claims;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
         // We used to ignore CookiePath and SessionIdClaimType, but these claims are only issued at login
         // meaning if we don't merge these claims you'll be logged out, after the claims are merged
         // since your session ID disappears
-        private static readonly string[] s_ignoredClaims = Array.Empty<string>();
+        private static readonly string[] s_ignoredClaims = { ClaimTypes.CookiePath, Constants.Security.SessionIdClaimType };
 
         public static void MergeAllClaims(this ClaimsIdentity destination, ClaimsIdentity source)
         {

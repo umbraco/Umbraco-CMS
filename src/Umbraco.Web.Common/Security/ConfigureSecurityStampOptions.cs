@@ -30,7 +30,8 @@ namespace Umbraco.Cms.Web.Common.Security
                 ClaimsIdentity newIdentity = refreshingPrincipal.NewPrincipal.Identities.First();
                 ClaimsIdentity currentIdentity = refreshingPrincipal.CurrentPrincipal.Identities.First();
 
-                newIdentity.MergeClaimsFromCookieIdentity(currentIdentity);
+                // Since this is refreshing an existing principal, we want to merge all claims.
+                newIdentity.MergeAllClaims(currentIdentity);
 
                 return Task.CompletedTask;
             };
