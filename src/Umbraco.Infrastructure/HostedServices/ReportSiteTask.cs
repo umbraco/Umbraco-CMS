@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // Send data to DEBUG telemetry service
                 BaseAddress = new Uri("https://telemetry.rainbowsrock.net/")
 #else
-                // Send data to LIVE telemetry
+                // Send data to LIVE telemetry service
                 BaseAddress = new Uri("https://telemetry.umbraco.com/")
 #endif
             };
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
             try
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
+                using (var request = new HttpRequestMessage(HttpMethod.Post, "v1/report"))
                 {
                     string content = _jsonSerializer.Serialize(telemetryReportData);
                     request.Content = new StringContent(content, Encoding.UTF8, "application/json");
@@ -89,12 +89,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                     using HttpResponseMessage response = await s_httpClient.SendAsync(request);
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 // Silently swallow
                 // The user does not need the logs being polluted if our service has fallen over or is down etc
                 // Hence only logging this at a more verbose level (which users should not be using in production)
-                _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
+                _logger.LogDebug(ex, "There was a problem sending a request to the Umbraco telemetry service");
             }
         }
     }
