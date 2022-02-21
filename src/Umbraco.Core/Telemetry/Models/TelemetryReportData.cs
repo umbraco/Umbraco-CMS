@@ -1,26 +1,32 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Telemetry.Models
 {
     /// <summary>
     /// Serializable class containing telemetry information.
     /// </summary>
-    [DataContract]
-    public class TelemetryReportData
+    public class TelemetryReportData : Dictionary<TelemetryData, object>
     {
         /// <summary>
         /// Gets or sets a random GUID to prevent an instance posting multiple times pr. day.
         /// </summary>
-        [DataMember(Name = "id")]
-        public Guid Id { get; set; }
+        [Obsolete("Get or set the ID from the dictionary using TelemetryData.TelemetryId instead.")]
+        public Guid Id
+        {
+            get => TryGetValue(TelemetryData.TelemetryId, out var value) && value is Guid telemetryId ? telemetryId : default;
+            set => this[TelemetryData.TelemetryId] = value;
+        }
 
         /// <summary>
         /// Gets or sets the Umbraco CMS version.
         /// </summary>
-        [DataMember(Name = "version")]
-        public string Version { get; set; }
+        [Obsolete("Get or set the version from the dictionary using TelemetryData.UmbracoVersion instead.")]
+        public string Version
+        {
+            get => TryGetValue(TelemetryData.UmbracoVersion, out var value) && value is string umbracoVersion ? umbracoVersion : default;
+            set => this[TelemetryData.UmbracoVersion] = value;
+        }
 
         /// <summary>
         /// Gets or sets an enumerable containing information about packages.
@@ -28,16 +34,11 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// <remarks>
         /// Contains only the name and version of the packages, unless no version is specified.
         /// </remarks>
-        [DataMember(Name = "packages")]
-        public IEnumerable<PackageTelemetry> Packages { get; set; }
-
-        /// <summary>
-        /// Gets the telemetry data.
-        /// </summary>
-        /// <value>
-        /// The telemetry data.
-        /// </value>
-        [DataMember(Name = "data")]
-        public IDictionary<TelemetryData, object> Data { get; } = new Dictionary<TelemetryData, object>();
+        [Obsolete("Get or set the package versions from the dictionary using TelemetryData.PackageVersions instead.")]
+        public IEnumerable<PackageTelemetry> Packages
+        {
+            get => TryGetValue(TelemetryData.PackageVersions, out var value) && value is IEnumerable<PackageTelemetry> packageVersions ? packageVersions : default;
+            set => this[TelemetryData.PackageVersions] = value;
+        }
     }
 }

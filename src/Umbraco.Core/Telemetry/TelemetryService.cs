@@ -42,25 +42,9 @@ namespace Umbraco.Cms.Core.Telemetry
                 {
                     if (telemetrySettings.IsEnabled(telemetryData))
                     {
-                        telemetryReportData.Data[telemetryData] = collector.Collect(telemetryData);
+                        telemetryReportData[telemetryData] = collector.Collect(telemetryData);
                     }
                 }
-            }
-
-            // Populate existing fields for backwards compatibility
-            if (telemetryReportData.Data.TryGetValue(TelemetryData.TelemetryId, out var telemetryId))
-            {
-                telemetryReportData.Id = telemetryId as Guid? ?? Guid.Empty;
-            }
-
-            if (telemetryReportData.Data.TryGetValue(TelemetryData.UmbracoVersion, out var umbracoVersion))
-            {
-                telemetryReportData.Version = umbracoVersion as string;
-            }
-
-            if (telemetryReportData.Data.TryGetValue(TelemetryData.PackageVersions, out var packageVersions))
-            {
-                telemetryReportData.Packages = packageVersions as IEnumerable<PackageTelemetry>;
             }
 
             return true;
