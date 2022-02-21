@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -51,7 +51,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
             }
 
-            //  no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
+            // no suffix - name without suffix does NOT exist - we can just use the name without suffix.
+            if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
+            {
+                model.Suffix = StructuredName.NO_SUFFIX;
+
+                return model.FullName;
+            }
+
+            // suffix - name with suffix does NOT exist
+            // We can just return the full name as it is as there's no conflict.
+            if (model.Suffix.HasValue && !items.SimpleNameExists(model.FullName))
+            {
+                return model.FullName;
+            }
+
+            // no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
             if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
             {
                 model.Suffix = StructuredName.NO_SUFFIX;
@@ -163,7 +178,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             internal static readonly uint? NO_SUFFIX = default;
 
             internal string Text { get; set; }
-            internal uint ? Suffix { get; set; }
+            internal uint? Suffix { get; set; }
             public string FullName
             {
                 get
