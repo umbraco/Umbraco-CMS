@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
 
             foreach (PackageManifest manifest in _manifestParser.GetManifests())
             {
-                if (manifest.AllowPackageTelemetry is false)
+                if (string.IsNullOrEmpty(manifest.PackageName) || manifest.AllowPackageTelemetry is false)
                 {
                     continue;
                 }
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
                 packages.Add(new PackageTelemetry
                 {
                     Name = manifest.PackageName,
-                    Version = manifest.Version ?? string.Empty
+                    Version = !string.IsNullOrEmpty(manifest.Version) ? manifest.Version : null
                 });
             }
 
