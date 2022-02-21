@@ -18,7 +18,7 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Empty recycle bin</key>
+    <key alias="emptyrecyclebin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importdocumenttype">Import Document Type</key>
@@ -1310,6 +1310,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoResultsDescription">Please try searching for another package or browse through the categories
     </key>
     <key alias="packagesPopular">Popular</key>
+    <key alias="packagesPromoted">Promoted</key>
     <key alias="packagesNew">New releases</key>
     <key alias="packageHas">has</key>
     <key alias="packageKarmaPoints">karma points</key>

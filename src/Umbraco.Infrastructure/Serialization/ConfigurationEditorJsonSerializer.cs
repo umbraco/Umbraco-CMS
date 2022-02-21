@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Infrastructure.Serialization
         {
             JsonSerializerSettings.Converters.Add(new FuzzyBooleanConverter());
             JsonSerializerSettings.ContractResolver = new ConfigurationCustomContractResolver();
+            JsonSerializerSettings.Formatting = Formatting.None;
+            JsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         }
 
         private class ConfigurationCustomContractResolver : DefaultContractResolver

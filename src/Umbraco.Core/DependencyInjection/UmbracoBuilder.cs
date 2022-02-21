@@ -263,6 +263,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ITelemetryService, TelemetryService>();
+
+            // Register a noop IHtmlSanitizer to be replaced
+            Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
         }
     }
 }

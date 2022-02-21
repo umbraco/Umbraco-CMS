@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -49,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
                 GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
-                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPhysicalRootPath);
+                var rootPath = Path.IsPathRooted(globalSettings.UmbracoMediaPhysicalRootPath) ? globalSettings.UmbracoMediaPhysicalRootPath : hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPhysicalRootPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
                 return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
             });

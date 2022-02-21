@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Web.BackOffice.Services
@@ -9,11 +13,16 @@ namespace Umbraco.Cms.Web.BackOffice.Services
     public class ConflictingRouteService : IConflictingRouteService
     {
         private readonly TypeLoader _typeLoader;
+        private readonly IEnumerable<EndpointDataSource> _endpointDataSources;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConflictingRouteService"/> class.
         /// </summary>
-        public ConflictingRouteService(TypeLoader typeLoader) => _typeLoader = typeLoader;
+        public ConflictingRouteService(TypeLoader typeLoader, IEnumerable<EndpointDataSource> endpointDataSources)
+        {
+            _typeLoader = typeLoader;
+            _endpointDataSources = endpointDataSources;
+        }
 
         /// <inheritdoc/>
         public bool HasConflictingRoutes(out string controllerName)
@@ -21,10 +30,20 @@ namespace Umbraco.Cms.Web.BackOffice.Services
             var controllers = _typeLoader.GetTypes<UmbracoApiControllerBase>().ToList();
             foreach (Type controller in controllers)
             {
-                if (controllers.Count(x => x.Name == controller.Name) > 1)
+                var potentialConflicting = controllers.Where(x => x.Name == controller.Name).ToArray();
+                if (potentialConflicting.Length > 1)
                 {
-                    controllerName = controller.Name;
-                    return true;
+                    //If we have any with same controller name and located in the same area, then it is a confict.
+                    var conflicting = potentialConflicting
+                        .Select(x => x.GetCustomAttribute<PluginControllerAttribute>())
+                        .GroupBy(x => x?.AreaName)
+                        .Any(x => x?.Count() > 1);
+
+                    if (conflicting)
+                    {
+                        controllerName = controller.Name;
+                        return true;
+                    }
                 }
             }
 

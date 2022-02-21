@@ -16,7 +16,7 @@
     <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
-    <key alias="emptyRecycleBin">Papierkorb leeren</key>
+    <key alias="emptyrecyclebin">Papierkorb leeren</key>
     <key alias="enable">Aktivieren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
     <key alias="importdocumenttype">Dokumenttyp importieren</key>

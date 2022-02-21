@@ -55,6 +55,7 @@ namespace Umbraco.Cms.Core
             public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
             public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
             public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
+            public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         }
     }
 }
