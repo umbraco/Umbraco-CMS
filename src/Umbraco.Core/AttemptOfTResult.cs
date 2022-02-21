@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static implicit operator bool?(Attempt<TResult> a)
+        public static implicit operator bool(Attempt<TResult> a)
         {
             return a.Success;
         }

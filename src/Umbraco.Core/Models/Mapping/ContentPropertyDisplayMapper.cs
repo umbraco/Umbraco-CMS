@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             base.Map(originalProp, dest, context);
 
-            var config = DataTypeService.GetDataType(originalProp.PropertyType?.DataTypeId).Configuration;
+            var config = originalProp.PropertyType is null ? null : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
             // TODO: IDataValueEditor configuration - general issue
             // GetValueEditor() returns a non-configured IDataValueEditor

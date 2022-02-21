@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataType(int? id);
+        IDataType GetDataType(int id);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its unique guid Id

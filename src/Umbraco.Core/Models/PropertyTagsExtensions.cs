@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
             var tagAttribute = editor?.GetTagAttribute();
             if (tagAttribute == null) return null;
 
-            var configurationObject = dataTypeService.GetDataType(property.PropertyType?.DataTypeId).Configuration;
+            var configurationObject = property.PropertyType is null ? null : dataTypeService.GetDataType(property.PropertyType.DataTypeId).Configuration;
             var configuration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(configurationObject);
 
             if (configuration?.Delimiter == default && configuration?.Delimiter is not null)
