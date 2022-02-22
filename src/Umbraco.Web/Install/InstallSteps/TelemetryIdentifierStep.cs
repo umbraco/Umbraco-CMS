@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Threading.Tasks;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Telemetry;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -14,54 +10,20 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = false)]
     internal class TelemetryIdentifierStep : InstallSetupStep<object>
     {
-        private readonly IProfilingLogger _logger;
         private readonly IUmbracoSettingsSection _settings;
+        private readonly ISiteIdentifierService _siteIdentifierService;
 
-        public TelemetryIdentifierStep(IProfilingLogger logger, IUmbracoSettingsSection settings)
+        public TelemetryIdentifierStep(
+            IUmbracoSettingsSection settings,
+            ISiteIdentifierService siteIdentifierService)
         {
-            _logger = logger;
             _settings = settings;
+            _siteIdentifierService = siteIdentifierService;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            // Generate GUID
-            var telemetrySiteIdentifier = Guid.NewGuid();
-
-            // Modify the XML to add a new GUID site identifier
-            // hack: ensure this does not trigger a restart
-            using (ChangesMonitor.Suspended())
-            {
-                var umbracoSettingsPath = IOHelper.MapPath(SystemFiles.UmbracoSettings);
-                if(File.Exists(umbracoSettingsPath) == false)
-                {
-                    // Log an error
-                    _logger.Error<TelemetryIdentifierStep>("Unable to find umbracoSettings.config file to add telemetry site identifier");
-                    return Task.FromResult<InstallSetupResult>(null);
-                }
-
-                try
-                {
-                    var umbracoConfigXml = XDocument.Load(umbracoSettingsPath, LoadOptions.PreserveWhitespace);
-                    if (umbracoConfigXml.Root != null)
-                    {
-                        var backofficeElement = umbracoConfigXml.Root.Element("backOffice");
-                        if (backofficeElement == null)
-                            return Task.FromResult<InstallSetupResult>(null);
-
-                        // Will add ID attribute if it does not exist
-                        backofficeElement.SetAttributeValue("id", telemetrySiteIdentifier.ToString());
-
-                        // Save file back down
-                        umbracoConfigXml.Save(umbracoSettingsPath, SaveOptions.DisableFormatting);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<TelemetryIdentifierStep>(ex, "Couldn't update umbracoSettings.config with a backoffice with a telemetry site identifier");
-                }
-            }
-
+            _siteIdentifierService.TryCreateSiteIdentifier(out _);
             return Task.FromResult<InstallSetupResult>(null);
         }
 
