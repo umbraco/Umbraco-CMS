@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -16,7 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
     public class TelemetryServiceTests
     {
         [Test]
-        public void CanCollectTelemetryIdTelemetryData()
+        public void CanCollectMetadataTelemetryData()
         {
             var telemetryOptions = CreateTelemetrySettings(TelemetryLevel.Basic);
             var globalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings
@@ -33,7 +35,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             var result = telemetryService.TryGetTelemetryReportData(out var telemetry);
 
             Assert.IsTrue(result);
-            Assert.AreEqual("0f1785c5-7ba0-4c52-ab62-863bd2c8f3fe", telemetry.Id.ToString());
+
+            Assert.Contains(TelemetryData.TelemetryId, telemetry.Keys);
+            Assert.AreEqual(Guid.Parse("0f1785c5-7ba0-4c52-ab62-863bd2c8f3fe"), telemetry[TelemetryData.TelemetryId]);
+
+            Assert.Contains(TelemetryData.Network, telemetry.Keys);
+            Assert.AreEqual(true, telemetry[TelemetryData.Network]);
         }
 
         [Test]
@@ -51,7 +58,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             var result = telemetryService.TryGetTelemetryReportData(out var telemetry);
 
             Assert.IsTrue(result);
-            Assert.AreEqual("9.1.1-rc", telemetry.Version);
+
+            Assert.Contains(TelemetryData.UmbracoVersion, telemetry.Keys);
+            Assert.AreEqual("9.1.1-rc", telemetry[TelemetryData.UmbracoVersion]);
         }
 
         [Test]
@@ -82,19 +91,25 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             var result = telemetryService.TryGetTelemetryReportData(out var telemetry);
 
             Assert.IsTrue(result);
+
+            Assert.Contains(TelemetryData.PackageVersions, telemetry.Keys);
+
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(3, telemetry.Packages.Count());
+                var packages = telemetry[TelemetryData.PackageVersions] as IEnumerable<PackageTelemetry>;
 
-                var versionPackage = telemetry.Packages.FirstOrDefault(x => x.Name == versionPackageName);
+                Assert.NotNull(packages);
+                Assert.AreEqual(3, packages.Count());
+
+                var versionPackage = packages.FirstOrDefault(x => x.Name == versionPackageName);
                 Assert.IsNotNull(versionPackage);
                 Assert.AreEqual(packageVersion, versionPackage.Version);
 
-                var noVersionPackage = telemetry.Packages.FirstOrDefault(x => x.Name == noVersionPackageName);
+                var noVersionPackage = packages.FirstOrDefault(x => x.Name == noVersionPackageName);
                 Assert.IsNotNull(noVersionPackage);
-                Assert.AreEqual(string.Empty, noVersionPackage.Version);
+                Assert.AreEqual(null, noVersionPackage.Version);
 
-                var trackingAllowedPackage = telemetry.Packages.FirstOrDefault(x => x.Name == trackingAllowedPackageName);
+                var trackingAllowedPackage = packages.FirstOrDefault(x => x.Name == trackingAllowedPackageName);
                 Assert.IsNotNull(trackingAllowedPackage);
             });
         }
