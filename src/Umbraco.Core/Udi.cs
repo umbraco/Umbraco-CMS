@@ -154,14 +154,14 @@ namespace Umbraco.Cms.Core
             return UriValue.GetHashCode();
         }
 
-        public static bool operator ==(Udi udi1, Udi udi2)
+        public static bool operator ==(Udi? udi1, Udi? udi2)
         {
             if (ReferenceEquals(udi1, udi2)) return true;
             if ((object)udi1 == null || (object)udi2 == null) return false;
             return udi1.Equals(udi2);
         }
 
-        public static bool operator !=(Udi udi1, Udi udi2)
+        public static bool operator !=(Udi? udi1, Udi? udi2)
         {
             return (udi1 == udi2) == false;
         }

@@ -72,16 +72,16 @@ namespace Umbraco.Cms.Core.Security
             target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.Email = source.Email;
             target.UserName = source.Username;
-            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
-            target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
+            target.LastLoginDateUtc = source.LastLoginDate?.ToUniversalTime();
             target.InviteDateUtc = source.InvitedDate?.ToUniversalTime();
             target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
             target.AccessFailedCount = source.FailedPasswordAttempts;
             target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
             target.PasswordConfig = source.PasswordConfiguration;
-            target.StartContentIds = source.StartContentIds;
-            target.StartMediaIds = source.StartMediaIds;
+            target.StartContentIds = source.StartContentIds ?? Array.Empty<int>();
+            target.StartMediaIds = source.StartMediaIds ?? Array.Empty<int>();
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
@@ -93,8 +93,8 @@ namespace Umbraco.Cms.Core.Security
         {
             target.Email = source.Email;
             target.UserName = source.Username;
-            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
-            target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
+            target.LastLoginDateUtc = source.LastLoginDate?.ToUniversalTime();
             target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
             target.AccessFailedCount = source.FailedPasswordAttempts;
@@ -112,6 +112,6 @@ namespace Umbraco.Cms.Core.Security
             // NB: same comments re AutoMapper as per BackOfficeUser
         }
 
-        private static string GetPasswordHash(string storedPass) => storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
+        private static string? GetPasswordHash(string? storedPass) => storedPass?.StartsWith(Constants.Security.EmptyPasswordPrefix) ?? false ? null : storedPass;
     }
 }

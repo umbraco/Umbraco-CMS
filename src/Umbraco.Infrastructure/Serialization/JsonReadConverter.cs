@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization
         }
 
         /// <inheritdoc />
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             // Load JObject from stream
             var jObject = JObject.Load(reader);
@@ -42,11 +42,11 @@ namespace Umbraco.Cms.Infrastructure.Serialization
         protected virtual void Deserialize(JObject jobject, T target, JsonSerializer serializer)
         {
             // Populate the object properties
-            serializer.Populate(jobject.CreateReader(), target);
+            serializer.Populate(jobject.CreateReader(), target!);
         }
 
         /// <inheritdoc />
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             throw new NotSupportedException("JsonReadConverter instances do not support writing.");
         }

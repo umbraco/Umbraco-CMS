@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
         /// <inheritdoc />
         public void Do() => Expression.Execute();
 
-        public IndexColumnDefinition CurrentColumn { get; set; }
+        public IndexColumnDefinition? CurrentColumn { get; set; }
 
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder OnTable(string tableName)
@@ -44,14 +44,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder Ascending()
         {
-            CurrentColumn.Direction = Direction.Ascending;
+            if (CurrentColumn is not null)
+            {
+                CurrentColumn.Direction = Direction.Ascending;
+            }
+
             return this;
         }
 
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder Descending()
         {
-            CurrentColumn.Direction = Direction.Descending;
+            if (CurrentColumn is not null)
+            {
+                CurrentColumn.Direction = Direction.Descending;
+            }
+
             return this;
         }
 

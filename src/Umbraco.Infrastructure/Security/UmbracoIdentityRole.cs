@@ -7,10 +7,10 @@ namespace Umbraco.Cms.Core.Security
 {
     public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
     {
-        private string _id;
-        private string _name;
+        private string? _id;
+        private string? _name;
 
-        public UmbracoIdentityRole(string roleName) : base(roleName)
+        public UmbracoIdentityRole(string? roleName) : base(roleName)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override string Id
+        public override string? Id
         {
             get => _id;
             set
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override string Name
+        public override string? Name
         {
             get => _name;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));

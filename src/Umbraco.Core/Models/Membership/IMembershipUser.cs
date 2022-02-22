@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <summary>
         /// Gets or sets the raw password value
         /// </summary>
-        string RawPasswordValue { get; set; }
+        string? RawPasswordValue { get; set; }
 
         /// <summary>
         /// The user's specific password config (i.e. algorithm type, etc...)
@@ -25,8 +25,8 @@ namespace Umbraco.Cms.Core.Models.Membership
         string? Comments { get; set; }
         bool IsApproved { get; set; }
         bool IsLockedOut { get; set; }
-        DateTime LastLoginDate { get; set; }
-        DateTime LastPasswordChangeDate { get; set; }
+        DateTime? LastLoginDate { get; set; }
+        DateTime? LastPasswordChangeDate { get; set; }
         DateTime LastLockoutDate { get; set; }
 
         /// <summary>

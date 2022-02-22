@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Models
                 throw new InvalidDataException($"The content item {entity.NodeId} has an invalid path: {entity.Path} with parentID: {entity.ParentId}");
             }
 
-            if (entity.ParentId != default(int) && pathParts[pathParts.Length - 2] != entity.ParentId.ToInvariantString())
+            if (entity.ParentId != default(int) && pathParts[pathParts.Length - 2] != entity.ParentId?.ToInvariantString())
             {
                 //the 2nd last id in the path must be it's parent id
                 throw new InvalidDataException($"The content item {entity.NodeId} has an invalid path: {entity.Path} with parentID: {entity.ParentId}");

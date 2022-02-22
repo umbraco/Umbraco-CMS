@@ -52,10 +52,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             if (publishedContentType == null || publishedContentType.IsElement == false)
                 return null;
 
-            var propertyValues = sourceObject.ToObject<Dictionary<string, object>>();
+            var propertyValues = sourceObject.ToObject<Dictionary<string, object?>>();
 
             if (propertyValues is null || !propertyValues.TryGetValue("key", out var keyo)
-                || !Guid.TryParse(keyo.ToString(), out var key))
+                || !Guid.TryParse(keyo!.ToString(), out var key))
                 key = Guid.Empty;
 
             IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);

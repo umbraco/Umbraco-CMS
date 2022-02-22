@@ -61,8 +61,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
         string Format(IndexDefinition index);
         string Format(ForeignKeyDefinition foreignKey);
-        string FormatColumnRename(string tableName, string oldName, string newName);
-        string FormatTableRename(string oldName, string newName);
+        string FormatColumnRename(string? tableName, string? oldName, string? newName);
+        string FormatTableRename(string? oldName, string? newName);
 
         /// <summary>
         /// Gets a regex matching aliased fields.
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// in which case the function may return true, but <paramref name="constraintName"/> is
         /// unspecified.</para>
         /// </remarks>
-        bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+        bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, out string constraintName);
 
         void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
         void WriteLock(IDatabase db, TimeSpan timeout, int lockId);

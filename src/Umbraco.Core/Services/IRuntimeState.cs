@@ -38,17 +38,17 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the current migration state.
         /// </summary>
-        string CurrentMigrationState { get; }
+        string? CurrentMigrationState { get; }
 
         /// <summary>
         /// Gets the final migration state.
         /// </summary>
-        string FinalMigrationState { get; }
+        string? FinalMigrationState { get; }
 
         /// <summary>
         /// Gets the exception that caused the boot to fail.
         /// </summary>
-        BootFailedException BootFailedException { get; }
+        BootFailedException? BootFailedException { get; }
 
         /// <summary>
         /// Determines the runtime level.

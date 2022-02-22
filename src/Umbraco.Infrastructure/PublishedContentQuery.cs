@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Infrastructure
                     return false;
             }
         }
-        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        private static bool ConvertIdObjectToUdi(object id, out Udi? guidId)
         {
             switch (id)
             {
@@ -93,17 +93,17 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Content
 
-        public IPublishedContent Content(int id) => ItemById(id, _publishedSnapshot.Content);
+        public IPublishedContent? Content(int id) => ItemById(id, _publishedSnapshot.Content);
 
         public IPublishedContent Content(Guid id) => ItemById(id, _publishedSnapshot.Content);
 
-        public IPublishedContent Content(Udi id)
+        public IPublishedContent? Content(Udi? id)
         {
             if (!(id is GuidUdi udi)) return null;
             return ItemById(udi.Guid, _publishedSnapshot.Content);
         }
 
-        public IPublishedContent Content(object id)
+        public IPublishedContent? Content(object id)
         {
             if (ConvertIdObjectToInt(id, out var intId))
                 return Content(intId);
@@ -139,17 +139,17 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Media
 
-        public IPublishedContent Media(int id) => ItemById(id, _publishedSnapshot.Media);
+        public IPublishedContent? Media(int id) => ItemById(id, _publishedSnapshot.Media);
 
         public IPublishedContent Media(Guid id) => ItemById(id, _publishedSnapshot.Media);
 
-        public IPublishedContent Media(Udi id)
+        public IPublishedContent? Media(Udi? id)
         {
             if (!(id is GuidUdi udi)) return null;
             return ItemById(udi.Guid, _publishedSnapshot.Media);
         }
 
-        public IPublishedContent Media(object id)
+        public IPublishedContent? Media(object id)
         {
             if (ConvertIdObjectToInt(id, out var intId))
                 return Media(intId);
@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Used by Content/Media
 
-        private static IPublishedContent ItemById(int id, IPublishedCache cache)
+        private static IPublishedContent? ItemById(int id, IPublishedCache cache)
         {
             var doc = cache.GetById(id);
             return doc;
@@ -235,7 +235,7 @@ namespace Umbraco.Cms.Infrastructure
             Search(term, 0, 0, out _, culture, indexName);
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string>? loadedFields = null)
         {
             if (skip < 0)
             {
@@ -349,7 +349,7 @@ namespace Umbraco.Cms.Infrastructure
             {
                 //We need to change the current culture to what is requested and then change it back
                 var originalContext = _variationContextAccessor.VariationContext;
-                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext.Culture))
+                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext?.Culture))
                     _variationContextAccessor.VariationContext = new VariationContext(_culture);
 
                 //now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
@@ -364,12 +364,12 @@ namespace Umbraco.Cms.Infrastructure
             /// </summary>
             private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
             {
-                private readonly VariationContext _originalContext;
+                private readonly VariationContext? _originalContext;
                 private readonly IVariationContextAccessor _variationContextAccessor;
                 private readonly IEnumerator<PublishedSearchResult> _wrapped;
 
                 public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped,
-                    IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
+                    IVariationContextAccessor variationContextAccessor, VariationContext? originalContext)
                 {
                     _wrapped = wrapped;
                     _variationContextAccessor = variationContextAccessor;

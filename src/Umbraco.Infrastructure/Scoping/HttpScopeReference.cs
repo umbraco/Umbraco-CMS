@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Scoping
                     {
                         // dispose the entire chain (if any)
                         // reset (don't commit by default)
-                        Scope scope;
+                        Scope? scope;
                         while ((scope = _scopeProvider.AmbientScope) != null)
                         {
                             scope.Reset();

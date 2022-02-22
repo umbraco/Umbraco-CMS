@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <summary>
         /// Configures the database factory.
         /// </summary>
-        void Configure(string connectionString, string providerName);
+        void Configure(string? connectionString, string? providerName);
 
         /// <summary>
         /// Gets the <see cref="ISqlContext"/>.

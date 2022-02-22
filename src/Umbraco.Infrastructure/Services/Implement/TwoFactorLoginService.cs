@@ -57,14 +57,18 @@ namespace Umbraco.Cms.Core.Services
             var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
                 .Select(x => x.ProviderName).ToArray();
 
-            return providersOnUser.Where(IsKnownProviderName);
+            return providersOnUser.Where(IsKnownProviderName)!;
         }
 
         /// <summary>
         /// The provider needs to be registered as either a member provider or backoffice provider to show up.
         /// </summary>
-        private bool IsKnownProviderName(string providerName)
+        private bool IsKnownProviderName(string? providerName)
         {
+            if (providerName is null)
+            {
+                return false;
+            }
             if (_identityOptions.Value.Tokens.ProviderMap.ContainsKey(providerName))
             {
                 return true;
@@ -85,14 +89,14 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public async Task<string> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName)
+        public async Task<string?> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey)).FirstOrDefault(x => x.ProviderName == providerName)?.Secret;
         }
 
         /// <inheritdoc />
-        public async Task<object> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
+        public async Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
         {
             var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
 
@@ -104,7 +108,7 @@ namespace Umbraco.Cms.Core.Services
 
             secret = GenerateSecret();
 
-            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider generator))
+            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider? generator))
             {
                 throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
             }
@@ -125,7 +129,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public bool ValidateTwoFactorSetup(string providerName, string secret, string code)
         {
-            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider generator))
+            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider? generator))
             {
                 throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
             }

@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <summary>
         /// Gets the scope context.
         /// </summary>
-        IScopeContext Context { get; }
+        IScopeContext? Context { get; }
 
         /// <summary>
         /// Creates an instance of <see cref="IQuery{T}"/>

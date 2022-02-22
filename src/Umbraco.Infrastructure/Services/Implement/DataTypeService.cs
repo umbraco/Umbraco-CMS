@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Containers
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public EntityContainer GetContainer(int containerId)
+        public EntityContainer? GetContainer(int containerId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -177,7 +177,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -254,7 +254,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(string name)
+        public IDataType? GetDataType(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -269,7 +269,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(int id)
+        public IDataType? GetDataType(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -284,7 +284,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(Guid id)
+        public IDataType? GetDataType(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -326,7 +326,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        private void ConvertMissingEditorOfDataTypeToLabel(IDataType dataType)
+        private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
         {
             if (dataType == null)
             {
@@ -348,7 +348,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
+        public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moveInfo = new List<MoveEventInfo<IDataType>>();
@@ -366,7 +366,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 try
                 {
-                    EntityContainer container = null;
+                    EntityContainer? container = null;
                     if (parentId > 0)
                     {
                         container = _dataTypeContainerRepository.Get(parentId);
@@ -492,10 +492,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     foreach (var propertyGroup in contentType.PropertyGroups)
                     {
-                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeId == dataType.Id).ToList();
-                        foreach (var propertyType in types)
+                        var types = propertyGroup.PropertyTypes?.Where(x => x.DataTypeId == dataType.Id).ToList();
+                        if (types is not null)
                         {
-                            propertyGroup.PropertyTypes.Remove(propertyType);
+                            foreach (var propertyType in types)
+                            {
+                                propertyGroup.PropertyTypes?.Remove(propertyType);
+                            }
                         }
                     }
 

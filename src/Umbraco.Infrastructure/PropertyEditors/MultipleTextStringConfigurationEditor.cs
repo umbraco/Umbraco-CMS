@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override MultipleTextStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTextStringConfiguration configuration)
+        public override MultipleTextStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTextStringConfiguration? configuration)
         {
             // TODO: this isn't pretty
             //the values from the editor will be min/max fields and we need to format to json in one field
@@ -51,12 +51,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(MultipleTextStringConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(MultipleTextStringConfiguration? configuration)
         {
             return new Dictionary<string, object>
             {
-                { "min", configuration.Minimum },
-                { "max", configuration.Maximum }
+                { "min", configuration?.Minimum ?? 0 },
+                { "max", configuration?.Maximum ?? 0 },
             };
         }
     }

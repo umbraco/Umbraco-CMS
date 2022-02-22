@@ -38,7 +38,9 @@ namespace Umbraco.Cms.Core.PublishedCache
         }
 
         // for unit tests ONLY
+#pragma warning disable CS8618
         internal PublishedContentTypeCache(ILogger<PublishedContentTypeCache> logger, IPublishedContentTypeFactory publishedContentTypeFactory)
+#pragma warning restore CS8618
         {
             _logger = logger;
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -119,7 +121,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             {
                 _lock.EnterWriteLock();
 
-                var toRemove = _typesById.Values.Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
+                var toRemove = _typesById.Values.Where(x => x.PropertyTypes?.Any(xx => xx.DataType.Id == id) ?? false).ToArray();
                 foreach (var type in toRemove)
                 {
                     _typesByAlias.Remove(GetAliasKey(type));
@@ -245,7 +247,7 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, Guid key)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
                 PublishedItemType.Content => _contentTypeService.Get(key),
                 PublishedItemType.Media => _mediaTypeService.Get(key),
@@ -275,7 +277,7 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
                 PublishedItemType.Content => _contentTypeService.Get(id),
                 PublishedItemType.Media => _mediaTypeService.Get(id),

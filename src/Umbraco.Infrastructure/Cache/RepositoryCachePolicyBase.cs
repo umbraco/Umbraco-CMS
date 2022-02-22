@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Cache
             get
             {
                 var ambientScope = _scopeAccessor.AmbientScope;
-                switch (ambientScope.RepositoryCacheMode)
+                switch (ambientScope?.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
                         return _globalCache;
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Cache
                     case RepositoryCacheMode.None:
                         return NoAppCache.Instance;
                     default:
-                        throw new NotSupportedException($"Repository cache mode {ambientScope.RepositoryCacheMode} is not supported.");
+                        throw new NotSupportedException($"Repository cache mode {ambientScope?.RepositoryCacheMode} is not supported.");
                 }
             }
         }

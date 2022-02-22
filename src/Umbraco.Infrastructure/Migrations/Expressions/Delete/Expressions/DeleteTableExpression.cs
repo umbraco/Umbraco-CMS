@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public virtual string TableName { get; set; }
+        public virtual string? TableName { get; set; }
 
         protected override string GetSql()
         {

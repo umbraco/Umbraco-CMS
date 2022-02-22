@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var key = (data.Udi is GuidUdi gudi) ? gudi.Guid : Guid.Empty;
             if (key == Guid.Empty && propertyValues.TryGetValue("key", out var keyo))
             {
-                Guid.TryParse(keyo.ToString(), out key);
+                Guid.TryParse(keyo!.ToString(), out key);
             }
 
             IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);

@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var asString = value is string str ? str : value?.ToString();
 

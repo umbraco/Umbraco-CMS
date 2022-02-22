@@ -25,6 +25,6 @@ namespace Umbraco.Cms.Core.Packaging
         /// </summary>
         /// <param name="packageFile"></param>
         /// <returns></returns>
-        CompiledPackage ReadPackage(XDocument packageXmlFile);
+        CompiledPackage ReadPackage(XDocument? packageXmlFile);
     }
 }

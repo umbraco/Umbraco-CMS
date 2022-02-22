@@ -19,11 +19,11 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public string Serialize(object input) => JsonConvert.SerializeObject(input, JsonSerializerSettings);
+        public string Serialize(object? input) => JsonConvert.SerializeObject(input, JsonSerializerSettings);
 
-        public T Deserialize<T>(string input) => JsonConvert.DeserializeObject<T>(input, JsonSerializerSettings);
+        public T? Deserialize<T>(string input) => JsonConvert.DeserializeObject<T>(input, JsonSerializerSettings);
 
-        public T DeserializeSubset<T>(string input, string key)
+        public T? DeserializeSubset<T>(string input, string key)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 

@@ -36,13 +36,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update
             return this;
         }
 
-        private static List<KeyValuePair<string, object>> GetData(object dataAsAnonymousType)
+        private static List<KeyValuePair<string, object?>> GetData(object dataAsAnonymousType)
         {
             var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
 
-            var data = new List<KeyValuePair<string, object>>();
+            var data = new List<KeyValuePair<string, object?>>();
             foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+                data.Add(new KeyValuePair<string, object?>(property.Name, property.GetValue(dataAsAnonymousType)));
             return data;
         }
     }

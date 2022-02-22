@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// Removes redundant crop data/default focal point.
         /// </summary>
         /// <param name="value">The image cropper value.</param>
-        public static void Prune(JObject value)
+        public static void Prune(JObject? value)
         {
             if (value is null)
                 throw new ArgumentNullException(nameof(value));

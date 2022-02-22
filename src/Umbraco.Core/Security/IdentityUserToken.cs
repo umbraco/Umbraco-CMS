@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="IdentityUserToken"/> class.
         /// </summary>
-        public IdentityUserToken(string loginProvider, string name, string value, string userId)
+        public IdentityUserToken(string loginProvider, string? name, string? value, string? userId)
         {
             LoginProvider = loginProvider ?? throw new ArgumentNullException(nameof(loginProvider));
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="IdentityUserToken"/> class.
         /// </summary>
-        public IdentityUserToken(int id, string loginProvider, string name, string value, string userId, DateTime createDate)
+        public IdentityUserToken(int id, string? loginProvider, string? name, string? value, string userId, DateTime createDate)
         {
             Id = id;
             LoginProvider = loginProvider ?? throw new ArgumentNullException(nameof(loginProvider));
@@ -39,6 +39,6 @@ namespace Umbraco.Cms.Core.Security
         public string Value { get; set; }
 
         /// <inheritdoc />
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
     }
 }

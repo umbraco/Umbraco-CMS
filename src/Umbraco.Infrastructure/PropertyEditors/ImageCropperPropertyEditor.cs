@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="writeLog">A value indicating whether to log the error.</param>
         /// <returns>The json object corresponding to the property value.</returns>
         /// <remarks>In case of an error, optionally logs the error and returns null.</remarks>
-        private JObject GetJObject(string value, bool writeLog)
+        private JObject? GetJObject(string value, bool writeLog)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -165,7 +165,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="deserializedValue">The deserialized <see cref="JObject"/> value</param>
         /// <param name="relative">Should the path returned be the application relative path</param>
         /// <returns></returns>
-        private string GetFileSrcFromPropertyValue(object propVal, out JObject deserializedValue, bool relative = true)
+        private string? GetFileSrcFromPropertyValue(object? propVal, out JObject? deserializedValue, bool relative = true)
         {
             deserializedValue = null;
             if (propVal == null || !(propVal is string str)) return null;
@@ -184,9 +184,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             if (deserializedValue?["src"] == null) return null;
-            var src = deserializedValue["src"].Value<string>();
+            var src = deserializedValue["src"]!.Value<string>();
 
-            return relative ? _mediaFileManager.FileSystem.GetRelativePath(src) : src;
+            return relative ? _mediaFileManager.FileSystem.GetRelativePath(src!) : src;
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                     var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(src);
                     var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
-                    jo["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
+                    jo!["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
                     notification.Copy.SetValue(property.Alias, jo.ToString(Formatting.None), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
@@ -267,7 +267,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     else
                     {
                         var jo = GetJObject(svalue, false);
-                        string src;
+                        string? src;
                         if (jo == null)
                         {
                             // so we have a non-empty string value that cannot be parsed into a json object

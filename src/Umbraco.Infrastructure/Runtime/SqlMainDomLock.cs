@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoDatabase _db;
+        private readonly IUmbracoDatabase? _db;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IHostingEnvironment hostingEnvironment,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers,
-            string connectionStringName)
+            string? connectionStringName)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             var tempId = Guid.NewGuid().ToString();
 
-            IUmbracoDatabase db = null;
+            IUmbracoDatabase? db = null;
 
             try
             {
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         _logger.LogDebug("Task canceled, exiting loop");
                         return;
                     }
-                    IUmbracoDatabase db = null;
+                    IUmbracoDatabase? db = null;
 
                     try
                     {
@@ -341,7 +341,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Creates a separate transaction to the DB instance so we aren't allocating tons of new DB instances for each transaction
             // since this is executed in a tight loop
 
-            ITransaction transaction = null;
+            ITransaction? transaction = null;
 
             try
             {
@@ -412,7 +412,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             _logger.LogDebug("Timeout elapsed, assuming orphan row, acquiring MainDom.");
 
-            ITransaction transaction = null;
+            ITransaction? transaction = null;
 
             try
             {
@@ -476,7 +476,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// </summary>
         /// <param name="exception"></param>
         /// <returns></returns>
-        private bool IsLockTimeoutException(SqlException sqlException) => sqlException?.Number == 1222;
+        private bool IsLockTimeoutException(SqlException? sqlException) => sqlException?.Number == 1222;
 
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
@@ -498,7 +498,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                         if (_dbFactory.Configured && _hasTable)
                         {
-                            IUmbracoDatabase db = null;
+                            IUmbracoDatabase? db = null;
                             try
                             {
                                 db = _dbFactory.CreateDatabase();

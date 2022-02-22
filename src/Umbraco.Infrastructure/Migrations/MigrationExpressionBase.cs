@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
         public List<IMigrationExpression> Expressions => _expressions ?? (_expressions = new List<IMigrationExpression>());
 
-        protected virtual string GetSql()
+        protected virtual string? GetSql()
         {
             return ToString();
         }
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 var stmtBuilder = new StringBuilder();
                 using (var reader = new StringReader(sql))
                 {
-                    string line;
+                    string? line;
                     while ((line = reader.ReadLine()) != null)
                     {
                         if (line.Trim().Equals("GO", StringComparison.OrdinalIgnoreCase))
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 expression.Execute();
         }
 
-        protected void Execute(Sql<ISqlContext> sql)
+        protected void Execute(Sql<ISqlContext>? sql)
         {
             if (_executed)
                 throw new InvalidOperationException("This expression has already been executed.");
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// </summary>
         internal string Name { get; set; }
 
-        protected string GetQuotedValue(object val)
+        protected string GetQuotedValue(object? val)
         {
             if (val == null) return "NULL";
 

@@ -49,8 +49,8 @@ namespace Umbraco.Cms.Core.Security
             if (!user.PasswordConfig.IsNullOrWhiteSpace())
             {
                 // check if the (legacy) password security supports this hash algorith and if so then use it
-                var deserialized = _jsonSerializer.Deserialize<PersistedPasswordSettings>(user.PasswordConfig);
-                if (LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
+                var deserialized = _jsonSerializer.Deserialize<PersistedPasswordSettings>(user.PasswordConfig!);
+                if (deserialized?.HashAlgorithm is not null && LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
                 {
                     var result = LegacyPasswordSecurity.VerifyPassword(deserialized.HashAlgorithm, providedPassword, hashedPassword);
 
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Security
                 // The PBKDF2.ASPNETCORE.V2 settings are:
                 //      PBKDF2 with HMAC-SHA1, 128-bit salt, 256-bit subkey, 1000 iterations.
 
-                switch (deserialized.HashAlgorithm)
+                switch (deserialized?.HashAlgorithm)
                 {
                     case Constants.Security.AspNetCoreV3PasswordHashAlgorithmName:
                         return base.VerifyHashedPassword(user, hashedPassword, providedPassword);

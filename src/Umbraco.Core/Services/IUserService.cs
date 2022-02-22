@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="groupId">Id of group</param>
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
-        IEnumerable<IUser> GetAllInGroup(int groupId);
+        IEnumerable<IUser> GetAllInGroup(int? groupId);
 
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects not associated with a given group

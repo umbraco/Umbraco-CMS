@@ -216,7 +216,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering? ordering = null);
+            IQuery<IContent>? filter, Ordering? ordering = null);
 
         /// <summary>
         /// Counts documents of a given document type.

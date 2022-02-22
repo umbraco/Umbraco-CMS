@@ -36,22 +36,22 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly ScopeProvider _scopeProvider;
         private bool _callContext;
         private bool? _completed;
-        private IUmbracoDatabase _database;
+        private IUmbracoDatabase? _database;
 
         private bool _disposed;
-        private ICompletable _fscope;
+        private ICompletable? _fscope;
 
-        private IsolatedCaches _isolatedCaches;
+        private IsolatedCaches? _isolatedCaches;
         private IScopedNotificationPublisher? _notificationPublisher;
 
-        private StackQueue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
+        private StackQueue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
 
         // This is all used to safely track read/write locks at given Scope levels so that
         // when we dispose we can verify that everything has been cleaned up correctly.
-        private HashSet<int> _readLocks;
-        private Dictionary<Guid, Dictionary<int, int>> _readLocksDictionary;
-        private HashSet<int> _writeLocks;
-        private Dictionary<Guid, Dictionary<int, int>> _writeLocksDictionary;
+        private HashSet<int>? _readLocks;
+        private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;
+        private HashSet<int>? _writeLocks;
+        private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
 
         // initializes a new scope
         private Scope(
@@ -171,7 +171,7 @@ namespace Umbraco.Cms.Core.Scoping
             ILogger<Scope> logger,
             FileSystems fileSystems,
             bool detachable,
-            IScopeContext scopeContext,
+            IScopeContext? scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IScopedNotificationPublisher? scopedNotificationPublisher = null,
@@ -204,9 +204,9 @@ namespace Umbraco.Cms.Core.Scoping
         {
         }
 
-        internal Dictionary<Guid, Dictionary<int, int>> ReadLocks => _readLocksDictionary;
+        internal Dictionary<Guid, Dictionary<int, int>>? ReadLocks => _readLocksDictionary;
 
-        internal Dictionary<Guid, Dictionary<int, int>> WriteLocks => _writeLocksDictionary;
+        internal Dictionary<Guid, Dictionary<int, int>>? WriteLocks => _writeLocksDictionary;
 
         // a value indicating whether to force call-context
         public bool CallContext
@@ -246,15 +246,15 @@ namespace Umbraco.Cms.Core.Scoping
         public bool Detachable { get; }
 
         // the parent scope (in a nested scopes chain)
-        public Scope ParentScope { get; set; }
+        public Scope? ParentScope { get; set; }
 
         public bool Attached { get; set; }
 
         // the original scope (when attaching a detachable scope)
-        public Scope OrigScope { get; set; }
+        public Scope? OrigScope { get; set; }
 
         // the original context (when attaching a detachable scope)
-        public IScopeContext OrigContext { get; set; }
+        public IScopeContext? OrigContext { get; set; }
 
         // the context (for attaching & detaching only)
         public IScopeContext? Context { get; }
@@ -277,7 +277,7 @@ namespace Umbraco.Cms.Core.Scoping
             }
         }
 
-        public IUmbracoDatabase DatabaseOrNull
+        public IUmbracoDatabase? DatabaseOrNull
         {
             get
             {
@@ -531,7 +531,7 @@ namespace Umbraco.Cms.Core.Scoping
         ///     Used for testing. Ensures and gets any queued read locks.
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<Guid, Dictionary<int, int>> GetReadLocks()
+        internal Dictionary<Guid, Dictionary<int, int>>? GetReadLocks()
         {
             EnsureDbLocks();
             // always delegate to root/parent scope.
@@ -547,7 +547,7 @@ namespace Umbraco.Cms.Core.Scoping
         ///     Used for testing. Ensures and gets and queued write locks.
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<Guid, Dictionary<int, int>> GetWriteLocks()
+        internal Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks()
         {
             EnsureDbLocks();
             // always delegate to root/parent scope.
@@ -594,6 +594,10 @@ namespace Umbraco.Cms.Core.Scoping
             }
             else
             {
+                if (_database is null)
+                {
+                    return;
+                }
                 lock (_lockQueueLocker)
                 {
                     if (_queuedLocks?.Count > 0)
@@ -702,7 +706,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="dict">Lock dictionary to report on.</param>
         /// <param name="builder">String builder to write to.</param>
         /// <param name="dictName">The name to report the dictionary as.</param>
-        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder,
+        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>>? dict, StringBuilder builder,
             string dictName)
         {
             if (dict?.Count > 0)
@@ -785,10 +789,10 @@ namespace Umbraco.Cms.Core.Scoping
                 {
                     if (completed)
                     {
-                        _fscope.Complete();
+                        _fscope?.Complete();
                     }
 
-                    _fscope.Dispose();
+                    _fscope?.Dispose();
                     _fscope = null;
                 }
             }
@@ -808,7 +812,7 @@ namespace Umbraco.Cms.Core.Scoping
                 {
                     try
                     {
-                        _scopeProvider.AmbientContext.ScopeExit(completed);
+                        _scopeProvider.AmbientContext?.ScopeExit(completed);
                     }
                     finally
                     {
@@ -879,17 +883,17 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock ID to increment.</param>
         /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
         /// <param name="locks">Reference to the dictionary to increment on</param>
-        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks)
+        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
         {
             // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
             // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
             locks ??= new Dictionary<Guid, Dictionary<int, int>>();
 
             // Try and get the dict associated with the scope id.
-            var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int> locksDict);
+            var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
             if (locksDictFound)
             {
-                locksDict.TryGetValue(lockId, out var value);
+                locksDict!.TryGetValue(lockId, out var value);
                 locksDict[lockId] = value + 1;
             }
             else
@@ -1066,8 +1070,8 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="obtainLockTimeout">Delegate used to request the lock from the database with a timeout.</param>
         /// <param name="timeout">Optional timeout parameter to specify a timeout.</param>
         /// <param name="lockIds">Lock identifiers to lock on.</param>
-        private void LockInner(IUmbracoDatabase db, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks,
-            ref HashSet<int> locksSet,
+        private void LockInner(IUmbracoDatabase db, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks,
+            ref HashSet<int>? locksSet,
             Action<IUmbracoDatabase, int> obtainLock, Action<IUmbracoDatabase, int, TimeSpan> obtainLockTimeout,
             TimeSpan? timeout,
             params int[] lockIds)
@@ -1099,7 +1103,7 @@ namespace Umbraco.Cms.Core.Scoping
                         {
                             // Something went wrong and we didn't get the lock
                             // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
-                            locks[instanceId].Remove(lockId);
+                            locks?[instanceId].Remove(lockId);
                             // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
                             locksSet.Remove(lockId);
                             throw;

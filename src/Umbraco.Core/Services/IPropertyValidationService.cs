@@ -34,6 +34,6 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         IEnumerable<ValidationResult> ValidatePropertyValue(
             IPropertyType propertyType,
-            object postedValue);
+            object? postedValue);
     }
 }

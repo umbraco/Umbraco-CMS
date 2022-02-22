@@ -601,11 +601,15 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="groupId">Id of group</param>
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
-        public IEnumerable<IUser> GetAllInGroup(int groupId)
+        public IEnumerable<IUser> GetAllInGroup(int? groupId)
         {
+            if (groupId is null)
+            {
+                return Array.Empty<IUser>();
+            }
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _userRepository.GetAllInGroup(groupId);
+                return _userRepository.GetAllInGroup(groupId.Value);
             }
         }
 

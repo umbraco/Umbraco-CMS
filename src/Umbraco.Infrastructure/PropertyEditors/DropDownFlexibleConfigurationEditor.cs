@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             items.Validators.Add(new ValueListUniqueValueValidator());
         }
 
-        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, DropDownFlexibleConfiguration configuration)
+        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, DropDownFlexibleConfiguration? configuration)
         {
             var output = new DropDownFlexibleConfiguration();
 
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return output;
         }
 
-        public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration? configuration)
         {
             // map to what the editor expects
             var i = 1;

@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="objectType">The object type of the entities.</param>
         /// <param name="keys">The unique identifiers of the entities.</param>
         /// <remarks>If <paramref name="keys"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, Guid[] keys);
+        IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, Guid?[] keys);
 
         /// <summary>
         /// Gets entities of a given object type.

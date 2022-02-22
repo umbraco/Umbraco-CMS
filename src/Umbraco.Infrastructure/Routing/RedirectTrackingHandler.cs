@@ -99,14 +99,14 @@ namespace Umbraco.Cms.Core.Routing
             {
                 return;
             }
-            var contentCache = publishedSnapshot.Content;
+            var contentCache = publishedSnapshot?.Content;
             var entityContent = contentCache?.GetById(entity.Id);
             if (entityContent == null)
                 return;
 
             // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
             var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
-                ?? new[] { (string)null };
+                ?? Array.Empty<string>();
             foreach (var x in entityContent.DescendantsOrSelf(_variationContextAccessor))
             {
                 // if this entity defines specific cultures, use those instead of the default ones
@@ -114,10 +114,10 @@ namespace Umbraco.Cms.Core.Routing
 
                 foreach (var culture in cultures)
                 {
-                    var route = contentCache.GetRouteById(x.Id, culture);
+                    var route = contentCache?.GetRouteById(x.Id, culture);
                     if (IsNotRoute(route))
                         continue;
-                    oldRoutes[new ContentIdAndCulture(x.Id, culture)] = new ContentKeyAndOldRoute(x.Key, route);
+                    oldRoutes[new ContentIdAndCulture(x.Id, culture)] = new ContentKeyAndOldRoute(x.Key, route!);
                 }
             }
         }
@@ -129,13 +129,13 @@ namespace Umbraco.Cms.Core.Routing
                 return;
             }
 
-            var contentCache = publishedSnapshot.Content;
+            var contentCache = publishedSnapshot?.Content;
 
             if (contentCache == null)
             {
                 _logger.LogWarning("Could not track redirects because there is no current published snapshot available.");
                 return;
-            } 
+            }
 
             foreach (var oldRoute in oldRoutes)
             {
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
-        private static bool IsNotRoute(string route)
+        private static bool IsNotRoute(string? route)
         {
             // null if content not found
             // err/- if collision or anomaly or ...

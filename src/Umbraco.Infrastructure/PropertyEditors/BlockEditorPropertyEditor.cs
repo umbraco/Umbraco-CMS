@@ -269,18 +269,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
 
                 if ((blockEditorData == null && validationLimit.Min.HasValue && validationLimit.Min > 0)
-                    || (blockEditorData != null && validationLimit.Min.HasValue && blockEditorData.Layout.Count() < validationLimit.Min))
+                    || (blockEditorData != null && validationLimit.Min.HasValue && blockEditorData.Layout?.Count() < validationLimit.Min))
                 {
                     yield return new ValidationResult(
                         _textService.Localize("validation", "entriesShort", new[]
                         {
                             validationLimit.Min.ToString(),
-                            (validationLimit.Min - (blockEditorData?.Layout.Count() ?? 0)).ToString()
+                            (validationLimit.Min - (blockEditorData?.Layout?.Count() ?? 0)).ToString()
                         }),
                         new[] { "minCount" });
                 }
 
-                if (blockEditorData != null && validationLimit.Max.HasValue && blockEditorData.Layout.Count() > validationLimit.Max)
+                if (blockEditorData != null && validationLimit.Max.HasValue && blockEditorData.Layout?.Count() > validationLimit.Max)
                 {
                     yield return new ValidationResult(
                         _textService.Localize("validation", "entriesExceed", new[]
@@ -305,7 +305,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _contentTypeService = contentTypeService;
             }
 
-            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value)
             {
                 var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
                 if (blockEditorData != null)
@@ -383,12 +383,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, IPropertyType>>();
 
                 // filter out any content that isn't referenced in the layout references
-                foreach (var block in blockEditorData.BlockValue.ContentData.Where(x => blockEditorData.References.Any(r => r.ContentUdi == x.Udi)))
+                foreach (var block in blockEditorData.BlockValue.ContentData.Where(x => blockEditorData.References.Any(r => x.Udi is not null && r.ContentUdi == x.Udi)))
                 {
                     ResolveBlockItemData(block, contentTypePropertyTypes);
                 }
                 // filter out any settings that isn't referenced in the layout references
-                foreach (var block in blockEditorData.BlockValue.SettingsData.Where(x => blockEditorData.References.Any(r => r.SettingsUdi == x.Udi)))
+                foreach (var block in blockEditorData.BlockValue.SettingsData.Where(x => blockEditorData.References.Any(r => r.SettingsUdi is not null && x.Udi is not null && r.SettingsUdi == x.Udi)))
                 {
                     ResolveBlockItemData(block, contentTypePropertyTypes);
                 }

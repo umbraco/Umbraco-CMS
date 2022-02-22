@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets user Id for the user who owns this token
         /// </summary>
-        string UserId { get; set; }
+        string? UserId { get; set; }
 
         /// <summary>
         /// Gets or sets the login provider for the login (i.e. Facebook, Google)

@@ -38,6 +38,6 @@
         /// <summary>
         /// Gets or sets the temporary path where the file has been uploaded.
         /// </summary>
-        public string? TempFilePath { get; set; }
+        public string TempFilePath { get; set; } = string.Empty;
     }
 }

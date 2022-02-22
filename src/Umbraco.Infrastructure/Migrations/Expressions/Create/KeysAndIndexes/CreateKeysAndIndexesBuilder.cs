@@ -17,12 +17,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.KeysAndIndexe
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        public Type TypeOfDto { get; set; }
+        public Type? TypeOfDto { get; set; }
 
         /// <inheritdoc />
         public void Do()
         {
             var syntax = _context.SqlContext.SqlSyntax;
+            if (TypeOfDto is null)
+            {
+                return;
+            }
             var tableDefinition = DefinitionFactory.GetTableDefinition(TypeOfDto, syntax);
 
             // note: of course we are creating the keys and indexes as per the DTO, so

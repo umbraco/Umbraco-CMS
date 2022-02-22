@@ -8,6 +8,6 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public interface IMemberUserStore : IUserStore<MemberIdentityUser>
     {
-        IPublishedContent GetPublishedMember(MemberIdentityUser user);
+        IPublishedContent? GetPublishedMember(MemberIdentityUser user);
     }
 }

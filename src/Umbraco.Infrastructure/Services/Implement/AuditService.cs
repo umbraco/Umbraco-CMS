@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _isAvailable = new Lazy<bool>(DetermineIsAvailable);
         }
 
-        public void Add(AuditType type, int userId, int objectId, string entityType, string comment, string? parameters = null)
+        public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
+        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
         {
             if (performingUserId < 0 && performingUserId != Cms.Core.Constants.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
             if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));

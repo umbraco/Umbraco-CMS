@@ -54,9 +54,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private bool _upgrading;
         private bool _initialized;
 
-        private DbProviderFactory _dbProviderFactory = null;
+        private DbProviderFactory? _dbProviderFactory = null;
 
-        private DbProviderFactory DbProviderFactory
+        private DbProviderFactory? DbProviderFactory
         {
             get
             {
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers,
-            string connectionString)
+            string? connectionString)
         {
             _globalSettings = globalSettings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 return; // not configured
             }
 
-            Configure(configConnectionString.ConnectionString, configConnectionString.ProviderName);
+            Configure(configConnectionString.ConnectionString!, configConnectionString.ProviderName!);
         }
 
         /// <summary>

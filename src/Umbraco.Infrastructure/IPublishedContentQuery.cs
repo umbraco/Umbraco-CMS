@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Core
     /// </summary>
     public interface IPublishedContentQuery
     {
-        IPublishedContent Content(int id);
+        IPublishedContent? Content(int id);
         IPublishedContent Content(Guid id);
-        IPublishedContent Content(Udi id);
-        IPublishedContent Content(object id);
+        IPublishedContent? Content(Udi id);
+        IPublishedContent? Content(object id);
         IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
         IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids);
@@ -25,11 +25,11 @@ namespace Umbraco.Cms.Core
         IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> ContentAtRoot();
 
-        IPublishedContent Media(int id);
+        IPublishedContent? Media(int id);
         IPublishedContent Media(Guid id);
-        IPublishedContent Media(Udi id);
+        IPublishedContent? Media(Udi id);
 
-        IPublishedContent Media(object id);
+        IPublishedContent? Media(object id);
         IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
         IEnumerable<IPublishedContent> Media(IEnumerable<object> ids);
         IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);

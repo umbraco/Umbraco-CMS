@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.PublishedCache
     {
         // initializes a new instance of the PublishedElement class
         // within the context of a published snapshot service (eg a published content property value)
-        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object>? values, bool previewing,
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing,
             PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
         {
             if (key == Guid.Empty) throw new ArgumentException("Empty guid.");
@@ -50,12 +50,12 @@ namespace Umbraco.Cms.Core.PublishedCache
             : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
         { }
 
-        private static Dictionary<string, object> GetCaseInsensitiveValueDictionary(Dictionary<string, object> values)
+        private static Dictionary<string, object?> GetCaseInsensitiveValueDictionary(Dictionary<string, object?> values)
         {
             // ensure we ignore case for property aliases
             var comparer = values.Comparer;
             var ignoreCase = Equals(comparer, StringComparer.OrdinalIgnoreCase) || Equals(comparer, StringComparer.InvariantCultureIgnoreCase) || Equals(comparer, StringComparer.CurrentCultureIgnoreCase);
-            return ignoreCase ? values :  new Dictionary<string, object>(values, StringComparer.OrdinalIgnoreCase);
+            return ignoreCase ? values : new Dictionary<string, object?>(values, StringComparer.OrdinalIgnoreCase);
         }
 
         #region ContentType

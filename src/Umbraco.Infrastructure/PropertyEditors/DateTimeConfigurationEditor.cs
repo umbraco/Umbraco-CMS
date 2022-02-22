@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             var d = base.ToValueEditor(configuration);
 
-            var format = d["format"].ToString();
+            var format = d["format"].ToString()!;
 
             d["pickTime"] = format.ContainsAny(new string[] { "H", "m", "s" });
 

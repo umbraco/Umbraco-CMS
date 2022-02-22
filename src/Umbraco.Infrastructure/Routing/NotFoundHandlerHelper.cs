@@ -26,8 +26,8 @@ namespace Umbraco.Cms.Core.Routing
             if (error404Collection.Length > 1)
             {
                 // test if a 404 page exists with current culture thread
-                ContentErrorPage cultureErr = error404Collection.FirstOrDefault(x => x.Culture.InvariantEquals(errorCulture))
-                    ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
+                ContentErrorPage? cultureErr = error404Collection.FirstOrDefault(x => x.Culture.InvariantEquals(errorCulture))
+                                               ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
 
                 if (cultureErr != null)
                 {
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Routing
                 {
                     // we have an xpath statement to execute
                     var xpathResult = UmbracoXPathPathSyntaxParser.ParseXPathQuery(
-                        xpathExpression: errorPage.ContentXPath,
+                        xpathExpression: errorPage.ContentXPath!,
                         nodeContextId: domainContentId,
                         getPath: nodeid =>
                         {

@@ -30,9 +30,9 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="allowMembers">Allowed individual members.</param>
         /// <returns>True or false if the currently logged in member is authorized</returns>
         Task<bool> IsMemberAuthorizedAsync(
-            IEnumerable<string> allowTypes = null,
-            IEnumerable<string> allowGroups = null,
-            IEnumerable<int> allowMembers = null);
+            IEnumerable<string>? allowTypes = null,
+            IEnumerable<string>? allowGroups = null,
+            IEnumerable<int>? allowMembers = null);
 
         /// <summary>
         /// Check if a member is logged in

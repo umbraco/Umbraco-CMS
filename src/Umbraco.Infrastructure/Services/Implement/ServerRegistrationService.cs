@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var regs = _serverRegistrationRepository.GetMany().ToArray();
                 var hasSchedulingPublisher = regs.Any(x => ((ServerRegistration) x).IsSchedulingPublisher);
-                var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                var server = regs.FirstOrDefault(x => x.ServerIdentity?.InvariantEquals(serverIdentity) ?? false);
 
                 if (server == null)
                 {
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
 
-                var server = _serverRegistrationRepository.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                var server = _serverRegistrationRepository.GetMany().FirstOrDefault(x => x.ServerIdentity?.InvariantEquals(serverIdentity) ?? false);
                 if (server == null) return;
                 server.IsActive = server.IsSchedulingPublisher = false;
                 _serverRegistrationRepository.Save(server); // will trigger a cache reload // will trigger a cache reload

@@ -49,8 +49,8 @@ namespace Umbraco.Cms.Infrastructure
 
                 s_tried = false;
 
-                ICacheRefresher pageRefresher = cacheRefresherCollection[ContentCacheRefresher.UniqueId];
-                pageRefresher.RefreshAll();
+                ICacheRefresher? pageRefresher = cacheRefresherCollection[ContentCacheRefresher.UniqueId];
+                pageRefresher?.RefreshAll();
             }
         }
 

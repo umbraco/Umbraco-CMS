@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Manifest
         private readonly ManifestValueValidatorCollection _validators;
         private readonly ManifestFilterCollection _filters;
 
-        private string _path;
+        private string _path = null!;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
@@ -51,30 +51,19 @@ namespace Umbraco.Cms.Core.Manifest
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IDataValueEditorFactory dataValueEditorFactory)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper, hostingEnvironment)
-        {
-            _jsonSerializer = jsonSerializer;
-            _localizedTextService = localizedTextService;
-            _shortStringHelper = shortStringHelper;
-            _dataValueEditorFactory = dataValueEditorFactory;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManifestParser"/> class.
-        /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string appPluginsPath, ILogger<ManifestParser> logger,  IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
-            if (appPluginsPath == null) throw new ArgumentNullException(nameof(appPluginsPath));
-            if (string.IsNullOrWhiteSpace(appPluginsPath)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(appPluginsPath));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
-
-            AppPluginsPath = appPluginsPath;
+            AppPluginsPath = "~/App_Plugins";
+            _jsonSerializer = jsonSerializer;
+            _localizedTextService = localizedTextService;
+            _shortStringHelper = shortStringHelper;
+            _dataValueEditorFactory = dataValueEditorFactory;
         }
 
         public string AppPluginsPath

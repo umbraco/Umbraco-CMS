@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _eventAggregator = eventAggregator;
         }
 
-        public DatabaseSchemaCreator Create(IUmbracoDatabase database)
+        public DatabaseSchemaCreator Create(IUmbracoDatabase? database)
         {
             return new DatabaseSchemaCreator(database, _logger, _loggerFactory, _umbracoVersion, _eventAggregator);
         }

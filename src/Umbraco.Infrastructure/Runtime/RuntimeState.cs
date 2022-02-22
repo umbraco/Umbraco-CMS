@@ -25,14 +25,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
     public class RuntimeState : IRuntimeState
     {
         internal const string PendingPacakgeMigrationsStateKey = "PendingPackageMigrations";
-        private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IOptions<UnattendedSettings> _unattendedSettings;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly ILogger<RuntimeState> _logger;
-        private readonly PendingPackageMigrations _packageMigrationState;
+        private readonly IOptions<GlobalSettings> _globalSettings = null!;
+        private readonly IOptions<UnattendedSettings> _unattendedSettings = null!;
+        private readonly IUmbracoVersion _umbracoVersion = null!;
+        private readonly IUmbracoDatabaseFactory _databaseFactory = null!;
+        private readonly ILogger<RuntimeState> _logger = null!;
+        private readonly PendingPackageMigrations _packageMigrationState = null!;
         private readonly Dictionary<string, object> _startupState = new Dictionary<string, object>();
-        private readonly IConflictingRouteService _conflictingRouteService;
+        private readonly IConflictingRouteService _conflictingRouteService = null!;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -94,10 +94,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public string CurrentMigrationState { get; private set; }
+        public string? CurrentMigrationState { get; private set; }
 
         /// <inheritdoc />
-        public string FinalMigrationState { get; private set; }
+        public string? FinalMigrationState { get; private set; }
 
         /// <inheritdoc />
         public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
         /// <inheritdoc />
-        public BootFailedException BootFailedException { get; internal set; }
+        public BootFailedException? BootFailedException { get; internal set; }
 
         /// <inheritdoc />
         public IReadOnlyDictionary<string, object> StartupState => _startupState;
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
         }
 
-        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null)
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null)
         {
             Level = level;
             Reason = reason;

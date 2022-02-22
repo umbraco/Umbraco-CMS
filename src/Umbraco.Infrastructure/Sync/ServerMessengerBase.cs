@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         }
 
         // ensures that all items in the enumerable are of the same type, either int or Guid.
-        protected static bool GetArrayType(IEnumerable<object> ids, out Type arrayType)
+        protected static bool GetArrayType(IEnumerable<object>? ids, out Type? arrayType)
         {
             arrayType = null;
             if (ids == null) return true;
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// <remarks>
         /// Since this is only for non strongly typed <see cref="ICacheRefresher"/> it will throw for message types that by instance
         /// </remarks>
-        protected void DeliverLocal(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+        protected void DeliverLocal(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null)
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
@@ -205,7 +205,10 @@ namespace Umbraco.Cms.Infrastructure.Sync
                     var jsonRefresher = refresher as IJsonCacheRefresher;
                     if (jsonRefresher == null)
                         throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IJsonCacheRefresher));
-                    jsonRefresher.Refresh(json);
+                    if (json is not null)
+                    {
+                        jsonRefresher.Refresh(json);
+                    }
                     break;
 
                 case MessageType.RemoveById:
@@ -283,7 +286,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         //    refresher.Notify(payload);
         //}
 
-        protected abstract void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null);
+        protected abstract void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null);
 
         //protected abstract void DeliverRemote(ICacheRefresher refresher, object payload);
 
@@ -304,7 +307,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             DeliverRemote(refresher, MessageType.RefreshByJson, null, json);
         }
 
-        protected virtual void Deliver(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+        protected virtual void Deliver(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));

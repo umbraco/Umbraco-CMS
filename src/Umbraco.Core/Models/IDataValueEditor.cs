@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Converts a value posted by the editor to a property value.
         /// </summary>
-        object? FromEditor(ContentPropertyData editorValue, object currentValue);
+        object? FromEditor(ContentPropertyData editorValue, object? currentValue);
 
         /// <summary>
         /// Converts a property value to a value for the editor.
@@ -80,6 +80,6 @@ namespace Umbraco.Cms.Core.Models
         /// <returns></returns>
         XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
-        string ConvertDbToString(IPropertyType propertyType, object value);
+        string ConvertDbToString(IPropertyType propertyType, object? value);
     }
 }

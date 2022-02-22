@@ -13,17 +13,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(EyeDropperColorPickerConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(EyeDropperColorPickerConfiguration? configuration)
         {
             return new Dictionary<string, object>
             {
-                { "showAlpha", configuration.ShowAlpha },
-                { "showPalette", configuration.ShowPalette }
+                { "showAlpha", configuration?.ShowAlpha ?? false },
+                { "showPalette", configuration?.ShowPalette ?? false },
             };
         }
 
         /// <inheritdoc />
-        public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyeDropperColorPickerConfiguration configuration)
+        public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyeDropperColorPickerConfiguration? configuration)
         {
             var showAlpha = true;
             var showPalette = true;

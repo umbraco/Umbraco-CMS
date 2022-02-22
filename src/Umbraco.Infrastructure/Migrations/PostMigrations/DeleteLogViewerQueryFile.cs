@@ -23,12 +23,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
         /// <inheritdoc />
         protected override void Migrate()
         {
-            var logViewerQueryFile = MigrateLogViewerQueriesFromFileToDb.GetLogViewerQueryFile(_hostingEnvironment);
-
-            if(File.Exists(logViewerQueryFile))
-            {
-                File.Delete(logViewerQueryFile);
-            }
+            // var logViewerQueryFile = MigrateLogViewerQueriesFromFileToDb.GetLogViewerQueryFile(_hostingEnvironment);
+            //
+            // if(File.Exists(logViewerQueryFile))
+            // {
+            //     File.Delete(logViewerQueryFile);
+            // }
         }
     }
 }

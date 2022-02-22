@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         // the sort order that comes back makes no sense
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration? configuration)
         {
             if (configuration == null)
                 return new Dictionary<string, object>
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ValueListConfiguration configuration)
+        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ValueListConfiguration? configuration)
         {
             var output = new ValueListConfiguration();
 

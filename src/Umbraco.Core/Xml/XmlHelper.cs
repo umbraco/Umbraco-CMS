@@ -366,7 +366,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <returns>
         ///     <c>true</c> if the specified string appears to be XML; otherwise, <c>false</c>.
         /// </returns>
-        public static bool CouldItBeXml(string xml)
+        public static bool CouldItBeXml(string? xml)
         {
             if (string.IsNullOrEmpty(xml)) return false;
 

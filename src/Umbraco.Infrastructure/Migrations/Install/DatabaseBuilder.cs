@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
-        private DatabaseSchemaResult _databaseSchemaValidationResult;
+        private DatabaseSchemaResult? _databaseSchemaValidationResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseBuilder"/> class.
@@ -117,17 +117,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             using (var scope = _scopeProvider.CreateScope())
             {
                 // look for the super user with default password
-                var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
                     .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
-                var result = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(sql);
+                var result = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)
                 {
                     // found only 1 user == the default user with default password
                     // however this always exists on uCloud, also need to check if there are other users too
-                    result = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    result = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
                     has = result != 1;
                 }
                 scope.Complete();
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                return _scopeAccessor.AmbientScope.Database.IsUmbracoInstalled();
+                return _scopeAccessor.AmbientScope?.Database.IsUmbracoInstalled() ?? false;
             }
         }
 
@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             Configure(connectionString, providerName, _globalSettings.CurrentValue.InstallMissingDatabase);
         }
 
-        private void Configure(string connectionString, string providerName, bool installMissingDatabase)
+        private void Configure(string connectionString, string? providerName, bool installMissingDatabase)
         {
             // Update existing connection string
             var umbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString, providerName);
@@ -322,7 +322,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <para>This assumes that the database exists and the connection string is
         /// configured and it is possible to connect to the database.</para>
         /// </remarks>
-        public DatabaseSchemaResult ValidateSchema()
+        public DatabaseSchemaResult? ValidateSchema()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -332,7 +332,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
-        private DatabaseSchemaResult ValidateSchema(IScope scope)
+        private DatabaseSchemaResult? ValidateSchema(IScope scope)
         {
             if (_databaseFactory.Initialized == false)
                 return new DatabaseSchemaResult();
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            _databaseSchemaValidationResult = _scopeAccessor.AmbientScope.Database.ValidateSchema();
+            _databaseSchemaValidationResult = _scopeAccessor.AmbientScope?.Database.ValidateSchema();
 
             scope.Complete();
 
@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <para>This assumes that the database exists and the connection string is
         /// configured and it is possible to connect to the database.</para>
         /// </remarks>
-        public Result CreateSchemaAndData()
+        public Result? CreateSchemaAndData()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -364,7 +364,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
-        private Result CreateSchemaAndData(IScope scope)
+        private Result? CreateSchemaAndData(IScope scope)
         {
             try
             {
@@ -376,12 +376,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 _logger.LogInformation("Database configuration status: Started");
 
-                var database = _scopeAccessor.AmbientScope.Database;
+                var database = _scopeAccessor.AmbientScope?.Database;
 
                 var message = string.Empty;
 
                 var schemaResult = ValidateSchema();
-                var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
+                var hasInstalledVersion = schemaResult?.DetermineHasInstalledVersion() ?? false;
 
                 //If the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (!hasInstalledVersion)
@@ -424,7 +424,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result UpgradeSchemaAndData(UmbracoPlan plan)
+        public Result? UpgradeSchemaAndData(UmbracoPlan plan)
         {
             try
             {
@@ -454,7 +454,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
-        private Attempt<Result> CheckReadyForInstall()
+        private Attempt<Result?> CheckReadyForInstall()
         {
             if (_databaseFactory.CanConnect == false)
             {
@@ -466,7 +466,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                     Percentage = "10"
                 });
             }
-            return Attempt<Result>.Succeed();
+            return Attempt<Result?>.Succeed();
         }
 
         private Result HandleInstallException(Exception ex)
@@ -501,7 +501,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             /// <summary>
             /// Gets or sets the message returned by the operation.
             /// </summary>
-            public string Message { get; set; }
+            public string? Message { get; set; }
 
             /// <summary>
             /// Gets or sets a value indicating whether the operation succeeded.
@@ -511,7 +511,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             /// <summary>
             /// Gets or sets an install progress pseudo-percentage.
             /// </summary>
-            public string Percentage { get; set; }
+            public string? Percentage { get; set; }
         }
 
         #endregion

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -66,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return editor;
         }
 
-        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)]out string mediaPath)
         {
             if (propertyEditorAlias == Alias &&
                 value?.ToString() is var mediaPathValue &&

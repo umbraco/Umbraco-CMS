@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions
             : base(context)
         { }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
         public virtual bool IsAllRows { get; set; }
 
         public List<DeletionDataDefinition> Rows { get; } = new List<DeletionDataDefinition>();

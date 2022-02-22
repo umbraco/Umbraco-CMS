@@ -6,13 +6,13 @@
             : base(context)
         { }
 
-        public virtual string TableName { get; set; }
+        public virtual string? TableName { get; set; }
 
-        public virtual string ColumnName { get; set; }
+        public virtual string? ColumnName { get; set; }
 
-        public virtual string ConstraintName { get; set; }
+        public virtual string? ConstraintName { get; set; }
 
-        public virtual object DefaultValue { get; set; }
+        public virtual object? DefaultValue { get; set; }
 
         protected override string GetSql()
         {

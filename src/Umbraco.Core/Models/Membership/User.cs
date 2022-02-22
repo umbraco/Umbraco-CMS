@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
-        public User(GlobalSettings globalSettings, string name, string email, string username, string rawPasswordValue)
+        public User(GlobalSettings globalSettings, string? name, string email, string username, string rawPasswordValue)
             : this(globalSettings)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));

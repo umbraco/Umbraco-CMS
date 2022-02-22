@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson);
 
         /// <inheritdoc />
-        public virtual object FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
+        public virtual object? FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
         {
             // by default, return the posted dictionary
             // but only keep entries that have a non-null/empty value
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public virtual IDictionary<string, object>? ToValueEditor(object? configuration)
+        public virtual IDictionary<string, object> ToValueEditor(object? configuration)
             => ToConfigurationEditor(configuration);
 
     }

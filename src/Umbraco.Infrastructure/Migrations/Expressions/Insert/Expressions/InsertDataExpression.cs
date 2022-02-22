@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions
             : base(context)
         { }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
         public bool EnabledIdentityInsert { get; set; }
 
         public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();

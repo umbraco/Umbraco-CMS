@@ -224,7 +224,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     {
                         if (completed)
                         {
-                            actions.Execute();
+                            actions?.Execute();
                         }
                     }, EnlistPriority);
             }

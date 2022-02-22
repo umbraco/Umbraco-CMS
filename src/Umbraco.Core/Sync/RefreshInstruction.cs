@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Sync
         /// When the refresh method is <see cref="RefreshMethodType.RefreshByIds"/> we know how many Ids are being refreshed so we know the instruction
         /// count which will be taken into account when we store this count in the database.
         /// </param>
-        private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string json, int idCount = 1)
+        private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string? json, int idCount = 1)
             : this(refresher, refreshType)
         {
             JsonIdCount = idCount;
@@ -85,9 +85,9 @@ namespace Umbraco.Cms.Core.Sync
             ICacheRefresher refresher,
             IJsonSerializer jsonSerializer,
             MessageType messageType,
-            IEnumerable<object> ids,
-            Type idType,
-            string json)
+            IEnumerable<object>? ids,
+            Type? idType,
+            string? json)
         {
             switch (messageType)
             {

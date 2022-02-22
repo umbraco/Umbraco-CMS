@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert
 
             var data = new InsertionDataDefinition();
             foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+                data.Add(new KeyValuePair<string, object?>(property.Name, property.GetValue(dataAsAnonymousType)));
             return data;
         }
     }

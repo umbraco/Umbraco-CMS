@@ -9,16 +9,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions
             : base(context)
         { }
 
-        public virtual string SqlStatement { get; set; }
+        public virtual string? SqlStatement { get; set; }
 
-        public virtual Sql<ISqlContext> SqlObject { get; set; }
+        public virtual Sql<ISqlContext>? SqlObject { get; set; }
 
         public void ExecuteSqlObject()
         {
             Execute(SqlObject);
         }
 
-        protected override string GetSql()
+        protected override string? GetSql()
         {
             return SqlStatement;
         }

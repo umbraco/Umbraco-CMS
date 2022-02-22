@@ -155,7 +155,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     var folderName = Path.GetDirectoryName(absoluteTempImagePath);
                     try
                     {
-                        Directory.Delete(folderName, true);
+                        if (folderName is not null)
+                        {
+                            Directory.Delete(folderName, true);
+                        }
                     }
                     catch (Exception ex)
                     {

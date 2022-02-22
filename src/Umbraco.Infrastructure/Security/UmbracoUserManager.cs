@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Security
         where TUser : UmbracoIdentityUser
         where TPasswordConfig : class, IPasswordConfiguration, new()
     {
-        private PasswordGenerator _passwordGenerator;
+        private PasswordGenerator? _passwordGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoUserManager{T, TPasswordConfig}"/> class.

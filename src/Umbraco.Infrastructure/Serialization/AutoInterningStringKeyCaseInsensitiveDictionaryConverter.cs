@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization
         {
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization
                     switch (reader.TokenType)
                     {
                         case JsonToken.PropertyName:
-                            var key = string.Intern(reader.Value.ToString());
+                            var key = string.Intern(reader.Value!.ToString()!);
 
                             if (!reader.Read())
                                 throw new Exception("Unexpected end when reading object.");

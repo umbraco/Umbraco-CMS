@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// The node's children collection
         /// </summary>
         [DataMember(Name = "children")]
-        public TreeNodeCollection Children { get; private set; }
+        public TreeNodeCollection? Children { get; private set; }
 
         /// <summary>
         /// Returns true if there are any children
@@ -152,6 +152,6 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// This is used in the UI to configure a full screen section/app
         /// </remarks>
         [DataMember(Name = "containsTrees")]
-        public bool ContainsTrees => Children.Count > 0 || !_isSingleNodeTree;
+        public bool ContainsTrees => Children?.Count > 0 || !_isSingleNodeTree;
     }
 }
