@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
@@ -30,7 +32,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoDatabase _db;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax;
@@ -51,23 +52,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers,
             string connectionStringName)
-        {
-            // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
-            _lockId = Guid.NewGuid().ToString();
-            _logger = logger;
-            _globalSettings = globalSettings;
-            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
-            _hostingEnvironment = hostingEnvironment;
-            _dbFactory = new UmbracoDatabaseFactory(
-                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+            : this(
+                logger,
                 loggerFactory,
-                _globalSettings,
-                new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
+                globalSettings,
+                connectionStrings,
                 dbProviderFactoryCreator,
+                StaticServiceProvider.Instance.GetRequiredService<IMainDomKeyGenerator>(),
                 databaseSchemaCreatorFactory,
-                npocoMappers,
-                connectionStringName);
-            MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
+                npocoMappers)
+        {
         }
 
         public SqlMainDomLock(
@@ -85,13 +79,39 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             globalSettings,
             connectionStrings,
             dbProviderFactoryCreator,
-            hostingEnvironment,
+            StaticServiceProvider.Instance.GetRequiredService<IMainDomKeyGenerator>(),
             databaseSchemaCreatorFactory,
-            npocoMappers,
-            connectionStrings.CurrentValue.UmbracoConnectionString.ConnectionString
-            )
+            npocoMappers)
         {
+        }
 
+        public SqlMainDomLock(
+            ILogger<SqlMainDomLock> logger,
+            ILoggerFactory loggerFactory,
+            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IMainDomKeyGenerator mainDomKeyGenerator,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers)
+        {
+            // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
+            _lockId = Guid.NewGuid().ToString();
+            _logger = logger;
+            _globalSettings = globalSettings;
+            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
+
+            _dbFactory = new UmbracoDatabaseFactory(
+                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                loggerFactory,
+                _globalSettings,
+                new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
+                dbProviderFactoryCreator,
+                databaseSchemaCreatorFactory,
+                npocoMappers,
+                connectionStrings.CurrentValue.UmbracoConnectionString.ConnectionString);
+
+            MainDomKey = MainDomKeyPrefix + "-" + mainDomKeyGenerator.GenerateKey();
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)

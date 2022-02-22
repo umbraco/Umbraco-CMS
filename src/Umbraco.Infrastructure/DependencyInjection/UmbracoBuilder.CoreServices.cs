@@ -218,6 +218,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<IMainDomKeyGenerator, DefaultMainDomKeyGenerator>();
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
@@ -229,6 +230,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
+                var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(
@@ -237,7 +239,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                             globalSettings,
                             connectionStrings,
                             dbCreator,
-                            hostingEnvironment,
+                            mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
                             npocoMappers)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
