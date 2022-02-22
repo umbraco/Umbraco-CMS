@@ -683,7 +683,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound("The passed id doesn't exist");
             }
 
-            var isFolderAllowed = IsFolderCreationAllowedHere(parentId);
+            var isFolderAllowed = IsFolderCreationAllowedHere(parentId.Value);
             if (isFolderAllowed == false)
             {
                 return ValidationProblem(_localizedTextService.Localize("speechBubbles", "folderCreationNotAllowed"));
@@ -732,7 +732,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (!string.IsNullOrEmpty(path))
             {
-                var isFolderAllowed = IsFolderCreationAllowedHere(parentId);
+                var isFolderAllowed = IsFolderCreationAllowedHere(parentId.Value);
                 if (isFolderAllowed == false)
                 {
                     AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
@@ -922,7 +922,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return Ok(tempFiles);
         }
 
-        private bool IsFolderCreationAllowedHere(int? parentId)
+        private bool IsFolderCreationAllowedHere(int parentId)
         {
             var allMediaTypes = _mediaTypeService.GetAll().ToList();
             var isFolderAllowed = false;
@@ -933,7 +933,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var parentMediaType = _mediaService.GetById(parentId.Value);
+                var parentMediaType = _mediaService.GetById(parentId);
                 var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == parentMediaType.ContentType.Alias);
                 if (mediaFolderType != null)
                 {
