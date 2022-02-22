@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _messenger;
         private readonly ILogger<InstructionProcessTask> _logger;
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstructionProcessTask"/> class.
@@ -63,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
                 {
                     disposable.Dispose();
                 }
-                
+
                 _disposedValue = true;
             }
 
