@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             if (routeValues.TryGetValue("controller", out var controllerName) &&
                 routeValues.TryGetValue("action", out var action))
             {
-                if (controllerName?.ToString() == nameof(AuthenticationController).TrimEnd("Controller")
+                if (controllerName?.ToString() == ControllerExtensions.GetControllerName<AuthenticationController>()
                     && action?.ToString() == nameof(AuthenticationController.GetRemainingTimeoutSeconds))
                 {
                     return true;
