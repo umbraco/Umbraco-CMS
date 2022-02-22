@@ -12,7 +12,7 @@ namespace Umbraco.Web.Telemetry
         private readonly ITelemetryService _telemetryService;
         private BackgroundTaskRunner<IBackgroundTask> _telemetryReporterRunner;
 
-        public TelemetryComponent(IProfilingLogger logger, IUmbracoSettingsSection settings, ITelemetryService telemetryService)
+        public TelemetryComponent(IProfilingLogger logger, ITelemetryService telemetryService)
         {
             _logger = logger;
             _telemetryService = telemetryService;
