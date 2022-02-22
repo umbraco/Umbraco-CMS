@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 }
                 catch (Exception ex)
                 {
-                    _log.LogError(ex, "Unexpected exception attempting to delete release signal {file}", _releaseSignalFilePath);
+                    _log.LogError(ex, "Unexpected exception attempting to delete release signal file {file}", _releaseSignalFilePath);
                     Thread.Sleep(500);
                 }
             }
