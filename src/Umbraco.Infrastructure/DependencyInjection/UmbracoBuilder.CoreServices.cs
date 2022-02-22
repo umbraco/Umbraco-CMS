@@ -232,6 +232,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
                 var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
 
+                if (globalSettings.Value.MainDomLock == "FileSystemMainDomLock")
+                {
+                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment);
+                }
+
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(
                             loggerFactory.CreateLogger<SqlMainDomLock>(),
