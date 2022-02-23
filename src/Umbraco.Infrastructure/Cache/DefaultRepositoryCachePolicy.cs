@@ -26,14 +26,21 @@ namespace Umbraco.Cms.Core.Cache
     {
         private static readonly TEntity[] s_emptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;
+        private readonly Func<TEntity, string> _getEntityCacheKey;
 
-        public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
+        public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options, Func<TEntity, string> getEntityCacheKey)
             : base(cache, scopeAccessor)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            _getEntityCacheKey = getEntityCacheKey;
         }
 
-        protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
+        public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
+            : this(cache, scopeAccessor, options, null)
+        {
+        }
+
+        protected string GetEntityCacheKey(TEntity entity) => _getEntityCacheKey?.Invoke(entity) ?? EntityTypeCacheKey + entity.Id;
 
         protected string GetEntityCacheKey(TId id)
         {
@@ -72,7 +79,7 @@ namespace Umbraco.Cms.Core.Cache
                 foreach (var entity in entities)
                 {
                     var capture = entity;
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                    Cache.Insert(GetEntityCacheKey(entity), () => capture, TimeSpan.FromMinutes(5), true);
                 }
             }
         }
@@ -89,7 +96,7 @@ namespace Umbraco.Cms.Core.Cache
                 // just to be safe, we cannot cache an item without an identity
                 if (entity.HasIdentity)
                 {
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                    Cache.Insert(GetEntityCacheKey(entity), () => entity, TimeSpan.FromMinutes(5), true);
                 }
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -100,7 +107,7 @@ namespace Umbraco.Cms.Core.Cache
                 // if an exception is thrown we need to remove the entry from cache,
                 // this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                Cache.Clear(GetEntityCacheKey(entity.Id));
+                Cache.Clear(GetEntityCacheKey(entity));
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                 Cache.Clear(EntityTypeCacheKey);
@@ -121,7 +128,7 @@ namespace Umbraco.Cms.Core.Cache
                 // just to be safe, we cannot cache an item without an identity
                 if (entity.HasIdentity)
                 {
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                    Cache.Insert(GetEntityCacheKey(entity), () => entity, TimeSpan.FromMinutes(5), true);
                 }
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -132,7 +139,7 @@ namespace Umbraco.Cms.Core.Cache
                 // if an exception is thrown we need to remove the entry from cache,
                 // this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                Cache.Clear(GetEntityCacheKey(entity.Id));
+                Cache.Clear(GetEntityCacheKey(entity));
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                 Cache.Clear(EntityTypeCacheKey);
@@ -153,7 +160,7 @@ namespace Umbraco.Cms.Core.Cache
             finally
             {
                 // whatever happens, clear the cache
-                var cacheKey = GetEntityCacheKey(entity.Id);
+                var cacheKey = GetEntityCacheKey(entity);
                 Cache.Clear(cacheKey);
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                 Cache.Clear(EntityTypeCacheKey);

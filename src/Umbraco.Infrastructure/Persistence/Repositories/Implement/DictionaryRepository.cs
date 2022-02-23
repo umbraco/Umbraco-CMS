@@ -407,8 +407,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     //allow zero to be cached
                     GetAllCacheAllowZeroCount = true
                 };
-
-                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
+                return new DefaultRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor,
+                    options, (entity) => $"uRepo_{nameof(IDictionaryItem)}_{entity.ItemKey}");
             }
         }
     }
