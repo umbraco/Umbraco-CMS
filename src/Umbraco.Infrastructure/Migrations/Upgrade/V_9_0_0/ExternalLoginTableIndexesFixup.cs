@@ -14,29 +14,29 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
 
         protected override void Migrate()
         {
-            var indexName1 = "IX_" + ExternalLoginDto.TableName + "_LoginProvider";
-            var indexName2 = "IX_" + ExternalLoginDto.TableName + "_ProviderKey";
+            var indexName1 = "IX_" + ExternalLoginTokenTable.LegacyExternalLoginDto.TableName + "_LoginProvider";
+            var indexName2 = "IX_" + ExternalLoginTokenTable.LegacyExternalLoginDto.TableName + "_ProviderKey";
 
             if (IndexExists(indexName1))
             {
                 // drop it since the previous migration index was wrong, and we
                 // need to modify a column that belons to it
-                Delete.Index(indexName1).OnTable(ExternalLoginDto.TableName).Do();
+                Delete.Index(indexName1).OnTable(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName).Do();
             }
 
             if (IndexExists(indexName2))
             {
                 // drop since it's using a column we're about to modify
-                Delete.Index(indexName2).OnTable(ExternalLoginDto.TableName).Do();
+                Delete.Index(indexName2).OnTable(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName).Do();
             }
 
             // then fixup the length of the loginProvider column
-            AlterColumn<ExternalLoginDto>(ExternalLoginDto.TableName, "loginProvider");
+            AlterColumn<ExternalLoginTokenTable.LegacyExternalLoginDto>(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName, "loginProvider");
 
             // create it with the correct definition
             Create
                  .Index(indexName1)
-                 .OnTable(ExternalLoginDto.TableName)
+                 .OnTable(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName)
                  .OnColumn("loginProvider").Ascending()
                  .OnColumn("userId").Ascending()
                  .WithOptions()
@@ -48,9 +48,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             // re-create the original
             Create
                  .Index(indexName2)
-                 .OnTable(ExternalLoginDto.TableName)
+                 .OnTable(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName)
                  .OnColumn("loginProvider").Ascending()
-                 .OnColumn("providerKey").Ascending()                 
+                 .OnColumn("providerKey").Ascending()
                  .WithOptions()
                  .NonClustered()
                  .Do();

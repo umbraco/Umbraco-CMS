@@ -132,7 +132,7 @@ namespace Umbraco.Extensions
                 }
             }
 
-            verifiedIdentity =  identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
+            verifiedIdentity = identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
             return true;
         }
 
