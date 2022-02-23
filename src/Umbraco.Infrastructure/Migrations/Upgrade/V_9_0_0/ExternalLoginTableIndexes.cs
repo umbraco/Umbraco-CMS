@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
@@ -20,14 +24,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         {
             // Before adding these indexes we need to remove duplicate data.
             // Get all logins by latest
-            var logins = Database.Fetch<ExternalLoginDto>()
+            var logins = Database.Fetch<ExternalLoginTokenTable.LegacyExternalLoginDto>()
                 .OrderByDescending(x => x.CreateDate)
                 .ToList();
 
             var toDelete = new List<int>();
             // used to track duplicates so they can be removed
             var keys = new HashSet<(string, string)>();
-            foreach(ExternalLoginDto login in logins)
+            foreach(ExternalLoginTokenTable.LegacyExternalLoginDto login in logins)
             {
                 if (!keys.Add((login.ProviderKey, login.LoginProvider)))
                 {
@@ -37,16 +41,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             }
             if (toDelete.Count > 0)
             {
-                Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
-            }   
+                Database.DeleteMany<ExternalLoginTokenTable.LegacyExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            }
 
-            var indexName1 = "IX_" + ExternalLoginDto.TableName + "_LoginProvider";
+            var indexName1 = "IX_" + ExternalLoginTokenTable.LegacyExternalLoginDto.TableName + "_LoginProvider";
 
             if (!IndexExists(indexName1))
             {
                 Create
                      .Index(indexName1)
-                     .OnTable(ExternalLoginDto.TableName)
+                     .OnTable(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName)
                      .OnColumn("loginProvider")
                      .Ascending()
                      .WithOptions()
@@ -56,13 +60,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
                      .Do();
             }
 
-            var indexName2 = "IX_" + ExternalLoginDto.TableName + "_ProviderKey";
+            var indexName2 = "IX_" + ExternalLoginTokenTable.LegacyExternalLoginDto.TableName + "_ProviderKey";
 
             if (!IndexExists(indexName2))
             {
                 Create
                      .Index(indexName2)
-                     .OnTable(ExternalLoginDto.TableName)
+                     .OnTable(ExternalLoginTokenTable.LegacyExternalLoginDto.TableName)
                      .OnColumn("loginProvider").Ascending()
                      .OnColumn("providerKey").Ascending()
                      .WithOptions()
@@ -70,5 +74,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
                      .Do();
             }
         }
+
+
     }
 }
