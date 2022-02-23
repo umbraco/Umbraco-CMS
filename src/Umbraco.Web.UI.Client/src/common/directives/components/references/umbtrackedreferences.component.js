@@ -12,6 +12,7 @@
         vm.contentReferencesTitle = "Used in Documents";
         vm.memberReferencesTitle = "Used in Members";
         vm.mediaReferencesTitle = "Used in Media";
+        vm.referencedDescendantsTitle = "Descendants in use";
 
         localizationService.localize("references_labelUsedByDocuments").then(function (value) {
             vm.contentReferencesTitle = value;
@@ -24,14 +25,20 @@
         localizationService.localize("references_labelUsedByMedia").then(function (value) {
             vm.mediaReferencesTitle = value;
         });
+
+        localizationService.localize("references_labelUsedDescendants").then(function (value) {
+            vm.referencedDescendantsTitle = value;
+        });
       
         vm.changeContentPageNumber = changeContentPageNumber;
+        vm.changeContentDescendantsPageNumber = changeContentDescendantsPageNumber;
         vm.contentOptions = {};
         vm.contentOptions.entityType = "DOCUMENT";
         vm.hasContentReferences = false;
         vm.hasContentReferencesInDescendants = false;
 
         vm.changeMediaPageNumber = changeMediaPageNumber;
+        vm.changeMediaDescendantsPageNumber = changeMediaDescendantsPageNumber;
         vm.mediaOptions = {};
         vm.mediaOptions.entityType = "MEDIA";
         vm.hasMediaReferences = false;
@@ -41,7 +48,6 @@
         vm.memberOptions = {};
         vm.memberOptions.entityType = "MEMBER";
         vm.hasMemberReferences = false;
-        vm.hasMemberReferencesInDescendants = false;
 
         vm.$onInit = onInit;
 
@@ -68,10 +74,6 @@
                         descendantsPromises.push(checkMediaDescendantsUsage());
                     }
 
-                    if (!vm.hasMemberReferences) {
-                        descendantsPromises.push(checkMemberDescendantsUsage());
-                    }
-
                     $q.all(descendantsPromises).then(function() {
                         vm.loading = false;
                         if(vm.onLoadingComplete) {
@@ -95,6 +97,16 @@
         function changeMemberPageNumber(pageNumber) {
             vm.memberOptions.pageNumber = pageNumber;
             loadMemberRelations();
+        }
+
+        function changeContentDescendantsPageNumber(pageNumber) {
+            vm.contentOptions.pageNumber = pageNumber;
+            checkContentDescendantsUsage();
+        }
+
+        function changeMediaDescendantsPageNumber(pageNumber) {
+            vm.mediaOptions.pageNumber = pageNumber;
+            checkMediaDescendantsUsage();
         }
 
         function loadContentRelations() {
@@ -134,33 +146,24 @@
         }
 
         function checkContentDescendantsUsage() {
-           return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.contentOptions.entityType)
+            return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.contentOptions)
                 .then(function (data) {
-                    vm.hasContentReferencesInDescendants = data;
+                    vm.referencedContentDescendants = data;
 
-                    if (vm.hasContentReferencesInDescendants) {
+                    if (data.items.length > 0) {
+                        vm.hasContentReferencesInDescendants = data.items.length > 0;
                         activateWarning();
                     }
                 });
         }
 
         function checkMediaDescendantsUsage() {
-            return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.mediaOptions.entityType)
+            return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.mediaOptions)
                 .then(function (data) {
-                    vm.hasMediaReferencesInDescendants = data;
+                    vm.referencedMediaDescendants = data;
 
-                    if (vm.hasMediaReferencesInDescendants) {
-                        activateWarning();
-                    }
-                });
-        }
-
-        function checkMemberDescendantsUsage() {
-            return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.memberOptions.entityType)
-                .then(function (data) {
-                    vm.hasMemberReferencesInDescendants = data;
-
-                    if (vm.hasMemberReferencesInDescendants) {
+                    if (data.items.length > 0) {
+                        vm.hasMediaReferencesInDescendants = data.items.length > 0;
                         activateWarning();
                     }
                 });

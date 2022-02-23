@@ -1,6 +1,6 @@
 <umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
 
-<umb-box ng-if="(vm.hasContentReferences === false) && (vm.hasContentReferencesInDescendants === false) && (vm.hasMediaReferences === false) && (vm.hasMediaReferencesInDescendants === false) && (vm.hasMemberReferences === false) && (vm.hasMemberReferencesInDescendants === false) && (vm.loading === false) && (vm.hideNoResult === false)">
+<umb-box ng-if="(vm.hasContentReferences === false) && (vm.hasContentReferencesInDescendants === false) && (vm.hasMediaReferences === false) && (vm.hasMediaReferencesInDescendants === false) && (vm.hasMemberReferences === false) && (vm.loading === false) && (vm.hideNoResult === false)">
     <umb-box-header title-key="references_tabName"></umb-box-header>
     <umb-box-content>
         <umb-empty-state size="small">
@@ -21,16 +21,13 @@
         </umb-tracked-references-table>
     </div>
 
-    <div ng-if="vm.hasContentReferencesInDescendants">
-        <h5 class="mt0" style="margin-bottom: 20px;">
-            <localize key="references_labelUsedByDocuments">Used in Documents</localize>
-        </h5>
-
-        <umb-box>
-            <umb-box-content>
-                <localize key="references_labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item.</localize>
-            </umb-box-content>
-        </umb-box>
+    <div ng-if="vm.hasContentReferencesInDescendants"> <!-- TODO: RENAME this table -->
+        <umb-tracked-references-listview-table  items="vm.referencedContentDescendants.items"
+                                                total-pages="vm.referencedContentDescendants.totalPages"
+                                                page-number="vm.referencedContentDescendants.pageNumber"
+                                                title="vm.referencedDescendantsTitle"
+                                                on-page-changed="vm.changeContentDescendantsPageNumber(pageNumber)">
+        </umb-tracked-references-listview-table>
     </div>
 
     <!-- Members -->
@@ -43,18 +40,6 @@
         </umb-tracked-references-table>
     </div>
 
-    <div ng-if="vm.hasMemberReferencesInDescendants">
-        <h5 class="mt0" style="margin-bottom: 20px;">
-            <localize key="references_labelUsedByMembers">Used in Members</localize>
-        </h5>
-
-        <umb-box>
-            <umb-box-content>
-                <localize key="references_labelUsedInMemberDescendants">One or more of this item's descendants is being used in a a member</localize>
-            </umb-box-content>
-        </umb-box>
-    </div>
-
     <!-- Media -->
     <div ng-if="vm.hasMediaReferences">
         <umb-tracked-references-table items="vm.mediaReferences.items"
@@ -65,15 +50,12 @@
         </umb-tracked-references-table>
     </div>
 
-    <div ng-if="vm.hasMediaReferencesInDescendants">
-        <h5 class="mt0" style="margin-bottom: 20px;">
-            <localize key="references_labelUsedByMedia">Used in Media</localize>
-        </h5>
-
-        <umb-box>
-            <umb-box-content>
-                <localize key="references_labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item.</localize>
-            </umb-box-content>
-        </umb-box>
+    <div ng-if="vm.hasMediaReferencesInDescendants"> <!-- TODO: RENAME this table -->
+        <umb-tracked-references-listview-table  items="vm.referencedMediaDescendants.items"
+                                                total-pages="vm.referencedMediaDescendants.totalPages"
+                                                page-number="vm.referencedMediaDescendants.pageNumber"
+                                                title="vm.referencedDescendantsTitle"
+                                                on-page-changed="vm.changeMediaDescendantsPageNumber(pageNumber)">
+        </umb-tracked-references-listview-table>
     </div>
 </div>
