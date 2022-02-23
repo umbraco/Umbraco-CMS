@@ -20,6 +20,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Models;
 using Umbraco.Web.Services;
 using System.Web.Http;
+using Umbraco.Core.Telemetry;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,18 +35,28 @@ namespace Umbraco.Web.Editors
     {
         private readonly IDashboardService _dashboardService;
         private readonly IContentDashboardSettings _dashboardSettings;
+        private readonly ISiteIdentifierService _siteIdentifierService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
-            IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper,
-            IContentDashboardSettings dashboardSettings)
+        public DashboardController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IDashboardService dashboardService,
+            UmbracoHelper umbracoHelper,
+            IContentDashboardSettings dashboardSettings,
+            ISiteIdentifierService siteIdentifierService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
             _dashboardSettings = dashboardSettings;
+            _siteIdentifierService = siteIdentifierService;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -60,17 +71,19 @@ namespace Umbraco.Web.Editors
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
+            _siteIdentifierService.TryGetOrCreateSiteIdentifier(out var siteIdentifier);
 
             VerifyDashboardSource(baseUrl);
 
-            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteid={7}",
                 baseUrl,
                 _dashboardSettings.ContentDashboardPath,
                 section,
                 allowedSections,
                 language,
                 version,
-                isAdmin);
+                isAdmin,
+                siteIdentifier.ToString());
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);

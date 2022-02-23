@@ -34,6 +34,24 @@ namespace Umbraco.Web.Telemetry
             return true;
         }
 
+        public bool TryGetOrCreateSiteIdentifier(out Guid siteIdentifier)
+        {
+            if (TryGetSiteIdentifier(out var existingId))
+            {
+                siteIdentifier = existingId;
+                return true;
+            }
+
+            if (TryCreateSiteIdentifier(out var createdId))
+            {
+                siteIdentifier = createdId;
+                return true;
+            }
+
+            siteIdentifier = Guid.Empty;
+            return false;
+        }
+
         public bool TryCreateSiteIdentifier(out Guid createdGuid)
         {
             createdGuid = Guid.NewGuid();

@@ -26,7 +26,7 @@ namespace Umbraco.Core.Telemetry
         /// <inheritdoc/>
         public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
         {
-            if (TryGetTelemetryId(out Guid telemetryId) is false)
+            if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
             {
                 telemetryReportData = null;
                 return false;
@@ -39,24 +39,6 @@ namespace Umbraco.Core.Telemetry
                 Packages = GetPackageTelemetry()
             };
             return true;
-        }
-
-        private bool TryGetTelemetryId(out Guid telemetryId)
-        {
-            if (_siteIdentifierService.TryGetSiteIdentifier(out var existingId))
-            {
-                telemetryId = existingId;
-                return true;
-            }
-
-            if (_siteIdentifierService.TryCreateSiteIdentifier(out var createdId))
-            {
-                telemetryId = createdId;
-                return true;
-            }
-
-            telemetryId = Guid.Empty;
-            return false;
         }
 
         private IEnumerable<PackageTelemetry> GetPackageTelemetry()
