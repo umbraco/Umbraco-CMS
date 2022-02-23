@@ -1,7 +1,9 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Extensions
 {
@@ -48,6 +50,23 @@ namespace Umbraco.Extensions
         {
             identityBuilder.AddSignInManager<TSignInManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TSignInManager));
+            return identityBuilder;
+        }
+
+
+        public static IdentityBuilder AddUserStore<TInterface, TStore>(this IdentityBuilder identityBuilder, Func<IServiceProvider, TStore> implementationFactory)
+            where TStore : class, TInterface
+        {
+            identityBuilder.Services.AddScoped(typeof(TInterface), implementationFactory);
+            return identityBuilder;
+        }
+
+        public static MemberIdentityBuilder AddTwoFactorProvider<T>(this MemberIdentityBuilder identityBuilder, string providerName) where T : class, ITwoFactorProvider
+        {
+            identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();
+            identityBuilder.Services.AddSingleton<T>();
+            identityBuilder.AddTokenProvider<TwoFactorMemberValidationProvider<T>>(providerName);
+
             return identityBuilder;
         }
     }

@@ -95,9 +95,8 @@
     </div>
 
     <div class="umb-group-builder__property-tags -right">
-
       <div class="umb-group-builder__property-tag" ng-if="vm.property.inherited">
-        <umb-icon icon="icon-merge"></umb-icon>
+        <umb-icon icon="icon-merge" class="umb-group-builder__property-tag-icon"></umb-icon>
         <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom">Inherited from</localize></span>
         <button type="button" class="btn btn-small btn-link p0" ng-click="vm.clickComposition(vm.property.contentTypeId)">
           {{vm.property.contentTypeName}}
@@ -105,10 +104,9 @@
       </div>
 
       <div class="umb-group-builder__property-tag" ng-if="vm.property.locked">
-        <umb-icon icon="icon-lock"></umb-icon>
+        <umb-icon icon="icon-lock" class="umb-group-builder__property-tag-icon"></umb-icon>
         <localize key="general_locked">Locked</localize>
       </div>
-
     </div>
 
     <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="vm.edit()" tabindex="-1">

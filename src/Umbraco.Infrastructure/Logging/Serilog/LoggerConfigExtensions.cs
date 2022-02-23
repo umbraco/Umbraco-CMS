@@ -24,9 +24,20 @@ namespace Umbraco.Extensions
         /// Such as adding ProcessID, Thread, AppDomain etc
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
-        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="loggingConfiguration"></param>
+        public static LoggerConfiguration MinimalConfiguration(
+            this LoggerConfiguration logConfig,
+            IHostingEnvironment hostingEnvironment,
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration)
+        {
+            return MinimalConfiguration(logConfig, hostingEnvironment, loggingConfiguration, configuration, out _);
+        }
+
+        /// <summary>
+        /// This configures Serilog with some defaults
+        /// Such as adding ProcessID, Thread, AppDomain etc
+        /// It is highly recommended that you keep/use this default in your own logging config customizations
+        /// </summary>
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             IHostingEnvironment hostingEnvironment,

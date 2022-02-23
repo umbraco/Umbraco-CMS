@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         {
             builder.CacheRefreshers().Add(() => builder.TypeLoader.GetCacheRefreshers());
             builder.DataEditors().Add(() => builder.TypeLoader.GetDataEditors());
-            builder.Actions().Add(() => builder.TypeLoader.GetActions());
+            builder.Actions().Add(() => builder .TypeLoader.GetActions());
 
             // register known content apps
             builder.ContentApps()
@@ -45,7 +45,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<ContentTypeDesignContentAppFactory>()
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
-                .Append<ContentTypeTemplatesContentAppFactory>();
+                .Append<ContentTypeTemplatesContentAppFactory>()
+                .Append<MemberEditorContentAppFactory>();
 
             // all built-in finders in the correct order,
             // devs can then modify this list on application startup

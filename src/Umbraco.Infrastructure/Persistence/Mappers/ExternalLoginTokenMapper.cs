@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             DefineMap<IdentityUserToken, ExternalLoginTokenDto>(nameof(IdentityUserToken.Name), nameof(ExternalLoginTokenDto.Name));
             DefineMap<IdentityUserToken, ExternalLoginTokenDto>(nameof(IdentityUserToken.Value), nameof(ExternalLoginTokenDto.Value));
             // separate table
-            DefineMap<IdentityUserToken, ExternalLoginDto>(nameof(IdentityUserToken.UserId), nameof(ExternalLoginDto.UserId));
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.Key), nameof(ExternalLoginDto.UserOrMemberKey));
         }
     }
 }
