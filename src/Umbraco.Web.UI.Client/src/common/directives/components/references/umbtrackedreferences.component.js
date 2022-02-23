@@ -66,11 +66,15 @@
                 } else {
                     var descendantsPromises = [];
 
-                    if (!vm.hasContentReferences) {
+                    // when vm.id == 0 it means that this is a new item, so it has no references yet
+                    // therefore we don't need to check for descendants
+                    if (!vm.hasContentReferences && vm.id != 0) {
                         descendantsPromises.push(checkContentDescendantsUsage());
                     }
 
-                    if (!vm.hasMediaReferences) {
+                    // when vm.id == 0 it means that this is a new item, so it has no references yet
+                    // therefore we don't need to check for descendants
+                    if (!vm.hasMediaReferences && vm.id != 0) {
                         descendantsPromises.push(checkMediaDescendantsUsage());
                     }
 
