@@ -2468,6 +2468,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelUsedByMembers">Used in Members</key>
     <key alias="labelUsedByMedia">Used in Media</key>
     <key alias="labelUsedItems">Items in use</key>
+    <key alias="labelUsedDescendants">Descendants in use</key>
     <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item.</key>
     <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item.</key>
     <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being used in a member.</key>
