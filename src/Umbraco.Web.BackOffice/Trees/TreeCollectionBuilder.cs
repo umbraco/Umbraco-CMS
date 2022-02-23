@@ -69,7 +69,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             where TController : TreeControllerBase
             => RemoveTreeController(typeof(TController));
 
-        public void RemoveTreeController(Type controllerType)
+        // TODO: Change parameter name to "controllerType" in a major version to make it consistent with AddTreeController method.
+        public void RemoveTreeController(Type type)
         {
             if (!typeof(TreeControllerBase).IsAssignableFrom(controllerType))
                 throw new ArgumentException($"Type {controllerType} does not inherit from {typeof(TreeControllerBase).FullName}.");
