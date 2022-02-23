@@ -1,47 +1,55 @@
 {
-    "$schema": "http://json.schemastore.org/dotnetcli.host",
-    "symbolInfo": {
-        "PackageTestSiteName": {
-            "longName": "PackageTestSiteName",
-            "shortName": "p"
-        },
-        "UseSqlCe": {
-            "longName": "SqlCe",
-            "shortName": "ce"
-        },
-        "SkipRestore": {
-            "longName": "no-restore",
-            "shortName": ""
-        },
-        "FriendlyName": {
-            "longName": "friendly-name",
-            "shortName": ""
-        },
-        "Email": {
-            "longName": "email",
-            "shortName": ""
-        },
-        "Password": {
-            "longName": "password",
-            "shortName": ""
-        },
-        "ConnectionString":{
-            "longName": "connection-string",
-            "shortName": ""
-        },
-        "NoNodesViewPath":{
-            "longName": "no-nodes-view-path",
-            "shortName": ""
-        },
-        "UseHttpsRedirect": {
-            "longName": "use-https-redirect",
-            "shortName": ""
-        }
+  "$schema": "http://json.schemastore.org/dotnetcli.host",
+  "symbolInfo": {
+    "Framework": {
+      "longName": "Framework",
+      "shortName": "F"
     },
-    "usageExamples": [
-        "dotnet new umbraco -n MyNewProject",
-        "dotnet new umbraco -n MyNewProjectWithCE -ce",
-        "dotnet new umbraco -n MyNewProject --no-restore",
-        "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly User\" --email user@email.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
-    ]
+    "UmbracoVersion": {
+      "longName": "version",
+      "shortName": "v"
+    },
+    "UseHttpsRedirect": {
+      "longName": "use-https-redirect",
+      "shortName": ""
+    },
+    "UseSqlCe": {
+      "longName": "SqlCe",
+      "shortName": "ce"
+    },
+    "SkipRestore": {
+      "longName": "no-restore",
+      "shortName": ""
+    },
+    "UnattendedUserName": {
+      "longName": "friendly-name",
+      "shortName": ""
+    },
+    "UnattendedUserEmail": {
+      "longName": "email",
+      "shortName": ""
+    },
+    "UnattendedUserPassword": {
+      "longName": "password",
+      "shortName": ""
+    },
+    "ConnectionString": {
+      "longName": "connection-string",
+      "shortName": ""
+    },
+    "NoNodesViewPath": {
+      "longName": "no-nodes-view-path",
+      "shortName": ""
+    },
+    "PackageProjectName": {
+      "longName": "PackageTestSiteName",
+      "shortName": "p"
+    }
+  },
+  "usageExamples": [
+    "dotnet new umbraco -n MyNewProject",
+    "dotnet new umbraco -n MyNewProjectUsingSqlCE -ce",
+    "dotnet new umbraco -n MyNewProject --no-restore",
+    "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly Admin User\" --email admin@example.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
+  ]
 }
