@@ -67,38 +67,60 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.trackedReferencesResource#hasReferencesInDescendants
+         * @name umbraco.resources.trackedReferencesResource#getPagedDescendantsInReferences
          * @methodOf umbraco.resources.trackedReferencesResource
          *
          * @description
-         * Checks if there are any tracked references for the child nodes of the current item
+         * Gets a page list of the child nodes of the current item used in any kind of relation
          *
          * ##usage
-         * <pre>         
-         * trackedReferencesResource.hasReferencesInDescendants(1,'MEDIA')
+         * <pre>
+         * var options = {
+         *      pageSize : 25,
+         *      pageNumber : 1,
+         *      entityType : 'DOCUMENT'
+         *  };
+         * trackedReferencesResource.getPagedDescendantsInReferences(1, options)
          *    .then(function(data) {
          *        console.log(data);
          *    });
          * </pre>
          *
-         * @param {int} id Id of the item to query for tracked references
-         * @param {String} entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @param {int} id Id of the item to query for child nodes used in relation
+         * @param {Object} args optional args object
+         * @param {Int} args.pageSize the pagesize of the returned list (default 25)
+         * @param {Int} args.pageNumber the current page index (default 1)
+         * @param {String} args.entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
          * @returns {Promise} resourcePromise object.
          *
          */
-        hasReferencesInDescendants: function (id, entityType) {
+        getPagedDescendantsInReferences: function (id, args) {
+            
+            var defaults = {
+                pageSize: 10,
+                pageNumber: 1,
+                entityType: "DOCUMENT"
+            };
+            if (args === undefined) {
+                args = {};
+            }
+
+            //overwrite the defaults if there are any specified
+            var options = Utilities.extend(defaults, args);
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "trackedReferencesApiBaseUrl",
-                        "HasReferencesInDescendants",
+                        "GetPagedDescendantsInReferences",
                         {
-                            id: id,
-                            entityType: entityType
+                            parentId: id,
+                            entityType: options.entityType,
+                            pageNumber: options.pageNumber,
+                            pageSize: options.pageSize
                         }
                     )),
-                "Failed to check for references in child nodes");
+                "Failed to retrieve usages for descendants of parent with id " + id);
         },
 
         /**
