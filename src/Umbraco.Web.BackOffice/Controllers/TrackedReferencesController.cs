@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,28 +33,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            var udiType = ObjectTypes.GetUdiType(objectType);
             var relationTypes = new string[]
             {
                 Constants.Conventions.RelationTypes.RelatedDocumentAlias,
                 Constants.Conventions.RelationTypes.RelatedMediaAlias
             };
 
-            var relations = _relationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, relationTypes, objectType);
+            UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            IEnumerable<IUmbracoEntity> relations = _relationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, relationTypes, objectType);
 
-            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
-            {
-                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
-                {
-                    Id = rel.Id,
-                    Key = rel.Key,
-                    Udi = Udi.Create(udiType, rel.Key),
-                    Icon = rel.ContentTypeIcon,
-                    Name = rel.Name,
-                    Alias = rel.ContentTypeAlias
-                })
-            };
+            return GetRelationsPagedResult(totalRecords, pageNumber, pageSize, objectType, relations);
         }
 
         public ActionResult<PagedResult<EntityBasic>> GetPagedDescendantsInReferences(int parentId, string entityType, int pageNumber = 1, int pageSize = 100)
@@ -63,33 +52,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            var currentEntity = _entityService.Get(parentId);
-
+            IEntitySlim currentEntity = _entityService.Get(parentId);
             if (currentEntity is null)
             {
                 return NotFound();
             }
 
-            var entities = _entityService.GetDescendants(currentEntity.Id);
+            IEnumerable<IEntitySlim> entities = _entityService.GetDescendants(currentEntity.Id);
             var ids = entities.Select(x => x.Id).ToArray();
 
-            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            var udiType = ObjectTypes.GetUdiType(objectType);
+            UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            IEnumerable<IUmbracoEntity> relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
 
-            var relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
-
-            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
-            {
-                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
-                {
-                    Id = rel.Id,
-                    Key = rel.Key,
-                    Udi = Udi.Create(udiType, rel.Key),
-                    Icon = rel.ContentTypeIcon,
-                    Name = rel.Name,
-                    Alias = rel.ContentTypeAlias
-                })
-            };
+            return GetRelationsPagedResult(totalRecords, pageNumber, pageSize, objectType, relations);
         }
 
         /// <summary>
@@ -112,10 +87,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            var udiType = ObjectTypes.GetUdiType(objectType);
+            UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            IEnumerable<IUmbracoEntity> relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
 
-            var relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
+            return GetRelationsPagedResult(totalRecords, pageNumber, pageSize, objectType, relations);
+        }
+
+        private PagedResult<EntityBasic> GetRelationsPagedResult(long totalRecords, int pageNumber, int pageSize, UmbracoObjectTypes objectType, IEnumerable<IUmbracoEntity> relations)
+        {
+            var udiType = ObjectTypes.GetUdiType(objectType);
 
             return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
