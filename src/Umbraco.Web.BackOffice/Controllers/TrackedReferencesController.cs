@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,46 +56,40 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             };
         }
 
-        [HttpGet]
-        public ActionResult<bool> HasReferencesInDescendants(int id, string entityType)
+        public ActionResult<PagedResult<EntityBasic>> GetPagedDescendantsInReferences(int parentId, string entityType, int pageNumber = 1, int pageSize = 100)
         {
-            var currentEntity = _entityService.Get(id);
-
-            if (currentEntity != null)
+            if (pageNumber <= 0 || pageSize <= 0)
             {
-                var currentObjectType = ObjectTypes.GetUmbracoObjectType(currentEntity.NodeObjectType);
-
-                var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-                var relationTypes = new string[]
-                {
-                    Constants.Conventions.RelationTypes.RelatedDocumentAlias,
-                    Constants.Conventions.RelationTypes.RelatedMediaAlias
-                };
-
-                var pageSize = 1000;
-                var currentPage = 0;
-
-                var entities = new List<IEntitySlim>();
-
-                do
-                {
-                    entities = _entityService.GetPagedDescendants(id, currentObjectType, currentPage, pageSize, out _).ToList();
-
-                    var ids = entities.Select(x => x.Id).ToArray();
-
-                    var relations = _relationService.GetPagedParentEntitiesByChildIds(ids, 0, int.MaxValue, out _, relationTypes, objectType);
-
-                    if (relations.Any())
-                    {
-                        return true;
-                    }
-
-                    currentPage++;
-
-                } while (entities.Count == pageSize);
+                return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            return false;
+            var currentEntity = _entityService.Get(parentId);
+
+            if (currentEntity is null)
+            {
+                return NotFound();
+            }
+
+            var entities = _entityService.GetDescendants(currentEntity.Id);
+            var ids = entities.Select(x => x.Id).ToArray();
+
+            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            var udiType = ObjectTypes.GetUdiType(objectType);
+
+            var relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
+
+            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
+            {
+                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
+                {
+                    Id = rel.Id,
+                    Key = rel.Key,
+                    Udi = Udi.Create(udiType, rel.Key),
+                    Icon = rel.ContentTypeIcon,
+                    Name = rel.Name,
+                    Alias = rel.ContentTypeAlias
+                })
+            };
         }
 
         /// <summary>
