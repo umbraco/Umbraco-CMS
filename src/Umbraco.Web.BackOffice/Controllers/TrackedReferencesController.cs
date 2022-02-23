@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -16,8 +14,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
-    [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
     public class TrackedReferencesController : BackOfficeNotificationsController
     {
         private readonly IRelationWithRelationTypesService _relationService;
@@ -29,11 +26,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _entityService = entityService;
         }
 
-        public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
+        public ActionResult<PagedResult<EntityBasic>> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
-                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+                return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
             var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
@@ -61,7 +58,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public bool HasReferencesInDescendants(int id, string entityType)
+        public ActionResult<bool> HasReferencesInDescendants(int id, string entityType)
         {
             var currentEntity = _entityService.Get(id);
 
@@ -115,11 +112,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public PagedResult<EntityBasic> CheckLinkedItems([FromJsonPath] int[] ids, string entityType, int pageNumber = 1, int pageSize = 100)
+        public ActionResult<PagedResult<EntityBasic>> CheckLinkedItems([FromJsonPath] int[] ids, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
-                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+                return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
             var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
