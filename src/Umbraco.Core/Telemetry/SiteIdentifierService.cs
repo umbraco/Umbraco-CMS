@@ -39,6 +39,25 @@ namespace Umbraco.Cms.Core.Telemetry
         }
 
         /// <inheritdoc/>
+        public bool TryGetOrCreateSiteIdentifier(out Guid siteIdentifier)
+        {
+            if (TryGetSiteIdentifier(out Guid existingId))
+            {
+                siteIdentifier = existingId;
+                return true;
+            }
+
+            if (TryCreateSiteIdentifier(out Guid createdId))
+            {
+                siteIdentifier = createdId;
+                return true;
+            }
+
+            siteIdentifier = Guid.Empty;
+            return false;
+        }
+
+        /// <inheritdoc/>
         public bool TryCreateSiteIdentifier(out Guid createdGuid)
         {
             createdGuid = Guid.NewGuid();
