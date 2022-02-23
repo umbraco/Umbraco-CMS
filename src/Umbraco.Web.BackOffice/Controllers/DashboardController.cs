@@ -52,6 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
+        [ActivatorUtilitiesConstructor]
         public DashboardController(
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             AppCaches appCaches,
