@@ -24,7 +24,8 @@ namespace Umbraco.Web.Telemetry
         {
             // Parse telemetry string as a GUID & verify its a GUID and not some random string
             // since users may have messed with or decided to empty the app setting or put in something random
-            if (Guid.TryParse(_settings.BackOffice.Id, out var parsedTelemetryId) is false)
+            if (Guid.TryParse(_settings.BackOffice.Id, out var parsedTelemetryId) is false
+                || parsedTelemetryId == Guid.Empty)
             {
                 siteIdentifier = Guid.Empty;
                 return false;
