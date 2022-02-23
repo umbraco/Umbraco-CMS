@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return JObject.Parse(errorJson);
             }
 
-            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteId={7}",
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteid={7}",
                 baseUrl,
                 _dashboardSettings.ContentDashboardPath,
                 section,
