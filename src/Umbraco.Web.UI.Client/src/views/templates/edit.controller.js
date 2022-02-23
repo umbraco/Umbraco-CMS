@@ -559,11 +559,13 @@
                 }
             });
 
+            const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
+
             localizationService.localize("template_mastertemplate").then(title => {
                 const editor = {
                     title,
                     filterCssClass: 'not-allowed',
-                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),                    
+                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),
                     submit: model => {
                         var template = model.selection[0];
                         if (template && template.alias) {
@@ -576,6 +578,12 @@
                         editorService.close();
                     },
                     close: () => editorService.close()
+                }
+
+                if (currentTemplate) {
+                    editor.currentNode = {
+                        path: currentTemplate.path
+                    };
                 }
 
                 editorService.templatePicker(editor);
