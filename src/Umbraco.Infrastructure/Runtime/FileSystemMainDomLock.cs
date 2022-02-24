@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -11,21 +12,22 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 {
     internal class FileSystemMainDomLock : IMainDomLock
     {
-        private readonly ILogger<FileSystemMainDomLock> _log;
-
+        private readonly ILogger<FileSystemMainDomLock> _logger;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
-
         private readonly string _lockFilePath;
         private readonly string _releaseSignalFilePath;
 
         private FileStream _lockFileStream;
+        private Task _listenForReleaseSignalFileTask;
+
+        private const int s_maxTriesRemovingLockReleaseSignalFile = 3;
 
         public FileSystemMainDomLock(
-            ILogger<FileSystemMainDomLock> log,
+            ILogger<FileSystemMainDomLock> logger,
             IMainDomKeyGenerator mainDomKeyGenerator,
             IHostingEnvironment hostingEnvironment)
         {
-            _log = log;
+            _logger = logger;
 
             var lockFileName = $"MainDom_{mainDomKeyGenerator.GenerateKey()}.lock";
             _lockFilePath = Path.Combine(hostingEnvironment.LocalTempPath, lockFileName);
@@ -41,20 +43,20 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 try
                 {
-                    _log.LogDebug("Attempting to obtain MainDom lock file handle {lockFilePath}", _lockFilePath);
+                    _logger.LogDebug("Attempting to obtain MainDom lock file handle {lockFilePath}", _lockFilePath);
                     _lockFileStream = File.Open(_lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                     DeleteLockReleaseFile();
                     return Task.FromResult(true);
                 }
                 catch (IOException)
                 {
-                    _log.LogDebug("Couldn't obtain MainDom lock file handle, signalling for release of {lockFilePath}", _lockFilePath);
+                    _logger.LogDebug("Couldn't obtain MainDom lock file handle, signalling for release of {lockFilePath}", _lockFilePath);
                     CreateLockReleaseFile();
                     Thread.Sleep(500);
                 }
                 catch (Exception ex)
                 {
-                    _log.LogError(ex, "Unexpected exception attempting to obtain MainDom lock file handle {lockFilePath}, giving up", _lockFilePath);
+                    _logger.LogError(ex, "Unexpected exception attempting to obtain MainDom lock file handle {lockFilePath}, giving up", _lockFilePath);
                     return Task.FromResult(false);
                 }
             }
@@ -64,12 +66,21 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         }
 
         // Create a long running task to poll to check if anyone has created a lock release file.
-        public Task ListenAsync() =>
-            Task.Factory.StartNew(
+        public Task ListenAsync()
+        {
+            if (_listenForReleaseSignalFileTask != null)
+            {
+                return _listenForReleaseSignalFileTask;
+            }
+
+            _listenForReleaseSignalFileTask = Task.Factory.StartNew(
                 ListeningLoop,
                 _cancellationTokenSource.Token,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
+
+            return _listenForReleaseSignalFileTask;
+        }
 
         public void Dispose()
         {
@@ -86,24 +97,29 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, "Unexpected exception attempting to create lock release signal file {file}", _releaseSignalFilePath);
+                _logger.LogError(ex, "Unexpected exception attempting to create lock release signal file {file}", _releaseSignalFilePath);
             }
         }
 
         private void DeleteLockReleaseFile()
         {
-            while (File.Exists(_releaseSignalFilePath))
+            List<Exception> encounteredExceptions = new();
+            for (var i = 0; i < s_maxTriesRemovingLockReleaseSignalFile; i++)
             {
                 try
                 {
                     File.Delete(_releaseSignalFilePath);
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    _log.LogError(ex, "Unexpected exception attempting to delete release signal file {file}", _releaseSignalFilePath);
-                    Thread.Sleep(500);
+                    _logger.LogError(ex, "Unexpected exception attempting to delete release signal file {file}", _releaseSignalFilePath);
+                    encounteredExceptions.Add(ex);
+                    Thread.Sleep(500 * (i + 1));
                 }
             }
+
+            throw new ApplicationException($"Failed to remove lock release signal file {_releaseSignalFilePath}", new AggregateException(encounteredExceptions));
         }
 
         private void ListeningLoop()
@@ -112,13 +128,13 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 if (_cancellationTokenSource.IsCancellationRequested)
                 {
-                    _log.LogDebug("ListenAsync Task canceled, exiting loop");
+                    _logger.LogDebug("ListenAsync Task canceled, exiting loop");
                     return;
                 }
 
                 if (File.Exists(_releaseSignalFilePath))
                 {
-                    _log.LogDebug("Found lock release signal file, releasing lock on {lockFilePath}", _lockFilePath);
+                    _logger.LogDebug("Found lock release signal file, releasing lock on {lockFilePath}", _lockFilePath);
                     _lockFileStream?.Close();
                     _lockFileStream = null;
                     break;
