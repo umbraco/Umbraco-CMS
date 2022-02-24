@@ -138,6 +138,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string MainDomLock { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets a value to discriminate MainDom boundaries.
+        /// <para>
+        /// Generally the default should suffice but useful for advanced scenarios e.g. azure deployment slot based zero downtime deployments.
+        /// </para>
+        /// </summary>
+        public string MainDomKeyDiscriminator { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets the telemetry ID.
         /// </summary>
         public string Id { get; set; } = string.Empty;
