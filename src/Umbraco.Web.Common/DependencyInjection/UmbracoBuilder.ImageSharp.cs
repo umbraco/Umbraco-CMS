@@ -32,7 +32,7 @@ namespace Umbraco.Extensions
                 // options.Configuration is set using ImageSharpConfigurationOptions below
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
-                options.CacheHashLength = imagingSettings.Cache.CacheHashLength;
+                options.CacheHashLength = imagingSettings.Cache.CachedNameLength;
 
                 // Use configurable maximum width and height (overwrite ImageSharps default)
                 options.OnParseCommandsAsync = context =>
