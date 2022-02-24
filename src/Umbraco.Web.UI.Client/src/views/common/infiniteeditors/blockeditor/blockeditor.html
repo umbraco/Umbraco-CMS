@@ -24,7 +24,13 @@
 
             <umb-editor-footer>
 
-                <!-- Missing breadcrumbs -->
+              <umb-editor-footer-content-left>
+
+                <umb-breadcrumbs ng-if="vm.ancestors && vm.ancestors.length > 0"
+                                 ancestors="vm.ancestors">
+                </umb-breadcrumbs>
+
+              </umb-editor-footer-content-left>
 
                 <umb-editor-footer-content-right>
 
