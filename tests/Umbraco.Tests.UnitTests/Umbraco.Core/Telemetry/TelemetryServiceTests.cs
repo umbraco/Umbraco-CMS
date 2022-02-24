@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
@@ -67,23 +68,33 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         public void CanCollectPackageVersionsTelemetryData()
         {
             var telemetryOptions = CreateTelemetrySettings(TelemetryLevel.Basic);
+            var currentAssembly = GetType().Assembly;
 
             var versionPackageName = "VersionPackage";
             var packageVersion = "1.0.0";
             var noVersionPackageName = "NoVersionPackage";
             var doNotTrackPackageName = "DoNotTrack";
             var trackingAllowedPackageName = "TrackingAllowed";
+            var assemblyVersionPackageName = currentAssembly.GetName().Name;
             var manifestParserMock = new Mock<IManifestParser>();
             manifestParserMock.Setup(x => x.GetManifests()).Returns(new[]
             {
                 new PackageManifest() { PackageName = versionPackageName, Version = packageVersion },
                 new PackageManifest() { PackageName = noVersionPackageName },
                 new PackageManifest() { PackageName = doNotTrackPackageName, AllowPackageTelemetry = false },
-                new PackageManifest() { PackageName = trackingAllowedPackageName, AllowPackageTelemetry = true }
+                new PackageManifest() { PackageName = trackingAllowedPackageName, AllowPackageTelemetry = true },
+                new PackageManifest() { PackageName = assemblyVersionPackageName }
             });
+
+            var typeFinderMock = new Mock<ITypeFinder>();
+            typeFinderMock.Setup(x => x.AssembliesToScan).Returns(new[]
+            {
+                currentAssembly
+            });
+
             var telemetryDataCollectors = new[]
             {
-                new PackageVersionsTelemetryDataCollector(manifestParserMock.Object)
+                new PackageVersionsTelemetryDataCollector(manifestParserMock.Object, typeFinderMock.Object)
             };
 
             var telemetryService = new TelemetryService(telemetryOptions, telemetryDataCollectors);
@@ -99,7 +110,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 var packages = telemetry[TelemetryData.PackageVersions] as IEnumerable<PackageTelemetry>;
 
                 Assert.NotNull(packages);
-                Assert.AreEqual(3, packages.Count());
+                Assert.AreEqual(4, packages.Count());
 
                 var versionPackage = packages.FirstOrDefault(x => x.Name == versionPackageName);
                 Assert.IsNotNull(versionPackage);
@@ -111,6 +122,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
 
                 var trackingAllowedPackage = packages.FirstOrDefault(x => x.Name == trackingAllowedPackageName);
                 Assert.IsNotNull(trackingAllowedPackage);
+
+                var assemblyVersionPackage = packages.FirstOrDefault(x => x.Name == assemblyVersionPackageName);
+                Assert.IsNotNull(assemblyVersionPackage);
+                Assert.AreEqual(currentAssembly.GetName().Version.ToString(3), assemblyVersionPackage.Version);
             });
         }
 
