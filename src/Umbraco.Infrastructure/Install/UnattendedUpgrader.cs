@@ -56,8 +56,8 @@ namespace Umbraco.Cms.Infrastructure.Install
                             "Starting unattended upgrade.",
                             "Unattended upgrade completed."))
                         {
-                            DatabaseBuilder.Result result = _databaseBuilder.UpgradeSchemaAndData(plan);
-                            if (result.Success == false)
+                            DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
+                            if (result?.Success == false)
                             {
                                 var innerException = new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
                                 _runtimeState.Configure(Core.RuntimeLevel.BootFailed, Core.RuntimeLevelReason.BootFailedOnException, innerException);

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("parentId")]
         [ForeignKey(typeof(NodeDto))]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ParentId")]
-        public int? ParentId { get; set; }
+        public int ParentId { get; set; }
 
         // NOTE: This index is primarily for the nucache data lookup, see https://github.com/umbraco/Umbraco-CMS/pull/8365#issuecomment-673404177
         [Column("level")]
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("path")]
         [Length(150)]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Path")]
-        public string Path { get; set; }
+        public string Path { get; set; } = null!;
 
         [Column("sortOrder")]
         public int SortOrder { get; set; }
@@ -63,6 +63,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; }
     }
 }

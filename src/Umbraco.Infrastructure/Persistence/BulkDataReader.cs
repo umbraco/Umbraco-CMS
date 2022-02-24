@@ -40,12 +40,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// The <see cref="DataTable"/> containing the input row set's schema information <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>
         /// requires to function correctly.
         /// </summary>
-        private DataTable _schemaTable = new DataTable();
+        private DataTable? _schemaTable = new DataTable();
 
         /// <summary>
         /// The mapping from the row set input to the target table's columns.
         /// </summary>
-        private List<SqlBulkCopyColumnMapping> _columnMappings = new List<SqlBulkCopyColumnMapping>();
+        private List<SqlBulkCopyColumnMapping>? _columnMappings = new List<SqlBulkCopyColumnMapping>();
 
         #endregion
 
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             get
             {
-                if (this._columnMappings.Count == 0)
+                if (this._columnMappings?.Count == 0)
                 {
                     // Need to add the column definitions and mappings.
                     AddSchemaTableRows();
@@ -71,10 +71,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                         throw new InvalidOperationException("AddSchemaTableRows did not add rows.");
                     }
 
-                    Debug.Assert(this._schemaTable.Rows.Count == FieldCount);
+                    Debug.Assert(this._schemaTable?.Rows.Count == FieldCount);
                 }
 
-                return new ReadOnlyCollection<SqlBulkCopyColumnMapping>(_columnMappings);
+                return new ReadOnlyCollection<SqlBulkCopyColumnMapping>(_columnMappings!);
             }
         }
 
@@ -213,11 +213,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                                          bool isKey,
                                          bool allowDbNull,
                                          SqlDbType providerType,
-                                         string udtSchema,
-                                         string udtType,
-                                         string xmlSchemaCollectionDatabase,
-                                         string xmlSchemaCollectionOwningSchema,
-                                         string xmlSchemaCollectionName)
+                                         string? udtSchema,
+                                         string? udtType,
+                                         string? xmlSchemaCollectionDatabase,
+                                         string? xmlSchemaCollectionOwningSchema,
+                                         string? xmlSchemaCollectionName)
         {
             if (string.IsNullOrEmpty(columnName))
             {
@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 throw new ArgumentOutOfRangeException("columnSize");
             }
 
-            List<string> allowedOptionalColumnList;
+            List<string>? allowedOptionalColumnList;
 
             if (BulkDataReader.AllowedOptionalColumnCombinations.TryGetValue(providerType, out allowedOptionalColumnList))
             {
@@ -629,7 +629,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             }
 
-            this._schemaTable.Rows.Add(columnName,
+            this._schemaTable?.Rows.Add(columnName,
                                       _schemaTable.Rows.Count,
                                       columnSize,
                                       numericPrecision,
@@ -658,7 +658,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                                       xmlSchemaCollectionOwningSchema,
                                       xmlSchemaCollectionName);
 
-            this._columnMappings.Add(new SqlBulkCopyColumnMapping(columnName, columnName));
+            this._columnMappings?.Add(new SqlBulkCopyColumnMapping(columnName, columnName));
         }
 
         #endregion
@@ -910,8 +910,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             object data = GetValue(i);
             char? dataAsChar = data as char?;
-            char[] dataAsCharArray = data as char[];
-            string dataAsString = data as string;
+            char[]? dataAsCharArray = data as char[];
+            string? dataAsString = data as string;
 
             if (dataAsChar.HasValue)
             {
@@ -1015,7 +1015,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 throw new ArgumentOutOfRangeException("i");
             }
 
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -1306,7 +1306,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 throw new InvalidOperationException("The IDataReader is closed.");
             }
 
-            if (_schemaTable.Rows.Count == 0)
+            if (_schemaTable?.Rows.Count == 0)
             {
                 // Need to add the column definitions and mappings
                 _schemaTable.TableName = TableName;
@@ -1316,7 +1316,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 Debug.Assert(_schemaTable.Rows.Count == FieldCount);
             }
 
-            return _schemaTable;
+            return _schemaTable!;
         }
 
         /// <summary>

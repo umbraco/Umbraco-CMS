@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public EntityContainer GetContainer(Guid containerId)
+        public EntityContainer? GetContainer(Guid containerId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
+        public IEnumerable<EntityContainer>? GetContainers(IDataType dataType)
         {
             var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return GetContainers(ancestorIds);
         }
 
-        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
+        public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // 'container' here does not know about its children, so we need
                 // to get it again from the entity repository, as a light entity
                 var entity = _entityRepository.Get(container.Id);
-                if (entity.HasChildren)
+                if (entity?.HasChildren ?? false)
                 {
                     scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name)).FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
                 return dataType;
             }
@@ -289,7 +289,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.Key == id);
-                var dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(query)?.FirstOrDefault();
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
                 return dataType;
             }
@@ -300,12 +300,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
-        public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
+        public IEnumerable<IDataType>? GetByEditorAlias(string propertyEditorAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
                 var dataType = _dataTypeRepository.Get(query);
+                if (dataType is null)
+                {
+                    return null;
+                }
                 ConvertMissingEditorsOfDataTypesToLabels(dataType);
                 return dataType;
             }
@@ -316,11 +320,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        public IEnumerable<IDataType> GetAll(params int[] ids)
+        public IEnumerable<IDataType>? GetAll(params int[] ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var dataTypes = _dataTypeRepository.GetMany(ids);
+                if (dataTypes is null)
+                {
+                    return null;
+                }
+
                 ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
                 return dataTypes;
             }

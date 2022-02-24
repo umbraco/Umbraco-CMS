@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
 
-        protected override IDictionaryItem PerformGet(int id)
+        protected override IDictionaryItem? PerformGet(int id)
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { id = id })
@@ -64,10 +64,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return entity;
         }
 
-        protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
             }
@@ -225,19 +225,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return entity;
         }
 
-        public IDictionaryItem Get(Guid uniqueId)
+        public IDictionaryItem? Get(Guid uniqueId)
         {
             var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches, _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>());
             return uniqueIdRepo.Get(uniqueId);
         }
 
-        public IDictionaryItem Get(string key)
+        public IDictionaryItem? Get(string key)
         {
             var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches, _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
             return keyRepo.Get(key);
         }
 
-        private IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+        private IEnumerable<IDictionaryItem>? GetRootDictionaryItems()
         {
             var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
             return Get(query);
@@ -252,7 +252,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private class DictionaryItemKeyIdDto
         {
-            public string Key { get; set; }
+            public string Key { get; set; } = null!;
             public Guid Id { get; set; }
         }
 
@@ -281,7 +281,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             };
 
             var childItems = parentId.HasValue == false
-                ? new[] { GetRootDictionaryItems() }
+                ? new[] { GetRootDictionaryItems()! }
                 : getItemsFromParents(new[] { parentId.Value });
 
             return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
@@ -372,7 +372,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return _dictionaryRepository.ConvertFromDto(dto);
             }
 
-            protected override object GetBaseWhereClauseArguments(string id)
+            protected override object GetBaseWhereClauseArguments(string? id)
             {
                 return new { id = id };
             }

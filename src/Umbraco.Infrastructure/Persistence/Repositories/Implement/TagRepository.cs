@@ -28,19 +28,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Manage Tag Entities
 
         /// <inheritdoc />
-        protected override ITag PerformGet(int id)
+        protected override ITag? PerformGet(int id)
         {
             Sql<ISqlContext> sql = Sql().Select<TagDto>().From<TagDto>().Where<TagDto>(x => x.Id == id);
-            TagDto dto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            TagDto? dto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return dto == null ? null : TagFactory.BuildEntity(dto);
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<ITag> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ITag> PerformGetAll(params int[]? ids)
         {
-            IEnumerable<TagDto> dtos = ids.Length == 0
+            IEnumerable<TagDto> dtos = ids?.Length == 0
                 ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
-                : Database.FetchByGroups<TagDto, int>(ids, Constants.Sql.MaxParameterCount,
+                : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
                     batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
 
             return dtos.Select(TagFactory.BuildEntity).ToList();
@@ -237,7 +237,7 @@ WHERE r.tagId IS NULL";
         // used to run Distinct() on tags
         private class TagComparer : IEqualityComparer<ITag>
         {
-            public bool Equals(ITag x, ITag y) =>
+            public bool Equals(ITag? x, ITag? y) =>
                 ReferenceEquals(x, y) // takes care of both being null
                 || (x != null && y != null && x.Text == y.Text && x.Group == y.Group && x.LanguageId == y.LanguageId);
 
@@ -245,8 +245,8 @@ WHERE r.tagId IS NULL";
             {
                 unchecked
                 {
-                    var h = obj.Text.GetHashCode();
-                    h = (h * 397) ^ obj.Group.GetHashCode();
+                    var h = obj.Text?.GetHashCode() ?? 1;
+                    h = (h * 397) ^ obj.Group?.GetHashCode() ?? 0;
                     h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                     return h;
                 }
@@ -265,17 +265,17 @@ WHERE r.tagId IS NULL";
         private class TaggedEntityDto
         {
             public int NodeId { get; set; }
-            public string PropertyTypeAlias { get; set; }
+            public string? PropertyTypeAlias { get; set; }
             public int PropertyTypeId { get; set; }
             public int TagId { get; set; }
-            public string TagText { get; set; }
-            public string TagGroup { get; set; }
+            public string? TagText { get; set; }
+            public string? TagGroup { get; set; }
             public int? TagLanguage { get; set; }
         }
         // ReSharper restore UnusedAutoPropertyAccessor.Local
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityByKey(Guid key)
+        public TaggedEntity? GetTaggedEntityByKey(Guid key)
         {
             Sql<ISqlContext> sql = GetTaggedEntitiesSql(TaggableObjectTypes.All, "*");
 
@@ -286,7 +286,7 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityById(int id)
+        public TaggedEntity? GetTaggedEntityById(int id)
         {
             Sql<ISqlContext> sql = GetTaggedEntitiesSql(TaggableObjectTypes.All, "*");
 
@@ -298,7 +298,7 @@ WHERE r.tagId IS NULL";
 
         /// <inheritdoc />
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group,
-            string culture = null)
+            string? culture = null)
         {
             Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
@@ -310,7 +310,7 @@ WHERE r.tagId IS NULL";
 
         /// <inheritdoc />
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag,
-            string group = null, string? culture = null)
+            string? group = null, string? culture = null)
         {
             Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
@@ -326,7 +326,7 @@ WHERE r.tagId IS NULL";
             return Map(Database.Fetch<TaggedEntityDto>(sql));
         }
 
-        private Sql<ISqlContext> GetTaggedEntitiesSql(TaggableObjectTypes objectType, string culture)
+        private Sql<ISqlContext> GetTaggedEntitiesSql(TaggableObjectTypes objectType, string? culture)
         {
             Sql<ISqlContext> sql = Sql()
                 .Select<TagRelationshipDto>(x => Alias(x.NodeId, "NodeId"))
@@ -368,7 +368,7 @@ WHERE r.tagId IS NULL";
             {
                 var taggedProperties = dtosForNode.GroupBy(x => x.PropertyTypeId).Select(dtosForProperty =>
                 {
-                    string propertyTypeAlias = null;
+                    string? propertyTypeAlias = null;
                     var tags = dtosForProperty.Select(dto =>
                     {
                         propertyTypeAlias = dto.PropertyTypeAlias;
@@ -381,8 +381,8 @@ WHERE r.tagId IS NULL";
             }).ToList();
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null,
-            string culture = null)
+        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string? group = null,
+            string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture, true);
 
@@ -408,7 +408,7 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null, string? culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(int contentId, string? group = null, string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture);
 
@@ -427,7 +427,7 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null, string? culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string? group = null, string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture);
 
@@ -446,8 +446,8 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null,
-            string culture = null)
+        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
+            string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture);
 
@@ -469,8 +469,8 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string group = null,
-            string culture = null)
+        public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null,
+            string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture);
 
@@ -491,7 +491,7 @@ WHERE r.tagId IS NULL";
             return ExecuteTagsQuery(sql);
         }
 
-        private Sql<ISqlContext> GetTagsSql(string culture, bool withGrouping = false)
+        private Sql<ISqlContext> GetTagsSql(string? culture, bool withGrouping = false)
         {
             Sql<ISqlContext> sql = Sql()
                 .Select<TagDto>();
@@ -518,7 +518,7 @@ WHERE r.tagId IS NULL";
             return sql;
         }
 
-        private Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string culture)
+        private Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string? culture)
         {
             if (culture == null)
             {

@@ -27,10 +27,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; }
 
         [Column("updateDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
     }
 }

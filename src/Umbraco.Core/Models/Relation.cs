@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models
         //NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
         private int _parentId;
         private int _childId;
-        private IRelationType _relationType;
+        private IRelationType? _relationType;
         private string? _comment;
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parentObjectType"></param>
         /// <param name="childObjectType"></param>
         /// <param name="relationType"></param>
-        public Relation(int parentId, int childId, Guid parentObjectType, Guid childObjectType, IRelationType relationType)
+        public Relation(int parentId, int childId, Guid parentObjectType, Guid childObjectType, IRelationType? relationType)
         {
             _parentId = parentId;
             _childId = childId;

@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Core.Models.Entities
         private bool _hasIdentity;
         private int _id;
         private Guid _key;
-        private DateTime _createDate;
-        private DateTime _updateDate;
+        private DateTime? _createDate;
+        private DateTime? _updateDate;
 
         /// <inheritdoc />
         [DataMember]
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public DateTime CreateDate
+        public DateTime? CreateDate
         {
             get => _createDate;
             set => SetPropertyValueAndDetectChanges(value, ref _createDate, nameof(CreateDate));
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public DateTime UpdateDate
+        public DateTime? UpdateDate
         {
             get => _updateDate;
             set => SetPropertyValueAndDetectChanges(value, ref _updateDate, nameof(UpdateDate));

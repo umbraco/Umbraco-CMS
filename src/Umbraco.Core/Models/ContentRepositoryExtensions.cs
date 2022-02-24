@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class ContentRepositoryExtensions
     {
-        public static void SetCultureInfo(this IContentBase content, string culture, string? name, DateTime date)
+        public static void SetCultureInfo(this IContentBase content, string? culture, string? name, DateTime date)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
@@ -203,7 +203,7 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static void SetPublishInfo(this IContent content, string? culture, string name, DateTime date)
+        public static void SetPublishInfo(this IContent content, string? culture, string? name, DateTime date)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
@@ -215,13 +215,13 @@ namespace Umbraco.Extensions
         }
 
         // sets the edited cultures on the content
-        public static void SetCultureEdited(this IContent content, IEnumerable<string> cultures)
+        public static void SetCultureEdited(this IContent content, IEnumerable<string?> cultures)
         {
             if (cultures == null)
                 content.EditedCultures = null;
             else
             {
-                var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace()), StringComparer.OrdinalIgnoreCase);
+                var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace())!, StringComparer.OrdinalIgnoreCase);
                 content.EditedCultures = editedCultures.Count > 0 ? editedCultures : null;
             }
         }

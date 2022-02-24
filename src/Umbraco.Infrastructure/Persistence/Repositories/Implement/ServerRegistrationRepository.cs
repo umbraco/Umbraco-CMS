@@ -47,16 +47,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override bool PerformExists(int id)
         {
             // use the underlying GetAll which force-caches all registrations
-            return GetMany().Any(x => x.Id == id);
+            return GetMany()?.Any(x => x.Id == id) ?? false;
         }
 
-        protected override IServerRegistration PerformGet(int id)
+        protected override IServerRegistration? PerformGet(int id)
         {
             // use the underlying GetAll which force-caches all registrations
-            return GetMany().FirstOrDefault(x => x.Id == id);
+            return GetMany()?.FirstOrDefault(x => x.Id == id);
         }
 
-        protected override IEnumerable<IServerRegistration> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IServerRegistration> PerformGetAll(params int[]? ids)
         {
             return Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
                 .Select(x => ServerRegistrationFactory.BuildEntity(x));

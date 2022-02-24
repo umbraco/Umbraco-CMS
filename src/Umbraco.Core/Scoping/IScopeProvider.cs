@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <summary>
         /// Creates an instance of <see cref="IQuery{T}"/>
         /// </summary>
-        IQuery<T> CreateQuery<T>();
+        IQuery<T>? CreateQuery<T>();
 
 #if DEBUG_SCOPES
 

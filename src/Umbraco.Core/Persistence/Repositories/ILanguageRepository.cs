@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     {
-        ILanguage GetByIsoCode(string isoCode);
+        ILanguage? GetByIsoCode(string isoCode);
 
         /// <summary>
         /// Gets a language identifier from its ISO code.
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <remarks>
         /// <para>This can be optimized and bypass all deep cloning.</para>
         /// </remarks>
-        string GetIsoCodeById(int? id, bool throwOnNotFound = true);
+        string? GetIsoCodeById(int? id, bool throwOnNotFound = true);
 
         /// <summary>
         /// Gets the default language ISO code.

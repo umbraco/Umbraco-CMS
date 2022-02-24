@@ -19,18 +19,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("Email")]
         [Length(1000)]
         [Constraint(Default = "''")]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Column("LoginName")]
         [Length(1000)]
         [Constraint(Default = "''")]
         [Index(IndexTypes.NonClustered, Name = "IX_cmsMember_LoginName")]
-        public string LoginName { get; set; }
+        public string LoginName { get; set; } = null!;
 
         [Column("Password")]
         [Length(1000)]
         [Constraint(Default = "''")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         /// <summary>
         /// This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
@@ -53,10 +53,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
-        public ContentDto ContentDto { get; set; }
+        public ContentDto ContentDto { get; set; } = null!;
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
-        public ContentVersionDto ContentVersionDto { get; set; }
+        public ContentVersionDto ContentVersionDto { get; set; } = null!;
     }
 }

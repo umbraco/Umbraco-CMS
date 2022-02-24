@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("entityType")]
         [Length(50)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string EntityType { get; set; }
+        public string? EntityType { get; set; }
 
         // TODO: Should we have an index on this since we allow searching on it?
         [Column("Datestamp")]
@@ -43,12 +43,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         // TODO: Should we have an index on this since we allow searching on it?
         [Column("logHeader")]
         [Length(50)]
-        public string Header { get; set; }
+        public string Header { get; set; } = null!;
 
         [Column("logComment")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(4000)]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         /// <summary>
         /// Used to store additional data parameters for the log
@@ -56,6 +56,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("parameters")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
-        public string Parameters { get; set; }
+        public string? Parameters { get; set; }
     }
 }

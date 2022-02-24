@@ -23,6 +23,6 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets a list of translations for the Dictionary Item
         /// </summary>
         [DataMember]
-        IEnumerable<IDictionaryTranslation>? Translations { get; set; }
+        IEnumerable<IDictionaryTranslation> Translations { get; set; }
     }
 }

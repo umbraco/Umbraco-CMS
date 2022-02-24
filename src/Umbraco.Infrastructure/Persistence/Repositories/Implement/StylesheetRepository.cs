@@ -19,8 +19,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of FileRepository<string,Stylesheet>
 
-        public override IStylesheet Get(string id)
+        public override IStylesheet? Get(string? id)
         {
+            if (id is null || FileSystem is null)
+            {
+                return null;
+            }
             // get the relative path within the filesystem
             // (though... id should be relative already)
             var path = FileSystem.GetRelativePath(id);
@@ -73,19 +77,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 stylesheet.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
-        public override IEnumerable<IStylesheet> GetMany(params string[] ids)
+        public override IEnumerable<IStylesheet> GetMany(params string[]? ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids
+            ids = ids?
                 .Select(x => x.EnsureEndsWith(".css"))
                 .Distinct()
                 .ToArray();
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 foreach (var id in ids)
                 {
-                    yield return Get(id);
+                    IStylesheet? stylesheet = Get(id);
+                    if (stylesheet is not null)
+                    {
+                        yield return stylesheet;
+                    }
                 }
             }
             else
@@ -93,7 +101,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 var files = FindAllFiles("", "*.css");
                 foreach (var file in files)
                 {
-                    yield return Get(file);
+                    IStylesheet? stylesheet = Get(file);
+                    if (stylesheet is not null)
+                    {
+                        yield return stylesheet;
+                    }
                 }
             }
         }

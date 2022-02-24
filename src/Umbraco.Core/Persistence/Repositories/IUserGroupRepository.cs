@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        IUserGroup Get(string alias);
+        IUserGroup? Get(string alias);
 
         /// <summary>
         /// This is useful when an entire section is removed from config

@@ -548,7 +548,7 @@ namespace Umbraco.Extensions
         /// <param name="compare">The compare.</param>
         /// <param name="compareTo">The compare to.</param>
         /// <returns></returns>
-        public static bool InvariantEquals(this string compare, string? compareTo)
+        public static bool InvariantEquals(this string? compare, string? compareTo)
         {
             return String.Equals(compare, compareTo, StringComparison.InvariantCultureIgnoreCase);
         }

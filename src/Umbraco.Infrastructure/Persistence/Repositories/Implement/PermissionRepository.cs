@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <remarks>
         ///     This will first clear the permissions for this user and entities and recreate them
         /// </remarks>
-        public void ReplacePermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplacePermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
         {
             if (entityIds.Length == 0)
             {
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override ContentPermissionSet PerformGet(int id) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
-        protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[] ids) =>
+        protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[]? ids) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
         protected override IEnumerable<ContentPermissionSet> PerformGetByQuery(IQuery<ContentPermissionSet> query) =>

@@ -238,14 +238,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 // no scope, no service - just directly accessing the database
                 using (var database = databaseFactory.CreateDatabase())
                 {
-                    if (!database.IsUmbracoInstalled())
+                    if (!database!.IsUmbracoInstalled())
                     {
                         return UmbracoDatabaseState.NotInstalled;
                     }
 
                     // Make ONE SQL call to determine Umbraco upgrade vs package migrations state.
                     // All will be prefixed with the same key.
-                    IReadOnlyDictionary<string, string> keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
+                    IReadOnlyDictionary<string, string?>? keyValues = database!.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
                     // This could need both an upgrade AND package migrations to execute but
                     // we will process them one at a time, first the upgrade, then the package migrations.
@@ -277,14 +277,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
         }
 
-        private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string> keyValues)
+        private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
 
-            _ = keyValues.TryGetValue(stateValueKey, out var value);
+            if(keyValues?.TryGetValue(stateValueKey, out var value) ?? false)
+            {
+                CurrentMigrationState = value;
+            }
 
-            CurrentMigrationState = value;
             FinalMigrationState = upgrader.Plan.FinalState;
 
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");

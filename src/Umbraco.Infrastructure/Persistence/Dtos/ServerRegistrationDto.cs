@@ -25,10 +25,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("registeredDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime DateRegistered { get; set; }
+        public DateTime? DateRegistered { get; set; }
 
         [Column("lastNotifiedDate")]
-        public DateTime DateAccessed { get; set; }
+        public DateTime? DateAccessed { get; set; }
 
         [Column("isActive")]
         [Index(IndexTypes.NonClustered)]

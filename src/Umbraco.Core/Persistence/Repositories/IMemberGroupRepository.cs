@@ -11,20 +11,20 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="uniqueId"></param>
         /// <returns></returns>
-        IMemberGroup Get(Guid uniqueId);
+        IMemberGroup? Get(Guid uniqueId);
 
         /// <summary>
         /// Gets a member group by it's name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IMemberGroup GetByName(string name);
+        IMemberGroup? GetByName(string name);
 
         /// <summary>
         /// Creates the new member group if it doesn't already exist
         /// </summary>
         /// <param name="roleName"></param>
-        IMemberGroup CreateIfNotExists(string roleName);
+        IMemberGroup? CreateIfNotExists(string roleName);
 
         /// <summary>
         /// Returns the member groups for a given member

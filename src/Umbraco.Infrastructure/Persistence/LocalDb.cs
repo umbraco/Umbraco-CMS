@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     {
         private int _version;
         private bool _hasVersion;
-        private string _exe;
+        private string? _exe;
 
         #region Availability & Version
 
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// </summary>
         /// <returns>The name of existing LocalDb instances.</returns>
         /// <exception cref="InvalidOperationException">Thrown when LocalDb is not available.</exception>
-        public string[] GetInstances()
+        public string[]? GetInstances()
         {
             EnsureAvailable();
             var rc = ExecuteSqlLocalDb("i", out var output, out var error); // info
@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <param name="instanceName">The name of the instance.</param>
         /// <returns>The instance with the specified name if it exists, otherwise null.</returns>
         /// <exception cref="InvalidOperationException">Thrown when LocalDb is not available.</exception>
-        public Instance GetInstance(string instanceName)
+        public Instance? GetInstance(string instanceName)
         {
             EnsureAvailable();
             return InstanceExists(instanceName) ? new Instance(instanceName) : null;
@@ -500,7 +500,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             /// <param name="databaseName">The name of the database.</param>
             /// <returns>The directory containing the database files.</returns>
             /// <exception cref="InvalidOperationException">Thrown when a database with the specified name does not exist.</exception>
-            public string DetachDatabase(string databaseName)
+            public string? DetachDatabase(string databaseName)
             {
                 using (var conn = new SqlConnection(_masterCstr))
                 using (var cmd = conn.CreateCommand())
@@ -547,8 +547,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             /// <param name="mdfFilename">The MDF filename.</param>
             /// <param name="ldfFilename">The LDF filename.</param>
             public void GetFilenames(string databaseName,
-                out string mdfName, out string ldfName,
-                out string mdfFilename, out string ldfFilename)
+                out string? mdfName, out string? ldfName,
+                out string? mdfFilename, out string? ldfFilename)
             {
                 using (var conn = new SqlConnection(_masterCstr))
                 using (var cmd = conn.CreateCommand())
@@ -587,13 +587,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             /// <param name="cmd">The Sql Command.</param>
             /// <param name="databaseName">The name of the database.</param>
             /// <returns>The full filename of the MDF file, if the database exists, otherwise null.</returns>
-            private static string GetDatabase(SqlCommand cmd, string databaseName)
+            private static string? GetDatabase(SqlCommand cmd, string databaseName)
             {
                 SetCommand(cmd, @"
                     SELECT name, filename FROM master.dbo.sysdatabases WHERE ('[' + name + ']' = @0 OR name = @0)",
                     databaseName);
 
-                string mdf = null;
+                string? mdf = null;
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
@@ -613,7 +613,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             /// <param name="databaseName">The name of the database.</param>
             /// <param name="mdf">The name of the database (MDF) file.</param>
             /// <param name="ldf">The name of the log (LDF) file.</param>
-            private static void ExecuteDropDatabase(SqlCommand cmd, string databaseName, string mdf, string ldf = null)
+            private static void ExecuteDropDatabase(SqlCommand cmd, string databaseName, string mdf, string? ldf = null)
             {
                 try
                 {
@@ -736,8 +736,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             /// <param name="mdfFilename">The MDF filename.</param>
             /// <param name="ldfFilename">The LDF filename.</param>
             private void GetFilenames(SqlCommand cmd, string databaseName,
-                out string mdfName, out string ldfName,
-                out string mdfFilename, out string ldfFilename)
+                out string? mdfName, out string? ldfName,
+                out string? mdfFilename, out string? ldfFilename)
             {
                 mdfName = ldfName = mdfFilename = ldfFilename = null;
 
@@ -786,8 +786,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// Extensions are used eg to copy MyDatabase.mdf to MyDatabase.mdf.temp.
         /// </remarks>
         public void CopyDatabaseFiles(string databaseName, string filesPath,
-            string targetDatabaseName = null, string targetFilesPath = null,
-            string sourceExtension = null, string targetExtension = null,
+            string? targetDatabaseName = null, string? targetFilesPath = null,
+            string? sourceExtension = null, string? targetExtension = null,
             bool overwrite = false, bool delete = false)
         {
             var nop = (targetFilesPath == null || targetFilesPath == filesPath)
@@ -847,7 +847,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <remarks>
         /// Extensions are used eg to copy MyDatabase.mdf to MyDatabase.mdf.temp.
         /// </remarks>
-        public bool DatabaseFilesExist(string databaseName, string filesPath, string extension = null)
+        public bool DatabaseFilesExist(string databaseName, string filesPath, string? extension = null)
         {
             GetDatabaseFiles(databaseName, filesPath,
                 out _, out _, out _, out var mdfFilename, out var ldfFilename);

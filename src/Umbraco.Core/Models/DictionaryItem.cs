@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models
         public Func<int, ILanguage?>? GetLanguage { get; set; }
         private Guid? _parentId;
         private string _itemKey;
-        private IEnumerable<IDictionaryTranslation>? _translations;
+        private IEnumerable<IDictionaryTranslation> _translations;
 
         public DictionaryItem(string itemKey)
             : this(null, itemKey)
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets a list of translations for the Dictionary Item
         /// </summary>
         [DataMember]
-        public IEnumerable<IDictionaryTranslation>? Translations
+        public IEnumerable<IDictionaryTranslation> Translations
         {
             get { return _translations; }
             set

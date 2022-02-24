@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Persistence
         /// <summary>
         /// Gets entities.
         /// </summary>
-        IEnumerable<TEntity> GetMany(params TId?[] ids);
+        IEnumerable<TEntity>? GetMany(params TId[]? ids);
 
         /// <summary>
         /// Gets a value indicating whether an entity exists.

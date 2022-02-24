@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
-        public static Content BuildEntity(DocumentDto dto, IContentType contentType)
+        public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
         {
             var contentDto = dto.ContentDto;
             var nodeDto = contentDto.NodeDto;
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType contentType)
+        public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
         {
             var nodeDto = dto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Member BuildEntity(MemberDto dto, IMemberType contentType)
+        public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
         {
             var nodeDto = dto.ContentDto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;

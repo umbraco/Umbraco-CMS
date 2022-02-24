@@ -25,13 +25,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     public class UmbracoDatabase : Database, IUmbracoDatabase
     {
         private readonly ILogger<UmbracoDatabase> _logger;
-        private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
-        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly IBulkSqlInsertProvider? _bulkSqlInsertProvider;
+        private readonly DatabaseSchemaCreatorFactory? _databaseSchemaCreatorFactory;
         private readonly RetryPolicy? _connectionRetryPolicy;
         private readonly RetryPolicy? _commandRetryPolicy;
         private readonly IEnumerable<IMapper>? _mapperCollection;
         private readonly Guid _instanceGuid = Guid.NewGuid();
-        private List<CommandInfo> _commands;
+        private List<CommandInfo>? _commands;
 
         #region Ctor
 
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             ISqlContext sqlContext,
             DbProviderFactory provider,
             ILogger<UmbracoDatabase> logger,
-            IBulkSqlInsertProvider bulkSqlInsertProvider,
+            IBulkSqlInsertProvider? bulkSqlInsertProvider,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             RetryPolicy? connectionRetryPolicy = null,
             RetryPolicy? commandRetryPolicy = null,
@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private int _spid = -1;
         private const bool EnableSqlTraceDefault = true;
 #else
-        private string _instanceId;
+        private string? _instanceId;
         private const bool EnableSqlTraceDefault = false;
 #endif
 
@@ -194,19 +194,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             set => _commands = value ? new List<CommandInfo>() : null;
         }
 
-        internal IEnumerable<CommandInfo> Commands => _commands;
+        internal IEnumerable<CommandInfo>? Commands => _commands;
 
-        public int BulkInsertRecords<T>(IEnumerable<T> records) => _bulkSqlInsertProvider.BulkInsertRecords(this, records);
+        public int BulkInsertRecords<T>(IEnumerable<T> records) => _bulkSqlInsertProvider?.BulkInsertRecords(this, records) ?? 0;
 
         /// <summary>
         /// Returns the <see cref="DatabaseSchemaResult"/> for the database
         /// </summary>
         public DatabaseSchemaResult ValidateSchema()
         {
-            var dbSchema = _databaseSchemaCreatorFactory.Create(this);
-            var databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            var dbSchema = _databaseSchemaCreatorFactory?.Create(this);
+            var databaseSchemaValidationResult = dbSchema?.ValidateSchema();
 
-            return databaseSchemaValidationResult;
+            return databaseSchemaValidationResult ?? new DatabaseSchemaResult();
         }
 
         /// <summary>
@@ -270,12 +270,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             base.OnException(ex);
         }
 
-        private DbCommand _cmd;
+        private DbCommand? _cmd;
 
         protected override void OnExecutingCommand(DbCommand cmd)
         {
             // if no timeout is specified, and the connection has a longer timeout, use it
-            if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection.ConnectionTimeout > 30)
+            if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection?.ConnectionTimeout > 30)
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
@@ -293,9 +293,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             base.OnExecutingCommand(cmd);
         }
 
-        private string CommandToString(DbCommand cmd) => CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).ToArray());
+        private string CommandToString(DbCommand cmd) => CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).WhereNotNull().ToArray());
 
-        private string CommandToString(string sql, object[] args)
+        private string CommandToString(string? sql, object[]? args)
         {
             var text = new StringBuilder();
 #if DEBUG_DATABASES
@@ -350,7 +350,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             }
 
             public string Name { get; }
-            public object Value { get; }
+            public object? Value { get; }
             public DbType DbType { get; }
             public int Size { get; }
         }

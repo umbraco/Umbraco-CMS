@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Models
             : this(shortStringHelper, name, alias, null)
         { }
 
-        public Template(IShortStringHelper shortStringHelper, string? name, string alias, Func<File, string>? getFileContent)
+        public Template(IShortStringHelper shortStringHelper, string? name, string alias, Func<File, string?>? getFileContent)
             : base(string.Empty, getFileContent)
         {
             _shortStringHelper = shortStringHelper;

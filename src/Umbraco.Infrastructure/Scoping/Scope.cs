@@ -396,13 +396,13 @@ namespace Umbraco.Cms.Core.Scoping
                 // enter a transaction, as a scope implies a transaction, always
                 try
                 {
-                    _database.BeginTransaction(IsolationLevel);
+                    _database!.BeginTransaction(IsolationLevel);
                     EnsureDbLocks();
                     return _database;
                 }
                 catch
                 {
-                    _database.Dispose();
+                    _database?.Dispose();
                     _database = null;
                     throw;
                 }

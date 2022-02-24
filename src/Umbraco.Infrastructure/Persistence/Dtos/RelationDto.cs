@@ -29,11 +29,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("datetime")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime Datetime { get; set; }
+        public DateTime? Datetime { get; set; }
 
         [Column("comment")]
         [Length(1000)]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         [ResultColumn]
         [Column("parentObjectType")]

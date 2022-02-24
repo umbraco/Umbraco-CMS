@@ -60,9 +60,9 @@ namespace Umbraco.Cms.Core.Scoping
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
-        public ISqlContext SqlContext => DatabaseFactory.SqlContext;
+        public ISqlContext? SqlContext => DatabaseFactory.SqlContext;
 
-        public IQuery<T> CreateQuery<T>() => SqlContext.Query<T>();
+        public IQuery<T>? CreateQuery<T>() => SqlContext?.Query<T>();
 
         #region Context
 

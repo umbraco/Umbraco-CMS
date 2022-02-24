@@ -455,14 +455,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreateLogViewerQueryData()
         {
-            var defaultData = MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries.ToArray();
-
-            for (int i = 0; i < defaultData.Length; i++)
-            {
-                var dto = defaultData[i];
-                dto.Id = i+1;
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
-            }
+            // var defaultData = MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries.ToArray();
+            //
+            // for (int i = 0; i < defaultData.Length; i++)
+            // {
+            //     var dto = defaultData[i];
+            //     dto.Id = i+1;
+            //     _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
+            // }
         }
     }
 }

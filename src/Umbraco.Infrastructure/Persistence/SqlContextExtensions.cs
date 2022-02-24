@@ -51,7 +51,7 @@ namespace Umbraco.Extensions
         /// <param name="alias1">An optional table alias for the first DTO.</param>
         /// <param name="alias2">An optional table alias for the second DTO.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitDto<TDto1, TDto2>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, object>> expression, string? alias1 = null, string? alias2 = null)
+        public static (string Sql, object[] Args) VisitDto<TDto1, TDto2>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, object?>> expression, string? alias1 = null, string? alias2 = null)
         {
             var visitor = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlContext, alias1, alias2);
             var visited = visitor.Visit(expression);

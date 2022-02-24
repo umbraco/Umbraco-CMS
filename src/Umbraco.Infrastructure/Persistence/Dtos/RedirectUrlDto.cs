@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("culture")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Culture { get; set; } = null!;
+        public string? Culture { get; set; }
 
         [Column("urlHash")]
         [NullSetting(NullSetting = NullSettings.NotNull)]

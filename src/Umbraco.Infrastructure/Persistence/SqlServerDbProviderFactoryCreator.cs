@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _globalSettings = globalSettings;
         }
 
-        public DbProviderFactory CreateFactory(string providerName)
+        public DbProviderFactory? CreateFactory(string? providerName)
         {
             if (string.IsNullOrEmpty(providerName)) return null;
 

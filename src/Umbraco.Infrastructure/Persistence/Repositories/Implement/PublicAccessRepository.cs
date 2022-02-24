@@ -27,17 +27,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
-        protected override PublicAccessEntry PerformGet(Guid id)
+        protected override PublicAccessEntry? PerformGet(Guid id)
         {
             //return from GetAll - this will be cached as a collection
-            return GetMany().FirstOrDefault(x => x.Key == id);
+            return GetMany()?.FirstOrDefault(x => x.Key == id);
         }
 
-        protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[] ids)
+        protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[]? ids)
         {
             var sql = GetBaseQuery(false);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.WhereIn<AccessDto>(x => x.Id, ids);
             }

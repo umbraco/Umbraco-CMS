@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class RelationFactory
     {
-        public static IRelation BuildEntity(RelationDto dto, IRelationType relationType)
+        public static IRelation BuildEntity(RelationDto dto, IRelationType? relationType)
         {
             var entity = new Relation(dto.ParentId, dto.ChildId, dto.ParentObjectType, dto.ChildObjectType, relationType);
 

@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets a version.
         /// </summary>
-        TEntity GetVersion(int versionId);
+        TEntity? GetVersion(int versionId);
 
         /// <summary>
         /// Deletes a version.
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets the recycle bin content.
         /// </summary>
-        IEnumerable<TEntity> GetRecycleBin();
+        IEnumerable<TEntity>? GetRecycleBin();
 
         /// <summary>
         /// Gets the count of content items of a given content type.

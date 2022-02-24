@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     {
         private readonly bool _upgrading;
 
-        public UmbracoPocoDataBuilder(Type type, MapperCollection mapper, bool upgrading)
+        public UmbracoPocoDataBuilder(Type type, MapperCollection? mapper, bool upgrading)
             : base(type, mapper)
         {
             _upgrading = upgrading;

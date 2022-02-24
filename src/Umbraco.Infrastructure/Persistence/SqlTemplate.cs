@@ -11,17 +11,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     {
         private readonly ISqlContext _sqlContext;
         private readonly string _sql;
-        private readonly Dictionary<int, object> _args;
+        private readonly Dictionary<int, object>? _args;
 
         // these are created in PocoToSqlExpressionVisitor
         internal class TemplateArg
         {
-            public TemplateArg(string name)
+            public TemplateArg(string? name)
             {
                 Name = name;
             }
 
-            public string Name { get; }
+            public string? Name { get; }
 
             public override string ToString()
             {
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             if (args.Length > 0)
                 _args = new Dictionary<int, object>();
             for (var i = 0; i < args.Length; i++)
-                _args[i] = args[i];
+                _args![i] = args[i];
         }
 
         public Sql<ISqlContext> Sql()
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             if (args.Length == 1 && args[0].GetType().Name.Contains("<"))
                 return SqlNamed(args[0]);
 
-            if (args.Length != _args.Count)
+            if (args.Length != _args?.Count)
                 throw new ArgumentException("Invalid number of arguments.", nameof(args));
 
             if (args.Length == 0)
@@ -69,23 +69,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public Sql<ISqlContext> SqlNamed(object nargs)
         {
             var isBuilt = true;
-            var args = new object[_args.Count];
+            var args = new object[_args?.Count ?? 0];
             var properties = nargs.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(nargs));
-            for (var i = 0; i < _args.Count; i++)
+            for (var i = 0; i < _args?.Count; i++)
             {
-                object value;
+                object? value;
                 if (_args[i] is TemplateArg templateArg)
                 {
-                    if (!properties.TryGetValue(templateArg.Name, out value))
+                    if (!properties.TryGetValue(templateArg.Name ?? string.Empty, out value))
                         throw new InvalidOperationException($"Missing argument \"{templateArg.Name}\".");
-                    properties.Remove(templateArg.Name);
+                    properties.Remove(templateArg.Name!);
                 }
                 else
                 {
                     value = _args[i];
                 }
 
-                args[i] = value;
+                args[i] = value!;
 
                 // if value is enumerable then we'll need to expand arguments
                 if (value is IEnumerable)
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         internal string ToText()
         {
-            var sql = new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.ToArray());
+            var sql = new Sql<ISqlContext>(_sqlContext, _sql, _args?.Values.ToArray());
             return sql.ToText();
         }
 
@@ -110,12 +110,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <summary>
         /// Gets a WHERE expression argument.
         /// </summary>
-        public static T Arg<T>(string name) => default;
+        public static T? Arg<T>(string name) => default;
 
         /// <summary>
         /// Gets a WHERE IN expression argument.
         /// </summary>
-        public static IEnumerable<T> ArgIn<T>(string name)
+        public static IEnumerable<T?> ArgIn<T>(string name)
         {
             // don't return an empty enumerable, as it breaks NPoco
             return new[] { default (T) };

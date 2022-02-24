@@ -33,12 +33,12 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
             var result = _databaseBuilder.CreateSchemaAndData();
 
-            if (result.Success == false)
+            if (result?.Success == false)
             {
                 throw new InstallException("The database failed to install. ERROR: " + result.Message);
             }
 
-            if (result.RequiresUpgrade == false)
+            if (result?.RequiresUpgrade == false)
             {
                 return Task.FromResult<InstallSetupResult?>(null);
             }

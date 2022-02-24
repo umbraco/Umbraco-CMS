@@ -11,11 +11,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class PropertyFactory
     {
-        public static IEnumerable<IProperty> BuildEntities(IPropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
+        public static IEnumerable<IProperty> BuildEntities(IPropertyType[]? propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
         {
             var properties = new List<IProperty>();
             var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>)x);
 
+            if (propertyTypes is null)
+            {
+                return properties;
+            }
             foreach (var propertyType in propertyTypes)
             {
                 var values = new List<Property.InitialPropertyValue>();

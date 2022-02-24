@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     public abstract class MigrationExpressionBase : IMigrationExpression
     {
         private bool _executed;
-        private List<IMigrationExpression> _expressions;
+        private List<IMigrationExpression>? _expressions;
 
         protected MigrationExpressionBase(IMigrationContext context)
         {
@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// This might be useful in the future if we add it to the interface, but for now it's used to hack the DeleteAppTables & DeleteForeignKeyExpression
         /// to ensure they are not executed twice.
         /// </summary>
-        internal string Name { get; set; }
+        internal string? Name { get; set; }
 
         protected string GetQuotedValue(object? val)
         {
@@ -151,11 +151,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 case TypeCode.UInt16:
                 case TypeCode.UInt32:
                 case TypeCode.UInt64:
-                    return val.ToString();
+                    return val.ToString()!;
                 case TypeCode.DateTime:
                     return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTime((DateTime) val));
                 default:
-                    return SqlSyntax.GetQuotedValue(val.ToString());
+                    return SqlSyntax.GetQuotedValue(val.ToString()!);
             }
         }
     }

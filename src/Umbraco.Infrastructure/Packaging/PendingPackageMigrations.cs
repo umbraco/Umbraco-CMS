@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Packaging
         {
             _logger = logger;
             _packageMigrationPlans = packageMigrationPlans;
-        
+
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Packaging
         /// These are the key/value pairs from the keyvalue storage of migration names and their final values
         /// </param>
         /// <returns></returns>
-        public IReadOnlyList<string> GetPendingPackageMigrations(IReadOnlyDictionary<string, string> keyValues)
+        public IReadOnlyList<string> GetPendingPackageMigrations(IReadOnlyDictionary<string, string?>? keyValues)
         {
             var packageMigrationPlans = _packageMigrationPlans.ToList();
 
@@ -35,9 +35,9 @@ namespace Umbraco.Cms.Core.Packaging
 
             foreach (PackageMigrationPlan plan in packageMigrationPlans)
             {
-                string currentMigrationState = null;
+                string? currentMigrationState = null;
                 var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
-                if (keyValues.TryGetValue(planKeyValueKey, out var value))
+                if (keyValues?.TryGetValue(planKeyValueKey, out var value) ?? false)
                 {
                     currentMigrationState = value;
 

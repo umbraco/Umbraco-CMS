@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return val;
 
             // more magic here ;-(
-            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.ConfigurationAs<ImageCropperConfiguration>();
             var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
             return JsonConvert.SerializeObject(new

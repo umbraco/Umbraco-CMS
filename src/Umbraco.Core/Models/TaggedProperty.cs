@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="TaggedProperty"/> class.
         /// </summary>
-        public TaggedProperty(int propertyTypeId, string propertyTypeAlias, IEnumerable<ITag> tags)
+        public TaggedProperty(int propertyTypeId, string? propertyTypeAlias, IEnumerable<ITag> tags)
         {
             PropertyTypeId = propertyTypeId;
             PropertyTypeAlias = propertyTypeAlias;
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the alias of the property type.
         /// </summary>
-        public string PropertyTypeAlias { get; }
+        public string? PropertyTypeAlias { get; }
 
         /// <summary>
         /// Gets the tags.

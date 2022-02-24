@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models
         private string? _name;
         private string? _query;
 
-        public LogViewerQuery(string name, string query)
+        public LogViewerQuery(string? name, string? query)
         {
             Name = name;
             _query = query;

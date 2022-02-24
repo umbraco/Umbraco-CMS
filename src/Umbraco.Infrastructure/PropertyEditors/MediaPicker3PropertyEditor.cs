@@ -146,10 +146,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
                 else
                 {
-                    // New JSON format
-                    foreach (var dto in jsonSerializer.Deserialize<IEnumerable<MediaWithCropsDto>>(rawJson))
+                    var dtos = jsonSerializer.Deserialize<IEnumerable<MediaWithCropsDto>>(rawJson);
+                    if (dtos is not null)
                     {
-                        yield return dto;
+                        // New JSON format
+                        foreach (var dto in dtos)
+                        {
+                            yield return dto;
+                        }
                     }
                 }
             }

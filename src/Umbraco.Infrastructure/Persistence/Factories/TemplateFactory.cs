@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-        public static Template BuildEntity(IShortStringHelper shortStringHelper, TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
+        public static Template BuildEntity(IShortStringHelper shortStringHelper, TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string?> getFileContent)
         {
             var template = new Template(shortStringHelper, dto.NodeDto.Text, dto.Alias, getFileContent);
 
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
 
                 if (dto.NodeDto.ParentId > 0)
-                    template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId.Value);
+                    template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
 
                 // reset dirty initial properties (U4-1946)
                 template.ResetDirtyProperties(false);
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                                   NodeId = entity.Id,
                                   Level = 1,
                                   NodeObjectType = nodeObjectTypeId,
-                                  ParentId = entity.MasterTemplateId?.Value,
+                                  ParentId = entity.MasterTemplateId?.Value ?? 0,
                                   Path = entity.Path,
                                   Text = entity.Name,
                                   Trashed = false,

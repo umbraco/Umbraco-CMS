@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
 
-            if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition transition))
+            if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition? transition))
             {
                 plan.ThrowOnUnknownInitialState(nextState);
             }
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 // that packages notification handlers may explode because that package isn't fully installed yet.
                 using (scope.Notifications.Suppress())
                 {
-                    var context = new MigrationContext(plan, _scopeAccessor.AmbientScope.Database, _loggerFactory.CreateLogger<MigrationContext>());
+                    var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database, _loggerFactory.CreateLogger<MigrationContext>());
 
                     while (transition != null)
                     {

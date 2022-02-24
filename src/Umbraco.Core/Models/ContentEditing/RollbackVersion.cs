@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int VersionId { get; set; }
 
         [DataMember(Name = "versionDate")]
-        public DateTime VersionDate { get; set; }
+        public DateTime? VersionDate { get; set; }
 
         [DataMember(Name = "versionAuthorId")]
         public int VersionAuthorId { get; set; }

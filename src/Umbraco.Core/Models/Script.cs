@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models
             : this(path, (Func<File, string>?) null)
         { }
 
-        public Script(string path, Func<File, string>? getFileContent)
+        public Script(string path, Func<File, string?>? getFileContent)
             : base(path, getFileContent)
         { }
 

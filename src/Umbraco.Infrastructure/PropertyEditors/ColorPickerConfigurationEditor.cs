@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 try
                 {
                     var o = _jsonSerializer.Deserialize<ItemValue>(item.Value);
-                    o.SortOrder = sortOrder;
+                    o!.SortOrder = sortOrder;
                     return o;
                 }
                 catch

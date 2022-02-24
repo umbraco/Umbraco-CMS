@@ -31,7 +31,7 @@ namespace Umbraco.Extensions
         /// NPoco's normal Page returns a List{T} but sometimes we don't want all that in memory and instead want to
         /// iterate over each row with a reader using Query vs Fetch.
         /// </remarks>
-        public static IEnumerable<T> QueryPaged<T>(this IDatabase database, long pageSize, Sql sql, Sql sqlCount)
+        public static IEnumerable<T> QueryPaged<T>(this IDatabase database, long pageSize, Sql sql, Sql? sqlCount)
         {
             var sqlString = sql.SQL;
             var sqlArgs = sql.Arguments;
@@ -131,8 +131,8 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db,
             T poco,
-            string updateCommand,
-            object updateArgs)
+            string? updateCommand,
+            object? updateArgs)
             where T : class
         {
             if (poco == null)
@@ -142,9 +142,9 @@ namespace Umbraco.Extensions
             //  in any case, no point trying to update if there's no primary key!
 
             // try to update
-            var rowCount = updateCommand.IsNullOrWhiteSpace()
+            var rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
                     ? db.Update(poco)
-                    : db.Update<T>(updateCommand, updateArgs);
+                    : db.Update<T>(updateCommand!, updateArgs);
             if (rowCount > 0)
                 return RecordPersistenceType.Update;
 
@@ -166,9 +166,9 @@ namespace Umbraco.Extensions
                     // RC2 race cond here: another thread may remove the record
 
                     // try to update
-                    rowCount = updateCommand.IsNullOrWhiteSpace()
+                    rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
                         ? db.Update(poco)
-                        : db.Update<T>(updateCommand, updateArgs);
+                        : db.Update<T>(updateCommand!, updateArgs);
                     if (rowCount > 0)
                         return RecordPersistenceType.Update;
 
@@ -229,7 +229,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="TTransaction"></typeparam>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public static TTransaction GetTypedTransaction<TTransaction>(IDbTransaction transaction)
+        public static TTransaction GetTypedTransaction<TTransaction>(IDbTransaction? transaction)
             where TTransaction : class, IDbTransaction
         {
             var t = transaction;
@@ -243,7 +243,7 @@ namespace Umbraco.Extensions
                         t = profiled.WrappedTransaction;
                         break;
                     default:
-                        throw new NotSupportedException(transaction.GetType().FullName);
+                        throw new NotSupportedException(transaction?.GetType().FullName);
                 }
             }
         }

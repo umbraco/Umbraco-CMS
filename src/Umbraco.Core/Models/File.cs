@@ -19,9 +19,9 @@ namespace Umbraco.Cms.Core.Models
         // cannot simply use HasIdentity as some classes (eg Script) override it
         // in a weird way.
         private string? _content;
-        public Func<File, string>? GetFileContent { get; set; }
+        public Func<File, string?>? GetFileContent { get; set; }
 
-        protected File(string path, Func<File, string>? getFileContent = null)
+        protected File(string path, Func<File, string?>? getFileContent = null)
         {
             _path = SanitizePath(path);
             _originalPath = _path;

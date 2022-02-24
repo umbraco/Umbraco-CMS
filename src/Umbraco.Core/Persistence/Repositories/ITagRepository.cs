@@ -50,12 +50,12 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets a tagged entity.
         /// </summary>
-        TaggedEntity GetTaggedEntityByKey(Guid key);
+        TaggedEntity? GetTaggedEntityByKey(Guid key);
 
         /// <summary>
         /// Gets a tagged entity.
         /// </summary>
-        TaggedEntity GetTaggedEntityById(int id);
+        TaggedEntity? GetTaggedEntityById(int id);
 
         /// Gets all entities of a type, tagged with any tag in the specified group.
         IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group, string? culture = null);

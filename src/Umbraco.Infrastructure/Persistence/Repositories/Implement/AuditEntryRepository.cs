@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        protected override IAuditEntry PerformGet(int id)
+        protected override IAuditEntry? PerformGet(int id)
         {
             Sql<ISqlContext> sql = Sql()
                 .Select<AuditEntryDto>()
@@ -63,9 +63,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<IAuditEntry> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IAuditEntry> PerformGetAll(params int[]? ids)
         {
-            if (ids.Length == 0)
+            if (ids?.Length == 0)
             {
                 Sql<ISqlContext> sql = Sql()
                     .Select<AuditEntryDto>()

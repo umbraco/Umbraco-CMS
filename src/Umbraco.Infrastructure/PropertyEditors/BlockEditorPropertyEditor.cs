@@ -216,7 +216,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         foreach (var prop in row.PropertyValues)
                         {
                             // Fetch the property types prevalue
-                            var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

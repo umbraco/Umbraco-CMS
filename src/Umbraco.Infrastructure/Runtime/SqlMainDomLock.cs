@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 return true;
             }
 
-            if (!(_dbFactory.SqlContext.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
+            if (!(_dbFactory.SqlContext?.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
             {
                 throw new NotSupportedException("SqlMainDomLock is only supported for Sql Server");
             }
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 db = _dbFactory.CreateDatabase();
 
 
-                _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
+                _hasTable = db!.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
                 {
                     _logger.LogDebug("The DB does not contain the required table so we must be in an install state. We have no choice but to assume we can acquire.");
@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     return true;
                 }
 
-                db.BeginTransaction(IsolationLevel.ReadCommitted);
+                db!.BeginTransaction(IsolationLevel.ReadCommitted);
 
                 try
                 {
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         {
                             // re-check if its still false, we don't want to re-query once we know its there since this
                             // loop needs to use minimal resources
-                            _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
+                            _hasTable = db!.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                             if (!_hasTable)
                             {
                                 // the Db does not contain the required table, we just keep looping since we can't query the db
@@ -253,10 +253,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         if (_acquireWhenTablesNotAvailable)
                         {
                             _acquireWhenTablesNotAvailable = false;
-                            InsertLockRecord(_lockId, db);
+                            InsertLockRecord(_lockId, db!);
                         }
 
-                        db.BeginTransaction(IsolationLevel.ReadCommitted);
+                        db!.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
                         _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
 
@@ -316,13 +316,13 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                             // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
                             Thread.Sleep(1000);
 
-                            var acquired = TryAcquire(db, tempId, updatedTempId);
+                            var acquired = TryAcquire(db!, tempId, updatedTempId);
                             if (acquired.HasValue)
                                 return acquired.Value;
 
                             if (watch.ElapsedMilliseconds >= millisecondsTimeout)
                             {
-                                return AcquireWhenMaxWaitTimeElapsed(db);
+                                return AcquireWhenMaxWaitTimeElapsed(db!);
                             }
                         }
                     }
@@ -366,7 +366,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     _logger.LogDebug("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
-                else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
+                else if (mainDomRows.Count == 1 && (!mainDomRows[0].Value?.StartsWith(tempId) ?? false))
                 {
                     // in this case, the prefixed ID is different which  means
                     // another new AppDomain has come online and is wanting to take over. In that case, we will not
@@ -502,7 +502,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                             try
                             {
                                 db = _dbFactory.CreateDatabase();
-                                db.BeginTransaction(IsolationLevel.ReadCommitted);
+                                db!.BeginTransaction(IsolationLevel.ReadCommitted);
 
                                 // get a write lock
                                 _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);

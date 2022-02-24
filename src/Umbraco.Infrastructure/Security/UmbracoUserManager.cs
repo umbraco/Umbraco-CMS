@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Security
             var isValid = true;
             foreach (IPasswordValidator<TUser> v in PasswordValidators)
             {
-                IdentityResult result = await v.ValidateAsync(this, null, password);
+                IdentityResult result = await v.ValidateAsync(this, null!, password);
                 if (!result.Succeeded)
                 {
                     if (result.Errors.Any())

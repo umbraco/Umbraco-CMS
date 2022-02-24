@@ -313,7 +313,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         #region Database Schema
 
-        public void CreateDatabase() => _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName, _databaseFactory.ConnectionString);
+        public void CreateDatabase() => _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName!, _databaseFactory.ConnectionString!);
 
         /// <summary>
         /// Validates the database schema.

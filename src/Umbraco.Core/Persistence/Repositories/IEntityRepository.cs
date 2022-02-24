@@ -9,10 +9,10 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IEntityRepository : IRepository
     {
-        IEntitySlim Get(int id);
-        IEntitySlim Get(Guid key);
-        IEntitySlim Get(int id, Guid objectTypeId);
-        IEntitySlim Get(Guid key, Guid objectTypeId);
+        IEntitySlim? Get(int id);
+        IEntitySlim? Get(Guid key);
+        IEntitySlim? Get(int id, Guid objectTypeId);
+        IEntitySlim? Get(Guid key, Guid objectTypeId);
 
         IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);
         IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);

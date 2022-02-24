@@ -20,8 +20,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Implementation of IRepository<string,Script>
 
-        public override IScript Get(string id)
+        public override IScript? Get(string? id)
         {
+            if (id is null || FileSystem is null)
+            {
+                return null;
+            }
             // get the relative path within the filesystem
             // (though... id should be relative already)
             var path = FileSystem.GetRelativePath(id);
@@ -63,16 +67,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 script.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
-        public override IEnumerable<IScript> GetMany(params string[] ids)
+        public override IEnumerable<IScript> GetMany(params string[]? ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct().ToArray();
+            ids = ids?.Distinct().ToArray();
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 foreach (var id in ids)
                 {
-                    yield return Get(id);
+                    IScript? script = Get(id);
+                    if (script is not null)
+                    {
+                        yield return script;
+                    }
                 }
             }
             else
@@ -80,7 +88,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 var files = FindAllFiles("", "*.*");
                 foreach (var file in files)
                 {
-                    yield return Get(file);
+                    IScript? script = Get(file);
+                    if (script is not null)
+                    {
+                        yield return script;
+                    }
                 }
             }
         }

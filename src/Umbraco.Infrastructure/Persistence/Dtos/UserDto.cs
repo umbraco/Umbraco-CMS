@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public bool NoConsole { get; set; }
 
         [Column("userName")]
-        public string? UserName { get; set; }
+        public string UserName { get; set; } = null!;
 
         [Column("userLogin")]
         [Length(125)]
@@ -93,12 +93,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("createDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
 
         [Column("updateDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime UpdateDate { get; set; }
+        public DateTime UpdateDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Will hold the media file system relative path of the users custom avatar if they uploaded one

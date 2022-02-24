@@ -472,7 +472,7 @@ namespace Umbraco.Cms.Core.Security
                 && user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
-                user.Name = identityUser.Name;
+                user.Name = identityUser.Name ?? string.Empty;
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Email))

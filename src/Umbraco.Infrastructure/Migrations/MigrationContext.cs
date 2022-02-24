@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationContext"/> class.
         /// </summary>
-        public MigrationContext(MigrationPlan plan, IUmbracoDatabase database, ILogger<MigrationContext> logger)
+        public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger)
         {
             Plan = plan;
             Database = database ?? throw new ArgumentNullException(nameof(database));

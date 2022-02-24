@@ -59,6 +59,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 var links = new List<Link>();
                 var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString()!);
                 var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                if (dtos is null)
+                {
+                    return links;
+                }
                 foreach (var dto in dtos)
                 {
                     var type = LinkType.External;

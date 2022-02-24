@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the tag group.
         /// </summary>
         [DataMember]
-        string? Group { get; set; }
+        string Group { get; set; }
 
         /// <summary>
         /// Gets or sets the tag text.
         /// </summary>
         [DataMember]
-        string? Text { get; set; }
+        string Text { get; set; }
 
         /// <summary>
         /// Gets or sets the tag language.

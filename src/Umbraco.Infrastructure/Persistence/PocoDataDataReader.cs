@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <returns></returns>
         public override object GetValue(int i)
         {
-            return _enumerator.Current == null ? null : _readerColumns[i].GetValue(_enumerator.Current);
+            return _enumerator.Current == null ? null! : _readerColumns[i].GetValue(_enumerator.Current);
         }
 
         /// <summary>

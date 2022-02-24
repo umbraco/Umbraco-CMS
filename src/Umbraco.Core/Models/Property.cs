@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public class InitialPropertyValue
         {
-            public InitialPropertyValue(string culture, string? segment, bool published, object? value)
+            public InitialPropertyValue(string? culture, string? segment, bool published, object? value)
             {
                 Culture = culture;
                 Segment = segment;
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Models
                 Value = value;
             }
 
-            public string Culture { get; }
+            public string? Culture { get; }
             public string? Segment { get; }
             public bool Published { get; }
             public object? Value { get; }

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         /// <summary>
         /// Adds a where-in clause to the query.
         /// </summary>
-        public virtual IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable values)
+        public virtual IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable? values)
         {
             if (fieldSelector == null) return this;
 
@@ -55,9 +55,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         {
             if (predicates == null) return this;
 
-            StringBuilder sb = null;
-            List<object> parameters = null;
-            Sql<ISqlContext> sql = null;
+            StringBuilder? sb = null;
+            List<object>? parameters = null;
+            Sql<ISqlContext>? sql = null;
             foreach (var predicate in predicates)
             {
                 // see notes in Where()
@@ -73,18 +73,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                 else
                 {
                     sb.Append(" OR ");
-                    sql.Append(" OR ");
+                    sql?.Append(" OR ");
                 }
 
                 sb.Append(whereExpression);
-                parameters.AddRange(expressionHelper.GetSqlParameters());
-                sql.Append(whereExpression, expressionHelper.GetSqlParameters());
+                parameters?.AddRange(expressionHelper.GetSqlParameters());
+                sql?.Append(whereExpression, expressionHelper.GetSqlParameters());
             }
 
             if (sb == null) return this;
 
             sb.Append(")");
-            _wheres.Add(Tuple.Create("(" + sql.SQL + ")", sql.Arguments));
+            _wheres.Add(Tuple.Create("(" + sql?.SQL + ")", sql?.Arguments)!);
 
             return this;
         }

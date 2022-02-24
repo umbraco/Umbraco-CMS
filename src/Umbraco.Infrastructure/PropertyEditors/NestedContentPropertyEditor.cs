@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                             if (propEditor == null) continue;
 
-                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
                             var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
 
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             var dataTypeId = prop.Value.PropertyType.DataTypeId;
                             if (!valEditors.TryGetValue(dataTypeId, out var valEditor))
                             {
-                                var tempConfig = _dataTypeService.GetDataType(dataTypeId).Configuration;
+                                var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
                                 valEditor = propEditor.GetValueEditor(tempConfig);
 
                                 valEditors.Add(dataTypeId, valEditor);
@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     foreach(var prop in row.PropertyValues.ToList())
                     {
                         // Fetch the property types prevalue
-                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                         // Lookup the property editor
                         var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
