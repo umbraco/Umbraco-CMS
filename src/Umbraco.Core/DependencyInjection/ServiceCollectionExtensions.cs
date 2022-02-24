@@ -37,6 +37,23 @@ namespace Umbraco.Extensions
             services.Add(ServiceDescriptor.Describe(typeof(TService), typeof(TImplementing), lifetime));
         }
 
+        /// <summary>
+        /// Adds services of types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/> with a shared implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <remarks>
+        /// Removes all previous registrations for the types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/>.
+        /// </remarks>
+        public static void AddMultipleUnique<TService1, TService2, TImplementing>(
+            this IServiceCollection services,
+            ServiceLifetime lifetime = ServiceLifetime.Singleton)
+            where TService1 : class
+            where TService2 : class
+            where TImplementing : class, TService1, TService2
+        {
+            services.AddUnique<TService1, TImplementing>(lifetime);
+            services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>(), lifetime);
+        }
+
         // TODO(V11): Remove this function.
         [Obsolete("This method is functionally equivalent to AddSingleton<TImplementing>() please use that instead.")]
         public static void AddUnique<TImplementing>(this IServiceCollection services)
