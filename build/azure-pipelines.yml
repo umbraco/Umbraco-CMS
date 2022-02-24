@@ -37,7 +37,7 @@ stages:
                              Write-Host "##vso[build.addbuildtag]Release build"
                              Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]true"
                           }else{
-                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]true"
+                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]false"
                           }
     - stage: Unit_Tests
       displayName: Unit Tests
