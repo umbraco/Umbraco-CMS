@@ -10,7 +10,7 @@
         </div>
 
         <div ng-hide="success">
-            <p class="abstract">
+            <p class="abstract" ng-if="!disableDelete">
                 <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
             </p>
 
@@ -28,7 +28,9 @@
                 <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
             </div>
 
-            <umb-confirm on-confirm="performDelete" confirm-button-style="danger" on-cancel="cancel" ng-hide="checkingReferences"></umb-confirm>
+            <umb-confirm ng-if="!disableDelete" on-confirm="performDelete" confirm-button-style="danger" on-cancel="cancel" ng-hide="checkingReferences"></umb-confirm>
+
+            <umb-confirm ng-if="disableDelete" confirm-button-style="danger" on-cancel="cancel"></umb-confirm>
         </div>
 
     </div>
