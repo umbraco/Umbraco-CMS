@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -66,5 +67,113 @@ namespace Umbraco.Tests.Models
 
             Assert.IsFalse(contentType.IsDirty());
         }
+
+        [Test]
+        public void Get_Dirty_Properties_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            Assert.IsEmpty(contentType.GetDirtyProperties());
+
+            contentType.Alias = "SomethingNew";
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+
+            var dirty = contentType.GetDirtyProperties().ToList();
+            Assert.AreEqual(2, dirty.Count);
+            Assert.Contains(nameof(contentType.Alias), dirty);
+            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), dirty);
+        }
+
+        [Test]
+        public void Get_Dirty_Properties_Works_If_Only_History_Cleanup_Is_Dirty()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            Assert.IsEmpty(contentType.GetDirtyProperties());
+
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+
+            var dirty = contentType.GetDirtyProperties().ToList();
+            Assert.AreEqual(1, dirty.Count);
+            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), dirty);
+        }
+
+        [Test]
+        public void Is_Property_Dirty_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.Alias = "SomethingNew";
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+
+            Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.Alias)));
+            Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)));
+        }
+
+        [Test]
+        public void Was_Dirty_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            contentType.ResetDirtyProperties();
+
+            Assert.IsTrue(contentType.WasDirty());
+        }
+
+        [Test]
+        public void Was_Dirty_Property_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.Alias = "SomethingNew";
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            contentType.ResetDirtyProperties();
+
+            Assert.IsTrue(contentType.WasPropertyDirty(nameof(contentType.Alias)));
+            Assert.IsTrue(contentType.WasPropertyDirty(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)));
+        }
+
+        [Test]
+        public void Get_Were_Dirty_Properties_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.Alias = "SomethingNew";
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            contentType.ResetDirtyProperties();
+
+            var wereDirty = contentType.GetWereDirtyProperties().ToList();
+            Assert.AreEqual(2, wereDirty.Count);
+            Assert.Contains(nameof(contentType.Alias), wereDirty);
+            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), wereDirty);
+        }
+
+        [Test]
+        public void Get_Were_Dirty_Works_If_Only_History_Cleanup_Is_Dirty()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            contentType.ResetDirtyProperties();
+
+            var wereDirty = contentType.GetWereDirtyProperties().ToList();
+            Assert.AreEqual(1, contentType.GetWereDirtyProperties().Count());
+            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), wereDirty);
+        }
+
+        [Test]
+        public void Reset_Were_Dirty_Properties_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.Alias = "SomethingNew";
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            contentType.ResetDirtyProperties();
+            Assert.AreEqual(2, contentType.GetWereDirtyProperties().Count());
+
+            contentType.ResetWereDirtyProperties();
+            Assert.IsEmpty(contentType.GetWereDirtyProperties());
+        }
     }
 }
+
+// TODO: Enable/Disable change tracking??

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.ContentEditing;
 
@@ -50,18 +49,42 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public override bool SupportsPublishing => SupportsPublishingConst;
 
+        /// <inheritdoc />
         public override bool IsDirty()
-        {
-            var baseIsDirty = base.IsDirty();
-            var dirtyHistory = HistoryCleanup.IsDirty();
+            => base.IsDirty() || HistoryCleanup.IsDirty();
 
-            return baseIsDirty || dirtyHistory;
-        }
+        /// <inheritdoc />
+        public override bool IsPropertyDirty(string propertyName)
+            => base.IsPropertyDirty(propertyName) || HistoryCleanup.IsPropertyDirty(propertyName);
 
+        /// <inheritdoc />
+        public override IEnumerable<string> GetDirtyProperties() =>
+            base.GetDirtyProperties().Concat(HistoryCleanup.GetDirtyProperties());
+
+        /// <inheritdoc />
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
             HistoryCleanup.ResetDirtyProperties(rememberDirty);
+        }
+
+        /// <inheritdoc />
+        public override bool WasDirty()
+            => base.WasDirty() || HistoryCleanup.WasDirty();
+
+        /// <inheritdoc />
+        public override bool WasPropertyDirty(string propertyName)
+            => base.WasPropertyDirty(propertyName) || HistoryCleanup.WasPropertyDirty(propertyName);
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetWereDirtyProperties()
+            => base.GetWereDirtyProperties().Concat(HistoryCleanup.GetWereDirtyProperties());
+
+        /// <inheritdoc />
+        public override void ResetWereDirtyProperties()
+        {
+            base.ResetWereDirtyProperties();
+            HistoryCleanup.ResetWereDirtyProperties();
         }
 
         //Custom comparer for enumerable
