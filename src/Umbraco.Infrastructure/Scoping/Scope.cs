@@ -594,10 +594,6 @@ namespace Umbraco.Cms.Core.Scoping
             }
             else
             {
-                if (_database is null)
-                {
-                    return;
-                }
                 lock (_lockQueueLocker)
                 {
                     if (_queuedLocks?.Count > 0)
@@ -626,12 +622,12 @@ namespace Umbraco.Cms.Core.Scoping
                                 switch (currentType)
                                 {
                                     case LockType.ReadLock:
-                                        EagerReadLockInner(_database, currentInstanceId,
+                                        EagerReadLockInner(_database!, currentInstanceId,
                                             currentTimeout == TimeSpan.Zero ? null : currentTimeout,
                                             collectedIds.ToArray());
                                         break;
                                     case LockType.WriteLock:
-                                        EagerWriteLockInner(_database, currentInstanceId,
+                                        EagerWriteLockInner(_database!, currentInstanceId,
                                             currentTimeout == TimeSpan.Zero ? null : currentTimeout,
                                             collectedIds.ToArray());
                                         break;
@@ -652,11 +648,11 @@ namespace Umbraco.Cms.Core.Scoping
                         switch (currentType)
                         {
                             case LockType.ReadLock:
-                                EagerReadLockInner(_database, currentInstanceId,
+                                EagerReadLockInner(_database!, currentInstanceId,
                                     currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                                 break;
                             case LockType.WriteLock:
-                                EagerWriteLockInner(_database, currentInstanceId,
+                                EagerWriteLockInner(_database!, currentInstanceId,
                                     currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                                 break;
                         }
