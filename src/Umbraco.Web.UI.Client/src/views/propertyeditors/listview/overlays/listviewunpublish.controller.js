@@ -75,6 +75,12 @@
         vm.onReferencesWarning = () => {
             $scope.model.submitButtonStyle = "danger";
           
+            // check if the unpublishing of items that have references has been disabled
+            if (Umbraco.Sys.ServerVariables.umbracoSettings.disableUnpublishWhenReferenced) {
+                // this will only be disabled if we have a warning, indicating that this item or its descendants have reference
+                $scope.model.disableSubmitButton = true;
+            }
+
             localizationService.localize("content_unpublish").then(function (action) {
                 localizationService.localize("references_listViewDialogWarning", [action.toLowerCase()]).then((value) => {
                     vm.warningText = value;
