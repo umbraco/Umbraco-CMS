@@ -407,11 +407,11 @@ stages:
                             $continuous = "$($version.release)-preview$date.$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
-                            # Update the version in templates
+                            # Update the default Umbraco version in templates
                             $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
                             foreach ($templatePath in $templatePaths) {
                               $a = Get-Content $templatePath -Raw | ConvertFrom-Json
-                              $a.symbols.version.defaultValue = $continuous
+                              $a.symbols.UmbracoVersion.defaultValue = $continuous
                               $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
                             }
                         }
