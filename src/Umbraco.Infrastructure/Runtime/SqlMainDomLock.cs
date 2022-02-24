@@ -42,6 +42,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private bool _hasTable = false;
         private bool _acquireWhenTablesNotAvailable = false;
 
+        // Note: Ignoring the two version notice rule as this class should probably be internal.
+        // We don't expect anyone downstream to be instantiating a SqlMainDomLock, only resolving IMainDomLock
+        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
         public SqlMainDomLock(
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
@@ -53,7 +56,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             NPocoMapperCollection npocoMappers,
             string connectionStringName)
             : this(
-                logger,
                 loggerFactory,
                 globalSettings,
                 connectionStrings,
@@ -64,6 +66,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
         }
 
+        // Note: Ignoring the two version notice rule as this class should probably be internal.
+        // We don't expect anyone downstream to be instantiating a SqlMainDomLock, only resolving IMainDomLock
+        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
         public SqlMainDomLock(
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
@@ -74,7 +79,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers)
         : this(
-            logger,
             loggerFactory,
             globalSettings,
             connectionStrings,
@@ -86,7 +90,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         }
 
         public SqlMainDomLock(
-            ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
             IOptionsMonitor<ConnectionStrings> connectionStrings,
@@ -97,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<SqlMainDomLock>();
             _globalSettings = globalSettings;
             _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
 

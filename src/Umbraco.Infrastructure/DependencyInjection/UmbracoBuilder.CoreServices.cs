@@ -239,7 +239,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(
-                            loggerFactory.CreateLogger<SqlMainDomLock>(),
                             loggerFactory,
                             globalSettings,
                             connectionStrings,

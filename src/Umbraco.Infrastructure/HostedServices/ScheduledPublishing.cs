@@ -36,6 +36,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
         /// </summary>
+        // Note: Ignoring the two version notice rule as this class should probably be internal.
+        // We don't expect anyone downstream to be instantiating a HostedService
+        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
         public ScheduledPublishing(
             IRuntimeState runtimeState,
             IMainDom mainDom,
