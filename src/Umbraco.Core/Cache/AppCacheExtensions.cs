@@ -31,7 +31,7 @@ namespace Umbraco.Extensions
             provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
         }
 
-        public static IEnumerable<T?> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
+        public static IEnumerable<T>? GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
         {
             var result = provider.SearchByKey(keyStartsWith);
             return result.Select(x => x.TryConvertTo<T>().Result);

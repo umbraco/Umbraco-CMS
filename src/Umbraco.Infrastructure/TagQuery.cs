@@ -65,37 +65,37 @@ namespace Umbraco.Cms.Core
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllTags(string? group = null, string? culture = null)
+        public IEnumerable<TagModel?> GetAllTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllContentTags(string? group = null, string? culture = null)
+        public IEnumerable<TagModel?> GetAllContentTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllContentTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllMediaTags(string? group = null, string? culture = null)
+        public IEnumerable<TagModel?> GetAllMediaTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllMediaTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllMemberTags(string? group = null, string? culture = null)
+        public IEnumerable<TagModel?> GetAllMemberTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllMemberTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null)
+        public IEnumerable<TagModel?> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetTagsForEntity(int contentId, string? group = null, string? culture = null)
+        public IEnumerable<TagModel?> GetTagsForEntity(int contentId, string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetTagsForEntity(contentId, group, culture));
         }

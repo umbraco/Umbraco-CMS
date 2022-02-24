@@ -40,13 +40,13 @@ namespace Umbraco.Cms.Core.Logging.Viewer
 
         public abstract bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
-        public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
+        public virtual IReadOnlyList<SavedLogSearch>? GetSavedSearches()
             => _logViewerConfig.GetSavedSearches();
 
-        public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
+        public virtual IReadOnlyList<SavedLogSearch>? AddSavedSearch(string name, string query)
             => _logViewerConfig.AddSavedSearch(name, query);
 
-        public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        public virtual IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string name, string query)
             => _logViewerConfig.DeleteSavedSearch(name, query);
 
         public int GetNumberOfErrors(LogTimePeriod logTimePeriod)

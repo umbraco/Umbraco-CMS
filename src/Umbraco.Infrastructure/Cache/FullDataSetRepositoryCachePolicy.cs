@@ -43,8 +43,13 @@ namespace Umbraco.Cms.Core.Cache
             return $"uRepo_{typeof (TEntity).Name}_";
         }
 
-        protected void InsertEntities(TEntity[] entities)
+        protected void InsertEntities(TEntity[]? entities)
         {
+            if (entities is null)
+            {
+                return;
+            }
+
             // cache is expected to be a deep-cloning cache ie it deep-clones whatever is
             // IDeepCloneable when it goes in, and out. it also resets dirty properties,
             // making sure that no 'dirty' entity is cached.
@@ -114,7 +119,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity? Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
             // get all from the cache, then look for the entity
             var all = GetAllCached(performGetAll);
@@ -138,7 +143,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override bool Exists(TId id, Func<TId, bool> performExits, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override bool Exists(TId id, Func<TId, bool> performExits, Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             // get all as one set, then look for the entity
             var all = GetAllCached(performGetAll);
@@ -146,13 +151,13 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity[] GetAll(TId[]? ids, Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             // get all as one set, from cache if possible, else repo
             var all = GetAllCached(performGetAll);
 
             // if ids have been specified, filter
-            if (ids.Length > 0) all = all.Where(x => ids.Contains(_entityGetId(x)));
+            if (ids?.Length > 0) all = all.Where(x => ids.Contains(_entityGetId(x)));
 
             // and return
             // see note in SetCacheActionToInsertEntities - what we get here is the original
@@ -161,16 +166,16 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         // does NOT clone anything, so be nice with the returned values
-        internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>> performGetAll)
+        internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             // try the cache first
             var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
             if (all != null) return all.ToArray();
 
             // else get from repo and cache
-            var entities = performGetAll(EmptyIds).WhereNotNull().ToArray();
+            var entities = performGetAll(EmptyIds)?.WhereNotNull().ToArray();
             InsertEntities(entities); // may be an empty array...
-            return entities;
+            return entities ?? Enumerable.Empty<TEntity>();
         }
 
         /// <inheritdoc />

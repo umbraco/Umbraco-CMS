@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// <param name="totalFound"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        public IEnumerable<SearchResultEntity> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
+        public IEnumerable<SearchResultEntity?> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
         {
             //if it's a GUID, match it
             Guid.TryParse(query, out var g);
