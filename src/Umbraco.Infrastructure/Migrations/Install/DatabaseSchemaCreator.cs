@@ -223,7 +223,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
-                if (foreignKeysInSchema!.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
+                if (foreignKeysInSchema!.InvariantContains(unknown) || primaryKeysInSchema!.InvariantContains(unknown))
                 {
                     result.ValidConstraints.Add(unknown);
                 }
@@ -259,16 +259,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             //Add valid and invalid primary key differences to the result object
             IEnumerable<string> validPrimaryKeyDifferences =
-                primaryKeysInDatabase.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+                primaryKeysInDatabase!.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!;
             foreach (var primaryKey in validPrimaryKeyDifferences)
             {
                 result.ValidConstraints.Add(primaryKey);
             }
 
             IEnumerable<string> invalidPrimaryKeyDifferences =
-                primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+                primaryKeysInDatabase!.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!
                     .Union(primaryKeysInSchema.Except(primaryKeysInDatabase,
-                        StringComparer.InvariantCultureIgnoreCase));
+                        StringComparer.InvariantCultureIgnoreCase))!;
             foreach (var primaryKey in invalidPrimaryKeyDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));

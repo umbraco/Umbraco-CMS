@@ -16,13 +16,13 @@ namespace Umbraco.Cms.Core.Models
     {
         private readonly GlobalSettings _globalSettings;
 
-        private string _isoCode = string.Empty;
+        private string? _isoCode;
         private string? _cultureName;
         private bool _isDefaultVariantLanguage;
         private bool _mandatory;
         private int? _fallbackLanguageId;
 
-        public Language(GlobalSettings globalSettings, string isoCode)
+        public Language(GlobalSettings globalSettings, string? isoCode)
         {
             IsoCode = isoCode;
             _globalSettings = globalSettings;
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public string CultureName
+        public string? CultureName
         {
             // CultureInfo.DisplayName is the name in the installed .NET language
             //            .NativeName is the name in culture info's language

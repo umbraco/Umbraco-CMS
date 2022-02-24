@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string>? FindByKeyPrefix(string keyPrefix)
+        public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
             => Get(Query<IKeyValue>().Where(entity => entity.Identifier!.StartsWith(keyPrefix)))?
-                .ToDictionary(x => x.Identifier!, x => x.Value!);
+                .ToDictionary(x => x.Identifier!, x => x.Value);
 
         #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
 

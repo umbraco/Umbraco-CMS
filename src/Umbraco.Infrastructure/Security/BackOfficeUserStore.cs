@@ -436,12 +436,12 @@ namespace Umbraco.Cms.Core.Security
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
                 || (user.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-                || (identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+                || (identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
                 anythingChanged = true;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-                DateTime? dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc?.ToLocalTime();
+                DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;
                 user.LastLoginDate = dt;
             }
 
@@ -454,10 +454,10 @@ namespace Umbraco.Cms.Core.Security
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
                 || (user.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
-                || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
+                || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
                 anythingChanged = true;
-                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime();
+                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))

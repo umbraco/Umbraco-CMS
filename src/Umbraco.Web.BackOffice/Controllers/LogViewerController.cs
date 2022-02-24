@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevels()
+        public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels()
         {
             return _logLevelLoader.GetLogLevelsFromSinks();
         }

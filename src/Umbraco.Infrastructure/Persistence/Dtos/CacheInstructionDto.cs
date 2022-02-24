@@ -21,12 +21,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("jsonInstruction")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        public string Instructions { get; set; }
+        public string Instructions { get; set; } = null!;
 
         [Column("originated")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Length(500)]
-        public string OriginIdentity { get; set; }
+        public string OriginIdentity { get; set; } = null!;
 
         [Column("instructionCount")]
         [NullSetting(NullSetting = NullSettings.NotNull)]

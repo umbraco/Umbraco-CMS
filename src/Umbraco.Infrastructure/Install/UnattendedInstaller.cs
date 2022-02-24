@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _runtimeState.DetermineRuntimeLevel();
             if (_runtimeState.Reason == RuntimeLevelReason.InstallMissingDatabase)
             {
-                _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName, _databaseFactory.ConnectionString);
+                _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName!, _databaseFactory.ConnectionString!);
             }
 
             bool connect;
@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             {
                 using (database = _databaseFactory.CreateDatabase())
                 {
-                    var hasUmbracoTables = database.IsUmbracoInstalled();
+                    var hasUmbracoTables = database?.IsUmbracoInstalled() ?? false;
 
                     // database has umbraco tables, assume Umbraco is already installed
                     if (hasUmbracoTables)
@@ -110,10 +110,10 @@ namespace Umbraco.Cms.Infrastructure.Install
                     // all conditions fulfilled, do the install
                     _logger.LogInformation("Starting unattended install.");
 
-                    database.BeginTransaction();
+                    database?.BeginTransaction();
                     DatabaseSchemaCreator creator = _databaseSchemaCreatorFactory.Create(database);
                     creator.InitializeDatabaseSchema();
-                    database.CompleteTransaction();
+                    database?.CompleteTransaction();
                     _logger.LogInformation("Unattended install completed.");
 
                     // Emit an event with EventAggregator that unattended install completed

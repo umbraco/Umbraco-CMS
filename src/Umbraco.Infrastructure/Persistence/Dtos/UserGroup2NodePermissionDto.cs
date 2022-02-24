@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int NodeId { get; set; }
 
         [Column("permission")]
-        public string Permission { get; set; }
+        public string? Permission { get; set; }
     }
 }

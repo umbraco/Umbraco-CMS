@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="DictionaryItem"/></returns>
-        public IDictionaryItem GetDictionaryItemById(Guid id)
+        public IDictionaryItem? GetDictionaryItemById(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -315,8 +315,12 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
         /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageByIsoCode(string isoCode)
+        public ILanguage? GetLanguageByIsoCode(string? isoCode)
         {
+            if (isoCode is null)
+            {
+                return null;
+            }
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.GetByIsoCode(isoCode);

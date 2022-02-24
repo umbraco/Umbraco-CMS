@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class BlockListConfiguration
     {
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
-        public BlockConfiguration[]? Blocks { get; set; }
+        public BlockConfiguration[] Blocks { get; set; } = null!;
 
         [DataContract]
         public class BlockConfiguration

@@ -24,6 +24,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]
-        public ContentTypeDto ContentTypeDto { get; set; }
+        public ContentTypeDto? ContentTypeDto { get; set; }
     }
 }

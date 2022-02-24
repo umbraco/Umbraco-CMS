@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
             admin.Email = user.Email.Trim();
-            admin.Name = user.Name?.Trim();
+            admin.Name = user.Name!.Trim();
             admin.Username = user.Email.Trim();
 
             _userService.Save(admin);

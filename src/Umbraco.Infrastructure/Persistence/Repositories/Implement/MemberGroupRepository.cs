@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 typeof(IMemberGroup).FullName + "." + name,
                 () =>
                 {
-                    var qry = Query<IMemberGroup>().Where(group => group.Name.Equals(name));
+                    var qry = Query<IMemberGroup>().Where(group => group.Name!.Equals(name));
                     var result = Get(qry);
                     return result?.FirstOrDefault();
                 },

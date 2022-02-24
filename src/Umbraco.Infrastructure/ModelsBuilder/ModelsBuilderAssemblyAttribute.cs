@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         /// Gets or sets a hash value representing the state of the custom source code files
         /// and the Umbraco content types that were used to generate and compile the assembly.
         /// </summary>
-        public string SourceHash { get; set; }
+        public string? SourceHash { get; set; }
     }
 }

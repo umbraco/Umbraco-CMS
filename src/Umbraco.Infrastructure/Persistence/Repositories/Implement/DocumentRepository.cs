@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
                            r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
                         .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
+                           r1.Select(documentVersionDto => documentVersionDto!.ContentVersionDto, "pcv")))
 
                        // select the variant name, coalesce to the invariant name, as "variantName"
                        .AndSelect(VariantNameSqlExpression + " AS variantName");

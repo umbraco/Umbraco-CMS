@@ -20,10 +20,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("alias")]
         [Length(100)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
-        public NodeDto NodeDto { get; set; }
+        public NodeDto NodeDto { get; set; } = null!;
     }
 }

@@ -22,6 +22,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]
-        public ContentVersionDto ContentVersionDto { get; set; }
+        public ContentVersionDto ContentVersionDto { get; set; } = null!;
     }
 }

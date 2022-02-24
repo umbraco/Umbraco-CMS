@@ -26,6 +26,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("value")]
         [Length(1000)]
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
     }
 }

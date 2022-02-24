@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         }
 
         /// <inheritdoc />
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
             PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // NOTE: The intermediate object is just a json string, we don't actually convert from source -> intermediate since source is always just a json string
@@ -64,15 +64,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                 // Get configuration
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
-                var blockConfigMap = configuration?.Blocks?.ToDictionary(x => x.ContentElementTypeKey);
-                var validSettingsElementTypes = blockConfigMap?.Values.Select(x => x.SettingsElementTypeKey)
+                if (configuration is null)
+                {
+                    return null;
+                }
+                var blockConfigMap = configuration.Blocks.ToDictionary(x => x.ContentElementTypeKey);
+                var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey)
                     .Where(x => x.HasValue).Distinct().ToList();
 
                 // Convert the content data
                 var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
                 foreach (var data in converted.BlockValue.ContentData)
                 {
-                    if (!blockConfigMap?.ContainsKey(data.ContentTypeKey) ?? false) continue;
+                    if (!blockConfigMap.ContainsKey(data.ContentTypeKey)) continue;
 
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
@@ -105,7 +109,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         if (contentGuidUdi is null || !contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
                             continue;
 
-                        if (contentData is null || (!blockConfigMap?.TryGetValue(contentData.ContentType.Key, out var blockConfig) ?? true))
+                        if (contentData is null || (!blockConfigMap.TryGetValue(contentData.ContentType.Key, out var blockConfig)))
                             continue;
 
                         // Get the setting reference

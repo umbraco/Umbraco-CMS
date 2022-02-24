@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="keyPrefix"></param>
         /// <returns></returns>
-        IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix);
+        IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix);
 
         /// <summary>
         /// Sets a value.

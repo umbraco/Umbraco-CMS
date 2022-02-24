@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("key")]
         [Length(256)]
         [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
-        public string? Key { get; set; }
+        public string Key { get; set; } = null!;
 
         [Column("value")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -21,6 +21,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("updated")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime? UpdateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

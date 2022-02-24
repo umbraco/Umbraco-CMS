@@ -20,12 +20,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Length(255)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, ForColumns = "name", Name = "IX_" + TableName + "_Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [Column("value")]
         [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
         [Column("updateDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]

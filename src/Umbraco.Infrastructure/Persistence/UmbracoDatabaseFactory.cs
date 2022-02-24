@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private RetryPolicy? _connectionRetryPolicy;
         private RetryPolicy? _commandRetryPolicy;
         private NPoco.MapperCollection? _pocoMappers;
-        private SqlContext? _sqlContext;
+        private SqlContext _sqlContext = null!;
         private bool _upgrading;
         private bool _initialized;
 
@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         }
 
         /// <inheritdoc />
-        public ISqlContext? SqlContext
+        public ISqlContext SqlContext
         {
             get
             {

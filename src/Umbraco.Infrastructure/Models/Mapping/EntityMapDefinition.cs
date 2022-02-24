@@ -52,18 +52,24 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (source is IMediaEntitySlim mediaSlim)
             {
-                //pass UpdateDate for MediaPicker ListView ordering
-                source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
-                source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+                if (source.AdditionalData is not null)
+                {
+                    //pass UpdateDate for MediaPicker ListView ordering
+                    source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
+                    source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+                }
             }
 
-            // NOTE: we're mapping the objects in AdditionalData by object reference here.
-            // it works fine for now, but it's something to keep in mind in the future
-            foreach(var kvp in source.AdditionalData)
+            if (source.AdditionalData is not null)
             {
-                if (kvp.Value is not null)
+                // NOTE: we're mapping the objects in AdditionalData by object reference here.
+                // it works fine for now, but it's something to keep in mind in the future
+                foreach(var kvp in source.AdditionalData)
                 {
-                    target.AdditionalData[kvp.Key] = kvp.Value;
+                    if (kvp.Value is not null)
+                    {
+                        target.AdditionalData[kvp.Key] = kvp.Value;
+                    }
                 }
             }
 

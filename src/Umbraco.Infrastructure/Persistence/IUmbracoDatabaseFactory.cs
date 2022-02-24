@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <remarks>
         /// <para>Getting the <see cref="ISqlContext"/> causes the factory to initialize if it is not already initialized.</para>
         /// </remarks>
-        ISqlContext? SqlContext { get; }
+        ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Gets the <see cref="IBulkSqlInsertProvider"/>.

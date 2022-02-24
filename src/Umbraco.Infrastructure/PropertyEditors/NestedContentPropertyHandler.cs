@@ -49,10 +49,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 {
                     // get it's sibling 'key' property
                     var ncKeyVal = prop.Parent?["key"] as JValue;
-                    if (((onlyMissingKeys && ncKeyVal == null) || (!onlyMissingKeys && ncKeyVal != null)) && prop.Parent?["key"] is not null)
+                    if ((onlyMissingKeys && ncKeyVal == null) || (!onlyMissingKeys && ncKeyVal != null))
                     {
                         // create or replace
-                        prop.Parent["key"] = createGuid().ToString();
+                        prop.Parent!["key"] = createGuid().ToString();
                     }
                 }
                 else if (!isNestedContent || prop.Name != "key")

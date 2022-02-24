@@ -21,10 +21,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int? PropertyTypeGroupId { get; set; }
 
         [Column("Alias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [Column("Name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("PropertyTypeSortOrder")]
         public int SortOrder { get; set; }
@@ -33,16 +33,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public bool Mandatory { get; set; }
 
         [Column("mandatoryMessage")]
-        public string MandatoryMessage { get; set; }
+        public string? MandatoryMessage { get; set; }
 
         [Column("validationRegExp")]
-        public string ValidationRegExp { get; set; }
+        public string? ValidationRegExp { get; set; }
 
         [Column("validationRegExpMessage")]
-        public string ValidationRegExpMessage { get; set; }
+        public string? ValidationRegExpMessage { get; set; }
 
         [Column("Description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("labelOnTop")]
         public bool LabelOnTop { get; set; }
@@ -59,10 +59,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         /* DataType */
         [Column("propertyEditorAlias")]
-        public string PropertyEditorAlias { get; set; }
+        public string? PropertyEditorAlias { get; set; }
 
         [Column("dbType")]
-        public string DbType { get; set; }
+        public string? DbType { get; set; }
 
         [Column("UniqueID")]
         public Guid UniqueId { get; set; }

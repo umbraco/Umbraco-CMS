@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         // with less objects.
         private static bool _isReady;
         private static bool _isReadSet;
-        private static object _isReadyLock;
+        private static object? _isReadyLock;
 
         public RebuildOnStartupHandler(
             ISyncBootStateAccessor syncBootStateAccessor,

@@ -63,6 +63,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime? CreateDate { get; set; }
+        public DateTime CreateDate { get; set; }
     }
 }

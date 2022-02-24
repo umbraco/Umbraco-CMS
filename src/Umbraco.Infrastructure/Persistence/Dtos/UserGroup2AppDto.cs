@@ -14,6 +14,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("app")]
         [Length(50)]
-        public string AppAlias { get; set; }
+        public string AppAlias { get; set; } = null!;
     }
 }

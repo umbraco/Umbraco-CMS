@@ -22,12 +22,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int? RootStructureId { get; set; }
 
         [Column("domainName")]
-        public string DomainName { get; set; }
+        public string DomainName { get; set; } = null!;
 
         /// <summary>
         /// Used for a result on the query to get the associated language for a domain if there is one
         /// </summary>
         [ResultColumn("languageISOCode")]
-        public string IsoCode { get; set; }
+        public string IsoCode { get; set; } = null!;
     }
 }

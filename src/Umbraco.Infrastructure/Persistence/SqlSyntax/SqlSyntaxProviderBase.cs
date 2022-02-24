@@ -503,7 +503,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                 return string.Format(DecimalColumnDefinitionFormat, precision, scale);
             }
 
-            var definition = DbTypeMap.ColumnTypeMap[type];
+            var definition = DbTypeMap.ColumnTypeMap[type!];
             var dbTypeDefinition = column.Size != default
                 ? $"{definition}({column.Size})"
                 : definition;

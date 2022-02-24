@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         {
             return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
                 group.StartContentId, group.StartMediaId, group.Alias,
-                group.UserGroup2AppDtos.Select(x => x.AppAlias).ToArray(),
+                group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
                 group.DefaultPermissions == null ? Enumerable.Empty<string>() : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()));
         }
     }

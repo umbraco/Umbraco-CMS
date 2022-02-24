@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         /// <returns></returns>
         public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
         {
-            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
             IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
             IEnumerable<string> packagePlans = _packageMigrationPlans.Values

@@ -68,8 +68,8 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(IShortStringHelper shortStringHelper, string @alias, string name,
-            string macroSource,
+        public Macro(IShortStringHelper shortStringHelper, string @alias, string? name,
+            string? macroSource,
             bool cacheByPage = false,
             bool cacheByMember = false,
             bool dontRender = true,

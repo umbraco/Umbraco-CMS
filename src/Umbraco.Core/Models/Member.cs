@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public DateTime? LastLoginDate
+        public DateTime LastLoginDate
         {
             get
             {
@@ -398,7 +398,7 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public DateTime? LastPasswordChangeDate
+        public DateTime LastPasswordChangeDate
         {
             get
             {

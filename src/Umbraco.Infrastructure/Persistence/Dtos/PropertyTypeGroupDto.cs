@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public string? Text { get; set; }
 
         [Column("alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [Column("sortorder")]
         public int SortOrder { get; set; }

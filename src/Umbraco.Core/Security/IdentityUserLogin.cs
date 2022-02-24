@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="IdentityUserLogin"/> class.
         /// </summary>
-        public IdentityUserLogin(int id, string loginProvider, string providerKey, string userId, DateTime? createDate)
+        public IdentityUserLogin(int id, string loginProvider, string providerKey, string userId, DateTime createDate)
         {
             Id = id;
             LoginProvider = loginProvider;

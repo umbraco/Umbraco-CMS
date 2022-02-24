@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
     /// </summary>
     internal class CachedExpression : Expression
     {
-        private string _visitResult;
+        private string _visitResult = null!;
 
         /// <summary>
         /// Gets or sets the inner Expression.
         /// </summary>
-        public Expression InnerExpression { get; private set; }
+        public Expression InnerExpression { get; private set; } = null!;
 
         /// <summary>
         /// Gets or sets the compiled SQL statement output.

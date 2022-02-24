@@ -15,11 +15,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         /// Overrides the default naming of a property constraint:
         /// DF_tableName_propertyName
         /// </remarks>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Default value
         /// </summary>
-        public object Default { get; set; }
+        public object? Default { get; set; }
     }
 }

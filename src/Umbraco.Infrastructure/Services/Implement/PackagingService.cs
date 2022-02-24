@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<InstalledPackage> GetAllInstalledPackages()
         {
-            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
             var installedPackages = new Dictionary<string, InstalledPackage>();
 
@@ -128,7 +128,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-                keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var currentState);
+                if (keyValues is null || keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
+                        out var currentState))
+                {
+                    currentState = null;
+                }
+
                 currentPlans.Add(new InstalledPackageMigrationPlans
                 {
                     CurrentMigrationId = currentState,

@@ -22,12 +22,12 @@ namespace Umbraco.Cms.Core.Models
             : this(shortStringHelper, name, alias, null)
         { }
 
-        public Template(IShortStringHelper shortStringHelper, string? name, string alias, Func<File, string?>? getFileContent)
+        public Template(IShortStringHelper shortStringHelper, string? name, string? alias, Func<File, string?>? getFileContent)
             : base(string.Empty, getFileContent)
         {
             _shortStringHelper = shortStringHelper;
             _name = name;
-            _alias = alias.ToCleanString(shortStringHelper, CleanStringType.UnderscoreAlias);
+            _alias = alias?.ToCleanString(shortStringHelper, CleanStringType.UnderscoreAlias) ?? string.Empty;
             _masterTemplateId = new Lazy<int>(() => -1);
         }
 

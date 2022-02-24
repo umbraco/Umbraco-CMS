@@ -66,14 +66,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (documentLinks?.Count > 0)
                 {
                     entities.AddRange(
-                        _entityService.GetAll(UmbracoObjectTypes.Document, documentLinks.Select(link => link.Udi?.Guid).ToArray())
+                        _entityService.GetAll(UmbracoObjectTypes.Document, documentLinks.Select(link => link.Udi!.Guid).ToArray())
                     );
                 }
 
                 if (mediaLinks?.Count > 0)
                 {
                     entities.AddRange(
-                        _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi?.Guid).ToArray())
+                        _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi!.Guid).ToArray())
                     );
                 }
 

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix)
+        public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
         {
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {

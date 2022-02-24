@@ -328,7 +328,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                     // perms can contain null if there are no permissions assigned, but the node is chosen in the UI.
                     permissions.Add(new EntityPermission(permission.Key, np.Key,
-                        perms.Where(x => x is not null).ToArray()));
+                        perms.WhereNotNull().ToArray()));
                 }
             }
 

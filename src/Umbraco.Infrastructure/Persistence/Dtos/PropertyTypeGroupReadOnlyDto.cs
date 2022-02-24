@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int? Id { get; set; }
 
         [Column("PropertyGroupName")]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [Column("PropertyGroupSortOrder")]
         public int SortOrder { get; set; }

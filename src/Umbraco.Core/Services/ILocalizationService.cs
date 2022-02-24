@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        IDictionaryItem GetDictionaryItemById(Guid id);
+        IDictionaryItem? GetDictionaryItemById(Guid id);
 
         /// <summary>
         /// Gets a <see cref="IDictionaryItem"/> by its key
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
         /// <returns><see cref="ILanguage"/></returns>
-        ILanguage GetLanguageByIsoCode(string isoCode);
+        ILanguage? GetLanguageByIsoCode(string? isoCode);
 
         /// <summary>
         /// Gets a language identifier from its ISO code.
