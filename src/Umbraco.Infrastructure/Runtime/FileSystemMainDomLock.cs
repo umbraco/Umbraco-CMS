@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private FileStream _lockFileStream;
         private Task _listenForReleaseSignalFileTask;
 
-        private const int s_maxTriesRemovingLockReleaseSignalFile = 10;
+        private const int s_maxTriesRemovingLockReleaseSignalFile = 3;
 
         public FileSystemMainDomLock(
             ILogger<FileSystemMainDomLock> logger,
@@ -115,11 +115,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 {
                     _logger.LogError(ex, "Unexpected exception attempting to delete release signal file {file}", _releaseSignalFilePath);
                     encounteredExceptions.Add(ex);
-                    Thread.Sleep(500);
+                    Thread.Sleep(500 * (i + 1));
                 }
             }
 
-            throw new ApplicationException("Failed to remove LockReleaseFile", new AggregateException(encounteredExceptions));
+            throw new ApplicationException($"Failed to remove lock release signal file {_releaseSignalFilePath}", new AggregateException(encounteredExceptions));
         }
 
         private void ListeningLoop()
