@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">נהל שמות מתחם</key>
+    <key alias="assigndomain">נהל שמות מתחם</key>
     <key alias="auditTrail">מעקב ביקורות</key>
     <key alias="browse">צפה בתוכן</key>
     <key alias="copy">העתק</key>
@@ -13,7 +13,7 @@
     <key alias="createPackage">צור חבילה</key>
     <key alias="delete">מחק</key>
     <key alias="disable">נטרל</key>
-    <key alias="emptyRecycleBin">רוקן סל מיחזור</key>
+    <key alias="emptyrecyclebin">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
     <key alias="importdocumenttype">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>

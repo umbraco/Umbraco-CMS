@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">管理主機名稱</key>
+    <key alias="assigndomain">管理主機名稱</key>
     <key alias="auditTrail">跟蹤審計</key>
     <key alias="browse">流覽節點</key>
     <key alias="changeDocType">改變文檔類型</key>
@@ -14,7 +14,7 @@
     <key alias="createPackage">創建擴展包</key>
     <key alias="delete">刪除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyRecycleBin">清空回收站</key>
+    <key alias="emptyrecyclebin">清空回收站</key>
     <key alias="exportDocumentType">匯出文檔類型</key>
     <key alias="importdocumenttype">導入文檔類型</key>
     <key alias="importPackage">導入擴展包</key>

@@ -57,6 +57,7 @@ Or alternatively, you can reach out directly to any of the team members behind t
 * Sebastiaan Janssen (He, Him - Languages spoken: English, Dutch, Danish(Read)) [sebastiaan@umbraco.com](mailto:sebastiaan@umbraco.com)
 * Ilham Boulghallat (She, Her - Languages spoken: English, French, Arabic) [ilham@umbraco.com](mailto:ilham@umbraco.com)
 * Arnold Visser (He, Him - Languages spoken: English, Dutch) [arnold@umbraco.com](mailto:arnold@umbraco.com)
+* Emma Burstow (She, Her - Languages spoken: English) [ema@umbraco.com](mailto:ema@umbraco.com)
 
 The review process is done with full respect for the privacy and security of the reporter of any incident.  
 

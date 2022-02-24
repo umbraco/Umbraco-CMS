@@ -305,7 +305,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, allowedTypes);
             };
 
-            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, allowedTypes);
+            mediaPicker.clipboardItems = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.MEDIA, allowedTypes);
             mediaPicker.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });

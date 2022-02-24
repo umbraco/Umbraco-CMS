@@ -582,7 +582,7 @@
             };
 
             scope.canRemoveTab = (tab) => {
-                return tab.inherited !== true;
+                return scope.canRemoveGroup(tab) && _.every(scope.model.groups.filter(group => group.parentAlias === tab.alias), group => scope.canRemoveGroup(group));
             };
 
             scope.setTabOverflowState = (overflowLeft, overflowRight) => {
