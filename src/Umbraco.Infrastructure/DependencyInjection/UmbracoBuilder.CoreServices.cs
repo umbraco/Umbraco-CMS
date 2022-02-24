@@ -229,26 +229,29 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
                 var databaseSchemaCreatorFactory = factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
                 var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
 
-                if (globalSettings.Value.MainDomLock == "FileSystemMainDomLock")
+                switch (globalSettings.Value.MainDomLock)
                 {
-                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment);
-                }
-
-                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(
+                    case "SqlMainDomLock":
+                        return new SqlMainDomLock(
                             loggerFactory,
                             globalSettings,
                             connectionStrings,
                             dbCreator,
                             mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
-                            npocoMappers)
-                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+                            npocoMappers);
+
+                    case "MainDomSemaphoreLock":
+                        return new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+
+                    case "FileSystemMainDomLock":
+                    default:
+                        return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment);
+                }
             });
 
             return builder;
