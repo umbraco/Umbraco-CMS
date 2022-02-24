@@ -40,53 +40,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private bool _hasTable = false;
         private bool _acquireWhenTablesNotAvailable = false;
 
-        // Note: Ignoring the two version notice rule as this class should probably be internal.
-        // We don't expect anyone downstream to be instantiating a SqlMainDomLock, only resolving IMainDomLock
-        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
-        public SqlMainDomLock(
-            ILogger<SqlMainDomLock> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IHostingEnvironment hostingEnvironment,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers,
-            string connectionStringName)
-            : this(
-                loggerFactory,
-                globalSettings,
-                connectionStrings,
-                dbProviderFactoryCreator,
-                StaticServiceProvider.Instance.GetRequiredService<IMainDomKeyGenerator>(),
-                databaseSchemaCreatorFactory,
-                npocoMappers)
-        {
-        }
-
-        // Note: Ignoring the two version notice rule as this class should probably be internal.
-        // We don't expect anyone downstream to be instantiating a SqlMainDomLock, only resolving IMainDomLock
-        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
-        public SqlMainDomLock(
-            ILogger<SqlMainDomLock> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IHostingEnvironment hostingEnvironment,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers)
-        : this(
-            loggerFactory,
-            globalSettings,
-            connectionStrings,
-            dbProviderFactoryCreator,
-            StaticServiceProvider.Instance.GetRequiredService<IMainDomKeyGenerator>(),
-            databaseSchemaCreatorFactory,
-            npocoMappers)
-        {
-        }
-
         public SqlMainDomLock(
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,

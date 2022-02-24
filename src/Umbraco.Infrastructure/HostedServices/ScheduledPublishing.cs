@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
@@ -13,7 +12,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -32,32 +30,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IScopeProvider _scopeProvider;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
-        /// </summary>
-        // Note: Ignoring the two version notice rule as this class should probably be internal.
-        // We don't expect anyone downstream to be instantiating a HostedService
-        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
-        public ScheduledPublishing(
-            IRuntimeState runtimeState,
-            IMainDom mainDom,
-            IServerRoleAccessor serverRegistrar,
-            IContentService contentService,
-            IUmbracoContextFactory umbracoContextFactory,
-            ILogger<ScheduledPublishing> logger,
-            IServerMessenger serverMessenger)
-            : this(
-                runtimeState,
-                mainDom,
-                serverRegistrar,
-                contentService,
-                umbracoContextFactory,
-                logger,
-                serverMessenger,
-                StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>())
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
