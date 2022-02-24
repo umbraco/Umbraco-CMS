@@ -10,6 +10,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
 
     $scope.checkingReferences = true;
     $scope.warningText = null;
+    $scope.disableDelete = false;
 
     $scope.performDelete = function() {
 
@@ -73,9 +74,20 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
     };
 
     $scope.onReferencesWarning = () => {
-        localizationService.localize("references_deleteWarning").then((value) => {
-            $scope.warningText = value;
-        });
+        // check if the deletion of items that have references has been disabled
+        if (Umbraco.Sys.ServerVariables.umbracoSettings.disableDeleteWhenReferenced) {
+            // this will only be set to true if we have a warning, indicating that this item or its descendants have reference
+            $scope.disableDelete = true;
+
+            localizationService.localize("references_deleteDisabledWarning").then((value) => {
+                $scope.warningText = value;
+            });
+        }
+        else {
+            localizationService.localize("references_deleteWarning").then((value) => {
+                $scope.warningText = value;
+            });
+        }
     };
 
     $scope.close = function() {
