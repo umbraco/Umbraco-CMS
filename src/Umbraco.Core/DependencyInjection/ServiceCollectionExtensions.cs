@@ -44,8 +44,17 @@ namespace Umbraco.Extensions
         /// Removes all previous registrations for the types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/>.
         /// </remarks>
         public static void AddMultipleUnique<TService1, TService2, TImplementing>(
+            this IServiceCollection services)
+            where TService1 : class
+            where TService2 : class
+            where TImplementing : class, TService1, TService2
+        {
+            AddMultipleUnique<TService1, TService2, TImplementing>(services, ServiceLifetime.Singleton);
+        }
+
+        public static void AddMultipleUnique<TService1, TService2, TImplementing>(
             this IServiceCollection services,
-            ServiceLifetime lifetime = ServiceLifetime.Singleton)
+            ServiceLifetime lifetime)
             where TService1 : class
             where TService2 : class
             where TImplementing : class, TService1, TService2
@@ -71,8 +80,16 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static void AddUnique<TService>(
             this IServiceCollection services,
+            Func<IServiceProvider, TService> factory)
+            where TService : class
+        {
+            AddUnique<TService>(services, factory, ServiceLifetime.Singleton);
+        }
+
+        public static void AddUnique<TService>(
+            this IServiceCollection services,
             Func<IServiceProvider, TService> factory,
-            ServiceLifetime lifetime = ServiceLifetime.Singleton)
+            ServiceLifetime lifetime)
             where TService : class
         {
             services.RemoveAll<TService>();
