@@ -411,8 +411,10 @@ stages:
                             $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
                             foreach ($templatePath in $templatePaths) {
                               $a = Get-Content $templatePath -Raw | ConvertFrom-Json
-                              $a.symbols.UmbracoVersion.defaultValue = $continuous
-                              $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                              if ($a.symbols -and $a.symbols.UmbracoVersion) {
+                                $a.symbols.UmbracoVersion.defaultValue = $continuous
+                                $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                              }
                             }
                         }
 
