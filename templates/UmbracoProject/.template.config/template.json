@@ -302,6 +302,9 @@
     "TelemetryId": {
       "type": "generated",
       "generator": "guid",
+      "parameters": {
+        "defaultFormat": "d"
+      },
       "replaces": "TELEMETRYID_FROM_TEMPLATE"
     }
   },
