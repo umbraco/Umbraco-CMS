@@ -50,7 +50,19 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public override bool SupportsPublishing => SupportsPublishingConst;
 
+        public override bool IsDirty()
+        {
+            var baseIsDirty = base.IsDirty();
+            var dirtyHistory = HistoryCleanup.IsDirty();
 
+            return baseIsDirty || dirtyHistory;
+        }
+
+        public override void ResetDirtyProperties(bool rememberDirty)
+        {
+            base.ResetDirtyProperties(rememberDirty);
+            HistoryCleanup.ResetDirtyProperties(rememberDirty);
+        }
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
