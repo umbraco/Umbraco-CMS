@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.ListViewDeleteController as vm">
 
-    <p class="abstract">
+    <p class="abstract" ng-if="!vm.disableDelete">
         <localize key="defaultdialogs_confirmdeleteNumberOfItems" tokens="[model.numberOfItems, model.totalItems]">Are you sure you want to delete</localize>?
     </p>
 
