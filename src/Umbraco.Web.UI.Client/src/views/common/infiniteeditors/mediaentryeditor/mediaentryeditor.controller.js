@@ -5,12 +5,13 @@ angular.module("umbraco")
             var unsubscribe = [];
             
             const vm = this;
-
+            
             vm.loading = true;
             vm.model = $scope.model;
             vm.mediaEntry = vm.model.mediaEntry;
             vm.currentCrop = null;
-
+            vm.title = "";
+            
             vm.focalPointChanged = focalPointChanged;
             vm.onImageLoaded = onImageLoaded;
             vm.openMedia = openMedia;
@@ -19,19 +20,17 @@ angular.module("umbraco")
             vm.deselectCrop = deselectCrop;
             vm.resetCrop = resetCrop;
             vm.submitAndClose = submitAndClose;
-            vm.close = close;
-
-            localizationService.localizeMany([
-                vm.model.createFlow ? "general_cancel" : "general_close",
-                vm.model.createFlow ? "general_create" : "buttons_submitChanges"
-            ]).then(data => {
-                vm.closeLabel = data[0];
-                vm.submitLabel = data[1];
-            });
-
-            vm.title = "";
+            vm.close = close;   
 
             function init() {
+
+                localizationService.localizeMany([
+                  vm.model.createFlow ? "general_cancel" : "general_close",
+                  vm.model.createFlow ? "general_create" : "buttons_submitChanges"
+                ]).then(data => {
+                  vm.closeLabel = data[0];
+                  vm.submitLabel = data[1];
+                });
 
                 updateMedia();
 
