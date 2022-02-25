@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -80,7 +81,7 @@ namespace Umbraco.Tests.Models
             var dirty = contentType.GetDirtyProperties().ToList();
             Assert.AreEqual(2, dirty.Count);
             Assert.Contains(nameof(contentType.Alias), dirty);
-            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), dirty);
+            Assert.Contains(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)), dirty);
         }
 
         [Test]
@@ -93,7 +94,7 @@ namespace Umbraco.Tests.Models
 
             var dirty = contentType.GetDirtyProperties().ToList();
             Assert.AreEqual(1, dirty.Count);
-            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), dirty);
+            Assert.Contains(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)), dirty);
         }
 
         [Test]
@@ -105,7 +106,7 @@ namespace Umbraco.Tests.Models
             contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
 
             Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.Alias)));
-            Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)));
+            Assert.IsTrue(contentType.IsPropertyDirty(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays))));
         }
 
         [Test]
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.Models
             contentType.ResetDirtyProperties();
 
             Assert.IsTrue(contentType.WasPropertyDirty(nameof(contentType.Alias)));
-            Assert.IsTrue(contentType.WasPropertyDirty(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)));
+            Assert.IsTrue(contentType.WasPropertyDirty(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays))));
         }
 
         [Test]
@@ -144,7 +145,7 @@ namespace Umbraco.Tests.Models
             var wereDirty = contentType.GetWereDirtyProperties().ToList();
             Assert.AreEqual(2, wereDirty.Count);
             Assert.Contains(nameof(contentType.Alias), wereDirty);
-            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), wereDirty);
+            Assert.Contains(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)), wereDirty);
         }
 
         [Test]
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Models
 
             var wereDirty = contentType.GetWereDirtyProperties().ToList();
             Assert.AreEqual(1, contentType.GetWereDirtyProperties().Count());
-            Assert.Contains(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays), wereDirty);
+            Assert.Contains(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)), wereDirty);
         }
 
         [Test]
@@ -182,11 +183,13 @@ namespace Umbraco.Tests.Models
             var propertyChangeHasFired = false;
             contentType.PropertyChanged += (sender, args) =>
             {
-                Assert.AreEqual($"{nameof(contentType.HistoryCleanup)}.{nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)}", args.PropertyName);
+                Assert.AreEqual(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)), args.PropertyName);
                 propertyChangeHasFired = true;
             };
             contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
             Assert.IsTrue(propertyChangeHasFired);
         }
+        private static string PrefixHistoryCleanup(string propertyName) =>
+            $"{nameof(ContentType.HistoryCleanup)}.{propertyName}";
     }
 }
