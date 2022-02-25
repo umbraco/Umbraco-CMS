@@ -146,6 +146,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
+    
     $scope.options = {
         useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
@@ -169,6 +170,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
+    
     _.each($scope.options.includeProperties, function (property) {
         property.nameExp = !!property.nameTemplate
             ? $interpolate(property.nameTemplate)
@@ -268,12 +270,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     $scope.getContent = function (contentId) {
         $scope.reloadView($scope.contentId, true);
-    }
+    };
 
     $scope.reloadView = function (id, reloadActiveNode) {
         if (!id) {
             return;
         }
+        
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -327,7 +330,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             $scope.options.pageNumber = 1;
             $scope.reloadView($scope.contentId);
         }
-    }
+    };
 
     $scope.onSearchStartTyping = function() {
         $scope.viewLoaded = false;
@@ -708,13 +711,15 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function initView() {
+        
         var id = $routeParams.id;
         if (id === undefined) {
             // no ID found in route params - don't list anything as we don't know for sure where we are
             return;
         }
-
-        $scope.contentId = id;
+        
+        // Get current id for node to load it's children
+        $scope.contentId = editorState.current ? editorState.current.id : id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
