@@ -220,6 +220,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<IMainDomKeyGenerator, DefaultMainDomKeyGenerator>();
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
@@ -228,21 +229,29 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
                 var databaseSchemaCreatorFactory = factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
+                var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
 
-                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(
-                            loggerFactory.CreateLogger<SqlMainDomLock>(),
+                switch (globalSettings.Value.MainDomLock)
+                {
+                    case "SqlMainDomLock":
+                        return new SqlMainDomLock(
                             loggerFactory,
                             globalSettings,
                             connectionStrings,
                             dbCreator,
-                            hostingEnvironment,
+                            mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
-                            npocoMappers)
-                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+                            npocoMappers);
+
+                    case "MainDomSemaphoreLock":
+                        return new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+
+                    case "FileSystemMainDomLock":
+                    default:
+                        return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
+                }
             });
 
             return builder;

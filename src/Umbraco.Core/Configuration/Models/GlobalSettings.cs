@@ -29,6 +29,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
         internal const string StaticSqlWriteLockTimeOut = "00:00:05";
         internal const bool StaticSanitizeTinyMce = false;
+        internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
         /// <summary>
         /// Gets or sets a value for the reserved URLs (must end with a comma).
@@ -136,6 +137,26 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the main dom lock.
         /// </summary>
         public string MainDomLock { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value to discriminate MainDom boundaries.
+        /// <para>
+        /// Generally the default should suffice but useful for advanced scenarios e.g. azure deployment slot based zero downtime deployments.
+        /// </para>
+        /// </summary>
+        public string MainDomKeyDiscriminator { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the duration (in milliseconds) for which the MainDomLock release signal polling task should sleep.
+        /// </summary>
+        /// <remarks>
+        /// Doesn't apply to MainDomSemaphoreLock.
+        /// <para>
+        ///  The default value is 2000ms.
+        /// </para>
+        /// </remarks>
+        [DefaultValue(StaticMainDomReleaseSignalPollingInterval)]
+        public int MainDomReleaseSignalPollingInterval { get; set; } = StaticMainDomReleaseSignalPollingInterval;
 
         /// <summary>
         /// Gets or sets the telemetry ID.

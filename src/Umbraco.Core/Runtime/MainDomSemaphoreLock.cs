@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,11 @@ namespace Umbraco.Cms.Core.Runtime
 
         public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("MainDomSemaphoreLock is only supported on Windows.");
+            }
+
             var mainDomId = MainDom.GetMainDomId(hostingEnvironment);
             var lockName = "UMBRACO-" + mainDomId + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);
