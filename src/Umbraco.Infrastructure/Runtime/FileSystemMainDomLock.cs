@@ -68,7 +68,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         }
 
         public void CreateLockReleaseSignalFile() =>
-            _ = File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete);
+            File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete)
+                .Close();
 
         public void DeleteLockReleaseSignalFile() =>
             File.Delete(_releaseSignalFilePath);
