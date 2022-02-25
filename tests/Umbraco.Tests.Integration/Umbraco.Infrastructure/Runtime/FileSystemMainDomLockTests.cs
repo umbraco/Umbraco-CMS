@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -44,13 +45,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Runtime
         [TearDown]
         public void TearDown()
         {
-            while (File.Exists(LockFilePath))
+            CleanupTestFile(LockFilePath);
+            CleanupTestFile(LockReleaseFilePath);
+        }
+
+        private static void CleanupTestFile(string path)
+        {
+            for (var i = 0; i < 3; i++)
             {
-                File.Delete(LockFilePath);
-            }
-            while (File.Exists(LockReleaseFilePath))
-            {
-                File.Delete(LockReleaseFilePath);
+                try
+                {
+                    File.Delete(path);
+                    return;
+                }
+                catch
+                {
+                    Thread.Sleep(500 * (i + 1));
+                }
             }
         }
 
