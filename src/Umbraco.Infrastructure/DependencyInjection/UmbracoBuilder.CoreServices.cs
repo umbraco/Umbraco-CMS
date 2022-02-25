@@ -250,7 +250,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                     case "FileSystemMainDomLock":
                     default:
-                        return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment);
+                        return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
                 }
             });
 
