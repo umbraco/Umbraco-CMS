@@ -115,7 +115,7 @@ namespace Umbraco.Core.Models
                     _historyCleanup.PropertyChanged -= FlowHistoryCleanupIsDirty;
                 }
 
-                _historyCleanup = value;
+                SetPropertyValueAndDetectChanges(value, ref _historyCleanup, nameof(HistoryCleanup));
                 _historyCleanup.PropertyChanged += FlowHistoryCleanupIsDirty;
             }
         }

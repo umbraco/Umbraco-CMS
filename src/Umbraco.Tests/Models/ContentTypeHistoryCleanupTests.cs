@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -189,6 +190,19 @@ namespace Umbraco.Tests.Models
             contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
             Assert.IsTrue(propertyChangeHasFired);
         }
+
+        [Test]
+        public void Replacing_History_Cleanup_Registers_As_Dirty()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            Assert.IsFalse(contentType.IsDirty());
+
+            contentType.HistoryCleanup = new HistoryCleanup();
+
+            Assert.IsTrue(contentType.IsDirty());
+            Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
+        }
+
         private static string PrefixHistoryCleanup(string propertyName) =>
             $"{nameof(ContentType.HistoryCleanup)}.{propertyName}";
     }
