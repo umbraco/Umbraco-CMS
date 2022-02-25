@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.ContentEditing;
@@ -133,7 +134,31 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public HistoryCleanup HistoryCleanup { get; set; }
+        private HistoryCleanup _historyCleanup;
+
+        public HistoryCleanup HistoryCleanup
+        {
+            get => _historyCleanup;
+            set
+            {
+                if (_historyCleanup is not null)
+                {
+                    _historyCleanup.PropertyChanged -= FlowIsDirty;
+                }
+
+                _historyCleanup = value;
+                _historyCleanup.PropertyChanged += FlowIsDirty;
+            }
+        }
+
+        /// <summary>
+        /// It's expected that the ContentType will be dirty if HistoryCleanup is changed.
+        /// This will flow the changes made in HistoryCleanup back to ContentType so it's included in the IsDirty/WereDirty methods
+        /// </summary>
+        private void FlowIsDirty(object sender, PropertyChangedEventArgs args)
+        {
+            OnPropertyChanged($"{nameof(HistoryCleanup)}.{args.PropertyName}");
+        }
 
         /// <summary>
         /// Determines if AllowedTemplates contains templateId

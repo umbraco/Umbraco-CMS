@@ -173,7 +173,20 @@ namespace Umbraco.Tests.Models
             contentType.ResetWereDirtyProperties();
             Assert.IsEmpty(contentType.GetWereDirtyProperties());
         }
+
+        [Test]
+        public void Change_Tracking_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.EnableChangeTracking();
+            var propertyChangeHasFired = false;
+            contentType.PropertyChanged += (sender, args) =>
+            {
+                Assert.AreEqual($"{nameof(contentType.HistoryCleanup)}.{nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)}", args.PropertyName);
+                propertyChangeHasFired = true;
+            };
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            Assert.IsTrue(propertyChangeHasFired);
+        }
     }
 }
-
-// TODO: Enable/Disable change tracking??
