@@ -51,37 +51,6 @@ namespace Umbraco.Core.Models
         public override bool SupportsPublishing => SupportsPublishingConst;
 
         /// <inheritdoc />
-        public override bool IsDirty()
-            => base.IsDirty() || HistoryCleanup.IsDirty();
-
-        /// <inheritdoc />
-        public override bool IsPropertyDirty(string propertyName)
-            => base.IsPropertyDirty(propertyName) || HistoryCleanup.IsPropertyDirty(propertyName);
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetDirtyProperties() =>
-            base.GetDirtyProperties().Concat(HistoryCleanup.GetDirtyProperties());
-
-        /// <inheritdoc />
-        public override void ResetDirtyProperties(bool rememberDirty)
-        {
-            base.ResetDirtyProperties(rememberDirty);
-            HistoryCleanup.ResetDirtyProperties(rememberDirty);
-        }
-
-        /// <inheritdoc />
-        public override bool WasDirty()
-            => base.WasDirty() || HistoryCleanup.WasDirty();
-
-        /// <inheritdoc />
-        public override bool WasPropertyDirty(string propertyName)
-            => base.WasPropertyDirty(propertyName) || HistoryCleanup.WasPropertyDirty(propertyName);
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetWereDirtyProperties()
-            => base.GetWereDirtyProperties().Concat(HistoryCleanup.GetWereDirtyProperties());
-
-        /// <inheritdoc />
         public override void ResetWereDirtyProperties()
         {
             base.ResetWereDirtyProperties();
@@ -143,11 +112,11 @@ namespace Umbraco.Core.Models
             {
                 if (_historyCleanup is not null)
                 {
-                    _historyCleanup.PropertyChanged -= FlowIsDirty;
+                    _historyCleanup.PropertyChanged -= FlowHistoryCleanupIsDirty;
                 }
 
                 _historyCleanup = value;
-                _historyCleanup.PropertyChanged += FlowIsDirty;
+                _historyCleanup.PropertyChanged += FlowHistoryCleanupIsDirty;
             }
         }
 
@@ -155,7 +124,7 @@ namespace Umbraco.Core.Models
         /// It's expected that the ContentType will be dirty if HistoryCleanup is changed.
         /// This will flow the changes made in HistoryCleanup back to ContentType so it's included in the IsDirty/WereDirty methods
         /// </summary>
-        private void FlowIsDirty(object sender, PropertyChangedEventArgs args)
+        private void FlowHistoryCleanupIsDirty(object sender, PropertyChangedEventArgs args)
         {
             OnPropertyChanged($"{nameof(HistoryCleanup)}.{args.PropertyName}");
         }
