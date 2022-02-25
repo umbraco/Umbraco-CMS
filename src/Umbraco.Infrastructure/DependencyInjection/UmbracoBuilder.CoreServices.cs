@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                 if (globalSettings.Value.MainDomLock == "FileSystemMainDomLock")
                 {
-                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment);
+                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
                 }
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false

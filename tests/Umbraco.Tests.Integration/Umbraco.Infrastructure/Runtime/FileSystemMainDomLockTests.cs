@@ -1,7 +1,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime;
@@ -31,8 +34,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Runtime
             LockFilePath = Path.Combine(HostingEnvironment.LocalTempPath, lockFileName);
             LockReleaseFilePath = LockFilePath + "_release";
 
+            var globalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>();
+            Mock.Get(globalSettings).Setup(x => x.CurrentValue).Returns(new GlobalSettings());
+
             var log = GetRequiredService<ILogger<FileSystemMainDomLock>>();
-            FileSystemMainDomLock = new FileSystemMainDomLock(log, MainDomKeyGenerator, HostingEnvironment);
+            FileSystemMainDomLock = new FileSystemMainDomLock(log, MainDomKeyGenerator, HostingEnvironment, globalSettings);
         }
 
         [TearDown]
@@ -79,10 +85,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Runtime
 
             var before = await sut.AcquireLockAsync(1000);
 
-            await using (_ = File.Open(LockReleaseFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-            }
-
+            sut.CreateLockReleaseSignalFile();
             await sut.ListenAsync();
 
             var after = await sut.AcquireLockAsync(1000);

@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 // poll every couple of seconds
                 // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                Thread.Sleep(2000);
+                Thread.Sleep(_globalSettings.Value.MainDomReleaseSignalPollingInterval);
 
                 if (!_dbFactory.Configured)
                 {
