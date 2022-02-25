@@ -3,17 +3,28 @@ angular.module("umbraco")
         function ($scope, localizationService, entityResource, editorService, overlayService, eventsService, mediaHelper) {
 
             var unsubscribe = [];
-            var vm = this;
+            
+            const vm = this;
 
             vm.loading = true;
             vm.model = $scope.model;
             vm.mediaEntry = vm.model.mediaEntry;
             vm.currentCrop = null;
 
+            vm.focalPointChanged = focalPointChanged;
+            vm.onImageLoaded = onImageLoaded;
+            vm.openMedia = openMedia;
+            vm.repickMedia = repickMedia;
+            vm.selectCrop = selectCrop;
+            vm.deselectCrop = deselectCrop;
+            vm.resetCrop = resetCrop;
+            vm.submitAndClose = submitAndClose;
+            vm.close = close;
+
             localizationService.localizeMany([
                 vm.model.createFlow ? "general_cancel" : "general_close",
                 vm.model.createFlow ? "general_create" : "buttons_submitChanges"
-            ]).then(function (data) {
+            ]).then(data => {
                 vm.closeLabel = data[0];
                 vm.submitLabel = data[1];
             });
@@ -35,6 +46,7 @@ angular.module("umbraco")
             function updateMedia() {
 
                 vm.loading = true;
+
                 entityResource.getById(vm.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                     vm.media = mediaEntity;
                     vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, true);
@@ -44,11 +56,11 @@ angular.module("umbraco")
                     vm.hasDimensions = false;
                     vm.isCroppable = false;
 
-                    localizationService.localize("mediaPicker_editMediaEntryLabel", [vm.media.name, vm.model.documentName]).then(function (data) {
+                    localizationService.localize("mediaPicker_editMediaEntryLabel", [vm.media.name, vm.model.documentName]).then(data => {
                         vm.title = data;
                     });
                 }, function () {
-                    localizationService.localize("mediaPicker_deletedItem").then(function (localized) {
+                    localizationService.localize("mediaPicker_deletedItem").then(localized => {
                         vm.media = {
                             name: localized,
                             icon: "icon-picture",
@@ -60,15 +72,12 @@ angular.module("umbraco")
                     });
                 });
             }
-
-            vm.onImageLoaded = onImageLoaded;
+            
             function onImageLoaded(isCroppable, hasDimensions) {
                 vm.isCroppable = isCroppable;
                 vm.hasDimensions = hasDimensions;
-            };
-
-
-            vm.repickMedia = repickMedia;
+            }
+            
             function repickMedia() {
                 vm.model.propertyEditor.changeMediaFor(vm.model.mediaEntry, onMediaReplaced);
             }
@@ -84,24 +93,23 @@ angular.module("umbraco")
                 //
                 updateMedia();
             }
-
-            vm.openMedia = openMedia;
+            
             function openMedia() {
 
-                var mediaEditor = {
+                const mediaEditor = {
                     id: vm.mediaEntry.mediaKey,
-                    submit: function () {
+                    submit: () => {
                         editorService.close();
                     },
-                    close: function () {
+                    close: () => {
                         editorService.close();
                     }
                 };
+                
                 editorService.mediaEditor(mediaEditor);
             }
 
-
-            vm.focalPointChanged = function(left, top) {
+            function focalPointChanged(left, top) {
                 //update the model focalpoint value
                 vm.mediaEntry.focalPoint = {
                     left: left,
@@ -111,22 +119,17 @@ angular.module("umbraco")
                 //set form to dirty to track changes
                 setDirty();
             }
-
-
-
-            vm.selectCrop = selectCrop;
+            
             function selectCrop(targetCrop) {
                 vm.currentCrop = targetCrop;
                 setDirty();
                 // TODO: start watchin values of crop, first when changed set to dirty.
-            };
-
-            vm.deselectCrop = deselectCrop;
+            }
+            
             function deselectCrop() {
                 vm.currentCrop = null;
-            };
-
-            vm.resetCrop = resetCrop;
+            }
+            
             function resetCrop() {
                 if (vm.currentCrop) {
                     $scope.$evalAsync( () => {
@@ -140,18 +143,22 @@ angular.module("umbraco")
                 vm.imageCropperForm.$setDirty();
             }
 
-
-            vm.submitAndClose = function () {
+            function submitAndClose() {
                 if (vm.model && vm.model.submit) {
                     vm.model.submit(vm.model);
                 }
             }
-
-            vm.close = function () {
-                if (vm.model && vm.model.close) {
-                    if (vm.model.createFlow === true || vm.imageCropperForm.$dirty === true) {
-                        var labels = vm.model.createFlow === true ? ["mediaPicker_confirmCancelMediaEntryCreationHeadline", "mediaPicker_confirmCancelMediaEntryCreationMessage"] : ["prompt_discardChanges", "mediaPicker_confirmCancelMediaEntryHasChanges"];
-                        localizationService.localizeMany(labels).then(function (localizations) {
+            
+            function close() {
+                if (vm.model && vm.model.close)
+                {
+                    if (vm.model.createFlow === true || vm.imageCropperForm.$dirty === true)
+                    {
+                      const labelKeys = vm.model.createFlow === true
+                          ? ["mediaPicker_confirmCancelMediaEntryCreationHeadline", "mediaPicker_confirmCancelMediaEntryCreationMessage"]
+                          : ["prompt_discardChanges", "mediaPicker_confirmCancelMediaEntryHasChanges"];
+                        
+                        localizationService.localizeMany(labelKeys).then(localizations => {
                             const confirm = {
                                 title: localizations[0],
                                 view: "default",
@@ -159,11 +166,11 @@ angular.module("umbraco")
                                 submitButtonLabelKey: "general_discard",
                                 submitButtonStyle: "danger",
                                 closeButtonLabelKey: "prompt_stay",
-                                submit: function () {
+                                submit: () => {
                                     overlayService.close();
                                     vm.model.close(vm.model);
                                 },
-                                close: function () {
+                                close: () => {
                                     overlayService.close();
                                 }
                             };
@@ -177,6 +184,7 @@ angular.module("umbraco")
             }
 
             init();
+            
             $scope.$on("$destroy", function () {
                 unsubscribe.forEach(x => x());
             });
