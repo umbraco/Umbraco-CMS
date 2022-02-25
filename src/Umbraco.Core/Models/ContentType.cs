@@ -113,6 +113,25 @@ namespace Umbraco.Core.Models
                 if (_historyCleanup is not null)
                 {
                     _historyCleanup.PropertyChanged -= FlowHistoryCleanupIsDirty;
+                    // Remove all dirty properties from the old HistoryCleanup since that's not relevant anymore
+                    // This is a bit of a hack, because we can't remove dirty properties,
+                    // so we have to remove them all and re-add those who are not HistoryCleanup
+                    var dirtyProperties = GetDirtyProperties();
+
+                    // We don't want to fire the PropertyChanged event when simply re-adding old dirty properties
+                    DisablePropertyChangedEvent();
+                    // We don't want the properties to remember being dirty since we're re-adding them
+                    // They weren't dirty, they are dirty.
+                    ResetDirtyProperties(false);
+                    foreach (var dirtyProperty in dirtyProperties)
+                    {
+                        if (dirtyProperty.StartsWith(nameof(HistoryCleanup)) is false)
+                        {
+                            OnPropertyChanged(dirtyProperty);
+                        }
+                    }
+                    EnablePropertyChangedEvent();
+
                 }
 
                 SetPropertyValueAndDetectChanges(value, ref _historyCleanup, nameof(HistoryCleanup));

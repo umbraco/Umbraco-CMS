@@ -181,14 +181,33 @@ namespace Umbraco.Tests.Models
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.EnableChangeTracking();
+
             var propertyChangeHasFired = false;
             contentType.PropertyChanged += (sender, args) =>
             {
                 Assert.AreEqual(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays)), args.PropertyName);
                 propertyChangeHasFired = true;
             };
+
             contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
             Assert.IsTrue(propertyChangeHasFired);
+        }
+
+        [Test]
+        public void Disable_Change_Tracking_Includes_History_Cleanup()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.DisableChangeTracking();
+
+            var propertyChangeHasFired = false;
+            contentType.PropertyChanged += (sender, args) =>
+            {
+                propertyChangeHasFired = true;
+            };
+
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+            Assert.IsFalse(propertyChangeHasFired);
+            Assert.IsFalse(contentType.IsDirty());
         }
 
         [Test]
@@ -201,6 +220,50 @@ namespace Umbraco.Tests.Models
 
             Assert.IsTrue(contentType.IsDirty());
             Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
+        }
+
+        [Test]
+        public void Replacing_History_Cleanup_Removes_Old_Dirty_History_Properties()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            contentType.Alias = "NewValue";
+            contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+
+            contentType.PropertyChanged += (sender, args) =>
+            {
+                // Ensure that property changed is only invoked for history cleanup
+                Assert.AreEqual(nameof(contentType.HistoryCleanup), args.PropertyName);
+            };
+
+            // Since we're replacing the entire HistoryCleanup the changed property is no longer dirty, the entire HistoryCleanup is
+            contentType.HistoryCleanup = new HistoryCleanup();
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(contentType.IsDirty());
+                Assert.IsFalse(contentType.WasDirty());
+                Assert.IsFalse(contentType.IsPropertyDirty(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays))));
+                Assert.AreEqual(2, contentType.GetDirtyProperties().Count());
+                Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
+                Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.Alias)));
+            });
+        }
+
+        [Test]
+        public void Old_History_Cleanup_Reference_Doesnt_Make_Content_Type_Dirty()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var oldHistoryCleanup = contentType.HistoryCleanup;
+
+            contentType.HistoryCleanup = new HistoryCleanup();
+            contentType.ResetDirtyProperties();
+            contentType.ResetWereDirtyProperties();
+
+            oldHistoryCleanup.KeepAllVersionsNewerThanDays = 2;
+
+            Assert.IsFalse(contentType.IsDirty());
+            Assert.IsFalse(contentType.WasDirty());
         }
 
         private static string PrefixHistoryCleanup(string propertyName) =>
