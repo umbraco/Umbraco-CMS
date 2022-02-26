@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     /**
@@ -136,13 +136,12 @@
         }
 
         var copyAllEntriesAction = {
-            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: [model.label],
-            icon: 'documents',
+            icon: "icon-documents",
             method: copyAllEntries,
             isDisabled: true
-        }
-
+        };
 
         var removeAllEntries = function () {
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
@@ -163,9 +162,9 @@
         }
 
         var removeAllEntriesAction = {
-            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelKey: "clipboard_labelForRemoveAllEntries",
             labelTokens: [],
-            icon: 'trash',
+            icon: "icon-trash",
             method: removeAllEntries,
             isDisabled: true
         };
@@ -728,8 +727,6 @@
             copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
             removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
         }
-
-
 
         var propertyActions = [
             copyAllEntriesAction,

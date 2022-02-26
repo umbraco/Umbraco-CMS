@@ -69,15 +69,15 @@
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
-                icon: "documents",
+                icon: "icon-documents",
                 method: requestCopyAllMedias,
                 isDisabled: true
             };
 
             removeAllMediasAction = {
-                labelKey: 'clipboard_labelForRemoveAllEntries',
+                labelKey: "clipboard_labelForRemoveAllEntries",
                 labelTokens: [],
-                icon: 'trash',
+                icon: "icon-trash",
                 method: requestRemoveAllMedia,
                 isDisabled: true
             };

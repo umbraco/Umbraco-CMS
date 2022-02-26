@@ -342,17 +342,17 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         var copyAllEntriesAction = {
-            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: ['Media'],
-            icon: "documents",
+            icon: "icon-documents",
             method: copyAllEntries,
             isDisabled: true
         }
 
         var removeAllEntriesAction = {
-            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelKey: "clipboard_labelForRemoveAllEntries",
             labelTokens: [],
-            icon: 'trash',
+            icon: "icon-trash",
             method: removeAllEntries,
             isDisabled: true
         };
