@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when a document is being published

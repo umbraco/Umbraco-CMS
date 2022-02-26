@@ -1,4 +1,4 @@
-﻿
+
 
 namespace Umbraco.Cms.Core.Actions
 {
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Actions
         public char Letter => 'V';
         public string Alias => ActionAlias;
         public string Category => null;
-        public string Icon => "undo";
+        public string Icon => "icon-undo";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => false;
 

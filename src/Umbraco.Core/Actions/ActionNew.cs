@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked upon creation of a document
@@ -10,7 +10,7 @@
 
         public char Letter => ActionLetter;
         public string Alias => ActionAlias;
-        public string Icon => "add";
+        public string Icon => "icon-add";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;

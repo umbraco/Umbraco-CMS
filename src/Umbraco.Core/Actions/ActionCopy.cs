@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when copying a document, media, member
@@ -10,7 +10,7 @@
         public char Letter => ActionLetter;
         public string Alias => "copy";
         public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
-        public string Icon => "documents";
+        public string Icon => "icon-documents";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
     }

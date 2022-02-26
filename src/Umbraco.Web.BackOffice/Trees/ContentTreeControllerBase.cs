@@ -472,7 +472,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 {
                     menu.Items.Add(new MenuItem("emptyrecyclebin", LocalizedTextService)
                     {
-                        Icon = "trash",
+                        Icon = "icon-trash",
                         OpensDialog = true
                     });
                     menu.Items.Add(new RefreshNode(LocalizedTextService, true));

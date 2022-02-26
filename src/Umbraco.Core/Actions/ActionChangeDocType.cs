@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     // TODO: Add this back in when we support this functionality again
     ///// <summary>
@@ -9,7 +9,7 @@
     //    public char Letter => '7';
     //    public string Alias => "changeDocType";
     //    public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
-    //    public string Icon => "axis-rotation-2";
+    //    public string Icon => "icon-axis-rotation-2";
     //    public bool ShowInNotifier => true;
     //    public bool CanBePermissionAssigned => true;
     //}

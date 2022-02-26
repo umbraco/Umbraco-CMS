@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when copying a document is being rolled back
@@ -10,7 +10,7 @@
         public char Letter => ActionLetter;
         public string Alias => "rollback";
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
-        public string Icon => "undo";
+        public string Icon => "icon-undo";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
     }

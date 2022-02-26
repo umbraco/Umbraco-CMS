@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when a document, media, member is deleted
@@ -11,7 +11,7 @@
         public char Letter => ActionLetter;
         public string Alias => ActionAlias;
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-        public string Icon => "delete";
+        public string Icon => "icon-delete";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
     }

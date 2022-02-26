@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when children to a document is being sent to published (by an editor without publishrights)
@@ -10,7 +10,7 @@
         public char Letter => ActionLetter;
         public string Alias => "sendtopublish";
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-        public string Icon => "outbox";
+        public string Icon => "icon-outbox";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
     }

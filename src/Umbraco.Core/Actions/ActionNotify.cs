@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     public class ActionNotify : IAction
     {
@@ -8,7 +8,7 @@
 
         public bool CanBePermissionAssigned => true;
 
-        public string Icon => "megaphone";
+        public string Icon => "icon-megaphone";
 
         public string Alias => "notify";
 

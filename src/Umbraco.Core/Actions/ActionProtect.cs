@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when a document is protected or unprotected
@@ -10,7 +10,7 @@
         public char Letter => ActionLetter;
         public string Alias => "protect";
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
-        public string Icon => "lock";
+        public string Icon => "icon-lock";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
     }

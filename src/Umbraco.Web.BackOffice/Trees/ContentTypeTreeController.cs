@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
                 menu.Items.Add(new MenuItem("importdocumenttype", LocalizedTextService)
                 {
-                    Icon = "page-up",
+                    Icon = "icon-page-up",
                     SeparatorBefore = true,
                     OpensDialog = true
                 });
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 menu.Items.Add(new MenuItem("rename", LocalizedTextService)
                 {
-                    Icon = "icon icon-edit"
+                    Icon = "icon-edit"
                 });
 
                 if (container.HasChildren == false)
@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
                 menu.Items.Add(new MenuItem("export", LocalizedTextService)
                 {
-                    Icon = "download-alt",
+                    Icon = "icon-download-alt",
                     SeparatorBefore = true,
                     OpensDialog = true
                 });

@@ -284,7 +284,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 menu.Items.Add(new MenuItem("notify", LocalizedTextService)
                 {
-                    Icon = "megaphone",
+                    Icon = "icon-megaphone",
                     SeparatorBefore = true,
                     OpensDialog = true
                 });

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when a domain is being assigned to a document
@@ -10,7 +10,7 @@
         public char Letter => ActionLetter;
         public string Alias => "assigndomain";
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
-        public string Icon => "home";
+        public string Icon => "icon-home";
         public bool ShowInNotifier => false;
         public bool CanBePermissionAssigned => true;
     }

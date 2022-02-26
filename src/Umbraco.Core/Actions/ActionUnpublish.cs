@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
 
     /// <summary>
@@ -11,7 +11,7 @@
         public char Letter => ActionLetter;
         public string Alias => "unpublish";
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-        public string Icon => "circle-dotted";
+        public string Icon => "icon-circle-dotted";
         public bool ShowInNotifier => false;
         public bool CanBePermissionAssigned => true;
     }

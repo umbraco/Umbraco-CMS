@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked upon creation of a document, media, member
@@ -10,7 +10,7 @@
         public char Letter => ActionLetter;
         public string Alias => "move";
         public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
-        public string Icon => "enter";
+        public string Icon => "icon-enter";
         public bool ShowInNotifier => true;
         public bool CanBePermissionAssigned => true;
     }
