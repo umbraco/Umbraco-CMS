@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         public MenuItem()
         {
             AdditionalData = new Dictionary<string, object>();
-            Icon = "folder";
+            Icon = Constants.Icons.Folder;
         }
 
         public MenuItem(string alias, string name)
@@ -85,7 +85,10 @@ namespace Umbraco.Cms.Core.Models.Trees
         [DataMember(Name = "separator")]
         public bool SeparatorBefore { get; set; }
 
-        [DataMember(Name = "cssclass")]
+        /// <summary>
+        /// Icon to use at action menu item
+        /// </summary>
+        [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
         /// <summary>
