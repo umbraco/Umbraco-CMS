@@ -2620,7 +2620,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
         Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
     ]]>
     </key>
-    <key alias="bulletPointThree">
+    <key alias="bulletPointTutorials">
       <![CDATA[
         Watch our free <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
     ]]>
