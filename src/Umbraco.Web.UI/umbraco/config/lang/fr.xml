@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture et noms d'hôte</key>
+    <key alias="assigndomain">Culture et noms d'hôte</key>
     <key alias="auditTrail">Informations d'audit</key>
     <key alias="browse">Parcourir</key>
     <key alias="changeDocType">Changer le type de document</key>
@@ -16,7 +16,7 @@
     <key alias="createGroup">Créer un groupe</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyRecycleBin">Vider la corbeille</key>
+    <key alias="emptyrecyclebin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
     <key alias="importdocumenttype">Importer un type de document</key>
@@ -259,6 +259,7 @@
     <key alias="nestedContentNoContentTypes">Aucun type de contenu n'est configuré pour cette propriété.</key>
     <key alias="nestedContentAddElementType">Ajouter un type d'élément</key>
     <key alias="nestedContentSelectElementTypeModalTitle">Sélectionner un type d'élément</key>
+    <key alias="nestedContentNoGroups">Le type d'élément sélectionné ne contient aucun groupe supporté (les onglets/tabs ne sont pas supportés par cet éditeur, changez-les en groupes ou utilisez l'éditeur Block List).</key>
     <key alias="addTextBox">Ajouter un autre champ texte</key>
     <key alias="removeTextBox">Enlever ce champ texte</key>
     <key alias="contentRoot">Racine du contenu</key>
@@ -289,6 +290,7 @@
     <key alias="clickToUpload">Cliquez pour télécharger</key>
     <key alias="orClickHereToUpload">ou cliquez ici pour choisir un fichier</key>
     <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.</key>
+    <key alias="invalidFileName">Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide</key>
     <key alias="maxFileSize">La taille maximum de fichier est</key>
     <key alias="mediaRoot">Racine du média</key>
     <key alias="moveToSameFolderFailed">Les dossiers parent et destination ne peuvent pas être identiques</key>
@@ -735,6 +737,9 @@
     <key alias="embed">Intégrer</key>
     <key alias="selected">sélectionné</key>
     <key alias="avatar">Avatar de</key>
+    <key alias="header">Entête</key>
+    <key alias="systemField">champ système</key>
+    <key alias="lastUpdated">Dernière mise à jour</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>

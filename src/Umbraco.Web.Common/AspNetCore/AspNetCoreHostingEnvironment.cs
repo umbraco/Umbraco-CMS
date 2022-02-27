@@ -37,7 +37,16 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
             _urlProviderMode = _webRoutingSettings.CurrentValue.UrlProviderMode;
 
-            SiteName = webHostEnvironment.ApplicationName;
+            SetSiteName(hostingSettings.CurrentValue.SiteName);
+
+            // We have to ensure that the OptionsMonitor is an actual options monitor since we have a hack
+            // where we initially use an OptionsMonitorAdapter, which doesn't implement OnChange.
+            // See summery of OptionsMonitorAdapter for more information.
+            if (hostingSettings is OptionsMonitor<HostingSettings>)
+            {
+                hostingSettings.OnChange(settings => SetSiteName(settings.SiteName));
+            }
+
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
 
             if (_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is not null)
@@ -53,7 +62,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         public Uri ApplicationMainUrl { get; private set; }
 
         /// <inheritdoc/>
-        public string SiteName { get; }
+        public string SiteName { get; private set; }
 
         /// <inheritdoc/>
         public string ApplicationId
@@ -198,7 +207,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                 }
             }
         }
+
+        private void SetSiteName(string siteName) =>
+            SiteName = string.IsNullOrWhiteSpace(siteName)
+                ? _webHostEnvironment.ApplicationName
+                : siteName;
     }
-
-
 }

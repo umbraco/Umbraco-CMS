@@ -235,7 +235,7 @@ namespace Umbraco.Cms.Core
                 /// The standard properties group name for membership properties.
                 /// </summary>
                 public const string StandardPropertiesGroupName = "Membership";
-            }
+              }
 
             /// <summary>
             /// Defines the alias identifiers for Umbraco member types.

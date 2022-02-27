@@ -558,24 +558,32 @@
                     }
                 }
             });
+          
+            const editor = {
+                filterCssClass: 'not-allowed',
+                filter: item => !availableMasterTemplates.some(template => template.id == item.id),
+                submit: model => {
+                  const template = model.selection[0];
+                  if (template && template.alias) {
+                    vm.template.masterTemplateAlias = template.alias;
+                    setLayout(template.alias + ".cshtml");
+                  } else {
+                    vm.template.masterTemplateAlias = null;
+                    setLayout(null);
+                  }
+                  editorService.close();
+                },
+                close: () => editorService.close()
+            }
 
             localizationService.localize("template_mastertemplate").then(title => {
-                const editor = {
-                    title,
-                    filterCssClass: 'not-allowed',
-                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),                    
-                    submit: model => {
-                        var template = model.selection[0];
-                        if (template && template.alias) {
-                            vm.template.masterTemplateAlias = template.alias;
-                            setLayout(template.alias + ".cshtml");
-                        } else {
-                            vm.template.masterTemplateAlias = null;
-                            setLayout(null);
-                        }
-                        editorService.close();
-                    },
-                    close: () => editorService.close()
+                editor.title = title;
+                
+                const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
+                if (currentTemplate) {
+                    editor.currentNode = {
+                        path: currentTemplate.path
+                    };
                 }
 
                 editorService.templatePicker(editor);

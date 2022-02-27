@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Kültür ve Ana Bilgisayar Adları</key>
+    <key alias="assigndomain">Kültür ve Ana Bilgisayar Adları</key>
     <key alias="auditTrail">Denetim Yolu</key>
     <key alias="browse">Düğüme Göz At</key>
     <key alias="changeDocType">Belge Türünü Değiştir</key>
@@ -17,7 +17,7 @@
     <key alias="delete">Sil</key>
     <key alias="disable">Devre Dışı Bırak</key>
     <key alias="editSettings">Ayarları düzenle</key>
-    <key alias="emptyRecycleBin">Geri dönüşüm kutusunu boşalt</key>
+    <key alias="emptyrecyclebin">Geri dönüşüm kutusunu boşalt</key>
     <key alias="enable">Etkinleştir</key>
     <key alias="exportDocumentType">Belge Türünü Dışa Aktar</key>
     <key alias="importdocumenttype">Belge Türünü İçe Aktar</key>

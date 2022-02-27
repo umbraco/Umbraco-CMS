@@ -128,51 +128,57 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (blockEditorData == null)
                     return string.Empty;
 
-                foreach (var row in blockEditorData.BlockValue.ContentData)
+                void MapBlockItemData(List<BlockItemData> items)
                 {
-                    foreach (var prop in row.PropertyValues)
+                    foreach (var row in items)
                     {
-                        // create a temp property with the value
-                        // - force it to be culture invariant as the block editor can't handle culture variant element properties
-                        prop.Value.PropertyType.Variations = ContentVariation.Nothing;
-                        var tempProp = new Property(prop.Value.PropertyType);
-                        tempProp.SetValue(prop.Value.Value);
-
-                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                        if (propEditor == null)
+                        foreach (var prop in row.PropertyValues)
                         {
-                            // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
-                            // if the property editor doesn't exist I think everything will break anyways?
+                            // create a temp property with the value
+                            // - force it to be culture invariant as the block editor can't handle culture variant element properties
+                            prop.Value.PropertyType.Variations = ContentVariation.Nothing;
+                            var tempProp = new Property(prop.Value.PropertyType);
+                            tempProp.SetValue(prop.Value.Value);
+
+                            var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                            if (propEditor == null)
+                            {
+                                // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
+                                // if the property editor doesn't exist I think everything will break anyways?
+                                // update the raw value since this is what will get serialized out
+                                row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
+                                continue;
+                            }
+
+                            var dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                            if (dataType == null)
+                            {
+                                // deal with weird situations by ignoring them (no comment)
+                                row.PropertyValues.Remove(prop.Key);
+                                _logger.LogWarning(
+                                    "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
+                                    prop.Key, row.Key, property.PropertyType.Alias);
+                                continue;
+                            }
+
+                            if (!valEditors.TryGetValue(dataType.Id, out var valEditor))
+                            {
+                                var tempConfig = dataType.Configuration;
+                                valEditor = propEditor.GetValueEditor(tempConfig);
+
+                                valEditors.Add(dataType.Id, valEditor);
+                            }
+
+                            var convValue = valEditor.ToEditor(tempProp);
+
                             // update the raw value since this is what will get serialized out
-                            row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
-                            continue;
+                            row.RawPropertyValues[prop.Key] = convValue;
                         }
-
-                        var dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
-                        if (dataType == null)
-                        {
-                            // deal with weird situations by ignoring them (no comment)
-                            row.PropertyValues.Remove(prop.Key);
-                            _logger.LogWarning(
-                                "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                                prop.Key, row.Key, property.PropertyType.Alias);
-                            continue;
-                        }
-
-                        if (!valEditors.TryGetValue(dataType.Id, out var valEditor))
-                        {
-                            var tempConfig = dataType.Configuration;
-                            valEditor = propEditor.GetValueEditor(tempConfig);
-
-                            valEditors.Add(dataType.Id, valEditor);
-                        }
-
-                        var convValue = valEditor.ToEditor(tempProp);
-
-                        // update the raw value since this is what will get serialized out
-                        row.RawPropertyValues[prop.Key] = convValue;
                     }
                 }
+
+                MapBlockItemData(blockEditorData.BlockValue.ContentData);
+                MapBlockItemData(blockEditorData.BlockValue.SettingsData);
 
                 // return json convertable object
                 return blockEditorData.BlockValue;
@@ -203,30 +209,36 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
                     return string.Empty;
 
-                foreach (var row in blockEditorData.BlockValue.ContentData)
+                void MapBlockItemData(List<BlockItemData> items)
                 {
-                    foreach (var prop in row.PropertyValues)
+                    foreach (var row in items)
                     {
-                        // Fetch the property types prevalue
-                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                        foreach (var prop in row.PropertyValues)
+                        {
+                            // Fetch the property types prevalue
+                            var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
 
-                        // Lookup the property editor
-                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                        if (propEditor == null) continue;
+                            // Lookup the property editor
+                            var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                            if (propEditor == null) continue;
 
-                        // Create a fake content property data object
-                        var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
+                            // Create a fake content property data object
+                            var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
 
-                        // Get the property editor to do it's conversion
-                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
+                            // Get the property editor to do it's conversion
+                            var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
 
-                        // update the raw value since this is what will get serialized out
-                        row.RawPropertyValues[prop.Key] = newValue;
+                            // update the raw value since this is what will get serialized out
+                            row.RawPropertyValues[prop.Key] = newValue;
+                        }
                     }
                 }
 
+                MapBlockItemData(blockEditorData.BlockValue.ContentData);
+                MapBlockItemData(blockEditorData.BlockValue.SettingsData);
+
                 // return json
-                return JsonConvert.SerializeObject(blockEditorData.BlockValue);
+                return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
             }
 
             #endregion

@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
 using Umbraco.Extensions;
@@ -16,23 +17,25 @@ namespace Umbraco.Cms.Core.DependencyInjection
     public static partial class UmbracoBuilderExtensions
     {
 
-        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder)
+        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>> configure = null)
             where TOptions : class
         {
             var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
-
             if (umbracoOptionsAttribute is null)
             {
-                throw new ArgumentException("typeof(TOptions) do not have the UmbracoOptionsAttribute");
+                throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
             }
 
-
-            builder.Services.AddOptions<TOptions>()
-                .Bind(builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
-                    o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
+            var optionsBuilder = builder.Services.AddOptions<TOptions>()
+                .Bind(
+                    builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
+                    o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties
+                )
                 .ValidateDataAnnotations();
 
-             return builder;
+            configure?.Invoke(optionsBuilder);
+
+            return builder;
         }
 
         /// <summary>
@@ -55,7 +58,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<ContentSettings>()
                 .AddUmbracoOptions<CoreDebugSettings>()
                 .AddUmbracoOptions<ExceptionFilterSettings>()
-                .AddUmbracoOptions<GlobalSettings>()
+                .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
+                {
+                    if (string.IsNullOrEmpty(options.UmbracoMediaPhysicalRootPath))
+                    {
+                        options.UmbracoMediaPhysicalRootPath = options.UmbracoMediaPath;
+                    }
+                }))
                 .AddUmbracoOptions<HealthChecksSettings>()
                 .AddUmbracoOptions<HostingSettings>()
                 .AddUmbracoOptions<ImagingSettings>()
@@ -77,7 +86,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<BasicAuthSettings>()
                 .AddUmbracoOptions<RuntimeMinificationSettings>()
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
-                .AddUmbracoOptions<PackageMigrationSettings>();
+                .AddUmbracoOptions<PackageMigrationSettings>()
+                .AddUmbracoOptions<ContentDashboardSettings>()
+                .AddUmbracoOptions<HelpPageSettings>();
 
             builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 

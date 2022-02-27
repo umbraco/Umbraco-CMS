@@ -484,9 +484,9 @@
 
             };
 
-            scope.openDocumentType = (documentTypeId) => {
+            scope.openContentType = (contentTypeId) => {
                 const editor = {
-                    id: documentTypeId,
+                    id: contentTypeId,
                     submit: () => {
                         const args = { node: scope.model };
                         eventsService.emit("editors.documentType.reload", args);
@@ -582,7 +582,7 @@
             };
 
             scope.canRemoveTab = (tab) => {
-                return tab.inherited !== true;
+                return scope.canRemoveGroup(tab) && _.every(scope.model.groups.filter(group => group.parentAlias === tab.alias), group => scope.canRemoveGroup(group));
             };
 
             scope.setTabOverflowState = (overflowLeft, overflowRight) => {
