@@ -98,7 +98,7 @@
           for (const [label, range] of Object.entries(pluginData.ranges)) {
             addRangeButton(label).addEventListener('click', function() {
                 this.blur();
-                fp.setDate([moment(range[0]).toDate(), moment(range[1]).toDate()], true,);
+                fp.setDate([moment(range[0]).toDate(), moment(range[1]).toDate()], true);
                 fp.close();
               });
           }
@@ -126,6 +126,7 @@
          * @param {Array} selectedDates
          */
         onValueUpdate(selectedDates) {
+          console.log("onValueUpdate", selectedDates);
           selectActiveRangeButton(selectedDates);
         }
       };
