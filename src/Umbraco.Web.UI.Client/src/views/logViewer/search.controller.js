@@ -44,7 +44,6 @@
             enabled: false,
             interval: 0,
             promise: null,
-
             defaultButton: {
                 labelKey: "logViewer_polling",
                 handler: function() {
@@ -116,7 +115,6 @@
             }, interval*1000);
         }
 
-
         vm.searches = [];
 
         vm.logItems = {};
@@ -170,15 +168,15 @@
             //If we have a Querystring set for lq (log query)
             //Then update vm.logOptions.filterExpression
             var querystring = $location.search();
-            if(querystring.lq){
+            if (querystring.lq){
                 vm.logOptions.filterExpression = querystring.lq;
             }
 
-            if(querystring.startDate){
+            if (querystring.startDate){
                 vm.logOptions.startDate = querystring.startDate;
             }
 
-            if(querystring.endDate){
+            if (querystring.endDate){
                 vm.logOptions.endDate = querystring.endDate;
             }
 
