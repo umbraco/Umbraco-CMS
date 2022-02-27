@@ -4,6 +4,7 @@
 
         <umb-toggle input-id="{{model.alias}}"
                     checked="renderModel.value"
+                    disabled="model.readonly"
                     on-click="toggle()"
                     show-labels="{{model.config.showLabels}}"
                     label-position="right"

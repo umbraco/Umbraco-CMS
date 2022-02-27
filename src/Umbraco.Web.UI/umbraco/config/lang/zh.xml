@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">管理主机名</key>
+    <key alias="assigndomain">管理主机名</key>
     <key alias="auditTrail">跟踪审计</key>
     <key alias="browse">浏览节点</key>
     <key alias="changeDocType">改变文档类型</key>
@@ -14,7 +14,7 @@
     <key alias="createPackage">创建扩展包</key>
     <key alias="delete">删除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyRecycleBin">清空回收站</key>
+    <key alias="emptyrecyclebin">清空回收站</key>
     <key alias="exportDocumentType">导出文档类型</key>
     <key alias="importdocumenttype">导入文档类型</key>
     <key alias="importPackage">导入扩展包</key>
@@ -1141,7 +1141,7 @@
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
     <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>

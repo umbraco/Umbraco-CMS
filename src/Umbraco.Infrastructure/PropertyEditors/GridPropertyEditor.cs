@@ -1,12 +1,10 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -139,7 +137,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
 
                 // Convert back to raw JSON for persisting
-                return JsonConvert.SerializeObject(grid);
+                return JsonConvert.SerializeObject(grid, Formatting.None);
             }
 
             /// <summary>
@@ -153,7 +151,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment)?.ToString();
-                if (val.IsNullOrWhiteSpace()) return string.Empty;
+                if (val.IsNullOrWhiteSpace())
+                    return string.Empty;
 
                 var grid = DeserializeGridValue(val, out var rtes, out _);
 
@@ -199,7 +198,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     _richTextPropertyValueEditor.GetReferences(x.Value)))
                     yield return umbracoEntityReference;
 
-                foreach (var umbracoEntityReference in mediaValues.Where(x=>x.Value.HasValues)
+                foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value.HasValues)
                     .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
                     yield return umbracoEntityReference;
             }

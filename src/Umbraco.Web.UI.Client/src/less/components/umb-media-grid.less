@@ -225,6 +225,17 @@
 .umb-media-grid__list-item.selected, .umb-media-grid__list-item.selected:hover, .umb-media-grid__list-item.selected:focus {
     border: 2px solid #f5c1bc !important;
 }
+.umb-media-grid__list-item-name:hover {
+    text-decoration:underline;
+} 
+.umb-media-grid__list-item.-filtered:not(.-folder) {
+  cursor: not-allowed;
+
+  * {
+    pointer-events: none;
+  }
+}
+
 
 .umb-media-grid__list-view .umb-table-cell.umb-table__name {
     flex: 1 1 25%;

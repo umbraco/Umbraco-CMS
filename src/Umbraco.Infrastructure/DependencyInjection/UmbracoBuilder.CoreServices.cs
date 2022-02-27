@@ -279,7 +279,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             return builder;
         }
 
-
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {
             // add handlers for sending user notifications (i.e. emails)

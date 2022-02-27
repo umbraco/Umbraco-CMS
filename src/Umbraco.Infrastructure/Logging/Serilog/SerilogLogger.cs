@@ -21,6 +21,14 @@ namespace Umbraco.Cms.Core.Logging.Serilog
             SerilogLog = logConfig.CreateLogger();
         }
 
+        public static SerilogLogger CreateWithDefaultConfiguration(
+            IHostingEnvironment hostingEnvironment,
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration)
+        {
+            return CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out _);
+        }
+
         /// <summary>
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
