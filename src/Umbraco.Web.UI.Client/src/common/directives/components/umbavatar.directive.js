@@ -45,6 +45,8 @@ Use this directive to render an avatar.
 @param {string} size (<code>attribute</code>): The size of the avatar (xs, s, m, l, xl).
 @param {string} img-src (<code>attribute</code>): The image source to the avatar.
 @param {string} img-srcset (<code>atribute</code>): Reponsive support for the image source.
+@param {string=} name (<code>attribute</code>): Name initials will be used if no image source.
+@param {string=} color (<code>attribute</code>): Color will be used if no image source (primary, secondary, success, warning, danger).
 **/
 
 (function() {

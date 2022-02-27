@@ -12,9 +12,9 @@
     multinode treepicker (so: replace "PropertyWithPicker" with the alias of your property).
 *@
 
-@{ var selection = Model.Content.Value<IEnumerable<IPublishedContent>>(PublishedValueFallback, "PropertyWithPicker").ToArray(); }
+@{ var selection = Model?.Content.Value<IEnumerable<IPublishedContent>>(PublishedValueFallback, "PropertyWithPicker").ToArray(); }
 
-@if (selection.Length > 0)
+@if (selection?.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

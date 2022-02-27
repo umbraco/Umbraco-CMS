@@ -30,9 +30,8 @@
 
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
-                    if (dataModel[prop.alias]) {
-                        prop.value = dataModel[prop.alias];
-                    }
+
+                    prop.value = dataModel[prop.alias];
                 }
             }
 
@@ -53,9 +52,8 @@
 
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
-                    if (prop.value) {
-                        dataModel[prop.alias] = prop.value;
-                    }
+
+                    dataModel[prop.alias] = prop.value;
                 }
             }
 
@@ -101,11 +99,30 @@
 
         /**
          * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
-         * @param {Object} blockObject BlockObject to recive data values from.
+         * @param {Object} blockObject BlockObject to receive data values from.
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                var labelVars = Object.assign({"$contentTypeName": blockObject.content.contentTypeName, "$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                // blockobject.content may be null if the block is no longer allowed,
+                // so try and fall back to the label in the config,
+                // if that too is null, there's not much we can do, so just default to empty string.
+                var contentTypeName;
+                if(blockObject.content != null){
+                  contentTypeName = blockObject.content.contentTypeName;
+                }
+                else if(blockObject.config != null && blockObject.config.label != null){
+                  contentTypeName = blockObject.config.label;
+                }
+                else {
+                  contentTypeName = "";
+                }
+
+                var labelVars = Object.assign({
+                  "$contentTypeName": contentTypeName,
+                  "$settings": blockObject.settingsData || {},
+                  "$layout": blockObject.layout || {},
+                  "$index": (blockObject.index || 0)+1
+                }, blockObject.data);
                 var label = blockObject.labelInterpolator(labelVars);
                 if (label) {
                     return label;
@@ -511,10 +528,10 @@
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve a Block Object for the given layout entry.
              * The Block Object offers the necessary data to display and edit a block.
-             * The Block Object setups live syncronization of content and settings models back to the data of your Property Editor model.
-             * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
+             * The Block Object setups live synchronization of content and settings models back to the data of your Property Editor model.
+             * The returned object, named ´BlockObject´, contains several useful models to make editing of this block happen.
              * The ´BlockObject´ contains the following properties:
-             * - key {string}: runtime generated key, usefull for tracking of this object
+             * - key {string}: runtime generated key, useful for tracking of this object
              * - content {Object}: Content model, the content data in a ElementType model.
              * - settings {Object}: Settings model, the settings data in a ElementType model.
              * - config {Object}: A local deep copy of the block configuration model.
@@ -522,12 +539,11 @@
              * - updateLabel {Method}: Method to trigger an update of the label for this block.
              * - data {Object}: A reference to the content data object from your property editor model.
              * - settingsData {Object}: A reference to the settings data object from your property editor model.
-             * - layout {Object}: A refernce to the layout entry from your property editor model.
+             * - layout {Object}: A reference to the layout entry from your property editor model.
              * @param {Object} layoutEntry the layout entry object to build the block model from.
-             * @return {Object | null} The BlockObject for the given layout entry. Or null if data or configuration wasnt found for this block.
+             * @return {Object | null} The BlockObject for the given layout entry. Or null if data or configuration wasn't found for this block.
              */
             getBlockObject: function (layoutEntry) {
-
                 var contentUdi = layoutEntry.contentUdi;
 
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);

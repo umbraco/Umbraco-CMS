@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -22,6 +25,7 @@ namespace Umbraco.Cms.Web.Common.Security
     public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManagerExternalLogins
     {
         private readonly IMemberExternalLoginProviders _memberExternalLoginProviders;
+        private readonly IEventAggregator _eventAggregator;
 
         public MemberSignInManager(
             UserManager<MemberIdentityUser> memberManager,
@@ -31,10 +35,12 @@ namespace Umbraco.Cms.Web.Common.Security
             ILogger<SignInManager<MemberIdentityUser>> logger,
             IAuthenticationSchemeProvider schemes,
             IUserConfirmation<MemberIdentityUser> confirmation,
-            IMemberExternalLoginProviders memberExternalLoginProviders) :
+            IMemberExternalLoginProviders memberExternalLoginProviders,
+            IEventAggregator eventAggregator) :
             base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
             _memberExternalLoginProviders = memberExternalLoginProviders;
+            _eventAggregator = eventAggregator;
         }
 
         [Obsolete("Use ctor with all params")]
@@ -46,7 +52,9 @@ namespace Umbraco.Cms.Web.Common.Security
             ILogger<SignInManager<MemberIdentityUser>> logger,
             IAuthenticationSchemeProvider schemes,
             IUserConfirmation<MemberIdentityUser> confirmation) :
-            this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>())
+            this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation,
+                StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>(),
+                StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
         { }
 
         // use default scheme for members
@@ -60,30 +68,6 @@ namespace Umbraco.Cms.Web.Common.Security
 
         // use default scheme for members
         protected override string TwoFactorRememberMeAuthenticationType => IdentityConstants.TwoFactorRememberMeScheme;
-
-        /// <inheritdoc />
-        public override Task<MemberIdentityUser> GetTwoFactorAuthenticationUserAsync()
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task<bool> IsTwoFactorClientRememberedAsync(MemberIdentityUser user)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task RememberTwoFactorClientAsync(MemberIdentityUser user)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task ForgetTwoFactorClientAsync()
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
-
-        /// <inheritdoc />
-        public override Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
-            => throw new NotImplementedException("Two factor is not yet implemented for members");
 
         /// <inheritdoc />
         public override async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
@@ -369,6 +353,29 @@ namespace Umbraco.Cms.Web.Common.Security
         private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>
             Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
 
+        protected override async Task<SignInResult> SignInOrTwoFactorAsync(MemberIdentityUser user, bool isPersistent,
+            string loginProvider = null, bool bypassTwoFactor = false)
+        {
+            var result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
 
+            if (result.RequiresTwoFactor)
+            {
+                NotifyRequiresTwoFactor(user);
+            }
+
+            return result;
+        }
+
+        protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(user,
+            (currentUser) => new MemberTwoFactorRequestedNotification(currentUser.Key)
+        );
+
+        private T Notify<T>(MemberIdentityUser currentUser, Func<MemberIdentityUser, T> createNotification) where T : INotification
+        {
+
+            var notification = createNotification(currentUser);
+            _eventAggregator.Publish(notification);
+            return notification;
+        }
     }
 }

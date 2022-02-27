@@ -3,7 +3,7 @@
 @try
 {
     string editor = EditorView(Model);
-    <text>@await Html.PartialAsync(editor, (object)Model)</text>
+    <text>@await Html.PartialAsync(editor, Model as object)</text>
 }
 catch (Exception ex)
 {

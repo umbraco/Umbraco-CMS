@@ -18,7 +18,7 @@
     <key alias="delete">Dileu</key>
     <key alias="disable">Analluogi</key>
     <key alias="editSettings">Golygu gosodiadau</key>
-    <key alias="emptyRecycleBin">Gwagu bin ailgylchu</key>
+    <key alias="emptyrecyclebin">Gwagu bin ailgylchu</key>
     <key alias="enable">Galluogi</key>
     <key alias="exportDocumentType">Allforio Math o Ddogfen</key>
     <key alias="importdocumenttype">Mewnforio Math o Ddogfen</key>
