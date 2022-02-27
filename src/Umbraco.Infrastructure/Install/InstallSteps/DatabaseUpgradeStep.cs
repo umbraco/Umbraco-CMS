@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
                 var result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
-                if (result.Success == false)
+                if (result?.Success == false)
                 {
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }

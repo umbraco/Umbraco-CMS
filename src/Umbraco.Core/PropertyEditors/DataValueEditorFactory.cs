@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public DataValueEditorFactory(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-        public TDataValueEditor Create<TDataValueEditor>(params object[] args)
+        public TDataValueEditor Create<TDataValueEditor>(params object?[] args)
          where TDataValueEditor: class, IDataValueEditor
-            => _serviceProvider.CreateInstance<TDataValueEditor>(args);
+            => _serviceProvider.CreateInstance<TDataValueEditor>(args.WhereNotNull());
 
     }
 }

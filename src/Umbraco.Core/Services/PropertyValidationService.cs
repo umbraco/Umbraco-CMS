@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidatePropertyValue(
            IPropertyType propertyType,
-           object postedValue)
+           object? postedValue)
         {
             if (propertyType is null) throw new ArgumentNullException(nameof(propertyType));
             var dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<ValidationResult> ValidatePropertyValue(
             IDataEditor editor,
             IDataType dataType,
-            object postedValue,
+            object? postedValue,
             bool isRequired,
             string? validationRegExp,
             string? isRequiredMessage,
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Services
                 // the property will be displayed as a label, so flagging it as invalid would be pointless.
                 return true;
             }
-            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
+            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.Configuration;
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
         }

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Trees
         }
 
         [DataMember(Name = "parentId", IsRequired = true)]
-        public new object ParentId { get; set; }
+        public new object? ParentId { get; set; }
 
         /// <summary>
         /// A flag to set whether or not this node has children

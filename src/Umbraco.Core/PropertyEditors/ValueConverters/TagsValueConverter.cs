@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var configuration = _dataTypeService.GetDataType(id).ConfigurationAs<TagConfiguration>();
+                var configuration = _dataTypeService.GetDataType(id)?.ConfigurationAs<TagConfiguration>();
                 return configuration?.StorageType == TagsStorageType.Json;
             });
         }

@@ -89,6 +89,7 @@ namespace Umbraco.Cms.Core.Models
             _forceValueStorageType = forceValueStorageType;
             _alias = propertyTypeAlias == null ? string.Empty : SanitizeAlias(propertyTypeAlias);
             _variations = ContentVariation.Nothing;
+            _name = string.Empty;
         }
 
         /// <summary>

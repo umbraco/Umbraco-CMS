@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
         {
             get
             {
-                string FormatGuidState(string value)
+                string FormatGuidState(string? value)
                 {
                     if (string.IsNullOrWhiteSpace(value)) value = "unknown";
                     else if (Guid.TryParse(value, out var currentStateGuid))

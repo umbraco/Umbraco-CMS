@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
         [DataMember]
-        string Url { get; set; }
+        string? Url { get; set; }
 
     }
 }

@@ -66,9 +66,12 @@ namespace Umbraco.Cms.Core.Install
             {
                 var deserialized = _jsonSerializer.Deserialize<IEnumerable<InstallTrackingItem>>(
                     File.ReadAllText(file));
-                foreach (var item in deserialized)
+                if (deserialized is not null)
                 {
-                    _steps.Add(item);
+                    foreach (var item in deserialized)
+                    {
+                        _steps.Add(item);
+                    }
                 }
             }
             else
@@ -89,9 +92,12 @@ namespace Umbraco.Cms.Core.Install
                 {
                     var deserialized = _jsonSerializer.Deserialize<IEnumerable<InstallTrackingItem>>(
                         File.ReadAllText(file));
-                    foreach (var item in deserialized)
+                    if (deserialized is not null)
                     {
-                        _steps.Add(item);
+                        foreach (var item in deserialized)
+                        {
+                            _steps.Add(item);
+                        }
                     }
                 }
                 else

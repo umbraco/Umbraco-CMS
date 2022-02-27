@@ -9,18 +9,18 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Returns all user logins assigned
         /// </summary>
-        IEnumerable<IIdentityUserLogin> GetExternalLogins(Guid userOrMemberKey);
+        IEnumerable<IIdentityUserLogin>? GetExternalLogins(Guid userOrMemberKey);
 
         /// <summary>
         /// Returns all user login tokens assigned
         /// </summary>
-        IEnumerable<IIdentityUserToken> GetExternalLoginTokens(Guid userOrMemberKey);
+        IEnumerable<IIdentityUserToken>? GetExternalLoginTokens(Guid userOrMemberKey);
 
         /// <summary>
         /// Returns all logins matching the login info - generally there should only be one but in some cases
         /// there might be more than one depending on if an administrator has been editing/removing members
         /// </summary>
-        IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey);
+        IEnumerable<IIdentityUserLogin>? Find(string loginProvider, string providerKey);
 
         /// <summary>
         /// Saves the external logins associated with the user

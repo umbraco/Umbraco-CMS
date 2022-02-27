@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets blueprints for a content type.
         /// </summary>
-        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
+        IEnumerable<IContent>? GetBlueprintsForContentTypes(params int[] documentTypeId);
 
         /// <summary>
         /// Saves a blueprint.
@@ -84,17 +84,17 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets documents.
         /// </summary>
-        IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
+        IEnumerable<IContent>? GetByIds(IEnumerable<int> ids);
 
         /// <summary>
         /// Gets documents.
         /// </summary>
-        IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
+        IEnumerable<IContent>? GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
         /// Gets documents at a given level.
         /// </summary>
-        IEnumerable<IContent> GetByLevel(int level);
+        IEnumerable<IContent>? GetByLevel(int level);
 
         /// <summary>
         /// Gets the parent of a document.
@@ -109,12 +109,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets ancestor documents of a document.
         /// </summary>
-        IEnumerable<IContent> GetAncestors(int id);
+        IEnumerable<IContent>? GetAncestors(int id);
 
         /// <summary>
         /// Gets ancestor documents of a document.
         /// </summary>
-        IEnumerable<IContent> GetAncestors(IContent content);
+        IEnumerable<IContent>? GetAncestors(IContent content);
 
         /// <summary>
         /// Gets all versions of a document.
@@ -137,12 +137,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a version of a document.
         /// </summary>
-        IContent GetVersion(int versionId);
+        IContent? GetVersion(int versionId);
 
         /// <summary>
         /// Gets root-level documents.
         /// </summary>
-        IEnumerable<IContent> GetRootContent();
+        IEnumerable<IContent>? GetRootContent();
 
         /// <summary>
         /// Gets documents having an expiration date before (lower than, or equal to) a specified date.

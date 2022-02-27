@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Core.Models
             _properties.CollectionChanged += PropertiesChanged;
             _addedProperties = new List<string>();
             _removedProperties = new List<string>();
+            _macroSource = string.Empty;
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
         public Macro(IShortStringHelper shortStringHelper, string @alias, string? name,
-            string? macroSource,
+            string macroSource,
             bool cacheByPage = false,
             bool cacheByMember = false,
             bool dontRender = true,
@@ -94,7 +95,7 @@ namespace Umbraco.Cms.Core.Models
         private bool _cacheByPage;
         private bool _cacheByMember;
         private bool _dontRender;
-        private string? _macroSource;
+        private string _macroSource;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
@@ -245,10 +246,10 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or set the path to the Partial View to render
         /// </summary>
         [DataMember]
-        public string? MacroSource
+        public string MacroSource
         {
             get => _macroSource;
-            set => SetPropertyValueAndDetectChanges(value, ref _macroSource, nameof(MacroSource));
+            set => SetPropertyValueAndDetectChanges(value, ref _macroSource!, nameof(MacroSource));
         }
 
         /// <summary>

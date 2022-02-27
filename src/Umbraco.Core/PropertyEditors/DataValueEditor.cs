@@ -24,16 +24,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [DataContract]
     public class DataValueEditor : IDataValueEditor
     {
-        private readonly ILocalizedTextService? _localizedTextService;
-        private readonly IShortStringHelper? _shortStringHelper;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IJsonSerializer? _jsonSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
         public DataValueEditor(
-            ILocalizedTextService? localizedTextService,
-            IShortStringHelper? shortStringHelper,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
             IJsonSerializer? jsonSerializer) // for tests, and manifest
         {
             _localizedTextService = localizedTextService;
@@ -167,9 +167,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             // Ensure JSON is serialized properly (without indentation or converted to null when empty)
             if (value is not null && ValueType.InvariantEquals(ValueTypes.Json))
             {
-                var jsonValue = _jsonSerializer.Serialize(value);
+                var jsonValue = _jsonSerializer?.Serialize(value);
 
-                if (jsonValue.DetectIsEmptyJson())
+                if (jsonValue?.DetectIsEmptyJson() ?? false)
                 {
                     value = null;
                 }
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
         /// value to the DB will fail when it tries to validate the value type.
         /// </remarks>
-        public virtual object? FromEditor(ContentPropertyData editorValue, object currentValue)
+        public virtual object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         try
                         {
-                            var json = _jsonSerializer.Deserialize<dynamic>(stringValue!);
+                            var json = _jsonSerializer?.Deserialize<dynamic>(stringValue!);
                             return json;
                         }
                         catch

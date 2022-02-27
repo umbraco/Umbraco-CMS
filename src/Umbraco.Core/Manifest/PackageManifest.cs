@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// An optional package name. If not specified then the directory name is used.
         /// </summary>
         [DataMember(Name = "name")]
-        public string PackageName
+        public string? PackageName
         {
             get
             {

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Persistence
         /// </summary>
         /// <param name="field">The field to alias.</param>
         /// <param name="alias">The alias.</param>
-        public static object Alias(object? field, string alias) => field;
+        public static object? Alias(object? field, string alias) => field;
 
         /// <summary>
         /// Produces Sql text.

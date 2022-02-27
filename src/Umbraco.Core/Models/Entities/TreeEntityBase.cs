@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         public string? Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <inheritdoc />

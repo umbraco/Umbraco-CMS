@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Core.Models
         public Func<int, ILanguage?>? GetLanguage { get; set; }
 
         private ILanguage? _language;
-        private string? _value;
+        private string _value;
         //note: this will be memberwise cloned
         private int _languageId;
 
-        public DictionaryTranslation(ILanguage language, string? value)
+        public DictionaryTranslation(ILanguage language, string value)
         {
             if (language == null) throw new ArgumentNullException("language");
             _language = language;
@@ -88,10 +88,10 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the translated text
         /// </summary>
         [DataMember]
-        public string? Value
+        public string Value
         {
             get { return _value; }
-            set { SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value)); }
+            set { SetPropertyValueAndDetectChanges(value, ref _value!, nameof(Value)); }
         }
 
         protected override void PerformDeepClone(object clone)

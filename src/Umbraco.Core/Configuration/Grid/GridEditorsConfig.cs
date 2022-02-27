@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Configuration.Grid
 
                         try
                         {
-                            editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
+                            editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString)!);
                         }
                         catch (Exception ex)
                         {
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Configuration.Grid
                         {
                             using var reader = new StreamReader(resourceStream, Encoding.UTF8);
                             var sourceString = reader.ReadToEnd();
-                            editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
+                            editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString)!);
                         }
                     }
 

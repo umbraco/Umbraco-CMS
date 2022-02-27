@@ -240,12 +240,12 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public Type? ModelClrType
+        public Type ModelClrType
         {
             get
             {
                 if (!_initialized) Initialize();
-                return _modelClrType;
+                return _modelClrType!;
             }
         }
 

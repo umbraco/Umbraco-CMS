@@ -33,12 +33,12 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         [Obsolete("Use overload that takes a user/member key (Guid).")]
-        public IEnumerable<IIdentityUserLogin> GetExternalLogins(int userId)
+        public IEnumerable<IIdentityUserLogin>? GetExternalLogins(int userId)
             => GetExternalLogins(userId.ToGuid());
 
         /// <inheritdoc />
         [Obsolete("Use overload that takes a user/member key (Guid).")]
-        public IEnumerable<IIdentityUserToken> GetExternalLoginTokens(int userId) =>
+        public IEnumerable<IIdentityUserToken>? GetExternalLoginTokens(int userId) =>
             GetExternalLoginTokens(userId.ToGuid());
 
         /// <inheritdoc />
@@ -57,32 +57,32 @@ namespace Umbraco.Cms.Core.Services
             => DeleteUserLogins(userId.ToGuid());
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserLogin> GetExternalLogins(Guid userOrMemberKey)
+        public IEnumerable<IIdentityUserLogin>? GetExternalLogins(Guid userOrMemberKey)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.Key == userOrMemberKey))
+                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.Key == userOrMemberKey))?
                     .ToList();
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserToken> GetExternalLoginTokens(Guid userOrMemberKey)
+        public IEnumerable<IIdentityUserToken>? GetExternalLoginTokens(Guid userOrMemberKey)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.Key == userOrMemberKey))
+                return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.Key == userOrMemberKey))?
                     .ToList();
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
+        public IEnumerable<IIdentityUserLogin>? Find(string loginProvider, string providerKey)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>()
-                    .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))
+                    .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))?
                     .ToList();
             }
         }

@@ -104,13 +104,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public IList? CreateModelList(string alias)
+        public IList? CreateModelList(string? alias)
         {
             // fail fast
             if (_modelInfos == null)
                 return new List<IPublishedElement>();
 
-            if (!_modelInfos.TryGetValue(alias, out var modelInfo) || modelInfo.ModelType is null)
+            if (alias is null || !_modelInfos.TryGetValue(alias, out var modelInfo) || modelInfo.ModelType is null)
                 return new List<IPublishedElement>();
 
             var ctor = modelInfo.ListCtor;

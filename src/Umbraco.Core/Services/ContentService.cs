@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Services
             IContent? content = GetById(id);
 
             // Get the version
-            IContent version = GetVersion(versionId);
+            IContent? version = GetVersion(versionId);
 
             // Good old null checks
             if (content == null || version == null || content.Trashed)
@@ -457,9 +457,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 IEnumerable<IContent> items = _documentRepository.GetMany(idsA);
-
                 var index = items.ToDictionary(x => x.Id, x => x);
-
                 return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
             }
         }
@@ -515,7 +513,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>
         ///     <see cref="IContent" />
         /// </returns>
-        public IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids)
+        public IEnumerable<IContent>? GetByIds(IEnumerable<Guid> ids)
         {
             Guid[] idsA = ids.ToArray();
             if (idsA.Length == 0)
@@ -526,11 +524,16 @@ namespace Umbraco.Cms.Core.Services
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                IEnumerable<IContent> items = _documentRepository.GetMany(idsA);
+                IEnumerable<IContent>? items = _documentRepository.GetMany(idsA);
 
-                var index = items.ToDictionary(x => x.Key, x => x);
+                if (items is not null)
+                {
+                    var index = items.ToDictionary(x => x.Key, x => x);
 
-                return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
+                    return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
+                }
+
+                return null;
             }
         }
 
@@ -565,7 +568,7 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize,
-            out long totalRecords, IQuery<IContent> filter, Ordering? ordering = null)
+            out long totalRecords, IQuery<IContent>? filter, Ordering? ordering = null)
         {
             if (pageIndex < 0)
             {
@@ -597,7 +600,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="level">The level to retrieve Content from</param>
         /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
         /// <remarks>Contrary to most methods, this method filters out trashed content items.</remarks>
-        public IEnumerable<IContent> GetByLevel(int level)
+        public IEnumerable<IContent>? GetByLevel(int level)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -612,7 +615,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IContent" /> item</returns>
-        public IContent GetVersion(int versionId)
+        public IContent? GetVersion(int versionId)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -667,7 +670,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent" /> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-        public IEnumerable<IContent> GetAncestors(int id)
+        public IEnumerable<IContent>? GetAncestors(int id)
         {
             // intentionally not locking
             IContent? content = GetById(id);
@@ -679,7 +682,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="content"><see cref="IContent" /> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-        public IEnumerable<IContent> GetAncestors(IContent? content)
+        public IEnumerable<IContent>? GetAncestors(IContent? content)
         {
             //null check otherwise we get exceptions
             if (content?.Path.IsNullOrWhiteSpace() ?? true)
@@ -705,13 +708,13 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Children from</param>
         /// <returns>An Enumerable list of published <see cref="IContent" /> objects</returns>
-        public IEnumerable<IContent> GetPublishedChildren(int id)
+        public IEnumerable<IContent>? GetPublishedChildren(int id)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
-                return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
+                return _documentRepository.Get(query)?.OrderBy(x => x.SortOrder);
             }
         }
 
@@ -827,7 +830,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>Parent <see cref="IContent" /> object</returns>
         public IContent? GetParent(IContent? content)
         {
-            if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent || content is null)
+            if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent ||
+                content is null)
             {
                 return null;
             }
@@ -839,7 +843,7 @@ namespace Umbraco.Cms.Core.Services
         ///     Gets a collection of <see cref="IContent" /> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-        public IEnumerable<IContent> GetRootContent()
+        public IEnumerable<IContent>? GetRootContent()
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -853,7 +857,7 @@ namespace Umbraco.Cms.Core.Services
         ///     Gets all published content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<IContent> GetAllPublished()
+        internal IEnumerable<IContent>? GetAllPublished()
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -947,7 +951,8 @@ namespace Umbraco.Cms.Core.Services
         #region Save, Publish, Unpublish
 
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, ContentScheduleCollection? contentSchedule = null)
+        public OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId,
+            ContentScheduleCollection? contentSchedule = null)
         {
             PublishedState publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -1010,10 +1015,14 @@ namespace Umbraco.Cms.Core.Services
 
                 if (culturesChanging != null)
                 {
-                    var langs = string.Join(", ", _languageRepository.GetMany()
+                    var languages = _languageRepository.GetMany()?
                         .Where(x => culturesChanging.InvariantContains(x.IsoCode))
-                        .Select(x => x.CultureName));
-                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+                        .Select(x => x.CultureName);
+                    if (languages is not null)
+                    {
+                        var langs = string.Join(", ", languages);
+                        Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+                    }
                 }
                 else
                 {
@@ -1808,7 +1817,7 @@ namespace Umbraco.Cms.Core.Services
                             contentSchedule.Clear(culture, ContentScheduleAction.Release, date);
 
                             if (d.Trashed)
-                               {
+                            {
                                 continue; // won't publish
                             }
 
@@ -1827,7 +1836,7 @@ namespace Umbraco.Cms.Core.Services
 
                             publishing &= tryPublish; //set the culture to be published
                             if (!publishing)
-                               {
+                            {
                                 continue;
                             }
                         }
@@ -1993,7 +2002,7 @@ namespace Umbraco.Cms.Core.Services
 
                 // if not published, publish if force/root else do nothing
                 return force || isRoot
-                    ? new HashSet<string> { "*" } // "*" means 'publish all'
+                    ? new HashSet<string> {"*"} // "*" means 'publish all'
                     : null; // null means 'nothing to do'
             }
 
@@ -2321,8 +2330,8 @@ namespace Umbraco.Cms.Core.Services
 
                 if (deletePriorVersions)
                 {
-                    IContent content = GetVersion(versionId);
-                    DeleteVersions(id, content.UpdateDate, userId);
+                    IContent? content = GetVersion(versionId);
+                    DeleteVersions(id, content?.UpdateDate ?? DateTime.Now, userId);
                 }
 
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -2549,7 +2558,7 @@ namespace Umbraco.Cms.Core.Services
 
                 // emptying the recycle bin means deleting whatever is in there - do it properly!
                 IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
-                IContent[] contents = _documentRepository.Get(query).ToArray();
+                IContent[]? contents = _documentRepository.Get(query)?.ToArray();
 
                 var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
@@ -2558,10 +2567,13 @@ namespace Umbraco.Cms.Core.Services
                     return OperationResult.Cancel(eventMessages);
                 }
 
-                foreach (IContent content in contents)
+                if (contents is not null)
                 {
-                    DeleteLocked(scope, content, eventMessages);
-                    deleted.Add(content);
+                    foreach (IContent content in contents)
+                    {
+                        DeleteLocked(scope, content, eventMessages);
+                        deleted.Add(content);
+                    }
                 }
 
                 scope.Notifications.Publish(
@@ -2665,7 +2677,7 @@ namespace Umbraco.Cms.Core.Services
 
                 // keep track of copies
                 copies.Add(Tuple.Create(content, copy));
-                var idmap = new Dictionary<int, int> { [content.Id] = copy.Id };
+                var idmap = new Dictionary<int, int> {[content.Id] = copy.Id};
 
                 if (recursive) // process descendants
                 {
@@ -2965,19 +2977,22 @@ namespace Umbraco.Cms.Core.Services
             var pathMatch = content.Path + ",";
             IQuery<IContent> query = Query<IContent>()
                 .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& x.Trashed == false*/);
-            IEnumerable<IContent> contents = _documentRepository.Get(query);
+            IEnumerable<IContent>? contents = _documentRepository.Get(query);
 
             // beware! contents contains all published version below content
             // including those that are not directly published because below an unpublished content
             // these must be filtered out here
 
-            var parents = new List<int> { content.Id };
-            foreach (IContent c in contents)
+            var parents = new List<int> {content.Id};
+            if (contents is not null)
             {
-                if (parents.Contains(c.ParentId))
+                foreach (IContent c in contents)
                 {
-                    yield return c;
-                    parents.Add(c.Id);
+                    if (parents.Contains(c.ParentId))
+                    {
+                        yield return c;
+                        parents.Add(c.Id);
+                    }
                 }
             }
         }
@@ -2986,12 +3001,13 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
+        private void Audit(AuditType type, int userId, int objectId, string? message = null,
+            string? parameters = null) =>
             _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message,
                 parameters));
 
-        private bool IsDefaultCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
-            langs.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture));
+        private bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
+            langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
         private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
             langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
@@ -3029,7 +3045,7 @@ namespace Umbraco.Cms.Core.Services
             var variesByCulture = content.ContentType.VariesByCulture();
 
             CultureImpact[] impactsToPublish = culturesPublishing == null
-                ? new[] { CultureImpact.Invariant } //if it's null it's invariant
+                ? new[] {CultureImpact.Invariant} //if it's null it's invariant
                 : culturesPublishing.Select(x =>
                     CultureImpact.Explicit(x,
                         allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory))).ToArray();
@@ -3096,7 +3112,7 @@ namespace Umbraco.Cms.Core.Services
 
             ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
             //loop over each culture publishing - or string.Empty for invariant
-            foreach (var culture in culturesPublishing ?? new[] { string.Empty })
+            foreach (var culture in culturesPublishing ?? new[] {string.Empty})
             {
                 // ensure that the document status is correct
                 // note: culture will be string.Empty for invariant
@@ -3334,7 +3350,12 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.ContentTree);
 
                 IQuery<IContent> query = Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
-                IContent[] contents = _documentRepository.Get(query).ToArray();
+                IContent[]? contents = _documentRepository.Get(query)?.ToArray();
+
+                if (contents is null)
+                {
+                    return;
+                }
 
                 if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(contents, eventMessages)))
                 {
@@ -3357,12 +3378,15 @@ namespace Umbraco.Cms.Core.Services
                     // if current content has children, move them to trash
                     IContent c = content;
                     IQuery<IContent> childQuery = Query<IContent>().Where(x => x.ParentId == c.Id);
-                    IEnumerable<IContent> children = _documentRepository.Get(childQuery);
-                    foreach (IContent child in children)
+                    IEnumerable<IContent>? children = _documentRepository.Get(childQuery);
+                    if (children is not null)
                     {
-                        // see MoveToRecycleBin
-                        PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
-                        changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
+                        foreach (IContent child in children)
+                        {
+                            // see MoveToRecycleBin
+                            PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
+                            changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
+                        }
                     }
 
                     // delete content
@@ -3395,7 +3419,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="contentTypeId">Id of the <see cref="IContentType" /></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
-            DeleteOfTypes(new[] { contentTypeId }, userId);
+            DeleteOfTypes(new[] {contentTypeId}, userId);
 
         private IContentType GetContentType(IScope scope, string contentTypeAlias)
         {
@@ -3413,7 +3437,7 @@ namespace Umbraco.Cms.Core.Services
             scope.ReadLock(Constants.Locks.ContentTypes);
 
             IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-            IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault();
+            IContentType? contentType = _contentTypeRepository.Get(query)?.FirstOrDefault();
 
             if (contentType == null)
             {
@@ -3524,7 +3548,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private static readonly string?[] ArrayOfOneNullString = { null };
+        private static readonly string?[] ArrayOfOneNullString = {null};
 
         public IContent CreateContentFromBlueprint(IContent blueprint, string name,
             int userId = Constants.Security.SuperUserId)
@@ -3575,7 +3599,7 @@ namespace Umbraco.Cms.Core.Services
             return content;
         }
 
-        public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
+        public IEnumerable<IContent>? GetBlueprintsForContentTypes(params int[] contentTypeId)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -3585,7 +3609,7 @@ namespace Umbraco.Cms.Core.Services
                     query.Where(x => contentTypeId.Contains(x.ContentTypeId));
                 }
 
-                return _documentBlueprintRepository.Get(query).Select(x =>
+                return _documentBlueprintRepository.Get(query)?.Select(x =>
                 {
                     x.Blueprint = true;
                     return x;
@@ -3609,24 +3633,27 @@ namespace Umbraco.Cms.Core.Services
                     query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
                 }
 
-                IContent[] blueprints = _documentBlueprintRepository.Get(query).Select(x =>
+                IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>
                 {
                     x.Blueprint = true;
                     return x;
                 }).ToArray();
 
-                foreach (IContent blueprint in blueprints)
+                if (blueprints is not null)
                 {
-                    _documentBlueprintRepository.Delete(blueprint);
-                }
+                    foreach (IContent blueprint in blueprints)
+                    {
+                        _documentBlueprintRepository.Delete(blueprint);
+                    }
 
-                scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
-                scope.Complete();
+                    scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
+                    scope.Complete();
+                }
             }
         }
 
         public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
-            DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+            DeleteBlueprintsOfTypes(new[] {contentTypeId}, userId);
 
         #endregion
     }

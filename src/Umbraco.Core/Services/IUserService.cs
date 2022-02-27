@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username</param>
         /// <returns><see cref="IProfile"/></returns>
-        IProfile GetProfileByUserName(string username);
+        IProfile? GetProfileByUserName(string username);
 
         /// <summary>
         /// Gets a user by Id

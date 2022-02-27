@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Core.Services
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUser>().Where(x => x.Email.Equals(email));
-                return _userRepository.Get(query).FirstOrDefault();
+                return _userRepository.Get(query)?.FirstOrDefault();
             }
         }
 
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetByUsername(string username)
+        public IUser? GetByUsername(string username)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -649,7 +649,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username</param>
         /// <returns><see cref="IProfile"/></returns>
-        public IProfile GetProfileByUserName(string username)
+        public IProfile? GetProfileByUserName(string username)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -770,7 +770,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 var query = Query<IUserGroup>().Where(x => aliases.SqlIn(x.Alias));
                 var contents = _userGroupRepository.Get(query);
-                return contents.WhereNotNull().ToArray();
+                return contents?.WhereNotNull().ToArray() ?? Enumerable.Empty<IUserGroup>();
             }
         }
 
@@ -787,7 +787,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 var query = Query<IUserGroup>().Where(x => x.Alias == alias);
                 var contents = _userGroupRepository.Get(query);
-                return contents.FirstOrDefault();
+                return contents?.FirstOrDefault();
             }
         }
 

@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         // + using an initial reference cache level of .None ensures that everything will be
         // cached at .Content level - and that reference cache level will propagate to all
         // properties
-        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?> values, bool previewing)
             : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
         { }
 

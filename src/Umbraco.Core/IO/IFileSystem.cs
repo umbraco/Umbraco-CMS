@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.IO
         /// <returns>
         /// <c>True</c> if the file exists and the user has permission to view it; otherwise <c>false</c>.
         /// </returns>
-        bool FileExists(string? path);
+        bool FileExists(string path);
 
         /// <summary>
         /// Returns the application relative path to the file.

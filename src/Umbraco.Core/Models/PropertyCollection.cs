@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
@@ -145,7 +146,7 @@ namespace Umbraco.Cms.Core.Models
             }
         }
 
-        public bool TryGetValue(string propertyTypeAlias, out IProperty? property)
+        public bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property)
         {
             property = this.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             return property != null;

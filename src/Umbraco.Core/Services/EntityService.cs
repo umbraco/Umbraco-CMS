@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEntitySlim Get(int id)
+        public IEntitySlim? Get(int id)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEntitySlim Get(Guid key)
+        public IEntitySlim? Get(Guid key)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual IEntitySlim Get(int id, UmbracoObjectTypes objectType)
+        public virtual IEntitySlim? Get(int id, UmbracoObjectTypes objectType)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEntitySlim Get(Guid key, UmbracoObjectTypes objectType)
+        public IEntitySlim? Get(Guid key, UmbracoObjectTypes objectType)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual IEntitySlim Get<T>(int id)
+        public virtual IEntitySlim? Get<T>(int id)
             where T : IUmbracoEntity
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public virtual IEntitySlim Get<T>(Guid key)
+        public virtual IEntitySlim? Get<T>(Guid key)
             where T : IUmbracoEntity
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
@@ -235,7 +235,7 @@ namespace Umbraco.Cms.Core.Services
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
-                if (entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
+                if (entity is null || entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
                     return null;
                 return _entityRepository.Get(entity.ParentId);
             }
@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Core.Services
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
-                if (entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
+                if (entity is null || entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
                     return null;
                 return _entityRepository.Get(entity.ParentId, objectType.GetGuid());
             }
@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Core.Services
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
-                var pathMatch = entity.Path + ",";
+                var pathMatch = entity?.Path + ",";
                 var query = Query<IUmbracoEntity>().Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
                 return _entityRepository.GetByQuery(query);
             }
@@ -291,6 +291,10 @@ namespace Umbraco.Cms.Core.Services
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
+                if (entity is null)
+                {
+                    return Enumerable.Empty<IEntitySlim>();
+                }
                 var query = Query<IUmbracoEntity>().Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
                 return _entityRepository.GetByQuery(query, objectType.GetGuid());
             }

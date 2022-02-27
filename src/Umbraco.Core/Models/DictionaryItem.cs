@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.Models
                     }
                 }
 
-                SetPropertyValueAndDetectChanges(asArray, ref _translations, nameof(Translations),
+                SetPropertyValueAndDetectChanges(asArray, ref _translations!, nameof(Translations),
                     DictionaryTranslationComparer);
             }
         }

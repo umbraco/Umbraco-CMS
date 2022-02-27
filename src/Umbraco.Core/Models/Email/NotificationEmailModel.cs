@@ -8,19 +8,19 @@ namespace Umbraco.Cms.Core.Models.Email
     /// </summary>
     public class NotificationEmailModel
     {
-        public NotificationEmailAddress From { get; }
+        public NotificationEmailAddress? From { get; }
 
-        public IEnumerable<NotificationEmailAddress> To { get; }
+        public IEnumerable<NotificationEmailAddress?>? To { get; }
 
-        public IEnumerable<NotificationEmailAddress> Cc { get; }
+        public IEnumerable<NotificationEmailAddress>? Cc { get; }
 
-        public IEnumerable<NotificationEmailAddress> Bcc { get; }
+        public IEnumerable<NotificationEmailAddress>? Bcc { get; }
 
-        public IEnumerable<NotificationEmailAddress> ReplyTo { get; }
+        public IEnumerable<NotificationEmailAddress>? ReplyTo { get; }
 
-        public string Subject { get; }
+        public string? Subject { get; }
 
-        public string Body { get; }
+        public string? Body { get; }
 
         public bool IsBodyHtml { get; }
 

@@ -78,19 +78,19 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public PublishedDataType GetDataType(int id)
         {
-            Dictionary<int, PublishedDataType> publishedDataTypes;
+            Dictionary<int, PublishedDataType>? publishedDataTypes;
             lock (_publishedDataTypesLocker)
             {
                 if (_publishedDataTypes == null)
                 {
                     var dataTypes = _dataTypeService.GetAll();
-                    _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
+                    _publishedDataTypes = dataTypes?.ToDictionary(x => x.Id, CreatePublishedDataType);
                 }
 
                 publishedDataTypes = _publishedDataTypes;
             }
 
-            if (!publishedDataTypes.TryGetValue(id, out var dataType))
+            if (publishedDataTypes is null || !publishedDataTypes.TryGetValue(id, out var dataType))
                 throw new ArgumentException($"Could not find a datatype with identifier {id}.", nameof(id));
 
             return dataType;
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 if (_publishedDataTypes == null)
                 {
                     var dataTypes = _dataTypeService.GetAll();
-                    _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
+                    _publishedDataTypes = dataTypes?.ToDictionary(x => x.Id, CreatePublishedDataType);
                 }
                 else
                 {
@@ -112,8 +112,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                         _publishedDataTypes.Remove(id);
 
                     var dataTypes = _dataTypeService.GetAll(ids);
-                    foreach (var dataType in dataTypes)
-                        _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
+                    if (dataTypes is not null)
+                    {
+                        foreach (var dataType in dataTypes)
+                            _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
+                    }
                 }
             }
         }

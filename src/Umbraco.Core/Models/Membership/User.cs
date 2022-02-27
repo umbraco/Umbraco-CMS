@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Core.Models.Membership
             _rawPasswordValue = "";
             _username = string.Empty;
             _email = string.Empty;
+            _name = string.Empty;
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <param name="userGroups"></param>
         /// <param name="startContentIds"></param>
         /// <param name="startMediaIds"></param>
-        public User(GlobalSettings globalSettings, int id, string? name, string? email, string? username,
+        public User(GlobalSettings globalSettings, int id, string? name, string email, string? username,
             string? rawPasswordValue, string? passwordConfig,
             IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
             : this(globalSettings)
@@ -98,7 +99,7 @@ namespace Umbraco.Cms.Core.Models.Membership
             _startMediaIds = startMediaIds;
         }
 
-        private string? _name;
+        private string _name;
         private string? _securityStamp;
         private string? _avatar;
         private string? _tourData;
@@ -111,7 +112,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         private DateTime? _emailConfirmedDate;
         private DateTime? _invitedDate;
         private string _email;
-        private string _rawPasswordValue;
+        private string? _rawPasswordValue;
         private string? _passwordConfig;
         private IEnumerable<string>? _allowedSections;
         private HashSet<IReadOnlyUserGroup> _userGroups;
@@ -158,7 +159,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [IgnoreDataMember]
-        public string RawPasswordValue
+        public string? RawPasswordValue
         {
             get => _rawPasswordValue;
             set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
@@ -237,10 +238,10 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string? Name
+        public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         public IEnumerable<string> AllowedSections

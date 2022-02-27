@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Core.Models.Packaging
     /// </summary>
     public class CompiledPackage
     {
-        public FileInfo PackageFile { get; set; } = null!;
-        public string Name { get; set; } = string.Empty;
+        public FileInfo? PackageFile { get; set; }
+        public string? Name { get; set; }
         public InstallWarnings Warnings { get; set; } = new InstallWarnings();
         public IEnumerable<XElement> Macros { get; set; } = null!; // TODO: make strongly typed
         public IEnumerable<XElement> MacroPartialViews { get; set; } = null!; // TODO: make strongly typed

@@ -57,7 +57,7 @@ namespace Umbraco.Extensions
         }
         #endregion
 
-        public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
+        public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
         {
             var guids = new List<GuidUdi>();
             foreach (var udi in ids)

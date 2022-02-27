@@ -150,8 +150,8 @@ namespace Umbraco.Extensions
         /// <param name="allowedApps">Allowed apps</param>
         /// <param name="roles">Roles</param>
         public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, string username,
-            string? realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture,
-            string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string?> roles)
+            string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture,
+            string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         {
             //This is the id that 'identity' uses to check for the user id
             if (identity.HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)

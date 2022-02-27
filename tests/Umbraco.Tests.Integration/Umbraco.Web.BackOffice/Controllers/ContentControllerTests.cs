@@ -529,6 +529,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
+            var result = JsonConvert.SerializeObject(model);
             HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
             {
                 { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }

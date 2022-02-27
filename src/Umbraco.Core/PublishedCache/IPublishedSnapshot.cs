@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <summary>
         /// Gets the <see cref="IPublishedMemberCache"/>.
         /// </summary>
-        IPublishedMemberCache Members { get; }
+        IPublishedMemberCache? Members { get; }
 
         /// <summary>
         /// Gets the <see cref="IDomainCache"/>.

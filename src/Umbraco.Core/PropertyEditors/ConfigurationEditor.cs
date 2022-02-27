@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public virtual object FromDatabase(string? configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => string.IsNullOrWhiteSpace(configurationJson)
                 ? new Dictionary<string, object>()
-                : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson);
+                : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson)!;
 
         /// <inheritdoc />
         public virtual object? FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)

@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
             }
         }
 
-        public virtual T GetJsonResponse<T>(string url) where T : class
+        public virtual T? GetJsonResponse<T>(string url) where T : class
         {
             var response = DownloadResponse(url);
             return _jsonSerializer.Deserialize<T>(response);

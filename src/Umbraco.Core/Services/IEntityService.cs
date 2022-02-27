@@ -12,41 +12,41 @@ namespace Umbraco.Cms.Core.Services
         /// Gets an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim Get(int id);
+        IEntitySlim? Get(int id);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="key">The unique key of the entity.</param>
-        IEntitySlim Get(Guid key);
+        IEntitySlim? Get(Guid key);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
-        IEntitySlim Get(int id, UmbracoObjectTypes objectType);
+        IEntitySlim? Get(int id, UmbracoObjectTypes objectType);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="key">The unique key of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
-        IEntitySlim Get(Guid key, UmbracoObjectTypes objectType);
+        IEntitySlim? Get(Guid key, UmbracoObjectTypes objectType);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim Get<T>(int id) where T : IUmbracoEntity;
+        IEntitySlim? Get<T>(int id) where T : IUmbracoEntity;
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="key">The unique key of the entity.</param>
-        IEntitySlim Get<T>(Guid key) where T : IUmbracoEntity;
+        IEntitySlim? Get<T>(Guid key) where T : IUmbracoEntity;
 
         /// <summary>
         /// Determines whether an entity exists.
