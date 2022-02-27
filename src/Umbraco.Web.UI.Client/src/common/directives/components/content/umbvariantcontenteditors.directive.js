@@ -111,7 +111,7 @@
                     vm.editors[s].content = variant;
                 }
             }
-            
+
             if (vm.content.variants.length > 1) {
                 eventsService.emit('editors.content.cultureChanged', activeVariant.language);
             }
@@ -138,7 +138,7 @@
 
             var currentCulture = index < vm.editors.length ? vm.editors[index].culture : null;
             var currentSegment = index < vm.editors.length ? vm.editors[index].segment : null;
-            
+
             // if index not already exists or if the culture or segment isnt identical then we do a replacement.
             if (index >= vm.editors.length || currentCulture !== variantCulture || currentSegment !== variantSegment) {
 
@@ -156,9 +156,9 @@
                 //replace the content of the editor, since the culture and segment is the same.
                 vm.editors[index].content = variant;
             }
-            
+
         }
-        
+
         /**
          * Adds a new editor to the editors array to show content in a split view
          * @param {any} selectedVariant
@@ -169,12 +169,12 @@
             if(contentApp) {
                 selectApp(contentApp);
             }
-            
+
             insertVariantEditor(vm.editors.length, selectedVariant);
-            
-            splitViewChanged();            
+
+            splitViewChanged();
         }
-        
+
         function requestSplitView(args) {
             var culture = args.culture;
             var segment = args.segment;
@@ -194,19 +194,18 @@
             var editor = vm.editors[editorIndex];
             vm.editors.splice(editorIndex, 1);
             editor.content.active = false;
-            
+
             //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
             const culture = vm.editors[0].content.language ? vm.editors[0].content.language.culture : null;
-            
+
             //retain the main culture
             const mculture = $location.search().mculture;
-            $location.search({ "cculture": culture, 'mculture': mculture, "csegment": vm.editors[0].content.segment});
-          
-            $location.search({"cculture": culture, "csegment": vm.editors[0].content.segment});
+            $location.search({ "cculture": culture, "mculture": mculture, "csegment": vm.editors[0].content.segment});
+
             splitViewChanged();
             unbindSplitViewRequest();
         }
-        
+
         // if split view was never closed, the listener is not disposed when changing nodes - this unbinds it
         $scope.$on('$destroy', () => unbindSplitViewRequest());
 
@@ -219,12 +218,12 @@
 
             var variantCulture = variant.language ? variant.language.culture : "invariant";
             var variantSegment = variant.segment || null;
-            
+
             // Check if we already have this editor open, if so, do nothing.
             if (vm.editors.find((editor) => (!editor.content.language || editor.content.language.culture === variantCulture) && editor.content.segment === variantSegment)) {
                 return;
             }
-            
+
             //if the editor index is zero, then update the query string to track the lang selection, otherwise if it's part
             //of a 2nd split view editor then update the model directly.
             if (editorIndex === 0) {
@@ -234,8 +233,8 @@
             }
             else {
                 //update the editors collection
-                insertVariantEditor(editorIndex, variant);                
-            }            
+                insertVariantEditor(editorIndex, variant);
+            }
         }
 
         /**
@@ -247,7 +246,7 @@
                 vm.onSelectApp({"app": app});
             }
         }
-        
+
         function selectAppAnchor(app, anchor) {
             if(vm.onSelectAppAnchor) {
                 vm.onSelectAppAnchor({"app": app, "anchor": anchor});
