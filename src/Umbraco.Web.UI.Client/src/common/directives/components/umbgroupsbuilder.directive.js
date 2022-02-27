@@ -484,9 +484,9 @@
 
             };
 
-            scope.openDocumentType = (documentTypeId) => {
+            scope.openContentType = (contentTypeId) => {
                 const editor = {
-                    id: documentTypeId,
+                    id: contentTypeId,
                     submit: () => {
                         const args = { node: scope.model };
                         eventsService.emit("editors.documentType.reload", args);
