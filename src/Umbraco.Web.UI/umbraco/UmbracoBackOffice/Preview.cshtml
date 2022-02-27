@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Options;
+@using Microsoft.Extensions.Options;
 @using Umbraco.Cms.Core.Configuration
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
@@ -20,7 +20,7 @@
 
 @model Umbraco.Cms.Core.Editors.BackOfficePreviewModel
 @{
-    var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
+    var disableDevicePreview = Model?.DisableDevicePreview.ToString().ToLowerInvariant();
 
     var EndLabel = LocalizedTextService.Localize("preview", "endLabel");
     var EndTitle = LocalizedTextService.Localize("preview", "endTitle");
@@ -53,7 +53,7 @@
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
     <div class="wait" ng-show="!frameLoaded"></div>
 
-    @if (!string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView))
+    @if (!string.IsNullOrWhiteSpace(Model?.PreviewExtendedHeaderView))
     {
         @await Html.PartialAsync(Model.PreviewExtendedHeaderView)
     }
@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                @if (Model.Languages != null && Model.Languages.Count() > 1)
+                @if (Model?.Languages.Any() == true)
                 {
                     <div class="preview-menu-option" ng-class="{'--open': cultureOpen === true}" ng-click="$event.stopPropagation()">
                         <button class="menu-bar__button umb-outline" ng-click="toggleCultureOpen()"><i class="icon icon-globe-europe---africa"></i><span>{{currentCulture.title}}</span></button>

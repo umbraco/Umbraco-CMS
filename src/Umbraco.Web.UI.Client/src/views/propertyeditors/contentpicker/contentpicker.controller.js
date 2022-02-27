@@ -45,14 +45,14 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         if ($scope.contentPickerForm) {
             //Validate!
             var hasItemsOrMandatory = $scope.renderModel.length !== 0 || ($scope.model.validation && $scope.model.validation.mandatory);
-            if (hasItemsOrMandatory && $scope.minNumberOfItems > $scope.renderModel.length) {
+            if (hasItemsOrMandatory && $scope.minNumberOfItems && $scope.minNumberOfItems > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
             }
             else {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", true);
             }
 
-            if ($scope.maxNumberOfItems < $scope.renderModel.length) {
+            if ($scope.maxNumberOfItems && $scope.maxNumberOfItems < $scope.renderModel.length) {
                 $scope.contentPickerForm.maxCount.$setValidity("maxCount", false);
             }
             else {
@@ -421,7 +421,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
                 var requests = [
                     entityResource.getByIds(missingIds, entityType),
-                    entityResource.getUrlsByUdis(missingIds)
+                    entityResource.getUrlsByIds(missingIds, entityType)
                 ];
 
                 return $q.all(requests).then(function ([data, urlMap]) {

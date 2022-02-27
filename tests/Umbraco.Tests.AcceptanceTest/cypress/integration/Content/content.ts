@@ -343,17 +343,11 @@ context('Content', () => {
         // Rollback
         cy.get('.umb-box-header :button').click();
 
-        cy.get('.umb-box-content > div > .input-block-level')
-            .find('option[label*=' + new Date().getDate() + ']')
-            .then(elements => {
-                const option = elements[elements.length - 1].getAttribute('value');
-                cy.get('.umb-box-content > div > .input-block-level')
-                    .select(option);
-            });
+        cy.get('.-selectable.cursor-pointer:first').click();
 
         cy.get('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn-success').click();
 
-        cy.reload();
+        refreshContentTree();
 
         // Assert
         cy.get('.history').find('.umb-badge').contains('Save').should('be.visible');
@@ -442,7 +436,7 @@ context('Content', () => {
         cy.umbracoTreeItem("content", [nodeName]).click();
 
         // Assert
-        cy.get('[data-element="node-info-status"]').find('.umb-badge').should('contain.text', "Draft");
+        cy.get('[data-element="node-info-status"]').find('.umb-badge').should('contain.text', "Unpublished");
 
         // Clean up (content is automatically deleted when document types are gone)
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);

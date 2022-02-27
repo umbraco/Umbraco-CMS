@@ -14,14 +14,15 @@ import {
       });
 
       afterEach(() =>  {
-          cy.umbracoEnsureDocumentTypeNameNotExists(tabsDocTypeName)
+          cy.umbracoEnsureDocumentTypeNameNotExists(tabsDocTypeName);
+          cy.umbracoEnsureTemplateNameNotExists(tabsDocTypeName);
       });
 
       function OpenDocTypeFolder(){
           cy.umbracoSection('settings');
+          // We have to wait in case the execution is slow, otherwise we'll try and click the item before it appears in the UI
           cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
-          cy.get('.umb-tree-item__inner > .umb-tree-item__arrow').eq(0).click();
-          cy.get('.umb-tree-item__inner > .umb-tree-item__label').contains(tabsDocTypeName).click();
+          cy.umbracoTreeItem('settings', ["Document Types", tabsDocTypeName]).click();
       }
 
       function CreateDocWithTabAndNavigate(){
@@ -98,8 +99,6 @@ import {
         cy.umbracoButtonByLabelKey('buttons_save').click();
         //Assert
         cy.get('[title="aTab 1"]').should('not.exist');
-        //Clean
-        cy.umbracoEnsureDocumentTypeNameNotExists(tabsDocTypeName);
       });
 
       it('Delete property in tab', () => {

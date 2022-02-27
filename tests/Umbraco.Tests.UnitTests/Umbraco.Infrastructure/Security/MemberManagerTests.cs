@@ -52,7 +52,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider),
                 scopeProvider,
                 new IdentityErrorDescriber(),
-                Mock.Of<IPublishedSnapshotAccessor>());
+                Mock.Of<IPublishedSnapshotAccessor>(), 
+                Mock.Of<IExternalLoginWithKeyService>(), 
+                Mock.Of<ITwoFactorLoginService>());
 
             _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
             var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };

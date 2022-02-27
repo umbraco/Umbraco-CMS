@@ -4,12 +4,16 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Core.Models
 {
-    [Obsolete("This will be merged into IContentType in Umbraco 10")]
+    /// <summary>
+    /// Defines a content type that contains a history cleanup policy.
+    /// </summary>
+    [Obsolete("This will be merged into IContentType in Umbraco 10.")]
     public interface IContentTypeWithHistoryCleanup : IContentType
     {
         /// <summary>
-        ///     Gets or Sets the history cleanup configuration
+        /// Gets or sets the history cleanup configuration.
         /// </summary>
+        /// <value>The history cleanup configuration.</value>
         HistoryCleanup HistoryCleanup { get; set; }
     }
 

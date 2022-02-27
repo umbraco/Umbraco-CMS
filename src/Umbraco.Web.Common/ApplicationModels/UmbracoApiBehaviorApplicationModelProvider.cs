@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
     /// <para>
     /// This is nearly a copy of aspnetcore's ApiBehaviorApplicationModelProvider which supplies a convention for the
     /// [ApiController] attribute, however that convention is too strict for our purposes so we will have our own.
+    /// Uses UmbracoJsonModelBinder for complex parameters and those with BindingSource of Body, but leaves the rest alone see GH #11554
     /// </para>
     /// <para>
     /// See https://shazwazza.com/post/custom-body-model-binding-per-controller-in-asp-net-core/
@@ -41,14 +42,12 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
             {
                 new ClientErrorResultFilterConvention(), // Ensures the responses without any body is converted into a simple json object with info instead of a string like "Status Code: 404; Not Found"
                 new ConsumesConstraintForFormFileParameterConvention(), // If an controller accepts files, it must accept multipart/form-data.
-                new InferParameterBindingInfoConvention(modelMetadataProvider), // no need for [FromBody] everywhere, A complex type parameter is assigned to FromBody
 
-                // This ensures that all parameters of type BindingSource.Body (based on the above InferParameterBindingInfoConvention) are bound
+                // This ensures that all parameters of type BindingSource.Body and those of complex type are bound
                 // using our own UmbracoJsonModelBinder
-                new UmbracoJsonModelBinderConvention()
+                new UmbracoJsonModelBinderConvention(modelMetadataProvider)
             };
 
-            // TODO: Need to determine exactly how this affects errors
             var defaultErrorType = typeof(ProblemDetails);
             var defaultErrorTypeAttribute = new ProducesErrorResponseTypeAttribute(defaultErrorType);
             _actionModelConventions.Add(new ApiConventionApplicationModelConvention(defaultErrorTypeAttribute));
@@ -68,25 +67,24 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
         /// <inheritdoc/>
         public void OnProvidersExecuting(ApplicationModelProviderContext context)
         {
-            foreach (var controller in context.Result.Controllers)
+            foreach (ControllerModel controller in context.Result.Controllers)
             {
                 if (!IsUmbracoApiController(controller))
                 {
                     continue;
                 }
 
-                foreach (var action in controller.Actions)
+                foreach (ActionModel action in controller.Actions)
                 {
-                    foreach (var convention in _actionModelConventions)
+                    foreach (IActionModelConvention convention in _actionModelConventions)
                     {
                         convention.Apply(action);
                     }
                 }
-
             }
         }
 
-        private bool IsUmbracoApiController(ControllerModel controller)
+        private static bool IsUmbracoApiController(ICommonModel controller)
             => controller.Attributes.OfType<UmbracoApiControllerAttribute>().Any();
     }
 }

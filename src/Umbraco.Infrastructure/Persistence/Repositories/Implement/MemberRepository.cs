@@ -565,6 +565,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var list = new List<string>
             {
                 "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
                 "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
                 "DELETE FROM umbracoRelation WHERE parentId = @id",
                 "DELETE FROM umbracoRelation WHERE childId = @id",
@@ -773,6 +774,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (memberDto.PasswordConfig.IsNullOrWhiteSpace())
             {
                 memberDto.PasswordConfig = DefaultPasswordConfigJson;
+                changedCols.Add("passwordConfig");
+            }else if (memberDto.PasswordConfig == Constants.Security.UnknownPasswordConfigJson)
+            {
                 changedCols.Add("passwordConfig");
             }
 

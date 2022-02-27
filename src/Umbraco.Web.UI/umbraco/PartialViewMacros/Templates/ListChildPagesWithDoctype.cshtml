@@ -13,9 +13,9 @@
     (You can find the alias of your Document Type by editing it in the Settings section)
 *@
 
-@{ var selection = Model.Content.Children<IPublishedContent>(VariationContextAccessor).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Content.Children<IPublishedContent>(VariationContextAccessor).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
-@if (selection.Length > 0)
+@if (selection?.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

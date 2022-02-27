@@ -113,6 +113,16 @@
         /// <summary>
         /// Custom audit message.
         /// </summary>
-        Custom
+        Custom,
+
+        /// <summary>
+        /// Content version preventCleanup set to true
+        /// </summary>
+        ContentVersionPreventCleanup,
+
+        /// <summary>
+        /// Content version preventCleanup set to false
+        /// </summary>
+        ContentVersionEnableCleanup
     }
 }

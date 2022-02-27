@@ -1,4 +1,4 @@
-﻿@using Umbraco.Cms.Core.Routing
+@using Umbraco.Cms.Core.Routing
 @using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
 @inject IPublishedUrlProvider PublishedUrlProvider
@@ -10,9 +10,9 @@
     - Finally it outputs the name of the current page (without a link)
 *@
 
-@{ var selection = Model.Content.Ancestors().ToArray(); }
+@{ var selection = Model?.Content.Ancestors().ToArray(); }
 
-@if (selection.Length > 0)
+@if (selection?.Length > 0)
 {
     <ul class="breadcrumb">
         @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@
@@ -22,6 +22,6 @@
         }
 
         @* Display the current page as the last item in the list *@
-        <li class="active">@Model.Content.Name</li>
+        <li class="active">@Model?.Content.Name</li>
     </ul>
 }

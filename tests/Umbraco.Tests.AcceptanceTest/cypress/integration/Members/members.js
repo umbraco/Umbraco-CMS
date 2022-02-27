@@ -23,6 +23,8 @@ context('Members', () => {
         //Type name
         cy.umbracoEditorHeaderName(name);
 
+        cy.get('[data-element="sub-view-umbMembership"]').click();
+        
         cy.get('input#_umb_login').clear().type(email);
         cy.get('input#_umb_email').clear().type(email);
         cy.get('input#password').clear().type(password, { timeout: passwordTimeout });

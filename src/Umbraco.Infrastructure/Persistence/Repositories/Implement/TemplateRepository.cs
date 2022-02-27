@@ -131,6 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var list = new List<string>
             {
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion + " SET templateId = NULL WHERE templateId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",

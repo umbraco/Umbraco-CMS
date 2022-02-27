@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture et noms d'hôte</key>
+    <key alias="assigndomain">Culture et noms d'hôte</key>
     <key alias="auditTrail">Informations d'audit</key>
     <key alias="browse">Parcourir</key>
     <key alias="changeDocType">Changer le type de document</key>
@@ -16,10 +16,10 @@
     <key alias="createGroup">Créer un groupe</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyRecycleBin">Vider la corbeille</key>
+    <key alias="emptyrecyclebin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
-    <key alias="importDocumentType">Importer un type de document</key>
+    <key alias="importdocumenttype">Importer un type de document</key>
     <key alias="importPackage">Importer un package</key>
     <key alias="liveEdit">Editer dans Canvas</key>
     <key alias="logout">Déconnexion</key>
@@ -259,6 +259,7 @@
     <key alias="nestedContentNoContentTypes">Aucun type de contenu n'est configuré pour cette propriété.</key>
     <key alias="nestedContentAddElementType">Ajouter un type d'élément</key>
     <key alias="nestedContentSelectElementTypeModalTitle">Sélectionner un type d'élément</key>
+    <key alias="nestedContentNoGroups">Le type d'élément sélectionné ne contient aucun groupe supporté (les onglets/tabs ne sont pas supportés par cet éditeur, changez-les en groupes ou utilisez l'éditeur Block List).</key>
     <key alias="addTextBox">Ajouter un autre champ texte</key>
     <key alias="removeTextBox">Enlever ce champ texte</key>
     <key alias="contentRoot">Racine du contenu</key>
@@ -289,6 +290,7 @@
     <key alias="clickToUpload">Cliquez pour télécharger</key>
     <key alias="orClickHereToUpload">ou cliquez ici pour choisir un fichier</key>
     <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.</key>
+    <key alias="invalidFileName">Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide</key>
     <key alias="maxFileSize">La taille maximum de fichier est</key>
     <key alias="mediaRoot">Racine du média</key>
     <key alias="moveToSameFolderFailed">Les dossiers parent et destination ne peuvent pas être identiques</key>
@@ -735,6 +737,9 @@
     <key alias="embed">Intégrer</key>
     <key alias="selected">sélectionné</key>
     <key alias="avatar">Avatar de</key>
+    <key alias="header">Entête</key>
+    <key alias="systemField">champ système</key>
+    <key alias="lastUpdated">Dernière mise à jour</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>
@@ -1962,7 +1967,14 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
-    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckConfigurationRectifyNotPossible">
+      L'appSetting 'Umbraco:CMS:Global:UseHttps' se trouve à 'false' dans votre fichier appSettings.json.
+      Une fois que vous aurez accès à ce site via le schema HTTPS, il faudra la mettre à 'true'.
+    </key>
+    <key alias="httpsCheckConfigurationCheckResult">
+      L'appSetting 'Umbraco:CMS:Global:UseHttps' se trouve à '%0%' dans votre fichier
+      appSettings.json, vos cookies sont %1% marqués comme 'secured'.
+    </key>   <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Le mode de compilation Debug est désactivé.</key>
     <key alias="compilationDebugCheckErrorMessage">Le mode de compilation Debug est actuellement activé. Il est recommandé de désactiver ce paramètre avant la mise en ligne.</key>
     <!-- The following keys get these tokens passed in:

@@ -433,7 +433,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Returns all content type objects
         /// </summary>
-        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
         public IEnumerable<ContentTypeBasic> GetAll()
         {
             var types = _contentTypeService.GetAll();

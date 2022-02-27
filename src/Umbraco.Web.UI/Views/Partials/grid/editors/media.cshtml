@@ -2,7 +2,8 @@
 @using Umbraco.Cms.Core.Media
 @using Umbraco.Cms.Core.PropertyEditors.ValueConverters
 @inject IImageUrlGenerator ImageUrlGenerator
-@if (Model.value != null)
+
+@if (Model?.value is not null)
 {
     var url = Model.value.image;
 

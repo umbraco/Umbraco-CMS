@@ -1,0 +1,7 @@
+<umb-box data-element="node-membership" class="form-horizontal">
+    <umb-box-content>
+        <umb-property ng-repeat="property in content.membershipProperties track by property.alias" property="property">
+            <umb-property-editor model="property"></umb-property-editor>
+        </umb-property>
+    </umb-box-content>
+</umb-box>
