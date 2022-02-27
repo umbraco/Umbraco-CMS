@@ -40,6 +40,12 @@ namespace Umbraco.Cms.Web.Common.Macros
         private readonly PartialViewMacroEngine _partialViewMacroEngine;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        private static readonly Action<ILogger, string, Exception> s_logMacroContentCacheHit
+          = LoggerMessage.Define<string>(Microsoft.Extensions.Logging.LogLevel.Debug, new EventId(56), "Macro content loaded from cache '{MacroCacheId}'");
+
+        private static readonly Action<ILogger, string, Exception> s_logMacroContentCacheStore
+          = LoggerMessage.Define<string>(Microsoft.Extensions.Logging.LogLevel.Debug, new EventId(57), "Macro content saved to cache '{MacroCacheId}'");
+
         public MacroRenderer(
             IProfilingLogger profilingLogger,
             ILogger<MacroRenderer> logger,
@@ -153,11 +159,13 @@ namespace Umbraco.Cms.Web.Common.Macros
             return macroContent;
         }
 
-        [LoggerMessage(
-          EventId = 56,
-          Level = MicrosoftLogLevel.Debug,
-          Message = "Macro content loaded from cache '{MacroCacheId}'")]
-        public partial void LogMacroContentCacheHit(string macroCacheId);
+        private void LogMacroContentCacheHit(string macroCacheId)
+        {
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                s_logMacroContentCacheHit.Invoke(_logger, macroCacheId, null);
+            }
+        }
 
         // stores macro content into the cache
         private async Task AddMacroContentToCacheAsync(MacroModel model, MacroContent macroContent)
@@ -196,11 +204,13 @@ namespace Umbraco.Cms.Web.Common.Macros
             LogMacroContentCacheStore(model.CacheIdentifier);
         }
 
-        [LoggerMessage(
-          EventId = 57,
-          Level = MicrosoftLogLevel.Debug,
-          Message = "Macro content saved to cache '{MacroCacheId}'")]
-        public partial void LogMacroContentCacheStore(string macroCacheId);
+        private void LogMacroContentCacheStore(string macroCacheId)
+        {
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                s_logMacroContentCacheStore.Invoke(_logger, macroCacheId, null);
+            }
+        }
 
         // gets the macro source file name
         // null if the macro is not file-based, or not supported

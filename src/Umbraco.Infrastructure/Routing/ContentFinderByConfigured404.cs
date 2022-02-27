@@ -25,6 +25,9 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
+        private static readonly Action<ILogger, int, Exception> s_logErrorNodeFound
+        = LoggerMessage.Define<int>(LogLevel.Debug, new EventId(48), "Got id={ErrorNodeId}.");
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByConfigured404"/> class.
         /// </summary>
@@ -124,10 +127,12 @@ namespace Umbraco.Cms.Core.Routing
             return content != null;
         }
 
-        [LoggerMessage(
-           EventId = 48,
-           Level = LogLevel.Debug,
-           Message = "Got id={ErrorNodeId}.")]
-        public partial void LogErrorNodeFound(int errorNodeId);
+        private void LogErrorNodeFound(int errorNodeId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logErrorNodeFound.Invoke(_logger, errorNodeId, null);
+            }
+        }
     }
 }

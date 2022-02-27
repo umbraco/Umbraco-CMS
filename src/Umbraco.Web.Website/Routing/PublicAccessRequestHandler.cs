@@ -25,6 +25,9 @@ namespace Umbraco.Cms.Web.Website.Routing
         private readonly IUmbracoRouteValuesFactory _umbracoRouteValuesFactory;
         private readonly IPublishedRouter _publishedRouter;
 
+        private static readonly Action<ILogger, int, Exception> s_logRewriteLoopCount
+             = LoggerMessage.Define<int>(LogLevel.Debug, new EventId(58), "RewriteForPublishedContentAccessAsync : Loop {LoopCounter}");
+
         public PublicAccessRequestHandler(
             ILogger<PublicAccessRequestHandler> logger,
             IPublicAccessService publicAccessService,
@@ -121,12 +124,15 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             return routeValues;
         }
+        
 
-        [LoggerMessage(
-          EventId = 58,
-          Level = LogLevel.Debug,
-          Message = "RewriteForPublishedContentAccessAsync : Loop {LoopCounter}")]
-        public partial void LogRewriteLoopCount(int loopCounter);
+        private void LogRewriteLoopCount(int loopCounter)
+        {
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                s_logRewriteLoopCount.Invoke(_logger, loopCounter, null);
+            }
+        }
 
         private async Task<UmbracoRouteValues> SetPublishedContentAsOtherPageAsync(HttpContext httpContext, IPublishedRequest publishedRequest, int pageId)
         {

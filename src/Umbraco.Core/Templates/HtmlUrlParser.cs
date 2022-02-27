@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,6 +18,9 @@ namespace Umbraco.Cms.Core.Templates
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        private static readonly Action<ILogger, long,int, Exception> s_logUrlRegexResult
+            = LoggerMessage.Define<long, int>(MicrosoftLogLevel.Debug, new EventId(46), "After regex: {Duration} matched: {TagsCount}");
 
         public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
         {
@@ -66,10 +70,12 @@ namespace Umbraco.Cms.Core.Templates
             return text;
         }
 
-        [LoggerMessage(
-           EventId = 46,
-           Level = MicrosoftLogLevel.Debug,
-           Message = "After regex: {Duration} matched: {TagsCount}")]
-        public partial void LogUrlRegexResult(long duration, int tagsCount);
+        private void LogUrlRegexResult(long duration, int tagsCount)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logUrlRegexResult.Invoke(_logger, duration,tagsCount, null);
+            }
+        }
     }
 }

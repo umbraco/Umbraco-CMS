@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -24,6 +25,18 @@ namespace Umbraco.Cms.Core.Routing
 
         private readonly IContentTypeService _contentTypeService;
         private readonly WebRoutingSettings _webRoutingSettings;
+
+        private static readonly Action<ILogger, string, Exception> s_logNotValidTemplate
+            = LoggerMessage.Define<string>(LogLevel.Debug, new EventId(18), "Not a valid template: '{TemplateAlias}'");
+
+        private static readonly Action<ILogger, string, Exception> s_logValidTemplate
+            = LoggerMessage.Define<string>(LogLevel.Debug, new EventId(19), "Valid template: '{TemplateAlias}'");
+
+        private static readonly Action<ILogger, string, Exception> s_logNotValidRouteToNode
+            = LoggerMessage.Define<string>(LogLevel.Debug, new EventId(20), "Not a valid route to node: '{Route}'");
+
+        private static readonly Action<ILogger, string, int, Exception> s_logNotAllowedTemplate
+            = LoggerMessage.Define<string, int>(LogLevel.Warning, new EventId(21), "Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByUrlAndTemplate"/> class.
@@ -102,30 +115,36 @@ namespace Umbraco.Cms.Core.Routing
             return true;
         }
 
-        [LoggerMessage(
-         EventId = 18,
-         Level = LogLevel.Debug,
-         Message = "Not a valid template: '{TemplateAlias}'")]
-        public partial void LogNotValidTemplate(string templateAlias);
+        private void LogNotValidTemplate(string templateAlias)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logNotValidTemplate.Invoke(_logger, templateAlias, null);
+            }
+        }
 
-        [LoggerMessage(
-         EventId = 19,
-         Level = LogLevel.Debug,
-         Message = "Valid template: '{TemplateAlias}'")]
-        public partial void LogValidTemplate(string templateAlias);
+        private void LogValidTemplate(string templateAlias)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logValidTemplate.Invoke(_logger, templateAlias, null);
+            }
+        }
 
+        private void LogNotValidRouteToNode(string route)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logNotValidRouteToNode.Invoke(_logger, route, null);
+            }
+        }
 
-        [LoggerMessage(
-         EventId = 20,
-         Level = LogLevel.Debug,
-         Message = "Not a valid route to node: '{Route}'")]
-        public partial void LogNotValidRouteToNode(string route);
-
-
-        [LoggerMessage(
-         EventId = 21,
-         Level = LogLevel.Warning,
-         Message = "Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.")]
-        public partial void LogNotAllowedTemplate(string templateAlias,int nodeId);
+        private void LogNotAllowedTemplate(string templateAlias, int nodeId)
+        {
+            if (_logger.IsEnabled(LogLevel.Warning))
+            {
+                s_logNotAllowedTemplate.Invoke(_logger, templateAlias, nodeId, null);
+            }
+        }
     }
 }

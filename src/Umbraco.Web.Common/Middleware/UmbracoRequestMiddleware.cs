@@ -67,6 +67,12 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private static object s_firstBackOfficeRequestLocker = new object();
 #pragma warning restore IDE0044 // Add readonly modifier
 
+        private static readonly Action<ILogger, Guid, string, Exception> s_logBeginRequest
+         = LoggerMessage.Define<Guid, string>(LogLevel.Trace, new EventId(1), "Begin request [{HttpRequestId}]: {RequestUrl}");
+
+        private static readonly Action<ILogger, Guid, string, double, Exception> s_logEndRequest
+          = LoggerMessage.Define<Guid, string, double>(LogLevel.Trace, new EventId(2), "End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)");
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
         /// </summary>
@@ -243,17 +249,20 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return true;
             });
 
+        private void LogBeginRequest(Guid httpRequestId, string requestUrl)
+        {
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                s_logBeginRequest.Invoke(_logger, httpRequestId, requestUrl, null);
+            }
+        }
 
-        [LoggerMessage(
-        EventId = 1,
-        Level = LogLevel.Trace,
-        Message = "Begin request [{HttpRequestId}]: {RequestUrl}")]
-        public partial void LogBeginRequest(Guid httpRequestId, string requestUrl);
-
-        [LoggerMessage(
-        EventId = 2,
-        Level = LogLevel.Trace,
-        Message = "End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)")]
-        public partial void LogEndRequest(Guid httpRequestId, string requestUrl, double requestDuration);
+        private void LogEndRequest(Guid httpRequestId, string requestUrl, double requestDuration)
+        {
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                s_logEndRequest.Invoke(_logger, httpRequestId, requestUrl, requestDuration, null);
+            }
+        }
     }
 }

@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Core.Logging
     public partial class LogProfiler : IProfiler
     {
         private readonly ILogger<LogProfiler> _logger;
+        private static readonly Action<ILogger, string, Exception> s_logStartStep
+           = LoggerMessage.Define<string>(MicrosoftLogLevel.Debug, new EventId(8), "Begin: {ProfileName}");
+
+        private static readonly Action<ILogger, string, long,Exception> s_logEndStep
+           = LoggerMessage.Define<string,long>(MicrosoftLogLevel.Debug, new EventId(9), "End {ProfileName} ({ProfileDuration}ms)");
 
         public LogProfiler(ILogger<LogProfiler> logger)
         {
@@ -36,17 +41,21 @@ namespace Umbraco.Cms.Core.Logging
             // the log never stops
         }
 
-        [LoggerMessage(
-           EventId = 8,
-           Level = MicrosoftLogLevel.Debug,
-           Message = "Begin: {ProfileName}")]
-        public partial void LogStartStep(string profileName);
+        private void LogStartStep(string profileName)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logStartStep.Invoke(_logger, profileName, null);
+            }
+        }
 
-        [LoggerMessage(
-           EventId = 9,
-           Level = MicrosoftLogLevel.Information,
-           Message = "End {ProfileName} ({ProfileDuration}ms)")]
-        public partial void LogEndStep(string profileName, long profileDuration);
+        private void LogEndStep(string profileName, long profileDuration)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logEndStep.Invoke(_logger, profileName, profileDuration, null);
+            }
+        }
 
         // a lightweight disposable timer
         private class LightDisposableTimer : DisposableObjectSlim

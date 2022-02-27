@@ -63,6 +63,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // see SnapDictionary notes
         private const long CollectMinGenDelta = 8;
 
+        private static readonly Action<ILogger, int, Exception> s_logContentIdSet
+            = LoggerMessage.Define<int>(LogLevel.Debug, new EventId(50), "Set content ID: {KitNodeId}");
+
+        private static readonly Action<ILogger, int,int, Exception> s_logParentContentIdSet
+            = LoggerMessage.Define<int,int>(LogLevel.Debug, new EventId(51), "Set {thisNodeId} with parent {thisNodeParentContentId}");
+
+        private static readonly Action<ILogger, int, Exception> s_logClearContentId
+            = LoggerMessage.Define<int>(LogLevel.Debug, new EventId(52), "Clear content ID: {ContentId}");
+
+        private static readonly Action<ILogger, string, Exception> s_logDisposeSnapshot
+            = LoggerMessage.Define<string>(LogLevel.Debug, new EventId(53), "Dispose snapshot ({Snapshot})");
+
         #region Ctor
 
         public ContentStore(
@@ -655,11 +667,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return true;
         }
 
-        [LoggerMessage(
-           EventId = 50,
-           Level = LogLevel.Debug,
-           Message = "Set content ID: {KitNodeId}")]
-        public partial void LogContentIdSet(int kitNodeId);
+      
+
+        private void LogContentIdSet(int kitNodeId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logContentIdSet.Invoke(_logger, kitNodeId, null);
+            }
+        }
 
         private void ClearRootLocked()
         {
@@ -758,11 +774,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return ok;
         }
 
-        [LoggerMessage(
-           EventId = 51,
-           Level = LogLevel.Debug,
-           Message = "Set {thisNodeId} with parent {thisNodeParentContentId}")]
-        public partial void LogParentContentIdSet(int thisNodeId,int thisNodeParentContentId);
+        private void LogParentContentIdSet(int thisNodeId,int thisNodeParentContentId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logParentContentIdSet.Invoke(_logger, thisNodeId, thisNodeParentContentId, null);
+            }
+        }
 
         /// <summary>
         /// Set all data for a collection of <see cref="ContentNodeKit"/>
@@ -896,11 +914,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return true;
         }
 
-        [LoggerMessage(
-           EventId = 52,
-           Level = LogLevel.Debug,
-           Message = "Clear content ID: {ContentId}")]
-        public partial void LogClearContentId(int contentId);
+        private void LogClearContentId(int contentId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logClearContentId.Invoke(_logger, contentId, null);
+            }
+        }
 
         private void ClearBranchLocked(int id)
         {
@@ -1716,11 +1736,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 GC.SuppressFinalize(this);
             }
 
-            [LoggerMessage(
-              EventId = 53,
-              Level = LogLevel.Debug,
-              Message = "Dispose snapshot ({Snapshot})")]
-            public partial void LogDisposeSnapshot(string snapshot);
+            private void LogDisposeSnapshot(string snapshot)
+            {
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    s_logDisposeSnapshot.Invoke(_logger, snapshot, null);
+                }
+            }
         }
         #endregion
     }

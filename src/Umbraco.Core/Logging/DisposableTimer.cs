@@ -21,7 +21,18 @@ namespace Umbraco.Cms.Core.Logging
         private Exception _failException;
         private bool _failed;
         private readonly string _timingId;
+        private static readonly Action<ILogger, string, string, Exception> s_logInformationStartTimer
+            = LoggerMessage.Define<string, string>(MicrosoftLogLevel.Information, new EventId(4), "{StartMessage} [Timing {TimingId}]");
 
+        private static readonly Action<ILogger, string, double, string, Exception> s_logInformationEndTimer
+            = LoggerMessage.Define<string, double, string>(MicrosoftLogLevel.Information, new EventId(7), "{EndMessage} ({Duration}ms) [Timing {TimingId}]");
+
+        private static readonly Action<ILogger, string, string, Exception> s_logDebugStartTimer
+            = LoggerMessage.Define<string, string>(MicrosoftLogLevel.Debug, new EventId(5), "{StartMessage} [Timing {TimingId}]");
+
+        private static readonly Action<ILogger, string, double, string, Exception> s_logDebugEndTimer
+            = LoggerMessage.Define<string, double, string>(MicrosoftLogLevel.Debug, new EventId(6), "{EndMessage} ({Duration}ms) [Timing {TimingId}]");
+        
         // internal - created by profiling logger
         internal DisposableTimer(
             ILogger logger,
@@ -171,28 +182,36 @@ namespace Umbraco.Cms.Core.Logging
             }
         }
 
-        [LoggerMessage(
-          EventId = 4,
-          Level = MicrosoftLogLevel.Information,
-          Message = "{StartMessage} [Timing {TimingId}]")]
-        public partial void LogInformationStartTimer(string startMessage, string timingId);
+        private void LogInformationStartTimer(string startMessage, string timingId)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Information))
+            {
+                s_logInformationStartTimer.Invoke(_logger, startMessage, timingId, null);
+            }
+        }
 
-        [LoggerMessage(
-          EventId = 5,
-          Level = MicrosoftLogLevel.Debug,
-          Message = "{StartMessage} [Timing {TimingId}]")]
-        public partial void LogDebugStartTimer(string startMessage, string timingId);
+        private void LogDebugStartTimer(string startMessage, string timingId)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logDebugStartTimer.Invoke(_logger, startMessage, timingId, null);
+            }
+        }
 
-        [LoggerMessage(
-          EventId = 6,
-          Level = MicrosoftLogLevel.Debug,
-          Message = "{EndMessage} ({Duration}ms) [Timing {TimingId}]")]
-        public partial void LogDebugEndTimer(string endMessage, double duration, string timingId);
+        private void LogDebugEndTimer(string endMessage, double duration, string timingId)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logDebugEndTimer.Invoke(_logger, endMessage, duration,timingId, null);
+            }
+        }
 
-        [LoggerMessage(
-          EventId = 7,
-          Level = MicrosoftLogLevel.Information,
-          Message = "{EndMessage} ({Duration}ms) [Timing {TimingId}]")]
-        public partial void LogInformationEndTimer(string endMessage, double duration, string timingId);
+        private void LogInformationEndTimer(string endMessage, double duration, string timingId)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Information))
+            {
+                s_logInformationEndTimer.Invoke(_logger, endMessage, duration, timingId, null);
+            }
+        }
     }
 }

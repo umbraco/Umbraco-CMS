@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILogger<ContentFinderByUrlAlias> _logger;
+        private static readonly Action<ILogger, string, int, Exception> s_logContentAliasFound
+            = LoggerMessage.Define<string, int>(LogLevel.Debug, new EventId(17), "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByUrlAlias"/> class.
@@ -147,10 +149,12 @@ namespace Umbraco.Cms.Core.Routing
             return null;
         }
 
-        [LoggerMessage(
-         EventId = 17,
-         Level = LogLevel.Debug,
-         Message = "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}")]
-        public partial void LogContentAliasFound(string uriAbsolutePath, int publishedContentId);
+        private void LogContentAliasFound(string uriAbsolutePath, int publishedContentId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logContentAliasFound.Invoke(_logger, uriAbsolutePath, publishedContentId, null);
+            }
+        }
     }
 }

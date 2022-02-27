@@ -1,9 +1,11 @@
+using System;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using MicrosoftLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Umbraco.Cms.Core.Routing
 {
@@ -19,6 +21,12 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IRequestAccessor _requestAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly WebRoutingSettings _webRoutingSettings;
+
+        private static readonly Action<ILogger, int,Exception> s_logNodeId
+            = LoggerMessage.Define<int>(MicrosoftLogLevel.Debug, new EventId(10), "Id={NodeId}");
+
+        private static readonly Action<ILogger, int, Exception> s_logFoundNodeId
+            = LoggerMessage.Define<int>(MicrosoftLogLevel.Debug, new EventId(11), "Found node with id={PublishedContentId}");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByIdPath"/> class.
@@ -101,16 +109,20 @@ namespace Umbraco.Cms.Core.Routing
             return node != null;
         }
 
-        [LoggerMessage(
-          EventId = 10,
-          Level = LogLevel.Debug,
-          Message = "Id={NodeId}")]
-        public partial void LogNodeId(int nodeId);
+        private void LogNodeId(int nodeId)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logNodeId.Invoke(_logger, nodeId, null);
+            }
+        }
 
-        [LoggerMessage(
-          EventId = 11,
-          Level = LogLevel.Debug,
-          Message = "Found node with id={PublishedContentId}")]
-        public partial void LogFoundNodeId(int publishedContentId);
+        private void LogFoundNodeId(int publishedContentId)
+        {
+            if (_logger.IsEnabled(MicrosoftLogLevel.Debug))
+            {
+                s_logFoundNodeId.Invoke(_logger, publishedContentId, null);
+            }
+        }
     }
 }

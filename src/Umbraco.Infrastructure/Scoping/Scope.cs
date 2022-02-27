@@ -55,6 +55,9 @@ namespace Umbraco.Cms.Core.Scoping
         private HashSet<int> _writeLocks;
         private Dictionary<Guid, Dictionary<int, int>> _writeLocksDictionary;
 
+        private static readonly Action<ILogger, string,int, Exception> s_logBeginScope
+        = LoggerMessage.Define<string,int>(LogLevel.Trace, new EventId(3), "Create {InstanceId} on thread {ThreadId}");
+        
         // initializes a new scope
         private Scope(
             ScopeProvider scopeProvider,
@@ -1194,10 +1197,12 @@ namespace Umbraco.Cms.Core.Scoping
             WriteLock
         }
 
-        [LoggerMessage(
-          EventId = 3,
-          Level = LogLevel.Trace,
-          Message = "Create {InstanceId} on thread {ThreadId}")]
-        public partial void LogBeginScope(string instanceId, int threadId);
+        private void LogBeginScope(string instanceId, int threadId)
+        {
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                s_logBeginScope.Invoke(_logger, instanceId, threadId, null);
+            }
+        }
     }
 }

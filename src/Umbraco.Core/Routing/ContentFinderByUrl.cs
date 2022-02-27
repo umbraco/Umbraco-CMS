@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
@@ -13,6 +14,12 @@ namespace Umbraco.Cms.Core.Routing
     public partial class ContentFinderByUrl : IContentFinder
     {
         private readonly ILogger<ContentFinderByUrl> _logger;
+
+        private static readonly Action<ILogger, string, Exception> s_logTestRoute
+            = LoggerMessage.Define<string>(LogLevel.Debug, new EventId(15), "Test route {Route}");
+
+        private static readonly Action<ILogger, int, Exception> s_logContentFound
+            = LoggerMessage.Define<int>(LogLevel.Debug, new EventId(16), "Got content, id={NodeId}");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByUrl"/> class.
@@ -86,17 +93,20 @@ namespace Umbraco.Cms.Core.Routing
             return node;
         }
 
-        [LoggerMessage(
-         EventId = 15,
-         Level = LogLevel.Debug,
-         Message = "Test route {Route}")]
-        public partial void LogTestRoute(string route);
+        private void LogTestRoute(string route)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logTestRoute.Invoke(_logger, route, null);
+            }
+        }
 
-        [LoggerMessage(
-         EventId = 16,
-         Level = LogLevel.Debug,
-         Message = "Got content, id={NodeId}")]
-        public partial void LogContentFound(int nodeId);
-
+        private void LogContentFound(int nodeId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logContentFound.Invoke(_logger, nodeId, null);
+            }
+        }
     }
 }

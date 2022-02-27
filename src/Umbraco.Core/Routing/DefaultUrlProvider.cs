@@ -26,6 +26,9 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
+        private static readonly Action<ILogger, int, Exception> s_logPageNotFoundByNodeId
+            = LoggerMessage.Define<int>(LogLevel.Debug, new EventId(22), "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.");
+
         [Obsolete("Use ctor with all parameters")]
         public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger,
             ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
@@ -161,11 +164,13 @@ namespace Umbraco.Cms.Core.Routing
             return null;
         }
 
-        [LoggerMessage(
-        EventId = 22,
-        Level = LogLevel.Debug,
-        Message = "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.")]
-        public partial void LogPageNotFoundByNodeId(int nodeId);
+        private void LogPageNotFoundByNodeId(int nodeId)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logPageNotFoundByNodeId.Invoke(_logger, nodeId, null);
+            }
+        }
         #endregion
 
         #region Utilities

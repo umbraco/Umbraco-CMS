@@ -26,6 +26,9 @@ namespace Umbraco.Cms.Web.Common.Controllers
         private readonly ILogger<RenderController> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
+        private static readonly Action<ILogger, int?, int?, string, Exception> s_logExecutingAction
+            = LoggerMessage.Define<int?, int?, string>(LogLevel.Debug, new EventId(55), "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}");
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderController"/> class.
         /// </summary>
@@ -101,11 +104,13 @@ namespace Umbraco.Cms.Web.Common.Controllers
             }
         }
 
-        [LoggerMessage(
-          EventId = 55,
-          Level = LogLevel.Debug,
-          Message = "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}")]
-        public partial void LogExecutingAction(int? content, int? responseStatusCode, string culture);
+        private void LogExecutingAction(int? content, int? responseStatusCode, string culture)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                s_logExecutingAction.Invoke(_logger, content, responseStatusCode, culture, null);
+            }
+        }
 
         private PublishedContentNotFoundResult GetNoTemplateResult(IPublishedRequest pcr)
         {
