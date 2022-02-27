@@ -8,63 +8,85 @@ using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
+    /// <inheritdoc />
     public class LocalizedTextService : ILocalizedTextService
     {
         private readonly ILogger<LocalizedTextService> _logger;
         private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
-        private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource => _dictionarySourceLazy.Value;
-        private IDictionary<CultureInfo, IDictionary<string, string>> _noAreaDictionarySource => _noAreaDictionarySourceLazy.Value;
-        private readonly Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>> _dictionarySourceLazy;
-        private readonly Lazy<IDictionary<CultureInfo, IDictionary<string, string>>> _noAreaDictionarySourceLazy;
-        private readonly char[] _splitter = new[] { '/' };
+
+        private IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> _dictionarySource =>
+            _dictionarySourceLazy.Value;
+
+        private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> _noAreaDictionarySource =>
+            _noAreaDictionarySourceLazy.Value;
+
+        private readonly Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>>
+            _dictionarySourceLazy;
+
+        private readonly Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>> _noAreaDictionarySourceLazy;
+
         /// <summary>
         /// Initializes with a file sources instance
         /// </summary>
         /// <param name="fileSources"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources, ILogger<LocalizedTextService> logger)
+        public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources,
+            ILogger<LocalizedTextService> logger)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             _logger = logger;
             if (fileSources == null) throw new ArgumentNullException(nameof(fileSources));
-            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => FileSourcesToAreaDictionarySources(fileSources.Value));
-            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => FileSourcesToNoAreaDictionarySources(fileSources.Value));
+            _dictionarySourceLazy =
+                new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>>(() =>
+                    FileSourcesToAreaDictionarySources(fileSources.Value));
+            _noAreaDictionarySourceLazy =
+                new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>>(() =>
+                    FileSourcesToNoAreaDictionarySources(fileSources.Value));
             _fileSources = fileSources;
         }
 
-        private IDictionary<CultureInfo, IDictionary<string, string>> FileSourcesToNoAreaDictionarySources(LocalizedTextServiceFileSources fileSources)
+        private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> FileSourcesToNoAreaDictionarySources(
+            LocalizedTextServiceFileSources fileSources)
         {
             var xmlSources = fileSources.GetXmlSources();
 
             return XmlSourceToNoAreaDictionary(xmlSources);
         }
 
-        private IDictionary<CultureInfo, IDictionary<string, string>> XmlSourceToNoAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
+        private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> XmlSourceToNoAreaDictionary(
+            IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
         {
-            var cultureNoAreaDictionary = new Dictionary<CultureInfo, IDictionary<string, string>>();
+            var cultureNoAreaDictionary = new Dictionary<CultureInfo, Lazy<IDictionary<string, string>>>();
             foreach (var xmlSource in xmlSources)
             {
-                var noAreaAliasValue = GetNoAreaStoredTranslations(xmlSources, xmlSource.Key);
+                var noAreaAliasValue =
+                    new Lazy<IDictionary<string, string>>(() => GetNoAreaStoredTranslations(xmlSources, xmlSource.Key));
                 cultureNoAreaDictionary.Add(xmlSource.Key, noAreaAliasValue);
             }
+
             return cultureNoAreaDictionary;
         }
 
-        private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> FileSourcesToAreaDictionarySources(LocalizedTextServiceFileSources fileSources)
+        private IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
+            FileSourcesToAreaDictionarySources(LocalizedTextServiceFileSources fileSources)
         {
             var xmlSources = fileSources.GetXmlSources();
             return XmlSourcesToAreaDictionary(xmlSources);
         }
 
-        private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> XmlSourcesToAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
+        private IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
+            XmlSourcesToAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
         {
-            var cultureDictionary = new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>();
+            var cultureDictionary =
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>();
             foreach (var xmlSource in xmlSources)
             {
-                var areaAliaValue = GetAreaStoredTranslations(xmlSources, xmlSource.Key);
+                var areaAliaValue =
+                    new Lazy<IDictionary<string, IDictionary<string, string>>>(() =>
+                        GetAreaStoredTranslations(xmlSources, xmlSource.Key));
                 cultureDictionary.Add(xmlSource.Key, areaAliaValue);
-
             }
+
             return cultureDictionary;
         }
 
@@ -73,45 +95,69 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="source"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(IDictionary<CultureInfo, Lazy<XDocument>> source, ILogger<LocalizedTextService> logger)
+        public LocalizedTextService(IDictionary<CultureInfo, Lazy<XDocument>> source,
+            ILogger<LocalizedTextService> logger)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => XmlSourcesToAreaDictionary(source));
-            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => XmlSourceToNoAreaDictionary(source));
-
+            _dictionarySourceLazy =
+                new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>>(() =>
+                    XmlSourcesToAreaDictionary(source));
+            _noAreaDictionarySourceLazy =
+                new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>>(() =>
+                    XmlSourceToNoAreaDictionary(source));
         }
 
+        [Obsolete("Use other ctor with IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> as input parameter.")]
+        public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source,
+            ILogger<LocalizedTextService> logger) : this(source.ToDictionary(x=>x.Key, x=> new Lazy<IDictionary<string, IDictionary<string, string>>>(() => x.Value)), logger)
+        {
 
+        }
         /// <summary>
         /// Initializes with a source of a dictionary of culture -> areas -> sub dictionary of keys/values
         /// </summary>
         /// <param name="source"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source, ILogger<LocalizedTextService> logger)
+        public LocalizedTextService(
+            IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> source,
+            ILogger<LocalizedTextService> logger)
         {
             var dictionarySource = source ?? throw new ArgumentNullException(nameof(source));
-            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => dictionarySource);
+            _dictionarySourceLazy =
+                new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>>(() =>
+                    dictionarySource);
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            var cultureNoAreaDictionary = new Dictionary<CultureInfo, IDictionary<string, string>>();
+            var cultureNoAreaDictionary = new Dictionary<CultureInfo, Lazy<IDictionary<string, string>>>();
             foreach (var cultureDictionary in dictionarySource)
             {
                 var areaAliaValue = GetAreaStoredTranslations(source, cultureDictionary.Key);
-                var aliasValue = new Dictionary<string, string>();
-                foreach (var area in areaAliaValue)
+
+                cultureNoAreaDictionary.Add(cultureDictionary.Key,
+                    new Lazy<IDictionary<string, string>>(() => GetAliasValues(areaAliaValue)));
+            }
+
+            _noAreaDictionarySourceLazy =
+                new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>>(() => cultureNoAreaDictionary);
+        }
+
+        private static Dictionary<string, string> GetAliasValues(
+            Dictionary<string, IDictionary<string, string>> areaAliaValue)
+        {
+            var aliasValue = new Dictionary<string, string>();
+            foreach (var area in areaAliaValue)
+            {
+                foreach (var alias in area.Value)
                 {
-                    foreach (var alias in area.Value)
+                    if (!aliasValue.ContainsKey(alias.Key))
                     {
-                        if (!aliasValue.ContainsKey(alias.Key))
-                        {
-                            aliasValue.Add(alias.Key, alias.Value);
-                        }
+                        aliasValue.Add(alias.Key, alias.Value);
                     }
                 }
-                cultureNoAreaDictionary.Add(cultureDictionary.Key, aliasValue);
             }
-            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => cultureNoAreaDictionary);
+
+            return aliasValue;
         }
 
         public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null)
@@ -122,12 +168,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (string.IsNullOrEmpty(key))
                 return string.Empty;
 
-            var keyParts = key.Split(_splitter, StringSplitOptions.RemoveEmptyEntries);
+            var keyParts = key.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
             var area = keyParts.Length > 1 ? keyParts[0] : null;
             var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
             return Localize(area, alias, culture, tokens);
         }
-        public string Localize(string area, string alias, CultureInfo culture, IDictionary<string, string> tokens = null)
+
+        public string Localize(string area, string alias, CultureInfo culture,
+            IDictionary<string, string> tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
 
@@ -153,12 +201,15 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.LogWarning(
+                    "The culture specified {Culture} was not found in any configured sources for this service",
+                    culture);
                 return new Dictionary<string, string>(0);
             }
+
             IDictionary<string, string> result = new Dictionary<string, string>();
             //convert all areas + keys to a single key with a '/'
-            foreach (var area in _dictionarySource[culture])
+            foreach (var area in _dictionarySource[culture].Value)
             {
                 foreach (var key in area.Value)
                 {
@@ -170,10 +221,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
                 }
             }
+
             return result;
         }
 
-        private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
+        private IDictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(
+            IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
         {
             var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
             var areas = xmlSource[cult].Value.XPathSelectElements("//area");
@@ -189,6 +242,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (result.ContainsKey(dictionaryKey) == false)
                         result.Add(dictionaryKey, key.Value);
                 }
+
                 overallResult.Add(area.Attribute("alias").Value, result);
             }
 
@@ -199,11 +253,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var enUS = xmlSource[englishCulture].Value.XPathSelectElements("//area");
                 foreach (var area in enUS)
                 {
-                    IDictionary<string, string> result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+                    IDictionary<string, string>
+                        result = new Dictionary<string, string>(StringComparer.InvariantCulture);
                     if (overallResult.ContainsKey(area.Attribute("alias").Value))
                     {
                         result = overallResult[area.Attribute("alias").Value];
                     }
+
                     var keys = area.XPathSelectElements("./key");
                     foreach (var key in keys)
                     {
@@ -213,15 +269,19 @@ namespace Umbraco.Cms.Core.Services.Implement
                         if (result.ContainsKey(dictionaryKey) == false)
                             result.Add(dictionaryKey, key.Value);
                     }
+
                     if (!overallResult.ContainsKey(area.Attribute("alias").Value))
                     {
                         overallResult.Add(area.Attribute("alias").Value, result);
                     }
                 }
             }
+
             return overallResult;
         }
-        private Dictionary<string, string> GetNoAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
+
+        private Dictionary<string, string> GetNoAreaStoredTranslations(
+            IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
         {
             var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
             var keys = xmlSource[cult].Value.XPathSelectElements("//key");
@@ -250,14 +310,18 @@ namespace Umbraco.Cms.Core.Services.Implement
                         result.Add(dictionaryKey, key.Value);
                 }
             }
+
             return result;
         }
-        private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> dictionarySource, CultureInfo cult)
+
+        private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(
+            IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> dictionarySource,
+            CultureInfo cult)
         {
             var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
             var areaDict = dictionarySource[cult];
 
-            foreach (var area in areaDict)
+            foreach (var area in areaDict.Value)
             {
                 var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
                 var keys = area.Value.Keys;
@@ -267,8 +331,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (result.ContainsKey(key) == false)
                         result.Add(key, area.Value[key]);
                 }
+
                 overallResult.Add(area.Key, result);
             }
+
             return overallResult;
         }
 
@@ -306,11 +372,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             return attempt ? attempt.Result : currentCulture;
         }
 
-        private string GetFromDictionarySource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
+        private string GetFromDictionarySource(CultureInfo culture, string area, string key,
+            IDictionary<string, string> tokens)
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.LogWarning(
+                    "The culture specified {Culture} was not found in any configured sources for this service",
+                    culture);
                 return "[" + key + "]";
             }
 
@@ -318,17 +387,18 @@ namespace Umbraco.Cms.Core.Services.Implement
             string found = null;
             if (string.IsNullOrWhiteSpace(area))
             {
-                _noAreaDictionarySource[culture].TryGetValue(key, out found);
+                _noAreaDictionarySource[culture].Value.TryGetValue(key, out found);
             }
             else
             {
-                if (_dictionarySource[culture].TryGetValue(area, out var areaDictionary))
+                if (_dictionarySource[culture].Value.TryGetValue(area, out var areaDictionary))
                 {
                     areaDictionary.TryGetValue(key, out found);
                 }
+
                 if (found == null)
                 {
-                    _noAreaDictionarySource[culture].TryGetValue(key, out found);
+                    _noAreaDictionarySource[culture].Value.TryGetValue(key, out found);
                 }
             }
 
@@ -341,6 +411,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             //NOTE: Based on how legacy works, the default text does not contain the area, just the key
             return "[" + key + "]";
         }
+
         /// <summary>
         /// Parses the tokens in the value
         /// </summary>
@@ -370,20 +441,29 @@ namespace Umbraco.Cms.Core.Services.Implement
             return value;
         }
 
+        /// <summary>
+        /// Returns all key/values in storage for the given culture
+        /// </summary>
+        /// <returns></returns>
         public IDictionary<string, IDictionary<string, string>> GetAllStoredValuesByAreaAndAlias(CultureInfo culture)
         {
-            if (culture == null) throw new ArgumentNullException("culture");
+            if (culture == null)
+            {
+                throw new ArgumentNullException("culture");
+            }
 
             // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);
 
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.LogWarning(
+                    "The culture specified {Culture} was not found in any configured sources for this service",
+                    culture);
                 return new Dictionary<string, IDictionary<string, string>>(0);
             }
 
-            return _dictionarySource[culture];
+            return _dictionarySource[culture].Value;
         }
     }
 }

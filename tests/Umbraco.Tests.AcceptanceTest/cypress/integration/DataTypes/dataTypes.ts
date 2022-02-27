@@ -8,8 +8,8 @@ import {
 context('DataTypes', () => {
 
     beforeEach(() => {
-        cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'), false);
-      });
+        cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
+    });
 
     it('Tests Approved Colors', () => {
         cy.deleteAllContent();
@@ -26,6 +26,12 @@ context('DataTypes', () => {
 
         //umbracoMakeDocTypeWithDataTypeAndContent(name, alias, pickerDataType);
         cy.umbracoCreateDocTypeWithContent(name, alias, pickerDataType);
+        //Editing template with some content
+        cy.editTemplate(name, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ApprovedColourTest>' +
+          '\n@{' +
+          '\n    Layout = null;' +
+          '\n}' +
+          '\n<p style="color:@Model.UmbracoTest">Lorem ipsum dolor sit amet</p>');
 
         // Act
         // Enter content
@@ -36,22 +42,19 @@ context('DataTypes', () => {
         //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
-        //Editing template with some content
-        cy.editTemplate(name, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ApprovedColourTest>' +
-            '\n@{' +
-            '\n    Layout = null;' +
-            '\n}' +
-            '\n<p style="color:@Model.UmbracoTest">Lorem ipsum dolor sit amet</p>');
 
         //Assert
         const expected = `<p style="color:000000" > Lorem ipsum dolor sit amet </p>`;
         cy.umbracoVerifyRenderedViewContent('/', expected, true).should('be.true');
+        cy.get('.umb-button__overlay').should('not.be.visible');
 
         //Pick another colour to verify both work
         cy.get('.btn-FF0000').click();
         //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
+        cy.umbracoButtonByLabelKey('buttons_saveAndPublish').should('be.visible');
+        cy.get('.umb-button__overlay').should('not.be.visible');
         //Assert
         const expected2 = '<p style="color:FF0000">Lorem ipsum dolor sit amet</p>';
         cy.umbracoVerifyRenderedViewContent('/', expected2, true).should('be.true');
@@ -100,6 +103,7 @@ context('DataTypes', () => {
         cy.get('.property-error').should('be.visible');
 
         // Clean
+        cy.umbracoEnsureTemplateNameNotExists(name);
         cy.umbracoEnsureDataTypeNameNotExists(name);
         cy.umbracoEnsureDocumentTypeNameNotExists(name);
     })

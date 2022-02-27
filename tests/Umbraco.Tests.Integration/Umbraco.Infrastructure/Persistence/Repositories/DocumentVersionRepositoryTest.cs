@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -30,7 +31,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             FileService.SaveTemplate(template);
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-            ContentTypeService.Save(contentType);
             ContentTypeService.Save(contentType);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
@@ -127,6 +127,76 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 {
                     Assert.AreEqual(2, after.Count);
                     Assert.True(after.All(x => x.Id > 3));
+                });
+            }
+        }
+
+
+        [Test]
+        public void GetPagedItemsByContentId_WithInvariantCultureContent_ReturnsPaginatedResults()
+        {
+            Template template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+            ContentTypeService.Save(contentType);
+
+            var content = ContentBuilder.CreateSimpleContent(contentType);
+
+            ContentService.SaveAndPublish(content); // Draft + Published
+            ContentService.SaveAndPublish(content); // New Draft
+
+            using (ScopeProvider.CreateScope())
+            {
+                var sut = new DocumentVersionRepository((IScopeAccessor)ScopeProvider);
+                var page1 = sut.GetPagedItemsByContentId(content.Id, 0, 2, out var page1Total);
+                var page2 = sut.GetPagedItemsByContentId(content.Id, 1, 2, out var page2Total);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.AreEqual(2, page1.Count());
+                    Assert.AreEqual(3, page1Total);
+
+                    Assert.AreEqual(1, page2.Count());
+                    Assert.AreEqual(3, page2Total);
+                });
+            }
+        }
+
+        [Test]
+        public void GetPagedItemsByContentId_WithVariantCultureContent_ReturnsPaginatedResults()
+        {
+            Template template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+            contentType.Variations = ContentVariation.Culture;
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                propertyType.Variations = ContentVariation.Culture;
+            }
+            FileService.SaveTemplate(contentType.DefaultTemplate);
+            ContentTypeService.Save(contentType);
+
+            var content = ContentBuilder.CreateSimpleContent(contentType, "foo", culture:"en-US");
+            content.SetCultureName("foo", "en-US");
+
+            ContentService.SaveAndPublish(content, "en-US"); // Draft + Published
+            ContentService.SaveAndPublish(content, "en-US"); // New Draft
+
+            using (ScopeProvider.CreateScope())
+            {
+                var sut = new DocumentVersionRepository((IScopeAccessor)ScopeProvider);
+                var page1 = sut.GetPagedItemsByContentId(content.Id, 0, 2, out var page1Total, 1);
+                var page2 = sut.GetPagedItemsByContentId(content.Id, 1, 2, out var page2Total, 1);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.AreEqual(2, page1.Count());
+                    Assert.AreEqual(3, page1Total);
+
+                    Assert.AreEqual(1, page2.Count());
+                    Assert.AreEqual(3, page2Total);
                 });
             }
         }

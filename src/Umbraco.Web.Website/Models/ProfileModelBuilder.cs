@@ -68,7 +68,8 @@ namespace Umbraco.Cms.Web.Website.Models
                 CreatedDate = member.CreatedDateUtc.ToLocalTime(),
                 LastLoginDate = member.LastLoginDateUtc?.ToLocalTime(),
                 LastPasswordChangedDate = member.LastPasswordChangeDateUtc?.ToLocalTime(),
-                RedirectUrl = _redirectUrl
+                RedirectUrl = _redirectUrl,
+                Key = member.Key
             };
 
             IMemberType memberType = MemberTypeService.Get(member.MemberTypeAlias);
@@ -83,7 +84,7 @@ namespace Umbraco.Cms.Web.Website.Models
             {
                 // should never happen
                 throw new InvalidOperationException($"Could not find a member with key: {member.Key}.");
-            } 
+            }
 
             if (_lookupProperties)
             {

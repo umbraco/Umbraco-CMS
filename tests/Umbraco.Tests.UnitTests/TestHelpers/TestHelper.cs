@@ -134,9 +134,9 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         /// </summary>
         public static string MapPathForTestFiles(string relativePath) => s_testHelperInternal.MapPathForTestFiles(relativePath);
 
-        public static void InitializeContentDirectories() => CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+        public static void InitializeContentDirectories() => CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPhysicalRootPath, Constants.SystemDirectories.AppPlugins });
 
-        public static void CleanContentDirectories() => CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
+        public static void CleanContentDirectories() => CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPhysicalRootPath });
 
         public static void CreateDirectories(string[] directories)
         {

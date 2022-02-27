@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
@@ -27,7 +29,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddImageSharp(options =>
             {
-                // The configuration is set using ImageSharpConfigurationOptions
+                // options.Configuration is set using ImageSharpConfigurationOptions below
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
                 options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
@@ -50,19 +52,29 @@ namespace Umbraco.Extensions
 
                     return Task.CompletedTask;
                 };
+                options.OnBeforeSaveAsync = _ => Task.CompletedTask;
+                options.OnProcessedAsync = _ => Task.CompletedTask;
+                options.OnPrepareResponseAsync = context =>
+                {
+                    // Change Cache-Control header when cache buster value is present
+                    if (context.Request.Query.ContainsKey("rnd"))
+                    {
+                        var headers = context.Response.GetTypedHeaders();
+
+                        var cacheControl = headers.CacheControl;
+                        cacheControl.MustRevalidate = false;
+                        cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+
+                        headers.CacheControl = cacheControl;
+                    }
+
+                    return Task.CompletedTask;
+                };
             })
                 .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
-                // We need to add CropWebProcessor before ResizeWebProcessor (until https://github.com/SixLabors/ImageSharp.Web/issues/182 is fixed)
-                .RemoveProcessor<ResizeWebProcessor>()
-                .RemoveProcessor<FormatWebProcessor>()
-                .RemoveProcessor<BackgroundColorWebProcessor>()
-                .RemoveProcessor<JpegQualityWebProcessor>()
-                .AddProcessor<CropWebProcessor>()
-                .AddProcessor<ResizeWebProcessor>()
-                .AddProcessor<FormatWebProcessor>()
-                .AddProcessor<BackgroundColorWebProcessor>()
-                .AddProcessor<JpegQualityWebProcessor>();
+                .AddProcessor<CropWebProcessor>();
 
+            // Configure middleware to use the registered/shared ImageSharp configuration
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
 
             return builder.Services;

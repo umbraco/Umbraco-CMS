@@ -14,7 +14,8 @@
         "target": "es5",
 
         "types": [
-            "cypress"
+            "cypress",
+            "cy-verify-downloads"
         ],
         "lib": [
             "es5",

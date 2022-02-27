@@ -233,6 +233,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
@@ -630,6 +631,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup; 
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
@@ -641,6 +646,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     contentVersionDto.Id = 0; // want a new id
                     contentVersionDto.Current = true; // current version
                     contentVersionDto.Text = entity.Name;
+                    contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                     Database.Insert(contentVersionDto);
                     entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 

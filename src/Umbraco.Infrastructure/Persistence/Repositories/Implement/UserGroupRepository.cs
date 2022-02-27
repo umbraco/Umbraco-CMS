@@ -286,6 +286,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                            {
                                "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @id",
                                "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
+                               "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @id",
                                "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
                                "DELETE FROM umbracoUserGroup WHERE id = @id"
                            };

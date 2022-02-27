@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -29,6 +30,7 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Extensions;
@@ -71,9 +73,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly WebRoutingSettings _webRoutingSettings;
 
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
-
+        [ActivatorUtilitiesConstructor]
         public AuthenticationController(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IBackOfficeUserManager backOfficeUserManager,
@@ -91,7 +95,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IHostingEnvironment hostingEnvironment,
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalAuthenticationOptions,
-            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
+            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
@@ -110,6 +116,50 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _linkGenerator = linkGenerator;
             _externalAuthenticationOptions = externalAuthenticationOptions;
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+            _httpContextAccessor = httpContextAccessor;
+            _webRoutingSettings = webRoutingSettings.Value;
+        }
+
+        [Obsolete("Use constructor that also takes IHttpAccessor and IOptions<WebRoutingSettings>, scheduled for removal in V11")]
+        public AuthenticationController(
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeUserManager backOfficeUserManager,
+            IBackOfficeSignInManager signInManager,
+            IUserService userService,
+            ILocalizedTextService textService,
+            IUmbracoMapper umbracoMapper,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<SecuritySettings> securitySettings,
+            ILogger<AuthenticationController> logger,
+            IIpResolver ipResolver,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IEmailSender emailSender,
+            ISmsSender smsSender,
+            IHostingEnvironment hostingEnvironment,
+            LinkGenerator linkGenerator,
+            IBackOfficeExternalLoginProviders externalAuthenticationOptions,
+            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
+            : this(
+                backofficeSecurityAccessor,
+                backOfficeUserManager,
+                signInManager,
+                userService,
+                textService,
+                umbracoMapper,
+                globalSettings,
+                securitySettings,
+                logger,
+                ipResolver,
+                passwordConfiguration,
+                emailSender,
+                smsSender,
+                hostingEnvironment,
+                linkGenerator,
+                externalAuthenticationOptions,
+                backOfficeTwoFactorOptions,
+                StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>())
+        {
         }
 
         /// <summary>
@@ -628,8 +678,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     r = code
                 });
 
-            // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _hostingEnvironment.ApplicationMainUrl;
+            // Construct full URL using configured application URL (which will fall back to current request)
+            Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request.GetApplicationUri(_webRoutingSettings);
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }
