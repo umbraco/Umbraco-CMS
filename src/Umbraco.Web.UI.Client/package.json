@@ -57,7 +57,7 @@
     "@babel/core": "7.17.5",
     "@babel/preset-env": "7.16.11",
     "autoprefixer": "9.6.5",
-    "caniuse-lite": "^1.0.30001237",
+    "caniuse-lite": "^1.0.30001312",
     "cssnano": "4.1.10",
     "fs": "0.0.2",
     "gulp": "4.0.2",
