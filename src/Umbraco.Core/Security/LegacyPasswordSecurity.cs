@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Core.Security
             var saltBytes = Convert.FromBase64String(salt);
             byte[] inArray;
 
-            var hashAlgorithm = GetHashAlgorithm(algorithmType);
+            using var hashAlgorithm = GetHashAlgorithm(algorithmType);
             var algorithm = hashAlgorithm as KeyedHashAlgorithm;
             if (algorithm != null)
             {
@@ -227,7 +227,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The encoded password.</returns>
         private string HashLegacySHA1Password(string password)
         {
-            var hashAlgorithm = GetLegacySHA1Algorithm(password);
+            using var hashAlgorithm = GetLegacySHA1Algorithm(password);
             var hash = Convert.ToBase64String(hashAlgorithm.ComputeHash(Encoding.Unicode.GetBytes(password)));
             return hash;
         }
