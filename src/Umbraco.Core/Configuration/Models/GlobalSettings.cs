@@ -180,12 +180,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
         /// <summary>
-        /// Gets a value representing the time in milliseconds to lock the database for a write operation.
+        /// An int value representing the time in milliseconds to lock the database for a write operation
         /// </summary>
         /// <remarks>
         /// The default value is 5000 milliseconds.
         /// </remarks>
         [DefaultValue(StaticSqlWriteLockTimeOut)]
-        public TimeSpan SqlWriteLockTimeOut { get; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
+        public TimeSpan SqlWriteLockTimeOut { get; set; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
     }
 }
