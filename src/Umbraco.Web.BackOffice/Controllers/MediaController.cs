@@ -830,80 +830,82 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (_contentSettings.IsFileAllowedForUpload(ext))
-                {
-                    if (string.IsNullOrEmpty(mediaTypeAlias))
-                    {
-                        mediaTypeAlias = Constants.Conventions.MediaTypes.File;
-
-                        if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
-                        {
-                            // Look up MediaTypes
-                            foreach (var mediaTypeItem in allMediaTypes)
-                            {
-                                var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
-                                if (fileProperty != null)
-                                {
-                                    var dataTypeKey = fileProperty.DataTypeKey;
-                                    var dataType = _dataTypeService.GetDataType(dataTypeKey);
-
-                                    if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig)
-                                    {
-                                        var fileExtensions = fileExtensionsConfig.FileExtensions;
-                                        if (fileExtensions != null)
-                                        {
-                                            if (fileExtensions.Any(x => x.Value == ext))
-                                            {
-                                                mediaTypeAlias = mediaTypeItem.Alias;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // If media type is still File then let's check if it's an image.
-                            if (mediaTypeAlias == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
-                            {
-                                mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
-                            }
-                        }
-                        else
-                        {
-                            mediaTypeAlias = contentTypeAlias;
-                        }
-                    }
-
-                    if (allowedContentTypes.Any(x => x.Alias == mediaTypeAlias) == false)
-                    {
-                        tempFiles.Notifications.Add(new BackOfficeNotification(
-                            _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                            _localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
-                            NotificationStyle.Warning));
-                        continue;
-                    }
-
-                    var mediaItemName = fileName.ToFriendlyName();
-
-                    var createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
-
-                    await using (var stream = formFile.OpenReadStream())
-                    {
-                        createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
-                    }
-
-                    var saveResult = _mediaService.Save(createdMediaItem, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
-                    if (saveResult == false)
-                    {
-                        AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
-                    }
-                }
-                else
+                if (!_contentSettings.IsFileAllowedForUpload(ext))
                 {
                     tempFiles.Notifications.Add(new BackOfficeNotification(
                         _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
                         _localizedTextService.Localize("media", "disallowedFileType"),
                         NotificationStyle.Warning));
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(mediaTypeAlias))
+                {
+                    mediaTypeAlias = Constants.Conventions.MediaTypes.File;
+
+                    if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
+                    {
+                        // Look up MediaTypes
+                        foreach (var mediaTypeItem in allMediaTypes)
+                        {
+                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                            if (fileProperty == null)
+                            {
+                                continue;
+                            }
+
+                            var dataTypeKey = fileProperty.DataTypeKey;
+                            var dataType = _dataTypeService.GetDataType(dataTypeKey);
+
+                            if (dataType == null || dataType.Configuration is not IFileExtensionsConfig fileExtensionsConfig)
+                            {
+                                continue;
+                            }
+
+                            var fileExtensions = fileExtensionsConfig.FileExtensions;
+                            if (fileExtensions == null || fileExtensions.All(x => x.Value != ext))
+                            {
+                                continue;
+                            }
+
+                            mediaTypeAlias = mediaTypeItem.Alias;
+                            break;
+                        }
+
+                        // If media type is still File then let's check if it's an image.
+                        if (mediaTypeAlias == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
+                        {
+                            mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
+                        }
+                    }
+                    else
+                    {
+                        mediaTypeAlias = contentTypeAlias;
+                    }
+                }
+
+                if (allowedContentTypes.Any(x => x.Alias == mediaTypeAlias) == false)
+                {
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
+                        NotificationStyle.Warning));
+                    continue;
+                }
+
+                var mediaItemName = fileName.ToFriendlyName();
+
+                var createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+
+                await using (var stream = formFile.OpenReadStream())
+                {
+                    createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
+                }
+
+                var saveResult = _mediaService.Save(createdMediaItem, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                if (saveResult == false)
+                {
+                    AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
                 }
             }
 
