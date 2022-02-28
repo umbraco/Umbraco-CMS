@@ -46,7 +46,7 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
         {
             lock (_locks)
             {
-                if (_locks.AcquireReadLock(lockId))
+                if (_locks.TrAcquireReadLock(lockId))
                 {
                     _logger.LogDebug("Acquired {lockType} for id {id}", DistributedLockType.ReadLock, lockId);
                     return InMemoryDistributedLock.Read(this, lockId);
@@ -102,7 +102,7 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
         private readonly IDictionary<int, int> _readLocks = new Dictionary<int, int>();
         private readonly HashSet<int> _writeLocks = new();
 
-        public bool AcquireReadLock(int lockId)
+        public bool TrAcquireReadLock(int lockId)
         {
             if (_writeLocks.Contains(lockId))
             {

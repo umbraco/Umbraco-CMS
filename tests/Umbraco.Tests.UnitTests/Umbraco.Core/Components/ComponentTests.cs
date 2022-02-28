@@ -24,9 +24,11 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
@@ -69,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 Mock.Of<IServiceProvider>(),
                 Options.Create(new ContentSettings()));
             IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
-            var scopeProvider = new ScopeProvider(f, fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), loggerFactory, NoAppCache.Instance, eventAggregator);
+            var scopeProvider = new ScopeProvider(Mock.Of<IDistributedLockingMechanism>(),f , fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), loggerFactory, NoAppCache.Instance, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);

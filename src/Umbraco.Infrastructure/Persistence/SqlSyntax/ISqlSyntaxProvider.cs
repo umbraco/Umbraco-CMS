@@ -140,11 +140,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// </remarks>
         bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
 
-        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
-        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
-
-        void ReadLock(IDatabase db, params int[] lockIds);
-        void WriteLock(IDatabase db, params int[] lockIds);
 
         string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
 
