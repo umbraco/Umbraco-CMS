@@ -262,9 +262,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public abstract bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
 
-        public abstract void ReadLock(IDatabase db, params int[] lockIds);
-        public abstract void WriteLock(IDatabase db, params int[] lockIds);
-
         public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
 
         public virtual Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql) => sql;
@@ -275,10 +272,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
 
         public virtual IDictionary<Type, IScalarMapper> ScalarMappers => null;
-
-        public abstract void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
-
-        public abstract void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
         public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 
