@@ -81,8 +81,8 @@ namespace Umbraco.Cms.Core.Routing
                         nodeContextId: domainContentId,
                         getPath: nodeid =>
                         {
-                            IEntitySlim ent = entityService.Get(nodeid);
-                            return ent.Path.Split(',').Reverse();
+                            IEntitySlim? ent = entityService.Get(nodeid);
+                            return ent?.Path.Split(',').Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 

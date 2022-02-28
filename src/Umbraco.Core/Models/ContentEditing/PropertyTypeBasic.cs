@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "label")]
         [Required]
-        public string? Label { get; set; }
+        public string Label { get; set; } = null!;
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }

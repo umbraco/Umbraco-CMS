@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dtos.Select(x => DtoToEntity(x));
         }
 
-        public IEnumerable<IRelationType>? GetMany(params Guid[]? ids)
+        public IEnumerable<IRelationType> GetMany(params Guid[]? ids)
         {
             // should not happen due to the cache policy
             if (ids?.Any() ?? false)

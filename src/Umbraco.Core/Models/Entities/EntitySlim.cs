@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         public int ParentId { get; set; }
 
         /// <inheritdoc />
-        public void SetParent(ITreeEntity parent) => throw new InvalidOperationException("This property won't be implemented.");
+        public void SetParent(ITreeEntity? parent) => throw new InvalidOperationException("This property won't be implemented.");
 
         /// <inheritdoc />
         [DataMember]

@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Core.Routing
             // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
             alias = alias.Replace(" ", string.Empty);
 
-            ITemplate model = _fileService.GetTemplate(alias);
+            ITemplate? model = _fileService.GetTemplate(alias);
             if (model == null)
             {
                 return false;

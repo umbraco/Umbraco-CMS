@@ -77,11 +77,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             //NOTE: This is N+1, BUT ALL relation types are cached so shouldn't matter
 
-            return dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).ToList();
+            return dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).WhereNotNull().ToList();
         }
 
-        private static IRelation DtoToEntity(RelationDto dto, IRelationType? relationType)
+        private static IRelation? DtoToEntity(RelationDto dto, IRelationType? relationType)
         {
+            if (relationType is null)
+            {
+                return null;
+            }
             var entity = RelationFactory.BuildEntity(dto, relationType);
 
             // reset dirty initial properties (U4-1946)
@@ -279,7 +283,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering)
+        public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering)
         {
             var sql = GetBaseQuery(false);
 
@@ -305,7 +309,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (relTypes is null || !relTypes.TryGetValue(r.RelationType, out var relType))
                     throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", r.RelationType));
                 return DtoToEntity(r, relType);
-            }).ToList();
+            }).WhereNotNull().ToList();
 
             return result;
         }

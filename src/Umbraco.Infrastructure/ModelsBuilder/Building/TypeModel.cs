@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// <summary>
         /// Gets the name of the content type.
         /// </summary>
-        public string Name= string.Empty;
+        public string? Name;
 
         /// <summary>
         /// Gets the description of the content type.

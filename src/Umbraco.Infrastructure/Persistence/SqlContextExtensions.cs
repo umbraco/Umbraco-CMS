@@ -83,7 +83,7 @@ namespace Umbraco.Extensions
         /// <param name="sqlContext">An <see cref="ISqlContext"/>.</param>
         /// <param name="expression">An expression to visit.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitModel<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object>> expression)
+        public static (string Sql, object[] Args) VisitModel<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object?>> expression)
         {
             var visitor = new ModelToSqlExpressionVisitor<TModel>(sqlContext.SqlSyntax, sqlContext.Mappers);
             var visited = visitor.Visit(expression);
@@ -97,7 +97,7 @@ namespace Umbraco.Extensions
         /// <param name="sqlContext">An <see cref="ISqlContext"/>.</param>
         /// <param name="field">An expression to visit, representing a field.</param>
         /// <returns>The name of the field.</returns>
-        public static string VisitModelField<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object>> field)
+        public static string VisitModelField<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object?>> field)
         {
             var (sql, _) = sqlContext.VisitModel(field);
 

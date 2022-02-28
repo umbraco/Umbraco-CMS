@@ -12,11 +12,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
     {
         private readonly Sql<ISqlContext> _sql;
 
-        public SqlTranslator(Sql<ISqlContext> sql, IQuery<T> query)
+        public SqlTranslator(Sql<ISqlContext> sql, IQuery<T>? query)
         {
             _sql = sql ?? throw new ArgumentNullException(nameof(sql));
-            foreach (var clause in query.GetWhereClauses())
-                _sql.Where(clause.Item1, clause.Item2);
+            if (query is not null)
+            {
+                foreach (var clause in query.GetWhereClauses())
+                    _sql.Where(clause.Item1, clause.Item2);
+            }
         }
 
         public Sql<ISqlContext> Translate()

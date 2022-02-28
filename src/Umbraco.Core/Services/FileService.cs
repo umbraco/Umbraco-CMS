@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetStylesheetFileContentStream(string filepath)
+        public Stream? GetStylesheetFileContentStream(string filepath)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -264,7 +264,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetScriptFileContentStream(string filepath)
+        public Stream? GetScriptFileContentStream(string filepath)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -393,11 +393,11 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
+        public IEnumerable<ITemplate>? GetTemplates(params string[] aliases)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
+                return _templateRepository.GetAll(aliases)?.OrderBy(x => x.Name);
             }
         }
 
@@ -405,11 +405,11 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
+        public IEnumerable<ITemplate>? GetTemplates(int masterTemplateId)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
+                return _templateRepository.GetChildren(masterTemplateId)?.OrderBy(x => x.Name);
             }
         }
 
@@ -418,7 +418,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
-        public ITemplate GetTemplate(string? alias)
+        public ITemplate? GetTemplate(string? alias)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -448,8 +448,8 @@ namespace Umbraco.Cms.Core.Services
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                IQuery<ITemplate> query = Query<ITemplate>().Where(x => x.Key == id);
-                return _templateRepository.Get(query).SingleOrDefault();
+                IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
+                return _templateRepository.Get(query)?.SingleOrDefault();
             }
         }
 
@@ -542,7 +542,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                ITemplate template = _templateRepository.Get(alias);
+                ITemplate? template = _templateRepository.Get(alias);
                 if (template == null)
                 {
                     scope.Complete();
@@ -578,7 +578,7 @@ namespace Umbraco.Cms.Core.Services
                 fileName = $"{fileName}.cshtml";
             }
 
-            Stream fs = _templateRepository.GetFileContentStream(fileName);
+            Stream? fs = _templateRepository.GetFileContentStream(fileName);
             if (fs == null)
             {
                 return null;
@@ -591,7 +591,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetTemplateFileContentStream(string filepath)
+        public Stream? GetTemplateFileContentStream(string filepath)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -873,7 +873,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetPartialViewFileContentStream(string filepath)
+        public Stream? GetPartialViewFileContentStream(string filepath)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -901,7 +901,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetPartialViewMacroFileContentStream(string filepath)
+        public Stream? GetPartialViewMacroFileContentStream(string filepath)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {

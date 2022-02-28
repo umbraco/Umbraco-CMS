@@ -1000,7 +1000,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _contentByGuidReadRepository.Get(id);
         }
 
-        IEnumerable<IContent>? IReadRepository<Guid, IContent>.GetMany(params Guid[]? ids)
+        IEnumerable<IContent> IReadRepository<Guid, IContent>.GetMany(params Guid[]? ids)
         {
             return _contentByGuidReadRepository.GetMany(ids);
         }
@@ -1612,9 +1612,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
         }
 
-        protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
         {
-            return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id)!;
+            return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
         }
 
         private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get("Umbraco.Core.DomainRepository.EnsureVariantNamesAreUnique", tsql => tsql

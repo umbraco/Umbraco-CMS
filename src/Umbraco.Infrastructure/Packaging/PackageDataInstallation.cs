@@ -569,7 +569,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 if (alias is not null && importedContentTypes.ContainsKey(alias) == false)
                 {
-                    T contentType = service.Get(alias);
+                    T? contentType = service.Get(alias);
 
                     importedContentTypes.Add(alias, contentType == null
                         ? CreateContentTypeFromXml(documentType, importedContentTypes, service)
@@ -827,7 +827,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             if (masterElement != null)
             {
                 var masterAlias = masterElement.Value;
-                T parent = importedContentTypes.ContainsKey(masterAlias)
+                T? parent = importedContentTypes.ContainsKey(masterAlias)
                     ? importedContentTypes[masterAlias]
                     : service.Get(masterAlias);
 
@@ -1520,7 +1520,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var macroKey = Guid.Parse(macroElement.Element("key")!.Value);
             var macroName = macroElement.Element("name")?.Value;
             var macroAlias = macroElement.Element("alias")!.Value;
-            var macroSource = macroElement.Element("macroSource")?.Value;
+            var macroSource = macroElement.Element("macroSource")!.Value;
 
             //Following xml elements are treated as nullable properties
             var useInEditorElement = macroElement.Element("useInEditor");

@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>The target object.</returns>
-        public TTarget? Map<TTarget>(object source, MapperContext context)
+        public TTarget? Map<TTarget>(object? source, MapperContext context)
             => Map<TTarget>(source, source?.GetType(), context);
 
         /// <summary>

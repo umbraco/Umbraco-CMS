@@ -877,7 +877,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Utilities
 
-        protected virtual string? EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        protected virtual string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))

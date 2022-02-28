@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             { }
 
             /// <inheritdoc />
-            public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 var value = editorValue?.Value?.ToString();
 

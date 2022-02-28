@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        private IContentBase GetPreviousVersion(int contentId)
+        private IContentBase? GetPreviousVersion(int contentId)
         {
             // Regarding this: http://issues.umbraco.org/issue/U4-5180
             // we know they are descending from the service so we know that newest is first
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Services
             var paths = entitiesL.Select(x => x.Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
 
             // lazily get versions
-            var prevVersionDictionary = new Dictionary<int, IContentBase>();
+            var prevVersionDictionary = new Dictionary<int, IContentBase?>();
 
             // see notes above
             var id = Cms.Core.Constants.Security.SuperUserId;
@@ -95,8 +95,8 @@ namespace Umbraco.Cms.Core.Services
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Cms.Core.Constants.ObjectTypes.Document).ToList();
-                if (notifications.Count == 0) break;
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Cms.Core.Constants.ObjectTypes.Document)?.ToList();
+                if (notifications is null || notifications.Count == 0) break;
 
                 var i = 0;
                 foreach (var user in users)
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.Services
             } while (id > 0);
         }
 
-        private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
+        private IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public IEnumerable<Notification> GetUserNotifications(IUser user)
+        public IEnumerable<Notification>? GetUserNotifications(IUser user)
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
@@ -167,7 +167,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// Notifications are inherited from the parent so any child node will also have notifications assigned based on it's parent (ancestors)
         /// </remarks>
-        public IEnumerable<Notification> GetUserNotifications(IUser user, string path)
+        public IEnumerable<Notification>? GetUserNotifications(IUser user, string path)
         {
             var userNotifications = GetUserNotifications(user);
             return FilterUserNotificationsByPath(userNotifications, path);
@@ -179,17 +179,17 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userNotifications"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
+        public IEnumerable<Notification>? FilterUserNotificationsByPath(IEnumerable<Notification>? userNotifications, string path)
         {
             var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
-            return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
+            return userNotifications?.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 
         /// <summary>
         /// Deletes notifications by entity
         /// </summary>
         /// <param name="entity"></param>
-        public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
+        public IEnumerable<Notification>? GetEntityNotifications(IEntity entity)
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
@@ -286,7 +286,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="siteUri"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IContentBase oldDoc,
+        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IContentBase? oldDoc,
             string? actionName,
             Uri siteUri,
             Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
@@ -318,7 +318,7 @@ namespace Umbraco.Cms.Core.Services
                         var oldText = newText;
 
                         // check if something was changed and display the changes otherwise display the fields
-                        if (oldDoc.Properties.Contains(p.PropertyType.Alias))
+                        if (oldDoc?.Properties.Contains(p.PropertyType.Alias) ?? false)
                         {
                             var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
                             oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : "";

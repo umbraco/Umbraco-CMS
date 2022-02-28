@@ -262,7 +262,7 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
                 PublishedItemType.Content => _contentTypeService.Get(alias),
                 PublishedItemType.Media => _mediaTypeService.Get(alias),

@@ -41,8 +41,8 @@ namespace Umbraco.Cms.Core.Security
         private DateTime? _lastPasswordChangeDateUtc;
         private ObservableCollection<IIdentityUserLogin>? _logins;
         private ObservableCollection<IIdentityUserToken>? _tokens;
-        private Lazy<IEnumerable<IIdentityUserLogin>>? _getLogins;
-        private Lazy<IEnumerable<IIdentityUserToken>>? _getTokens;
+        private Lazy<IEnumerable<IIdentityUserLogin>?>? _getLogins;
+        private Lazy<IEnumerable<IIdentityUserToken>?>? _getTokens;
         private ObservableCollection<IdentityUserRole<string>> _roles;
 
         /// <summary>
@@ -54,6 +54,7 @@ namespace Umbraco.Cms.Core.Security
             _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += Roles_CollectionChanged;
             Claims = new List<IdentityUserClaim<string>>();
+            _name = string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged
@@ -180,7 +181,7 @@ namespace Umbraco.Cms.Core.Security
                 // if the callback is there and hasn't been created yet then execute it and populate the logins
                 if (_getLogins != null && !_getLogins.IsValueCreated)
                 {
-                    foreach (IIdentityUserLogin l in _getLogins.Value)
+                    foreach (IIdentityUserLogin l in _getLogins.Value!)
                     {
                         _logins.Add(l);
                     }
@@ -210,9 +211,9 @@ namespace Umbraco.Cms.Core.Security
 
                 // if the callback is there and hasn't been created yet then execute it and populate the logins
                // if (_getTokens != null && !_getTokens.IsValueCreated)
-                    if (_getTokens?.IsValueCreated != true)
+                if (_getTokens?.IsValueCreated != true)
                 {
-                    if (_getTokens is not null)
+                    if (_getTokens is not null && _getTokens.Value is not null)
                     {
                         foreach (IIdentityUserToken l in _getTokens.Value)
                         {
@@ -353,13 +354,13 @@ namespace Umbraco.Cms.Core.Security
         /// Used to set a lazy call back to populate the user's Login list
         /// </summary>
         /// <param name="callback">The lazy value</param>
-        internal void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback) => _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
+        internal void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>?>? callback) => _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's token list
         /// </summary>
         /// <param name="callback">The lazy value</param>
-        internal void SetTokensCallback(Lazy<IEnumerable<IIdentityUserToken>> callback) => _getTokens = callback ?? throw new ArgumentNullException(nameof(callback));
+        internal void SetTokensCallback(Lazy<IEnumerable<IIdentityUserToken>?> ?callback) => _getTokens = callback ?? throw new ArgumentNullException(nameof(callback));
 
         private void Logins_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Logins));
 

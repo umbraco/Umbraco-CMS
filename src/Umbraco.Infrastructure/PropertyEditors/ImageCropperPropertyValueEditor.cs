@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <para>editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
         /// it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.</para>
         /// </remarks>
-        public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             // Get the current path
             var currentPath = string.Empty;

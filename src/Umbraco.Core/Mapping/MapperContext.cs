@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        public TTarget? Map<TTarget>(object source)
+        public TTarget? Map<TTarget>(object? source)
             => _mapper.Map<TTarget>(source, this);
 
         // let's say this is a bad (dangerous) idea, and leave it out for now
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
         /// <param name="source">The source objects.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
         {
             return source.Select(Map<TSourceElement, TTargetElement>).ToList();
         }

@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken> query)
+        public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken>? query)
         {
             Sql<ISqlContext> sqlClause = GetBaseTokenQuery(false);
 

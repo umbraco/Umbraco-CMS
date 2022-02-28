@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
-        public int GetCountByQuery(IQuery<IMember> query)
+        public int GetCountByQuery(IQuery<IMember>? query)
         {
             Sql<ISqlContext> sqlWithProps = GetNodeIdQueryWithPropertyData();
             var translator = new SqlTranslator<IMember>(sqlWithProps, query);

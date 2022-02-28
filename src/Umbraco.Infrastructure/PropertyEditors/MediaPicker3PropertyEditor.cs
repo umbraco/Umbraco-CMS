@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return dtos;
             }
 
-            public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value is JArray dtos)
                 {

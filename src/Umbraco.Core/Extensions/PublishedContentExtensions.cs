@@ -1346,7 +1346,7 @@ namespace Umbraco.Extensions
         {
             var type = contentTypeService.Get(alias)
                        ?? mediaTypeService.Get(alias)
-                       ?? (IContentTypeBase)memberTypeService.Get(alias);
+                       ?? (IContentTypeBase?)memberTypeService.Get(alias);
             var fields = GetAliasesAndNames(type);
 
             // ensure the standard fields are there
@@ -1370,7 +1370,7 @@ namespace Umbraco.Extensions
             return fields;
         }
 
-        private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType) => contentType.PropertyTypes.Where(x => x.Alias is not null && x.Name is not null).ToDictionary(x => x.Alias!, x => x.Name!);
+        private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase? contentType) => contentType?.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name) ?? new Dictionary<string, string>();
 
         #endregion
     }

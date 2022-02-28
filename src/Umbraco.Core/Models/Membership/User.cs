@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));

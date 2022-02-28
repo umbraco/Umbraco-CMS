@@ -52,14 +52,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="key">Key of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        IDictionaryItem GetDictionaryItemByKey(string key);
+        IDictionaryItem? GetDictionaryItemByKey(string key);
 
         /// <summary>
         /// Gets a list of children for a <see cref="IDictionaryItem"/>
         /// </summary>
         /// <param name="parentId">Id of the parent</param>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId);
+        IEnumerable<IDictionaryItem>? GetDictionaryItemChildren(Guid parentId);
 
         /// <summary>
         /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the root/top <see cref="IDictionaryItem"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        IEnumerable<IDictionaryItem> GetRootDictionaryItems();
+        IEnumerable<IDictionaryItem>? GetRootDictionaryItems();
 
         /// <summary>
         /// Checks if a <see cref="IDictionaryItem"/> with given key exists
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// <para>This can be optimized and bypass all deep cloning.</para>
         /// </remarks>
-        string GetLanguageIsoCodeById(int id);
+        string? GetLanguageIsoCodeById(int id);
 
         /// <summary>
         /// Gets the default language ISO code.

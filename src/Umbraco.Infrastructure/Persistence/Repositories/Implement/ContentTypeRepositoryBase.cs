@@ -1413,9 +1413,9 @@ AND umbracoNode.id <> @id",
         /// <remarks>
         /// Ensure explicit implementation, we don't want to have any accidental calls to this since it is essentially the same signature as the main GetAll when there are no parameters
         /// </remarks>
-        IEnumerable<TEntity>? IReadRepository<Guid, TEntity>.GetMany(params Guid[]? ids)
+        IEnumerable<TEntity> IReadRepository<Guid, TEntity>.GetMany(params Guid[]? ids)
         {
-            return PerformGetAll(ids);
+            return PerformGetAll(ids) ?? Enumerable.Empty<TEntity>();
         }
 
         /// <summary>

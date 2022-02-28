@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
 {
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                     return _fileService.GetTemplate(xElement.Value);
                 })
-                .Where(v => v != null);
+                .WhereNotNull();
         }
 
         public IEnumerable<IMacro?>? FindConflictingMacros(IEnumerable<XElement>? macroNodes)

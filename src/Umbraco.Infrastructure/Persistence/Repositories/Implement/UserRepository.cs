@@ -660,7 +660,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         #region Implementation of IUserRepository
 
-        public int GetCountByQuery(IQuery<IUser> query)
+        public int GetCountByQuery(IQuery<IUser>? query)
         {
             var sqlClause = GetBaseQuery("umbracoUser.id");
             var translator = new SqlTranslator<IUser>(sqlClause, query);

@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAwaiter().GetResult().Text));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)!).GetAwaiter().GetResult().Text));
 
                 return sb.ToString();
             }

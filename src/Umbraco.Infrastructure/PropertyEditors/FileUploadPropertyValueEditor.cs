@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Other places (FileUploadPropertyEditor...) do NOT deal with multiple files, and our logic for reusing
         /// folders would NOT work, etc.</para>
         /// </remarks>
-        public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             var currentPath = currentValue as string;
             if (!currentPath.IsNullOrWhiteSpace())

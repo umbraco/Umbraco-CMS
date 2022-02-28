@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        int GetCountByQuery(IQuery<IUser> query);
+        int GetCountByQuery(IQuery<IUser>? query);
 
         /// <summary>
         /// Checks if a user with the username exists

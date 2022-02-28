@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityById(int id)
+        public TaggedEntity? GetTaggedEntityById(int id)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityByKey(Guid key)
+        public TaggedEntity? GetTaggedEntityByKey(Guid key)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {

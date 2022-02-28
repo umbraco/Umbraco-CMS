@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            IUser user = _userService.GetByUsername(userName);
+            IUser? user = _userService.GetByUsername(userName);
             if (user == null)
             {
                 return Task.FromResult((BackOfficeIdentityUser)null!);
@@ -350,8 +350,8 @@ namespace Umbraco.Cms.Core.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
-            if (logins.Count == 0)
+            var logins = _externalLoginService.Find(loginProvider, providerKey)?.ToList();
+            if (logins is null || logins.Count == 0)
             {
                 return Task.FromResult((IdentityUserLogin<string>)null!);
             }
@@ -422,8 +422,8 @@ namespace Umbraco.Cms.Core.Security
             if (user != null)
             {
                 var userId = UserIdToInt(user.Id).ToGuid();
-                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(userId)));
-                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(userId)));
+                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(userId)));
+                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(userId)));
             }
 
             return user;

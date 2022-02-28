@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
-        public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             var json = editorValue.Value as JArray;
             if (json == null || json.HasValues == false)

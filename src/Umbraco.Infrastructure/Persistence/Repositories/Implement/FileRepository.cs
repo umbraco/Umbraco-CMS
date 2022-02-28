@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public abstract IEnumerable<TEntity> GetMany(params TId[]? ids);
 
-        public virtual bool Exists(TId id) => FileSystem?.FileExists(id!.ToString()) ?? false;
+        public virtual bool Exists(TId id) => FileSystem?.FileExists(id!.ToString()!) ?? false;
 
         #endregion
 
@@ -180,7 +180,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected string? GetFileContent(string? filename)
         {
-            if (FileSystem?.FileExists(filename) == false)
+            if (filename is null || FileSystem?.FileExists(filename) == false)
             {
                 return null;
             }

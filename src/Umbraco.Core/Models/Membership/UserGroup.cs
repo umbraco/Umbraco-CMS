@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         private int? _startMediaId;
         private string _alias;
         private string? _icon;
-        private string? _name;
+        private string _name;
         private IEnumerable<string>? _permissions;
         private List<string> _sectionCollection;
 
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         {
             UserCount = userCount;
             _alias = alias ?? string.Empty;
-            _name = name;
+            _name = name ?? string.Empty;
             _permissions = permissions;
             _icon = icon;
         }
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         public string? Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         /// <summary>

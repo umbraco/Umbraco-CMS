@@ -409,7 +409,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _mediaByGuidReadRepository.Get(id);
         }
 
-        IEnumerable<IMedia>? IReadRepository<Guid, IMedia>.GetMany(params Guid[]? ids)
+        IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetMany(params Guid[]? ids)
         {
             return _mediaByGuidReadRepository.GetMany(ids);
         }

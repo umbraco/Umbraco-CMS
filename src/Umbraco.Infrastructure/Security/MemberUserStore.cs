@@ -267,7 +267,7 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            IMember user = _memberService.GetByUsername(userName);
+            IMember? user = _memberService.GetByUsername(userName);
             if (user == null)
             {
                 return Task.FromResult((MemberIdentityUser)null!);
@@ -435,8 +435,8 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(providerKey));
             }
 
-            var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
-            if (logins.Count == 0)
+            var logins = _externalLoginService.Find(loginProvider, providerKey)?.ToList();
+            if (logins is null || logins.Count == 0)
             {
                 return Task.FromResult((IdentityUserLogin<string>)null!);
             }
@@ -494,7 +494,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Lists all users of a given role.
         /// </summary>
-        public override Task<IList<MemberIdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
+        public override Task<IList<MemberIdentityUser>?> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -504,9 +504,9 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(roleName));
             }
 
-            IEnumerable<IMember> members = _memberService.GetMembersByMemberType(roleName);
+            IEnumerable<IMember>? members = _memberService.GetMembersByMemberType(roleName);
 
-            IList<MemberIdentityUser> membersIdentityUsers = members.Select(x => _mapper.Map<MemberIdentityUser>(x)!).ToList();
+            IList<MemberIdentityUser>? membersIdentityUsers = members?.Select(x => _mapper.Map<MemberIdentityUser>(x)!).ToList();
 
             return Task.FromResult(membersIdentityUsers);
         }
@@ -549,8 +549,8 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user != null)
             {
-                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(user.Key)));
-                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
+                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
+                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
             }
 
             return user;
@@ -687,7 +687,7 @@ namespace Umbraco.Cms.Core.Security
                 return null;
             }
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-            return publishedSnapshot.Members.Get(member);
+            return publishedSnapshot.Members?.Get(member);
         }
 
         private enum MemberDataChangeType

@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        int GetCountByQuery(IQuery<IMember> query);
+        int GetCountByQuery(IQuery<IMember>? query);
 
         /// <summary>
         /// Sets a members last login date based on their username

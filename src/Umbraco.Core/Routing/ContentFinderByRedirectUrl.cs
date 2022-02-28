@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Routing
                 ? frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded)
                 : frequest.AbsolutePathDecoded;
 
-            IRedirectUrl redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture);
+            IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture);
 
             if (redirectUrl == null)
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Routing
                 return false;
             }
 
-            IPublishedContent? content = umbracoContext?.Content.GetById(redirectUrl.ContentId);
+            IPublishedContent? content = umbracoContext.Content.GetById(redirectUrl.ContentId);
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {

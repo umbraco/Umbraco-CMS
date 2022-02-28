@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Notifications
     {
         public static T WithState<T>(this T notification, IDictionary<string, object>? state) where T : IStatefulNotification
         {
-            notification.State = state;
+            notification.State = state!;
             return notification;
         }
 

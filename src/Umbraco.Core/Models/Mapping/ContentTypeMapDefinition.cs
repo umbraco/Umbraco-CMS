@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             mapper.Define<PropertyTypeBasic, IPropertyType>(
                 (source, context) =>
                 {
-                    IDataType dataType = _dataTypeService.GetDataType(source.DataTypeId);
+                    IDataType? dataType = _dataTypeService.GetDataType(source.DataTypeId);
                     if (dataType == null)
                     {
                         throw new NullReferenceException("No data type found with id " + source.DataTypeId);
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.AllowedTemplates = source.AllowedTemplates?
                 .Where(x => x != null)
                 .Select(_fileService.GetTemplate)
-                .Where(x => x != null)
+                .WhereNotNull()
                 .ToArray();
 
             target.SetDefaultTemplate(source.DefaultTemplate == null
@@ -201,7 +201,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             //sync templates
             if (source.AllowedTemplates is not null)
             {
-                target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
+                target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates).WhereNotNull();
             }
 
             if (source.DefaultTemplate != null)
@@ -351,11 +351,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             //if the dest is set and it's the same as the source, then don't change
             if (source.AllowedTemplates is not null && destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
             {
-                IEnumerable<ITemplate> templates = _fileService.GetTemplates(source.AllowedTemplates.ToArray());
+                IEnumerable<ITemplate>? templates = _fileService.GetTemplates(source.AllowedTemplates.ToArray());
                 target.AllowedTemplates = source.AllowedTemplates
                     .Select(x =>
                     {
-                        ITemplate? template = templates.SingleOrDefault(t => t.Alias == x);
+                        ITemplate? template = templates?.SingleOrDefault(t => t.Alias == x);
                         return template != null
                             ? context.Map<EntityBasic>(template)
                             : null;
@@ -369,7 +369,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 //if the dest is set and it's the same as the source, then don't change
                 if (target.DefaultTemplate == null || source.DefaultTemplate != target.DefaultTemplate.Alias)
                 {
-                    ITemplate template = _fileService.GetTemplate(source.DefaultTemplate);
+                    ITemplate? template = _fileService.GetTemplate(source.DefaultTemplate);
                     target.DefaultTemplate = template == null ? null : context.Map<EntityBasic>(template);
                 }
             }
@@ -436,7 +436,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Name = source.Name;
             target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
-            target.Properties = context.MapEnumerable<PropertyTypeBasic, PropertyTypeDisplay>(source.Properties);
+            target.Properties = context.MapEnumerable<PropertyTypeBasic, PropertyTypeDisplay>(source.Properties).WhereNotNull();
         }
 
         // Umbraco.Code.MapAll -ContentTypeId -ParentTabContentTypes -ParentTabContentTypeNames
@@ -455,7 +455,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
             target.Properties =
-                context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
+                context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties).WhereNotNull();
         }
 
         // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
@@ -560,12 +560,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (PropertyGroupBasic<TSourcePropertyType> sourceGroup in sourceGroups)
             {
                 // get the dest group
-                PropertyGroup destGroup = MapSaveGroup(sourceGroup, destOrigGroups, context);
+                PropertyGroup? destGroup = MapSaveGroup(sourceGroup, destOrigGroups, context);
 
                 // handle local properties
                 IPropertyType[] destProperties = sourceGroup.Properties
                     .Where(x => x.Inherited == false)
                     .Select(x => MapSaveProperty(x, destOrigProperties, context))
+                    .WhereNotNull()
                     .ToArray();
 
                 // if the group has no local properties and is not used as parent, skip it, ie sort-of garbage-collect
@@ -577,8 +578,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 // ensure no duplicate alias, then assign the group properties collection
                 EnsureUniqueAliases(destProperties);
-                destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
-                destGroups.Add(destGroup);
+                if (destGroup is not null)
+                {
+                    destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                    destGroups.Add(destGroup);
+                }
             }
 
             // ensure no duplicate name, then assign the groups collection
@@ -597,6 +601,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 IPropertyType[] destProperties = genericPropertiesGroup.Properties
                     .Where(x => x.Inherited == false)
                     .Select(x => MapSaveProperty(x, destOrigProperties, context))
+                    .WhereNotNull()
                     .ToArray();
 
                 // ensure no duplicate alias, then assign the generic properties collection
@@ -691,7 +696,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Groups =
                 context
                     .MapEnumerable<PropertyGroupBasic<TSourcePropertyType>, PropertyGroupDisplay<TTargetPropertyType>>(
-                        source.Groups);
+                        source.Groups).WhereNotNull();
         }
 
         private IEnumerable<string> MapLockedCompositions(IContentTypeComposition source)
@@ -755,7 +760,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return Udi.Create(udiType, source.Key);
         }
 
-        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup,
+        private static PropertyGroup? MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup,
             IEnumerable<PropertyGroup> destOrigGroups, MapperContext context)
             where TPropertyType : PropertyTypeBasic
         {
@@ -782,7 +787,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return destGroup;
         }
 
-        private static IPropertyType MapSaveProperty(PropertyTypeBasic sourceProperty,
+        private static IPropertyType? MapSaveProperty(PropertyTypeBasic sourceProperty,
             IEnumerable<IPropertyType> destOrigProperties, MapperContext context)
         {
             IPropertyType? destProperty;
@@ -835,7 +840,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         }
 
         private static void MapComposition(ContentTypeSave source, IContentTypeComposition target,
-            Func<string, IContentTypeComposition> getContentType)
+            Func<string, IContentTypeComposition?> getContentType)
         {
             var current = target.CompositionAliases().ToArray();
             IEnumerable<string> proposed = source.CompositeContentTypes;
@@ -851,7 +856,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var alias in add)
             {
                 // TODO: Remove N+1 lookup
-                IContentTypeComposition contentType = getContentType(alias);
+                IContentTypeComposition? contentType = getContentType(alias);
                 if (contentType != null)
                 {
                     target.AddContentType(contentType);

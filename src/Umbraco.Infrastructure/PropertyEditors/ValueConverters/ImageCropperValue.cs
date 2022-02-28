@@ -309,7 +309,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public class ImageCropperCrop : IEquatable<ImageCropperCrop>
         {
             [DataMember(Name = "alias")]
-            public string Alias { get; set; } = string.Empty;
+            public string? Alias { get; set; }
 
             [DataMember(Name = "width")]
             public int Width { get; set; }

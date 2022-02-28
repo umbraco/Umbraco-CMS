@@ -126,8 +126,12 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="contentType">The content type to add.</param>
         /// <returns>True if the content type was added, otherwise false.</returns>
-        public bool AddContentType(IContentTypeComposition contentType)
+        public bool AddContentType(IContentTypeComposition? contentType)
         {
+            if (contentType is null)
+            {
+                return false;
+            }
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
                 return false;
 

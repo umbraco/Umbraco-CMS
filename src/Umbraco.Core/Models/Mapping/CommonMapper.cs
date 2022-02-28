@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return profile == null ? null : context.Map<IProfile, UserProfile>(profile);
         }
 
-        public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
+        public ContentTypeBasic? GetContentType(IContentBase source, MapperContext context)
         {
             var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
             var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);

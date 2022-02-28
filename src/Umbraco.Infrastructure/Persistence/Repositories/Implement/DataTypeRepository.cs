@@ -318,7 +318,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
         }
 
-        private string? EnsureUniqueNodeName(string nodeName, int id = 0)
+        private string? EnsureUniqueNodeName(string? nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))

@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <remarks>
             /// We will also check the pre-values here, if there are more items than what is allowed we'll just trim the end
             /// </remarks>
-            public override object? FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 var asArray = editorValue.Value as JArray;
                 if (asArray == null || asArray.HasValues == false)

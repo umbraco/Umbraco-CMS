@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var properties = _propertyEditors
                 .Where(x => !x.IsDeprecated || _contentSettings.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name);
-            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties);
+            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties).WhereNotNull();
         }
 
         private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, MapperContext context)
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configurationEditor = editor!.GetConfigurationEditor();
-            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
+            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields).WhereNotNull().ToList();
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
             MapConfigurationFields(dataType, fields, configurationDictionary);
@@ -201,7 +201,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var configurationEditor = source.GetConfigurationEditor();
 
-            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
+            var fields =
+                context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields).WhereNotNull().ToList();
 
             var defaultConfiguration = configurationEditor.DefaultConfiguration;
             if (defaultConfiguration != null)

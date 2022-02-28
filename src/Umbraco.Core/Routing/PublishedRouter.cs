@@ -639,7 +639,7 @@ namespace Umbraco.Cms.Core.Routing
                     altTemplate))
                 {
                     // allowed, use
-                    ITemplate template = _fileService.GetTemplate(altTemplate);
+                    ITemplate? template = _fileService.GetTemplate(altTemplate);
 
                     if (template != null)
                     {

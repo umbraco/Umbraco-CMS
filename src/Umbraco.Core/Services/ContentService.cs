@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Services
         // lazy-constructed because when the ctor runs, the query factory may not be ready
 
         private IQuery<IContent> QueryNotTrashed =>
-            _queryNotTrashed ?? (_queryNotTrashed = Query<IContent>().Where(x => x.Trashed == false));
+            _queryNotTrashed ??= Query<IContent>().Where(x => x.Trashed == false);
 
         #endregion
 
@@ -561,7 +561,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetPage(
-                    Query<IContent>().Where(x => x.ContentTypeId == contentTypeId),
+                    Query<IContent>()?.Where(x => x.ContentTypeId == contentTypeId),
                     pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
@@ -589,7 +589,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetPage(
-                    Query<IContent>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                    Query<IContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
                     pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
@@ -605,7 +605,7 @@ namespace Umbraco.Cms.Core.Services
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                IQuery<IContent> query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
+                IQuery<IContent>? query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
                 return _documentRepository.Get(query);
             }
         }
@@ -713,7 +713,7 @@ namespace Umbraco.Cms.Core.Services
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
+                IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
                 return _documentRepository.Get(query)?.OrderBy(x => x.SortOrder);
             }
         }
@@ -741,7 +741,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
 
-                IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == id);
+                IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
                 return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
@@ -778,12 +778,12 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private IQuery<IContent> GetPagedDescendantQuery(string contentPath)
+        private IQuery<IContent>? GetPagedDescendantQuery(string contentPath)
         {
-            IQuery<IContent> query = Query<IContent>();
+            IQuery<IContent>? query = Query<IContent>();
             if (!contentPath.IsNullOrWhiteSpace())
             {
-                query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
+                query?.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
             }
 
             return query;
@@ -848,7 +848,7 @@ namespace Umbraco.Cms.Core.Services
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
+                IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
                 return _documentRepository.Get(query);
             }
         }
@@ -901,7 +901,7 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 scope.ReadLock(Constants.Locks.ContentTree);
-                IQuery<IContent> query = Query<IContent>()
+                IQuery<IContent>? query = Query<IContent>()?
                     .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
                 return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
@@ -2513,7 +2513,7 @@ namespace Umbraco.Cms.Core.Services
                     : parent.Path) + "," + content.Id;
 
             const int pageSize = 500;
-            IQuery<IContent> query = GetPagedDescendantQuery(originalPath);
+            IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
             long total;
             do
             {
@@ -2557,7 +2557,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.ContentTree);
 
                 // emptying the recycle bin means deleting whatever is in there - do it properly!
-                IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
+                IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
                 IContent[]? contents = _documentRepository.Get(query)?.ToArray();
 
                 var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);

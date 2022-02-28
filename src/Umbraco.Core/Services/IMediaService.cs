@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a collection of <see cref="IMedia"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetRootMedia();
+        IEnumerable<IMedia>? GetRootMedia();
 
         /// <summary>
         /// Gets a collection of an <see cref="IMedia"/> objects, which resides in the Recycle Bin
@@ -219,14 +219,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="level">The level to retrieve Media from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetByLevel(int level);
+        IEnumerable<IMedia>? GetByLevel(int level);
 
         /// <summary>
         /// Gets a specific version of an <see cref="IMedia"/> item.
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        IMedia GetVersion(int versionId);
+        IMedia? GetVersion(int versionId);
 
         /// <summary>
         /// Gets a collection of an <see cref="IMedia"/> objects versions by Id
@@ -264,7 +264,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="mediaPath">Path of the media item to retrieve (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia GetMediaByPath(string mediaPath);
+        IMedia? GetMediaByPath(string mediaPath);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.

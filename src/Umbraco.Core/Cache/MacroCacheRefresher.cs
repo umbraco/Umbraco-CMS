@@ -46,15 +46,18 @@ namespace Umbraco.Cms.Core.Cache
         {
             var payloads = Deserialize(json);
 
-            foreach (var payload in payloads)
+            if (payloads is not null)
             {
-                foreach (var alias in GetCacheKeysForAlias(payload.Alias))
-                    AppCaches.RuntimeCache.ClearByKey(alias);
-
-                var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
-                if (macroRepoCache.Success)
+                foreach (var payload in payloads)
                 {
-                    macroRepoCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
+                    foreach (var alias in GetCacheKeysForAlias(payload.Alias))
+                        AppCaches.RuntimeCache.ClearByKey(alias);
+
+                    var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
+                    if (macroRepoCache.Success)
+                    {
+                        macroRepoCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
+                    }
                 }
             }
 

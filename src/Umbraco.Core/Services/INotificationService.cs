@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        IEnumerable<Notification> GetUserNotifications(IUser user);
+        IEnumerable<Notification>? GetUserNotifications(IUser user);
 
         /// <summary>
         /// Gets the notifications for the user based on the specified node path
@@ -38,14 +38,14 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// Notifications are inherited from the parent so any child node will also have notifications assigned based on it's parent (ancestors)
         /// </remarks>
-        IEnumerable<Notification> GetUserNotifications(IUser user, string path);
+        IEnumerable<Notification>? GetUserNotifications(IUser user, string path);
 
         /// <summary>
         /// Returns the notifications for an entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        IEnumerable<Notification> GetEntityNotifications(IEntity entity);
+        IEnumerable<Notification>? GetEntityNotifications(IEntity entity);
 
         /// <summary>
         /// Deletes notifications by entity

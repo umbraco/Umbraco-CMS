@@ -18,12 +18,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a tagged entity.
         /// </summary>
-        TaggedEntity GetTaggedEntityById(int id);
+        TaggedEntity? GetTaggedEntityById(int id);
 
         /// <summary>
         /// Gets a tagged entity.
         /// </summary>
-        TaggedEntity GetTaggedEntityByKey(Guid key);
+        TaggedEntity? GetTaggedEntityByKey(Guid key);
 
         /// <summary>
         /// Gets all documents tagged with any tag in the specified group.

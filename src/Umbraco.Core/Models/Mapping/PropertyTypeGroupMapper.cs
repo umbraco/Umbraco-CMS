@@ -223,7 +223,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     propertyEditor = _propertyEditors[propertyEditorAlias];
                 }
 
-                var config = propertyEditor == null
+                var config = propertyEditor is null || dataType is null
                     ? new Dictionary<string, object>()
                     : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
 
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Inherited = inherited,
                     DataTypeId = p.DataTypeId,
                     DataTypeKey = p.DataTypeKey,
-                    DataTypeName = dataType.Name,
+                    DataTypeName = dataType?.Name,
                     DataTypeIcon = propertyEditor?.Icon,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,

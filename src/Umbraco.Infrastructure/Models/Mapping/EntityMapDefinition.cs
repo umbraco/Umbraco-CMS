@@ -24,8 +24,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             mapper.Define<IContentTypeComposition, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IEntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
             mapper.Define<ISearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
-            mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
-            mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
+            mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source).WhereNotNull());
+            mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source).WhereNotNull());
         }
 
         // Umbraco.Code.MapAll -Alias
@@ -269,10 +269,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private static string MapName(IEntitySlim source, MapperContext context)
         {
             if (!(source is DocumentEntitySlim doc))
-                return source.Name;
+                return source.Name!;
 
             // invariant = only 1 name
-            if (!doc.Variations.VariesByCulture()) return source.Name;
+            if (!doc.Variations.VariesByCulture()) return source.Name!;
 
             // variant = depends on culture
             var culture = context.GetCulture();
@@ -281,7 +281,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             if (culture == null)
                 //throw new InvalidOperationException("Missing culture in mapping options.");
                 // TODO: we should throw, but this is used in various places that won't set a culture yet
-                return source.Name;
+                return source.Name!;
 
             // if we don't have a name for a culture, it means the culture is not available, and
             // hey we should probably not be mapping it, but it's too late, return a fallback name

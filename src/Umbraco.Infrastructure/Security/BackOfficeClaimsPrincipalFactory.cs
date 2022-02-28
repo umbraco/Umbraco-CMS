@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Security
             id.AddRequiredClaims(
                 user.Id!,
                 user.UserName,
-                user.Name,
+                user.Name!,
                 user.CalculatedContentStartNodeIds,
                 user.CalculatedMediaStartNodeIds,
                 user.Culture,

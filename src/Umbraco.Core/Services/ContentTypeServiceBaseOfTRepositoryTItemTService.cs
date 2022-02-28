@@ -270,7 +270,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public TItem Get(string alias)
+        public TItem? Get(string alias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -306,7 +306,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem> GetChildren(int id)
+        public IEnumerable<TItem>? GetChildren(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem> GetChildren(Guid id)
+        public IEnumerable<TItem>? GetChildren(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -397,12 +397,15 @@ namespace Umbraco.Cms.Core.Services
                 {
                     var i = ids.Pop();
                     var query = Query<TItem>().Where(x => x.ParentId == i);
-                    var result = Repository.Get(query).ToArray();
+                    var result = Repository.Get(query)?.ToArray();
 
-                    foreach (var c in result)
+                    if (result is not null)
                     {
-                        descendants.Add(c);
-                        ids.Push(c.Id);
+                        foreach (var c in result)
+                        {
+                            descendants.Add(c);
+                            ids.Push(c.Id);
+                        }
                     }
                 }
 
@@ -989,8 +992,8 @@ namespace Umbraco.Cms.Core.Services
 
                 // 'container' here does not know about its children, so we need
                 // to get it again from the entity repository, as a light entity
-                IEntitySlim entity = _entityRepository.Get(container.Id);
-                if (entity.HasChildren)
+                IEntitySlim? entity = _entityRepository.Get(container.Id);
+                if (entity?.HasChildren ?? false)
                 {
                     scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, eventMessages));

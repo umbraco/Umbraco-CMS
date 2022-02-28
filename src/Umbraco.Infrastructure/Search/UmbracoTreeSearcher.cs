@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             Guid.TryParse(query, out var g);
 
             var results = _entityService.GetPagedDescendants(objectType, pageIndex, pageSize, out totalFound,
-                filter: _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query) || x.Key == g));
+                filter: _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(query) || x.Key == g));
             return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
 

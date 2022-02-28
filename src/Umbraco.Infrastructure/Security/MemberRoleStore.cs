@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Security
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            IMemberGroup memberGroup = _memberGroupService.GetByName(name);
+            IMemberGroup? memberGroup = _memberGroupService.GetByName(name);
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
         }
 

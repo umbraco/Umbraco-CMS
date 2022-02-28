@@ -376,19 +376,19 @@ namespace Umbraco.Cms.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Email.Equals(emailStringToMatch));
+                        query?.Where(member => member.Email.Equals(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Email.Contains(emailStringToMatch));
+                        query?.Where(member => member.Email.Contains(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Email.StartsWith(emailStringToMatch));
+                        query?.Where(member => member.Email.StartsWith(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Email.EndsWith(emailStringToMatch));
+                        query?.Where(member => member.Email.EndsWith(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
+                        query?.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -416,19 +416,19 @@ namespace Umbraco.Cms.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Username.Equals(login));
+                        query?.Where(member => member.Username.Equals(login));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Username.Contains(login));
+                        query?.Where(member => member.Username.Contains(login));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Username.StartsWith(login));
+                        query?.Where(member => member.Username.StartsWith(login));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Username.EndsWith(login));
+                        query?.Where(member => member.Username.EndsWith(login));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(login, TextColumnType.NVarchar));
+                        query?.Where(member => member.Email.SqlWildcard(login, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -452,7 +452,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                IQuery<IUser> query;
+                IQuery<IUser>? query;
 
                 switch (countType)
                 {
@@ -460,10 +460,10 @@ namespace Umbraco.Cms.Core.Services
                         query = Query<IUser>();
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IUser>().Where(x => x.IsLockedOut);
+                        query = Query<IUser>()?.Where(x => x.IsLockedOut);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IUser>().Where(x => x.IsApproved);
+                        query = Query<IUser>()?.Where(x => x.IsApproved);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(countType));
@@ -522,7 +522,7 @@ namespace Umbraco.Cms.Core.Services
             IQuery<IUser>? filterQuery = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                filterQuery = Query<IUser>().Where(x => (x.Name != null && x.Name.Contains(filter!)) || x.Username.Contains(filter!));
+                filterQuery = Query<IUser>()?.Where(x => (x.Name != null && x.Name.Contains(filter!)) || x.Username.Contains(filter!));
             }
 
             return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null, filterQuery);

@@ -393,7 +393,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
                 return _mediaRepository.GetPage(
-                    Query<IMedia>().Where(x => x.ContentTypeId == contentTypeId),
+                    Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId),
                     pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
@@ -411,7 +411,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
                 return _mediaRepository.GetPage(
-                    Query<IMedia>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                    Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
                     pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
@@ -422,7 +422,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="level">The level to retrieve Media from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
-        public IEnumerable<IMedia> GetByLevel(int level)
+        public IEnumerable<IMedia>? GetByLevel(int level)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -437,7 +437,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        public IMedia GetVersion(int versionId)
+        public IMedia? GetVersion(int versionId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -511,7 +511,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
 
-                var query = Query<IMedia>().Where(x => x.ParentId == id);
+                var query = Query<IMedia>()?.Where(x => x.ParentId == id);
                 return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
@@ -542,15 +542,15 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private IQuery<IMedia> GetPagedDescendantQuery(string? mediaPath)
+        private IQuery<IMedia>? GetPagedDescendantQuery(string? mediaPath)
         {
             var query = Query<IMedia>();
             if (!mediaPath.IsNullOrWhiteSpace())
-                query.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
+                query?.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
             return query;
         }
 
-        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalChildren,
+        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia>? query, long pageIndex, int pageSize, out long totalChildren,
             IQuery<IMedia>? filter, Ordering ordering)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
@@ -590,7 +590,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a collection of <see cref="IMedia"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetRootMedia()
+        public IEnumerable<IMedia>? GetRootMedia()
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -610,7 +610,7 @@ namespace Umbraco.Cms.Core.Services
                     ordering = Ordering.By("Path");
 
                 scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                var query = Query<IMedia>().Where(x => x.Path.StartsWith(Cms.Core.Constants.System.RecycleBinMediaPathPrefix));
+                var query = Query<IMedia>()?.Where(x => x.Path.StartsWith(Cms.Core.Constants.System.RecycleBinMediaPathPrefix));
                 return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
@@ -635,7 +635,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="mediaPath">Path of the media item to retrieve (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetMediaByPath(string mediaPath)
+        public IMedia? GetMediaByPath(string mediaPath)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -859,7 +859,10 @@ namespace Umbraco.Cms.Core.Services
                 if (deletePriorVersions)
                 {
                     var media = GetVersion(versionId);
-                    DeleteVersions(scope, true, id, media.UpdateDate, userId);
+                    if (media is not null)
+                    {
+                        DeleteVersions(scope, true, id, media.UpdateDate, userId);
+                    }
                 }
                 else
                 {
@@ -1045,8 +1048,8 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
 
                 // emptying the recycle bin means deleting whatever is in there - do it properly!
-                IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinMedia);
-                IMedia[] medias = _mediaRepository.Get(query).ToArray();
+                IQuery<IMedia>? query = Query<IMedia>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinMedia);
+                IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
                 var emptyingRecycleBinNotification = new MediaEmptyingRecycleBinNotification(medias, messages);
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
@@ -1235,8 +1238,8 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
 
-                IQuery<IMedia> query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
-                IMedia[] medias = _mediaRepository.Get(query).ToArray();
+                IQuery<IMedia>? query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
+                IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(medias, messages)))
                 {
@@ -1250,13 +1253,16 @@ namespace Umbraco.Cms.Core.Services
                 {
                     // if current media has children, move them to trash
                     IMedia m = media;
-                    IQuery<IMedia> childQuery = Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
-                    IEnumerable<IMedia> children = _mediaRepository.Get(childQuery);
-                    foreach (IMedia child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
+                    IQuery<IMedia>? childQuery = Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
+                    IEnumerable<IMedia>? children = _mediaRepository.Get(childQuery);
+                    if (children is not null)
                     {
-                        // see MoveToRecycleBin
-                        PerformMoveLocked(child, Cms.Core.Constants.System.RecycleBinMedia, null, userId, moves, true);
-                        changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
+                        foreach (IMedia child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
+                        {
+                            // see MoveToRecycleBin
+                            PerformMoveLocked(child, Cms.Core.Constants.System.RecycleBinMedia, null, userId, moves, true);
+                            changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
+                        }
                     }
 
                     // delete media
@@ -1300,7 +1306,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.ReadLock(Cms.Core.Constants.Locks.MediaTypes);
 
                 var query = Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
-                var mediaType = _mediaTypeRepository.Get(query).FirstOrDefault();
+                var mediaType = _mediaTypeRepository.Get(query)?.FirstOrDefault();
 
                 if (mediaType == null)
                     throw new InvalidOperationException($"No media type matched the specified alias '{mediaTypeAlias}'.");

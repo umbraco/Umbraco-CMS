@@ -79,9 +79,9 @@ namespace Umbraco.Cms.Core.Cache
 
             if (idsRemoved.Count > 0)
             {
-                var assignedDomains = _domainService.GetAll(true).Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value)).ToList();
+                var assignedDomains = _domainService.GetAll(true)?.Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value)).ToList();
 
-                if (assignedDomains.Count > 0)
+                if (assignedDomains?.Count > 0)
                 {
                     // TODO: this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
                     // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the

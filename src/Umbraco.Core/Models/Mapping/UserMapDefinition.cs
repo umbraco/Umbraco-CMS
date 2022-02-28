@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
             var users = _userService.GetAllInGroup(source.Id);
-            target.Users = context.MapEnumerable<IUser, UserBasic>(users);
+            target.Users = context.MapEnumerable<IUser, UserBasic>(users).WhereNotNull();
 
             //Deal with assigned permissions:
 
@@ -268,6 +268,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 var contentPermissions = allContentPermissions[entity.Id];
 
                 var assignedContentPermissions = context.Map<AssignedContentPermissions>(entity);
+                if (assignedContentPermissions is null)
+                {
+                    continue;
+                }
                 assignedContentPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(target.DefaultPermissions);
 
                 //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
@@ -309,7 +313,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.StartContentIds = GetStartNodes(source.StartContentIds?.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
             target.StartMediaIds = GetStartNodes(source.StartMediaIds?.ToArray(), UmbracoObjectTypes.Media, "media","mediaRoot", context);
             target.UpdateDate = source.UpdateDate;
-            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
+            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups).WhereNotNull();
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -330,7 +334,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
+            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups).WhereNotNull();
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -359,7 +363,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
         {
             var allSections = _sectionService.GetSections();
-            target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias)));
+            target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias))).WhereNotNull();
 
             if (sourceStartMediaId > 0)
                 target.MediaStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartMediaId.Value, UmbracoObjectTypes.Media));
@@ -410,7 +414,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 startNodes.Add(CreateRootNode(_textService.Localize(localizedArea, localizedAlias)));
 
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
-            startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems));
+            startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems).WhereNotNull());
             return startNodes;
         }
 

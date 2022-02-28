@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 Password = entity.RawPasswordValue,
                 PasswordConfig = entity.PasswordConfiguration,
                 UserLanguage = entity.Language,
-                UserName = entity.Name,
+                UserName = entity.Name!,
                 SecurityStampToken = entity.SecurityStamp,
                 FailedLoginAttempts = entity.FailedPasswordAttempts,
                 LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,

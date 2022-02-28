@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
     {
         public static ILanguage BuildEntity(GlobalSettings globalSettings, LanguageDto dto)
         {
-            var lang = new Language(globalSettings, dto.IsoCode)
+            var lang = new Language(globalSettings, dto.IsoCode!)
             {
                 CultureName = dto.CultureName,
                 Id = dto.Id,

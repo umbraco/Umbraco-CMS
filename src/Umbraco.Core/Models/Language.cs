@@ -16,13 +16,13 @@ namespace Umbraco.Cms.Core.Models
     {
         private readonly GlobalSettings _globalSettings;
 
-        private string? _isoCode;
+        private string _isoCode = null!;
         private string? _cultureName;
         private bool _isDefaultVariantLanguage;
         private bool _mandatory;
         private int? _fallbackLanguageId;
 
-        public Language(GlobalSettings globalSettings, string? isoCode)
+        public Language(GlobalSettings globalSettings, string isoCode)
         {
             IsoCode = isoCode;
             _globalSettings = globalSettings;

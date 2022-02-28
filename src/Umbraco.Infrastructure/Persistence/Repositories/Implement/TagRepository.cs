@@ -268,8 +268,8 @@ WHERE r.tagId IS NULL";
             public string? PropertyTypeAlias { get; set; }
             public int PropertyTypeId { get; set; }
             public int TagId { get; set; }
-            public string? TagText { get; set; }
-            public string? TagGroup { get; set; }
+            public string TagText { get; set; } = null!;
+            public string TagGroup { get; set; } = null!;
             public int? TagLanguage { get; set; }
         }
         // ReSharper restore UnusedAutoPropertyAccessor.Local

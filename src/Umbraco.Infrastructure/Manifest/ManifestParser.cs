@@ -76,13 +76,13 @@ namespace Umbraco.Cms.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        public CompositePackageManifest? CombinedManifest
+        public CompositePackageManifest CombinedManifest
             => _cache.GetCacheItem<CompositePackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
             {
                 IEnumerable<PackageManifest> manifests = GetManifests();
                 return MergeManifests(manifests);
 
-            }, new TimeSpan(0, 4, 0));
+            }, new TimeSpan(0, 4, 0))!;
 
         /// <summary>
         /// Gets all manifests.

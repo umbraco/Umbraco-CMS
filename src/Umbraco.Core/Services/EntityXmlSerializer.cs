@@ -196,11 +196,14 @@ namespace Umbraco.Cms.Core.Services
             if (dataType.Level != 1)
             {
                 //get URL encoded folder names
-                var folders = _dataTypeService.GetContainers(dataType)
+                var folders = _dataTypeService.GetContainers(dataType)?
                     .OrderBy(x => x.Level);
 
-                folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
-                folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
+                if (folders is not null)
+                {
+                    folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
+                    folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
+                }
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
@@ -242,9 +245,12 @@ namespace Umbraco.Cms.Core.Services
             if (includeChildren)
             {
                 var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
-                foreach (var child in children)
+                if (children is not null)
                 {
-                    xml.Add(Serialize(child, true));
+                    foreach (var child in children)
+                    {
+                        xml.Add(Serialize(child, true));
+                    }
                 }
             }
 
@@ -317,7 +323,7 @@ namespace Umbraco.Cms.Core.Services
             var xml = new XElement("Language",
                 new XAttribute("Id", language.Id),
                 new XAttribute("CultureAlias", language.IsoCode),
-                new XAttribute("FriendlyName", language.CultureName));
+                new XAttribute("FriendlyName", language.CultureName!));
 
             return xml;
         }
@@ -570,14 +576,14 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private XElement SerializePropertyType(IPropertyType propertyType, IDataType definition, PropertyGroup? propertyGroup)
+        private XElement SerializePropertyType(IPropertyType propertyType, IDataType? definition, PropertyGroup? propertyGroup)
             => new XElement("GenericProperty",
                     new XElement("Name", propertyType.Name),
                     new XElement("Alias", propertyType.Alias),
                     new XElement("Key", propertyType.Key),
                     new XElement("Type", propertyType.PropertyEditorAlias),
-                    new XElement("Definition", definition.Key),
-                    propertyGroup != null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
+                    definition is not null ? new XElement("Definition", definition.Key) : null,
+                    propertyGroup is not null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
                     new XElement("SortOrder", propertyType.SortOrder),
                     new XElement("Mandatory", propertyType.Mandatory.ToString()),
                     new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),

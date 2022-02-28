@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Core.Handlers
                 _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.UtcNow,
                     -1, $"User Group {group?.Id} \"{group?.Name}\" ({group?.Alias})",
-                    "umbraco/user-group/permissions-change", $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
+                    "umbraco/user-group/permissions-change", $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity?.Name}\"");
             }
         }
     }

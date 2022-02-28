@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         ///     Gets all entities of type TEntity or a list according to the passed in Ids
         /// </summary>
-        public IEnumerable<TEntity>? GetMany(params TId[]? ids)
+        public IEnumerable<TEntity> GetMany(params TId[]? ids)
         {
             // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids?.Distinct()
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
             if (ids?.Length <= Constants.Sql.MaxParameterCount)
             {
-                return CachePolicy.GetAll(ids, PerformGetAll);
+                return CachePolicy.GetAll(ids, PerformGetAll) ?? Enumerable.Empty<TEntity>();
             }
 
             var entities = new List<TEntity>();
@@ -177,8 +177,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         ///     Gets a list of entities by the passed in query
         /// </summary>
         public IEnumerable<TEntity>? Get(IQuery<TEntity> query)
-            => PerformGetByQuery(query)?
-                .WhereNotNull(); // ensure we don't include any null refs in the returned collection!
+        {
+
+            // ensure we don't include any null refs in the returned collection!
+            return PerformGetByQuery(query)?
+                .WhereNotNull();
+        }
 
         /// <summary>
         ///     Returns a boolean indicating whether an entity with the passed Id exists

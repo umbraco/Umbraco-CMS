@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public string? PasswordConfig { get; set; }
 
         [Column("userEmail")]
-        public string? Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]

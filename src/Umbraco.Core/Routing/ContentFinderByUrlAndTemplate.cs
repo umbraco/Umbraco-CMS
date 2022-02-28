@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Routing
             var templateAlias = path.Substring(pos + 1);
             path = pos == 0 ? "/" : path.Substring(0, pos);
 
-            ITemplate template = _fileService.GetTemplate(templateAlias);
+            ITemplate? template = _fileService.GetTemplate(templateAlias);
 
             if (template == null)
             {

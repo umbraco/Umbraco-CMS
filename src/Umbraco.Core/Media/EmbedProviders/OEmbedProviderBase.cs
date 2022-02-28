@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
 
         public abstract Dictionary<string, string> RequestParams { get; }
 
-        public abstract string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+        public abstract string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
         public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
         {

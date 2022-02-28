@@ -20,6 +20,6 @@ namespace Umbraco.Cms.Core.Media
         /// <example>?key=value&key2=value2</example>
         Dictionary<string, string> RequestParams { get; }
 
-        string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+        string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
     }
 }

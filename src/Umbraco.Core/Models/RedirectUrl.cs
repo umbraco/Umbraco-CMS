@@ -17,13 +17,14 @@ namespace Umbraco.Cms.Core.Models
         public RedirectUrl()
         {
             CreateDateUtc = DateTime.UtcNow;
+            _url = string.Empty;
         }
 
         private int _contentId;
         private Guid _contentKey;
         private DateTime _createDateUtc;
         private string? _culture;
-        private string? _url;
+        private string _url;
 
         /// <inheritdoc />
         public int ContentId
@@ -54,10 +55,10 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string? Url
+        public string Url
         {
             get => _url;
-            set => SetPropertyValueAndDetectChanges(value, ref _url, nameof(Url));
+            set => SetPropertyValueAndDetectChanges(value, ref _url!, nameof(Url));
         }
     }
 }

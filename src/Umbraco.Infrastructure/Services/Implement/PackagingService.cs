@@ -146,6 +146,11 @@ namespace Umbraco.Cms.Core.Services.Implement
             // Collect and merge the packages from the manifests
             foreach(PackageManifest package in _manifestParser.GetManifests())
             {
+                if (package.PackageName is null)
+                {
+                    continue;
+                }
+
                 if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
                 {
                     installedPackage = new InstalledPackage
