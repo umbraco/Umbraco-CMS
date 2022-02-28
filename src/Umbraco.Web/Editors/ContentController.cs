@@ -376,7 +376,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IDictionary<string, ContentItemDisplay> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
         {
-            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            // It's important to do this operation within a scope to reduce the amount of readlock queries.
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => Services.ContentTypeService.Get(alias));
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
@@ -2019,6 +2019,8 @@ namespace Umbraco.Web.Editors
 
             var variantIndex = 0;
 
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
+
             //loop through each variant, set the correct name and property values
             foreach (var variant in contentSave.Variants)
             {
@@ -2033,6 +2035,12 @@ namespace Umbraco.Web.Editors
                         if (variant.Culture.IsNullOrWhiteSpace())
                             throw new InvalidOperationException($"Cannot set culture name without a culture.");
                         contentSave.PersistedContent.SetCultureName(variant.Name, variant.Culture);
+
+                        // If the variant culture is the default culture we also want to update the name on the Content itself.
+                        if (variant.Culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            contentSave.PersistedContent.Name = variant.Name;
+                        }
                     }
                     else
                     {
@@ -2423,7 +2431,7 @@ namespace Umbraco.Web.Editors
                 Items = results.Select(x => new ContentVersionMetaViewModel(x))
             };
         }
-        
+
         [HttpPost]
         [EnsureUserPermissionForContent("contentId", ActionUpdate.ActionLetter)]
         public HttpResponseMessage PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
