@@ -22,7 +22,7 @@
                             tab="tab"
                             is-open="tab.alias === openTabAlias"
                             on-click="changeTab(tab)"
-                            on-click-composition="openDocumentType(documentTypeId)"
+                            on-click-composition="openContentType(contentTypeId)"
                             sorting="sortingMode"
                             allow-remove="canRemoveTab(tab) && !sortingMode"
                             on-remove="removeTab(tab, tabIndex)"
@@ -55,7 +55,7 @@
                 ng-if="sortingMode"
                 class="umb-group-builder__convert-dropzone"
                 umb-droppable="droppableOptionsConvert">
-                <localize key="contentTypeEditor_convertToTab" />
+                <localize key="contentTypeEditor_convertToTab">Convert to tab</localize>
             </div>
 
             <umb-button
@@ -91,7 +91,7 @@
     <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
 
     <div ng-if="sortingMode && model.groups.length === 0" class="umb-group-builder__no-data-text">
-        <localize key="contentTypeEditor_noGroups"></localize>
+        <localize key="contentTypeEditor_noGroups">You have not added any groups</localize>
     </div>
 
     <!-- Properties added directly to a tab -->
@@ -105,6 +105,7 @@
                         sortable="sortingMode"
                         on-edit="editPropertyTypeSettings(property)"
                         on-remove="deleteProperty(tab.properties, property)"
+                        on-click-composition="openContentType(contentTypeId)"
                         val-server-field-alias="{{'Groups[' + tab.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
                         val-server-field-label="{{'Groups[' + tab.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
                         on-change-sort-order-value="onChangePropertySortOrderValue(tab)"
@@ -118,7 +119,7 @@
                 data-element="property-add"
                 class="umb-group-builder__group-add-property"
                 ng-click="addNewProperty(tab)">
-                <localize key="contentTypeEditor_addProperty"></localize>
+                <localize key="contentTypeEditor_addProperty">Add property</localize>
             </button>
 
             <umb-empty-state
@@ -143,7 +144,7 @@
                 allow-name="true"
                 group="group"
                 allow-remove="canRemoveGroup(group) && !sortingMode"
-                on-click-composition="openDocumentType(documentTypeId)"
+                on-click-composition="openContentType(contentTypeId)"
                 on-remove="removeGroup(group)"
                 on-update-name="onChangeGroupName(group)"
                 sorting="sortingMode"
@@ -159,6 +160,7 @@
                             sortable="sortingMode"
                             on-edit="editPropertyTypeSettings(property)"
                             on-remove="deleteProperty(group.properties, property)"
+                            on-click-composition="openContentType(contentTypeId)"
                             on-change-sort-order-value="onChangePropertySortOrderValue(group)"
                             val-server-field-alias="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
                             val-server-field-label="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
@@ -172,7 +174,7 @@
                     data-element="property-add"
                     class="umb-group-builder__group-add-property"
                     ng-click="addNewProperty(group)">
-                    <localize key="contentTypeEditor_addProperty"></localize>
+                    <localize key="contentTypeEditor_addProperty">Add property</localize>
                 </button>
             </umb-content-type-group>
         </div>
@@ -183,6 +185,6 @@
         class="umb-group-builder__group -placeholder"
         ng-click="addGroupToActiveTab()"
         data-element="group-add">
-        <localize key="contentTypeEditor_addGroup"></localize>
+        <localize key="contentTypeEditor_addGroup">Add group</localize>
     </button>
 </div>

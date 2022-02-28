@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<SearchResults> GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
         {
-            query = query.Trim();
+            query = query?.Trim();
 
             if (query.IsNullOrWhiteSpace())
             {
@@ -91,12 +91,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return SearchResults.Empty();
             }
 
-            var pagedResults = results.Skip(pageIndex * pageSize);
-
             return new SearchResults
             {
                 TotalRecords = results.TotalItemCount,
-                Results = pagedResults.Select(x => new SearchResult
+                Results = results.Select(x => new SearchResult
                 {
                     Id = x.Id,
                     Score = x.Score,

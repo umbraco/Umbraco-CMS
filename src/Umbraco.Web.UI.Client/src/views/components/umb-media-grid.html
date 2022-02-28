@@ -60,38 +60,41 @@
                                    ng-click="vm.selectAll($event)"
                                    ng-checked="vm.isSelectedAll()">
                         </div>
-                        <div class="umb-table-cell  umb-table__name">
+                        <div class="umb-table-cell umb-table__name">
                             <button type="button"
                                     class="umb-table-head__link sortable"
                                     ng-click="setSort('name')">
                                 <localize key="general_name">Name</localize>
-                                <i class="umb-table-head__icon icon" aria-hidden="true" ng-class="{'icon-navigation-up': isSortDirection('name', 'asc'), 'icon-navigation-down': isSortDirection('name', 'desc')}"></i>
+                                <umb-icon ng-attr-icon="{{isSortDirection('name', 'asc') && 'icon-navigation-up' || isSortDirection('name', 'desc') && 'icon-navigation-down'}}" class="umb-table-head__icon"></umb-icon>
                             </button>
                         </div>
                         <div class="umb-table-cell">
                             <button type="button"
                                     class="umb-table-head__link sortable"
                                     ng-click="setSort('updateDate')">
-                                Last Updated
-                                <i class="umb-table-head__icon icon"  aria-hidden="true" ng-class="{'icon-navigation-up': isSortDirection('updateDate', 'asc'), 'icon-navigation-down': isSortDirection('updateDate', 'desc')}"></i>
+                                <localize key="general_lastUpdated">Last Updated</localize>
+                                <umb-icon ng-attr-icon="{{isSortDirection('updateDate', 'asc') && 'icon-navigation-up' || isSortDirection('updateDate', 'desc') && 'icon-navigation-down'}}" class="umb-table-head__icon"></umb-icon>
                             </button>
                         </div>
 
                     </div>
                 </div>
-                <div class="umb-table-body">
-                    <div class="umb-table-row umb-media-grid__list-item -selectable" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse" ng-class="{'-selected': item.selected}">
+                <div class="umb-table-body"> 
+                    <div class="umb-table-row umb-media-grid__list-item -selectable"
+                         ng-click="clickItem(item, $event, $index)"
+                         ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse"
+                         ng-class="{'-selected': item.selected, '-folder': item.isFolder, '-filtered': item.filtered}">
                         <div class="umb-table-cell">
                             <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
                             <umb-icon icon="{{item.thumbnail ? 'icon-picture' : item.icon}}" class="umb-table-body__icon" ng-if="!item.selected"></umb-icon>
                         </div>
                         <div class="umb-table-cell umb-table__name">
-                            <umb-icon icon="icon-navigation-right"
-                                      ng-show="item.isFolder"
-                                      ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}"
-                                      ng-click="clickItemName(item, $event, $index)">
-                            </umb-icon> 
-                            <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
+                            <div class="umb-media-grid__list-item-name"
+                                 ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}"
+                                 ng-click="clickItemName(item, $event, $index)">
+                                <umb-icon icon="icon-navigation-right" ng-show="item.isFolder"></umb-icon>
+                                <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
+                            </div>
                         </div>
                         <div class="umb-table-cell">
                             <span class="muted small" style="font-size:0.8em">{{item.updateDate | date:'medium'}}</span>
@@ -101,4 +104,3 @@
             </div>
         </div>
     </div>
-

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
@@ -494,6 +495,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                 genericProperties,
                 tabs);
 
+            if (contentType is IContentTypeWithHistoryCleanup withCleanup && withCleanup.HistoryCleanup is not null)
+            {
+                xml.Add(SerializeCleanupPolicy(withCleanup.HistoryCleanup));
+            }
+
             var folderNames = string.Empty;
             var folderKeys = string.Empty;
             //don't add folders if this is a child doc type
@@ -563,6 +569,29 @@ namespace Umbraco.Cms.Core.Services.Implement
                     propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
                     propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
                     propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
+
+        private XElement SerializeCleanupPolicy(HistoryCleanup cleanupPolicy)
+        {
+            if (cleanupPolicy == null)
+            {
+                throw new ArgumentNullException(nameof(cleanupPolicy));
+            }
+
+            var element = new XElement("HistoryCleanupPolicy",
+                new XAttribute("preventCleanup", cleanupPolicy.PreventCleanup));
+
+            if (cleanupPolicy.KeepAllVersionsNewerThanDays.HasValue)
+            {
+                element.Add(new XAttribute("keepAllVersionsNewerThanDays", cleanupPolicy.KeepAllVersionsNewerThanDays));
+            }
+
+            if (cleanupPolicy.KeepLatestVersionPerDayForDays.HasValue)
+            {
+                element.Add(new XAttribute("keepLatestVersionPerDayForDays", cleanupPolicy.KeepLatestVersionPerDayForDays));
+            }
+
+            return element;
+        }
 
         // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
         private XElement SerializeContentBase(IContentBase contentBase, string urlValue, string nodeName, bool published)

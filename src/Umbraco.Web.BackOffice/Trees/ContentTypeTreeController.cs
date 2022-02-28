@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder, dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
                         // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
@@ -76,7 +76,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     }));
 
             //if the request is for folders only then just return
-            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1")
+                return nodes;
 
             var children = _entityService.GetChildren(intId, UmbracoObjectTypes.DocumentType).ToArray();
             var contentTypes = _contentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);

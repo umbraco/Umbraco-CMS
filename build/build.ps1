@@ -119,10 +119,10 @@
         npm cache clean --force >> $log 2>&1
         $error.Clear() # that one can fail 'cos security bug - ignore
 
-        Write-Output "### npm install" >> $log 2>&1
-        npm install >> $log 2>&1
+        Write-Output "### npm ci" >> $log 2>&1
+        npm ci >> $log 2>&1
         Write-Output ">> $? $($error.Count)" >> $log 2>&1
-        # Don't really care about the messages from npm install making us think there are errors
+        # Don't really care about the messages from npm ci making us think there are errors
         $error.Clear()
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
@@ -265,7 +265,7 @@
 
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\src\Umbraco.Tests\Umbraco.Tests.csproj" `
+    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\tests\Umbraco.Tests\Umbraco.Tests.csproj" `
       /p:WarningLevel=0 `
       /p:Configuration=$buildConfiguration `
       /p:Platform=AnyCPU `
@@ -390,7 +390,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
 	$params = "-Source", $nugetsourceUmbraco
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -401,7 +401,7 @@
 
     Write-Host "Create NuGet packages"
 
-    &dotnet pack "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" `
+    &dotnet pack "$($this.SolutionRoot)\umbraco-netcore-only.sln" `
         --output "$($this.BuildOutput)" `
         --verbosity detailed `
         -c Release `
@@ -449,12 +449,6 @@
     if ($this.OnError()) { return }
   })
 
-  $ubuild.DefineMethod("PrepareAzureGallery",
-  {
-    Write-Host "Prepare Azure Gallery"
-    $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
-  })
-
   $ubuild.DefineMethod("PrepareCSharpDocs",
   {
     Write-Host "Prepare C# Documentation"
@@ -489,7 +483,7 @@
     cd $src\Umbraco.Web.UI.Docs
 
     "Generating the docs and waiting before executing the next commands"
-	& npm install
+	  & npm ci
     & npx gulp docs
 
     Pop-Location
@@ -527,8 +521,6 @@
     $this.VerifyNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
-    if ($this.OnError()) { return }
-    $this.PrepareAzureGallery()
     if ($this.OnError()) { return }
     $this.PostPackageHook()
     if ($this.OnError()) { return }

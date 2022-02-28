@@ -1,11 +1,14 @@
 <div data-element="group-{{vm.group.name}}" class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting && !vm.group.inherited}" tabindex="0" ng-focus="vm.whenFocus()">
     <div class="umb-group-builder__group-title-wrapper" ng-if="vm.allowName" data-element="{{vm.valTabAlias}}">
 
-        <ng-form name="groupNameForm" data-element="group-name">
+        <ng-form name="groupNameForm" data-element="group-name" class="flx-g1">
             <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-inherited': vm.group.inherited}">
-                <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="vm.sorting && !vm.group.inherited"></i>
+                <umb-icon icon="icon-navigation"
+                          class="umb-group-builder__group-title-icon"
+                          ng-if="vm.sorting && !vm.group.inherited">
+                </umb-icon>
                 <input data-element="group-name-field"
-                        class="umb-group-builder__group-title-input"
+                        class="umb-group-builder__group-title-input w-100"
                         type="text"
                         localize="placeholder"
                         placeholder="@placeholders_entername"
@@ -23,15 +26,15 @@
 
                 <div class="umb-group-builder__group-title-val-message" ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
                     <div class="umb-validation-label -arrow-left" ng-message="valServerField">{{groupNameForm.groupName.errorMsg}}</div>
-                    <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                    <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required">Required</localize></div>
                 </div>
             </div>
         </ng-form>
 
         <div class="umb-group-builder__group-title-right">
             <div class="umb-group-builder__group-inherited-label" ng-if="vm.group.inherited">
-                <i class="icon icon-merge"></i>
-                <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ vm.group.inheritedFromName }}
+                <umb-icon icon="icon-merge" class="icon"></umb-icon>
+                <localize key="contentTypeEditor_inheritedFrom">Inherited from</localize>: {{ vm.group.inheritedFromName }}
                 <span ng-repeat="contentTypeName in vm.group.parentTabContentTypeNames">
                     <button type="button" class="btn-link btn-small p0" ng-click="vm.clickComposition(vm.group.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
                     <span ng-if="!$last">, </span>
@@ -43,16 +46,16 @@
                     <input name="groupSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="vm.group.sortOrder" ng-disabled="vm.group.inherited" ng-blur="vm.changeSortOrderValue()" required />
 
                     <!-- This is a manual validation message not bound to a validator -->
-                    <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
+                    <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required">Required</localize></div>
                     <div ng-messages="groupSortOrderForm.groupSortOrder.$error" show-validation-on-submit>
-                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required">Required</localize></div>
                     </div>
                 </div>
             </ng-form>
         </div>
 
         <div class="umb-group-builder__group-remove" ng-if="vm.allowRemove">
-            <i class="icon-trash" ng-click="vm.removeGroup()"></i>
+            <umb-icon icon="icon-trash" ng-click="vm.removeGroup()"></umb-icon>
         </div>
     </div>
 

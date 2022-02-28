@@ -263,13 +263,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             Func<Guid[], IEnumerable<IEnumerable<IDictionaryItem>>> getItemsFromParents = guids =>
             {
-                //needs to be in groups of 2000 because we are doing an IN clause and there's a max parameter count that can be used.
-                return guids.InGroupsOf(2000)
-                    .Select(@group =>
+                return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
+                    .Select(group =>
                     {
                         var sqlClause = GetBaseQuery(false)
                             .Where<DictionaryDto>(x => x.Parent != null)
-                            .Where($"{SqlSyntax.GetQuotedColumnName("parent")} IN (@parentIds)", new { parentIds = @group });
+                            .WhereIn<DictionaryDto>(x => x.Parent, group);
 
                         var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>());
                         var sql = translator.Translate();

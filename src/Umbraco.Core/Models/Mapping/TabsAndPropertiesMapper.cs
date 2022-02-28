@@ -52,47 +52,25 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var noGroupProperties = content.GetNonGroupedProperties()
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
                 .ToList();
-            var genericproperties = MapProperties(content, noGroupProperties, context);
+            var genericProperties = MapProperties(content, noGroupProperties, context);
 
-            tabs.Add(new Tab<ContentPropertyDisplay>
-            {
-                Id = 0,
-                Label = LocalizedTextService.Localize("general", "properties"),
-                Alias = "Generic properties",
-                Properties = genericproperties,
-                Type = PropertyGroupType.Group.ToString()
-            });
 
-            var genericProps = tabs.Single(x => x.Id == 0);
-
-            //store the current props to append to the newly inserted ones
-            var currProps = genericProps.Properties.ToArray();
-
-            var contentProps = new List<ContentPropertyDisplay>();
 
             var customProperties = GetCustomGenericProperties(content);
             if (customProperties != null)
             {
-                //add the custom ones
-                contentProps.AddRange(customProperties);
+                genericProperties.AddRange(customProperties);
             }
 
-            //now add the user props
-            contentProps.AddRange(currProps);
-
-            //re-assign
-            genericProps.Properties = contentProps;
-
-            //Show or hide properties tab based on whether it has or not any properties
-            if (genericProps.Properties.Any() == false)
+            if (genericProperties.Count > 0)
             {
-                //loop through the tabs, remove the one with the id of zero and exit the loop
-                for (var i = 0; i < tabs.Count; i++)
+                tabs.Add(new Tab<ContentPropertyDisplay>
                 {
-                    if (tabs[i].Id != 0) continue;
-                    tabs.RemoveAt(i);
-                    break;
-                }
+                    Id = 0,
+                    Label = LocalizedTextService.Localize("general", "properties"),
+                    Alias = "Generic properties",
+                    Properties = genericProperties
+                });
             }
         }
 

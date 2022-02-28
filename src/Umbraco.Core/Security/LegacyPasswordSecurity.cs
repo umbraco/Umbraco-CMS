@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
@@ -50,9 +50,33 @@ namespace Umbraco.Cms.Core.Security
             if (dbPassword.StartsWith(Constants.Security.EmptyPasswordPrefix))
                 return false;
 
-            var storedHashedPass = ParseStoredHashPassword(algorithm, dbPassword, out var salt);
-            var hashed = HashPassword(algorithm, password, salt);
-            return storedHashedPass == hashed;
+            try
+            {
+                var storedHashedPass = ParseStoredHashPassword(algorithm, dbPassword, out var salt);
+                var hashed = HashPassword(algorithm, password, salt);
+                return storedHashedPass == hashed;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                //This can happen if the length of the password is wrong and a salt cannot be extracted.
+                return false;
+            }
+
+        }
+
+        /// <summary>
+        /// Verify a legacy hashed password (HMACSHA1)
+        /// </summary>
+        public bool VerifyLegacyHashedPassword(string password, string dbPassword)
+        {
+            var hashAlgorith = new HMACSHA1
+            {
+                //the legacy salt was actually the password :(
+                Key = Encoding.Unicode.GetBytes(password)
+            };
+            var hashed = Convert.ToBase64String(hashAlgorith.ComputeHash(Encoding.Unicode.GetBytes(password)));
+
+            return dbPassword == hashed;
         }
 
         /// <summary>
@@ -120,7 +144,7 @@ namespace Umbraco.Cms.Core.Security
             var saltBytes = Convert.FromBase64String(salt);
             byte[] inArray;
 
-            var hashAlgorithm = GetHashAlgorithm(algorithmType);
+            using var hashAlgorithm = GetHashAlgorithm(algorithmType);
             var algorithm = hashAlgorithm as KeyedHashAlgorithm;
             if (algorithm != null)
             {
@@ -203,7 +227,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The encoded password.</returns>
         private string HashLegacySHA1Password(string password)
         {
-            var hashAlgorithm = GetLegacySHA1Algorithm(password);
+            using var hashAlgorithm = GetLegacySHA1Algorithm(password);
             var hash = Convert.ToBase64String(hashAlgorithm.ComputeHash(Encoding.Unicode.GetBytes(password)));
             return hash;
         }

@@ -25,6 +25,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly ILogger<PublishedContentTypeCache> _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private bool _disposedValue;
 
         // default ctor
         public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
@@ -259,8 +260,6 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
         {
-            if (GetPublishedContentTypeByAlias != null)
-                return GetPublishedContentTypeByAlias(alias);
             IContentTypeComposition contentType = itemType switch
             {
                 PublishedItemType.Content => _contentTypeService.Get(alias),
@@ -276,8 +275,6 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
         {
-            if (GetPublishedContentTypeById != null)
-                return GetPublishedContentTypeById(id);
             IContentTypeComposition contentType = itemType switch
             {
                 PublishedItemType.Content => _contentTypeService.Get(id),
@@ -289,56 +286,6 @@ namespace Umbraco.Cms.Core.PublishedCache
                 throw new Exception($"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with id {id}.");
 
             return _publishedContentTypeFactory.CreateContentType(contentType);
-        }
-
-        // for unit tests - changing the callback must reset the cache obviously
-        // TODO: Why does this even exist? For testing you'd pass in a mocked service to get by id
-        private Func<string, IPublishedContentType> _getPublishedContentTypeByAlias;
-        internal Func<string, IPublishedContentType> GetPublishedContentTypeByAlias
-        {
-            get => _getPublishedContentTypeByAlias;
-            set
-            {
-                try
-                {
-                    _lock.EnterWriteLock();
-
-                    _typesByAlias.Clear();
-                    _typesById.Clear();
-                    _getPublishedContentTypeByAlias = value;
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld)
-                        _lock.ExitWriteLock();
-                }
-            }
-        }
-
-        // for unit tests - changing the callback must reset the cache obviously
-        // TODO: Why does this even exist? For testing you'd pass in a mocked service to get by id
-        private Func<int, IPublishedContentType> _getPublishedContentTypeById;
-        private bool _disposedValue;
-
-        internal Func<int, IPublishedContentType> GetPublishedContentTypeById
-        {
-            get => _getPublishedContentTypeById;
-            set
-            {
-                try
-                {
-                    _lock.EnterWriteLock();
-
-                    _typesByAlias.Clear();
-                    _typesById.Clear();
-                    _getPublishedContentTypeById = value;
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld)
-                        _lock.ExitWriteLock();
-                }
-            }
         }
 
         private static string GetAliasKey(PublishedItemType itemType, string alias)

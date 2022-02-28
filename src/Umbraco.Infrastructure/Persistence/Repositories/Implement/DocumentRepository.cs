@@ -233,6 +233,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
@@ -292,9 +293,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+            var pageIndex = skip / take;
+
+            return MapDtosToContent(Database.Page<DocumentDto>(pageIndex+1, take, sql).Items, true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, false, true).Skip(skip).Take(take);
+                false, false, false, true);
         }
 
         public override IContent GetVersion(int versionId)
@@ -553,6 +556,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IContent entity)
         {
             var isEntityDirty = entity.IsDirty();
+            var editedSnapshot = entity.Edited;
 
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
@@ -627,6 +631,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup; 
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
@@ -638,6 +646,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     contentVersionDto.Id = 0; // want a new id
                     contentVersionDto.Current = true; // current version
                     contentVersionDto.Text = entity.Name;
+                    contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                     Database.Insert(contentVersionDto);
                     entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
@@ -655,6 +664,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
                 if (!publishing && entity.PublishName != entity.Name)
+                {
+                    edited = true;
+                }
+
+                // To establish the new value of "edited" we compare all properties publishedValue to editedValue and look
+                // for differences.
+                //
+                // If we SaveAndPublish but the publish fails (e.g. already scheduled for release)
+                // we have lost the publishedValue on IContent (in memory vs database) so we cannot correctly make that comparison.
+                //
+                // This is a slight change to behaviour, historically a publish, followed by change & save, followed by undo change & save
+                // would change edited back to false.
+                if (!publishing && editedSnapshot)
                 {
                     edited = true;
                 }
@@ -1376,7 +1398,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var result = new Dictionary<int, ContentScheduleCollection>();
 
-            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, 2000, batch => Sql()
+            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, Constants.Sql.MaxParameterCount, batch => Sql()
                 .Select<ContentScheduleDto>()
                 .From<ContentScheduleDto>()
                 .WhereIn<ContentScheduleDto>(x => x.NodeId, batch));
@@ -1426,7 +1448,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (versions.Count == 0)
                 return new Dictionary<int, List<ContentVariation>>();
 
-            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, 2000, batch
+            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, Constants.Sql.MaxParameterCount, batch
                 => Sql()
                     .Select<ContentVersionCultureVariationDto>()
                     .From<ContentVersionCultureVariationDto>()
@@ -1455,7 +1477,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var ids = temps.Select(x => x.Id);
 
-            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, 2000, batch =>
+            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
                 Sql()
                     .Select<DocumentCultureVariationDto>()
                     .From<DocumentCultureVariationDto>()

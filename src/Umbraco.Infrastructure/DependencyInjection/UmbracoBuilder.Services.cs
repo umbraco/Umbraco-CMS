@@ -6,16 +6,21 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -28,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         internal static IUmbracoBuilder AddServices(this IUmbracoBuilder builder)
         {
             // register the service context
-            builder.Services.AddUnique<ServiceContext>();
+            builder.Services.AddSingleton<ServiceContext>();
 
             // register the special idk map
             builder.Services.AddUnique<IIdKeyMap, IdKeyMap>();
@@ -43,6 +48,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
             builder.Services.AddUnique<ITagService, TagService>();
             builder.Services.AddUnique<IContentService, ContentService>();
+            builder.Services.AddUnique<IContentVersionService, ContentVersionService>();
+            builder.Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             builder.Services.AddUnique<IUserService, UserService>();
             builder.Services.AddUnique<IMemberService, MemberService>();
             builder.Services.AddUnique<IMediaService, MediaService>();
@@ -60,7 +67,15 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
             builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();
             builder.Services.AddUnique<INotificationService, NotificationService>();
-            builder.Services.AddUnique<IExternalLoginService, ExternalLoginService>();
+            builder.Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
+                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ILoggerFactory>(),
+                factory.GetRequiredService<IEventMessagesFactory>(),
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>()
+                ));
+            builder.Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
+            builder.Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
+            builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             builder.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
             builder.Services.AddUnique<IConsentService, ConsentService>();
             builder.Services.AddTransient(SourcesFactory);
@@ -70,18 +85,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
-            builder.Services.AddUnique<ConflictingPackageData>();
-            builder.Services.AddUnique<CompiledPackageXmlParser>();
-            builder.Services.AddUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
-            builder.Services.AddUnique<PackageDataInstallation>();
+            builder.Services.AddSingleton<ConflictingPackageData>();
+            builder.Services.AddSingleton<CompiledPackageXmlParser>();
+            builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
+            builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
+            builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
 
             return builder;
         }
 
-        /// <summary>
-        /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
-        /// </summary>
         private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
             => new PackagesRepository(
                 factory.GetRequiredService<IContentService>(),
@@ -110,7 +123,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : appPlugins.GetDirectories()
-                    .SelectMany(x => x.GetDirectories("Lang", SearchOption.AllDirectories))
+                    // Check for both Lang & lang to support case sensitive file systems.
+                    .SelectMany(x => x.GetDirectories("?ang", SearchOption.AllDirectories).Where(x => x.Name.InvariantEquals("lang")))
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
 

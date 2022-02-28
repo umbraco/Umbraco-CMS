@@ -65,6 +65,9 @@
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
         vm.labels = {};
+        vm.options = {
+            createFlow: false
+        };
 
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
@@ -380,7 +383,7 @@
 
         function editBlock(blockObject, openSettings, blockIndex, parentForm, options) {
 
-            options = options || {};
+            options = options || vm.options;
 
             // this must be set
             if (blockIndex === undefined) {
@@ -560,7 +563,9 @@
                 if (inlineEditing === true) {
                     blockObject.activate();
                 } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
+                    vm.options.createFlow = true;
                     blockObject.edit();
+                    vm.options.createFlow = false;
                 }
             }
         }
@@ -571,7 +576,7 @@
 
             vm.clipboardItems = [];
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,
@@ -591,7 +596,7 @@
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,

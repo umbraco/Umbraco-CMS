@@ -47,7 +47,6 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
             target.CreateDate = source.CreateDate;
-            target.Email = source.Email;
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.Key = source.Key;
@@ -61,7 +60,11 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MemberTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
             target.UpdateDate = source.UpdateDate;
+
+            //Membership
             target.Username = source.Username;
+            target.Email = source.Email;
+            target.MembershipProperties = _tabsAndPropertiesMapper.MapMembershipProperties(source, context);
         }
 
         // Umbraco.Code.MapAll -Trashed -Edited -Updater -Alias -VariesByCulture

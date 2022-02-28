@@ -8,7 +8,7 @@
         public const char ActionLetter = 'I';
 
         public char Letter => ActionLetter;
-        public string Alias => "assignDomain";
+        public string Alias => "assigndomain";
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
         public string Icon => "home";
         public bool ShowInNotifier => false;

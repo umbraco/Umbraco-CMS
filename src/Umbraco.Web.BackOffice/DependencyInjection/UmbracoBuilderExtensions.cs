@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -54,7 +55,8 @@ namespace Umbraco.Extensions
                 .AddCoreNotifications()
                 .AddLogViewer()
                 .AddExamine()
-                .AddExamineIndexes();
+                .AddExamineIndexes()
+                .AddControllersWithAmbiguousConstructors();
 
         public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {
@@ -82,12 +84,12 @@ namespace Umbraco.Extensions
         {
             builder.Services.AddSingleton<KeepAliveMiddleware>();
             builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
-            builder.Services.AddUnique<ServerVariablesParser>();
-            builder.Services.AddUnique<InstallAreaRoutes>();
-            builder.Services.AddUnique<BackOfficeAreaRoutes>();
-            builder.Services.AddUnique<PreviewRoutes>();
+            builder.Services.AddSingleton<ServerVariablesParser>();
+            builder.Services.AddSingleton<InstallAreaRoutes>();
+            builder.Services.AddSingleton<BackOfficeAreaRoutes>();
+            builder.Services.AddSingleton<PreviewRoutes>();
             builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
-            builder.Services.AddUnique<BackOfficeServerVariables>();
+            builder.Services.AddSingleton<BackOfficeServerVariables>();
             builder.Services.AddScoped<BackOfficeSessionIdValidator>();
             builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
@@ -114,7 +116,21 @@ namespace Umbraco.Extensions
             });
 
             builder.Services.AddUnique<IIconService, IconService>();
-            builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
+            builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
+            builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds explicit registrations for controllers with ambiguous constructors to prevent downstream issues for
+        /// users who wish to use <see cref="Microsoft.AspNetCore.Mvc.Controllers.ServiceBasedControllerActivator"/>
+        /// </summary>
+        public static IUmbracoBuilder AddControllersWithAmbiguousConstructors(
+            this IUmbracoBuilder builder)
+        {
+            builder.Services.TryAddTransient(sp =>
+                ActivatorUtilities.CreateInstance<CurrentUserController>(sp));
 
             return builder;
         }

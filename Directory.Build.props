@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-
     <!-- Package references and additional files which are consumed by all projects -->
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" IsImplicitlyDefined="true"  />
-        <AdditionalFiles Include="$(MSBuildThisFileDirectory)linting\stylecop.json" />
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" IsImplicitlyDefined="true" />
     </ItemGroup>
-
-    <Choose>
-        <When Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(MSBuildProjectFile), 'Tests'))">
-            <PropertyGroup>
-                <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)linting\codeanalysis.tests.ruleset</CodeAnalysisRuleSet>
-            </PropertyGroup>
-        </When>
-        <Otherwise>
-            <PropertyGroup>
-                <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)linting\codeanalysis.ruleset</CodeAnalysisRuleSet>
-            </PropertyGroup>
-        </Otherwise>
-    </Choose>
-
 </Project>

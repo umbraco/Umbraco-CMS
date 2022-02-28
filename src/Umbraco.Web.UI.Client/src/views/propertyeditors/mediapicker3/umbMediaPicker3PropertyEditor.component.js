@@ -137,6 +137,10 @@
             if (vm.propertyForm) {
                 vm.propertyForm.$setDirty();
             }
+
+            if (vm.modelValueForm) {
+                vm.modelValueForm.modelValue.$setDirty();
+            }
         }
 
         function addMediaAt(createIndex, $event) {
@@ -189,7 +193,7 @@
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, vm.allowedTypes || null);
             };
 
-            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, vm.allowedTypes || null);
+            mediaPicker.clipboardItems = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.MEDIA, vm.allowedTypes || null);
             mediaPicker.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });

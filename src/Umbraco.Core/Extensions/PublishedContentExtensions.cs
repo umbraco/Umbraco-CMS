@@ -1328,8 +1328,8 @@ namespace Umbraco.Extensions
                 {"NodeTypeAlias", "NodeTypeAlias"},
                 {"CreateDate", "CreateDate"},
                 {"UpdateDate", "UpdateDate"},
-                {"CreatorName", "CreatorName"},
-                {"WriterName", "WriterName"},
+                {"CreatorId", "CreatorId"},
+                {"WriterId", "WriterId"},
                 {"Url", "Url"}
             };
 
