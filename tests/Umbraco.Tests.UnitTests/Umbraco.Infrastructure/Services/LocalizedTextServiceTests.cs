@@ -23,10 +23,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea1", new Dictionary<string, string>
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "blah2", "blahValue2" }
                                 }
                             },
-                        }
+                        })
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -119,10 +119,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea", new Dictionary<string, string>
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "testKey", "testValue" }
                                 }
                             }
-                        }
+                        })
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -144,10 +144,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea", new Dictionary<string, string>
@@ -155,7 +155,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "testKey", "testValue" }
                                 }
                             }
-                        }
+                        })
+
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -169,10 +170,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea", new Dictionary<string, string>
@@ -180,7 +181,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "testKey", "testValue" }
                                 }
                             }
-                        }
+                        })
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -195,10 +196,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea", new Dictionary<string, string>
@@ -206,7 +207,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "testKey", "testValue" }
                                 }
                             }
-                        }
+                        })
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -220,10 +221,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea", new Dictionary<string, string>
@@ -231,7 +232,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "testKey", "Hello %0%, you are such a %1% %2%" }
                                 }
                             }
-                        }
+                        })
+
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -350,10 +352,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
-                new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>
+                new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Dictionary<string, IDictionary<string, string>>
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
                         {
                             {
                                 "testArea", new Dictionary<string, string>
@@ -361,7 +363,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     { "testKey", "testValue" }
                                 }
                             }
-                        }
+                        })
                     }
                 }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 

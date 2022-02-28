@@ -185,23 +185,18 @@ namespace Umbraco.Cms.Core.Models.Mapping
             {
                 target.HistoryCleanup = new HistoryCleanupViewModel
                 {
-                    PreventCleanup = sourceWithHistoryCleanup.HistoryCleanup.PreventCleanup,
-                    KeepAllVersionsNewerThanDays =
-                        sourceWithHistoryCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                    KeepLatestVersionPerDayForDays =
-                        sourceWithHistoryCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays,
-                    GlobalKeepAllVersionsNewerThanDays =
-                        _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
-                    GlobalKeepLatestVersionPerDayForDays =
-                        _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
+                    PreventCleanup = sourceWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false,
+                    KeepAllVersionsNewerThanDays = sourceWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,
+                    KeepLatestVersionPerDayForDays = sourceWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays,
+                    GlobalKeepAllVersionsNewerThanDays = _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
+                    GlobalKeepLatestVersionPerDayForDays = _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
                     GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
                 };
             }
 
-
             target.AllowCultureVariant = source.VariesByCulture();
             target.AllowSegmentVariant = source.VariesBySegment();
-            target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
 
             //sync templates
             target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);

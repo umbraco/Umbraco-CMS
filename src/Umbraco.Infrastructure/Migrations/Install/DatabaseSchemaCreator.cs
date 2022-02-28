@@ -60,6 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(CacheInstructionDto),
             typeof(ExternalLoginDto),
             typeof(ExternalLoginTokenDto),
+            typeof(TwoFactorLoginDto),
             typeof(RedirectUrlDto),
             typeof(LockDto),
             typeof(UserGroupDto),
@@ -77,7 +78,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(DocumentCultureVariationDto),
             typeof(ContentScheduleDto),
             typeof(LogViewerQueryDto),
-            typeof(ContentVersionCleanupPolicyDto)
+            typeof(ContentVersionCleanupPolicyDto),
+            typeof(UserGroup2NodeDto),
+            typeof(CreatedPackageSchemaDto)
         };
 
         private readonly IUmbracoDatabase _database;

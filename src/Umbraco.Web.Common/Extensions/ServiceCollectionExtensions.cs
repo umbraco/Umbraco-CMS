@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,8 @@ namespace Umbraco.Extensions
             IConfiguration configuration)
         {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out var umbracoFileConfig);
+            services.AddSingleton(umbracoFileConfig);
 
             // This is nessasary to pick up all the loggins to MS ILogger.
             Log.Logger = logger.SerilogLog;

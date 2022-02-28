@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<InstallSetupStep, CompleteInstallStep>();
 
             builder.Services.AddTransient<InstallStepCollection>();
-            builder.Services.AddUnique<InstallHelper>();
+            builder.Services.AddSingleton<InstallHelper>();
 
             builder.Services.AddTransient<PackageMigrationRunner>();
 

@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
@@ -34,7 +35,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         {
             builder.CacheRefreshers().Add(() => builder.TypeLoader.GetCacheRefreshers());
             builder.DataEditors().Add(() => builder.TypeLoader.GetDataEditors());
-            builder.Actions().Add(() => builder.TypeLoader.GetActions());
+            builder.Actions().Add(() => builder .TypeLoader.GetActions());
 
             // register known content apps
             builder.ContentApps()
@@ -44,7 +45,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<ContentTypeDesignContentAppFactory>()
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
-                .Append<ContentTypeTemplatesContentAppFactory>();
+                .Append<ContentTypeTemplatesContentAppFactory>()
+                .Append<MemberEditorContentAppFactory>()
+                .Append<DictionaryContentAppFactory>();
 
             // all built-in finders in the correct order,
             // devs can then modify this list on application startup
@@ -102,7 +105,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             builder.ManifestFilters();
             builder.MediaUrlGenerators();
             // register OEmbed providers - no type scanning - all explicit opt-in of adding types, IEmbedProvider is not IDiscoverable
-            builder.OEmbedProviders()
+            builder.EmbedProviders()
                 .Append<YouTube>()
                 .Append<Twitter>()
                 .Append<Vimeo>()
@@ -265,7 +268,15 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// Gets the backoffice OEmbed Providers collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
+        [Obsolete("Use EmbedProviders() instead")]
         public static EmbedProvidersCollectionBuilder OEmbedProviders(this IUmbracoBuilder builder)
+            => EmbedProviders(builder);
+
+        /// <summary>
+        /// Gets the backoffice Embed Providers collection builder.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        public static EmbedProvidersCollectionBuilder EmbedProviders(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
 
         /// <summary>

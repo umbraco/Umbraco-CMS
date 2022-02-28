@@ -1,9 +1,9 @@
 (function () {
     "use strict";
 
-    function AppHeaderDirective(eventsService, appState, userService, focusService, backdropService, overlayService) {
+    function AppHeaderDirective(eventsService, appState, userService, focusService, overlayService, $timeout) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, element) {
 
             var evts = [];
 
@@ -16,6 +16,7 @@
                 { value: "assets/img/application/logo@2x.png" },
                 { value: "assets/img/application/logo@3x.png" }
             ];
+            scope.hideBackofficeLogo = Umbraco.Sys.ServerVariables.umbracoSettings.hideBackofficeLogo;
 
             // when a user logs out or timesout
             evts.push(eventsService.on("app.notAuthenticated", function () {
@@ -82,6 +83,46 @@
                 };
 
                 overlayService.open(dialog);
+            };
+
+            scope.logoModal = {
+                show: false,
+                text: "",
+                timer: null
+            };
+            scope.showLogoModal = function() {
+                $timeout.cancel(scope.logoModal.timer);
+                scope.logoModal.show = true;
+                scope.logoModal.text = "version "+Umbraco.Sys.ServerVariables.application.version;
+                $timeout(function () {
+                    const anchorLink = element[0].querySelector('.umb-app-header__logo-modal');
+                    if(anchorLink) {
+                        anchorLink.focus();
+                    }
+                });
+            };
+            scope.keepLogoModal = function() {
+                $timeout.cancel(scope.logoModal.timer);
+            };
+            scope.hideLogoModal = function() {
+                if(scope.logoModal.show === true) {
+                    $timeout.cancel(scope.logoModal.timer);
+                    scope.logoModal.timer = $timeout(function () {
+                        scope.logoModal.show = false;
+                    }, 100);
+                }
+            };
+            scope.stopClickEvent = function($event) {
+                $event.stopPropagation();
+            };
+
+            scope.toggleLogoModal = function() {
+                if(scope.logoModal.show) {
+                    $timeout.cancel(scope.logoModal.timer);
+                    scope.logoModal.show = false;
+                } else {
+                    scope.showLogoModal();
+                }
             };
 
         }

@@ -28,11 +28,15 @@
 
 .login-overlay__logo {
     position: absolute;
-    top: 22px;
-    left: 25px;
-    width: 30px;
+    top: 12.5px;
+    left: 20px;
+    right: 25px;
+    min-width: 112px;    
     height: 30px;
     z-index: 1;
+}
+.login-overlay__logo img {
+    height: 100%;
 }
 
 .login-overlay .umb-modalcolumn {
@@ -66,7 +70,8 @@
     margin-right: 25px;
     margin-top: auto;
     margin-bottom: auto;
-    border-radius: @baseBorderRadius;
+    border-radius: @doubleBorderRadius;
+    box-shadow: 0 1px 6px 1px rgba(0, 0, 0, 0.12);
 }
 
 .login-overlay .form input[type="text"],

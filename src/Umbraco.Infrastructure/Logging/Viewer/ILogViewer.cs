@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Serilog.Events;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
@@ -44,6 +47,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// Gets the current Serilog minimum log level
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
         string GetLogLevel();
 
         /// <summary>

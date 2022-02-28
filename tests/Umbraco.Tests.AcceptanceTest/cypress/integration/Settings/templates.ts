@@ -68,7 +68,9 @@ context('Templates', () => {
         // Open partial view
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
-        cy.get('.ace_text-input').type(edit, {force:true} );
+        cy.get('.ace_content').type(edit);
+        cy.get('.ace_content').contains(edit).should('be.visible');
+        cy.get('.btn-success').should('be.visible')
 
         // Navigate away
         cy.umbracoSection('content');
@@ -101,7 +103,9 @@ context('Templates', () => {
         // Open partial view
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
-        cy.get('.ace_text-input').type(edit, {force:true} );
+        cy.get('.ace_content').type(edit);
+        cy.get('.ace_content').contains(edit).should('be.visible');
+        cy.get('.btn-success').should('be.visible')
 
         // Navigate away
         cy.umbracoSection('content');

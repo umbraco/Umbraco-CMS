@@ -138,14 +138,21 @@
                 vm.commonLogMessages = data;
             });
             
-            var logLevel = logViewerResource.getLogLevel().then(function(data) {
-                vm.logLevel = data; 
-                const index = vm.logTypeLabels.findIndex(x => vm.logLevel.startsWith(x));
-                vm.logLevelColor = index > -1 ? vm.logTypeColors[index] : '#000';
+            var logLevels = logViewerResource.getLogLevels().then(function(data) {
+                vm.logLevels = {};
+                vm.logLevelsCount = 0;
+
+                for (let [key, value] of Object.entries(data)) {
+                    const index = vm.logTypeLabels.findIndex(x => value.startsWith(x));
+                    if (index > -1) {
+                        vm.logLevels[key] = index;
+                        vm.logLevelsCount++;
+                    }
+                }
             });
 
             // Set loading indicator to false when these 3 queries complete
-            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs, logLevel]).then(function () {
+            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs, logLevels]).then(function () {
                 vm.loading = false;
             });
 

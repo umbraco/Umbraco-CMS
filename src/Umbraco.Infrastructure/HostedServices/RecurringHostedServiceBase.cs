@@ -21,9 +21,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly TimeSpan _period;
+        private TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringHostedServiceBase"/> class.
@@ -73,11 +74,29 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            _period = Timeout.InfiniteTimeSpan;
             _timer?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                     _timer?.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
         /// <inheritdoc/>
-        public void Dispose() => _timer?.Dispose();
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;

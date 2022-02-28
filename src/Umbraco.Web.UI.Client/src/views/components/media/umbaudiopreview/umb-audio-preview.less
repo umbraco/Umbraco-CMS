@@ -1,0 +1,18 @@
+.umb-audio-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    audio {
+        max-width: 100%;
+    }
+    audio::-webkit-media-controls-panel {
+        background-color: white;
+    }
+    audio::-webkit-media-controls {
+        padding: 6px;
+    }
+    audio::-webkit-media-controls-enclosure {
+        &:extend(.shadow-depth-1);
+        border-radius: 6px;
+    }
+}
