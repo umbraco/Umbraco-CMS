@@ -9,16 +9,17 @@ namespace Umbraco.Cms.Core.Telemetry
     /// <inheritdoc />
     internal class SiteIdentifierService : ISiteIdentifierService
     {
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IConfigManipulator _configManipulator;
         private readonly ILogger<SiteIdentifierService> _logger;
 
         public SiteIdentifierService(
-            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> optionsMonitor,
             IConfigManipulator configManipulator,
             ILogger<SiteIdentifierService> logger)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = optionsMonitor.CurrentValue;
+            optionsMonitor.OnChange(globalSettings => _globalSettings = globalSettings);
             _configManipulator = configManipulator;
             _logger = logger;
         }
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Core.Telemetry
         {
             // Parse telemetry string as a GUID & verify its a GUID and not some random string
             // since users may have messed with or decided to empty the app setting or put in something random
-            if (Guid.TryParse(_globalSettings.CurrentValue.Id, out var parsedTelemetryId) is false
+            if (Guid.TryParse(_globalSettings.Id, out var parsedTelemetryId) is false
                 || parsedTelemetryId == Guid.Empty)
             {
                 siteIdentifier = Guid.Empty;
