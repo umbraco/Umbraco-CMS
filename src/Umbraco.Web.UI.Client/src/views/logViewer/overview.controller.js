@@ -20,7 +20,6 @@
             mode: "range",
             maxDate: "today",
             conjunction: " to ",
-            mode: 'range',
             plugins: umbFlatpickrPlugins,
             ranges: {
               'Today': [moment(), moment()],
