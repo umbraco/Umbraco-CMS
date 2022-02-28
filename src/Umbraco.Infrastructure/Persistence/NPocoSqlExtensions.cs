@@ -252,7 +252,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderByDescending<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ") DESC");
+            return sql.OrderByDescending(sql.SqlContext.SqlSyntax.GetFieldName(field));
         }
 
         /// <summary>
