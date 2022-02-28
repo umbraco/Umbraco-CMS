@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() =>  DataValueEditorFactory.Create<LabelPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() =>  DataValueEditorFactory.Create<LabelPropertyValueEditor>(Attribute!);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor(_ioHelper);

@@ -42,6 +42,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleValueEditor>(Attribute!);
     }
 }

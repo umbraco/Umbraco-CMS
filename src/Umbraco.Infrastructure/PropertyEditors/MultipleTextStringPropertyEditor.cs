@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute!);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);

@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() =>
-            DataValueEditorFactory.Create<MediaPicker3PropertyValueEditor>(Attribute);
+            DataValueEditorFactory.Create<MediaPicker3PropertyValueEditor>(Attribute!);
 
         internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
         {

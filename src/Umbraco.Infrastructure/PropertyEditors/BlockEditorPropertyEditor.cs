@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<BlockEditorPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<BlockEditorPropertyValueEditor>(Attribute!);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {

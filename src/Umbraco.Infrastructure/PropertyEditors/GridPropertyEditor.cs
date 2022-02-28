@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<GridPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<GridPropertyValueEditor>(Attribute!);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 

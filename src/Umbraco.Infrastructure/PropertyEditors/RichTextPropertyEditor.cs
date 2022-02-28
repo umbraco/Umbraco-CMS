@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <returns></returns>
         protected override IDataValueEditor CreateValueEditor() =>
-            DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute);
+            DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute!);
 
         protected override IConfigurationEditor CreateConfigurationEditor() =>
             new RichTextConfigurationEditor(_ioHelper);

@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         #region Value Editor
 
         protected override IDataValueEditor CreateValueEditor()
-            => DataValueEditorFactory.Create<NestedContentPropertyValueEditor>(Attribute);
+            => DataValueEditorFactory.Create<NestedContentPropertyValueEditor>(Attribute!);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {

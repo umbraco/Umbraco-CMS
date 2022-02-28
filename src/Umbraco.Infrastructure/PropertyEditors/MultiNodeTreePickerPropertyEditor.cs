@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute!);
 
         public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {

@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute);
+            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
             editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
             return editor;
         }

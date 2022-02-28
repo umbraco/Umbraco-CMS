@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         protected override IDataValueEditor CreateValueEditor() =>
-            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute);
+            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService);
 
