@@ -732,8 +732,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (!string.IsNullOrEmpty(path))
             {
-                var isFolderAllowed = IsFolderCreationAllowedHere(parentId.Value);
-                if (isFolderAllowed == false)
+                if (!IsFolderCreationAllowedHere(parentId.Value))
                 {
                     AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
                     return Ok(tempFiles);
@@ -793,8 +792,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (parentId != Constants.System.Root)
             {
                 var mediaFolderItem = _mediaService.GetById(parentId.Value);
-                var mediaFolderType =
-                    allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
+                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
 
                 if (mediaFolderType != null)
                 {
@@ -802,10 +800,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     foreach (ContentTypeSort allowedContentType in mediaFolderType.AllowedContentTypes)
                     {
-                        IMediaType checkMediaTypeItem = _mediaTypeService.Get(allowedContentType.Id.Value);
+                        IMediaType checkMediaTypeItem = allMediaTypes.FirstOrDefault(x => x.Id == allowedContentType.Id.Value);
                         allowedContentTypes.Add(checkMediaTypeItem);
 
-                        var fileProperty = checkMediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                        var fileProperty = checkMediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
                         if (fileProperty != null)
                         {
                             mediaTypeItem = checkMediaTypeItem;
@@ -813,7 +811,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
 
                     //Only set the permission-based mediaType if we only allow 1 specific file under this parent.
-                    if (allowedContentTypes.Count() == 1 && mediaTypeItem != null)
+                    if (allowedContentTypes.Count == 1 && mediaTypeItem != null)
                     {
                         mediaTypeAlias = mediaTypeItem.Alias;
                     }
@@ -821,7 +819,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var typesAllowedAtRoot = _mediaTypeService.GetAll().Where(ct => ct.AllowedAsRoot).ToList();
+                var typesAllowedAtRoot = allMediaTypes.Where(x => x.AllowedAsRoot).ToList();
                 allowedContentTypes.UnionWith(typesAllowedAtRoot);
             }
 
@@ -928,7 +926,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var isFolderAllowed = false;
             if (parentId == Constants.System.Root)
             {
-                var typesAllowedAtRoot = _mediaTypeService.GetAll().Where(ct => ct.AllowedAsRoot).ToList();
+                var typesAllowedAtRoot = allMediaTypes.Where(ct => ct.AllowedAsRoot).ToList();
                 isFolderAllowed = typesAllowedAtRoot.Any(x => x.Alias == Constants.Conventions.MediaTypes.Folder);
             }
             else
