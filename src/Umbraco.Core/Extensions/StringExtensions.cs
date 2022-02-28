@@ -1252,9 +1252,9 @@ namespace Umbraco.Extensions
         /// <param name="alias">The text to filter.</param>
         /// <param name="shortStringHelper">The short string helper.</param>
         /// <returns>The safe alias.</returns>
-        public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper)
+        public static string ToSafeAlias(this string alias, IShortStringHelper? shortStringHelper)
         {
-            return shortStringHelper.CleanStringForSafeAlias(alias);
+            return shortStringHelper?.CleanStringForSafeAlias(alias) ?? string.Empty;
         }
 
         /// <summary>
