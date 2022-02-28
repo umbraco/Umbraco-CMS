@@ -54,12 +54,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult GetResized(string imagePath, int width)
         {
             var ext = Path.GetExtension(imagePath);
-
+            
+            // check if imagePath is local to prevent open redirect
+            if (!Uri.IsWellFormedUriString(imagePath, UriKind.Relative))
+            {
+                return Unauthorized();
+            }
+            
             // we need to check if it is an image by extension
             if (_imageUrlGenerator.IsSupportedImageFormat(ext) == false)
+            {
                 return NotFound();
-
-            //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
+            }
+            
+            // redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             DateTimeOffset? imageLastModified = null;
             try
             {
@@ -80,8 +88,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ImageCropMode = ImageCropMode.Max,
                 CacheBusterValue = rnd
             });
-
-            return new RedirectResult(imageUrl, false);
+            if (Url.IsLocalUrl(imageUrl))
+            {
+                return new LocalRedirectResult(imageUrl, false);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         /// <summary>
