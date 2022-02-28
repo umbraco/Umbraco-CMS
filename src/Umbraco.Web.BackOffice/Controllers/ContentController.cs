@@ -820,11 +820,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
                 defaultCulture);
 
+            //get the updated model
+            var display = mapToDisplay(contentItem.PersistedContent);
+            bool isBlueprint = display.IsBlueprint;
+
+            var contentSavedHeader = isBlueprint ? "editBlueprintSavedHeader" : "editContentSavedHeader";
+            var contentSavedText = isBlueprint ? "editBlueprintSavedText" : "editContentSavedText";
+
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, contentSavedHeader, contentSavedText, "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
                     break;
                 case ContentSaveAction.Schedule:
                 case ContentSaveAction.ScheduleNew:
@@ -834,7 +841,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         wasCancelled = false;
                         break;
                     }
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedHeader", "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
                     break;
 
                 case ContentSaveAction.SendPublish:
@@ -883,7 +891,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                         {
                             globalNotifications.AddErrorNotification(
-                                _localizedTextService.Localize(null,"publish"),
+                                _localizedTextService.Localize(null, "publish"),
                                 _localizedTextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
@@ -900,7 +908,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                         {
                             globalNotifications.AddErrorNotification(
-                                _localizedTextService.Localize(null,"publish"),
+                                _localizedTextService.Localize(null, "publish"),
                                 _localizedTextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
@@ -913,9 +921,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            //get the updated model
-            var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
@@ -1041,7 +1046,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, int variantCount,
             Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-            string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
+            string savedContentHeaderLocalizationAlias, string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
             out bool wasCancelled)
         {
             var saveResult = saveMethod(contentItem.PersistedContent);
@@ -1061,15 +1066,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         var variantName = GetVariantName(culture, segment);
 
                         AddSuccessNotification(notifications, culture, segment,
-                            _localizedTextService.Localize("speechBubbles", "editContentSavedHeader"),
-                            _localizedTextService.Localize(null,variantSavedLocalizationAlias, new[] { variantName }));
+                            _localizedTextService.Localize("speechBubbles", savedContentHeaderLocalizationAlias),
+                            _localizedTextService.Localize(null, variantSavedLocalizationAlias, new[] { variantName }));
                     }
                 }
                 else if (ModelState.IsValid)
                 {
                     globalNotifications.AddSuccessNotification(
-                        _localizedTextService.Localize("speechBubbles", "editContentSavedHeader"),
-                        _localizedTextService.Localize("speechBubbles",invariantSavedLocalizationAlias));
+                        _localizedTextService.Localize("speechBubbles", savedContentHeaderLocalizationAlias),
+                        _localizedTextService.Localize("speechBubbles", invariantSavedLocalizationAlias));
                 }
             }
         }
