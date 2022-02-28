@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>All servers.</returns>
         /// <remarks>By default this method will rely on the repository's cache, which is updated each
         /// time the current server is touched, and the period depends on the configuration. Use the
-        /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
+        /// <paramref name="refresh"/> parameter to force a cache refresh and reload all servers
         /// from the database.</remarks>
         public IEnumerable<IServerRegistration> GetServers(bool refresh = false)
         {
