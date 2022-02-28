@@ -96,19 +96,32 @@
          */
         onReady(selectedDates) {
           for (const [label, range] of Object.entries(pluginData.ranges)) {
-            addRangeButton(label).addEventListener('click', function() {
-                this.blur();
-                fp.setDate([moment(range[0]).toDate(), moment(range[1]).toDate()], true);
+            addRangeButton(label).addEventListener('click', function () {
+
+                let start = moment(range[0]).toDate();
+                let end = moment(range[1]).toDate();
+                console.log("click", label, [start, end]);
+
+                if (!start) {
+                  fp.clear();
+                }
+                else {
+                  fp.setDate([start, end], true);
+                }
+                
                 fp.close();
               });
           }
 
           if (pluginData.rangesNav.children.length > 0) {
             if (pluginData.rangesOnly && pluginData.rangesAllowCustom) {
-              addRangeButton(pluginData.rangesCustomLabel).addEventListener('click', function () {
-                  this.blur();
-                  pluginData.rangesNav.querySelector('.active').classList.remove('active');
-                  this.classList.add('active');
+              let customButton = addRangeButton(pluginData.rangesCustomLabel);
+              customButton.addEventListener('click', function () {
+                  let current = pluginData.rangesNav.querySelector('.active');
+                  if (current) {
+                    current.classList.remove('active');
+                  }
+                  customButton.classList.add('active');
                   fp.calendarContainer.classList.remove('flatpickr-predefined-ranges-only');
                 });
             }
