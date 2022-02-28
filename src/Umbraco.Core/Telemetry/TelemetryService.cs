@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Telemetry.Models;
 
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Telemetry
     /// <inheritdoc/>
     internal class TelemetryService : ITelemetryService
     {
-        private readonly IUmbracoSettingsSection _settings;
+        private readonly ISiteIdentifierService _siteIdentifierService;
         private readonly ManifestParser _manifestParser;
 
         /// <summary>
@@ -18,16 +17,16 @@ namespace Umbraco.Core.Telemetry
         /// </summary>
         public TelemetryService(
             ManifestParser manifestParser,
-            IUmbracoSettingsSection settings)
+            ISiteIdentifierService siteIdentifierService)
         {
             _manifestParser = manifestParser;
-            _settings = settings;
+            _siteIdentifierService = siteIdentifierService;
         }
 
         /// <inheritdoc/>
         public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
         {
-            if (TryGetTelemetryId(out Guid telemetryId) is false)
+            if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
             {
                 telemetryReportData = null;
                 return false;
@@ -39,20 +38,6 @@ namespace Umbraco.Core.Telemetry
                 Version = UmbracoVersion.SemanticVersion.ToSemanticString(),
                 Packages = GetPackageTelemetry()
             };
-            return true;
-        }
-
-        private bool TryGetTelemetryId(out Guid telemetryId)
-        {
-            // Parse telemetry string as a GUID & verify its a GUID and not some random string
-            // since users may have messed with or decided to empty the app setting or put in something random
-            if (Guid.TryParse(_settings.BackOffice.Id, out var parsedTelemetryId) is false)
-            {
-                telemetryId = Guid.Empty;
-                return false;
-            }
-
-            telemetryId = parsedTelemetryId;
             return true;
         }
 

@@ -347,6 +347,7 @@
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
     <Compile Include="Telemetry\ReportSiteTask.cs" />
+    <Compile Include="Telemetry\SiteIdentifierService.cs" />
     <Compile Include="Telemetry\TelemetryComponent.cs" />
     <Compile Include="Telemetry\TelemetryComposer.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />

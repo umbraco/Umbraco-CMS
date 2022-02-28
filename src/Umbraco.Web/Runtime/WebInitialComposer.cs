@@ -39,7 +39,9 @@ using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Models;
+using Umbraco.Core.Telemetry;
 using Umbraco.Web.Models;
+using Umbraco.Web.Telemetry;
 
 namespace Umbraco.Web.Runtime
 {
@@ -57,6 +59,8 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
             composition.ComposeWebMappingProfiles();
+
+            composition.RegisterUnique<ISiteIdentifierService, SiteIdentifierService>();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts

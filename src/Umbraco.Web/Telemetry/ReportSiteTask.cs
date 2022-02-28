@@ -62,9 +62,6 @@ namespace Umbraco.Web.Telemetry
                 {
                     request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
-                    // Set a low timeout - no need to use a larger default timeout for this POST request
-                    _httpClient.Timeout = new TimeSpan(0, 0, 1);
-
                     // Make a HTTP Post to telemetry service
                     // https://telemetry.umbraco.com/installs/
                     // Fire & Forget, do not need to know if its a 200, 500 etc

@@ -400,6 +400,7 @@
     <Compile Include="Services\DateTypeServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
+    <Compile Include="Telemetry\ISiteIdentifierService.cs" />
     <Compile Include="Telemetry\ITelemetryService.cs" />
     <Compile Include="Telemetry\Models\PackageTelemetry.cs" />
     <Compile Include="Telemetry\Models\TelemetryReportData.cs" />
