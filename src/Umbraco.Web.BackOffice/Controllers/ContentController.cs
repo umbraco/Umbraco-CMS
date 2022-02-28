@@ -2117,21 +2117,34 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var variantIndex = 0;
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
 
-            //loop through each variant, set the correct name and property values
+            // loop through each variant, set the correct name and property values
             foreach (var variant in contentSave.Variants)
             {
-                //Don't update anything for this variant if Save is not true
-                if (!variant.Save) continue;
+                // Don't update anything for this variant if Save is not true
+                if (!variant.Save)
+                {
+                    continue;
+                }
 
-                //Don't update the name if it is empty
+                // Don't update the name if it is empty
                 if (!variant.Name.IsNullOrWhiteSpace())
                 {
                     if (contentSave.PersistedContent.ContentType.VariesByCulture())
                     {
                         if (variant.Culture.IsNullOrWhiteSpace())
+                        {
                             throw new InvalidOperationException($"Cannot set culture name without a culture.");
+                        }
+
                         contentSave.PersistedContent.SetCultureName(variant.Name, variant.Culture);
+
+                        // If the variant culture is the default culture we also want to update the name on the Content itself.
+                        if (variant.Culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            contentSave.PersistedContent.Name = variant.Name;
+                        }
                     }
                     else
                     {
@@ -2139,7 +2152,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                //This is important! We only want to process invariant properties with the first variant, for any other variant
+                // This is important! We only want to process invariant properties with the first variant, for any other variant
                 // we need to exclude invariant properties from being processed, otherwise they will be double processed for the
                 // same value which can cause some problems with things such as file uploads.
                 var propertyCollection = variantIndex == 0
@@ -2147,10 +2160,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     : new ContentPropertyCollectionDto
                     {
                         Properties = variant.PropertyCollectionDto.Properties.Where(
-                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace())
+                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace()),
                     };
 
-                //for each variant, map the property values
+                // for each variant, map the property values
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
                     propertyCollection,
@@ -2171,6 +2184,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 variantIndex++;
             }
 
+            // Map IsDirty cultures to edited cultures, to make it easier to verify changes on specific variants on Saving and Saved events.
+            IEnumerable<string> editedCultures = contentSave.PersistedContent.CultureInfos.Values
+                .Where(x => x.IsDirty())
+                .Select(x => x.Culture);
+            contentSave.PersistedContent.SetCultureEdited(editedCultures);
+
             // handle template
             if (string.IsNullOrWhiteSpace(contentSave.TemplateAlias)) // cleared: clear if not already null
             {
@@ -2181,10 +2200,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else // set: update if different
             {
-                var template = _fileService.GetTemplate(contentSave.TemplateAlias);
+                ITemplate template = _fileService.GetTemplate(contentSave.TemplateAlias);
                 if (template == null)
                 {
-                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    // ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
                     _logger.LogWarning("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else if (template.Id != contentSave.PersistedContent.TemplateId)
