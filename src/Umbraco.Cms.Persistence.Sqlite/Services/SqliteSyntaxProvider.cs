@@ -142,7 +142,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     {
         foreach (var lockId in lockIds)
         {
-            WriteLock(db, _globalSettings.Value.SqlWriteLockTimeOut, lockId);
+            WriteLock(db, _globalSettings.Value.DistributedLockingWriteLockDefaultTimeout, lockId);
         }
     }
 

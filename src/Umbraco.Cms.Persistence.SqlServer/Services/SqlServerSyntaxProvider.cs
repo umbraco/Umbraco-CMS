@@ -300,7 +300,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
-            WriteLock(db, _globalSettings.Value.SqlWriteLockTimeOut, lockIds);
+            WriteLock(db, _globalSettings.Value.DistributedLockingWriteLockDefaultTimeout, lockIds);
         }
 
         public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)

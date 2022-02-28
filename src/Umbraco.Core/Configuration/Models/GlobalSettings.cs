@@ -27,7 +27,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticInstallMissingDatabase = false;
         internal const bool StaticDisableElectionForSingleServer = false;
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
-        internal const string StaticSqlWriteLockTimeOut = "00:00:05";
+        internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
+        internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
         internal const bool StaticSanitizeTinyMce = false;
         internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
@@ -201,12 +202,21 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
         /// <summary>
-        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// Gets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.
         /// </summary>
         /// <remarks>
-        /// The default value is 5000 milliseconds.
+        /// The default value is 60 seconds.
         /// </remarks>
-        [DefaultValue(StaticSqlWriteLockTimeOut)]
-        public TimeSpan SqlWriteLockTimeOut { get; set; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
+        [DefaultValue(StaticDistributedLockingReadLockDefaultTimeout)]
+        public TimeSpan DistributedLockingReadLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingReadLockDefaultTimeout);
+
+        /// <summary>
+        /// Gets a value representing the maximum time to wait whilst attempting to obtain a distributed write lock.
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5 seconds.
+        /// </remarks>
+        [DefaultValue(StaticDistributedLockingWriteLockDefaultTimeout)]
+        public TimeSpan DistributedLockingWriteLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingWriteLockDefaultTimeout);
     }
 }
