@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -16,6 +17,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
@@ -24,12 +26,12 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// The user store for back office users
     /// </summary>
-    public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>
+    public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>, IUserSessionStore<BackOfficeIdentityUser>
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
-        private readonly IExternalLoginService _externalLoginService;
+        private readonly IExternalLoginWithKeyService _externalLoginService;
         private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoMapper _mapper;
         private readonly AppCaches _appCaches;
@@ -37,11 +39,12 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeUserStore"/> class.
         /// </summary>
+        [ActivatorUtilitiesConstructor]
         public BackOfficeUserStore(
             IScopeProvider scopeProvider,
             IUserService userService,
             IEntityService entityService,
-            IExternalLoginService externalLoginService,
+            IExternalLoginWithKeyService externalLoginService,
             IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
@@ -104,7 +107,7 @@ namespace Umbraco.Cms.Core.Security
             if (isLoginsPropertyDirty)
             {
                 _externalLoginService.Save(
-                    userEntity.Id,
+                    userEntity.Key,
                     user.Logins.Select(x => new ExternalLogin(
                         x.LoginProvider,
                         x.ProviderKey,
@@ -114,7 +117,7 @@ namespace Umbraco.Cms.Core.Security
             if (isTokensPropertyDirty)
             {
                 _externalLoginService.Save(
-                    userEntity.Id,
+                    userEntity.Key,
                     user.LoginTokens.Select(x => new ExternalLoginToken(
                         x.LoginProvider,
                         x.Name,
@@ -156,7 +159,7 @@ namespace Umbraco.Cms.Core.Security
                     if (isLoginsPropertyDirty)
                     {
                         _externalLoginService.Save(
-                            found.Id,
+                            found.Key,
                             user.Logins.Select(x => new ExternalLogin(
                                 x.LoginProvider,
                                 x.ProviderKey,
@@ -166,7 +169,7 @@ namespace Umbraco.Cms.Core.Security
                     if (isTokensPropertyDirty)
                     {
                         _externalLoginService.Save(
-                            found.Id,
+                            found.Key,
                             user.LoginTokens.Select(x => new ExternalLoginToken(
                                 x.LoginProvider,
                                 x.Name,
@@ -190,13 +193,14 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IUser found = _userService.GetUserById(UserIdToInt(user.Id));
+            var userId = UserIdToInt(user.Id);
+            IUser found = _userService.GetUserById(userId);
             if (found != null)
             {
                 _userService.Delete(found);
             }
 
-            _externalLoginService.DeleteUserLogins(UserIdToInt(user.Id));
+            _externalLoginService.DeleteUserLogins(userId.ToGuid());
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -414,7 +418,7 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user != null)
             {
-                var userId = UserIdToInt(user.Id);
+                var userId = UserIdToInt(user.Id).ToGuid();
                 user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(userId)));
                 user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(userId)));
             }

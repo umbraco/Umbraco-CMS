@@ -4,9 +4,9 @@ using System.Linq;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public CacheInstructionRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
         /// <inheritdoc/>
-        private IScope AmbientScope => _scopeAccessor.AmbientScope;
+        private IDatabaseScope AmbientScope => _scopeAccessor.AmbientScope;
 
         /// <inheritdoc/>
         public int CountAll()

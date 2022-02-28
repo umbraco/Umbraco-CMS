@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -82,6 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var list = new[]
                            {
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                               "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
                                "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
                                "DELETE FROM umbracoRelation WHERE parentId = @id",
                                "DELETE FROM umbracoRelation WHERE childId = @id",
@@ -182,7 +183,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<Member2MemberGroupDto>(x => x.Member == memberId);
 
             return Database.Fetch<NodeDto>(sql)
-                .DistinctBy(dto => dto.NodeId)
+                .LegacyDistinctBy(dto => dto.NodeId)
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 
@@ -199,7 +200,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where("cmsMember.LoginName=@loginName", new { loginName = username });
 
             return Database.Fetch<NodeDto>(sql)
-                .DistinctBy(dto => dto.NodeId)
+                .LegacyDistinctBy(dto => dto.NodeId)
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 

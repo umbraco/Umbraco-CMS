@@ -34,10 +34,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         internal static IUmbracoBuilder AddFileSystems(this IUmbracoBuilder builder)
         {
             // register FileSystems, which manages all filesystems
-            builder.Services.AddUnique<FileSystems>();
+            builder.Services.AddSingleton<FileSystems>();
 
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+
+            builder.Services.AddUnique<IViewHelper, ViewHelper>();
+            builder.Services.AddUnique<IDefaultViewContentProvider, DefaultViewContentProvider>();
 
             builder.SetMediaFileSystem(factory =>
             {
@@ -46,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
                 GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
-                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
+                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPhysicalRootPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
                 return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
             });

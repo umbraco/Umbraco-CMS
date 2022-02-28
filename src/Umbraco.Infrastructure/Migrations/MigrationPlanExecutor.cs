@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using Type = System.Type;
 
@@ -12,16 +13,19 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
         private readonly IScopeProvider _scopeProvider;
+        private readonly IScopeAccessor _scopeAccessor;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly ILogger<MigrationPlanExecutor> _logger;
 
         public MigrationPlanExecutor(
             IScopeProvider scopeProvider,
+            IScopeAccessor scopeAccessor,
             ILoggerFactory loggerFactory,
             IMigrationBuilder migrationBuilder)
         {
             _scopeProvider = scopeProvider;
+            _scopeAccessor = scopeAccessor;
             _loggerFactory = loggerFactory;
             _migrationBuilder = migrationBuilder;
             _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
@@ -61,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 // that packages notification handlers may explode because that package isn't fully installed yet.
                 using (scope.Notifications.Suppress())
                 {
-                    var context = new MigrationContext(plan, scope.Database, _loggerFactory.CreateLogger<MigrationContext>());
+                    var context = new MigrationContext(plan, _scopeAccessor.AmbientScope.Database, _loggerFactory.CreateLogger<MigrationContext>());
 
                     while (transition != null)
                     {

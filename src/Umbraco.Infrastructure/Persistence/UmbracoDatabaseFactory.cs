@@ -292,7 +292,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             _pocoMappers.AddRange(_dbProviderFactoryCreator.ProviderSpecificMappers(_providerName));
 
-            var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
+            var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver, _pocoMappers);
             _pocoDataFactory = factory;
             var config = new FluentConfig(xmappers => factory);
 

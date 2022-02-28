@@ -15,12 +15,12 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
@@ -657,7 +657,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // in the table?
 
             // get all PropertyDataDto for all definitions / versions
-            var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, 2000, batch =>
+            var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
                 SqlContext.Sql()
                     .Select<PropertyDataDto>()
                     .From<PropertyDataDto>()
@@ -666,7 +666,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // get PropertyDataDto distinct PropertyTypeDto
             var allPropertyTypeIds = allPropertyDataDtos.Select(x => x.PropertyTypeId).Distinct().ToList();
-            var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, 2000, batch =>
+            var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, Constants.Sql.MaxParameterCount, batch =>
                 SqlContext.Sql()
                     .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
                     .From<PropertyTypeDto>()

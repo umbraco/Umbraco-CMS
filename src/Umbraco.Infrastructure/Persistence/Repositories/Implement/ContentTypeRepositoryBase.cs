@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -12,12 +12,12 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -795,7 +795,7 @@ AND umbracoNode.id <> @id",
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             // delete existing relations (for target language)
@@ -933,7 +933,7 @@ AND umbracoNode.id <> @id",
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             //first clear out any existing property data that might already exists under the target language
@@ -1032,7 +1032,7 @@ AND umbracoNode.id <> @id",
             //based on the current variance of each item to see if it's 'edited' value should be true/false.
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             var propertySql = Sql()
@@ -1121,14 +1121,20 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            //lookup all matching rows in umbracoDocumentCultureVariation
-            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
-                .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
-                    Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
-                            .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
-                            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
-                //convert to dictionary with the same key type
-                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+            // lookup all matching rows in umbracoDocumentCultureVariation
+            // fetch in batches to account for maximum parameter count (distinct languages can't exceed 2000)
+            var languageIds = editedLanguageVersions.Keys.Select(x => x.langId).Distinct().ToArray();
+            var nodeIds = editedLanguageVersions.Keys.Select(x => x.nodeId).Distinct();
+            var docCultureVariationsToUpdate = nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length)
+                .SelectMany(group =>
+                {
+                    var sql = Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
+                        .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, languageIds)
+                        .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, group);
+
+                    return Database.Fetch<DocumentCultureVariationDto>(sql);
+                })
+                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x); //convert to dictionary with the same key type
 
             var toUpdate = new List<DocumentCultureVariationDto>();
             foreach (var ev in editedLanguageVersions)
@@ -1377,6 +1383,7 @@ WHERE {Cms.Core.Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cm
             var list = new List<string>
             {
                 "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
                 "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
                 "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",

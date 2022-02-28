@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -12,15 +15,14 @@ namespace JsonSchema
     public class UmbracoJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
         /// <summary>
-        /// Creates a new instance of <see cref="UmbracoJsonSchemaGeneratorSettings"/>.
+        /// Initializes a new instance of the <see cref="UmbracoJsonSchemaGeneratorSettings"/> class.
         /// </summary>
-        /// <param name="definitionPrefix">The prefix to use for definitions generated.</param>
         public UmbracoJsonSchemaGeneratorSettings()
         {
             AlwaysAllowAdditionalObjectProperties = true;
             SerializerSettings = new JsonSerializerSettings()
             {
-                ContractResolver =  new WritablePropertiesOnlyResolver()
+                ContractResolver = new WritablePropertiesOnlyResolver()
             };
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
             SchemaNameGenerator = new NamespacePrefixedSchemaNameGenerator();

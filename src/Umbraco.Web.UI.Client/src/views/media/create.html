@@ -5,11 +5,13 @@
 			<h5><localize key="create_createUnder">Create under</localize> {{currentNode.name}}</h5>
 
             <div ng-if="allowedTypes && allowedTypes.length === 0">
-                <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noMediaTypesWithNoSettingsAccess"></localize></p>
+                <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</localize></p>
                 <div ng-if="hasSettingsAccess">
-                    <p class="abstract"><localize key="create_noMediaTypes"></localize></p>
+                    <p class="abstract"><localize key="create_noMediaTypes">There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types
+						Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node
+						types</strong> under <strong>Permissions</strong>.</localize></p>
                     <a class="btn" href="#settings/mediaTypes/edit/{{mediaTypeId}}?view=permissions" role="button" ng-click="close()">
-                        <localize key="create_noMediaTypesEditPermissions"></localize>
+                        <localize key="create_noMediaTypesEditPermissions">Edit permissions for this Media Type</localize>
                     </a>
                 </div>
             </div>

@@ -50,6 +50,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
@@ -68,7 +69,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddLogging();
 
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();
             builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
@@ -93,9 +93,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Mappers().AddCoreMappers();
 
             // register the scope provider
-            builder.Services.AddSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
             builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+
+
             builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
             builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
@@ -166,7 +168,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
-            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>();
+            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
+                new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>())
+            );
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
@@ -216,6 +220,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<IMainDomKeyGenerator, DefaultMainDomKeyGenerator>();
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
@@ -224,21 +229,29 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
                 var databaseSchemaCreatorFactory = factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
+                var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
 
-                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(
-                            loggerFactory.CreateLogger<SqlMainDomLock>(),
+                switch (globalSettings.Value.MainDomLock)
+                {
+                    case "SqlMainDomLock":
+                        return new SqlMainDomLock(
                             loggerFactory,
                             globalSettings,
                             connectionStrings,
                             dbCreator,
-                            hostingEnvironment,
+                            mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
-                            npocoMappers)
-                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+                            npocoMappers);
+
+                    case "MainDomSemaphoreLock":
+                        return new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+
+                    case "FileSystemMainDomLock":
+                    default:
+                        return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
+                }
             });
 
             return builder;
@@ -266,15 +279,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
+            builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
             builder.SetLogViewer<SerilogJsonLogViewer>();
             builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
                 factory.GetRequiredService<ILogViewerConfig>(),
                 factory.GetRequiredService<ILoggingConfiguration>(),
+                factory.GetRequiredService<ILogLevelLoader>(),
                 Log.Logger));
 
             return builder;
         }
-
 
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Linq;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax

@@ -76,7 +76,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     }));
 
             //if the request is for folders only then just return
-            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1")
+                return nodes;
 
             var children = _entityService.GetChildren(intId, UmbracoObjectTypes.DocumentType).ToArray();
             var contentTypes = _contentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);

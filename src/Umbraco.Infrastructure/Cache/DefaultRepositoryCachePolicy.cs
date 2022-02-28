@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache

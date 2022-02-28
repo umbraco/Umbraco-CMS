@@ -8,11 +8,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
     /// <para>Returns <see cref="IEntitySlim"/> objects, i.e. lightweight representation of entities.</para>
     /// </remarks>
-    internal class EntityRepository : RepositoryBase, IEntityRepository
+    internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     {
         public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
             : base(scopeAccessor, appCaches)
@@ -251,6 +251,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
         }
 
+        public int ReserveId(Guid key)
+        {
+            NodeDto node;
+
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation);
+
+            node = Database.SingleOrDefault<NodeDto>(sql);
+            if (node != null)
+                throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
+
+            node = new NodeDto
+            {
+                UniqueId = key,
+                Text = "RESERVED.ID",
+                NodeObjectType = Cms.Core.Constants.ObjectTypes.IdReservation,
+
+                CreateDate = DateTime.Now,
+                UserId = null,
+                ParentId = -1,
+                Level = 1,
+                Path = "-1",
+                SortOrder = 0,
+                Trashed = false
+            };
+            Database.Insert(node);
+
+            return node.NodeId;
+        }
+
         public bool Exists(Guid key)
         {
             var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
@@ -279,7 +311,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (v == null) return entitiesList;
 
             // fetch all variant info dtos
-            var dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id), 2000, GetVariantInfos);
+            var dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id), Constants.Sql.MaxParameterCount, GetVariantInfos);
 
             // group by node id (each group contains all languages)
             var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);

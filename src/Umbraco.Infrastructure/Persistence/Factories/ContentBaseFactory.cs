@@ -172,9 +172,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
+        public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(IContent entity, ContentScheduleCollection contentSchedule, ILanguageRepository languageRepository)
         {
-            return entity.ContentSchedule.FullSchedule.Select(x =>
+            return contentSchedule.FullSchedule.Select(x =>
                 (x, new ContentScheduleDto
                 {
                     Action = x.Action.ToString(),

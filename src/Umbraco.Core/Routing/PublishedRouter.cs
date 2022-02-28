@@ -253,6 +253,11 @@ namespace Umbraco.Cms.Core.Routing
                 builder.SetPublishedContent(content);
             }
 
+            if (!builder.HasDomain())
+            {
+                FindDomain(builder);
+            }
+
             return BuildRequest(builder);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
 using NPoco;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;

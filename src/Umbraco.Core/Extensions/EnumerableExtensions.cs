@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -75,13 +75,13 @@ namespace Umbraco.Extensions
                     yield return result;
         }
 
-        /// <summary>The distinct by.</summary>
+        /// <summary>The legacy distinct by.</summary>
         /// <param name="source">The source.</param>
         /// <param name="keySelector">The key selector.</param>
         /// <typeparam name="TSource">Source type</typeparam>
         /// <typeparam name="TKey">Key type</typeparam>
         /// <returns>the unique list</returns>
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        public static IEnumerable<TSource> LegacyDistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
             where TKey : IEquatable<TKey>
         {
             return source.Distinct(DelegateEqualityComparer<TSource>.CompareMember(keySelector));

@@ -24,7 +24,7 @@
         "version": {
             "type": "parameter",
             "datatype": "string",
-            "defaultValue": "9.1.0",
+            "defaultValue": "10.0.0-rc",
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
         },
@@ -84,16 +84,12 @@
             "datatype": "choice",
             "choices": [
                 {
-                    "choice": "net5.0",
-                    "description": "Target net5.0"
-                },
-                {
                     "choice": "net6.0",
                     "description": "Target net6.0"
                 }
             ],
-            "replaces": "net5.0",
-            "defaultValue": "net5.0"
+            "replaces": "net6.0",
+            "defaultValue": "net6.0"
         }
     }
 }

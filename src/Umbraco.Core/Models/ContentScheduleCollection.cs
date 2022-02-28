@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -223,6 +223,20 @@ namespace Umbraco.Cms.Core.Models
             }
 
             return true;
+        }
+
+        public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
+        {
+            var schedule = new ContentScheduleCollection();
+            schedule.Add(string.Empty, release, expire);
+            return schedule;
+        }
+
+        public static ContentScheduleCollection CreateWithEntry(string culture, DateTime? release, DateTime? expire)
+        {
+            var schedule = new ContentScheduleCollection();
+            schedule.Add(culture, release, expire);
+            return schedule;
         }
     }
 }

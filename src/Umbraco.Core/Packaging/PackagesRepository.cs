@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Packaging
     /// <summary>
     /// Manages the storage of installed/created package definitions
     /// </summary>
+    [Obsolete("Packages have now been moved to the database instead of local files, please use CreatedPackageSchemaRepository instead")]
     public class PackagesRepository : ICreatedPackagesRepository
     {
         private readonly IContentService _contentService;
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
+            _mediaFolderPath = mediaFolderPath ?? Path.Combine(globalSettings.Value.UmbracoMediaPhysicalRootPath, Constants.SystemDirectories.CreatedPackages);
 
             _parser = new PackageDefinitionXmlParser();
             _mediaService = mediaService;
@@ -578,7 +579,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                         ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
                         //var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
-                        //    .DistinctBy(x => x.EntityId)
+                        //    .LegacyDistinctBy(x => x.EntityId)
                         //    .OrderBy(x => x.EntityId);
 
                         //foreach (var taggedEntity in allExportedTaggedEntities)
@@ -743,6 +744,14 @@ namespace Umbraco.Cms.Core.Packaging
 
             var packagesXml = XDocument.Load(packagesFile);
             return packagesXml;
+        }
+
+        public void DeleteLocalRepositoryFiles()
+        {
+            var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
+            File.Delete(packagesFile);
+            var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
+            Directory.Delete(packagesFolder);
         }
     }
 }

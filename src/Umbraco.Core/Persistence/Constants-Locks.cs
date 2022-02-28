@@ -65,6 +65,11 @@ namespace Umbraco.Cms.Core
             /// All languages.
             /// </summary>
             public const int Languages = -340;
+
+            /// <summary>
+            /// ScheduledPublishing job.
+            /// </summary>
+            public const int ScheduledPublishing = -341;
         }
     }
 }

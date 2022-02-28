@@ -205,6 +205,8 @@ namespace Umbraco.Cms.Core.Security
 
             await lockoutStore.ResetAccessFailedCountAsync(user, CancellationToken.None);
 
+            //Ensure the password config is null, so it is set to the default in repository
+            user.PasswordConfig = null;
             return await UpdateAsync(user);
         }
 
@@ -234,6 +236,11 @@ namespace Umbraco.Cms.Core.Security
                 // here we are persisting the value for the back office
             }
 
+            if (string.IsNullOrEmpty(user.PasswordConfig))
+            {
+                //We cant pass null as that would be interpreted as the default algoritm, but due to the failing attempt we dont know.
+                user.PasswordConfig = Constants.Security.UnknownPasswordConfigJson;
+            }
             IdentityResult result = await UpdateAsync(user);
             return result;
         }
@@ -255,6 +262,14 @@ namespace Umbraco.Cms.Core.Security
             var hash = await userPasswordStore.GetPasswordHashAsync(user, new CancellationToken());
 
             return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
+        {
+            var results = await base.GetValidTwoFactorProvidersAsync(user);
+
+            return results;
         }
     }
 }

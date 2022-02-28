@@ -8,11 +8,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -146,7 +146,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
-            entity.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupAlias, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
             var standardPropertyTypes = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             foreach (var standardPropertyType in standardPropertyTypes)
             {

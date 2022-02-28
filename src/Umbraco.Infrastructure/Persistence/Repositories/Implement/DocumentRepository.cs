@@ -21,6 +21,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -233,6 +234,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
@@ -292,9 +294,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+            var pageIndex = skip / take;
+
+            return MapDtosToContent(Database.Page<DocumentDto>(pageIndex+1, take, sql).Items, true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, false, true).Skip(skip).Take(take);
+                false, false, true);
         }
 
         public override IContent GetVersion(int versionId)
@@ -477,9 +481,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
 
-            //insert the schedule
-            PersistContentSchedule(entity, false);
-
             // persist the variations
             if (entity.ContentType.VariesByCulture())
             {
@@ -553,6 +554,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IContent entity)
         {
             var isEntityDirty = entity.IsDirty();
+            var editedSnapshot = entity.Edited;
 
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
@@ -627,6 +629,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup;
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
@@ -638,6 +644,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     contentVersionDto.Id = 0; // want a new id
                     contentVersionDto.Current = true; // current version
                     contentVersionDto.Text = entity.Name;
+                    contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                     Database.Insert(contentVersionDto);
                     entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
@@ -655,6 +662,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
                 if (!publishing && entity.PublishName != entity.Name)
+                {
+                    edited = true;
+                }
+
+                // To establish the new value of "edited" we compare all properties publishedValue to editedValue and look
+                // for differences.
+                //
+                // If we SaveAndPublish but the publish fails (e.g. already scheduled for release)
+                // we have lost the publishedValue on IContent (in memory vs database) so we cannot correctly make that comparison.
+                //
+                // This is a slight change to behaviour, historically a publish, followed by change & save, followed by undo change & save
+                // would change edited back to false.
+                if (!publishing && editedSnapshot)
                 {
                     edited = true;
                 }
@@ -721,12 +741,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
                 Database.Update(dto);
 
-                //update the schedule
-                if (entity.IsPropertyDirty(nameof(entity.ContentSchedule)))
-                {
-                    PersistContentSchedule(entity, true);
-                }
-
                 // if entity is publishing, update tags, else leave tags there
                 // means that implicitly unpublished, or trashed, entities *still* have tags in db
                 if (entity.PublishedState == PublishedState.Publishing)
@@ -783,19 +797,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //}
         }
 
-        private void PersistContentSchedule(IContent content, bool update)
+        /// <inheritdoc />
+        public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
         {
-            var schedules = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository).ToList();
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (contentSchedule == null)
+            {
+                throw new ArgumentNullException(nameof(contentSchedule));
+            }
+
+            var schedules = ContentBaseFactory.BuildScheduleDto(content, contentSchedule, LanguageRepository).ToList();
 
             //remove any that no longer exist
-            if (update)
-            {
-                var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
-                Database.Execute(Sql()
-                    .Delete<ContentScheduleDto>()
-                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
-                    .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
-            }
+            var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
+            Database.Execute(Sql()
+                .Delete<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
+                .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
 
             //add/update the rest
             foreach (var schedule in schedules)
@@ -1194,7 +1216,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool withCache = false,
             bool loadProperties = true,
             bool loadTemplates = true,
-            bool loadSchedule = true,
             bool loadVariants = true)
         {
             var temps = new List<TempContent<Content>>();
@@ -1269,8 +1290,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 properties = GetPropertyCollections(temps);
             }
 
-            var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
-
             // assign templates and properties
             foreach (var temp in temps)
             {
@@ -1292,14 +1311,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
                 }
-
-                if (loadSchedule)
-                {
-                    // load in the schedule
-                    if (schedule.TryGetValue(temp.Content.Id, out var s))
-                        temp.Content.ContentSchedule = s;
-                }
-
             }
 
             if (loadVariants)
@@ -1357,11 +1368,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     SetVariations(content, contentVariations, documentVariations);
                 }
 
-                //load in the schedule
-                var schedule = GetContentSchedule(dto.NodeId);
-                if (schedule.TryGetValue(dto.NodeId, out var s))
-                    content.ContentSchedule = s;
-
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
                 return content;
@@ -1372,21 +1378,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        private IDictionary<int, ContentScheduleCollection> GetContentSchedule(params int[] contentIds)
+        /// <inheritdoc />
+        public ContentScheduleCollection GetContentSchedule(int contentId)
         {
-            var result = new Dictionary<int, ContentScheduleCollection>();
+            var result = new ContentScheduleCollection();
 
-            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, 2000, batch => Sql()
+            var scheduleDtos = Database.Fetch<ContentScheduleDto>(Sql()
                 .Select<ContentScheduleDto>()
                 .From<ContentScheduleDto>()
-                .WhereIn<ContentScheduleDto>(x => x.NodeId, batch));
+                .Where<ContentScheduleDto>(x => x.NodeId == contentId ));
 
             foreach (var scheduleDto in scheduleDtos)
             {
-                if (!result.TryGetValue(scheduleDto.NodeId, out var col))
-                    col = result[scheduleDto.NodeId] = new ContentScheduleCollection();
-
-                col.Add(new ContentSchedule(scheduleDto.Id,
+                result.Add(new ContentSchedule(scheduleDto.Id,
                     LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
                     scheduleDto.Date,
                     scheduleDto.Action == ContentScheduleAction.Release.ToString()
@@ -1426,7 +1430,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (versions.Count == 0)
                 return new Dictionary<int, List<ContentVariation>>();
 
-            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, 2000, batch
+            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, Constants.Sql.MaxParameterCount, batch
                 => Sql()
                     .Select<ContentVersionCultureVariationDto>()
                     .From<ContentVersionCultureVariationDto>()
@@ -1455,7 +1459,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var ids = temps.Select(x => x.Id);
 
-            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, 2000, batch =>
+            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
                 Sql()
                     .Select<DocumentCultureVariationDto>()
                     .From<DocumentCultureVariationDto>()

@@ -1,0 +1,38 @@
+<div>
+    <umb-editor-view>
+        <umb-editor-header
+            name="model.title"
+            hide-icon="true"
+            hide-alias="true"
+            name-locked="true"
+            hide-description="true">
+        </umb-editor-header>
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+                    <div class="flex mb2" ng-repeat="field in model.availableFields">
+                        <span class="mr2">
+                            <umb-toggle
+                                checked="model.fieldIsSelected(field)"
+                                on-click="model.toggleField(field)"
+                                hide-icons="true">
+                            </umb-toggle>
+                        </span>
+                        <span>{{ field }}</span>
+                    </div>
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="model.close()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+    </umb-editor-view>
+</div>

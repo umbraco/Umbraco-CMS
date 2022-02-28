@@ -15,7 +15,6 @@ namespace Umbraco.Cms.Core.Models
     public class Content : ContentBase, IContent
     {
         private int? _templateId;
-        private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
         private HashSet<string> _editedCultures;
@@ -110,44 +109,6 @@ namespace Umbraco.Cms.Core.Models
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
-        }
-
-        /// <inheritdoc />
-        [DoNotClone]
-        public ContentScheduleCollection ContentSchedule
-        {
-            get
-            {
-                if (_schedule == null)
-                {
-                    _schedule = new ContentScheduleCollection();
-                    _schedule.CollectionChanged += ScheduleCollectionChanged;
-                }
-                return _schedule;
-            }
-            set
-            {
-                if (_schedule != null)
-                {
-                    _schedule.ClearCollectionChangedEvents();
-                }
-
-                SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
-                if (_schedule != null)
-                {
-                    _schedule.CollectionChanged += ScheduleCollectionChanged;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Collection changed event handler to ensure the schedule field is set to dirty when the schedule changes
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ScheduleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(ContentSchedule));
         }
 
         /// <summary>
@@ -482,14 +443,6 @@ namespace Umbraco.Cms.Core.Models
                 clonedContent._publishInfos.ClearCollectionChangedEvents();          //clear this event handler if any
                 clonedContent._publishInfos = (ContentCultureInfosCollection)_publishInfos.DeepClone(); //manually deep clone
                 clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
-            }
-
-            //if properties exist then deal with event bindings
-            if (clonedContent._schedule != null)
-            {
-                clonedContent._schedule.ClearCollectionChangedEvents();         //clear this event handler if any
-                clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
-                clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
             }
 
             clonedContent._currentPublishCultureChanges.updatedCultures = null;

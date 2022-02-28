@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public ActionResult<TreeNode> GetTreeNode([FromRoute] string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNode> GetTreeNode([FromRoute] string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
         {
             int asInt;
             Guid asGuid = Guid.Empty;
@@ -325,7 +325,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <returns></returns>
         protected bool HasPathAccess(IUmbracoEntity entity, FormCollection queryStrings)
         {
-            if (entity == null) return false;
+            if (entity == null)
+                return false;
             return RecycleBinId == Constants.System.RecycleBinContent
                 ? _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService, _appCaches)
                 : _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService, _appCaches);
@@ -469,13 +470,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {
-	                menu.Items.Add(new MenuItem("emptyrecyclebin", LocalizedTextService)
-	                {
-	                    Icon = "trash",
-	                    OpensDialog = true
-	                });
-	                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
-				}
+                    menu.Items.Add(new MenuItem("emptyRecycleBin", LocalizedTextService)
+                    {
+                        Icon = "trash",
+                        OpensDialog = true
+                    });
+                    menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+                }
                 return menu;
             }
 
@@ -608,7 +609,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <returns></returns>
         internal bool IgnoreUserStartNodes(FormCollection queryStrings)
         {
-            if (_ignoreUserStartNodes.HasValue) return _ignoreUserStartNodes.Value;
+            if (_ignoreUserStartNodes.HasValue)
+                return _ignoreUserStartNodes.Value;
 
             var dataTypeKey = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeKey);
             _ignoreUserStartNodes = dataTypeKey.HasValue && _dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);

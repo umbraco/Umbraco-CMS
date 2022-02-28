@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -13,13 +15,16 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
+    /// <inheritdoc />
     public class CoreRuntime : IRuntime
     {
-        private readonly ILogger<CoreRuntime> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ComponentCollection _components;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
@@ -27,11 +32,48 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IMainDom _mainDom;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly ILogger<CoreRuntime> _logger;
         private CancellationToken _cancellationToken;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
+        /// Initializes a new instance of the <see cref="CoreRuntime" /> class.
         /// </summary>
+        public CoreRuntime(
+            IRuntimeState state,
+            ILoggerFactory loggerFactory,
+            ComponentCollection components,
+            IApplicationShutdownRegistry applicationShutdownRegistry,
+            IProfilingLogger profilingLogger,
+            IMainDom mainDom,
+            IUmbracoDatabaseFactory databaseFactory,
+            IEventAggregator eventAggregator,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoVersion umbracoVersion,
+            IServiceProvider serviceProvider,
+            IHostApplicationLifetime hostApplicationLifetime)
+        {
+            State = state;
+
+            _loggerFactory = loggerFactory;
+            _components = components;
+            _applicationShutdownRegistry = applicationShutdownRegistry;
+            _profilingLogger = profilingLogger;
+            _mainDom = mainDom;
+            _databaseFactory = databaseFactory;
+            _eventAggregator = eventAggregator;
+            _hostingEnvironment = hostingEnvironment;
+            _umbracoVersion = umbracoVersion;
+            _serviceProvider = serviceProvider;
+            _hostApplicationLifetime = hostApplicationLifetime;
+            _logger = _loggerFactory.CreateLogger<CoreRuntime>();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete]
         public CoreRuntime(
             ILoggerFactory loggerFactory,
             IRuntimeState state,
@@ -40,18 +82,51 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IProfilingLogger profilingLogger,
             IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
-            IEventAggregator eventAggregator)
-        {
-            State = state;
-            _loggerFactory = loggerFactory;
-            _components = components;
-            _applicationShutdownRegistry = applicationShutdownRegistry;
-            _profilingLogger = profilingLogger;
-            _mainDom = mainDom;
-            _databaseFactory = databaseFactory;
-            _eventAggregator = eventAggregator;
-            _logger = _loggerFactory.CreateLogger<CoreRuntime>();
-        }
+            IEventAggregator eventAggregator,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoVersion umbracoVersion,
+            IServiceProvider serviceProvider)
+            : this(
+                state,
+                loggerFactory,
+                components,
+                applicationShutdownRegistry,
+                profilingLogger,
+                mainDom,
+                databaseFactory,
+                eventAggregator,
+                hostingEnvironment,
+                umbracoVersion,
+                serviceProvider,
+                serviceProvider?.GetRequiredService<IHostApplicationLifetime>())
+        { }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete]
+        public CoreRuntime(
+            ILoggerFactory loggerFactory,
+            IRuntimeState state,
+            ComponentCollection components,
+            IApplicationShutdownRegistry applicationShutdownRegistry,
+            IProfilingLogger profilingLogger,
+            IMainDom mainDom,
+            IUmbracoDatabaseFactory databaseFactory,
+            IEventAggregator eventAggregator,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoVersion umbracoVersion)
+            : this(
+                loggerFactory,
+                state,
+                components,
+                applicationShutdownRegistry,
+                profilingLogger,
+                mainDom,
+                databaseFactory,
+                eventAggregator,
+                hostingEnvironment,
+                umbracoVersion,
+                null)
+        { }
 
         /// <summary>
         /// Gets the state of the Umbraco runtime.
@@ -59,47 +134,48 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public IRuntimeState State { get; }
 
         /// <inheritdoc/>
-        public async Task RestartAsync()
-        {
-            await StopAsync(_cancellationToken);
-            await StartAsync(_cancellationToken);
-        }
+        public async Task StartAsync(CancellationToken cancellationToken) => await StartAsync(cancellationToken, false);
 
         /// <inheritdoc/>
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken) => await StopAsync(cancellationToken, false);
+
+        /// <inheritdoc/>
+        public async Task RestartAsync()
         {
+            await StopAsync(_cancellationToken, true);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppedNotification(true), _cancellationToken);
+            await StartAsync(_cancellationToken, true);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartedNotification(true), _cancellationToken);
+        }
+
+        private async Task StartAsync(CancellationToken cancellationToken, bool isRestarting)
+        {
+            // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
-            StaticApplicationLogging.Initialize(_loggerFactory);
 
-            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            if (isRestarting == false)
             {
-                var exception = (Exception)args.ExceptionObject;
-                var isTerminating = args.IsTerminating; // always true?
+                StaticApplicationLogging.Initialize(_loggerFactory);
+                StaticServiceProvider.Instance = _serviceProvider;
 
-                var msg = "Unhandled exception in AppDomain";
+                AppDomain.CurrentDomain.UnhandledException += (_, args)
+                    => _logger.LogError(args.ExceptionObject as Exception, $"Unhandled exception in AppDomain{(args.IsTerminating ? " (terminating)" : null)}.");
+            }
 
-                if (isTerminating)
-                {
-                    msg += " (terminating)";
-                }
-
-                msg += ".";
-
-                _logger.LogError(exception, msg);
-            };
-
-            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
+            // Acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
 
+            // TODO (V10): Remove this obsoleted notification publish.
             await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
 
-            // notify for unattended install
-            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification());
+            // Notify for unattended install
+            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
             DetermineRuntimeLevel();
 
             if (!State.UmbracoCanBoot())
             {
-                return; // The exception will be rethrown by BootFailedMiddelware
+                // We cannot continue here, the exception will be rethrown by BootFailedMiddelware
+                return;
             }
 
             IApplicationShutdownRegistry hostingEnvironmentLifetime = _applicationShutdownRegistry;
@@ -108,9 +184,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
             }
 
-            // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
+            // If level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
-            await _eventAggregator.PublishAsync(unattendedUpgradeNotification);
+            await _eventAggregator.PublishAsync(unattendedUpgradeNotification, cancellationToken);
             switch (unattendedUpgradeNotification.UnattendedUpgradeResult)
             {
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors:
@@ -118,53 +194,60 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     {
                         throw new InvalidOperationException($"Unattended upgrade result was {RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered");
                     }
-                    // we cannot continue here, the exception will be rethrown by BootFailedMiddelware
+
+                    // We cannot continue here, the exception will be rethrown by BootFailedMiddelware
                     return;
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete:
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete:
-                    // upgrade is done, set reason to Run
+                    // Upgrade is done, set reason to Run
                     DetermineRuntimeLevel();
                     break;
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
                     break;
             }
 
+            // TODO (V10): Remove this obsoleted notification publish
             await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
 
-            // create & initialize the components
+            // Initialize the components
             _components.Initialize();
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
+
+            if (isRestarting == false)
+            {
+                // Add application started and stopped notifications last (to ensure they're always published after starting)
+                _hostApplicationLifetime.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
+                _hostApplicationLifetime.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
+            }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
         {
             _components.Terminate();
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(), cancellationToken);
-            StaticApplicationLogging.Initialize(null);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
         }
 
         private void AcquireMainDom()
         {
-            using (DisposableTimer timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
+            using DisposableTimer timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
+
+            try
             {
-                try
-                {
-                    _mainDom.Acquire(_applicationShutdownRegistry);
-                }
-                catch
-                {
-                    timer?.Fail();
-                    throw;
-                }
+                _mainDom.Acquire(_applicationShutdownRegistry);
+            }
+            catch
+            {
+                timer?.Fail();
+                throw;
             }
         }
 
         private void DetermineRuntimeLevel()
         {
-            if (State.BootFailedException != null)
+            if (State.BootFailedException is not null)
             {
-                // there's already been an exception so cannot boot and no need to check
+                // There's already been an exception, so cannot boot and no need to check
                 return;
             }
 
@@ -187,7 +270,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 State.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException);
                 timer?.Fail();
                 _logger.LogError(ex, "Boot Failed");
-                // We do not throw the exception. It will be rethrown by BootFailedMiddleware
+
+                // We do not throw the exception, it will be rethrown by BootFailedMiddleware
             }
         }
     }

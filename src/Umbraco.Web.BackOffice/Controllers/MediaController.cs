@@ -858,7 +858,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            return Ok();
+            return Ok(tempFiles);
         }
 
         private IMedia FindInChildren(int mediaId, string nameToFind, string contentTypeAlias)

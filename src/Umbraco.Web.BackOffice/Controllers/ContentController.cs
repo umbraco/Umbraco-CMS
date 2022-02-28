@@ -62,6 +62,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ActionCollection _actionCollection;
         private readonly ISqlContext _sqlContext;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IContentVersionService _contentVersionService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
         private readonly IScopeProvider _scopeProvider;
@@ -90,7 +91,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             IJsonSerializer serializer,
             IScopeProvider scopeProvider,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            IContentVersionService contentVersionService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _propertyEditors = propertyEditors;
@@ -109,6 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _actionCollection = actionCollection;
             _sqlContext = sqlContext;
             _authorizationService = authorizationService;
+            _contentVersionService = contentVersionService;
             _logger = loggerFactory.CreateLogger<ContentController>();
             _scopeProvider = scopeProvider;
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -164,27 +167,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IEnumerable<string> groupPermissions;
                 if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
                 {
-                    //create a string collection of the assigned letters
-                    var groupPermissionCodes = groupPermissions.ToArray();
-
-                    //check if there are no permissions assigned for this group save model, if that is the case we want to reset the permissions
-                    //for this group/node which will go back to the defaults
-                    if (groupPermissionCodes.Length == 0)
+                    if (groupPermissions is null)
                     {
                         _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                        continue;
                     }
-                    //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
-                    else if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
-                    {
-                        //only remove them if they are actually currently assigned
-                        if (contentPermissions.ContainsKey(userGroup.Id))
-                        {
-                            //remove these permissions from this node for this group since the ones being assigned are the same as the defaults
-                            _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
-                        }
-                    }
-                    //if they are different we need to update, otherwise there's nothing to update
-                    else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
+
+                    // Create a string collection of the assigned letters
+                    var groupPermissionCodes = groupPermissions.ToArray();
+                    // Check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
+                    if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
 
                         _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
@@ -321,15 +313,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(int id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 return HandleContentNotFound(id);
             }
-            var content = MapToDisplay(foundContent);
-            return content;
+
+            return MapToDisplayWithSchedule(foundContent);
         }
 
         /// <summary>
@@ -339,16 +331,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(Guid id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 return HandleContentNotFound(id);
             }
-
-            var content = MapToDisplay(foundContent);
-            return content;
+            return MapToDisplayWithSchedule(foundContent);
         }
 
         /// <summary>
@@ -358,7 +348,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(Udi id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -398,7 +388,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public ActionResult<IDictionary<string, ContentItemDisplay>> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
         {
-            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            // It's important to do this operation within a scope to reduce the amount of readlock queries.
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => _contentTypeService.Get(alias));
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
@@ -710,11 +700,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        public async Task<ActionResult<ContentItemDisplay>> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>>> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
-                content =>
+                (content, _) =>
                 {
                     if (!EnsureUniqueName(content.Name, content, "Name"))
                     {
@@ -742,17 +732,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         [OutgoingEditorModelEvent]
-        public async Task<ActionResult<ContentItemDisplay>> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>>> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
-                content => _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id),
-                MapToDisplay);
+                (content, contentSchedule) => _contentService.Save(content, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id, contentSchedule),
+                MapToDisplayWithSchedule);
 
             return contentItemDisplay;
         }
 
-        private async Task<ActionResult<ContentItemDisplay>> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
+        private async Task<ActionResult<ContentItemDisplay<TVariant>>> PostSaveInternal<TVariant>(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, Func<IContent, ContentItemDisplay<TVariant>> mapToDisplay)
+            where TVariant : ContentVariantDisplay
         {
             // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -832,17 +823,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedText", "editVariantSavedText", cultureForInvariantErrors, null, out wasCancelled);
                     break;
                 case ContentSaveAction.Schedule:
                 case ContentSaveAction.ScheduleNew:
-
-                    if (!SaveSchedule(contentItem, globalNotifications))
+                    ContentScheduleCollection contentSchedule = _contentService.GetContentScheduleByContentId(contentItem.Id);
+                    if (!SaveSchedule(contentItem, contentSchedule, globalNotifications))
                     {
                         wasCancelled = false;
                         break;
                     }
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, contentSchedule, out wasCancelled);
                     break;
 
                 case ContentSaveAction.SendPublish:
@@ -879,7 +870,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
                     {
-                        var publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
+                        PublishResult publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
+                        // Add warnings if domains are not set up correctly
+                        AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
                         AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
                     }
                     break;
@@ -896,6 +889,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                        AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                         AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
@@ -1044,12 +1038,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// Method is used for normal Saving and Scheduled Publishing
         /// </remarks>
-        private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, int variantCount,
+        private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, int variantCount,
             Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-            string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
+            string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors, ContentScheduleCollection contentSchedule,
             out bool wasCancelled)
         {
-            var saveResult = saveMethod(contentItem.PersistedContent);
+            var saveResult = saveMethod(contentItem.PersistedContent, contentSchedule);
             wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
             if (saveResult.Success)
             {
@@ -1084,20 +1078,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentItem"></param>
         /// <param name="globalNotifications"></param>
-        private bool SaveSchedule(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
+        private bool SaveSchedule(ContentItemSave contentItem, ContentScheduleCollection contentSchedule, SimpleNotificationModel globalNotifications)
         {
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
-                return SaveScheduleInvariant(contentItem, globalNotifications);
+                return SaveScheduleInvariant(contentItem, contentSchedule, globalNotifications);
             else
-                return SaveScheduleVariant(contentItem);
+                return SaveScheduleVariant(contentItem, contentSchedule);
         }
 
-        private bool SaveScheduleInvariant(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
+        private bool SaveScheduleInvariant(ContentItemSave contentItem, ContentScheduleCollection contentSchedule, SimpleNotificationModel globalNotifications)
         {
             var variant = contentItem.Variants.First();
 
-            var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
-            var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
+            var currRelease = contentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
+            var currExpire = contentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
 
             //Do all validation of data first
 
@@ -1134,45 +1128,41 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //remove any existing release dates so we can replace it
             //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
             if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Release);
+                contentSchedule.Clear(ContentScheduleAction.Release);
 
             //remove any existing expire dates so we can replace it
             //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
             if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Expire);
+                contentSchedule.Clear(ContentScheduleAction.Expire);
 
             //add the new schedule
-            contentItem.PersistedContent.ContentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
+            contentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
             return true;
         }
 
-        private bool SaveScheduleVariant(ContentItemSave contentItem)
+        private bool SaveScheduleVariant(ContentItemSave contentItem, ContentScheduleCollection contentSchedule)
         {
             //All variants in this collection should have a culture if we get here but we'll double check and filter here)
             var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            //Make a copy of the current schedule and apply updates to it
-
-            var schedCopy = (ContentScheduleCollection)contentItem.PersistedContent.ContentSchedule.DeepClone();
-
             foreach (var variant in cultureVariants.Where(x => x.Save))
             {
-                var currRelease = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
-                var currExpire = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
+                var currRelease = contentSchedule.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
+                var currExpire = contentSchedule.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
 
                 //remove any existing release dates so we can replace it
                 //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
                 if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Release);
+                    contentSchedule.Clear(variant.Culture, ContentScheduleAction.Release);
 
                 //remove any existing expire dates so we can replace it
                 //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
                 if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Expire);
+                    contentSchedule.Clear(variant.Culture, ContentScheduleAction.Expire);
 
                 //add the new schedule
-                schedCopy.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
+                contentSchedule.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
             }
 
             //now validate the new schedule to make sure it passes all of the rules
@@ -1182,7 +1172,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //create lists of mandatory/non-mandatory states
             var mandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
             var nonMandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
-            foreach (var groupedSched in schedCopy.FullSchedule.GroupBy(x => x.Culture))
+            foreach (var groupedSched in contentSchedule.FullSchedule.GroupBy(x => x.Culture))
             {
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(groupedSched.Key);
                 var releaseDates = groupedSched.Where(x => x.Action == ContentScheduleAction.Release).Select(x => x.Date).ToList();
@@ -1215,7 +1205,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            if (!isValid) return false;
+            if (!isValid)
+                return false;
 
             //now we can validate the more basic rules for individual variants
             foreach (var variant in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
@@ -1245,11 +1236,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            if (!isValid) return false;
+            if (!isValid)
+                return false;
 
-
-            //now that we are validated, we can assign the copied schedule back to the model
-            contentItem.PersistedContent.ContentSchedule = schedCopy;
             return true;
         }
 
@@ -1412,6 +1401,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
+
                 return publishStatus;
             }
             else
@@ -1422,6 +1412,73 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
                 return publishStatus;
+            }
+        }
+
+        private void AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[] culturesPublished,
+            SimpleNotificationModel globalNotifications)
+        {
+            foreach (PublishResult publishResult in publishResults)
+            {
+                AddDomainWarnings(publishResult.Content, culturesPublished, globalNotifications);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that there's an appropriate domain setup for the published cultures
+        /// </summary>
+        /// <remarks>
+        /// Adds a warning and logs a message if a node varies by culture, there's at least 1 culture already published,
+        /// and there's no domain added for the published cultures
+        /// </remarks>
+        /// <param name="persistedContent"></param>
+        /// <param name="culturesPublished"></param>
+        /// <param name="globalNotifications"></param>
+        internal void AddDomainWarnings(IContent persistedContent, string[] culturesPublished, SimpleNotificationModel globalNotifications)
+        {
+            // Don't try to verify if no cultures were published
+            if (culturesPublished is null)
+            {
+                return;
+            }
+
+            var publishedCultures = GetPublishedCulturesFromAncestors(persistedContent).ToList();
+            // If only a single culture is published we shouldn't have any routing issues
+            if (publishedCultures.Count < 2)
+            {
+                return;
+            }
+
+            // If more than a single culture is published we need to verify that there's a domain registered for each published culture
+            var assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true).ToHashSet();
+            // We also have to check all of the ancestors, if any of those has the appropriate culture assigned we don't need to warn
+            foreach (var ancestorID in persistedContent.GetAncestorIds())
+            {
+                assignedDomains.UnionWith(_domainService.GetAssignedDomains(ancestorID, true));
+            }
+
+            // No domains at all, add a warning, to add domains.
+            if (assignedDomains.Count == 0)
+            {
+                globalNotifications.AddWarningNotification(
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"));
+
+                _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
+                    persistedContent.Name, string.Join(", ", publishedCultures));
+                return;
+            }
+
+            // If there is some domains, verify that there's a domain for each of the published cultures
+            foreach (var culture in culturesPublished
+                .Where(culture => assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false))
+            {
+                globalNotifications.AddWarningNotification(
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{culture}));
+
+                _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
+                    persistedContent.Name, culture);
             }
         }
 
@@ -1512,6 +1569,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return true;
         }
 
+        private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent content)
+        {
+            if (content.ParentId == -1)
+            {
+                return content.PublishedCultures;
+            }
+
+            HashSet<string> publishedCultures = new ();
+            publishedCultures.UnionWith(content.PublishedCultures);
+
+            IEnumerable<int> ancestorIds = content.GetAncestorIds();
+
+            foreach (var id in ancestorIds)
+            {
+                IEnumerable<string> cultures = _contentService.GetById(id).PublishedCultures;
+                publishedCultures.UnionWith(cultures);
+            }
+
+            return publishedCultures;
+
+        }
         /// <summary>
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>
@@ -1763,7 +1841,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public async Task<ActionResult<ContentItemDisplay>> PostUnpublish(UnpublishContent model)
+        public async Task<ActionResult<ContentItemDisplayWithSchedule>> PostUnpublish(UnpublishContent model)
         {
             var foundContent = _contentService.GetById(model.Id);
 
@@ -1786,7 +1864,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 //this means that the entire content item will be unpublished
                 var unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
-                var content = MapToDisplay(foundContent);
+                var content = MapToDisplayWithSchedule(foundContent);
 
                 if (!unpublishResult.Success)
                 {
@@ -1816,7 +1894,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                var content = MapToDisplay(foundContent);
+                var content = MapToDisplayWithSchedule(foundContent);
 
                 //check for this status and return the correct message
                 if (results.Any(x => x.Value.Result == PublishResultType.SuccessUnpublishMandatoryCulture))
@@ -2004,7 +2082,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// This is required to wire up the validation in the save/publish dialog
         /// </remarks>
-        private void HandleInvalidModelState(ContentItemDisplay display, string cultureForInvariantErrors)
+        private void HandleInvalidModelState<TVariant>(ContentItemDisplay<TVariant> display, string cultureForInvariantErrors)
+            where TVariant : ContentVariantDisplay
         {
             if (!ModelState.IsValid && display.Variants.Count() > 1)
             {
@@ -2362,6 +2441,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             });
 
+        private ContentItemDisplayWithSchedule MapToDisplayWithSchedule(IContent content)
+        {
+            ContentItemDisplayWithSchedule display = _umbracoMapper.Map<ContentItemDisplayWithSchedule>(content, context =>
+            {
+                context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                context.Items["Schedule"] = _contentService.GetContentScheduleByContentId(content.Id);
+            });
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
+            return display;
+        }
+        
         /// <summary>
         /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring AllowPreview is set correctly.
         /// Also allows you to pass in an action for the mapper context where you can pass additional information on to the mapper.
@@ -2371,7 +2461,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
         {
-            var display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
+            ContentItemDisplay display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
@@ -2408,6 +2498,53 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (content == null) return NotFound();
 
             _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, content, notifyOptions);
+
+            return NoContent();
+        }
+
+        [HttpGet]
+        [JsonCamelCaseFormatter]
+        public IActionResult GetPagedContentVersions(
+            int contentId,
+            int pageNumber = 1,
+            int pageSize = 10,
+            string culture = null)
+        {
+            if (!string.IsNullOrEmpty(culture))
+            {
+                if (!_allLangs.Value.TryGetValue(culture, out _))
+                {
+                    return NotFound();
+                }
+            }
+
+            IEnumerable<ContentVersionMeta> results = _contentVersionService.GetPagedContentVersions(
+                contentId,
+                pageNumber - 1,
+                pageSize,
+                out var totalRecords,
+                culture);
+
+            var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize)
+            {
+                Items = results
+            };
+
+            return Ok(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
+        public IActionResult PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
+        {
+            IContent content = _contentService.GetVersion(versionId);
+
+            if (content == null || content.Id != contentId)
+            {
+                return NotFound();
+            }
+
+            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return NoContent();
         }

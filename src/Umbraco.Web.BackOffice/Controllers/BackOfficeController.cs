@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -31,6 +32,7 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -68,7 +70,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
         private readonly IManifestParser _manifestParser;
         private readonly ServerVariablesParser _serverVariables;
+        private readonly IOptions<SecuritySettings> _securitySettings;
 
+
+        [ActivatorUtilitiesConstructor]
         public BackOfficeController(
             IBackOfficeUserManager userManager,
             IRuntimeState runtimeState,
@@ -87,7 +92,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IHttpContextAccessor httpContextAccessor,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
             IManifestParser manifestParser,
-            ServerVariablesParser serverVariables)
+            ServerVariablesParser serverVariables,
+            IOptions<SecuritySettings> securitySettings)
         {
             _userManager = userManager;
             _runtimeState = runtimeState;
@@ -107,6 +113,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
             _manifestParser = manifestParser;
             _serverVariables = serverVariables;
+            _securitySettings = securitySettings;
         }
 
         [HttpGet]
@@ -458,7 +465,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (response == null) throw new ArgumentNullException(nameof(response));
 
             // Sign in the user with this external login provider (which auto links, etc...)
-            SignInResult result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
+            SignInResult result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false, bypassTwoFactor: _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
 
             var errors = new List<string>();
 
@@ -516,6 +523,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 // Failed only occurs when the user does not exist
                 errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
+            }
+            else if (result == ExternalLoginSignInResult.NotAllowed)
+            {
+                // This occurs when the external provider has approved the login but custom logic in OnExternalLogin has denined it.
+                errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not been accepted and cannot sign in.");
             }
             else if (result == AutoLinkSignInResult.FailedNotLinked)
             {

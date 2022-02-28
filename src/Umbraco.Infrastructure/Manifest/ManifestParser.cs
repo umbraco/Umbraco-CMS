@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Manifest
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
                 if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
-                if (manifest.Sections != null) sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias.ToLowerInvariant()));
+                if (manifest.Sections != null) sections.AddRange(manifest.Sections.LegacyDistinctBy(x => x.Alias.ToLowerInvariant()));
             }
 
             return new CompositePackageManifest(
