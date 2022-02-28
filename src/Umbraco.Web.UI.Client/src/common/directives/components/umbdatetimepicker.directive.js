@@ -226,7 +226,7 @@ Use this directive to render a date time picker
             }
 
             // bind hook for onValueUpdate
-            if (ctrl.onValueUpdate) {
+            if (ctrl.options && ctrl.onValueUpdate) {
                 ctrl.options.onValueUpdate = function (selectedDates, dateStr, instance) {
                     $timeout(function () {
                         ctrl.onValueUpdate({ selectedDates: selectedDates, dateStr: dateStr, instance: instance });
@@ -235,7 +235,7 @@ Use this directive to render a date time picker
             }
 
             // bind hook for onDayCreate
-            if (ctrl.onDayCreate) {
+            if (ctrl.options && ctrl.onDayCreate) {
                 ctrl.options.onDayCreate = function (selectedDates, dateStr, instance) {
                     $timeout(function () {
                         ctrl.onDayCreate({ selectedDates: selectedDates, dateStr: dateStr, instance: instance });
