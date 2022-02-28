@@ -2080,6 +2080,12 @@ namespace Umbraco.Web.Editors
                 variantIndex++;
             }
 
+            // Map IsDirty cultures to edited cultures, to make it easier to verify changes on specific variants on Saving and Saved events.
+            var editedCultures = contentSave.PersistedContent.CultureInfos.Values
+                .Where(x => x.IsDirty())
+                .Select(x => x.Culture);
+            contentSave.PersistedContent.SetCultureEdited(editedCultures);
+
             // handle template
             if (string.IsNullOrWhiteSpace(contentSave.TemplateAlias)) // cleared: clear if not already null
             {
