@@ -4,9 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.DistributedLocking;
@@ -182,55 +181,3 @@ internal class InMemoryDistributedLockingMechanismTests
     }
 }
 
-[SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Seems reasonable")]
-internal static class DistributedLockingMechanismExtensions
-{
-    public static LockTester ReadTester(this IDistributedLockingMechanism lockingMechanism, int lockId, TimeSpan timeout)
-        => new(lockingMechanism, lockId, false, timeout);
-
-    public static LockTester WriteTester(this IDistributedLockingMechanism lockingMechanism, int lockId, TimeSpan timeout)
-        => new(lockingMechanism, lockId, true, timeout);
-}
-
-[SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Seems reasonable")]
-internal class LockTester
-{
-    private readonly IDistributedLockingMechanism _lockingMechanism;
-    private readonly int _lockId;
-    private readonly bool _write;
-    private readonly TimeSpan _timeout;
-
-    public bool Success => Exception == null;
-    public DistributedLockingTimeoutException Exception { get; private set; }
-
-    public LockTester(IDistributedLockingMechanism lockingMechanism, int lockId, bool write, TimeSpan timeout)
-    {
-        _lockingMechanism = lockingMechanism;
-        _lockId = lockId;
-        _write = write;
-        _timeout = timeout;
-    }
-
-    public LockTester Run()
-    {
-        try
-        {
-            if (_write)
-            {
-                _lockingMechanism.WriteLock(_lockId, _timeout);
-            }
-            else
-            {
-                _lockingMechanism.ReadLock(_lockId, _timeout);
-            }
-        }
-        catch (DistributedLockingTimeoutException ex)
-        {
-            Exception = ex;
-        }
-
-        return this;
-    }
-
-    public void ThreadStart() => _ = Run();
-}

@@ -26,6 +26,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         IUmbracoDatabaseFactory dbFactory,
         IOptionsMonitor<GlobalSettings> globalSettings)
     {
+        if (dbFactory.SqlContext.DatabaseType is not NPoco.DatabaseTypes.SqlServerDatabaseType)
+        {
+            throw new DistributedLockingException($"Invalid database type {dbFactory.SqlContext.DatabaseType}");
+        }
+
         _logger = logger;
         _dbFactory = dbFactory;
         _globalSettings = globalSettings;
@@ -66,13 +71,25 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             _parent._logger.LogDebug("{lockType} requested for id {id}", LockType, LockId);
 
-            if (LockType == DistributedLockType.ReadLock)
+            try
             {
-                ObtainReadLock();
+                switch (lockType)
+                {
+                    case DistributedLockType.ReadLock:
+                        ObtainReadLock();
+                        break;
+                    case DistributedLockType.WriteLock:
+                        ObtainWriteLock();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
+                }
             }
-            else
+            catch (SqlException ex) when (ex.Number == 1222)
             {
-                ObtainWriteLock();
+                _db.AbortTransaction();
+                _db.Dispose();
+                throw new DistributedReadLockTimeoutException(LockId);
             }
 
             _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
@@ -84,7 +101,18 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         public void Dispose()
         {
-            _db.CompleteTransaction();
+            if (_db.InTransaction)
+            {
+                try
+                {
+                    _db.CompleteTransaction();
+                }
+                catch (Exception ex)
+                {
+                    throw new DistributedLockingException($"Unexpected exception thrown whilst attempting to release {LockType} for id {LockId}.", ex);
+                }
+            }
+
             _db.Dispose();
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
         }
@@ -94,41 +122,27 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         private void ObtainReadLock()
         {
-            try
-            {
-                const string query = "SELECT value FROM umbracoLock WHERE id=@id";
+            const string query = "SELECT value FROM umbracoLock WHERE id=@id";
 
-                var i = _db.ExecuteScalar<int?>(query, new { id = LockId });
+            var i = _db.ExecuteScalar<int?>(query, new {id = LockId});
 
-                if (i == null)
-                {
-                    // ensure we are actually locking!
-                    throw new ArgumentException(@$"LockObject with id={LockId} does not exist.", nameof(LockId));
-                }
-            }
-            catch (SqlException ex) when (ex.Number == 1222)
+            if (i == null)
             {
-                throw new DistributedReadLockTimeoutException(LockId);
+                // ensure we are actually locking!
+                throw new ArgumentException(@$"LockObject with id={LockId} does not exist.", nameof(LockId));
             }
         }
 
         private void ObtainWriteLock()
         {
-            try
-            {
-                const string query = @"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
+            const string query = @"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
-                var i = _db.Execute(query, new { id = LockId });
+            var i = _db.Execute(query, new {id = LockId});
 
-                if (i == 0)
-                {
-                    // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={LockId} does not exist.");
-                }
-            }
-            catch (SqlException ex) when (ex.Number == 1222)
+            if (i == 0)
             {
-                throw new DistributedReadLockTimeoutException(LockId);
+                // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={LockId} does not exist.");
             }
         }
     }

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.DistributedLocking.Exceptions;
 /// <summary>
 /// Base class for all DistributedLockingExceptions.
 /// </summary>
-public abstract class DistributedLockingException : ApplicationException
+public class DistributedLockingException : ApplicationException
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedLockingException"/> class.

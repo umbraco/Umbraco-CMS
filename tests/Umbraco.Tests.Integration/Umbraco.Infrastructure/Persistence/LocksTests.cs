@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -284,7 +285,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             //Assert.IsNotNull(e1);
             if (e1 != null)
             {
-                AssertIsSqlLockException(e1);
+                AssertIsDistributedLockingTimeoutException(e1);
             }
 
             // the assertion below depends on timing conditions - on a fast enough environment,
@@ -295,16 +296,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             //Assert.IsNull(e2);
             if (e2 != null)
             {
-                AssertIsSqlLockException(e2);
+                AssertIsDistributedLockingTimeoutException(e2);
             }
 
         }
 
-        private void AssertIsSqlLockException(Exception e)
+        private void AssertIsDistributedLockingTimeoutException(Exception e)
         {
-            var sqlException = e as SqlException;
+            var sqlException = e as DistributedLockingTimeoutException;
             Assert.IsNotNull(sqlException);
-            Assert.AreEqual(1222, sqlException.Number);
         }
 
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
@@ -417,7 +417,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                         // This will wait for the write lock to release but it isn't going to wait long
                         // enough so an exception will be thrown.
-                        Assert.Throws<SqlException>(() =>
+                        Assert.Throws<DistributedReadLockTimeoutException>(() =>
                             scope.EagerReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
                         scope.Complete();
                         Console.WriteLine("Finished Read lock B");
@@ -432,7 +432,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                         // This will wait for the write lock to release but it isn't going to wait long
                         // enough so an exception will be thrown.
-                        Assert.Throws<SqlException>(() =>
+                        Assert.Throws<DistributedWriteLockTimeoutException>(() =>
                             scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
 
                         scope.Complete();
