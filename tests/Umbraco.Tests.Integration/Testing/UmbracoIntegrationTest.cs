@@ -77,7 +77,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
                     configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
-                    configBuilder.AddEnvironmentVariables();
 
                     Configuration = configBuilder.Build();
                 })

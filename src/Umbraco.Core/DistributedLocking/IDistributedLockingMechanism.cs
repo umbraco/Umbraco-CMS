@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.DistributedLocking;
 /// The rules for distributed locks are as follows.
 /// <list type="bullet">
 /// <item>
-/// <b>Cannot</b> obtain a write lock if a read lock exists for same lock id.
+/// <b>Cannot</b> obtain a write lock if a read lock exists for same lock id (except during an upgrade from reader -> writer)
 /// </item>
 /// <item>
 /// <b>Cannot</b> obtain a write lock if a write lock exists for same lock id.
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.DistributedLocking;
 /// <b>Cannot</b> obtain a read lock if a write lock exists for same lock id.
 /// </item>
 /// <item>
-/// <b>Can</b> obtain a read lock if a write lock exists for same lock id.
+/// <b>Can</b> obtain a read lock if a read lock exists for same lock id.
 /// </item>
 /// </list>
 /// However please note these rules can be ignored at a higher level of abstraction e.g. IScope will allow upgrade / downgrade of locks within a single transaction.

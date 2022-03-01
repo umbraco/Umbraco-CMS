@@ -142,7 +142,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
                     configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
-                    configBuilder.AddEnvironmentVariables();
 
                     Configuration = configBuilder.Build();
                 })
