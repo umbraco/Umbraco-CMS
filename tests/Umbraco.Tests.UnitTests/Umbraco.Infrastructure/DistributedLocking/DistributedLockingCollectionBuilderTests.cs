@@ -67,7 +67,7 @@ public class DistributedLockingCollectionBuilderTests
     }
 
     [Test]
-    public void RegisterWith_WithNomplementationSpecified_RegistersFirstFoundOnly()
+    public void RegisterWith_WithNoImplementationSpecified_RegistersFirstFoundOnly()
     {
         var services = new ServiceCollection();
         var config = new ConfigurationBuilder().Build();
