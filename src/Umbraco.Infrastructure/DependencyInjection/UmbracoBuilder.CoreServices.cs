@@ -80,7 +80,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<PendingPackageMigrations>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
-            builder.Services.AddSingleton<IDistributedLockingMechanism, InMemoryDistributedLockingMechanism>();
+
+            builder.WithCollectionBuilder<DistributedLockingCollectionBuilder>()
+                .AddDistributedLockingMechanism<InMemoryDistributedLockingMechanism>();
 
             // composers
             builder

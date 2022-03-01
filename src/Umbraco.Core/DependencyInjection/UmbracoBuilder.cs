@@ -112,7 +112,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 return (TBuilder)o;
             }
 
-            var builder = new TBuilder();
+            TBuilder builder;
+
+            if (typeof(TBuilder).GetConstructor(new[] { typeof(IUmbracoBuilder) }) != null)
+            {
+                // Handle those collection builders which need a reference to umbraco builder i.e. DistributedLockingCollectionBuilder.
+                builder = (TBuilder)Activator.CreateInstance(typeof(TBuilder), this);
+            }
+            else
+            {
+                builder = new TBuilder();
+            }
+
             _builders[typeOfBuilder] = builder;
             return builder;
         }
