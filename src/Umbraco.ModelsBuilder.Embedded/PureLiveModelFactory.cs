@@ -375,7 +375,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
 
             Assembly assembly;
-            if (!forceRebuild)
+             if (!forceRebuild)
             {
                 // try to load the dll directly (avoid rebuilding)
                 //

@@ -253,7 +253,12 @@ namespace Umbraco.Web.Models.Mapping
                 target.Id = source.Id;
 
             if (source.GroupId > 0)
-                target.PropertyGroupId = new Lazy<int>(() => source.GroupId, false);
+            {
+                if (target.PropertyGroupId?.Value != source.GroupId)
+                {
+                    target.PropertyGroupId = new Lazy<int>(() => source.GroupId, false);
+                }
+            }
 
             target.Alias = source.Alias;
             target.Description = source.Description;
@@ -476,13 +481,23 @@ namespace Umbraco.Web.Models.Mapping
 
                 // ensure no duplicate alias, then assign the group properties collection
                 EnsureUniqueAliases(destProperties);
-                destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+
+                if (destGroup.PropertyTypes.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false)
+                {
+                    destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                }
+
                 destGroups.Add(destGroup);
             }
 
             // ensure no duplicate name, then assign the groups collection
             EnsureUniqueAliases(destGroups);
-            target.PropertyGroups = new PropertyGroupCollection(destGroups);
+
+
+            if (target.PropertyGroups.SequenceEqual(destGroups) is false)
+            {
+                target.PropertyGroups = new PropertyGroupCollection(destGroups);
+            }
 
             // because the property groups collection was rebuilt, there is no need to remove
             // the old groups - they are just gone and will be cleared by the repository
