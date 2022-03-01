@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
     public abstract class BaseTestDatabase
     {
         public static bool IsSqlite() => BaseTestDatabase.Instance is SqliteTestDatabase;
+        public static bool IsSqlServer() => BaseTestDatabase.Instance is SqlServerBaseTestDatabase;
 
         protected ILoggerFactory _loggerFactory;
         protected IUmbracoDatabaseFactory _databaseFactory;
