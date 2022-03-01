@@ -454,12 +454,9 @@ namespace Umbraco.Cms.Core.Scoping
             ClearLocks(InstanceId);
             if (ParentScope is null)
             {
-                lock (_acquiredLocks)
+                while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
                 {
-                    while (!_acquiredLocks.IsCollectionEmpty())
-                    {
-                        _acquiredLocks.Dequeue().Dispose();
-                    }
+                    _acquiredLocks.Dequeue().Dispose();
                 }
 
                 // We're the parent scope, make sure that locks of all scopes has been cleared
@@ -1032,7 +1029,7 @@ namespace Umbraco.Cms.Core.Scoping
                     {
                         IncrementLock(lockId, instanceId, ref _readLocksDictionary);
 
-                        // TODO: PMJ his may or may not be smart.
+                        // TODO: PMJ this may or may not be smart.
                         // Implied business rule from the SQL implementation now handled at application layer.
                         // If we have an existing write lock for a given lock id, we do not need to later obtain a read lock for that same lock id.
                         if (_writeLocks?.Contains(lockId) ?? false)

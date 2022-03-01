@@ -132,6 +132,8 @@ stages:
                     arguments: '--no-build'
                 env:
                   Tests__Database__DatabaseType: 'Sqlite'
+                  Umbraco__Cms__global__DistributedLockingMechanism: 'InMemoryDistributedLockingMechanism'
+                  Umbraco__Cms__global__MainDomLock: 'FileSystemMainDomLock'
 
         - job: Linux_Integration_Tests_SQLServer
           services:
@@ -160,6 +162,7 @@ stages:
                 Tests__Database__DatabaseType: 'SqlServer'
                 Tests__Database__SQLServerMasterConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
                 Umbraco__Cms__global__DistributedLockingMechanism: 'SqlServerDistributedLockingMechanism'
+                Umbraco__Cms__global__MainDomLock: 'SqlMainDomLock'
 
         - job: macOS_Integration_Tests_SQLite
           timeoutInMinutes: 120
@@ -184,6 +187,8 @@ stages:
                     arguments: '--no-build'
                 env:
                   Tests__Database__DatabaseType: 'Sqlite'
+                  Umbraco__Cms__global__DistributedLockingMechanism: 'InMemoryDistributedLockingMechanism'
+                  Umbraco__Cms__global__MainDomLock: 'FileSystemMainDomLock'
 
         - job: Windows_Integration_Tests_LocalDb
           timeoutInMinutes: 120
@@ -211,6 +216,7 @@ stages:
                 env:
                   Tests__Database__DatabaseType: 'LocalDb'
                   Umbraco__Cms__global__DistributedLockingMechanism: 'SqlServerDistributedLockingMechanism'
+                  Umbraco__Cms__global__MainDomLock: 'MainDomSemaphoreLock'
 
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
