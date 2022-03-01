@@ -87,8 +87,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
-
-            target.HistoryCleanup = source.HistoryCleanup;
+            MapHistoryCleanup(source, target);
 
             target.AllowedTemplates = source.AllowedTemplates
                 .Where(x => x != null)
@@ -97,6 +96,27 @@ namespace Umbraco.Web.Models.Mapping
                 .ToArray();
 
             target.SetDefaultTemplate(source.DefaultTemplate == null ? null : _fileService.GetTemplate(source.DefaultTemplate));
+        }
+
+        private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
+        {
+            // We need to reset the dirty properties, because it is otherwise true, just because the json serializer has set properties
+            target.HistoryCleanup.ResetDirtyProperties(false);
+            if (target.HistoryCleanup.PreventCleanup != source.HistoryCleanup.PreventCleanup)
+            {
+                target.HistoryCleanup.PreventCleanup = source.HistoryCleanup.PreventCleanup;
+            }
+
+            if (target.HistoryCleanup.KeepAllVersionsNewerThanDays != source.HistoryCleanup.KeepAllVersionsNewerThanDays)
+            {
+                target.HistoryCleanup.KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays;
+            }
+
+            if (target.HistoryCleanup.KeepLatestVersionPerDayForDays !=
+                source.HistoryCleanup.KeepLatestVersionPerDayForDays)
+            {
+                target.HistoryCleanup.KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays;
+            }
         }
 
         // no MapAll - take care

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.ContentEditing
         {
             get => _keepLatestVersionPerDayForDays;
             set => SetPropertyValueAndDetectChanges(value, ref _keepLatestVersionPerDayForDays,
-                nameof(_keepAllVersionsNewerThanDays));
+                nameof(KeepLatestVersionPerDayForDays));
         }
     }
 }

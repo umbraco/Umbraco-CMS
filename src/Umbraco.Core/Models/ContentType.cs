@@ -101,48 +101,9 @@ namespace Umbraco.Core.Models
         public HistoryCleanup HistoryCleanup
         {
             get => _historyCleanup;
-            set
-            {
-                if (_historyCleanup is not null)
-                {
-                    _historyCleanup.PropertyChanged -= FlowHistoryCleanupIsDirty;
-                    // Remove all dirty properties from the old HistoryCleanup since that's not relevant anymore
-                    // This is a bit of a hack, because we can't remove dirty properties,
-                    // so we have to remove them all and re-add those who are not HistoryCleanup
-                    var dirtyProperties = GetDirtyProperties();
-
-                    // We don't want to fire the PropertyChanged event when simply re-adding old dirty properties
-                    DisablePropertyChangedEvent();
-                    // We don't want the properties to remember being dirty since we're re-adding them
-                    // They weren't dirty, they are dirty.
-                    ResetDirtyProperties(false);
-                    foreach (var dirtyProperty in dirtyProperties)
-                    {
-                        if (dirtyProperty.StartsWith(nameof(HistoryCleanup)) is false)
-                        {
-                            OnPropertyChanged(dirtyProperty);
-                        }
-                    }
-                    EnablePropertyChangedEvent();
-
-                }
-
-                SetPropertyValueAndDetectChanges(value, ref _historyCleanup, nameof(HistoryCleanup));
-                if (value is not null)
-                {
-                    value.PropertyChanged += FlowHistoryCleanupIsDirty;
-                }
-            }
+            set => SetPropertyValueAndDetectChanges(value, ref _historyCleanup, nameof(HistoryCleanup));
         }
 
-        /// <summary>
-        /// It's expected that the ContentType will be dirty if HistoryCleanup is changed.
-        /// This will flow the changes made in HistoryCleanup back to ContentType so it's included in the IsDirty/WereDirty methods
-        /// </summary>
-        private void FlowHistoryCleanupIsDirty(object sender, PropertyChangedEventArgs args)
-        {
-            OnPropertyChanged($"{nameof(HistoryCleanup)}.{args.PropertyName}");
-        }
 
         /// <summary>
         /// Determines if AllowedTemplates contains templateId
@@ -209,5 +170,15 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         IContentType IContentType.DeepCloneWithResetIdentities(string newAlias) => (IContentType)DeepCloneWithResetIdentities(newAlias);
+
+
+        public override bool IsDirty()
+        {
+            bool dirtyEntity = base.IsDirty();
+
+            bool dirtyHistoryCleanup = HistoryCleanup.IsDirty();
+
+            return dirtyEntity || dirtyHistoryCleanup;
+        }
     }
 }
