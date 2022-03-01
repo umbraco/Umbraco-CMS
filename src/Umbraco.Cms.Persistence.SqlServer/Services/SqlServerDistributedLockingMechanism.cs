@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services;
 public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 {
     private readonly ILogger<SqlServerDistributedLockingMechanism> _logger;
-    private readonly IUmbracoDatabaseFactory _dbFactory;
+    private readonly Lazy<IScopeAccessor> _scopeAccessor; // Hooray it's a circular dependency.
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
     /// <summary>
@@ -23,16 +24,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
     /// </summary>
     public SqlServerDistributedLockingMechanism(
         ILogger<SqlServerDistributedLockingMechanism> logger,
-        IUmbracoDatabaseFactory dbFactory,
+        Lazy<IScopeAccessor> scopeAccessor,
         IOptionsMonitor<GlobalSettings> globalSettings)
     {
-        if (dbFactory.SqlContext.DatabaseType is not NPoco.DatabaseTypes.SqlServerDatabaseType)
-        {
-            throw new DistributedLockingException($"Invalid database type {dbFactory.SqlContext.DatabaseType}");
-        }
-
         _logger = logger;
-        _dbFactory = dbFactory;
+        _scopeAccessor = scopeAccessor;
         _globalSettings = globalSettings;
     }
 
@@ -53,7 +49,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
     private class SqlServerDistributedLock : IDistributedLock
     {
         private readonly SqlServerDistributedLockingMechanism _parent;
-        private readonly IUmbracoDatabase _db;
+        private readonly TimeSpan _timeout;
 
         public SqlServerDistributedLock(
             SqlServerDistributedLockingMechanism parent,
@@ -61,13 +57,10 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             DistributedLockType lockType,
             TimeSpan timeout)
         {
-            _db = parent._dbFactory.CreateDatabase();
             _parent = parent;
+            _timeout = timeout;
             LockId = lockId;
             LockType = lockType;
-
-            _db.BeginTransaction(IsolationLevel.RepeatableRead);
-            _db.Execute("SET LOCK_TIMEOUT " + timeout.TotalMilliseconds + ";");
 
             _parent._logger.LogDebug("{lockType} requested for id {id}", LockType, LockId);
 
@@ -87,9 +80,12 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             }
             catch (SqlException ex) when (ex.Number == 1222)
             {
-                _db.AbortTransaction();
-                _db.Dispose();
-                throw new DistributedReadLockTimeoutException(LockId);
+                if (LockType == DistributedLockType.ReadLock)
+                {
+                    throw new DistributedReadLockTimeoutException(LockId);
+                }
+
+                throw new DistributedWriteLockTimeoutException(LockId);
             }
 
             _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
@@ -101,19 +97,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         public void Dispose()
         {
-            if (_db.InTransaction)
-            {
-                try
-                {
-                    _db.CompleteTransaction();
-                }
-                catch (Exception ex)
-                {
-                    throw new DistributedLockingException($"Unexpected exception thrown whilst attempting to release {LockType} for id {LockId}.", ex);
-                }
-            }
-
-            _db.Dispose();
+            // Mostly no op, cleaned up by completing transaction in scope.
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
         }
 
@@ -122,9 +106,23 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         private void ObtainReadLock()
         {
-            const string query = "SELECT value FROM umbracoLock WHERE id=@id";
+            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
 
-            var i = _db.ExecuteScalar<int?>(query, new {id = LockId});
+            if (db.DatabaseType is not NPoco.DatabaseTypes.SqlServerDatabaseType)
+            {
+                throw new DistributedLockingException($"Invalid database type {db.DatabaseType}");
+            }
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+            {
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+            }
+
+            const string query = "SELECT value FROM umbracoLock WITH (REPEATABLEREAD)  WHERE id=@id";
+
+            db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
+
+            var i = db.ExecuteScalar<int?>(query, new {id = LockId});
 
             if (i == null)
             {
@@ -135,9 +133,23 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         private void ObtainWriteLock()
         {
-            const string query = @"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
+            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
 
-            var i = _db.Execute(query, new {id = LockId});
+            if (db.DatabaseType is not NPoco.DatabaseTypes.SqlServerDatabaseType)
+            {
+                throw new DistributedLockingException($"Invalid database type {db.DatabaseType}");
+            }
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+            {
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+            }
+
+            const string query = @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
+
+            db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
+
+            var i = db.Execute(query, new {id = LockId});
 
             if (i == 0)
             {
