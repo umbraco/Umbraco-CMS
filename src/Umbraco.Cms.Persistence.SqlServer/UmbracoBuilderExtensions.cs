@@ -29,6 +29,9 @@ public static class UmbracoBuilderExtensions
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
 
+        builder.WithCollectionBuilder<DistributedLockingCollectionBuilder>()
+            .AddDistributedLockingMechanism<SqlServerDistributedLockingMechanism>();
+
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);
 

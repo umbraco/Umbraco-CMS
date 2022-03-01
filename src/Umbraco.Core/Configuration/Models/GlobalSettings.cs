@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
         /// <summary>
-        /// Gets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.
+        /// Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.
         /// </summary>
         /// <remarks>
         /// The default value is 60 seconds.
@@ -211,12 +211,17 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public TimeSpan DistributedLockingReadLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingReadLockDefaultTimeout);
 
         /// <summary>
-        /// Gets a value representing the maximum time to wait whilst attempting to obtain a distributed write lock.
+        /// Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed write lock.
         /// </summary>
         /// <remarks>
         /// The default value is 5 seconds.
         /// </remarks>
         [DefaultValue(StaticDistributedLockingWriteLockDefaultTimeout)]
         public TimeSpan DistributedLockingWriteLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingWriteLockDefaultTimeout);
+
+        /// <summary>
+        /// Gets or sets a value representing the DistributedLockingMechanism to use.
+        /// </summary>
+        public string DistributedLockingMechanism { get; set; } = string.Empty;
     }
 }
