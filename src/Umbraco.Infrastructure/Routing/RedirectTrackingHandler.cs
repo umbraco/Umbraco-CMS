@@ -118,8 +118,7 @@ namespace Umbraco.Cms.Core.Routing
 
                 foreach (var culture in cultures)
                 {
-                    var checkedCulture = string.IsNullOrEmpty(culture) ? null : culture;
-                    var route = contentCache.GetRouteById(publishedContent.Id, checkedCulture);
+                    var route = contentCache.GetRouteById(publishedContent.Id, culture);
                     if (IsNotRoute(route))
                     {
                         continue;
@@ -147,14 +146,13 @@ namespace Umbraco.Cms.Core.Routing
 
             foreach (KeyValuePair<ContentIdAndCulture, ContentKeyAndOldRoute> oldRoute in oldRoutes)
             {
-                var culture = string.IsNullOrWhiteSpace(oldRoute.Key.Culture) ? null : oldRoute.Key.Culture;
-                var newRoute = contentCache.GetRouteById(oldRoute.Key.ContentId, culture);
+                var newRoute = contentCache.GetRouteById(oldRoute.Key.ContentId, oldRoute.Key.Culture);
                 if (IsNotRoute(newRoute) || oldRoute.Value.OldRoute == newRoute)
                 {
                     continue;
                 }
 
-                _redirectUrlService.Register(oldRoute.Value.OldRoute, oldRoute.Value.ContentKey, culture);
+                _redirectUrlService.Register(oldRoute.Value.OldRoute, oldRoute.Value.ContentKey, oldRoute.Key.Culture);
             }
         }
 
