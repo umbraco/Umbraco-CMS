@@ -20,7 +20,7 @@ public class DistributedLockingCollectionBuilder : ICollectionBuilder
 
     private List<Type> _types = new();
 
-    // HACK: WAT? meet the generic constraints but throw so we fallback to the other constructor in UmbracoBuilder
+    // HACK: WAT? meet the generic constraints, this ctor is never called.
     public DistributedLockingCollectionBuilder()
     {
         throw new NotImplementedException();
