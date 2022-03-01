@@ -109,13 +109,29 @@ internal class InMemoryDistributedLockingMechanismTests
             InMemoryDistributedLockingMechanism sut,
             int aLockId)
         {
-            var a = sut.ReadTester(aLockId, TimeSpan.FromSeconds(1)).Run();
-            var b = sut.WriteTester(aLockId, TimeSpan.FromSeconds(1)).Run();
+            var testers = new List<LockTester>()
+            {
+                sut.ReadTester(aLockId, TimeSpan.FromSeconds(1)),
+                sut.WriteTester(aLockId, TimeSpan.FromSeconds(1)),
+            };
+
+            var threads = new List<Thread>();
+            foreach (var tester in testers)
+            {
+                threads.Add(new Thread(tester.ThreadStart));
+                threads.Last().Start();
+                Thread.Sleep(100);
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(a.Success);
-                Assert.IsFalse(b.Success);
+                Assert.IsTrue(testers.First().Success);
+                Assert.IsFalse(testers.Last().Success);
             });
         }
 

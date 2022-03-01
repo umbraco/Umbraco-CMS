@@ -48,12 +48,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ConcurrentReadersTest()
         {
-            if (BaseTestDatabase.IsSqlite())
-            {
-                // TODO: PMJ - SQLite, this passed with System.Data.Sqlite (and probably should have), investigate
-                Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite");
-                return;
-            }
 
             const int threadCount = 8;
             var threads = new Thread[threadCount];
@@ -153,12 +147,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ConcurrentWritersTest()
         {
-            if (BaseTestDatabase.IsSqlite())
-            {
-                // TODO: PMJ - SQLite, this passed with System.Data.Sqlite (although it probably shouldn't have), investigate
-                Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite");
-                return;
-            }
 
             const int threadCount = 8;
             var threads = new Thread[threadCount];
@@ -256,7 +244,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             if (BaseTestDatabase.IsSqlite())
             {
-                Assert.Ignore("This test doesn't work with SQLite");
+                Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
                 return;
             }
 
@@ -350,9 +338,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             if (BaseTestDatabase.IsSqlite())
             {
-                Assert.Ignore("This test doesn't work with SQLite");
+                Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
                 return;
             }
+
 
             Exception e1 = null, e2 = null;
             AutoResetEvent ev1 = new AutoResetEvent(false), ev2 = new AutoResetEvent(false);
@@ -380,15 +369,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             Assert.IsNull(e2);
         }
 
-                [Test]
+        [Test]
         public void Throws_When_Lock_Timeout_Is_Exceeded()
         {
-            if (BaseTestDatabase.IsSqlite())
-            {
-                Assert.Ignore("This test doesn't work with SQLite");
-                return;
-            }
-
             using (ExecutionContext.SuppressFlow())
             {
 
@@ -447,12 +430,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void Read_Lock_Waits_For_Write_Lock()
         {
-            if (BaseTestDatabase.IsSqlite())
-            {
-                Assert.Ignore("This test doesn't work with SQLite");
-                return;
-            }
-
             var locksCompleted = 0;
 
             using (ExecutionContext.SuppressFlow())

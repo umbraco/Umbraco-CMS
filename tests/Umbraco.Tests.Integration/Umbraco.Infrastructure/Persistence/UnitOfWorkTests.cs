@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -17,6 +18,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
+            if (Configuration[Constants.Configuration.ConfigGlobalDistributedLockingMechanism] !=
+                nameof(SqlServerDistributedLockingMechanism))
+            {
+                Assert.Ignore("This test only applies to SqlServerDistributedLockingMechanism");
+            }
+
             IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {
@@ -42,6 +49,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void WriteLockNonExisting()
         {
+            if (Configuration[Constants.Configuration.ConfigGlobalDistributedLockingMechanism] !=
+                nameof(SqlServerDistributedLockingMechanism))
+            {
+                Assert.Ignore("This test only applies to SqlServerDistributedLockingMechanism");
+            }
+
             IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {

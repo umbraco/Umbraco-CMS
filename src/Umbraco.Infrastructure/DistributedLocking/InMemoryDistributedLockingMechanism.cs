@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
 {
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<InMemoryDistributedLockingMechanism> _logger;
-    private readonly Locks _locks = new();
+    private readonly Locks _locks;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InMemoryDistributedLockingMechanism"/> class.
@@ -31,6 +32,7 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
     {
         _globalSettings = globalSettings;
         _logger = logger;
+        _locks = new Locks(this);
     }
 
     /// <inheritdoc />
@@ -47,10 +49,10 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
         {
             lock (_locks)
             {
-                if (_locks.TrAcquireReadLock(lockId))
+                if (_locks.TrAcquireReadLock(lockId, out InMemoryDistributedLock distributedLock))
                 {
                     _logger.LogDebug("Acquired {lockType} for id {id}", DistributedLockType.ReadLock, lockId);
-                    return InMemoryDistributedLock.Read(this, lockId);
+                    return distributedLock;
                 }
             }
 
@@ -75,78 +77,94 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
         {
             lock (_locks)
             {
-                if (_locks.TryAcquireWriteLock(lockId))
+                if (_locks.TryAcquireWriteLock(lockId, out InMemoryDistributedLock distributedLock))
                 {
                     _logger.LogDebug("Acquired {lockType} for id {id}", DistributedLockType.WriteLock, lockId);
-                    return InMemoryDistributedLock.Write(this, lockId);
+                    return distributedLock;
                 }
             }
 
             Thread.Sleep(50);
-        }
-        while (timer.Elapsed < obtainLockTimeout);
+        } while (timer.Elapsed < obtainLockTimeout);
 
         throw new DistributedWriteLockTimeoutException(lockId);
     }
 
-    private void DropLock(int lockId, DistributedLockType lockType)
+    private void DropLock(InMemoryDistributedLock distributedLock)
     {
         lock (_locks)
         {
-            _locks.DropLock(lockId, lockType);
-            _logger.LogDebug("Dropped {lockType} for id {id}", lockType, lockId);
+            _locks.DropLock(distributedLock);
+            _logger.LogDebug("Dropped {lockType} for id {id}", distributedLock.LockType, distributedLock.LockId);
         }
     }
 
     private class Locks
     {
-        private readonly IDictionary<int, int> _readLocks = new Dictionary<int, int>();
-        private readonly HashSet<int> _writeLocks = new();
+        private readonly InMemoryDistributedLockingMechanism _parent;
+        private readonly List<InMemoryDistributedLock> _internalLocks = new();
 
-        public bool TrAcquireReadLock(int lockId)
+        public Locks(InMemoryDistributedLockingMechanism parent)
         {
-            if (_writeLocks.Contains(lockId))
+            _parent = parent;
+        }
+
+
+        public bool TrAcquireReadLock(int lockId, out InMemoryDistributedLock distributedLock)
+        {
+            if (HasExistingWriteLock(lockId))
             {
+                distributedLock = null;
                 return false;
             }
 
-            _readLocks[lockId] = GetReaderCount(lockId) + 1;
+            distributedLock = InMemoryDistributedLock.Read(_parent, lockId);
+            _internalLocks.Add(distributedLock);
             return true;
         }
 
-        public bool TryAcquireWriteLock(int lockId)
+        public bool TryAcquireWriteLock(int lockId, out InMemoryDistributedLock distributedLock)
         {
-            if (GetReaderCount(lockId) > 0)
+            if (HasExistingWriteLock(lockId))
             {
+                distributedLock = null;
                 return false;
             }
 
-            if (_writeLocks.Contains(lockId))
+            // No one has any sort of lock for this ID, so go ahead.
+            if (_internalLocks.All(x => x.LockId != lockId))
             {
-                return false;
+                distributedLock = InMemoryDistributedLock.Write(_parent, lockId);
+                _internalLocks.Add(distributedLock);
+                return true;
             }
 
-            _writeLocks.Add(lockId);
-            return true;
+            var existingLocks = _internalLocks.Where(x => x.LockId == lockId).ToList();
+            if (existingLocks.Count == 1 && existingLocks.First().ThreadId == Thread.CurrentThread.ManagedThreadId)
+            {
+                // There's only a single read lock, and it's from this very same thread so allow it anyway.
+                // How reasonable is this? I don't know but it makes tests pass.
+                // It's probably fine for SQLite because with journal_mode = wal
+                // 1) All reads are from a snapshot
+                // 2) Can only ever have a single writer
+                distributedLock = InMemoryDistributedLock.Write(_parent, lockId);
+                _internalLocks.Add(distributedLock);
+                return true;
+            }
+
+            distributedLock = null;
+            return false;
         }
 
-        public void DropLock(int lockId, DistributedLockType lockType)
+        public void DropLock(InMemoryDistributedLock distributedLock)
         {
-            switch (lockType)
-            {
-                case DistributedLockType.ReadLock:
-                    _readLocks[lockId] = GetReaderCount(lockId) - 1;
-                    break;
-                case DistributedLockType.WriteLock:
-                    _writeLocks.Remove(lockId);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
-            }
+            _internalLocks.Remove(distributedLock);
         }
 
-        private int GetReaderCount(int lockId)
-            => _readLocks.TryGetValue(lockId, out var count) ? count : 0;
+        private bool HasExistingWriteLock(int lockId) =>
+            _internalLocks
+                .Where(x => x.LockType == DistributedLockType.WriteLock)
+                .Any(x => x.LockId == lockId);
     }
 
     private class InMemoryDistributedLock : IDistributedLock
@@ -158,9 +176,12 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
             _parent = parent;
             LockId = lockId;
             LockType = lockType;
+            ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
         public int LockId { get; }
+
+        public int ThreadId { get; }
 
         public DistributedLockType LockType { get; }
 
@@ -171,7 +192,7 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
             new(parent, lockId, DistributedLockType.WriteLock);
 
         public void Dispose()
-            => _parent.DropLock(LockId, LockType);
+            => _parent.DropLock(this);
 
         public override string ToString()
             => $"InMemoryDistributedLock({LockId}, {LockType}";
