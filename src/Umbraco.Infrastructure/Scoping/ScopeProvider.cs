@@ -11,6 +11,7 @@ using Umbraco.Extensions;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Scoping;

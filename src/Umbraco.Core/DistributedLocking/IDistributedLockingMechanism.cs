@@ -1,7 +1,8 @@
 using System;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 
-namespace Umbraco.Cms.Infrastructure.DistributedLocking;
+namespace Umbraco.Cms.Core.DistributedLocking;
 
 /// <summary>
 /// Represents a class responsible for managing distributed locks.
@@ -32,6 +33,7 @@ public interface IDistributedLockingMechanism
     /// <remarks>
     /// When timeout is null, implementations should use <see cref="GlobalSettings.DistributedLockingReadLockDefaultTimeout"/>.
     /// </remarks>
+    /// <exception cref="DistributedReadLockTimeoutException">Failed to obtain distributed read lock in time.</exception>
     IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null);
 
     /// <summary>
@@ -40,5 +42,6 @@ public interface IDistributedLockingMechanism
     /// <remarks>
     /// When timeout is null, implementations should use <see cref="GlobalSettings.DistributedLockingWriteLockDefaultTimeout"/>.
     /// </remarks>
+    /// <exception cref="DistributedWriteLockTimeoutException">Failed to obtain distributed write lock in time.</exception>
     IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null);
 }

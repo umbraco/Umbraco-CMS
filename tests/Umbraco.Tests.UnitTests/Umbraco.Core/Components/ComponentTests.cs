@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;

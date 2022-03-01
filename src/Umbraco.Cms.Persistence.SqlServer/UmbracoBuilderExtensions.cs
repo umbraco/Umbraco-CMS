@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
