@@ -159,6 +159,7 @@ stages:
               env:
                 Tests__Database__DatabaseType: 'SqlServer'
                 Tests__Database__SQLServerMasterConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+                Umbraco__Cms__global__DistributedLockingMechanism: 'SqlServerDistributedLockingMechanism'
 
         - job: macOS_Integration_Tests_SQLite
           timeoutInMinutes: 120
@@ -209,6 +210,7 @@ stages:
                     arguments: '--no-build'
                 env:
                   Tests__Database__DatabaseType: 'LocalDb'
+                  Umbraco__Cms__global__DistributedLockingMechanism: 'SqlServerDistributedLockingMechanism'
 
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
