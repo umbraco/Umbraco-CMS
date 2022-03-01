@@ -4,8 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
-using Umbraco.Cms.Infrastructure.DistributedLocking.Exceptions;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.DistributedLocking;

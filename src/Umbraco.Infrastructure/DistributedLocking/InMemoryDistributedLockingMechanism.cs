@@ -5,7 +5,8 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Infrastructure.DistributedLocking.Exceptions;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 
 namespace Umbraco.Cms.Infrastructure.DistributedLocking;
 
@@ -169,9 +170,8 @@ internal class InMemoryDistributedLockingMechanism : IDistributedLockingMechanis
         public static InMemoryDistributedLock Write(InMemoryDistributedLockingMechanism parent, int lockId) =>
             new(parent, lockId, DistributedLockType.WriteLock);
 
-        public void Dispose() => Release();
-
-        public void Release() => _parent.DropLock(LockId, LockType);
+        public void Dispose()
+            => _parent.DropLock(LockId, LockType);
 
         public override string ToString()
             => $"InMemoryDistributedLock({LockId}, {LockType}";

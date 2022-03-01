@@ -3,14 +3,14 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Infrastructure.DistributedLocking;
-using Umbraco.Cms.Infrastructure.DistributedLocking.Exceptions;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
 /// <summary>
-/// SQL Server implementation of of <see cref="IDistributedLockingMechanism"/>.
+/// SQL Server implementation of <see cref="IDistributedLockingMechanism"/>.
 /// </summary>
 public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 {
@@ -48,7 +48,6 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
     private class SqlServerDistributedLock : IDistributedLock
     {
         private readonly SqlServerDistributedLockingMechanism _parent;
-        private readonly TimeSpan _timeout;
         private readonly IUmbracoDatabase _db;
 
         public SqlServerDistributedLock(
@@ -59,12 +58,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         {
             _db = parent._dbFactory.CreateDatabase();
             _parent = parent;
-            _timeout = timeout;
             LockId = lockId;
             LockType = lockType;
 
             _db.BeginTransaction(IsolationLevel.RepeatableRead);
-            _db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
+            _db.Execute("SET LOCK_TIMEOUT " + timeout.TotalMilliseconds + ";");
 
             _parent._logger.LogDebug("{lockType} requested for id {id}", LockType, LockId);
 
@@ -85,9 +83,6 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         public DistributedLockType LockType { get; }
 
         public void Dispose()
-            => Release();
-
-        public void Release()
         {
             _db.CompleteTransaction();
             _db.Dispose();
@@ -108,17 +103,12 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                 if (i == null)
                 {
                     // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={LockId} does not exist.", nameof(LockId));
+                    throw new ArgumentException(@$"LockObject with id={LockId} does not exist.", nameof(LockId));
                 }
             }
-            catch (SqlException ex)
+            catch (SqlException ex) when (ex.Number == 1222)
             {
-                if (ex?.Number == 1222)
-                {
-                    throw new DistributedReadLockTimeoutException(LockId);
-                }
-
-                throw;
+                throw new DistributedReadLockTimeoutException(LockId);
             }
         }
 
@@ -128,7 +118,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             {
                 const string query = @"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
-                var i = _db.Execute(query, new {id = LockId});
+                var i = _db.Execute(query, new { id = LockId });
 
                 if (i == 0)
                 {
@@ -136,14 +126,9 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                     throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                 }
             }
-            catch (SqlException ex)
+            catch (SqlException ex) when (ex.Number == 1222)
             {
-                if (ex?.Number == 1222)
-                {
-                    throw new DistributedReadLockTimeoutException(LockId);
-                }
-
-                throw;
+                throw new DistributedReadLockTimeoutException(LockId);
             }
         }
     }
