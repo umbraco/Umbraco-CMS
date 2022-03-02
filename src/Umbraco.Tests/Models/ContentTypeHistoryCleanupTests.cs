@@ -103,8 +103,5 @@ namespace Umbraco.Tests.Models
             Assert.IsFalse(contentType.IsDirty());
             Assert.IsFalse(contentType.WasDirty());
         }
-
-        private static string PrefixHistoryCleanup(string propertyName) =>
-            $"{nameof(ContentType.HistoryCleanup)}.{propertyName}";
     }
 }
