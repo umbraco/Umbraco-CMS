@@ -4,7 +4,7 @@
     <umb-box-header title-key="references_tabName"></umb-box-header>
     <umb-box-content>
         <umb-empty-state size="small">
-            This item has no references
+            This item is not referenced
         </umb-empty-state>
     </umb-box-content>
 </umb-box>
@@ -21,6 +21,7 @@
         </umb-tracked-references-table>
     </div>
 
+    <!-- TODO: Make it optional to show this, so we can hide it in Info tabs. -->
     <div ng-if="vm.hasContentReferencesInDescendants"> <!-- TODO: RENAME this table -->
         <umb-tracked-references-listview-table  items="vm.referencedContentDescendants.items"
                                                 total-pages="vm.referencedContentDescendants.totalPages"
@@ -50,6 +51,7 @@
         </umb-tracked-references-table>
     </div>
 
+    <!-- TODO: Make it optional to show this. -->
     <div ng-if="vm.hasMediaReferencesInDescendants"> <!-- TODO: RENAME this table -->
         <umb-tracked-references-listview-table  items="vm.referencedMediaDescendants.items"
                                                 total-pages="vm.referencedMediaDescendants.totalPages"

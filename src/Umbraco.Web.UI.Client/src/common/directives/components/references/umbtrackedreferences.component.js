@@ -9,10 +9,10 @@
 
         var vm = this;
 
-        vm.contentReferencesTitle = "Used in Documents";
-        vm.memberReferencesTitle = "Used in Members";
-        vm.mediaReferencesTitle = "Used in Media";
-        vm.referencedDescendantsTitle = "Descendants in use";
+        vm.contentReferencesTitle = "Referenced by the following Documents";
+        vm.memberReferencesTitle = "Referenced by the following Members";
+        vm.mediaReferencesTitle = "Referenced by the following Media";
+        vm.referencedDescendantsTitle = "The following descendant items are referenced";
 
         localizationService.localize("references_labelUsedByDocuments").then(function (value) {
             vm.contentReferencesTitle = value;
@@ -68,7 +68,7 @@
 
                     // when vm.id == 0 it means that this is a new item, so it has no references yet
                     // therefore we don't need to check for descendants
-                    if (!vm.hasContentReferences && vm.id != 0) {
+                    if (vm.id != 0) {
                         descendantsPromises.push(checkContentDescendantsUsage());
                     }
 
