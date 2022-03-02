@@ -139,12 +139,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             // if the database model is null then we will attempt quick install.
             if (databaseSettings == null)
             {
-                databaseSettings = new DatabaseModel();
-
                 providerMeta = _databaseProviderMetadata
                     .OrderBy(x => x.SortOrder)
                     .Where(x => x.SupportsQuickInstall)
                     .FirstOrDefault(x => x.IsAvailable);
+
+                databaseSettings = new DatabaseModel
+                {
+                    DatabaseName = providerMeta?.DefaultDatabaseName,
+                };
             }
             else
             {
