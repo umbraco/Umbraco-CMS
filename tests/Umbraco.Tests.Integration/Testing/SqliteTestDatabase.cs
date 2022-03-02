@@ -92,6 +92,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             }
         }
 
+        new SqliteDatabaseCreator().Create(meta.ConnectionString);
         using var connection = GetConnection(meta);
         connection.Open();
 
