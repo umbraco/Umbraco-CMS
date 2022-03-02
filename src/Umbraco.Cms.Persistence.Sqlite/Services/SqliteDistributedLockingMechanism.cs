@@ -109,18 +109,19 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             => $"SqliteDistributedLock({LockId})";
 
         // Can always obtain a read lock (snapshot isolation in wal mode)
+        // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
 
-            const string query = "SELECT value FROM umbracoLock WHERE id = @id";
-
-            var i = db.ExecuteScalar<int?>(query, new { id = LockId });
-
-            if (i == null)
+            if (!db.InTransaction)
             {
-                // ensure we are actually locking!
-                throw new ArgumentException(@$"LockObject with id={LockId} does not exist.", nameof(LockId));
+                throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
+            }
+
+            if (db.Transaction.IsolationLevel != IsolationLevel.Serializable)
+            {
+                throw new InvalidOperationException("Unexpected IsolationLevel, please check SqliteCacheMode.");
             }
         }
 
@@ -129,6 +130,16 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         private void ObtainWriteLock()
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+
+            if (!db.InTransaction)
+            {
+                throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
+            }
+
+            if (db.Transaction.IsolationLevel != IsolationLevel.Serializable)
+            {
+                throw new InvalidOperationException("Unexpected IsolationLevel, please check SqliteCacheMode.");
+            }
 
             var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";
 

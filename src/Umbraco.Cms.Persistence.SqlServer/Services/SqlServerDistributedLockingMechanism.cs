@@ -116,6 +116,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
 
+            if (!db.InTransaction)
+            {
+                throw new InvalidOperationException("SqlServerDistributedLockingMechanism requires a transaction to function.");
+            }
+
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
                 throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
@@ -137,6 +142,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         private void ObtainWriteLock()
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+
+            if (!db.InTransaction)
+            {
+                throw new InvalidOperationException("SqlServerDistributedLockingMechanism requires a transaction to function.");
+            }
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
