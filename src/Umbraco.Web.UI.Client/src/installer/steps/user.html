@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <div class="row" ng-if="installer.current.model.quickInstallSettings" ng-style="{'opacity': myForm.$invalid ? '0.4' : ''}">
+    <div class="row" ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable" ng-style="{'opacity': myForm.$invalid ? '0.4' : ''}">
       <legend>Database Configuration</legend>
       <div class="span8">
         <div class="pull-right">
@@ -61,7 +61,7 @@
           <div class="span12">
             <div class="control-group">
               <div class="controls">
-                <button ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable" class="btn btn-info control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Change Database Configuration</button>
+                <button class="btn btn-info control-customize" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Change Database Configuration</button>
               </div>
             </div>
           </div>
