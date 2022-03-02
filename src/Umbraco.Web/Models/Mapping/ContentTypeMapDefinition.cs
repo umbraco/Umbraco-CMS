@@ -87,8 +87,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
-
-            target.HistoryCleanup = source.HistoryCleanup;
+            MapHistoryCleanup(source, target);
 
             target.AllowedTemplates = source.AllowedTemplates
                 .Where(x => x != null)
@@ -97,6 +96,34 @@ namespace Umbraco.Web.Models.Mapping
                 .ToArray();
 
             target.SetDefaultTemplate(source.DefaultTemplate == null ? null : _fileService.GetTemplate(source.DefaultTemplate));
+        }
+
+        private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
+        {
+            // If source history cleanup is null we don't have to map all properties
+            if (source.HistoryCleanup is null)
+            {
+                target.HistoryCleanup = null;
+                return;
+            }
+
+            // We need to reset the dirty properties, because it is otherwise true, just because the json serializer has set properties
+            target.HistoryCleanup.ResetDirtyProperties(false);
+            if (target.HistoryCleanup.PreventCleanup != source.HistoryCleanup.PreventCleanup)
+            {
+                target.HistoryCleanup.PreventCleanup = source.HistoryCleanup.PreventCleanup;
+            }
+
+            if (target.HistoryCleanup.KeepAllVersionsNewerThanDays != source.HistoryCleanup.KeepAllVersionsNewerThanDays)
+            {
+                target.HistoryCleanup.KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays;
+            }
+
+            if (target.HistoryCleanup.KeepLatestVersionPerDayForDays !=
+                source.HistoryCleanup.KeepLatestVersionPerDayForDays)
+            {
+                target.HistoryCleanup.KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays;
+            }
         }
 
         // no MapAll - take care
@@ -253,7 +280,12 @@ namespace Umbraco.Web.Models.Mapping
                 target.Id = source.Id;
 
             if (source.GroupId > 0)
-                target.PropertyGroupId = new Lazy<int>(() => source.GroupId, false);
+            {
+                if (target.PropertyGroupId?.Value != source.GroupId)
+                {
+                    target.PropertyGroupId = new Lazy<int>(() => source.GroupId, false);
+                }
+            }
 
             target.Alias = source.Alias;
             target.Description = source.Description;
@@ -476,13 +508,23 @@ namespace Umbraco.Web.Models.Mapping
 
                 // ensure no duplicate alias, then assign the group properties collection
                 EnsureUniqueAliases(destProperties);
-                destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+
+                if (destGroup.PropertyTypes.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false)
+                {
+                    destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                }
+
                 destGroups.Add(destGroup);
             }
 
             // ensure no duplicate name, then assign the groups collection
             EnsureUniqueAliases(destGroups);
-            target.PropertyGroups = new PropertyGroupCollection(destGroups);
+
+
+            if (target.PropertyGroups.SequenceEqual(destGroups) is false)
+            {
+                target.PropertyGroups = new PropertyGroupCollection(destGroups);
+            }
 
             // because the property groups collection was rebuilt, there is no need to remove
             // the old groups - they are just gone and will be cleared by the repository

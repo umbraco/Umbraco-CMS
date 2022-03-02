@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models.Entities
     public abstract class BeingDirtyBase : IRememberBeingDirty
     {
         private bool _withChanges = true; // should we track changes?
+        private bool _withChangedEvent = true; // should we fire the event when changes are registered
         private Dictionary<string, bool> _currentChanges; // which properties have changed?
         private Dictionary<string, bool> _savedChanges; // which properties had changed at last commit?
 
@@ -117,7 +118,10 @@ namespace Umbraco.Core.Models.Entities
 
             _currentChanges[propertyName] = true;
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (_withChangedEvent)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
         /// <summary>
@@ -134,6 +138,22 @@ namespace Umbraco.Core.Models.Entities
         public void EnableChangeTracking()
         {
             _withChanges = true;
+        }
+
+        /// <summary>
+        /// Disables the property changed event.
+        /// </summary>
+        protected void DisablePropertyChangedEvent()
+        {
+            _withChangedEvent = false;
+        }
+
+        /// <summary>
+        /// Enables the property changed event.
+        /// </summary>
+        protected void EnablePropertyChangedEvent()
+        {
+            _withChangedEvent = true;
         }
 
         /// <summary>

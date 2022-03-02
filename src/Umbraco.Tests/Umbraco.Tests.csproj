@@ -145,6 +145,7 @@
     <Compile Include="ModelsBuilder\StringExtensions.cs" />
     <Compile Include="ModelsBuilder\UmbracoApplicationTests.cs" />
     <Compile Include="Models\ContentScheduleTests.cs" />
+    <Compile Include="Models\ContentTypeHistoryCleanupTests.cs" />
     <Compile Include="Models\CultureImpactTests.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\PathValidationTests.cs" />

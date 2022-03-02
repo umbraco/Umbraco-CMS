@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.ContentEditing;
 
@@ -50,8 +50,6 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public override bool SupportsPublishing => SupportsPublishingConst;
 
-
-
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
             (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
@@ -98,7 +96,14 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public HistoryCleanup HistoryCleanup { get; set; }
+        private HistoryCleanup _historyCleanup;
+
+        public HistoryCleanup HistoryCleanup
+        {
+            get => _historyCleanup;
+            set => SetPropertyValueAndDetectChanges(value, ref _historyCleanup, nameof(HistoryCleanup));
+        }
+
 
         /// <summary>
         /// Determines if AllowedTemplates contains templateId
@@ -165,5 +170,15 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         IContentType IContentType.DeepCloneWithResetIdentities(string newAlias) => (IContentType)DeepCloneWithResetIdentities(newAlias);
+
+
+        public override bool IsDirty()
+        {
+            bool dirtyEntity = base.IsDirty();
+
+            bool dirtyHistoryCleanup = HistoryCleanup.IsDirty();
+
+            return dirtyEntity || dirtyHistoryCleanup;
+        }
     }
 }
