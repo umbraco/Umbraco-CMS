@@ -23,6 +23,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware
@@ -53,6 +54,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IRuntimeState _runtimeState;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+        private readonly IOptions<UmbracoRequestOptions> _umbracoRequestOptions;
         private readonly SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
 
@@ -82,7 +84,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             IOptions<SmidgeOptions> smidgeOptions,
             IRuntimeState runtimeState,
             IVariationContextAccessor variationContextAccessor,
-            IDefaultCultureAccessor defaultCultureAccessor)
+            IDefaultCultureAccessor defaultCultureAccessor,
+            IOptions<UmbracoRequestOptions> umbracoRequestOptions)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
@@ -95,6 +98,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _runtimeState = runtimeState;
             _variationContextAccessor = variationContextAccessor;
             _defaultCultureAccessor = defaultCultureAccessor;
+            _umbracoRequestOptions = umbracoRequestOptions;
             _smidgeOptions = smidgeOptions.Value;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
@@ -103,7 +107,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             // do not process if client-side request
-            if (context.Request.IsClientSideRequest())
+            if (context.Request.IsClientSideRequest() && _umbracoRequestOptions.Value.HandleAsClientSideRequest(context.Request))
             {
                 // we need this here because for bundle requests, these are 'client side' requests that we need to handle
                 LazyInitializeBackOfficeServices(context.Request.Path);
