@@ -82,7 +82,6 @@ namespace Umbraco.Tests.Models
             {
                 Assert.IsTrue(contentType.IsDirty());
                 Assert.IsFalse(contentType.WasDirty());
-                Assert.IsFalse(contentType.IsPropertyDirty(PrefixHistoryCleanup(nameof(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays))));
                 Assert.AreEqual(2, contentType.GetDirtyProperties().Count());
                 Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
                 Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.Alias)));
