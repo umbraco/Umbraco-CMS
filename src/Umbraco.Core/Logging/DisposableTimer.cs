@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.Logging
                             {
                                 var args = new object[_endMessageArgs.Length + 3];
                                 _endMessageArgs.CopyTo(args, 0);
-                                args[args.Length - 2] = _endMessage;
+                                args[_endMessageArgs.Length - 2] = _endMessage;
                                 args[_endMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
                                 args[_endMessageArgs.Length] = _timingId;
                                 _logger.LogInformation("{EndMessage} ({Duration}ms) [Timing {TimingId}]", args);
