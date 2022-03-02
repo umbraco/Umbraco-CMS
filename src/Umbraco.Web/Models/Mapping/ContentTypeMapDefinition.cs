@@ -100,6 +100,13 @@ namespace Umbraco.Web.Models.Mapping
 
         private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
         {
+            // If source history cleanup is null we don't have to map all properties
+            if (source.HistoryCleanup is null)
+            {
+                target.HistoryCleanup = null;
+                return;
+            }
+
             // We need to reset the dirty properties, because it is otherwise true, just because the json serializer has set properties
             target.HistoryCleanup.ResetDirtyProperties(false);
             if (target.HistoryCleanup.PreventCleanup != source.HistoryCleanup.PreventCleanup)
