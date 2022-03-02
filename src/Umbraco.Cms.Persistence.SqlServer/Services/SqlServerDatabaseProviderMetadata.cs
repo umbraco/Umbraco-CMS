@@ -17,7 +17,7 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     public int SortOrder => 2;
 
     /// <inheritdoc />
-    public string DisplayName => "Microsoft SQL Server";
+    public string DisplayName => "SQL Server";
 
     /// <inheritdoc />
     public string DefaultDatabaseName => string.Empty;

@@ -18,7 +18,7 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
     public int SortOrder => 3;
 
     /// <inheritdoc />
-    public string DisplayName => "Microsoft SQL Azure";
+    public string DisplayName => "Azure SQL";
 
     /// <inheritdoc />
     public string DefaultDatabaseName => string.Empty;
