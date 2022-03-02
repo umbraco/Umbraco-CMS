@@ -37,5 +37,11 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember]
         Guid? ChildObjectType { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean indicating whether the RelationType should be returned in "Used by"-queries.
+        /// </summary>
+        [DataMember]
+        bool IsDependency { get; set; }
     }
 }

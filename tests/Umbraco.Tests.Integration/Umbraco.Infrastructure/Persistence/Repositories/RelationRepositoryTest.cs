@@ -533,14 +533,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 "relateContentOnCopy",
                 true,
                 Constants.ObjectTypes.Document,
-                new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"));
+                new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"),
+                false);
 
             _relateContentType = new RelationType(
                 "Relate ContentType on Copy",
                 "relateContentTypeOnCopy",
                 true,
                 Constants.ObjectTypes.DocumentType,
-                new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"));
+                new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"),
+                false);
 
             using (IScope scope = ScopeProvider.CreateScope())
             {

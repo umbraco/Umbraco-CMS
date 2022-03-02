@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Create_RelationType_Without_Name()
         {
             IRelationService rs = RelationService;
-            IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
+            IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, true);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -130,6 +130,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual("Test", rt.Name);
             Assert.AreEqual("repeatedEventOccurence", rt.Alias);
             Assert.AreEqual(false, rt.IsBidirectional);
+            Assert.AreEqual(true, rt.IsDependency);
             Assert.AreEqual(Constants.ObjectTypes.Document, rt.ParentObjectType.Value);
             Assert.AreEqual(Constants.ObjectTypes.Media, rt.ChildObjectType.Value);
         }
@@ -138,7 +139,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Create_Relation_Type_Without_Object_Types()
         {
             IRelationService rs = RelationService;
-            IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null);
+            IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null, false);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -269,7 +270,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IRelation CreateAndSaveRelation(string name, string alias)
         {
             IRelationService rs = RelationService;
-            var rt = new RelationType(name, alias, false, null, null);
+            var rt = new RelationType(name, alias, false, null, null, false);
             rs.Save(rt);
 
             ContentType ct = ContentTypeBuilder.CreateBasicContentType();
@@ -298,7 +299,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IRelationService rs = RelationService;
             string rtName = Guid.NewGuid().ToString();
-            var rt = new RelationType(rtName, rtName, false, null, null);
+            var rt = new RelationType(rtName, rtName, false, null, null, false);
             rs.Save(rt);
 
             ContentType ct = ContentTypeBuilder.CreateBasicContentType();

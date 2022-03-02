@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
         public static IRelationType BuildEntity(RelationTypeDto dto)
         {
-            var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType);
+            var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType, dto.IsDependency);
 
             try
             {
@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 Alias = entity.Alias,
                 ChildObjectType = entity.ChildObjectType,
                 Dual = entity.IsBidirectional,
+                IsDependency = entity.IsDependency,
                 Name = entity.Name,
                 ParentObjectType = entity.ParentObjectType,
                 UniqueId = entity.Key

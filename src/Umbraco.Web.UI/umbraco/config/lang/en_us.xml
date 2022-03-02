@@ -2473,6 +2473,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noRelations">No relations for this Relation Type</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
+    <key alias="isDependency">Is Dependency</key>
+    <key alias="dependency">Yes</key>
+    <key alias="noDependency">No</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Getting Started</key>

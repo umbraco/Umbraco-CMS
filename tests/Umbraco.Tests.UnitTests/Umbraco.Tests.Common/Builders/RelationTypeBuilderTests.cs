@@ -26,6 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var parentObjectType = Guid.NewGuid();
             var childObjectType = Guid.NewGuid();
             const bool isBidirectional = true;
+            const bool isDependency = true;
 
             var builder = new RelationTypeBuilder();
 
@@ -41,6 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
                 .WithParentObjectType(parentObjectType)
                 .WithChildObjectType(childObjectType)
                 .WithIsBidirectional(isBidirectional)
+                .WithIsDependency(isDependency)
                 .Build();
 
             // Assert
@@ -54,6 +56,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(parentObjectType, relationType.ParentObjectType);
             Assert.AreEqual(childObjectType, relationType.ChildObjectType);
             Assert.AreEqual(isBidirectional, relationType.IsBidirectional);
+            Assert.AreEqual(isDependency, relationType.IsDependency);
         }
     }
 }
