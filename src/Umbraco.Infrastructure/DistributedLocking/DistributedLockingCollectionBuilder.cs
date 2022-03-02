@@ -20,13 +20,6 @@ public class DistributedLockingCollectionBuilder : ICollectionBuilder
 
     private List<Type> _types = new();
 
-    // HACK: WAT? meet the generic constraints, this ctor is never called.
-    public DistributedLockingCollectionBuilder()
-    {
-        throw new NotImplementedException();
-    }
-
-    // ReSharper disable once UnusedMember.Global (it's used by UmbracoBuilder)
     public DistributedLockingCollectionBuilder(IUmbracoBuilder builder)
     {
         _builder = builder;
