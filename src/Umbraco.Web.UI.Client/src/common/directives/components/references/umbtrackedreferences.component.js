@@ -9,10 +9,10 @@
 
         var vm = this;
 
-        vm.contentReferencesTitle = "Used in Documents";
-        vm.memberReferencesTitle = "Used in Members";
-        vm.mediaReferencesTitle = "Used in Media";
-        vm.referencedDescendantsTitle = "Descendants in use";
+        vm.contentReferencesTitle = "Referenced by the following Documents";
+        vm.memberReferencesTitle = "Referenced by the following Members";
+        vm.mediaReferencesTitle = "Referenced by the following Media";
+        vm.referencedDescendantsTitle = "The following descendant items are referenced";
 
         localizationService.localize("references_labelUsedByDocuments").then(function (value) {
             vm.contentReferencesTitle = value;

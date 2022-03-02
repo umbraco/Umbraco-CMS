@@ -9,7 +9,7 @@
     {
         var vm = this;
 
-        vm.referencedItemsTitle = "Items in use";
+        vm.referencedItemsTitle = "These items are referenced";
 
         localizationService.localize("references_labelUsedItems").then(function (value) {
             vm.referencedItemsTitle = value;
@@ -18,11 +18,13 @@
         vm.changeContentPageNumber = changeContentPageNumber;
         vm.contentOptions = {};
         vm.contentOptions.entityType = "DOCUMENT";
+        // TODO: rename this prop. it has nothing to do with list-views. suggestion, rename to: hasReferencesDescendants
         vm.hasContentReferencesInListView = false;
 
         vm.changeMediaPageNumber = changeMediaPageNumber;
         vm.mediaOptions = {};
         vm.mediaOptions.entityType = "MEDIA";
+        // TODO: rename this prop. it has nothing to do with list-views. suggestion, rename to: hasReferencesDescendants
         vm.hasMediaReferencesInListView = false;
 
         vm.$onInit = onInit;
