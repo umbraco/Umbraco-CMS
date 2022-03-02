@@ -370,17 +370,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         }
 
         [Test]
-        public void Throws_When_Lock_Timeout_Is_Exceeded()
+        public void Throws_When_Lock_Timeout_Is_Exceeded_Read()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // Reader reads snapshot, isolated from the writer.
+                Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
+            }
+
             using (ExecutionContext.SuppressFlow())
             {
-
-
                 var t1 = Task.Run(() =>
                 {
                     using (var scope = ScopeProvider.CreateScope())
                     {
-
                         Console.WriteLine("Write lock A");
                         // This will acquire right away
                         scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
@@ -407,11 +410,36 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     }
                 });
 
-                var t3 = Task.Run(() =>
+                Task.WaitAll(t1, t2);
+            }
+        }
+
+        [Test]
+        public void Throws_When_Lock_Timeout_Is_Exceeded_Write()
+        {
+            using (ExecutionContext.SuppressFlow())
+            {
+                var t1 = Task.Run(() =>
                 {
                     using (var scope = ScopeProvider.CreateScope())
                     {
-                        Console.WriteLine("Write lock C");
+
+                        Console.WriteLine("Write lock A");
+                        // This will acquire right away
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                        Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
+                        scope.Complete();
+                        Console.WriteLine("Finished Write lock A");
+                    }
+                });
+
+                Thread.Sleep(500); // 100% sure task 1 starts first
+
+                var t2 = Task.Run(() =>
+                {
+                    using (var scope = ScopeProvider.CreateScope())
+                    {
+                        Console.WriteLine("Write lock B");
 
                         // This will wait for the write lock to release but it isn't going to wait long
                         // enough so an exception will be thrown.
@@ -419,17 +447,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                             scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
 
                         scope.Complete();
-                        Console.WriteLine("Finished Write lock C");
+                        Console.WriteLine("Finished Write lock B");
                     }
                 });
 
-                Task.WaitAll(t1, t2, t3);
+                Task.WaitAll(t1, t2);
             }
         }
 
         [Test]
         public void Read_Lock_Waits_For_Write_Lock()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // Reader reads snapshot, isolated from the writer.
+                Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
+            }
+
             var locksCompleted = 0;
 
             using (ExecutionContext.SuppressFlow())

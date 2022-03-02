@@ -1029,14 +1029,6 @@ namespace Umbraco.Cms.Core.Scoping
                     {
                         IncrementLock(lockId, instanceId, ref _readLocksDictionary);
 
-                        // TODO: PMJ this may or may not be smart.
-                        // Implied business rule from the SQL implementation now handled at application layer.
-                        // If we have an existing write lock for a given lock id, we do not need to later obtain a read lock for that same lock id.
-                        if (_writeLocks?.Contains(lockId) ?? false)
-                        {
-                            continue;
-                        }
-
                         // We are the outermost scope, handle the lock request.
                         LockInner(
                             instanceId,
