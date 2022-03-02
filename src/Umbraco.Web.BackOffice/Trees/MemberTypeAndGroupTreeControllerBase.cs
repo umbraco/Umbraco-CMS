@@ -59,7 +59,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             else
             {
-                //delete member type/group
                 var memberType = _memberTypeService.Get(int.Parse(id));
                 if (memberType != null)
                 {
