@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Core.Routing
 
             IPublishedContentCache contentCache = publishedSnapshot.Content;
             IPublishedContent entityContent = contentCache?.GetById(entity.Id);
-            if (entityContent == null)
+            if (entityContent is null)
             {
                 return;
             }
