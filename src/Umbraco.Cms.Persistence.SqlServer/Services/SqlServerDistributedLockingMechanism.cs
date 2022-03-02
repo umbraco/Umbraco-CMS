@@ -70,7 +70,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             LockId = lockId;
             LockType = lockType;
 
-            _parent._logger.LogDebug("{lockType} requested for id {id}", LockType, LockId);
+            _parent._logger.LogDebug("Requesting {lockType} for id {id}", LockType, LockId);
 
             try
             {
