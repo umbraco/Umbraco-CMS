@@ -1,6 +1,6 @@
 <div>
     <h5 class="mt0" style="margin-bottom: 20px;">
-        {{vm.title}}
+        {{vm.headline}}
     </h5>
 
     <div class="umb-table">
@@ -8,16 +8,16 @@
             <div class="umb-table-row">
                 <div class="umb-table-cell"></div>
                 <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
-                <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                <div ng-if="vm.showType" class="umb-table-cell"><localize key="{{vm.typeLabelKey}}">Type</localize></div>
+                <div ng-if="vm.showAlias" class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
             </div>
         </div>
         <div class="umb-table-body">
             <div class="umb-table-row" ng-repeat="reference in vm.items">
                 <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
-                <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
-                <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
-                <div class="umb-table-cell umb-table-cell--nano umb-table-body__link" ng-click="vm.close()"><a ng-href="{{vm.getUrl(reference.udi, reference.id)}}"><localize key="general_open">Open</localize></a></div>
+                <div class="umb-table-cell umb-table__name"><a ng-href="{{vm.getUrl(reference.udi, reference.id)}}" ng-click="vm.referenceAnchorClicked($event, reference)">{{::reference.name}}</a></div>
+                <div ng-if="vm.showType" class="umb-table-cell"><span title="{{::reference.type}}">{{::reference.type}}</span></div>
+                <div ng-if="vm.showAlias" class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
             </div>
         </div>
     </div>

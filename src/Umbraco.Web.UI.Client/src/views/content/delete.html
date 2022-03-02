@@ -18,7 +18,7 @@
                 <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
             </div>
 
-            <umb-tracked-references id="currentNode.id" on-loading-complete="checkingReferencesComplete()" hide-no-result="true" on-warning="onReferencesWarning()"></umb-tracked-references>
+            <umb-tracked-references id="currentNode.id" on-loading-complete="checkingReferencesComplete()" hide-no-result="true" compact="true" show-descendants="true" on-warning="onReferencesWarning()"></umb-tracked-references>
 
             <div class="abstract umb-alert umb-alert--warning" ng-if="warningText">
                 {{warningText}}
