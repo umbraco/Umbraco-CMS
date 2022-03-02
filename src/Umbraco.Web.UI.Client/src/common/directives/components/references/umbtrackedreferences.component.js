@@ -68,7 +68,7 @@
 
                     // when vm.id == 0 it means that this is a new item, so it has no references yet
                     // therefore we don't need to check for descendants
-                    if (!vm.hasContentReferences && vm.id != 0) {
+                    if (vm.id != 0) {
                         descendantsPromises.push(checkContentDescendantsUsage());
                     }
 
