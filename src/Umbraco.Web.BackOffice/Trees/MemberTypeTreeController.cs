@@ -38,7 +38,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _memberTypeService = memberTypeService;
         }
 
-
         protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
