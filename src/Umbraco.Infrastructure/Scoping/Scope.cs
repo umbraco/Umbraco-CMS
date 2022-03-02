@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Core.Collections;
@@ -55,11 +54,9 @@ namespace Umbraco.Cms.Core.Scoping
         private HashSet<int> _writeLocks;
         private Dictionary<Guid, Dictionary<int, int>> _writeLocksDictionary;
         private Queue<IDistributedLock> _acquiredLocks;
-        private IDistributedLockingMechanism _distributedLockingMechanism;
 
         // initializes a new scope
         private Scope(
-            IDistributedLockingMechanism distributedLockingMechanism,
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IEventAggregator eventAggregator,
@@ -75,7 +72,6 @@ namespace Umbraco.Cms.Core.Scoping
             bool callContext = false,
             bool autoComplete = false)
         {
-            _distributedLockingMechanism = distributedLockingMechanism;
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
             _eventAggregator = eventAggregator;
@@ -173,7 +169,6 @@ namespace Umbraco.Cms.Core.Scoping
 
         // initializes a new scope
         public Scope(
-            IDistributedLockingMechanism distributedLockingMechanism,
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IEventAggregator eventAggregator,
@@ -187,7 +182,7 @@ namespace Umbraco.Cms.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(distributedLockingMechanism, scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, null,
+            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, null,
                 scopeContext, detachable, isolationLevel, repositoryCacheMode,
                 scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
         {
@@ -195,7 +190,6 @@ namespace Umbraco.Cms.Core.Scoping
 
         // initializes a new scope in a nested scopes chain, with its parent
         public Scope(
-            IDistributedLockingMechanism distributedLockingMechanism,
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IEventAggregator eventAggregator,
@@ -208,7 +202,7 @@ namespace Umbraco.Cms.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(distributedLockingMechanism, scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, parent,
+            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, parent,
                 null, false, isolationLevel, repositoryCacheMode, notificationPublisher,
                 scopeFileSystems, callContext, autoComplete)
         {
@@ -1124,7 +1118,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainReadLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_distributedLockingMechanism.ReadLock(lockId, timeout));
+            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
 
         /// <summary>
         ///     Obtains a write lock with a custom timeout.
@@ -1132,6 +1126,6 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainWriteLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_distributedLockingMechanism.WriteLock(lockId, timeout));
+            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
     }
 }

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
@@ -18,6 +19,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
     private readonly ILogger<SqlServerDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor; // Hooray it's a circular dependency.
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism"/> class.
@@ -25,12 +27,18 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
     public SqlServerDistributedLockingMechanism(
         ILogger<SqlServerDistributedLockingMechanism> logger,
         Lazy<IScopeAccessor> scopeAccessor,
-        IOptionsMonitor<GlobalSettings> globalSettings)
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         _logger = logger;
         _scopeAccessor = scopeAccessor;
         _globalSettings = globalSettings;
+        _connectionStrings = connectionStrings;
     }
+
+    /// <inheritdoc />
+    public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
+                           _connectionStrings.CurrentValue.ProviderName == Constants.ProviderName;
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
@@ -108,11 +116,6 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
 
-            if (db.DatabaseType is not NPoco.DatabaseTypes.SqlServerDatabaseType)
-            {
-                throw new DistributedLockingException($"Invalid database type {db.DatabaseType}");
-            }
-
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
                 throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
@@ -134,11 +137,6 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         private void ObtainWriteLock()
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
-
-            if (db.DatabaseType is not NPoco.DatabaseTypes.SqlServerDatabaseType)
-            {
-                throw new DistributedLockingException($"Invalid database type {db.DatabaseType}");
-            }
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {

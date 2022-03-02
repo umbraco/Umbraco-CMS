@@ -42,7 +42,6 @@ public class GlobalSetupTeardown
         TestContext.Progress.WriteLine($"* DatabaseType     : {databaseType}");
         TestContext.Progress.WriteLine($"* UmbracoVersion   : {version.ToString().Split('+').First()}");
         TestContext.Progress.WriteLine($"* WorkingDirectory : {testHelper.WorkingDirectory}");
-        TestContext.Progress.WriteLine($"* DistributedLocking : {TestConfiguration[Umbraco.Cms.Core.Constants.Configuration.ConfigGlobalDistributedLockingMechanism]}");
         TestContext.Progress.WriteLine($"******************************************************************************");
 
         _stopwatch = Stopwatch.StartNew();

@@ -16,7 +16,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
@@ -94,7 +93,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
             eventAggregatorMock = new Mock<IEventAggregator>();
 
             return new ScopeProvider(
-                Mock.Of<IDistributedLockingMechanism>(),
+                Mock.Of<IDistributedLockingMechanismFactory>(),
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
                 new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),

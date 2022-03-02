@@ -17,7 +17,6 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -56,6 +55,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             lockingMechanism.Setup(x => x.WriteLock(It.IsAny<int>(), It.IsAny<TimeSpan?>()))
                 .Returns(Mock.Of<IDistributedLock>());
 
+            var lockingMechanismFactory = new Mock<IDistributedLockingMechanismFactory>();
+            lockingMechanismFactory.Setup(x => x.DistributedLockingMechanism)
+                .Returns(lockingMechanism.Object);
+
             // Setup mock of database factory to return mock of database.
             databaseFactory.Setup(x => x.CreateDatabase()).Returns(database.Object);
             databaseFactory.Setup(x => x.SqlContext).Returns(sqlContext.Object);
@@ -68,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             sqlContext.Setup(x => x.SqlSyntax).Returns(syntaxProviderMock.Object);
 
             return new ScopeProvider(
-                lockingMechanism.Object,
+                lockingMechanismFactory.Object,
                 databaseFactory.Object,
                 fileSystems,
                 new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
@@ -574,23 +577,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 var realScope = (Scope)scope;
                 Assert.IsNull(realScope.GetReadLocks());
             }
-        }
-
-        [Test]
-        [AutoMoqData]
-        public void ReadLock_WriteLockForSameIdExists_DoesNotAttemptToAcquire(int aLockId)
-        {
-            var scopeProvider = GetScopeProvider(out var distributedLocking);
-
-            using (var scope = scopeProvider.CreateScope())
-            {
-                scope.WriteLock(aLockId);
-                scope.ReadLock(aLockId);
-            }
-
-            distributedLocking.Verify(
-                x => x.ReadLock(It.IsAny<int>(), It.IsAny<TimeSpan?>()),
-                Times.Never);
         }
     }
 }

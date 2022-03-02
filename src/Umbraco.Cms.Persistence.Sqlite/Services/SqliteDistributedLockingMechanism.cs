@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
-
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
@@ -17,17 +17,24 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 {
     private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor;
+    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
     public SqliteDistributedLockingMechanism(
         ILogger<SqliteDistributedLockingMechanism> logger,
         Lazy<IScopeAccessor> scopeAccessor,
-        IOptionsMonitor<GlobalSettings> globalSettings)
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         _logger = logger;
         _scopeAccessor = scopeAccessor;
+        _connectionStrings = connectionStrings;
         _globalSettings = globalSettings;
     }
+
+    /// <inheritdoc />
+    public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
+                           _connectionStrings.CurrentValue.ProviderName == Constants.ProviderName;
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
@@ -99,11 +106,22 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         }
 
         public override string ToString()
-            => $"SqliteWriteLock({LockId})";
+            => $"SqliteDistributedLock({LockId})";
 
-        // noop can always obtain a read lock (snapshot isolation in wal mode)
+        // Can always obtain a read lock (snapshot isolation in wal mode)
         private void ObtainReadLock()
         {
+            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+
+            const string query = "SELECT value FROM umbracoLock WHERE id = @id";
+
+            var i = db.ExecuteScalar<int?>(query, new { id = LockId });
+
+            if (i == null)
+            {
+                // ensure we are actually locking!
+                throw new ArgumentException(@$"LockObject with id={LockId} does not exist.", nameof(LockId));
+            }
         }
 
         // Only one writer is possible at a time
@@ -112,16 +130,11 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         {
             IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
 
-            if (db.DatabaseType is not NPoco.DatabaseTypes.SQLiteDatabaseType)
-            {
-                throw new DistributedLockingException($"Invalid database type {db.DatabaseType}");
-            }
-
-            var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}";
+            var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";
 
             DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, query);
 
-            // assume there is a second writer, whilst elapsed time is < command time out sqlite will busy loop
+            // imagine there is an existing writer, whilst elapsed time is < command timeout sqlite will busy loop
             command.CommandTimeout = _timeout.Seconds;
 
             try

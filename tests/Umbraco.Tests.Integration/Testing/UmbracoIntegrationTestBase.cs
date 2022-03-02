@@ -8,9 +8,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Serilog;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -116,22 +118,30 @@ public abstract class UmbracoIntegrationTestBase
         TestUmbracoDatabaseFactoryProvider testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
         IUmbracoDatabaseFactory databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
         ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        IOptionsMonitor<ConnectionStrings> connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         // This will create a db, install the schema and ensure the app is configured to run
-        SetupTestDatabase(testDatabaseFactoryProvider, databaseFactory, loggerFactory, state);
+        SetupTestDatabase(testDatabaseFactoryProvider, connectionStrings, databaseFactory, loggerFactory, state);
     }
 
-    private void ConfigureTestDatabaseFactory(TestDbMeta meta, IUmbracoDatabaseFactory factory, IRuntimeState state)
+    private void ConfigureTestDatabaseFactory(
+        TestDbMeta meta,
+        IUmbracoDatabaseFactory factory,
+        IRuntimeState state,
+        IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         // It's just been pulled from container and wasn't used to create test database
         Assert.IsFalse(factory.Configured);
 
         factory.Configure(meta.ToStronglyTypedConnectionString());
+        connectionStrings.CurrentValue.ConnectionString = meta.ConnectionString;
+        connectionStrings.CurrentValue.ProviderName = meta.Provider;
         state.DetermineRuntimeLevel();
     }
 
     private void SetupTestDatabase(
             TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IUmbracoDatabaseFactory databaseFactory,
             ILoggerFactory loggerFactory,
             IRuntimeState runtimeState)
@@ -153,7 +163,7 @@ public abstract class UmbracoIntegrationTestBase
                     // Add teardown callback
                     AddOnTestTearDown(() => db.Detach(newSchemaDbMeta));
 
-                    ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState);
+                    ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState, connectionStrings);
 
                     Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
 
@@ -164,7 +174,7 @@ public abstract class UmbracoIntegrationTestBase
                     // Add teardown callback
                     AddOnTestTearDown(() => db.Detach(newEmptyDbMeta));
 
-                    ConfigureTestDatabaseFactory(newEmptyDbMeta, databaseFactory, runtimeState);
+                    ConfigureTestDatabaseFactory(newEmptyDbMeta, databaseFactory, runtimeState, connectionStrings);
 
                     Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
 
@@ -183,7 +193,7 @@ public abstract class UmbracoIntegrationTestBase
                         AddOnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
                     }
 
-                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState);
+                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
@@ -200,7 +210,7 @@ public abstract class UmbracoIntegrationTestBase
                         AddOnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
                     }
 
-                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState);
+                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
 
                     break;
                 default:

@@ -70,6 +70,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddMainDom()
                 .AddLogging();
 
+            builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();
@@ -80,9 +81,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<PendingPackageMigrations>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
-
-            builder.WithCollectionBuilder<DistributedLockingCollectionBuilder>()
-                .AddDistributedLockingMechanism<InMemoryDistributedLockingMechanism>();
 
             // composers
             builder

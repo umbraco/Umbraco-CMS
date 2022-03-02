@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlServer.Services;
@@ -29,8 +28,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
 
-        builder.WithCollectionBuilder<DistributedLockingCollectionBuilder>()
-            .AddDistributedLockingMechanism<SqlServerDistributedLockingMechanism>();
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDistributedLockingMechanism, SqlServerDistributedLockingMechanism>());
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);

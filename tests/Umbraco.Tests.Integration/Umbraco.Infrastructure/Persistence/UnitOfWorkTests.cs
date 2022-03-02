@@ -18,12 +18,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
-            if (Configuration[Constants.Configuration.ConfigGlobalDistributedLockingMechanism] !=
-                nameof(SqlServerDistributedLockingMechanism))
-            {
-                Assert.Ignore("This test only applies to SqlServerDistributedLockingMechanism");
-            }
-
             IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {
@@ -49,12 +43,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void WriteLockNonExisting()
         {
-            if (Configuration[Constants.Configuration.ConfigGlobalDistributedLockingMechanism] !=
-                nameof(SqlServerDistributedLockingMechanism))
-            {
-                Assert.Ignore("This test only applies to SqlServerDistributedLockingMechanism");
-            }
-
             IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {

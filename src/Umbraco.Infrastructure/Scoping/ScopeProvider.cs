@@ -13,7 +13,6 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Scoping;
 
 #if DEBUG_SCOPES
@@ -38,10 +37,9 @@ namespace Umbraco.Cms.Core.Scoping
         private static readonly string s_scopeItemKey = typeof(Scope).FullName;
         private static readonly string s_contextItemKey = typeof(ScopeProvider).FullName;
         private readonly IEventAggregator _eventAggregator;
-        private IDistributedLockingMechanism _distributedLockingMechanism;
 
         public ScopeProvider(
-            IDistributedLockingMechanism distributedLockingMechanism,
+            IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
             IUmbracoDatabaseFactory databaseFactory,
             FileSystems fileSystems,
             IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
@@ -49,7 +47,7 @@ namespace Umbraco.Cms.Core.Scoping
             IRequestCache requestCache,
             IEventAggregator eventAggregator)
         {
-            _distributedLockingMechanism = distributedLockingMechanism;
+            DistributedLockingMechanismFactory = distributedLockingMechanismFactory;
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _coreDebugSettings = coreDebugSettings.CurrentValue;
@@ -62,6 +60,8 @@ namespace Umbraco.Cms.Core.Scoping
 
             coreDebugSettings.OnChange(x => _coreDebugSettings = x);
         }
+
+        public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
@@ -396,7 +396,7 @@ namespace Umbraco.Cms.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null)
-            => new Scope(_distributedLockingMechanism, this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, scopedNotificationPublisher, scopeFileSystems);
+            => new Scope(this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, scopedNotificationPublisher, scopeFileSystems);
 
         /// <inheritdoc />
         public void AttachScope(IScope other, bool callContext = false)
@@ -475,7 +475,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 IScopeContext ambientContext = AmbientContext;
                 ScopeContext newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(_distributedLockingMechanism, this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, notificationPublisher, scopeFileSystems, callContext, autoComplete);
                 // assign only if scope creation did not throw!
                 PushAmbientScope(scope);
                 if (newContext != null)
@@ -485,7 +485,7 @@ namespace Umbraco.Cms.Core.Scoping
                 return scope;
             }
 
-            var nested = new Scope(_distributedLockingMechanism, this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, notificationPublisher, scopeFileSystems, callContext, autoComplete);
             PushAmbientScope(nested);
             return nested;
         }
