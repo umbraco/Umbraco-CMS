@@ -181,6 +181,7 @@ namespace Umbraco.Cms.Core.Security
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                     var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
+                    var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
                     MemberDataChangeType memberChangeType = UpdateMemberProperties(found, user);
                     if (memberChangeType == MemberDataChangeType.FullSave)
@@ -202,6 +203,16 @@ namespace Umbraco.Cms.Core.Security
                                 x.LoginProvider,
                                 x.ProviderKey,
                                 x.UserData)));
+                    }
+
+                    if (isTokensPropertyDirty)
+                    {
+                        _externalLoginService.Save(
+                            found.Key,
+                            user.LoginTokens.Select(x => new ExternalLoginToken(
+                                x.LoginProvider,
+                                x.Name,
+                                x.Value)));
                     }
                 }
 
