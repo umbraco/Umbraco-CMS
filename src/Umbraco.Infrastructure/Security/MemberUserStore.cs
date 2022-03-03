@@ -535,6 +535,37 @@ namespace Umbraco.Cms.Core.Security
             return found;
         }
 
+        /// <summary>
+        /// Overridden to support Umbraco's own data storage requirements
+        /// </summary>
+        /// <remarks>
+        /// The base class's implementation of this calls into FindTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+        /// tracking ORMs like EFCore.
+        /// </remarks>
+        /// <inheritdoc />
+        public override Task SetTokenAsync(MemberIdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            if (token == null)
+            {
+                user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
+            }
+            else
+            {
+                token.Value = value;
+            }
+
+            return Task.CompletedTask;
+        }
+
         private MemberIdentityUser AssignLoginsCallback(MemberIdentityUser user)
         {
             if (user != null)
