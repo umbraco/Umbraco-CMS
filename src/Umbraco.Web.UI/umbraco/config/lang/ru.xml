@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Языки и домены</key>
+    <key alias="assigndomain">Языки и домены</key>
     <key alias="auditTrail">История исправлений</key>
     <key alias="browse">Просмотреть</key>
     <key alias="changeDocType">Изменить тип документа</key>
@@ -17,11 +17,11 @@
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
-    <key alias="emptyRecycleBin">Очистить корзину</key>
+    <key alias="emptyrecyclebin">Очистить корзину</key>
     <key alias="enable">Включить</key>
     <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
-    <key alias="importDocumentType">Импортировать</key>
+    <key alias="importdocumenttype">Импортировать</key>
     <key alias="importPackage">Импортировать пакет</key>
     <key alias="liveEdit">Править на месте</key>
     <key alias="logout">Выйти</key>

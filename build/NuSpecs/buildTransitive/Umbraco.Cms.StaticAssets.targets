@@ -33,14 +33,15 @@
             SkipUnchangedFiles="true" />
     </Target>
 
-    <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
         <ItemGroup>
             <_AppPluginsFiles Include="App_Plugins\**" />
 
             <ContentWithTargetPath
                 Include="@(_AppPluginsFiles)"
                 TargetPath="%(Identity)"
-                CopyToOutputDirectory="Always" />
+                CopyToOutputDirectory="PreserveNewest"
+                CopyToPublishDirectory="PreserveNewest"/>
         </ItemGroup>
     </Target>
 
@@ -49,7 +50,7 @@
         A fix was put in place in Web SDK to update for wwwwroot in case someone runs npm build etc in a target, we're borrowing their trick.
         https://github.com/dotnet/sdk/blob/e2b2b1a4ac56c955b84d62fe71cda3b6f258b42b/src/WebSdk/Publish/Targets/ComputeTargets/Microsoft.NET.Sdk.Publish.ComputeFiles.targets
      -->
-    <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
         <ItemGroup>
             <_UmbracoFolderFiles Include="umbraco\config\**" />
             <_UmbracoFolderFiles Include="umbraco\PartialViewMacros\**" />
@@ -65,9 +66,11 @@
             <ContentWithTargetPath
                 Include="@(_UmbracoFolderFiles)"
                 TargetPath="%(Identity)"
-                CopyToOutputDirectory="Always" />
+                CopyToOutputDirectory="PreserveNewest"
+                CopyToPublishDirectory="PreserveNewest"/>
         </ItemGroup>
     </Target>
+
 
     <Target Name="ClearUmbracoAssets" BeforeTargets="Clean">
         <ItemGroup>
@@ -85,6 +88,12 @@
         <RemoveDir Directories="@(UmbracoUmbracoInstallDir)"  />
         <RemoveDir Directories="@(UmbracoUmbracoWebsiteMacrosDir)"  />
         <RemoveDir Directories="@(WwwrootUmbracoPackageDir)"  />
+    </Target>
+
+    <Target Name="IncludeUmbracoRazorFiles" BeforeTargets="ResolveRazorGenerateInputs">
+        <ItemGroup>
+            <Content Include="$(MSBuildProjectDirectory)\umbraco\**\*.cshtml" />
+        </ItemGroup>
     </Target>
 
 </Project>

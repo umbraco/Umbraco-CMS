@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 // return the endpoint for the RenderController.Index action.
                 ControllerActionDescriptor descriptor = x.Metadata?.GetMetadata<ControllerActionDescriptor>();
                 return descriptor?.ControllerTypeInfo == typeof(RenderController)
-                    && descriptor?.ActionName == nameof(RenderController.Index);
+                       && descriptor?.ActionName == nameof(RenderController.Index);
             });
             return e;
         }
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         public bool AppliesToEndpoints(IReadOnlyList<Endpoint> endpoints)
         {
             // Don't apply this filter to any endpoint group that is a controller route
-            // i.e. only dynamic routes.            
+            // i.e. only dynamic routes.
             foreach (Endpoint endpoint in endpoints)
             {
                 ControllerAttribute controller = endpoint.Metadata?.GetMetadata<ControllerAttribute>();
@@ -80,11 +81,15 @@ namespace Umbraco.Cms.Web.Website.Routing
         {
             for (int i = 0; i < candidates.Count; i++)
             {
-                if (candidates.IsValidCandidate(i))
+                // We have to check if candidates needs to be ignored here
+                // So we dont return false when all endpoints are invalid
+                if (candidates.IsValidCandidate(i) &&
+                    candidates[i].Endpoint.Metadata.GetMetadata<IgnoreFromNotFoundSelectorPolicyAttribute>() is null)
                 {
                     return false;
                 }
             }
+
             return true;
         }
     }

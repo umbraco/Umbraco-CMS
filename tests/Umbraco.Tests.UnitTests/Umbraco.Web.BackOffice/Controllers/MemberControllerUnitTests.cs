@@ -121,6 +121,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
+                .ReturnsAsync(() => Array.Empty<string>());
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
             Mock.Get(memberService).SetupSequence(
@@ -162,6 +165,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
+                .ReturnsAsync(() => Array.Empty<string>());
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
             Mock.Get(memberService).SetupSequence(
@@ -209,6 +215,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
+                .ReturnsAsync(() => Array.Empty<string>());
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(globalSettings);
 
@@ -392,6 +401,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
+                .ReturnsAsync(() => Array.Empty<string>());
+
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
             Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
@@ -416,6 +429,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Verify(u => u.GetRolesAsync(membersIdentityUser));
             Mock.Get(umbracoMembersUserManager)
                .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
+            Mock.Get(umbracoMembersUserManager)
+                .Verify(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()));
             Mock.Get(memberService)
                 .Verify(m => m.Save(It.IsAny<Member>()));
             AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
@@ -603,20 +618,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                         Id = 77,
                         Properties = new List<ContentPropertyDisplay>()
                         {
-                            new ContentPropertyDisplay()
-                            {
-                                Alias = "_umb_id",
-                                View = "idwithguid",
-                                Value = new []
-                                {
-                                    "123",
-                                    "guid"
-                                }
-                            },
-                            new ContentPropertyDisplay()
-                            {
-                                Alias = "_umb_doctype"
-                            },
                             new ContentPropertyDisplay()
                             {
                                 Alias = "_umb_login"

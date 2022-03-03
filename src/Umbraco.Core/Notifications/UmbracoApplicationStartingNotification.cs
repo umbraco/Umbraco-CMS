@@ -1,23 +1,44 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
+using System;
 
 namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
-    /// Notification that occurs at the very end of the Umbraco boot
-    /// process and after all <see cref="IComponent"/> initialize.
+    /// Notification that occurs at the very end of the Umbraco boot process (after all <see cref="IComponent" />s are initialized).
     /// </summary>
-    public class UmbracoApplicationStartingNotification : INotification
+    /// <seealso cref="Umbraco.Cms.Core.Notifications.IUmbracoApplicationLifetimeNotification" />
+    public class UmbracoApplicationStartingNotification : IUmbracoApplicationLifetimeNotification
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoApplicationStartingNotification"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoApplicationStartingNotification" /> class.
         /// </summary>
         /// <param name="runtimeLevel">The runtime level</param>
-        public UmbracoApplicationStartingNotification(RuntimeLevel runtimeLevel) => RuntimeLevel = runtimeLevel;
+        [Obsolete("Use ctor with all params")]
+        public UmbracoApplicationStartingNotification(RuntimeLevel runtimeLevel)
+            : this(runtimeLevel, false)
+        {
+            // TODO: Remove this constructor in V10
+        }
 
         /// <summary>
-        /// Gets the runtime level of execution.
+        /// Initializes a new instance of the <see cref="UmbracoApplicationStartingNotification" /> class.
         /// </summary>
+        /// <param name="runtimeLevel">The runtime level</param>
+        /// <param name="isRestarting">Indicates whether Umbraco is restarting.</param>
+        public UmbracoApplicationStartingNotification(RuntimeLevel runtimeLevel, bool isRestarting)
+        {
+            RuntimeLevel = runtimeLevel;
+            IsRestarting = isRestarting;
+        }
+
+        /// <summary>
+        /// Gets the runtime level.
+        /// </summary>
+        /// <value>
+        /// The runtime level.
+        /// </value>
         public RuntimeLevel RuntimeLevel { get; }
+
+        /// <inheritdoc />
+        public bool IsRestarting { get; }
     }
 }

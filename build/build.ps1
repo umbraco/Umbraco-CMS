@@ -449,12 +449,6 @@
     if ($this.OnError()) { return }
   })
 
-  $ubuild.DefineMethod("PrepareAzureGallery",
-  {
-    Write-Host "Prepare Azure Gallery"
-    $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
-  })
-
   $ubuild.DefineMethod("PrepareCSharpDocs",
   {
     Write-Host "Prepare C# Documentation"
@@ -527,8 +521,6 @@
     $this.VerifyNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
-    if ($this.OnError()) { return }
-    $this.PrepareAzureGallery()
     if ($this.OnError()) { return }
     $this.PostPackageHook()
     if ($this.OnError()) { return }

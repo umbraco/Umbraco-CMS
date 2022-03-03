@@ -24,14 +24,14 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
             _documentVersionRepository = documentVersionRepository ?? throw new ArgumentNullException(nameof(documentVersionRepository));
         }
 
-        public IEnumerable<HistoricContentVersionMeta> Apply(DateTime asAtDate, IEnumerable<HistoricContentVersionMeta> items)
+        public IEnumerable<ContentVersionMeta> Apply(DateTime asAtDate, IEnumerable<ContentVersionMeta> items)
         {
             // Note: Not checking global enable flag, that's handled in the scheduled job.
             // If this method is called and policy is globally disabled someone has chosen to run in code.
 
             var globalPolicy = _contentSettings.Value.ContentVersionCleanupPolicy;
 
-            var theRest = new List<HistoricContentVersionMeta>();
+            var theRest = new List<ContentVersionMeta>();
 
             using(_scopeProvider.CreateScope(autoComplete: true))
             {
@@ -76,13 +76,16 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
 
                 foreach (var group in grouped)
                 {
-                    yield return group.OrderByDescending(x => x.VersionId).First();
+                    foreach (var version in group.OrderByDescending(x => x.VersionId).Skip(1))
+                    {
+                        yield return version;
+                    }
                 }
             }
         }
 
         private ContentVersionCleanupPolicySettings GetOverridePolicy(
-            HistoricContentVersionMeta version,
+            ContentVersionMeta version,
             IDictionary<int, ContentVersionCleanupPolicySettings> overrides)
         {
             _ = overrides.TryGetValue(version.ContentTypeId, out var value);

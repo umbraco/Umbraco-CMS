@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Core.Handlers
             foreach (var perm in perms)
             {
                 var group = _userService.GetUserGroupById(perm.UserGroupId);
-                var assigned = string.Join(", ", perm.AssignedPermissions);
+                var assigned = string.Join(", ", perm?.AssignedPermissions ?? Array.Empty<string>());
                 var entity = _entityService.Get(perm.EntityId);
 
                 _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
