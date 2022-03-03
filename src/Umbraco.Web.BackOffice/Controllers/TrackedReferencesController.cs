@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public ActionResult<PagedResult<EntityBasic>> CheckLinkedItems([FromJsonPath] int[] ids, string entityType, int pageNumber = 1, int pageSize = 100)
+        public ActionResult<PagedResult<EntityBasic>> GetPagedReferencedItems([FromJsonPath] int[] ids, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {

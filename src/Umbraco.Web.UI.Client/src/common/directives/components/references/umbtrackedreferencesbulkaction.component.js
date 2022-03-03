@@ -55,7 +55,7 @@
         function checkContentBulkActionUsage() {
              var ids = vm.selection.map(s => s.id);
 
-             return trackedReferencesResource.checkLinkedItems(ids, vm.contentOptions)
+             return trackedReferencesResource.getPagedReferencedItems(ids, vm.contentOptions)
                   .then(function (data) {
                       vm.referencedContentItems = data;
 
@@ -69,7 +69,7 @@
         function checkMediaBulkActionUsage() {
             var ids = vm.selection.map(s => s.id);
 
-            return trackedReferencesResource.checkLinkedItems(ids, vm.mediaOptions)
+            return trackedReferencesResource.getPagedReferencedItems(ids, vm.mediaOptions)
                   .then(function (data) {
                       vm.referencedMediaItems = data;
 
