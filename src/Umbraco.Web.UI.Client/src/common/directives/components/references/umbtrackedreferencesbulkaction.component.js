@@ -34,7 +34,7 @@
             this.loading = true;
             this.hideNoResult = this.hideNoResult || false;
 
-            $q.all([checkContentBulkActionUsage(), checkMediaBulkActionUsage()]).then(function () {
+            $q.all([loadContentBulkActionUsage(), loadMediaBulkActionUsage()]).then(function () {
                 vm.loading = false;
                 if(vm.onLoadingComplete) {
                     vm.onLoadingComplete();
@@ -44,15 +44,15 @@
 
         function changeContentPageNumber(pageNumber) {
             vm.contentOptions.pageNumber = pageNumber;
-            checkContentBulkActionUsage();
+            loadContentBulkActionUsage();
         }
 
         function changeMediaPageNumber(pageNumber) {
             vm.mediaOptions.pageNumber = pageNumber;
-            checkMediaBulkActionUsage();
+            loadMediaBulkActionUsage();
         }
 
-        function checkContentBulkActionUsage() {
+        function loadContentBulkActionUsage() {
              var ids = vm.selection.map(s => s.id);
 
              return trackedReferencesResource.getPagedReferencedItems(ids, vm.contentOptions)
@@ -66,7 +66,7 @@
                   });
         }
 
-        function checkMediaBulkActionUsage() {
+        function loadMediaBulkActionUsage() {
             var ids = vm.selection.map(s => s.id);
 
             return trackedReferencesResource.getPagedReferencedItems(ids, vm.mediaOptions)
