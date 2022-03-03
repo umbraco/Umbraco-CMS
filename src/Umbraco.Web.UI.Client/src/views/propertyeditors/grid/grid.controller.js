@@ -667,6 +667,7 @@ angular.module("umbraco")
             $scope.removeControl = function (cell, $index) {
                 $scope.currentControl = null;
                 cell.controls.splice($index, 1);
+                currentForm.$setDirty();
             };
 
             $scope.percentage = function (spans) {
