@@ -125,7 +125,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.trackedReferencesResource#checkLinkedItems
+         * @name umbraco.resources.trackedReferencesResource#getPagedReferencedItems
          * @methodOf umbraco.resources.trackedReferencesResource
          *
          * @description
@@ -140,7 +140,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
          *      entityType : 'DOCUMENT'
          *  };
          *  
-         * trackedReferencesResource.checkLinkedItems(ids, options)
+         * trackedReferencesResource.getPagedReferencedItems(ids, options)
          *    .then(function(data) {
          *        console.log(data);
          *    });
@@ -154,14 +154,14 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object.
          *
          */
-        checkLinkedItems: function (ids, options) {
+        getPagedReferencedItems: function (ids, options) {
             var query = `entityType=${options.entityType}&pageNumber=${options.pageNumber}&pageSize=${options.pageSize}`;
 
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "trackedReferencesApiBaseUrl",
-                        "CheckLinkedItems",
+                        "getPagedReferencedItems",
                         query),
                         {
                             ids: ids,

@@ -56,34 +56,28 @@
             this.loading = true;
             this.hideNoResult = this.hideNoResult || false;
 
-            $q.all([loadContentRelations(), loadMediaRelations(), loadMemberRelations()]).then(function () {
-                
-                if (vm.hasContentReferences && vm.hasMediaReferences && vm.hasMemberReferences) {
-                    vm.loading = false;
-                    if(vm.onLoadingComplete) {
-                        vm.onLoadingComplete();
-                    }
-                } else {
-                    var descendantsPromises = [];
+            // when vm.id == 0 it means that this is a new item, so it has no references yet
+            if (vm.id === 0) {
+                vm.loading = false;
+                if(vm.onLoadingComplete) {
+                    vm.onLoadingComplete();
+                }
+                return;
+            }
 
-                    // when vm.id == 0 it means that this is a new item, so it has no references yet
-                    // therefore we don't need to check for descendants
-                    if (vm.id != 0) {
-                        descendantsPromises.push(checkContentDescendantsUsage());
-                    }
+            // Make array of promises to load:
+            var promises = [loadContentRelations(), loadMediaRelations(), loadMemberRelations()];
+            
+            // only load descendants if we want to show them.
+            if (vm.showDescendants) {
+                promises.push(loadContentDescendantsUsage());
+                promises.push(loadMediaDescendantsUsage());
+            }
 
-                    // when vm.id == 0 it means that this is a new item, so it has no references yet
-                    // therefore we don't need to check for descendants
-                    if (!vm.hasMediaReferences && vm.id != 0) {
-                        descendantsPromises.push(checkMediaDescendantsUsage());
-                    }
-
-                    $q.all(descendantsPromises).then(function() {
-                        vm.loading = false;
-                        if(vm.onLoadingComplete) {
-                            vm.onLoadingComplete();
-                        }
-                    });
+            $q.all(promises).then(function () {
+                vm.loading = false;
+                if(vm.onLoadingComplete) {
+                    vm.onLoadingComplete();
                 }
             });
         }
@@ -105,12 +99,12 @@
 
         function changeContentDescendantsPageNumber(pageNumber) {
             vm.contentOptions.pageNumber = pageNumber;
-            checkContentDescendantsUsage();
+            loadContentDescendantsUsage();
         }
 
         function changeMediaDescendantsPageNumber(pageNumber) {
             vm.mediaOptions.pageNumber = pageNumber;
-            checkMediaDescendantsUsage();
+            loadMediaDescendantsUsage();
         }
 
         function loadContentRelations() {
@@ -149,7 +143,7 @@
                 });
         }
 
-        function checkContentDescendantsUsage() {
+        function loadContentDescendantsUsage() {
             return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.contentOptions)
                 .then(function (data) {
                     vm.referencedContentDescendants = data;
@@ -161,7 +155,7 @@
                 });
         }
 
-        function checkMediaDescendantsUsage() {
+        function loadMediaDescendantsUsage() {
             return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.mediaOptions)
                 .then(function (data) {
                     vm.referencedMediaDescendants = data;
@@ -187,7 +181,9 @@
             id: "<",
             hideNoResult: "<?",
             onWarning: "&?",
-            onLoadingComplete: "&?"
+            onLoadingComplete: "&?",
+            compact: "<?",
+            showDescendants: "<?"
         },
         controllerAs: 'vm',
         controller: umbTrackedReferencesController

@@ -2,22 +2,22 @@
 
 <div ng-if="vm.loading === false">
     <!-- Content -->
-    <div ng-if="vm.hasContentReferencesInListView">
-        <umb-tracked-references-listview-table items="vm.referencedContentItems.items"
+    <div ng-if="vm.hasContentReferences">
+        <umb-tracked-references-table items="vm.referencedContentItems.items"
                                       total-pages="vm.referencedContentItems.totalPages"
                                       page-number="vm.referencedContentItems.pageNumber"
-                                      title="vm.referencedItemsTitle"
+                                      headline="vm.referencedItemsTitle"
                                       on-page-changed="vm.changeContentPageNumber(pageNumber)">
-        </umb-tracked-references-listview-table>
+        </umb-tracked-references-table>
     </div>
 
     <!-- Media -->
-    <div ng-if="vm.hasMediaReferencesInListView">
-        <umb-tracked-references-listview-table items="vm.referencedMediaItems.items"
+    <div ng-if="vm.hasMediaReferences">
+        <umb-tracked-references-table items="vm.referencedMediaItems.items"
                                       total-pages="vm.referencedMediaItems.totalPages"
                                       page-number="vm.referencedMediaItems.pageNumber"
-                                      title="vm.referencedItemsTitle"
+                                      headline="vm.referencedItemsTitle"
                                       on-page-changed="vm.changeMediaPageNumber(pageNumber)">
-        </umb-tracked-references-listview-table>
+        </umb-tracked-references-table>
     </div>
 </div>

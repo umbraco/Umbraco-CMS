@@ -5,13 +5,13 @@
      * A component to render a table for the tracked references of an item
      */
 
-    function umbTrackedReferencesTableController(udiParser, navigationService, overlayService)
+    function umbTrackedReferencesTableController(editorService, udiParser, navigationService, overlayService)
     {
         var vm = this;
 
         vm.changePageNumber = changePageNumber;
         vm.getUrl = getUrl;
-        vm.close = close;
+        vm.referenceAnchorClicked = referenceAnchorClicked;
 
         function changePageNumber(pageNumber) {
             vm.onPageChanged({ 'pageNumber' : pageNumber });
@@ -30,11 +30,57 @@
                 return "#/" + entityType + "/" + entityType + "/edit/" + itemId;
             }
 	          return "#";
-	      }
+	    }
 
         function close() {
             navigationService.hideMenu(); // close menu
             overlayService.close(); // close overlay
+        }
+
+        function referenceAnchorClicked($event, reference) {
+
+
+            if ($event.shiftKey || $event.ctrlKey || $event.metaKey) {
+                // we will let the browser take over here.
+                return;
+            }
+
+            $event.preventDefault();
+            close();
+
+            var editorModel = {
+                id: reference.id,
+                submit: function (model) {
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+
+            overlayService.close();
+
+            // extract the entity type from the udi
+            var udi = udiParser.parse(reference.udi);
+
+            if (udi && udi.entityType === "document")
+            {
+                editorService.contentEditor(editorModel);
+                return;
+            }
+
+            if (udi && udi.entityType === "media")
+            {
+                editorService.mediaEditor(editorModel);
+                return;
+            }
+
+            if (udi && udi.entityType === "member")
+            {
+                editorModel.id = reference.key;
+                editorService.memberEditor(editorModel);
+                return;
+            }
         }
     }
 
@@ -44,8 +90,11 @@
         bindings: {
             pageNumber: "<",
             totalPages: "<",
-            title: "<",
+            headline: "<",
             items: "<",
+            showType: "<?",
+            typeLabelKey: "=?",
+            showAlias: "<?",
             onPageChanged: "&"
         },
         controllerAs: 'vm',

@@ -4,7 +4,7 @@
     <umb-box-header title-key="references_tabName"></umb-box-header>
     <umb-box-content>
         <umb-empty-state size="small">
-            This item is not referenced
+            <localize key="references_itemHasNoReferences">This item is not referenced</localize>
         </umb-empty-state>
     </umb-box-content>
 </umb-box>
@@ -16,19 +16,22 @@
         <umb-tracked-references-table items="vm.contentReferences.items"
                                       total-pages="vm.contentReferences.totalPages"
                                       page-number="vm.contentReferences.pageNumber"
-                                      title="vm.contentReferencesTitle"
-                                      on-page-changed="vm.changeContentPageNumber(pageNumber)">
+                                      headline="vm.contentReferencesTitle"
+                                      on-page-changed="vm.changeContentPageNumber(pageNumber)"
+                                      show-alias="!vm.compact"
+                                      show-type="!vm.compact"
+                                      type-label-key="content_documentType">
         </umb-tracked-references-table>
     </div>
 
     <!-- TODO: Make it optional to show this, so we can hide it in Info tabs. -->
     <div ng-if="vm.hasContentReferencesInDescendants"> <!-- TODO: RENAME this table -->
-        <umb-tracked-references-listview-table  items="vm.referencedContentDescendants.items"
+        <umb-tracked-references-table  items="vm.referencedContentDescendants.items"
                                                 total-pages="vm.referencedContentDescendants.totalPages"
                                                 page-number="vm.referencedContentDescendants.pageNumber"
-                                                title="vm.referencedDescendantsTitle"
+                                                headline="vm.referencedDescendantsTitle"
                                                 on-page-changed="vm.changeContentDescendantsPageNumber(pageNumber)">
-        </umb-tracked-references-listview-table>
+        </umb-tracked-references-table>
     </div>
 
     <!-- Members -->
@@ -36,8 +39,11 @@
         <umb-tracked-references-table items="vm.memberReferences.items"
                                       total-pages="vm.memberReferences.totalPages"
                                       page-number="vm.memberReferences.pageNumber"
-                                      title="vm.memberReferencesTitle"
-                                      on-page-changed="vm.changeMemberPageNumber(pageNumber)">
+                                      headline="vm.memberReferencesTitle"
+                                      on-page-changed="vm.changeMemberPageNumber(pageNumber)"
+                                      show-alias="!vm.compact"
+                                      show-type="!vm.compact"
+                                      type-label-key="content_memberType">
         </umb-tracked-references-table>
     </div>
 
@@ -46,18 +52,21 @@
         <umb-tracked-references-table items="vm.mediaReferences.items"
                                       total-pages="vm.mediaReferences.totalPages"
                                       page-number="vm.mediaReferences.pageNumber"
-                                      title="vm.mediaReferencesTitle"
-                                      on-page-changed="vm.changeMediaPageNumber(pageNumber)">
+                                      headline="vm.mediaReferencesTitle"
+                                      on-page-changed="vm.changeMediaPageNumber(pageNumber)"
+                                      show-alias="!vm.compact"
+                                      show-type="!vm.compact"
+                                      type-label-key="content_mediaType">
         </umb-tracked-references-table>
     </div>
 
     <!-- TODO: Make it optional to show this. -->
     <div ng-if="vm.hasMediaReferencesInDescendants"> <!-- TODO: RENAME this table -->
-        <umb-tracked-references-listview-table  items="vm.referencedMediaDescendants.items"
+        <umb-tracked-references-table  items="vm.referencedMediaDescendants.items"
                                                 total-pages="vm.referencedMediaDescendants.totalPages"
                                                 page-number="vm.referencedMediaDescendants.pageNumber"
-                                                title="vm.referencedDescendantsTitle"
+                                                headline="vm.referencedDescendantsTitle"
                                                 on-page-changed="vm.changeMediaDescendantsPageNumber(pageNumber)">
-        </umb-tracked-references-listview-table>
+        </umb-tracked-references-table>
     </div>
 </div>
