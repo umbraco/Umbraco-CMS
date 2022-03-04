@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -10,40 +9,73 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class RelationService : RepositoryService, IRelationWithRelationTypesService
+    public class TrackedReferencesService : ITrackedReferencesService
+    {
+        private readonly ITrackedReferencesRepository _trackedReferencesRepository;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly IEntityService _entityService;
+
+        public TrackedReferencesService(ITrackedReferencesRepository trackedReferencesRepository, IScopeProvider scopeProvider, IEntityService entityService)
+        {
+            _trackedReferencesRepository = trackedReferencesRepository;
+            _scopeProvider = scopeProvider;
+            _entityService = entityService;
+        }
+
+        public PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        {
+            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            var items =  _trackedReferencesRepository.GetPagedRelationsForItems(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+
+            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+        }
+
+        public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        {
+            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            var items =  _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+
+            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+        }
+
+        public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        {
+            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+
+            var descendants = _entityService.GetDescendants(parentId);
+
+            if (!descendants.Any())
+            {
+                return new PagedResult<RelationItem>(0, pageIndex, pageSize);
+            }
+            var ids = descendants.Select(x => x.Id).ToArray();
+
+
+            var items =  _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+
+            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+        }
+    }
+
+    public class RelationService : RepositoryService, IRelationService
     {
         private readonly IEntityService _entityService;
-        private readonly IRelationWithRelationTypesRepository _relationRepository;
+        private readonly IRelationRepository _relationRepository;
         private readonly IRelationTypeRepository _relationTypeRepository;
         private readonly IAuditRepository _auditRepository;
 
         public RelationService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
-            IRelationWithRelationTypesRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
+            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
             : base(uowProvider, loggerFactory, eventMessagesFactory)
         {
             _relationRepository = relationRepository;
             _relationTypeRepository = relationTypeRepository;
             _auditRepository = auditRepository;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-        }
-
-        [Obsolete("Use ctor injecting IRelationWithRelationTypesRepository instead")]
-        public RelationService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
-            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
-            : this (
-                  uowProvider,
-                  loggerFactory,
-                  eventMessagesFactory,
-                  entityService,
-                  StaticServiceProvider.Instance.GetRequiredService<IRelationWithRelationTypesRepository>(),
-                  relationTypeRepository,
-                  auditRepository)
-        {
         }
 
         /// <inheritdoc />
@@ -309,44 +341,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
-            return GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, new string[0], entityTypes);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
-        {
-            var relationTypeIds = GetRelationTypeIdsFromAliases(relationTypes);
-
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
-            }
-        }
-
-        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildIds(int[] ids, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
-        {
-            var relationTypeIds = GetRelationTypeIdsFromAliases(relationTypes);
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _relationRepository.GetPagedParentEntitiesByChildIds(ids, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
+                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
-            return GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, new string[0], entityTypes);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
-        {
-            var relationTypeIds = GetRelationTypeIdsFromAliases(relationTypes);
-
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
+                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
@@ -366,48 +372,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 yield return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
             }
         }
-
-        /// <inheritdoc/>
-        public IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] ids, long pageIndex, int pageSize, out long totalItems, params UmbracoObjectTypes[] entityTypes)
-        {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-            return _relationRepository.GetPagedEntitiesForItemsInRelation(ids, pageIndex, pageSize, out totalItems, entityTypes.Select(x => x.GetGuid()).ToArray());
-        }
-
-        public PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-        {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-            var items =  _relationRepository.GetPagedRelationsForItems(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
-
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
-        }
-
-        public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-        {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-            var items =  _relationRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
-
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
-        }
-
-        public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-        {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-
-            var descendants = _entityService.GetDescendants(parentId);
-
-            if (!descendants.Any())
-            {
-                return new PagedResult<RelationItem>(0, pageIndex, pageSize);
-            }
-            var ids = descendants.Select(x => x.Id).ToArray();
-
-
-            var items =  _relationRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
-
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
-        }
-
 
         /// <inheritdoc />
         public IRelation Relate(int parentId, int childId, IRelationType relationType)
@@ -672,26 +636,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
             }
             return relations;
-        }
-
-        private int[] GetRelationTypeIdsFromAliases(string[] aliases)
-        {
-            var relationTypeIds = new List<int>();
-
-            if (aliases != null && aliases.Any())
-            {
-                foreach (var relType in aliases)
-                {
-                    var relationType = GetRelationTypeByAlias(relType);
-
-                    if (relationType != null)
-                    {
-                        relationTypeIds.Add(relationType.Id);
-                    }
-                }
-            }
-
-            return relationTypeIds.ToArray();
         }
 
         private void Audit(AuditType type, int userId, int objectId, string message = null)

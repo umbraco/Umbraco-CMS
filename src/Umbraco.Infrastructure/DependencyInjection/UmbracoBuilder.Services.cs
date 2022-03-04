@@ -62,17 +62,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IPackagingService, PackagingService>();
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
             builder.Services.AddUnique<IEntityService, EntityService>();
-            builder.Services.AddUnique<RelationService>(factory => new RelationService(
-                factory.GetRequiredService<IScopeProvider>(),
-                factory.GetRequiredService<ILoggerFactory>(),
-                factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IEntityService>(),
-                factory.GetRequiredService<IRelationWithRelationTypesRepository>(),
-                factory.GetRequiredService<IRelationTypeRepository>(),
-                factory.GetRequiredService<IAuditRepository>()
-                ));
-            builder.Services.AddUnique<IRelationService>(factory => factory.GetRequiredService<RelationService>());
-            builder.Services.AddUnique<IRelationWithRelationTypesService>(factory => factory.GetRequiredService<RelationService>());
+            builder.Services.AddUnique<IRelationService, RelationService>();
+            builder.Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             builder.Services.AddUnique<IMacroService, MacroService>();
             builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
             builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();

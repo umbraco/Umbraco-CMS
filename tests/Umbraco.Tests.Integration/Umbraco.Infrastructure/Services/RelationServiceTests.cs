@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private IMediaService MediaService => GetRequiredService<IMediaService>();
 
-        private IRelationWithRelationTypesService RelationService => GetRequiredService<IRelationWithRelationTypesService>();
+        private IRelationService RelationService => GetRequiredService<IRelationService>();
 
         [Test]
         public void Get_Paged_Relations_By_Relation_Type()
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Create_RelationType_Without_Name()
         {
             IRelationService rs = RelationService;
-            IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, true);
+            IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -130,7 +130,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual("Test", rt.Name);
             Assert.AreEqual("repeatedEventOccurence", rt.Alias);
             Assert.AreEqual(false, rt.IsBidirectional);
-            Assert.AreEqual(true, rt.IsDependency);
             Assert.AreEqual(Constants.ObjectTypes.Document, rt.ParentObjectType.Value);
             Assert.AreEqual(Constants.ObjectTypes.Media, rt.ChildObjectType.Value);
         }
@@ -139,7 +138,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Create_Relation_Type_Without_Object_Types()
         {
             IRelationService rs = RelationService;
-            IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null, false);
+            IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -213,64 +212,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(newRelations.All(x => x.UpdateDate == newDate));
         }
 
-        [Test]
-        public void Return_List_Of_Parent_Entities_When_Getting_By_Multiple_Child_Ids()
-        {
-            // Create content
-            var createdContent = new List<IContent>();
-            ContentType contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-            ContentTypeService.Save(contentType);
-
-            for (int i = 0; i < 10; i++)
-            {
-                Content c1 = ContentBuilder.CreateBasicContent(contentType);
-                ContentService.Save(c1);
-                createdContent.Add(c1);
-            }
-
-            // Create media
-            var createdMedia = new List<IMedia>();
-            MediaType imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-            MediaTypeService.Save(imageType);
-
-            for (int i = 0; i < 10; i++)
-            {
-                Media m1 = MediaBuilder.CreateMediaImage(imageType, -1);
-                MediaService.Save(m1);
-                createdMedia.Add(m1);
-            }
-
-            IRelationType relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
-
-            // Relate content to media
-            foreach (var content in createdContent)
-            {
-                foreach (var media in createdMedia)
-                {
-                    RelationService.Relate(content.Id, media.Id, relType);
-                }
-            }
-
-            var mediaItemIds = createdMedia.Select(x => x.Id).ToArray();
-
-            var paged = RelationService.GetPagedParentEntitiesByChildIds(mediaItemIds, 0, 6, out var totalChildren, new[] { Constants.Conventions.RelationTypes.RelatedMediaAlias }).ToList();
-
-            Assert.AreEqual(10, totalChildren);
-            Assert.AreEqual(6, paged.Count);
-
-            // Next page
-            paged.AddRange(RelationService.GetPagedParentEntitiesByChildIds(mediaItemIds, 1, 6, out totalChildren, new[] { Constants.Conventions.RelationTypes.RelatedMediaAlias }));
-
-            Assert.AreEqual(10, totalChildren);
-            Assert.AreEqual(10, paged.Count);
-
-            Assert.IsTrue(createdContent.Select(x => x.Id).ContainsAll(paged.Select(x => x.Id)));
-        }
-
         private IRelation CreateAndSaveRelation(string name, string alias)
         {
             IRelationService rs = RelationService;
-            var rt = new RelationType(name, alias, false, null, null, false);
+            var rt = new RelationType(name, alias, false, null, null);
             rs.Save(rt);
 
             ContentType ct = ContentTypeBuilder.CreateBasicContentType();
@@ -299,7 +244,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IRelationService rs = RelationService;
             string rtName = Guid.NewGuid().ToString();
-            var rt = new RelationType(rtName, rtName, false, null, null, false);
+            var rt = new RelationType(rtName, rtName, false, null, null);
             rs.Save(rt);
 
             ContentType ct = ContentTypeBuilder.CreateBasicContentType();

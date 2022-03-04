@@ -46,9 +46,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<INotificationsRepository, NotificationsRepository>();
             builder.Services.AddUnique<IPublicAccessRepository, PublicAccessRepository>();
             builder.Services.AddUnique<IRedirectUrlRepository, RedirectUrlRepository>();
-            builder.Services.AddUnique<RelationRepository>();
-            builder.Services.AddUnique<IRelationRepository>(factory => factory.GetRequiredService<RelationRepository>());
-            builder.Services.AddUnique<IRelationWithRelationTypesRepository>(factory => factory.GetRequiredService<RelationRepository>());
+            builder.Services.AddUnique<IRelationRepository, RelationRepository>();
+            builder.Services.AddUnique<ITrackedReferencesRepository, TrackedReferencesRepository>();
             builder.Services.AddUnique<IRelationTypeRepository, RelationTypeRepository>();
             builder.Services.AddUnique<IServerRegistrationRepository, ServerRegistrationRepository>();
             builder.Services.AddUnique<ITagRepository, TagRepository>();

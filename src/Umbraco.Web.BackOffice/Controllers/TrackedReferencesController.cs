@@ -18,10 +18,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
     public class TrackedReferencesController : BackOfficeNotificationsController
     {
-        private readonly IRelationWithRelationTypesService _relationService;
+        private readonly ITrackedReferencesService _relationService;
         private readonly IEntityService _entityService;
 
-        public TrackedReferencesController(IRelationWithRelationTypesService relationService,
+        public TrackedReferencesController(ITrackedReferencesService relationService,
             IEntityService entityService)
         {
             _relationService = relationService;
