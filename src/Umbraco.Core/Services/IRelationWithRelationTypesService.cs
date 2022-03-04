@@ -51,5 +51,23 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entityTypes"></param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
         IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] ids, long pageIndex, int pageSize, out long totalItems, params UmbracoObjectTypes[] entityTypes);
+
+
+        /// <summary>
+        /// Returns paged entities for only the items used in a relation
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalItems"></param>
+        /// <param name="entityTypes"></param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
+        PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency);
+
+
+        PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency);
+
+
+        PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency);
     }
 }

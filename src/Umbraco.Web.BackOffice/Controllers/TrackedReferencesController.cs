@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -20,95 +21,51 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IRelationWithRelationTypesService _relationService;
         private readonly IEntityService _entityService;
 
-        public TrackedReferencesController(IRelationWithRelationTypesService relationService, IEntityService entityService)
+        public TrackedReferencesController(IRelationWithRelationTypesService relationService,
+            IEntityService entityService)
         {
             _relationService = relationService;
             _entityService = entityService;
         }
 
-        public ActionResult<PagedResult<EntityBasic>> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
+        // Used by info tabs on content, media etc. So this is basically finding childs of relations.
+        public ActionResult<PagedResult<RelationItem>> GetPagedReferences(int id, int pageNumber = 1,
+            int pageSize = 100, bool filterMustBeIsDependency = false)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            var relationTypes = new string[]
-            {
-                Constants.Conventions.RelationTypes.RelatedDocumentAlias,
-                Constants.Conventions.RelationTypes.RelatedMediaAlias
-            };
-
-            UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            IEnumerable<IUmbracoEntity> relations = _relationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, relationTypes, objectType);
-
-            return GetRelationsPagedResult(totalRecords, pageNumber, pageSize, objectType, relations);
+            return _relationService.GetPagedRelationsForItems(new []{id}, pageNumber - 1, pageSize, filterMustBeIsDependency);
         }
 
-        public ActionResult<PagedResult<EntityBasic>> GetPagedDescendantsInReferences(int parentId, string entityType, int pageNumber = 1, int pageSize = 100)
+        // Used on delete, finds
+        public ActionResult<PagedResult<RelationItem>> GetPagedDescendantsInReferences(int parentId, int pageNumber = 1, int pageSize = 100, bool filterMustBeIsDependency = false)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            IEntitySlim currentEntity = _entityService.Get(parentId);
-            if (currentEntity is null)
-            {
-                return NotFound();
-            }
 
-            IEnumerable<IEntitySlim> entities = _entityService.GetDescendants(currentEntity.Id);
-            var ids = entities.Select(x => x.Id).ToArray();
+            return _relationService.GetPagedDescendantsInReferences(parentId, pageNumber - 1, pageSize, filterMustBeIsDependency);
 
-            UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            IEnumerable<IUmbracoEntity> relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
-
-            return GetRelationsPagedResult(totalRecords, pageNumber, pageSize, objectType, relations);
         }
 
-        /// <summary>
-        ///     Get entities of the items in relation from selected integer ids
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="entityType"></param>
-        /// <param name="pageNumber"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     We allow for POST because there could be quite a lot of ids
-        /// </remarks>
+        // Used by unpublish content. So this is basically finding parents of relations.
         [HttpGet]
         [HttpPost]
-        public ActionResult<PagedResult<EntityBasic>> GetPagedReferencedItems([FromJsonPath] int[] ids, string entityType, int pageNumber = 1, int pageSize = 100)
+        public ActionResult<PagedResult<RelationItem>> GetPagedReferencedItems([FromJsonPath] int[] ids, int pageNumber = 1, int pageSize = 100, bool filterMustBeIsDependency = true)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            IEnumerable<IUmbracoEntity> relations = _relationService.GetPagedEntitiesForItemsInRelation(ids, pageNumber - 1, pageSize, out var totalRecords, objectType);
+            return _relationService.GetPagedItemsWithRelations(ids, pageNumber - 1, pageSize, filterMustBeIsDependency);
 
-            return GetRelationsPagedResult(totalRecords, pageNumber, pageSize, objectType, relations);
-        }
-
-        private PagedResult<EntityBasic> GetRelationsPagedResult(long totalRecords, int pageNumber, int pageSize, UmbracoObjectTypes objectType, IEnumerable<IUmbracoEntity> relations)
-        {
-            var udiType = ObjectTypes.GetUdiType(objectType);
-
-            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
-            {
-                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
-                {
-                    Id = rel.Id,
-                    Key = rel.Key,
-                    Udi = Udi.Create(udiType, rel.Key),
-                    Icon = rel.ContentTypeIcon,
-                    Name = rel.Name,
-                    Alias = rel.ContentTypeAlias
-                })
-            };
         }
     }
+
 }

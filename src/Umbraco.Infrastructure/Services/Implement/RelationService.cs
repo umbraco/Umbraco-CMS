@@ -374,6 +374,41 @@ namespace Umbraco.Cms.Core.Services.Implement
             return _relationRepository.GetPagedEntitiesForItemsInRelation(ids, pageIndex, pageSize, out totalItems, entityTypes.Select(x => x.GetGuid()).ToArray());
         }
 
+        public PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            var items =  _relationRepository.GetPagedRelationsForItems(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+
+            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+        }
+
+        public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            var items =  _relationRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+
+            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+        }
+
+        public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+
+            var descendants = _entityService.GetDescendants(parentId);
+
+            if (!descendants.Any())
+            {
+                return new PagedResult<RelationItem>(0, pageIndex, pageSize);
+            }
+            var ids = descendants.Select(x => x.Id).ToArray();
+
+
+            var items =  _relationRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+
+            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+        }
+
+
         /// <inheritdoc />
         public IRelation Relate(int parentId, int childId, IRelationType relationType)
         {
