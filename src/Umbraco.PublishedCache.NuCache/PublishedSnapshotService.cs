@@ -338,7 +338,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
                 var kits = _publishedContentService.GetAllContentSources();
-                return onStartup ? _contentStore.SetAllFastSortedLocked(kits, true) : _contentStore.SetAllLocked(kits);
+                try
+                {
+                    return onStartup ? _contentStore.SetAllFastSortedLocked(kits, true) : _contentStore.SetAllLocked(kits);
+                }
+                catch (ThreadAbortException tae)
+                {
+                    // Caught a ThreadAbortException, most likely from a database timeout.
+                    // If we don't catch it here, the whole local cache can remain locked causing widespread panic.
+                    _logger.LogWarning(tae, tae.Message);
+                }
+                return false;
             }
         }
 
@@ -386,7 +396,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 _logger.LogDebug("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
                 var kits = _publishedContentService.GetAllMediaSources();
-                return onStartup ? _mediaStore.SetAllFastSortedLocked(kits, true) : _mediaStore.SetAllLocked(kits);
+
+                try
+                {
+                    return onStartup ? _mediaStore.SetAllFastSortedLocked(kits, true) : _mediaStore.SetAllLocked(kits);
+                }
+                catch (ThreadAbortException tae)
+                {
+                    // Caught a ThreadAbortException, most likely from a database timeout.
+                    // If we don't catch it here, the whole local cache can remain locked causing widespread panic.
+                    _logger.LogWarning(tae, tae.Message);
+                }
+                return false;
             }
         }
 
