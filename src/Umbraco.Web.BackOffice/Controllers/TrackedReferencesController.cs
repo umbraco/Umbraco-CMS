@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         // Used on delete, finds
-        public ActionResult<PagedResult<RelationItem>> GetPagedDescendantsInReferences(int parentId, int pageNumber = 1, int pageSize = 100, bool filterMustBeIsDependency = false)
+        public ActionResult<PagedResult<RelationItem>> GetPagedDescendantsInReferences(int parentId, int pageNumber = 1, int pageSize = 100, bool filterMustBeIsDependency = true)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {

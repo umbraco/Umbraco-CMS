@@ -29,24 +29,24 @@
         localizationService.localize("references_labelUsedDescendants").then(function (value) {
             vm.referencedDescendantsTitle = value;
         });
-      
+
         vm.changeContentPageNumber = changeContentPageNumber;
         vm.changeContentDescendantsPageNumber = changeContentDescendantsPageNumber;
         vm.contentOptions = {};
-        vm.contentOptions.entityType = "DOCUMENT";
+        vm.contentOptions.filterMustBeIsDependency = true;
         vm.hasContentReferences = false;
         vm.hasContentReferencesInDescendants = false;
 
         vm.changeMediaPageNumber = changeMediaPageNumber;
         vm.changeMediaDescendantsPageNumber = changeMediaDescendantsPageNumber;
         vm.mediaOptions = {};
-        vm.mediaOptions.entityType = "MEDIA";
+        vm.mediaOptions.filterMustBeIsDependency = true;
         vm.hasMediaReferences = false;
         vm.hasMediaReferencesInDescendants = false;
 
         vm.changeMemberPageNumber = changeMemberPageNumber;
         vm.memberOptions = {};
-        vm.memberOptions.entityType = "MEMBER";
+        vm.memberOptions.filterMustBeIsDependency = true;
         vm.hasMemberReferences = false;
 
         vm.$onInit = onInit;
@@ -67,7 +67,7 @@
 
             // Make array of promises to load:
             var promises = [loadContentRelations(), loadMediaRelations(), loadMemberRelations()];
-            
+
             // only load descendants if we want to show them.
             if (vm.showDescendants) {
                 promises.push(loadContentDescendantsUsage());

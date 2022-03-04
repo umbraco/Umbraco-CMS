@@ -6,7 +6,7 @@
 function trackedReferencesResource($q, $http, umbRequestHelper) {
 
     return {
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.trackedReferencesResource#getPagedReferences
@@ -49,7 +49,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
 
             //overwrite the defaults if there are any specified
             var options = Utilities.extend(defaults, args);
-          
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -59,7 +59,8 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                             id: id,
                             entityType: options.entityType,
                             pageNumber: options.pageNumber,
-                            pageSize: options.pageSize
+                            pageSize: options.pageSize,
+                            filterMustBeIsDependency: options.filterMustBeIsDependency,
                         }
                     )),
                 "Failed to retrieve usages for entity of id " + id);
@@ -95,7 +96,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
          *
          */
         getPagedDescendantsInReferences: function (id, args) {
-            
+
             var defaults = {
                 pageSize: 10,
                 pageNumber: 1,
@@ -139,13 +140,13 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
          *      pageNumber : 1,
          *      entityType : 'DOCUMENT'
          *  };
-         *  
+         *
          * trackedReferencesResource.getPagedReferencedItems(ids, options)
          *    .then(function(data) {
          *        console.log(data);
          *    });
          * </pre>
-         * 
+         *
          * @param {Array} ids array of the selected items ids to query for references
          * @param {Object} options optional options object
          * @param {Int} options.pageSize the pagesize of the returned list (default 25)
