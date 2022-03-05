@@ -197,6 +197,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         #region OnSomething
 
+        protected override DbConnection OnConnectionOpened(DbConnection connection)
+        {
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            // TODO: this should probably move to a SQL Server ProviderSpecificInterceptor.
+#if DEBUG_DATABASES
+            // determines the database connection SPID for debugging
+            if (DatabaseType.IsSqlServer())
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT @@SPID";
+                    _spid = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+            else
+            {
+                // includes SqlCE
+                _spid = 0;
+            }
+
+#endif
+            return connection;
+        }
+
 #if DEBUG_DATABASES
         protected override void OnConnectionClosing(DbConnection conn)
         {
