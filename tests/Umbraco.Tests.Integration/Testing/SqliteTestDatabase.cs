@@ -63,10 +63,8 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             File.Delete(file);
         }
 
-        var creator = new SqliteDatabaseCreator();
         foreach (TestDbMeta meta in _testDatabases)
         {
-            creator.Create(meta.ConnectionString);
             _prepareQueue.Add(meta);
         }
 
@@ -83,6 +81,10 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
     {
+        new SqliteDatabaseCreator().Create(meta.ConnectionString);
+        using var connection = GetConnection(meta);
+        connection.Open();
+
         lock (_cachedDatabaseInitCommands)
         {
             if (!_cachedDatabaseInitCommands.Any())
@@ -91,10 +93,6 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
                 return;
             }
         }
-
-        new SqliteDatabaseCreator().Create(meta.ConnectionString);
-        using var connection = GetConnection(meta);
-        connection.Open();
 
         // Get NPoco to handle all the type mappings (e.g. dates) for us.
         var database = new Database(connection, DatabaseType.SQLite);
@@ -156,21 +154,14 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     private void Drop(TestDbMeta meta)
     {
-        // DO something... In memory only?
-        try
+        foreach (var file in Directory.GetFiles(_settings.FilesPath))
         {
-            foreach (var file in Directory.GetFiles(_settings.FilesPath))
+            if (!Path.GetFileName(file).StartsWith(meta.Name))
             {
-                if (!Path.GetFileName(file).StartsWith(meta.Name))
-                {
-                    continue;
-                }
-
-                File.Delete(file);
+                continue;
             }
-        }
-        catch (IOException ex)
-        {
+
+            File.Delete(file);
         }
     }
 
@@ -182,8 +173,9 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         var builder = new SqliteConnectionStringBuilder()
         {
             DataSource = path,
+            ForeignKeys = true,
+            Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
             Cache = SqliteCacheMode.Private,
-            Pooling = false // TODO: PMJ - Breaks if connection pooling is on, why?
         };
 
         return new TestDbMeta(name, empty, builder.ConnectionString, Persistence.Sqlite.Constants.ProviderName, path);
