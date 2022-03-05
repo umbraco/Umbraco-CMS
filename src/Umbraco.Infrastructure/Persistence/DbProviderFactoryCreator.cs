@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     public class DbProviderFactoryCreator : IDbProviderFactoryCreator
     {
         private readonly Func<string, DbProviderFactory> _getFactory;
+        private readonly IEnumerable<IProviderSpecificInterceptor> _providerSpecificInterceptors;
         private readonly IDictionary<string, IDatabaseCreator> _databaseCreators;
         private readonly IDictionary<string, ISqlSyntaxProvider> _syntaxProviders;
         private readonly IDictionary<string, IBulkSqlInsertProvider> _bulkSqlInsertProviders;
@@ -20,9 +21,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             IEnumerable<ISqlSyntaxProvider> syntaxProviders,
             IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
             IEnumerable<IDatabaseCreator> databaseCreators,
-            IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories)
+            IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories,
+            IEnumerable<IProviderSpecificInterceptor> providerSpecificInterceptors)
+
         {
             _getFactory = getFactory;
+            _providerSpecificInterceptors = providerSpecificInterceptors;
             _databaseCreators = databaseCreators.ToDictionary(x => x.ProviderName);
             _syntaxProviders = syntaxProviders.ToDictionary(x => x.ProviderName);
             _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x => x.ProviderName);
@@ -75,5 +79,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             return new NPocoMapperCollection(() => Enumerable.Empty<IMapper>());
         }
+
+        public IEnumerable<IInterceptor> GetProviderSpecificInterceptors(string providerName)
+            => _providerSpecificInterceptors.Where(x => x.ProviderName == providerName);
     }
 }

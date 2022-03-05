@@ -154,7 +154,8 @@ namespace Umbraco.Extensions
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
                 factory.GetServices<IDatabaseCreator>(),
-                factory.GetServices<IProviderSpecificMapperFactory>()
+                factory.GetServices<IProviderSpecificMapperFactory>(),
+                factory.GetServices<IProviderSpecificInterceptor>()
             ));
 
             builder.AddCoreInitialServices();

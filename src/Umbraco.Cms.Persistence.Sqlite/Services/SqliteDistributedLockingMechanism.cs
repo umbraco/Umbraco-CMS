@@ -118,11 +118,6 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             {
                 throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
             }
-
-            if (db.Transaction.IsolationLevel != IsolationLevel.Serializable)
-            {
-                throw new InvalidOperationException("Unexpected IsolationLevel, please check SqliteCacheMode.");
-            }
         }
 
         // Only one writer is possible at a time
@@ -134,11 +129,6 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             if (!db.InTransaction)
             {
                 throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
-            }
-
-            if (db.Transaction.IsolationLevel != IsolationLevel.Serializable)
-            {
-                throw new InvalidOperationException("Unexpected IsolationLevel, please check SqliteCacheMode.");
             }
 
             var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";

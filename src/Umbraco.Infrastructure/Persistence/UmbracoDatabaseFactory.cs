@@ -239,9 +239,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             var config = new FluentConfig(xmappers => factory);
 
             // create the database factory
-            _npocoDatabaseFactory = DatabaseFactory.Config(x => x
-                .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
-                .WithFluentConfig(config)); // with proper configuration
+            _npocoDatabaseFactory = DatabaseFactory.Config(cfg =>
+            {
+                cfg.UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
+                    .WithFluentConfig(config);
+
+                foreach (IInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName))
+                {
+                    cfg.WithInterceptor(interceptor);
+                }
+
+                cfg.WithInterceptor(new ProfiledDbConnectionInterceptor());
+                cfg.WithInterceptor(new RetryDbConnectionInterceptor(_connectionRetryPolicy, _commandRetryPolicy));
+            }); // with proper configuration
 
             if (_npocoDatabaseFactory == null)
             {

@@ -49,23 +49,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     /// <inheritdoc />
     public override IsolationLevel DefaultIsolationLevel
-       /* Why ReadUncommitted?
-       *
-       * SQLite only ever supports a single active writer.
-       *
-       * MS.Data.Sqlite BeginTransaction can either issue "BEGIN IMMEDIATE" (write mode) or "BEGIN" (upgradable read mode).
-       * This is controlled by the deferred parameter on BeginTransaction.
-       *
-       * BeginTransaction(deferred: false) starts a write transaction and blocks all other calls to BeginTransaction(deferred: false).
-       *
-       * We have no direct access to the SqliteConnection to pass a deferred parameter to BeginTransaction as we
-       * have Npoco as a layer of abstraction over the database.
-       *
-       * However... MS.Data.SQLite defaults deferred to true if isolation level is ReadUncommitted.
-       *
-       * ReadUncommitted is upgraded to Serializable unless CacheMode == shared & deferred == false.
-       * So we actually end up with IsolationLevel = Serializable, on top of which because we are in journal_mode = wal so really have snapshot isolation. */
-        => IsolationLevel.ReadUncommitted;
+        => IsolationLevel.Serializable;
 
     /// <inheritdoc />
     public override string DbProvider => Constants.ProviderName;

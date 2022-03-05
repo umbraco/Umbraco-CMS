@@ -197,39 +197,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         #region OnSomething
 
-        // TODO: has new interceptors to replace OnSomething?
-
-        protected override DbConnection OnConnectionOpened(DbConnection connection)
-        {
-            if (connection == null) throw new ArgumentNullException(nameof(connection));
-
-#if DEBUG_DATABASES
-            // determines the database connection SPID for debugging
-            if (DatabaseType.IsSqlServer())
-            {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "SELECT @@SPID";
-                    _spid = Convert.ToInt32(command.ExecuteScalar());
-                }
-            }
-            else
-            {
-                // includes SqlCE
-                _spid = 0;
-            }
-#endif
-
-            // wrap the connection with a profiling connection that tracks timings
-            connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
-
-            // wrap the connection with a retrying connection
-            if (_connectionRetryPolicy != null || _commandRetryPolicy != null)
-                connection = new RetryDbConnection(connection, _connectionRetryPolicy, _commandRetryPolicy);
-
-            return connection;
-        }
-
 #if DEBUG_DATABASES
         protected override void OnConnectionClosing(DbConnection conn)
         {
