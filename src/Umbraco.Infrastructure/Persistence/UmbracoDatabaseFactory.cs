@@ -244,7 +244,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 cfg.UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
                     .WithFluentConfig(config);
 
-                foreach (IInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName))
+                foreach (IProviderSpecificInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName))
                 {
                     cfg.WithInterceptor(interceptor);
                 }

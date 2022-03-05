@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Data.Common;
-using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
@@ -13,6 +12,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         IBulkSqlInsertProvider CreateBulkSqlInsertProvider(string providerName);
         void CreateDatabase(string providerName, string connectionString);
         NPocoMapperCollection ProviderSpecificMappers(string providerName);
-        IEnumerable<IInterceptor> GetProviderSpecificInterceptors(string providerName);
+        IEnumerable<IProviderSpecificInterceptor> GetProviderSpecificInterceptors(string providerName);
     }
 }

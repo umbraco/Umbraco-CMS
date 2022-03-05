@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             return new NPocoMapperCollection(() => Enumerable.Empty<IMapper>());
         }
 
-        public IEnumerable<IInterceptor> GetProviderSpecificInterceptors(string providerName)
+        public IEnumerable<IProviderSpecificInterceptor> GetProviderSpecificInterceptors(string providerName)
             => _providerSpecificInterceptors.Where(x => x.ProviderName == providerName);
     }
 }
