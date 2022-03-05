@@ -14,7 +14,7 @@ public class SqlitePreferDeferredTransactionsConnection : DbConnection
     }
 
     protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
-        => _inner.BeginTransaction(isolationLevel, true);
+        => _inner.BeginTransaction(isolationLevel, deferred: true); // <-- The important bit
 
     public override void ChangeDatabase(string databaseName)
         => _inner.ChangeDatabase(databaseName);
