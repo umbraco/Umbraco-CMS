@@ -93,7 +93,7 @@ tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
 tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
 tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 tests/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
-tests/Umbraco.Tests.Integration/appsettings.Tests.local.json
+tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
 tests/Umbraco.Tests.Integration/TEMP/*
 tests/Umbraco.Tests.Integration/umbraco/Data/
 tests/Umbraco.Tests.Integration/umbraco/logs/
