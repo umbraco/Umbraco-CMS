@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Data.Common;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 
@@ -13,6 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public string ConnectionString { get; set; }
         public string Provider { get; set; }
         public string Path { get; set; } // Null if not embedded.
+        public DbConnection Connection { get; set; } // for SQLite in memory, can move to subclass later.
 
         public TestDbMeta(string name, bool isEmpty, string connectionString, string providerName, string path)
         {

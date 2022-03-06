@@ -36,13 +36,11 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         _databaseFactory = dbFactoryProvider.Create();
         _loggerFactory = loggerFactory;
 
-        var counter = 0;
-
         var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
-            .Select(x => CreateSqLiteMeta(++counter, false));
+            .Select(x => CreateSqLiteMeta(false));
 
         var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
-            .Select(x => CreateSqLiteMeta(++counter, true));
+            .Select(x => CreateSqLiteMeta(true));
 
         _testDatabases = schema.Concat(empty).ToList();
     }
@@ -52,16 +50,6 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         _prepareQueue = new BlockingCollection<TestDbMeta>();
         _readySchemaQueue = new BlockingCollection<TestDbMeta>();
         _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
-
-        foreach (var file in Directory.GetFiles(_settings.FilesPath))
-        {
-            if (!Path.GetFileName(file).StartsWith(DatabaseName))
-            {
-                continue;
-            }
-
-            File.Delete(file);
-        }
 
         foreach (TestDbMeta meta in _testDatabases)
         {
@@ -75,13 +63,23 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         }
     }
 
-    protected override void ResetTestDatabase(TestDbMeta meta) => Drop(meta);
+    protected override void ResetTestDatabase(TestDbMeta meta)
+    {
+        // Database survives in memory until all connections closed.
+        meta.Connection = GetConnection(meta);
+        meta.Connection.Open();
+    }
+
+    public override void Detach(TestDbMeta meta)
+    {
+        meta.Connection.Close();
+        _prepareQueue.TryAdd(CreateSqLiteMeta(meta.IsEmpty));
+    }
 
     protected override DbConnection GetConnection(TestDbMeta meta) => new SqliteConnection(meta.ConnectionString);
 
     protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
     {
-        new SqliteDatabaseCreator().Create(meta.ConnectionString);
         using var connection = GetConnection(meta);
         connection.Open();
 
@@ -148,36 +146,19 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
         _readySchemaQueue.CompleteAdding();
         while (_readySchemaQueue.TryTake(out _)) { }
-
-        Parallel.ForEach(_testDatabases, Drop);
     }
 
-    private void Drop(TestDbMeta meta)
+    private TestDbMeta CreateSqLiteMeta(bool empty)
     {
-        foreach (var file in Directory.GetFiles(_settings.FilesPath))
-        {
-            if (!Path.GetFileName(file).StartsWith(meta.Name))
-            {
-                continue;
-            }
-
-            File.Delete(file);
-        }
-    }
-
-    private TestDbMeta CreateSqLiteMeta(int i, bool empty)
-    {
-        var name = $"{DatabaseName}-{i}.sqlite";
-        var path = Path.Combine(_settings.FilesPath, name);
-
         var builder = new SqliteConnectionStringBuilder()
         {
-            DataSource = path,
+            DataSource = $"{Guid.NewGuid()}",
+            Mode = SqliteOpenMode.Memory,
             ForeignKeys = true,
             Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
-            Cache = SqliteCacheMode.Private,
+            Cache = SqliteCacheMode.Shared,
         };
 
-        return new TestDbMeta(name, empty, builder.ConnectionString, Persistence.Sqlite.Constants.ProviderName, path);
+        return new TestDbMeta(builder.DataSource, empty, builder.ConnectionString, Persistence.Sqlite.Constants.ProviderName, "InMemory");
     }
 }
