@@ -237,13 +237,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _npocoDatabaseFactory = DatabaseFactory.Config(cfg =>
             {
                 cfg.UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
-                    .WithFluentConfig(config);
+                    .WithFluentConfig(config); // with proper configuration
 
                 foreach (IProviderSpecificInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName))
                 {
                     cfg.WithInterceptor(interceptor);
                 }
-            }); // with proper configuration
+            });
 
             if (_npocoDatabaseFactory == null)
             {

@@ -28,7 +28,7 @@ public class GlobalSetupTeardown
     {
         var builder = new ConfigurationBuilder();
         builder.AddJsonFile("appsettings.Tests.json");
-        builder.AddJsonFile("appsettings.Tests.local.json", optional: true);
+        builder.AddJsonFile("appsettings.Tests.Local.json", optional: true);
         builder.AddEnvironmentVariables();
         TestConfiguration = builder.Build();
 
