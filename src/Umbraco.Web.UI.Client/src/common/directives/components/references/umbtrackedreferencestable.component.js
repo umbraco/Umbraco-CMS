@@ -93,8 +93,8 @@
             headline: "<",
             items: "<",
             showType: "<?",
-            typeLabelKey: "=?",
-            showAlias: "<?",
+            showTypeName: "<?",
+            showRelationTypeName: "<?",
             onPageChanged: "&"
         },
         controllerAs: 'vm',

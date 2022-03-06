@@ -9,45 +9,27 @@
 
         var vm = this;
 
-        vm.contentReferencesTitle = "Referenced by the following Documents";
-        vm.memberReferencesTitle = "Referenced by the following Members";
-        vm.mediaReferencesTitle = "Referenced by the following Media";
-        vm.referencedDescendantsTitle = "The following descendant items are referenced";
+        vm.referencesTitle = "Referenced by the following items";
+        vm.referencedDescendantsTitle = "The following descending items are referenced";
 
-        localizationService.localize("references_labelUsedByDocuments").then(function (value) {
-            vm.contentReferencesTitle = value;
-        });
-
-        localizationService.localize("references_labelUsedByMembers").then(function (value) {
-            vm.memberReferencesTitle = value;
-        });
-
-        localizationService.localize("references_labelUsedByMedia").then(function (value) {
-            vm.mediaReferencesTitle = value;
+        localizationService.localize("references_labelUsedByItems").then(function (value) {
+            vm.referencesTitle = value;
         });
 
         localizationService.localize("references_labelUsedDescendants").then(function (value) {
             vm.referencedDescendantsTitle = value;
         });
 
-        vm.changeContentPageNumber = changeContentPageNumber;
-        vm.changeContentDescendantsPageNumber = changeContentDescendantsPageNumber;
-        vm.contentOptions = {};
-        vm.contentOptions.filterMustBeIsDependency = true;
-        vm.hasContentReferences = false;
-        vm.hasContentReferencesInDescendants = false;
+        vm.descendantsOptions = {};
+        vm.descendantsOptions.filterMustBeIsDependency = true;
+        vm.hasReferencesInDescendants = false;
 
-        vm.changeMediaPageNumber = changeMediaPageNumber;
-        vm.changeMediaDescendantsPageNumber = changeMediaDescendantsPageNumber;
-        vm.mediaOptions = {};
-        vm.mediaOptions.filterMustBeIsDependency = true;
-        vm.hasMediaReferences = false;
-        vm.hasMediaReferencesInDescendants = false;
+        vm.referencesOptions = {};
+        vm.referencesOptions.filterMustBeIsDependency = true;
+        vm.hasReferences = false;
 
-        vm.changeMemberPageNumber = changeMemberPageNumber;
-        vm.memberOptions = {};
-        vm.memberOptions.filterMustBeIsDependency = true;
-        vm.hasMemberReferences = false;
+        vm.changeReferencesPageNumber = changeReferencesPageNumber;
+        vm.changeContentDescendantsPageNumber = changeDescendantsPageNumber;
 
         vm.$onInit = onInit;
 
@@ -66,12 +48,11 @@
             }
 
             // Make array of promises to load:
-            var promises = [loadContentRelations(), loadMediaRelations(), loadMemberRelations()];
+            var promises = [loadReferencesRelations()];
 
             // only load descendants if we want to show them.
             if (vm.showDescendants) {
-                promises.push(loadContentDescendantsUsage());
-                promises.push(loadMediaDescendantsUsage());
+                promises.push(loadDescendantsUsage());
             }
 
             $q.all(promises).then(function () {
@@ -82,86 +63,35 @@
             });
         }
 
-        function changeContentPageNumber(pageNumber) {
-            vm.contentOptions.pageNumber = pageNumber;
-            loadContentRelations();
+        function changeReferencesPageNumber(pageNumber) {
+            vm.referencesOptions.pageNumber = pageNumber;
+            loadReferencesRelations();
         }
 
-        function changeMediaPageNumber(pageNumber) {
-            vm.mediaOptions.pageNumber = pageNumber;
-            loadMediaRelations();
+        function changeDescendantsPageNumber(pageNumber) {
+            vm.descendantsOptions.pageNumber = pageNumber;
+            loadDescendantsUsage();
         }
 
-        function changeMemberPageNumber(pageNumber) {
-            vm.memberOptions.pageNumber = pageNumber;
-            loadMemberRelations();
-        }
-
-        function changeContentDescendantsPageNumber(pageNumber) {
-            vm.contentOptions.pageNumber = pageNumber;
-            loadContentDescendantsUsage();
-        }
-
-        function changeMediaDescendantsPageNumber(pageNumber) {
-            vm.mediaOptions.pageNumber = pageNumber;
-            loadMediaDescendantsUsage();
-        }
-
-        function loadContentRelations() {
-            return trackedReferencesResource.getPagedReferences(vm.id, vm.contentOptions)
+        function loadReferencesRelations() {
+            return trackedReferencesResource.getPagedReferences(vm.id, vm.referencesOptions)
                 .then(function (data) {
-                    vm.contentReferences = data;
+                    vm.references = data;
 
                     if (data.items.length > 0) {
-                        vm.hasContentReferences = data.items.length > 0;
+                        vm.hasReferences = data.items.length > 0;
                         activateWarning();
                     }
                 });
         }
 
-        function loadMediaRelations() {
-            return trackedReferencesResource.getPagedReferences(vm.id, vm.mediaOptions)
+        function loadDescendantsUsage() {
+            return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.descendantsOptions)
                 .then(function (data) {
-                    vm.mediaReferences = data;
+                    vm.referencedDescendants = data;
 
                     if (data.items.length > 0) {
-                        vm.hasMediaReferences = data.items.length > 0;
-                        activateWarning();
-                    }
-                });
-        }
-
-        function loadMemberRelations() {
-            return trackedReferencesResource.getPagedReferences(vm.id, vm.memberOptions)
-                .then(function (data) {
-                    vm.memberReferences = data;
-
-                    if (data.items.length > 0) {
-                        vm.hasMemberReferences = data.items.length > 0;
-                        activateWarning();
-                    }
-                });
-        }
-
-        function loadContentDescendantsUsage() {
-            return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.contentOptions)
-                .then(function (data) {
-                    vm.referencedContentDescendants = data;
-
-                    if (data.items.length > 0) {
-                        vm.hasContentReferencesInDescendants = data.items.length > 0;
-                        activateWarning();
-                    }
-                });
-        }
-
-        function loadMediaDescendantsUsage() {
-            return trackedReferencesResource.getPagedDescendantsInReferences(vm.id, vm.mediaOptions)
-                .then(function (data) {
-                    vm.referencedMediaDescendants = data;
-
-                    if (data.items.length > 0) {
-                        vm.hasMediaReferencesInDescendants = data.items.length > 0;
+                        vm.hasReferencesInDescendants = data.items.length > 0;
                         activateWarning();
                     }
                 });

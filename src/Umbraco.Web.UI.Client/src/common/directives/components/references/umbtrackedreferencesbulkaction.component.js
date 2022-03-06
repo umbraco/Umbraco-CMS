@@ -15,17 +15,10 @@
             vm.referencedItemsTitle = value;
         });
       
-        vm.changeContentPageNumber = changeContentPageNumber;
-        vm.contentOptions = {};
-        vm.contentOptions.entityType = "DOCUMENT";
-        // TODO: rename this prop. it has nothing to do with list-views. suggestion, rename to: hasReferencesDescendants
-        vm.hasContentReferences = false;
-
-        vm.changeMediaPageNumber = changeMediaPageNumber;
-        vm.mediaOptions = {};
-        vm.mediaOptions.entityType = "MEDIA";
-        // TODO: rename this prop. it has nothing to do with list-views. suggestion, rename to: hasReferencesDescendants
-        vm.hasMediaReferences = false;
+        vm.changeReferencesPageNumber = changeReferencesPageNumber;
+        vm.referencesOptions = {};
+        vm.referencesOptions.filterMustBeIsDependency = true;
+        vm.hasReferences = false;
 
         vm.$onInit = onInit;
 
@@ -34,7 +27,7 @@
             this.loading = true;
             this.hideNoResult = this.hideNoResult || false;
 
-            $q.all([loadContentBulkActionUsage(), loadMediaBulkActionUsage()]).then(function () {
+            loadContentBulkActionUsage().then(function () {
                 vm.loading = false;
                 if(vm.onLoadingComplete) {
                     vm.onLoadingComplete();
@@ -42,39 +35,20 @@
             });
         }
 
-        function changeContentPageNumber(pageNumber) {
-            vm.contentOptions.pageNumber = pageNumber;
+        function changeReferencesPageNumber(pageNumber) {
+            vm.referencesOptions.pageNumber = pageNumber;
             loadContentBulkActionUsage();
-        }
-
-        function changeMediaPageNumber(pageNumber) {
-            vm.mediaOptions.pageNumber = pageNumber;
-            loadMediaBulkActionUsage();
         }
 
         function loadContentBulkActionUsage() {
              var ids = vm.selection.map(s => s.id);
 
-             return trackedReferencesResource.getPagedReferencedItems(ids, vm.contentOptions)
+             return trackedReferencesResource.getPagedReferencedItems(ids, vm.referencesOptions)
                   .then(function (data) {
-                      vm.referencedContentItems = data;
+                      vm.referencedItems = data;
 
                       if (data.items.length > 0) {
-                          vm.hasContentReferences = data.items.length > 0;
-                          activateWarning();
-                      }
-                  });
-        }
-
-        function loadMediaBulkActionUsage() {
-            var ids = vm.selection.map(s => s.id);
-
-            return trackedReferencesResource.getPagedReferencedItems(ids, vm.mediaOptions)
-                  .then(function (data) {
-                      vm.referencedMediaItems = data;
-
-                      if (data.items.length > 0) {
-                          vm.hasMediaReferences = data.items.length > 0;
+                          vm.hasReferences = data.items.length > 0;
                           activateWarning();
                       }
                   });
