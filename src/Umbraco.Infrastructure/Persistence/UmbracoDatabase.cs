@@ -27,8 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private readonly ILogger<UmbracoDatabase> _logger;
         private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
-        private readonly RetryPolicy _connectionRetryPolicy;
-        private readonly RetryPolicy _commandRetryPolicy;
         private readonly IEnumerable<IMapper> _mapperCollection;
         private readonly Guid _instanceGuid = Guid.NewGuid();
         private List<CommandInfo> _commands;
@@ -49,8 +47,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             ILogger<UmbracoDatabase> logger,
             IBulkSqlInsertProvider bulkSqlInsertProvider,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            RetryPolicy connectionRetryPolicy = null,
-            RetryPolicy commandRetryPolicy = null,
             IEnumerable<IMapper> mapperCollection = null)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
@@ -58,8 +54,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _logger = logger;
             _bulkSqlInsertProvider = bulkSqlInsertProvider;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
-            _connectionRetryPolicy = connectionRetryPolicy;
-            _commandRetryPolicy = commandRetryPolicy;
             _mapperCollection = mapperCollection;
 
             Init();

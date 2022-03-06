@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
@@ -20,6 +22,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class LocksTests : UmbracoIntegrationTest
     {
+        protected override void ConfigureTestServices(IServiceCollection services)
+        {
+            // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
+            services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
+        }
+
         [SetUp]
         protected void SetUp()
         {

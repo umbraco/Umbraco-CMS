@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Persistence.Sqlite.Services;
 
 namespace Umbraco.Cms.Persistence.Sqlite;
@@ -28,7 +29,9 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDistributedLockingMechanism, SqliteDistributedLockingMechanism>());
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteConnectionInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteAddPreferDeferredInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteAddMiniProfilerInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteAddRetryPolicyInterceptor>());
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);

@@ -46,8 +46,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
         private IBulkSqlInsertProvider _bulkSqlInsertProvider;
-        private RetryPolicy _connectionRetryPolicy;
-        private RetryPolicy _commandRetryPolicy;
         private NPoco.MapperCollection _pocoMappers;
         private SqlContext _sqlContext;
         private bool _upgrading;
@@ -207,9 +205,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 throw new Exception($"Can't find a provider factory for provider name \"{ProviderName}\".");
             }
 
-            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(ConnectionString);
-            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(ConnectionString);
-
             _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, ProviderName);
             if (_databaseType == null)
             {
@@ -248,9 +243,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 {
                     cfg.WithInterceptor(interceptor);
                 }
-
-                cfg.WithInterceptor(new ProfiledDbConnectionInterceptor());
-                cfg.WithInterceptor(new RetryDbConnectionInterceptor(_connectionRetryPolicy, _commandRetryPolicy));
             }); // with proper configuration
 
             if (_npocoDatabaseFactory == null)
@@ -275,8 +267,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private InitializedPocoDataBuilder GetPocoDataFactoryResolver(Type type, IPocoDataFactory factory)
             => new UmbracoPocoDataBuilder(type, _pocoMappers, _upgrading).Init();
 
-
-
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
             => new UmbracoDatabase(
@@ -286,10 +276,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 _loggerFactory.CreateLogger<UmbracoDatabase>(),
                 _bulkSqlInsertProvider,
                 _databaseSchemaCreatorFactory,
-                _connectionRetryPolicy,
-                _commandRetryPolicy,
-                _pocoMappers
-                );
+                _pocoMappers);
 
         protected override void DisposeResources()
         {

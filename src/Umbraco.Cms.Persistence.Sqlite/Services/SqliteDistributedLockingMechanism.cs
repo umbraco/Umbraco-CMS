@@ -148,7 +148,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                     throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                 }
             }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == SQLitePCL.raw.SQLITE_BUSY)
+            catch (SqliteException ex) when (ex.IsBusyOrLocked())
             {
                 throw new DistributedWriteLockTimeoutException(LockId);
             }
