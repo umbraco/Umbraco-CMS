@@ -1,5 +1,4 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
@@ -9,6 +8,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigRuntime)]
     public class RuntimeSettings
     {
+        /// <summary>
+        /// Gets or sets the runtime mode.
+        /// </summary>
+        [DefaultValue(RuntimeMode.Development)]
+        public RuntimeMode Mode { get; set; } = RuntimeMode.Development;
+
         /// <summary>
         /// Gets or sets a value for the maximum query string length.
         /// </summary>
