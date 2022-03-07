@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class RelationTypeBuilder
-        : ChildBuilderBase<RelationBuilder, IRelationType>,
+        : ChildBuilderBase<RelationBuilder, IRelationTypeWithIsDependency>,
             IWithIdBuilder,
             IWithAliasBuilder,
             IWithNameBuilder,
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             return this;
         }
 
-        public override IRelationType Build()
+        public override IRelationTypeWithIsDependency Build()
         {
             var alias = _alias ?? Guid.NewGuid().ToString();
             var name = _name ?? Guid.NewGuid().ToString();

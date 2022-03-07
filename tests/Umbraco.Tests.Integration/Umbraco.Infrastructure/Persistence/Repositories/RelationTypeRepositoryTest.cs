@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                IRelationType relationType = repository.Get(8);
+                var relationType = repository.Get(8) as IRelationTypeWithIsDependency;
 
                 // Assert
                 Assert.That(relationType, Is.Not.Null);

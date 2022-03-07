@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new RelationTypeBuilder();
 
             // Act
-            IRelationType relationType = builder
+            var relationType = builder
                 .WithId(id)
                 .WithAlias(alias)
                 .WithName(name)

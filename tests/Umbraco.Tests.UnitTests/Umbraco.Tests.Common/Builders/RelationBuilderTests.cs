@@ -62,7 +62,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(relationTypeAlias, relation.RelationType.Alias);
             Assert.AreEqual(relationTypeName, relation.RelationType.Name);
             Assert.IsFalse(relation.RelationType.IsBidirectional);
-            Assert.IsTrue(relation.RelationType.IsDependency);
+            
+            Assert.IsTrue((relation.RelationType as IRelationTypeWithIsDependency).IsDependency);
             Assert.AreEqual(parentObjectType, relation.RelationType.ParentObjectType);
             Assert.AreEqual(childObjectType, relation.RelationType.ChildObjectType);
         }

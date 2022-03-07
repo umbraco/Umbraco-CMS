@@ -30,12 +30,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
         public static RelationTypeDto BuildDto(IRelationType entity)
         {
+            var isDependency = false;
+            if (entity is IRelationTypeWithIsDependency relationTypeWithIsDependency)
+            {
+                isDependency = relationTypeWithIsDependency.IsDependency;
+            }
             var dto = new RelationTypeDto
             {
                 Alias = entity.Alias,
                 ChildObjectType = entity.ChildObjectType,
                 Dual = entity.IsBidirectional,
-                IsDependency = entity.IsDependency,
+                IsDependency = isDependency,
                 Name = entity.Name,
                 ParentObjectType = entity.ParentObjectType,
                 UniqueId = entity.Key
@@ -47,6 +52,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
             return dto;
         }
+
+
 
         #endregion
     }

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RelationType : EntityBase, IRelationType
+    public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDependency
     {
         private string _name;
         private string _alias;
