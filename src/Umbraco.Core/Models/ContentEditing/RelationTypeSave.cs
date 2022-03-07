@@ -23,5 +23,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "childObjectType", IsRequired = false)]
         public Guid? ChildObjectType { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean indicating whether the RelationType should be returned in "Used by"-queries.
+        /// </summary>
+        [DataMember(Name = "isDependency", IsRequired = true)]
+        public bool IsDependency { get; set; }
     }
 }

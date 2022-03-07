@@ -63,6 +63,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
             builder.Services.AddUnique<IEntityService, EntityService>();
             builder.Services.AddUnique<IRelationService, RelationService>();
+            builder.Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             builder.Services.AddUnique<IMacroService, MacroService>();
             builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
             builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();

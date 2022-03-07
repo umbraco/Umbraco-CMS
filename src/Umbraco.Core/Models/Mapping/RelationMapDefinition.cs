@@ -30,6 +30,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.ChildObjectType = source.ChildObjectType;
             target.Id = source.Id;
             target.IsBidirectional = source.IsBidirectional;
+
+            if (source is IRelationTypeWithIsDependency sourceWithIsDependency)
+            {
+                target.IsDependency = sourceWithIsDependency.IsDependency;
+            }
             target.Key = source.Key;
             target.Name = source.Name;
             target.Alias = source.Alias;
@@ -74,6 +79,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.ChildObjectType = source.ChildObjectType;
             target.Id = source.Id.TryConvertTo<int>().Result;
             target.IsBidirectional = source.IsBidirectional;
+            if (target is IRelationTypeWithIsDependency targetWithIsDependency)
+            {
+                targetWithIsDependency.IsDependency = source.IsDependency;
+            }
+
             target.Key = source.Key;
             target.Name = source.Name;
             target.ParentObjectType = source.ParentObjectType;

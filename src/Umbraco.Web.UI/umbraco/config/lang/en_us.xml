@@ -809,6 +809,7 @@
     <key alias="new">New</key>
     <key alias="next">Next</key>
     <key alias="no">No</key>
+    <key alias="nodename">Node Name</key>
     <key alias="of">of</key>
     <key alias="off">Off</key>
     <key alias="ok">OK</key>
@@ -849,6 +850,7 @@
     <key alias="submit">Submit</key>
     <key alias="success">Success</key>
     <key alias="type">Type</key>
+    <key alias="typename">Type Name</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="under">under</key>
     <key alias="up">Up</key>
@@ -2470,6 +2472,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="parent">Parent</key>
     <key alias="child">Child</key>
     <key alias="count">Count</key>
+    <key alias="relation">Relation</key>
     <key alias="relations">Relations</key>
     <key alias="created">Created</key>
     <key alias="comment">Comment</key>
@@ -2477,6 +2480,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noRelations">No relations for this Relation Type</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
+    <key alias="isDependency">Is Dependency</key>
+    <key alias="dependency">Yes</key>
+    <key alias="noDependency">No</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Getting Started</key>
@@ -2547,13 +2553,26 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="references">
     <key alias="tabName">References</key>
     <key alias="DataTypeNoReferences">This Data Type has no references.</key>
-    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
-    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
-    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
-    <key alias="usedByProperties">Used by</key>
-    <key alias="labelUsedByDocuments">Used in Documents</key>
-    <key alias="labelUsedByMembers">Used in Members</key>
-    <key alias="labelUsedByMedia">Used in Media</key>
+    <key alias="itemHasNoReferences">This item has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Referenced by the following Document Types</key>
+    <key alias="labelUsedByMediaTypes">Referenced by the following Media Types</key>
+    <key alias="labelUsedByMemberTypes">Referenced by the following Member Types</key>
+    <key alias="usedByProperties">Referenced by</key>
+    <key alias="labelUsedByItems">Referenced by the following items</key>
+    <key alias="labelDependsOnThis">The following items depends on this</key>
+    <key alias="labelUsedByDocuments">Referenced by the following Documents</key>
+    <key alias="labelUsedByMembers">Referenced by the following Members</key>
+    <key alias="labelUsedByMedia">Referenced by the following Media</key>
+    <key alias="labelUsedItems">The following items are referenced</key>
+    <key alias="labelUsedDescendants">The following descending items are referenced</key>
+    <key alias="labelDependentDescendants">The following descending items has dependencies</key>
+    <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being referenced in a media item.</key>
+    <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being referenced in a content item.</key>
+    <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being referenced in a member.</key>
+    <key alias="deleteWarning">This item or its descendants is being referenced. Deletion can lead to broken links on your website.</key>
+    <key alias="unpublishWarning">This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
+    <key alias="deleteDisabledWarning">This item or its descendants is being referenced. Therefore, deletion has been disabled.</key>
+    <key alias="listViewDialogWarning">The following items you are trying to %0% are referenced by other content.</key>
   </area>
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Delete Saved Search</key>

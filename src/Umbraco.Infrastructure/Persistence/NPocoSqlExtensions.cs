@@ -72,7 +72,27 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, Sql<ISqlContext> values)
         {
-            return sql.WhereIn(field, values, false);
+            return WhereIn(sql, field, values, false, null);
+        }
+
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, Sql<ISqlContext> values, string tableAlias)
+        {
+            return sql.WhereIn(field, values, false, tableAlias);
+        }
+
+
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, Sql<ISqlContext> valuesSql)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            sql.Where(fieldName + " LIKE (" + valuesSql.SQL + ")", valuesSql.Arguments);
+            return sql;
+        }
+
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, string likeValue)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            sql.Where(fieldName + " LIKE ('" + likeValue + "')");
+            return sql;
         }
 
         /// <summary>
@@ -130,7 +150,12 @@ namespace Umbraco.Extensions
 
         private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql valuesSql, bool not)
         {
-            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            return WhereIn(sql, fieldSelector, valuesSql, not, null);
+        }
+
+        private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql valuesSql, bool not, string tableAlias)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector, tableAlias);
             sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + valuesSql.SQL + ")", valuesSql.Arguments);
             return sql;
         }
