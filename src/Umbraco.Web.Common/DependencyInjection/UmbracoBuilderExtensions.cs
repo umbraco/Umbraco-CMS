@@ -224,8 +224,12 @@ namespace Umbraco.Extensions
             IMvcBuilder mvcBuilder = builder.Services
                 .AddControllersWithViews();
 
-            FixForDotnet6Preview1(builder.Services);
-            mvcBuilder.AddRazorRuntimeCompilation();
+            if (builder.Config.IsRuntimeMode(RuntimeMode.Development))
+            {
+                FixForDotnet6Preview1(builder.Services);
+
+                mvcBuilder.AddRazorRuntimeCompilation();
+            }
 
             mvcBuilding?.Invoke(mvcBuilder);
 
