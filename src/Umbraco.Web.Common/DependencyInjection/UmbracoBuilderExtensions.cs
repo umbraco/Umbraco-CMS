@@ -226,11 +226,14 @@ public static partial class UmbracoBuilderExtensions
         // this will directly affect developers who need to call that themselves.
         // We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
         // But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
-        IMvcBuilder mvcBuilder = builder.Services
-            .AddControllersWithViews();
+        IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
 
-        FixForDotnet6Preview1(builder.Services);
-        mvcBuilder.AddRazorRuntimeCompilation();
+        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
+        {
+            FixForDotnet6Preview1(builder.Services);
+
+            mvcBuilder.AddRazorRuntimeCompilation();
+        }
 
         mvcBuilding?.Invoke(mvcBuilder);
 
