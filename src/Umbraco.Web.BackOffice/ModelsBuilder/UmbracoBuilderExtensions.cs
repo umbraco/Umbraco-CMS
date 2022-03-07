@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dashboards;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
         }
 
         /// <summary>
-        /// Adds the ModelsBuilder dashboard.
+        /// Adds the ModelsBuilder dashboard (dashboard and API controller are automatically added).
         /// </summary>
         public static IUmbracoBuilder AddModelsBuilderDashboard(this IUmbracoBuilder builder)
         {
@@ -41,7 +42,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
         }
 
         /// <summary>
-        /// Removes the ModelsBuilder dashboard.
+        /// Removes the ModelsBuilder dashboard (and API controller).
         /// </summary>
         public static IUmbracoBuilder RemoveModelsBuilderDashboard(this IUmbracoBuilder builder)
         {
@@ -54,6 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
         /// <summary>
         /// Can be called if using an external models builder to remove the embedded models builder controller features
         /// </summary>
+        [Obsolete("This doesn't remove the controller or dashboard, use RemoveModelsBuilderDashboard() instead.")]
         public static IUmbracoBuilder DisableModelsBuilderControllers(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<DisableModelsBuilderNotificationHandler>();

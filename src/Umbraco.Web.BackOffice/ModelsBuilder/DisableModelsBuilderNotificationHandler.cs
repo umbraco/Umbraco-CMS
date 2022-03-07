@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Notifications;
@@ -7,6 +8,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
     /// <summary>
     /// Used in conjunction with <see cref="UmbracoBuilderExtensions.DisableModelsBuilderControllers"/>
     /// </summary>
+    [Obsolete("Disabling controllers doesn't seem to work!")]
     internal class DisableModelsBuilderNotificationHandler : INotificationHandler<UmbracoApplicationStartingNotification>
     {
         private readonly UmbracoFeatures _features;
