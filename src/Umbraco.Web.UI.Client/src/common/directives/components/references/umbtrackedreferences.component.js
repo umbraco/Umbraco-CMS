@@ -29,7 +29,7 @@
         vm.hasReferences = false;
 
         vm.changeReferencesPageNumber = changeReferencesPageNumber;
-        vm.changeContentDescendantsPageNumber = changeDescendantsPageNumber;
+        vm.changeDescendantsPageNumber = changeDescendantsPageNumber;
 
         vm.$onInit = onInit;
 

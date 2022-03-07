@@ -13,54 +13,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class TrackedReferencesService : ITrackedReferencesService
-    {
-        private readonly ITrackedReferencesRepository _trackedReferencesRepository;
-        private readonly IScopeProvider _scopeProvider;
-        private readonly IEntityService _entityService;
-
-        public TrackedReferencesService(ITrackedReferencesRepository trackedReferencesRepository, IScopeProvider scopeProvider, IEntityService entityService)
-        {
-            _trackedReferencesRepository = trackedReferencesRepository;
-            _scopeProvider = scopeProvider;
-            _entityService = entityService;
-        }
-
-        public PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-        {
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            var items =  _trackedReferencesRepository.GetPagedRelationsForItems(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
-
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
-        }
-
-        public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-        {
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            var items =  _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
-
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
-        }
-
-        public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
-        {
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-
-            var descendants = _entityService.GetDescendants(parentId);
-
-            if (!descendants.Any())
-            {
-                return new PagedResult<RelationItem>(0, pageIndex, pageSize);
-            }
-            var ids = descendants.Select(x => x.Id).ToArray();
-
-
-            var items =  _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
-
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
-        }
-    }
-
     public class RelationService : RepositoryService, IRelationService
     {
         private readonly IEntityService _entityService;

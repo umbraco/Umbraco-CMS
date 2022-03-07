@@ -9,5 +9,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         IEnumerable<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency,out long totalRecords);
         IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency,out long totalRecords);
+        IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency,out long totalRecords);
     }
 }
