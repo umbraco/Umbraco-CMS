@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 using Umbraco.Extensions;
@@ -31,7 +31,7 @@ public static class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the ModelsBuilder dashboard.
+    /// Adds the ModelsBuilder dashboard (dashboard and API controller are automatically added).
     /// </summary>
     public static IUmbracoBuilder AddModelsBuilderDashboard(this IUmbracoBuilder builder)
     {
@@ -41,7 +41,7 @@ public static class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    /// Removes the ModelsBuilder dashboard.
+    /// Removes the ModelsBuilder dashboard (and API controller).
     /// </summary>
     public static IUmbracoBuilder RemoveModelsBuilderDashboard(this IUmbracoBuilder builder)
     {
@@ -52,11 +52,8 @@ public static class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    /// Can be called if using an external models builder to remove the embedded models builder controller features
+    /// Can be called if using an external models builder to remove the embedded models builder controller features.
     /// </summary>
     public static IUmbracoBuilder DisableModelsBuilderControllers(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<DisableModelsBuilderNotificationHandler>();
-        return builder;
-    }
+        => builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DisableModelsBuilderNotificationHandler>();
 }
