@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -69,15 +70,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // Gets the path of the parent with ",%" added
             var subsubQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .Select(syntax.GetConcat("[node].[path]", "',%'"))
-                //.Select<NodeDto>(x => SqlExtensionsStatics.SqlText<bool>(x.Path, path=> syntax.GetConcat(path, "',%'")))
                 .From<NodeDto>("node")
                 .Where<NodeDto>(x => x.NodeId == parentId, "node");
 
+
             // Gets the descendants of the parent node
-            var subQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
-                .Select<NodeDto>(x => x.NodeId)
-                .From<NodeDto>()
-                .WhereLike<NodeDto>(x => x.Path, subsubQuery);
+            Sql<ISqlContext> subQuery;
+
+            if (_scopeAccessor.AmbientScope.Database.DatabaseType.IsSqlCe())
+            {
+                // SqlCE do not support nested selects that returns a scalar. So we need to do this in multiple queries
+
+                var pathForLike = _scopeAccessor.AmbientScope.Database.ExecuteScalar<string>(subsubQuery);
+
+                subQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                    .Select<NodeDto>(x => x.NodeId)
+                    .From<NodeDto>()
+                    .WhereLike<NodeDto>(x => x.Path, pathForLike);
+            }
+            else
+            {
+                subQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                    .Select<NodeDto>(x => x.NodeId)
+                    .From<NodeDto>()
+                    .WhereLike<NodeDto>(x => x.Path, subsubQuery);
+            }
+
+
 
             // Get all relations where parent is in the sub query
             var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(

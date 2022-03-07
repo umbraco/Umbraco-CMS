@@ -88,6 +88,13 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, string likeValue)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            sql.Where(fieldName + " LIKE ('" + likeValue + "')");
+            return sql;
+        }
+
         /// <summary>
         /// Appends a WHERE NOT IN clause to the Sql statement.
         /// </summary>
