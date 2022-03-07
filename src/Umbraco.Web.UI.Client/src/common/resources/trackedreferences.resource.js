@@ -60,7 +60,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                             entityType: options.entityType,
                             pageNumber: options.pageNumber,
                             pageSize: options.pageSize,
-                            filterMustBeIsDependency: options.filterMustBeIsDependency,
+                            filterMustBeIsDependency: options.filterMustBeIsDependency
                         }
                     )),
                 "Failed to retrieve usages for entity of id " + id);
