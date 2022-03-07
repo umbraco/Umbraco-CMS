@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 using Umbraco.Extensions;
 
@@ -11,11 +14,40 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
     public static class UmbracoBuilderExtensions
     {
         /// <summary>
+        /// Adds the ModelsBuilder dashboard, but only when not in production mode.
+        /// </summary>
+        internal static IUmbracoBuilder TryAddModelsBuilderDashboard(this IUmbracoBuilder builder)
+        {
+            if (builder.Config.IsRuntimeMode(RuntimeMode.Production))
+            {
+                builder.RemoveModelsBuilderDashboard();
+            }
+            else
+            {
+                builder.AddModelsBuilderDashboard();
+            }
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds the ModelsBuilder dashboard.
         /// </summary>
         public static IUmbracoBuilder AddModelsBuilderDashboard(this IUmbracoBuilder builder)
         {
             builder.Services.AddUnique<IModelsBuilderDashboardProvider, ModelsBuilderDashboardProvider>();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Removes the ModelsBuilder dashboard.
+        /// </summary>
+        public static IUmbracoBuilder RemoveModelsBuilderDashboard(this IUmbracoBuilder builder)
+        {
+            builder.Dashboards().Remove<ModelsBuilderDashboard>();
+            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>().Remove<ModelsBuilderDashboardController>();
+
             return builder;
         }
 

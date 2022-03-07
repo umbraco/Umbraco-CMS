@@ -50,7 +50,7 @@ namespace Umbraco.Extensions
                 .AddHostedServices()
                 .AddNuCache()
                 .AddDistributedCache()
-                .AddModelsBuilderDashboard()
+                .TryAddModelsBuilderDashboard()
                 .AddUnattendedInstallInstallCreateUser()
                 .AddCoreNotifications()
                 .AddLogViewer()
