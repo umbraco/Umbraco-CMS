@@ -154,7 +154,7 @@
             formatUserPostData: function (displayModel) {
 
                 //create the save model from the display model
-                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message');
+                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message', 'key');
 
                 //make sure the userGroups are just a string array
                 var currGroups = saveModel.userGroups;
