@@ -9,31 +9,31 @@
 
         var vm = this;
 
-        vm.referencesTitle = this.hideNoneDependencies ? "The following items dependents on this" : "Referenced by the following items";
-        vm.referencedDescendantsTitle = this.hideNoneDependencies ? "The following descending items has dependencies" : "The following descending items are referenced";
-
-        localizationService.localize(this.hideNoneDependencies ? "references_labelDependentsOnThis" : "references_labelUsedByItems").then(function (value) {
-            vm.referencesTitle = value;
-        });
-
-        localizationService.localize(this.hideNoneDependencies ? "references_labelDependentDescendants" : "references_labelUsedDescendants").then(function (value) {
-            vm.referencedDescendantsTitle = value;
-        });
-
-        vm.descendantsOptions = {};
-        vm.descendantsOptions.filterMustBeIsDependency = this.hideNoneDependencies;
-        vm.hasReferencesInDescendants = false;
-
-        vm.referencesOptions = {};
-        vm.referencesOptions.filterMustBeIsDependency = this.hideNoneDependencies;
-        vm.hasReferences = false;
-
         vm.changeReferencesPageNumber = changeReferencesPageNumber;
         vm.changeDescendantsPageNumber = changeDescendantsPageNumber;
 
         vm.$onInit = onInit;
 
         function onInit() {
+
+            vm.referencesTitle = this.hideNoneDependencies ? "The following items depends on this" : "Referenced by the following items";
+            vm.referencedDescendantsTitle = this.hideNoneDependencies ? "The following descending items has dependencies" : "The following descending items are referenced";
+    
+            localizationService.localize(this.hideNoneDependencies ? "references_labelDependsOnThis" : "references_labelUsedByItems").then(function (value) {
+                vm.referencesTitle = value;
+            });
+    
+            localizationService.localize(this.hideNoneDependencies ? "references_labelDependentDescendants" : "references_labelUsedDescendants").then(function (value) {
+                vm.referencedDescendantsTitle = value;
+            });
+    
+            vm.descendantsOptions = {};
+            vm.descendantsOptions.filterMustBeIsDependency = this.hideNoneDependencies;
+            vm.hasReferencesInDescendants = false;
+
+            vm.referencesOptions = {};
+            vm.referencesOptions.filterMustBeIsDependency = this.hideNoneDependencies;
+            vm.hasReferences = false;
 
             this.loading = true;
             this.hideNoResult = this.hideNoResult || false;
@@ -114,7 +114,7 @@
             onLoadingComplete: "&?",
             compact: "<?",
             showDescendants: "<?",
-            hideNoneDependencies: "@?"
+            hideNoneDependencies: "<?"
         },
         controllerAs: 'vm',
         controller: umbTrackedReferencesController
