@@ -5,23 +5,19 @@ public static partial class Constants
     public static class Configuration
     {
         /// <summary>
-        ///     Case insensitive prefix for all configurations
+        /// Case insensitive prefix for all configurations.
         /// </summary>
         /// <remarks>
-        ///     ":" is used as marker for nested objects in json. E.g. "Umbraco:CMS:" = {"Umbraco":{"CMS":{....}}
+        /// ":" is used as marker for nested objects in JSON, e.g. <c>"Umbraco:CMS:" = {"Umbraco":{"CMS":{...}}</c>.
         /// </remarks>
         public const string ConfigPrefix = "Umbraco:CMS:";
-
         public const string ConfigContentPrefix = ConfigPrefix + "Content:";
         public const string ConfigContentNotificationsPrefix = ConfigContentPrefix + "Notifications:";
         public const string ConfigCorePrefix = ConfigPrefix + "Core:";
         public const string ConfigCustomErrorsPrefix = ConfigPrefix + "CustomErrors:";
         public const string ConfigGlobalPrefix = ConfigPrefix + "Global:";
         public const string ConfigGlobalId = ConfigGlobalPrefix + "Id";
-
-        public const string ConfigGlobalDistributedLockingMechanism =
-            ConfigGlobalPrefix + "DistributedLockingMechanism";
-
+        public const string ConfigGlobalDistributedLockingMechanism = ConfigGlobalPrefix + "DistributedLockingMechanism";
         public const string ConfigHostingPrefix = ConfigPrefix + "Hosting:";
         public const string ConfigModelsBuilderPrefix = ConfigPrefix + "ModelsBuilder:";
         public const string ConfigSecurityPrefix = ConfigPrefix + "Security:";
@@ -49,6 +45,7 @@ public static partial class Constants
         public const string ConfigPlugins = ConfigPrefix + "Plugins";
         public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";
         public const string ConfigRuntime = ConfigPrefix + "Runtime";
+        public const string ConfigRuntimeMode = ConfigRuntime + ":Mode";
         public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
         public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";
@@ -62,7 +59,7 @@ public static partial class Constants
         public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
         public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
-            public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
+        public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
 
         public static class NamedOptions
         {
