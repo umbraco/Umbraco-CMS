@@ -14,14 +14,18 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -182,6 +186,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
+                .AddExamine()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()
                 .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
@@ -197,11 +202,22 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Tests.Integration
                     mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
+
+                    // Ensures that if we were to register backoffice controllers as services
+                    // (which some folks downstream can/will/already do)
+                    // that container can still be built.
+                    mvcBuilder.AddControllersAsServicesWithoutChangingActivator();
                 })
                 .AddWebServer()
                 .AddWebsite()
                 .AddTestServices(TestHelper) // This is the important one!
                 .Build();
+
+            // These are dependencies for LogViewerController.
+            // They are added when IUmbracoBuilder.AddBackOffice is called
+            // note that here we use IUmbracoBuilder.AddBackOfficeCore instead for some reason.
+            services.AddSingleton(Mock.Of<ILogViewer>());
+            services.AddSingleton(Mock.Of<ILogLevelLoader>());
         }
 
         public override void Configure(IApplicationBuilder app)

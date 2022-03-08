@@ -55,8 +55,7 @@ namespace Umbraco.Extensions
                 .AddCoreNotifications()
                 .AddLogViewer()
                 .AddExamine()
-                .AddExamineIndexes()
-                .AddControllersWithAmbiguousConstructors();
+                .AddExamineIndexes();
 
         public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {
@@ -118,6 +117,8 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IIconService, IconService>();
             builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
             builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
+
+            builder.AddControllersWithAmbiguousConstructors();
 
             return builder;
         }
