@@ -821,8 +821,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 defaultCulture);
 
             //get the updated model
-            var display = mapToDisplay(contentItem.PersistedContent);
-            bool isBlueprint = display.IsBlueprint;
+            bool isBlueprint = contentItem.PersistedContent.Blueprint;
 
             var contentSavedHeader = isBlueprint ? "editBlueprintSavedHeader" : "editContentSavedHeader";
             var contentSavedText = isBlueprint ? "editBlueprintSavedText" : "editContentSavedText";
@@ -921,6 +920,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            // We have to map do display after we've actually saved the content, otherwise we'll miss information that's set when saving content, such as ID
+            var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
