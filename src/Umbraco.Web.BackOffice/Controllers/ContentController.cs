@@ -2201,7 +2201,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else // set: update if different
             {
                 ITemplate template = _fileService.GetTemplate(contentSave.TemplateAlias);
-                if (template == null)
+                if (template is null)
                 {
                     // ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
                     _logger.LogWarning("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
