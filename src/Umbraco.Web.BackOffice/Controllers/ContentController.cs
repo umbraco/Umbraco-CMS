@@ -922,6 +922,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     throw new ArgumentOutOfRangeException();
             }
 
+            // We have to map do display after we've actually saved the content, otherwise we'll miss information that's set when saving content, such as ID
+            display = mapToDisplay(contentItem.PersistedContent);
+
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
             foreach (var v in display.Variants.Where(x => x.Language != null))
