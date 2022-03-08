@@ -502,24 +502,20 @@ namespace Umbraco.Cms.Core.Routing
             var redirect = false;
             var valid = false;
             IPublishedContent internalRedirectNode = null;
-            var internalRedirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
+            var internalRedirect = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId);
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
-            if (internalRedirectId > 0)
+            // try and get the redirect node from a legacy integer ID
+            if (internalRedirect is int internalRedirectId)
             {
-                // try and get the redirect node from a legacy integer ID
                 valid = true;
                 internalRedirectNode = umbracoContext.Content.GetById(internalRedirectId);
             }
-            else
+            // try and get the redirect node from a UDI Guid
+            else if (internalRedirect is GuidUdi internalRedirectUdi)
             {
-                GuidUdi udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId);
-                if (udiInternalRedirectId != null)
-                {
-                    // try and get the redirect node from a UDI Guid
-                    valid = true;
-                    internalRedirectNode = umbracoContext.Content.GetById(udiInternalRedirectId.Guid);
-                }
+                valid = true;
+                internalRedirectNode = umbracoContext.Content.GetById(internalRedirectUdi.Guid);
             }
 
             if (valid == false)
@@ -536,7 +532,7 @@ namespace Umbraco.Cms.Core.Routing
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
                     request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
             }
-            else if (internalRedirectId == request.PublishedContent.Id)
+            else if (internalRedirectNode.Id == request.PublishedContent.Id)
             {
                 // redirect to self
                 _logger.LogDebug("FollowInternalRedirects: Redirecting to self, ignore");
@@ -556,7 +552,8 @@ namespace Umbraco.Cms.Core.Routing
                 }
 
                 redirect = true;
-                _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+
+                _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectNode.Id);
             }
 
             return redirect;
@@ -682,6 +679,7 @@ namespace Umbraco.Cms.Core.Routing
             if (templateId.HasValue == false || templateId.Value == default)
             {
                 _logger.LogDebug("GetTemplateModel: No template.");
+
                 return null;
             }
 
@@ -693,12 +691,14 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             ITemplate template = _fileService.GetTemplate(templateId.Value);
+
             if (template == null)
             {
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
             }
 
             _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+
             return template;
         }
 
@@ -719,20 +719,24 @@ namespace Umbraco.Cms.Core.Routing
                 return;
             }
 
-            var redirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect, defaultValue: -1);
             var redirectUrl = "#";
-            if (redirectId > 0)
+
+            var redirect = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect);
+
+            // might be an int Id from a legacy picker
+            if (redirect is int redirectId)
             {
                 redirectUrl = _publishedUrlProvider.GetUrl(redirectId);
             }
-            else
+            // might be a UDI from a content picker / MNTP
+            else if (redirect is GuidUdi redirectUdi)
             {
-                // might be a UDI instead of an int Id
-                GuidUdi redirectUdi = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.Redirect);
-                if (redirectUdi != null)
-                {
-                    redirectUrl = _publishedUrlProvider.GetUrl(redirectUdi.Guid);
-                }
+                redirectUrl = _publishedUrlProvider.GetUrl(redirectUdi.Guid);
+            }
+            // might be a single URL picker
+            else if (redirect is Link redirectLink)
+            {
+                redirectUrl = redirectLink.Url;
             }
 
             if (redirectUrl != "#")
