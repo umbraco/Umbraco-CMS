@@ -71,9 +71,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _trees.Remove(treeDefinition);
         }
 
-        public void RemoveTreeController<TController>()
-            where TController : TreeControllerBase
-            => RemoveTreeController(typeof(TController));
+        public void RemoveTreeController<T>()
+            where T : TreeControllerBase
+            => RemoveTreeController(typeof(T));
 
         // TODO: Change parameter name to "controllerType" in a major version to make it consistent with AddTreeController method.
         public void RemoveTreeController(Type type)
