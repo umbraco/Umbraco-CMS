@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             {
                 var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber;
 
-                if (inter == null)
+                if (string.IsNullOrWhiteSpace(inter?.ToString()))
                 {
                     return maxNumber == 1 ? null : Enumerable.Empty<Link>();
                 }
@@ -59,12 +59,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 var links = new List<Link>();
                 var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
                 var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-
-                if (dtos == null)
-                {
-                    return maxNumber == 1 ? null : Enumerable.Empty<Link>();
-                }
-
                 foreach (var dto in dtos)
                 {
                     var type = LinkType.External;
