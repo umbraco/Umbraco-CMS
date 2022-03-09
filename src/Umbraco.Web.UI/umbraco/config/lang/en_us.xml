@@ -2559,12 +2559,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelUsedByMemberTypes">Referenced by the following Member Types</key>
     <key alias="usedByProperties">Referenced by</key>
     <key alias="labelUsedByItems">Referenced by the following items</key>
-    <key alias="labelDependsOnThis">The following items depends on this</key>
+    <key alias="labelDependsOnThis">The following items depend on this</key>
     <key alias="labelUsedByDocuments">Referenced by the following Documents</key>
     <key alias="labelUsedByMembers">Referenced by the following Members</key>
     <key alias="labelUsedByMedia">Referenced by the following Media</key>
     <key alias="labelUsedItems">The following items are referenced</key>
-    <key alias="labelUsedDescendants">The following descending items are referenced</key>
+    <key alias="labelUsedDescendants">The following descendant items have dependencies</key>
     <key alias="labelDependentDescendants">The following descending items has dependencies</key>
     <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being referenced in a media item.</key>
     <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being referenced in a content item.</key>
