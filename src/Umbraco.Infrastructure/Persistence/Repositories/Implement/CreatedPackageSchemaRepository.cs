@@ -263,11 +263,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 var finalPackagePath = Path.Combine(directoryName, fileName);
 
-                // Clean existing XML and ZIP files
+                // Clean existing files
                 foreach (var packagePath in new[]
                 {
-                    Path.ChangeExtension(finalPackagePath, "xml"),
-                    Path.ChangeExtension(finalPackagePath, "zip")
+                    definition.PackagePath,
+                    finalPackagePath
                 })
                 {
                     if (File.Exists(packagePath))
