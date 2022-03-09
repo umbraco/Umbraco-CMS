@@ -62,6 +62,19 @@ namespace Umbraco.Extensions
             return username;
         }
 
+        public static string GetEmail(this IIdentity identity)
+        {
+            if (identity == null) throw new ArgumentNullException(nameof(identity));
+
+            string email = null;
+            if (identity is ClaimsIdentity claimsIdentity)
+            {
+                email = claimsIdentity.FindFirstValue(ClaimTypes.Email);
+            }
+
+            return email;
+        }
+
         /// <summary>
         /// Returns the first claim value found in the <see cref="ClaimsIdentity"/> for the given claimType
         /// </summary>
@@ -119,7 +132,7 @@ namespace Umbraco.Extensions
                 }
             }
 
-            verifiedIdentity =  identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
+            verifiedIdentity = identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
             return true;
         }
 

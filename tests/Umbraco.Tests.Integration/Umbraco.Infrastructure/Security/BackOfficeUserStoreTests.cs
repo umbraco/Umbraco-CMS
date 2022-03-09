@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
     {
         private IUserService UserService => GetRequiredService<IUserService>();
         private IEntityService EntityService => GetRequiredService<IEntityService>();
-        private IExternalLoginService ExternalLoginService => GetRequiredService<IExternalLoginService>();
+        private IExternalLoginWithKeyService ExternalLoginService => GetRequiredService<IExternalLoginWithKeyService>();
         private IUmbracoMapper UmbracoMapper => GetRequiredService<IUmbracoMapper>();
         private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
 

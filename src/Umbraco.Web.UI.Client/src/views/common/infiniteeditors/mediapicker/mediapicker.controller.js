@@ -103,40 +103,43 @@ angular.module("umbraco")
                 $scope.target = dialogOptions.currentTarget;
             }
 
-            function setTitle() {
-                if (!$scope.model.title) {
-                    localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
-                        .then(function (data) {
-                            $scope.model.title = data[0];
+          function setTitle(data) {
+            if (!$scope.model.title)
+              $scope.model.title = data[0];        
+          }
 
-
-                            vm.navigation = [{
-                                "alias": "empty",
-                                "name": data[0],
-                                "icon": "icon-umb-media",
-                                "active": true,
-                                "view": ""
-                            }];
-
-                            if(vm.clipboardItems) {
-                                vm.navigation.push({
-                                    "alias": "clipboard",
-                                    "name": data[1],
-                                    "icon": "icon-paste-in",
-                                    "view": "",
-                                    "disabled": vm.clipboardItems.length === 0
-                                });
-                            }
-
-                            vm.activeTab = vm.navigation[0];
-                        });
-
-                }
+          function setNavigation(data) {
+            if (!vm.navigation.length) { 
+            vm.navigation = [{
+              "alias": "empty",
+              "name": data[0],
+              "icon": "icon-umb-media",
+              "active": true,
+              "view": ""
+            }];
+            if (vm.clipboardItems) {
+              vm.navigation.push({
+                "alias": "clipboard",
+                "name": data[1],
+                "icon": "icon-paste-in",
+                "view": "",
+                "disabled": vm.clipboardItems.length === 0
+              });
             }
+              vm.activeTab = vm.navigation[0];
+            }       
+          }
 
-            function onInit() {
 
-                setTitle();
+          function onInit() {
+
+
+              localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
+                .then(function (localizationResult) {
+                  setTitle(localizationResult);
+                  setNavigation(localizationResult);
+                });
+               
 
                 userService.getCurrentUser().then(function (userData) {
                     userStartNodes = userData.startMediaIds;
@@ -425,9 +428,9 @@ angular.module("umbraco")
             };
 
             function onNavigationChanged(tab) {
-                vm.activeTab.active = false;
-                vm.activeTab = tab;
-                vm.activeTab.active = true;
+              vm.activeTab.active = false;
+              vm.activeTab = tab;
+              vm.activeTab.active = true;
             };
 
             function clickClearClipboard() {

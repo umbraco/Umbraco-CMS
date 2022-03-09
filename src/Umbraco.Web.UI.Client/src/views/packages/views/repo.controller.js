@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
+    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, localizationService) {
 
         var vm = this;
 
@@ -24,6 +24,8 @@
         vm.closeLightbox = closeLightbox;
         vm.search = search;
         vm.installCompleted = false;
+        vm.highlightedPackageCollections = [];
+        vm.labels = {};
 
         var defaultSort = "Latest";
         var currSort = defaultSort;
@@ -46,28 +48,38 @@
         function init() {
 
             vm.loading = true;
+            localizationService.localizeMany(["packager_packagesPopular", "packager_packagesPromoted"])
+                .then(function (labels) {
+                    vm.labels.popularPackages = labels[0];
+                    vm.labels.promotedPackages = labels[1];
 
-            $q.all([
-                ourPackageRepositoryResource.getCategories()
-                    .then(function (cats) {
-                        vm.categories = cats.filter(function (cat) {
-                            return cat.name !== "Umbraco Pro";
+                    var popularPackages, promotedPackages;
+                    $q.all([
+                        ourPackageRepositoryResource.getCategories()
+                            .then(function (cats) {
+                                vm.categories = cats.filter(function (cat) {
+                                    return cat.name !== "Umbraco Pro";
+                                });
+                            }),
+                        ourPackageRepositoryResource.getPopular(10)
+                            .then(function (pack) {
+                                popularPackages = { title: vm.labels.popularPackages, packages: pack.packages };
+                            }),
+                        ourPackageRepositoryResource.getPromoted(20)
+                            .then(function (pack) {
+                                promotedPackages = { title: vm.labels.promotedPackages, packages: pack.packages };
+                            }),
+                        ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
+                            .then(function (pack) {
+                                vm.packages = pack.packages;
+                                vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
+                            })
+                        ])
+                        .then(function () {
+                            vm.highlightedPackageCollections = [popularPackages, promotedPackages];
+                            vm.loading = false;
                         });
-                    }),
-                ourPackageRepositoryResource.getPopular(8)
-                    .then(function (pack) {
-                        vm.popular = pack.packages;
-                    }),
-                ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
-                    .then(function (pack) {
-                        vm.packages = pack.packages;
-                        vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
-                    })
-            ])
-                .then(function () {
-                    vm.loading = false;
                 });
-
         }
 
         function selectCategory(selectedCategory, categories) {
@@ -96,10 +108,15 @@
 
             currSort = defaultSort;
 
+            var popularPackages, promotedPackages;
             $q.all([
-                ourPackageRepositoryResource.getPopular(8, searchCategory)
+                ourPackageRepositoryResource.getPopular(10, searchCategory)
                     .then(function (pack) {
-                        vm.popular = pack.packages;
+                        popularPackages = { title: vm.labels.popularPackages, packages: pack.packages };
+                    }),
+                ourPackageRepositoryResource.getPromoted(20, searchCategory)
+                    .then(function (pack) {
+                        promotedPackages = { title: vm.labels.promotedPackages, packages: pack.packages };
                     }),
                 ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort, searchCategory, vm.searchQuery)
                     .then(function (pack) {
@@ -109,6 +126,7 @@
                     })
                 ])
                 .then(function () {
+                    vm.highlightedPackageCollections = [popularPackages, promotedPackages];
                     vm.loading = false;
                 });
         }

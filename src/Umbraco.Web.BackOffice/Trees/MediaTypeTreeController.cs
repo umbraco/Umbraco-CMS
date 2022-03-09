@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder, dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
                         // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.

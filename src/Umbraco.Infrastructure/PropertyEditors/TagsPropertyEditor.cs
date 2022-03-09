@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 if (editorValue.Value is JArray json)
                 {
-                    return json.Select(x => x.Value<string>());
+                    return json.HasValues ? json.Select(x => x.Value<string>()) : null;
                 }
 
                 if (string.IsNullOrWhiteSpace(value) == false)

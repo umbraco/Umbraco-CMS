@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bogus;
 using Examine;
+using Lucene.Net.Util;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -44,6 +46,43 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                 valueSet.Values["path"] = new List<object> { "-1,999," + valueSet.Id };
                 index.IndexItems(new[] { valueSet });
                 Assert.AreEqual(1, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
+            }
+        }
+
+        [Test]
+        public void GivenIndexingDocument_WhenRichTextPropertyData_CanStoreImmenseFields()
+        {
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out _, out ContentValueSetBuilder contentValueSetBuilder, null))
+            {
+                index.CreateIndex();
+
+                ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+                contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Ntext)
+                {
+                    Alias = "rte",
+                    Name = "RichText",
+                    PropertyEditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.TinyMce
+                });
+
+                Content content = ContentBuilder.CreateBasicContent(contentType);
+                content.Id = 555;
+                content.Path = "-1,555";
+
+                var luceneStringFieldMaxLength = ByteBlockPool.BYTE_BLOCK_SIZE - 2;
+                var faker = new Faker();
+                var immenseText = faker.Random.String(length: luceneStringFieldMaxLength + 10);
+
+                content.Properties["rte"].SetValue(immenseText);
+
+                IEnumerable<ValueSet> valueSet = contentValueSetBuilder.GetValueSets(content);
+                index.IndexItems(valueSet);
+
+                ISearchResults results = index.Searcher.CreateQuery().Id(555).Execute();
+                ISearchResult result = results.First();
+
+                var key = $"{UmbracoExamineFieldNames.RawFieldPrefix}rte";
+                Assert.IsTrue(result.Values.ContainsKey(key));
+                Assert.Greater(result.Values[key].Length, luceneStringFieldMaxLength);
             }
         }
 

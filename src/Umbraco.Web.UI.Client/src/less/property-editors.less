@@ -526,7 +526,9 @@
     position: absolute;
     bottom: -20px;
     height: 20px;
+    min-width: 100px;
     right: 0;
+    text-align: right;
     z-index: @zindexCropperOverlay - 1;
     font-size: 12px;
     opacity: 0.7;
@@ -566,12 +568,17 @@
     }
 }
 
-.umb-cropper .crop-controls-wrapper__icon-left {
-    margin-right: 10px;
-
-}
+.umb-cropper .crop-controls-wrapper__icon-left,
 .umb-cropper .crop-controls-wrapper__icon-right {
-    margin-left: 10px;
+    color: @gray-3;
+}
+
+.umb-cropper .crop-controls-wrapper__icon-left {
+    margin-right: 15px;
+}
+
+.umb-cropper .crop-controls-wrapper__icon-right {
+    margin-left: 15px;
     font-size: 22px;
 }
 
@@ -821,11 +828,15 @@
 .umb-fileupload {
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    border: 1px solid @inputBorder;
+    box-sizing: border-box;
+    width: 100%;
+    .umb-property-editor--limit-width();
 }
 
 .umb-fileupload .preview {
   border-radius: 5px;
-  border: 1px solid @gray-6;
   padding: 3px;
   background: @gray-9;
   float: left;

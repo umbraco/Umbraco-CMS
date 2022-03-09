@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture and Hostnames</key>
+    <key alias="assigndomain">Culture and Hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
@@ -17,10 +17,10 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Empty recycle bin</key>
+    <key alias="emptyrecyclebin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="importDocumentType">Import Document Type</key>
+    <key alias="importdocumenttype">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>
     <key alias="logout">Exit</key>
@@ -81,6 +81,7 @@
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
+    <key alias="notify">Allow access to setup notifications for content nodes</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Content</key>
@@ -170,6 +171,8 @@
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
     <key alias="custom">%0%</key>
+    <key alias="contentversionpreventcleanup">Cleanup disabled for version: %0%</key>
+    <key alias="contentversionenablecleanup">Cleanup enabled for version: %0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -183,6 +186,8 @@
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
     <key alias="smallCustom">Custom</key>
+    <key alias="smallContentVersionPreventCleanup">Save</key>
+    <key alias="smallContentVersionEnableCleanup">Save</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="codefile">
@@ -254,6 +259,7 @@
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Unpublished</key>
+    <key alias="notCreated">Not created</key>
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
@@ -326,6 +332,7 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
     <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
@@ -558,6 +565,8 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -1284,6 +1293,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoResultsDescription">Please try searching for another package or browse through the categories
     </key>
     <key alias="packagesPopular">Popular</key>
+    <key alias="packagesPromoted">Promoted</key>
     <key alias="packagesNew">New releases</key>
     <key alias="packageHas">has</key>
     <key alias="packageKarmaPoints">karma points</key>
@@ -1498,6 +1508,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
+    <key alias="folderUploadNotAllowed">This file is being uploaded as part of a folder, but creating a new folder is not allowed here</key>	
+    <key alias="folderCreationNotAllowed">Creating a new folder is not allowed here</key>
     <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
@@ -1515,6 +1527,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and visible on the website</key>
+    <key alias="editBlueprintSavedHeader">Content Template saved</key>
+    <key alias="editBlueprintSavedText">Changes have been successfully saved</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
@@ -1831,11 +1845,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="usingEditor">using this editor will get updated with the new settings.</key>
     <key alias="historyCleanupHeading">History cleanup</key>
-    <key alias="historyCleanupDescription">Allow override the global settings for when history versions are removed.</key>
+    <key alias="historyCleanupDescription">Allow overriding the global history cleanup settings.</key>
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled">NOTE! The cleanup of historically content versions is disabled globally. These settings will not take effect before it is enabled.</key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2282,6 +2296,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
+    <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is set to <strong>%0%</strong>.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultFalse">The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set.</key>
     <key alias="clickJackingCheckHeaderFound">
       <![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
     <key alias="clickJackingCheckHeaderNotFound">
@@ -2609,9 +2625,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
         Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
     ]]>
     </key>
-    <key alias="bulletPointThree">
+    <key alias="bulletPointTutorials">
       <![CDATA[
-        Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutorial videos</a> (some are free, some require a subscription)
+        Watch our free <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
     ]]>
     </key>
     <key alias="bulletPointFour">

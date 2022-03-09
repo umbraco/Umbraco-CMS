@@ -29,7 +29,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddImageSharp(options =>
             {
-                // The configuration is set using ImageSharpConfigurationOptions
+                // options.Configuration is set using ImageSharpConfigurationOptions below
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
                 options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
@@ -72,17 +72,9 @@ namespace Umbraco.Extensions
                 };
             })
                 .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
-                // We need to add CropWebProcessor before ResizeWebProcessor (until https://github.com/SixLabors/ImageSharp.Web/issues/182 is fixed)
-                .RemoveProcessor<ResizeWebProcessor>()
-                .RemoveProcessor<FormatWebProcessor>()
-                .RemoveProcessor<BackgroundColorWebProcessor>()
-                .RemoveProcessor<JpegQualityWebProcessor>()
-                .AddProcessor<CropWebProcessor>()
-                .AddProcessor<ResizeWebProcessor>()
-                .AddProcessor<FormatWebProcessor>()
-                .AddProcessor<BackgroundColorWebProcessor>()
-                .AddProcessor<JpegQualityWebProcessor>();
+                .AddProcessor<CropWebProcessor>();
 
+            // Configure middleware to use the registered/shared ImageSharp configuration
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
 
             return builder.Services;

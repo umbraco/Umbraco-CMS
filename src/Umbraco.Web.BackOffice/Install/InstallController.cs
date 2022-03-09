@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 
@@ -71,9 +72,6 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             // TODO: Update for package migrations
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
-                // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
-                _runtimeMinifier.Reset();
-
                 var authResult = await this.AuthenticateBackOfficeAsync();
 
                 if (!authResult.Succeeded)
@@ -101,6 +99,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [IgnoreFromNotFoundSelectorPolicy]
         public ActionResult Redirect()
         {
             var uri = HttpContext.Request.GetEncodedUrl();

@@ -713,7 +713,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _userGroupRepository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 scope.Complete();
 
-                var assigned = permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
+                var assigned = permissions?.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
                 var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
                 scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
             }

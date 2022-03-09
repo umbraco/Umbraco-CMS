@@ -166,7 +166,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
-            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>();
+            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
+                new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>())
+            );
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
@@ -216,6 +218,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<IMainDomKeyGenerator, DefaultMainDomKeyGenerator>();
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
@@ -227,15 +230,20 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
+                var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
+
+                if (globalSettings.Value.MainDomLock == "FileSystemMainDomLock")
+                {
+                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
+                }
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(
-                            loggerFactory.CreateLogger<SqlMainDomLock>(),
                             loggerFactory,
                             globalSettings,
                             connectionStrings,
                             dbCreator,
-                            hostingEnvironment,
+                            mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
                             npocoMappers)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
@@ -266,15 +274,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
+            builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
             builder.SetLogViewer<SerilogJsonLogViewer>();
             builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
                 factory.GetRequiredService<ILogViewerConfig>(),
                 factory.GetRequiredService<ILoggingConfiguration>(),
+                factory.GetRequiredService<ILogLevelLoader>(),
                 Log.Logger));
 
             return builder;
         }
-
 
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {

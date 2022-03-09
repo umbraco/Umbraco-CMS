@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
-            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);            
+            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
             // now we need to do some public access checks
             umbracoRouteValues = await _publicAccessRequestHandler.RewriteForPublishedContentAccessAsync(httpContext, umbracoRouteValues);
@@ -201,23 +201,23 @@ namespace Umbraco.Cms.Web.Website.Routing
                 throw new ArgumentNullException(nameof(httpContext));
             }
 
-            // if it is a POST/GET then a value must be in the request
-            if (!httpContext.Request.Query.TryGetValue("ufprt", out StringValues encodedVal)
-                && (!httpContext.Request.HasFormContentType || !httpContext.Request.Form.TryGetValue("ufprt", out encodedVal)))
+            // if it is a POST/GET then a `ufprt` value must be in the request
+            var ufprt = httpContext.Request.GetUfprt();
+            if (string.IsNullOrWhiteSpace(ufprt))
             {
                 return null;
             }
 
             if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(
                 _dataProtectionProvider,
-                encodedVal,
-                out IDictionary<string, string> decodedParts))
+                ufprt,
+                out IDictionary<string, string> decodedUfprt))
             {
                 return null;
             }
 
             // Get all route values that are not the default ones and add them separately so they eventually get to action parameters
-            foreach (KeyValuePair<string, string> item in decodedParts.Where(x => ReservedAdditionalKeys.AllKeys.Contains(x.Key) == false))
+            foreach (KeyValuePair<string, string> item in decodedUfprt.Where(x => ReservedAdditionalKeys.AllKeys.Contains(x.Key) == false))
             {
                 values[item.Key] = item.Value;
             }
@@ -225,9 +225,9 @@ namespace Umbraco.Cms.Web.Website.Routing
             // return the proxy info without the surface id... could be a local controller.
             return new PostedDataProxyInfo
             {
-                ControllerName = WebUtility.UrlDecode(decodedParts.First(x => x.Key == ReservedAdditionalKeys.Controller).Value),
-                ActionName = WebUtility.UrlDecode(decodedParts.First(x => x.Key == ReservedAdditionalKeys.Action).Value),
-                Area = WebUtility.UrlDecode(decodedParts.First(x => x.Key == ReservedAdditionalKeys.Area).Value),
+                ControllerName = WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Controller).Value),
+                ActionName = WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Action).Value),
+                Area = WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Area).Value),
             };
         }
 
