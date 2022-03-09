@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Events;
@@ -8,6 +10,8 @@ using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees
@@ -16,21 +20,46 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [CoreTree]
     public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
     {
+        private readonly IMemberTypeService _memberTypeService;
+
         public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
         protected MemberTypeAndGroupTreeControllerBase(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IMemberTypeService memberTypeService)
             : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             MenuItemCollectionFactory = menuItemCollectionFactory;
+
+            _memberTypeService = memberTypeService;
+        }
+
+        [Obsolete("Use ctor injecting IMemberTypeService")]
+        protected MemberTypeAndGroupTreeControllerBase(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEventAggregator eventAggregator)
+            : this(
+                localizedTextService,
+                umbracoApiControllerTypeCollection,
+                menuItemCollectionFactory,
+                eventAggregator,
+                StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
+        {
         }
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
+
+            // if the request is for folders only then just return
+            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"].ToString() == "1")
+                return nodes;
+
             nodes.AddRange(GetTreeNodesFromService(id, queryStrings));
             return nodes;
         }
@@ -48,7 +77,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             else
             {
-                //delete member type/group
+                var memberType = _memberTypeService.Get(int.Parse(id));
+                if (memberType != null)
+                {
+                    menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
+                }
+
+                // delete member type/group
                 menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
             }
 
