@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
@@ -21,6 +23,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly BlockEditorConverter _blockConverter;
         private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
         private readonly ModelsBuilderSettings _modelsBuilderSettings;
+
+        [Obsolete("Use ctor injecting ModelsBuilderSettings")]
+        public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
+            : this(proflog, blockConverter,StaticServiceProvider.Instance.GetRequiredService<IOptions<ModelsBuilderSettings>>())
+        {
+        }
+
         public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IOptions<ModelsBuilderSettings> modelsBuilderOptions)
         {
             _proflog = proflog;
