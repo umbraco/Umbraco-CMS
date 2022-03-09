@@ -23,7 +23,6 @@ namespace Umbraco.Cms.Tests.Integration.Extensions
 
             foreach (Type controller in feature.Controllers.Select(c => c.AsType()))
             {
-                Console.WriteLine(controller.Name);
                 builder.Services.TryAddTransient(controller, controller);
             }
 
