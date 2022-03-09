@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -339,6 +340,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
+        [OutgoingEditorModelEvent]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
