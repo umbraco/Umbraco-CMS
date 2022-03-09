@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             var items =  _trackedReferencesRepository.GetPagedRelationsForItems(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
 
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex+1, pageSize) { Items = items };
         }
 
         public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             var items =  _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
 
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex+1, pageSize) { Items = items };
         }
 
         public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 pageSize,
                 filterMustBeIsDependency,
                 out var totalItems);
-            return new PagedResult<RelationItem>(totalItems, pageIndex, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex+1, pageSize) { Items = items };
         }
     }
 }
