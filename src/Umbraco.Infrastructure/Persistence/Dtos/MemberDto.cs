@@ -55,7 +55,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("isLockedOut")]
         [Constraint(Default = 0)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public bool IsLockedOut { get; set; }
+
+        [Column("isApproved")]
+        [Constraint(Default = 1)]
+        public bool IsApproved { get; set; }
 
         [Column("lastLoginDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
