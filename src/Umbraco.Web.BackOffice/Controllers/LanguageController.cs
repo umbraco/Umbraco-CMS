@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // create it (creating a new language cannot create a fallback cycle)
                 var newLang = new Cms.Core.Models.Language(_globalSettings, culture.Name)
                 {
-                    CultureName = culture.DisplayName,
+                    CultureName = culture.EnglishName,
                     IsDefault = language.IsDefault,
                     IsMandatory = language.IsMandatory,
                     FallbackLanguageId = language.FallbackLanguageId
