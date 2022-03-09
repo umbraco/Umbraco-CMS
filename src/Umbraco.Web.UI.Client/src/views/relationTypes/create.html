@@ -55,6 +55,34 @@
             <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
           </select>
         </umb-control-group>
+
+        <!-- IsDependency -->
+
+        <umb-control-group label="@relationType_isDependency">
+          <p class="sr-only" tabindex="0">
+            <localize key="relationType_direction"></localize>
+          </p>
+          <ul class="unstyled">
+            <li>
+              <label class="radio" for="dependency">
+                <umb-radiobutton input-id="dependency"
+                                 label-key="relationType_dependency"
+                                 model="vm.relationType.isDependency" name="relationType-isdependency" required="true"
+                                 value="true">
+                </umb-radiobutton>
+              </label>
+            </li>
+            <li>
+              <label class="radio" for="nodependency">
+                <umb-radiobutton input-id="nodependency"
+                                 label-key="relationType_noDependency"
+                                 model="vm.relationType.isDependency" name="relationType-isdependency" required="true"
+                                 value="false">
+                </umb-radiobutton>
+              </label>
+            </li>
+          </ul>
+        </umb-control-group>
       </div>
     </div>
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">

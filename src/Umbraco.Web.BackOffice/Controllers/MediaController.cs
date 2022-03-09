@@ -33,12 +33,9 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Authorization;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -1085,7 +1082,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return new ActionResult<IMedia>(toMove);
         }
 
-
+        [Obsolete("Please use TrackedReferencesController.GetPagedReferences() instead. Scheduled for removal in V11.")]
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)

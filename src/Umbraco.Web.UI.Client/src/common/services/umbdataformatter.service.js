@@ -461,6 +461,7 @@
                     alias: relationType.alias,
                     key: relationType.key,
                     isBidirectional: relationType.isBidirectional,
+                    isDependency: relationType.isDependency,
                     parentObjectType: relationType.parentObjectType,
                     childObjectType: relationType.childObjectType
                 };
