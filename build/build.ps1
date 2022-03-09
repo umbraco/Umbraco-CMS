@@ -190,14 +190,14 @@
 
     # remove extra files
     $webAppBin = "$($this.BuildTemp)\WebApp\bin"
-    $excludeDirs = @("$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
+    $excludeDirs = @("$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\umbraco","$($webAppBin)\wwwroot")
     $excludeFiles = @("$($webAppBin)\appsettings.*","$($webAppBin)\*.deps.json","$($webAppBin)\*.exe","$($webAppBin)\*.config","$($webAppBin)\*.runtimeconfig.json")
     $this.RemoveDirectory($excludeDirs)
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
-    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib","$($this.BuildTemp)\WebApp\umbraco\Data","$($this.BuildTemp)\WebApp\umbraco\Logs")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\Views", "*", "$($this.BuildTemp)\WebApp\Views")
     Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI\appsettings.json" "$($this.BuildTemp)\WebApp"

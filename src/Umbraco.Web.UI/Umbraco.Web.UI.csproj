@@ -3,12 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
-    <DefaultItemExcludes>
-      $(DefaultItemExcludes);
-      umbraco/Data/**;
-      umbraco/Logs/**;
-      wwwroot/umbraco/**
-    </DefaultItemExcludes>
+  </PropertyGroup>
+
+  <Import Project="../../build/NuSpecs/buildTransitive/Umbraco.Cms.StaticAssets.props" />
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot/umbraco/**</DefaultItemExcludes>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
