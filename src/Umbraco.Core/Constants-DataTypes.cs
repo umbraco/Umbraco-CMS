@@ -211,7 +211,6 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 public static readonly Guid ListViewMembersGuid = new Guid(ListViewMembers);
 
-
                 /// <summary>
                 /// Guid for Date Picker with time as string
                 /// </summary>

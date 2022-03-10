@@ -88,7 +88,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
                 .AddUmbracoOptions<PackageMigrationSettings>()
                 .AddUmbracoOptions<ContentDashboardSettings>()
-                .AddUmbracoOptions<HelpPageSettings>();
+                .AddUmbracoOptions<HelpPageSettings>()
+                .AddUmbracoOptions<DefaultDataCreationSettings>();
 
             builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 
