@@ -1,29 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    internal class MacroService : RepositoryService, IMacroService
+    internal class MacroService : RepositoryService, IMacroWithAliasService
     {
-        private readonly IMacroRepository _macroRepository;
+        private readonly IMacroWithAliasRepository _macroRepository;
         private readonly IAuditRepository _auditRepository;
 
         public MacroService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            IMacroRepository macroRepository, IAuditRepository auditRepository)
+            IMacroWithAliasRepository macroRepository, IAuditRepository auditRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _macroRepository = macroRepository;
             _auditRepository = auditRepository;
+        }
+
+        [Obsolete("Use ctor injecting IMacroWithAliasRepository instead")]
+        public MacroService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+            IMacroRepository macroRepository, IAuditRepository auditRepository)
+            : this (
+                  provider,
+                  loggerFactory,
+                  eventMessagesFactory,
+                  StaticServiceProvider.Instance.GetRequiredService<IMacroWithAliasRepository>(),
+                  auditRepository)
+        {
         }
 
         /// <summary>
@@ -35,8 +49,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var q = Query<IMacro>().Where(x => x.Alias == alias);
-                return _macroRepository.Get(q).FirstOrDefault();
+                return _macroRepository.GetByAlias(alias);
             }
         }
 
@@ -58,6 +71,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _macroRepository.GetMany(ids);
+            }
+        }
+
+        public IEnumerable<IMacro> GetAll(params string[] aliases)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _macroRepository.GetAllByAlias(aliases);
             }
         }
 
