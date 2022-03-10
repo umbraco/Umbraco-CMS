@@ -55,6 +55,7 @@ namespace Umbraco.Cms.Core.Cache
                 if (macroRepoCache)
                 {
                     macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
+                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro, string>(payload.Alias)); // Repository caching of macro definition by alias
                 }
             }
 
