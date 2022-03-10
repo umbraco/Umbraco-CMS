@@ -32,6 +32,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         /// <remarks>
         /// The values provided should be the ISO codes for the languages to be included or excluded, e.g. "en-US".
+        /// If removing the single default language, ensure that a different one is created via some other means (such
+        /// as a restore from Umbraco Deploy schema data).
         /// </remarks>
         public List<string> SelectedDefaultLanguages { get; set; } = new List<string>();
 
