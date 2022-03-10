@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <remarks>
         /// The values provided should be the ISO codes for the languages to be included or excluded, e.g. "en-US".
         /// </remarks>
-        public IEnumerable<string> SelectedDefaultLanguages { get; set; } = Enumerable.Empty<string>();
+        public List<string> SelectedDefaultLanguages { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a value indicating whether to create default data type data on installation.
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Otherwise take care not to remove data types required for default Umbraco media and member types, unless you also
         /// choose to exclude them.
         /// </remarks>
-        public IEnumerable<Guid> SelectedDefaultDataTypes { get; set; } = Enumerable.Empty<Guid>();
+        public List<string> SelectedDefaultDataTypes { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a value indicating whether to create default media type data on installation.
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// The values provided should be the Guid values used by Umbraco for the media type, listed at:
         /// https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
         /// </remarks>
-        public IEnumerable<Guid> SelectedDefaultMediaTypes { get; set; } = Enumerable.Empty<Guid>();
+        public List<string> SelectedDefaultMediaTypes { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a value indicating whether to create default media type data on installation.
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// The values provided should be the Guid values used by Umbraco for the media type, listed at:
         /// https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
         /// </remarks>
-        public IEnumerable<Guid> SelectedDefaultMemberTypes { get; set; } = Enumerable.Empty<Guid>();
+        public List<string> SelectedDefaultMemberTypes { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a value indicating whether to create default relation type data on installation.
@@ -97,6 +97,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// The values provided should be the aliases for the relation types, listed at:
         /// https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Core/Constants-Conventions.cs
         /// </remarks>
-        public IEnumerable<string> SelectedDefaultRelationTypes { get; set; } = Enumerable.Empty<string>();
+        public List<string> SelectedDefaultRelationTypes { get; set; } = new List<string>();
     }
 }
