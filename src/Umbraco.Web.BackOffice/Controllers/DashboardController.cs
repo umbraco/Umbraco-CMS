@@ -74,28 +74,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardSettings = dashboardSettings.Value;
         }
 
-
-        [Obsolete("Use the constructor that accepts ISiteIdentifierService")]
-        public DashboardController(
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            AppCaches appCaches,
-            ILogger<DashboardController> logger,
-            IDashboardService dashboardService,
-            IUmbracoVersion umbracoVersion,
-            IShortStringHelper shortStringHelper,
-            IOptions<ContentDashboardSettings> dashboardSettings)
-        : this(
-            backOfficeSecurityAccessor,
-            appCaches,
-            logger,
-            dashboardService,
-            umbracoVersion,
-            shortStringHelper,
-            dashboardSettings,
-            StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
-        {
-        }
-
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
 

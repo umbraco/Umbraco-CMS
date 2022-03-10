@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services
 {
     public class TrackedReferencesService : ITrackedReferencesService
     {

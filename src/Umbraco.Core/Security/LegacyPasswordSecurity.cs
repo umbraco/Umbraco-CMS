@@ -209,11 +209,21 @@ namespace Umbraco.Cms.Core.Security
         {
             // This is for the v6-v8 hashing algorithm
             if (algorithm.InvariantEquals(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName))
+            {
                 return true;
+            }
+
+            // Default validation value for old machine keys (switched to HMACSHA256 aspnet 4 https://docs.microsoft.com/en-us/aspnet/whitepapers/aspnet4/breaking-changes)
+            if (algorithm.InvariantEquals("SHA1"))
+            {
+                return true;
+            }
 
             // This is for the <= v4 hashing algorithm
             if (IsLegacySHA1Algorithm(algorithm))
+            {
                 return true;
+            }
 
             return false;
         }
