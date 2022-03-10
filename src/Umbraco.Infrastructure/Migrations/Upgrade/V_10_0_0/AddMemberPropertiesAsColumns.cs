@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -60,17 +60,17 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .From<PropertyTypeDto>("pt")
             .Where("[pt].[Alias] = 'umbracoMemberLastPasswordChangeDate'");
 
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.AppendLine($"UPDATE {Constants.DatabaseSchema.Tables.Member}");
+        queryBuilder.AppendLine("SET");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.FailedPasswordAttempts)} = [umbracoPropertyData].[intValue],");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsApproved)} = [pdmp].[intValue],");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsLockedOut)} = [pdlo].[intValue],");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLockoutDate)} = [pdlout].[dateValue],");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLoginDate)} = [pdlin].[dateValue],");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate)} = [pdlpc].[dateValue]");
 
-        Sql<ISqlContext> columnDataQuery = Database.SqlContext.Sql()
-            .Select(
-                "[cmsMember].[nodeId]",
-                "[umbracoPropertyData].[intValue] as [failedPasswordAttempts]",
-                "[pdmp].[intValue] as [memberApproved]",
-                "[pdlo].[intValue] as [isLockedOut]",
-                "[pdlout].[dateValue] as [lastLockoutDate]",
-                "[pdlin].[dateValue] as [lastLoginDate]",
-                "[pdlpc].[dateValue] as [lastPasswordChangeDate]"
-            )
+        Sql<ISqlContext> updateMemberColumnsQuery = Database.SqlContext.Sql(queryBuilder.ToString())
             .From<NodeDto>()
             .InnerJoin<ContentDto>()
             .On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
@@ -78,8 +78,8 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
             .InnerJoin(newestContentVersionQuery, "umbracoContentVersion")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<MemberDto>()
-            .On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId)
+            .InnerJoin<MemberDto>("m")
+            .On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId, null, "m")
             .LeftJoin(passwordAttemptsQuery, "failedAttemptsType")
             .On<ContentDto, FailedAttempts>((left, right) => left.ContentTypeId == right.ContentTypeId)
             .LeftJoin<DataTypeDto>()
@@ -118,31 +118,7 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .On<PropertyDataDto, LastPasswordChange, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlpc")
             .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Member);
 
-        var columnData = Database.Fetch<MemberColumnData>(columnDataQuery);
-    }
-
-    private class MemberColumnData
-    {
-        [Column("nodeId")]
-        public int Id { get; set; }
-
-        [Column("failedPasswordAttempts")]
-        public int? FailedPasswordAttempts { get; set; }
-
-        [Column("memberApproved")]
-        public bool MemberApproved { get; set; }
-
-        [Column("isLockedOut")]
-        public bool? IsLockedOut { get; set; }
-
-        [Column("lastLockoutDate")]
-        public DateTime? LastLockoutDate { get; set; }
-
-        [Column("lastLoginDate")]
-        public DateTime? LastLoginDate { get; set; }
-
-        [Column("lastPasswordChangeDate")]
-        public DateTime? LastPasswordChangeDate { get; set; }
+        Database.Execute(updateMemberColumnsQuery);
     }
 
     [TableName("failedAttemptsType")]
