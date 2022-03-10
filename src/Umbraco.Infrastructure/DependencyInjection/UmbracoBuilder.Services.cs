@@ -18,9 +18,9 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -64,7 +64,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IEntityService, EntityService>();
             builder.Services.AddUnique<IRelationService, RelationService>();
             builder.Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
-            builder.Services.AddUnique<IMacroService, MacroService>();
+            builder.Services.AddUnique<MacroService>(factory => new MacroService(
+                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ILoggerFactory>(),
+                factory.GetRequiredService<IEventMessagesFactory>(),
+                factory.GetRequiredService<IMacroWithAliasRepository>(),
+                factory.GetRequiredService<IAuditRepository>()
+                ));
+            builder.Services.AddUnique<IMacroService>(factory => factory.GetRequiredService<MacroService>());
+            builder.Services.AddUnique<IMacroWithAliasService>(factory => factory.GetRequiredService<MacroService>());
+
             builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
             builder.Services.AddUnique<IMemberGroupService, MemberGroupService>();
             builder.Services.AddUnique<INotificationService, NotificationService>();
@@ -92,6 +101,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
             builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
+            builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
 
             return builder;
         }
