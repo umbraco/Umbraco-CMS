@@ -16,7 +16,7 @@
     Alias:mediaId     Name:Select folder with images    Type:Single Media Picker
 *@
 
-@{ var mediaId = Model.MacroParameters["mediaId"]; }
+@{ var mediaId = Model?.MacroParameters["mediaId"]; }
 
 @if (mediaId != null)
 {

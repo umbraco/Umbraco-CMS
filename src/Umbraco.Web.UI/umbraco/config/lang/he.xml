@@ -13,7 +13,7 @@
     <key alias="createPackage">צור חבילה</key>
     <key alias="delete">מחק</key>
     <key alias="disable">נטרל</key>
-    <key alias="emptyRecycleBin">רוקן סל מיחזור</key>
+    <key alias="emptyrecyclebin">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
     <key alias="importdocumenttype">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>

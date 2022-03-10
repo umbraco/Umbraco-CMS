@@ -16,12 +16,17 @@ function RelationTypeSettingsController($scope, localizationService) {
 
         var labelKeys = [
             "relationType_parentToChild",
-            "relationType_bidirectional"
+            "relationType_bidirectional",
+            "relationType_dependency",
+            "relationType_noDependency"
+
         ];
 
         localizationService.localizeMany(labelKeys).then(function (data) {
             vm.labels.parentToChild = data[0];
             vm.labels.bidirectional = data[1];
+            vm.labels.dependency = data[2];
+            vm.labels.noDependency = data[3];
         });
     }
 

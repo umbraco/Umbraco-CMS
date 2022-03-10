@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
         private void Map(IMember source, MemberDisplay target, MapperContext context)
         {
-            target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
             target.ContentType = _commonMapper.GetContentType(source, context);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;

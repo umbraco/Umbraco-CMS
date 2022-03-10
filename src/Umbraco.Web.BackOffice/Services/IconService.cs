@@ -106,8 +106,18 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 // iterate sub directories of app plugins
                 foreach (var dir in appPlugins.EnumerateDirectories())
                 {
-                    var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIcons}");
-                    if (Directory.Exists(iconPath))
+                    // AppPluginIcons path was previoulsy the wrong case, so we first check for the prefered directory 
+                    // and then check the legacy directory.
+                    var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.PluginIcons}");
+                    var iconPathExists = Directory.Exists(iconPath);
+
+                    if (!iconPathExists)
+                    {
+                        iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIcons}");
+                        iconPathExists = Directory.Exists(iconPath);
+                    }
+
+                    if (iconPathExists)
                     {
                         var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
                         icons.UnionWith(dirIcons);

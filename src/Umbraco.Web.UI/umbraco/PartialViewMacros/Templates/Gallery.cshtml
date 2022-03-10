@@ -24,7 +24,7 @@
                                                             Type: (note: You can use a Single Media Picker if that's more appropriate to your needs)
 *@
 
-@{ var mediaIds = Model.MacroParameters["mediaIds"] as string; }
+@{ var mediaIds = Model?.MacroParameters["mediaIds"] as string; }
 
 @if (mediaIds != null)
 {

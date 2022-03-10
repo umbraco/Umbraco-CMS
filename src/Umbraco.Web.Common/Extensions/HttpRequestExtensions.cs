@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 
@@ -135,6 +136,26 @@ namespace Umbraco.Extensions
             }
 
             return new Uri(routingSettings.UmbracoApplicationUrl);
+        }
+
+        /// <summary>
+        /// Gets the Umbraco `ufprt` encrypted string from the current request
+        /// </summary>
+        /// <param name="request">The current request</param>
+        /// <returns>The extracted `ufprt` token.</returns>
+        public static string GetUfprt(this HttpRequest request)
+        {
+            if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal) && formVal != StringValues.Empty)
+            {
+                return formVal.ToString();
+            }
+
+            if (request.Query.TryGetValue("ufprt", out StringValues queryVal) && queryVal != StringValues.Empty)
+            {
+                return queryVal.ToString();
+            }
+
+            return null;
         }
     }
 }

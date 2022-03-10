@@ -74,7 +74,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function changePageNumber(pageNumber) {
         vm.options.pageNumber = pageNumber;
         loadRelations();
-    } 
+    }
 
 
     /** Loads in the references one time  when content app changed */
@@ -86,12 +86,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
                 vm.relations = data;
             });
     }
-    
+
 
     function bindRelationType(relationType) {
         // Convert property value to string, since the umb-radiobutton component at the moment only handle string values.
         // Sometime later the umb-radiobutton might be able to handle value as boolean.
         relationType.isBidirectional = (relationType.isBidirectional || false).toString();
+        relationType.isDependency = (relationType.isDependency || false).toString();
 
         vm.relationType = relationType;
 

@@ -17,7 +17,7 @@
     <key alias="delete">Sil</key>
     <key alias="disable">Devre Dışı Bırak</key>
     <key alias="editSettings">Ayarları düzenle</key>
-    <key alias="emptyRecycleBin">Geri dönüşüm kutusunu boşalt</key>
+    <key alias="emptyrecyclebin">Geri dönüşüm kutusunu boşalt</key>
     <key alias="enable">Etkinleştir</key>
     <key alias="exportDocumentType">Belge Türünü Dışa Aktar</key>
     <key alias="importdocumenttype">Belge Türünü İçe Aktar</key>

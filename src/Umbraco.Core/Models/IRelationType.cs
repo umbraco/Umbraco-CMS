@@ -4,6 +4,15 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models
 {
+    public interface IRelationTypeWithIsDependency : IRelationType
+    {
+        /// <summary>
+        /// Gets or sets a boolean indicating whether the RelationType should be returned in "Used by"-queries.
+        /// </summary>
+        [DataMember]
+        bool IsDependency { get; set; }
+    }
+
     public interface IRelationType : IEntity, IRememberBeingDirty
     {
         /// <summary>

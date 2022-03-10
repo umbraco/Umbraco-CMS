@@ -174,6 +174,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem(ModelState);
             }
 
+            // Update language
+            CultureInfo cultureAfterChange;
+            try
+            {
+                // language has the CultureName of the previous lang so we get information about new culture.
+                cultureAfterChange = CultureInfo.GetCultureInfo(language.IsoCode);
+            }
+            catch (CultureNotFoundException)
+            {
+                ModelState.AddModelError("IsoCode", "No Culture found with name " + language.IsoCode);
+                return ValidationProblem(ModelState);
+            }
+            existingById.CultureName = cultureAfterChange.DisplayName;
             existingById.IsDefault = language.IsDefault;
             existingById.FallbackLanguageId = language.FallbackLanguageId;
             existingById.IsoCode = language.IsoCode;

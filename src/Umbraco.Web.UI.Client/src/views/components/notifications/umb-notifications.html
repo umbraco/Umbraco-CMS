@@ -1,5 +1,5 @@
 <div class="umb-notifications" id="umb-notifications-wrapper" ng-cloak>
-    <ul class="umb-notifications__notifications" aria-live="assertive" aria-relevant="additions">
+    <ul ng-if="notifications" class="umb-notifications__notifications" aria-live="assertive" aria-relevant="additions">
         <li ng-repeat="notification in notifications"
             class="alert alert-block alert-{{notification.type}} umb-notifications__notification animated -half-second fadeIn"
             ng-class="{'-no-border -extra-padding': notification.type === 'form'}">

@@ -16,7 +16,7 @@
     <key alias="createGroup">Vytvořit skupinu</key>
     <key alias="delete">Odstranit</key>
     <key alias="disable">Deaktivovat</key>
-    <key alias="emptyRecycleBin">Vyprázdnit koš</key>
+    <key alias="emptyrecyclebin">Vyprázdnit koš</key>
     <key alias="enable">Aktivovat</key>
     <key alias="exportDocumentType">Exportovat typ dokumentu</key>
     <key alias="importdocumenttype">Importovat typ dokumentu</key>
