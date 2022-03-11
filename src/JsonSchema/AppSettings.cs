@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Deploy.Core.Configuration.DebugConfiguration;
 using Umbraco.Deploy.Core.Configuration.DeployConfiguration;
 using Umbraco.Deploy.Core.Configuration.DeployProjectConfiguration;
 using Umbraco.Forms.Core.Configuration;
@@ -127,6 +128,8 @@ namespace JsonSchema
                 public DeploySettings Settings { get; set; }
 
                 public DeployProjectConfig Project { get; set; }
+
+                public DebugSettings Debug { get; set; }
             }
         }
     }

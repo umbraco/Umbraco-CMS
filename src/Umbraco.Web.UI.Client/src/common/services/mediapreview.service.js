@@ -1,4 +1,4 @@
-﻿/**
+/**
 * @ngdoc service
 * @name umbraco.services.mediaPreview
 * @description A service providing views used for dealing with previewing files.
@@ -56,12 +56,15 @@ function mediaPreview() {
         */
         getMediaPreview: function (fileExtension) {
 
-            fileExtension = fileExtension.toLowerCase();
+            if (fileExtension)
+            {
+              fileExtension = fileExtension.toLowerCase();
 
-            var previewObject = _mediaPreviews.find((preview) => preview.fileExtensions.indexOf(fileExtension) !== -1);
+              var previewObject = _mediaPreviews.find(preview => preview.fileExtensions.indexOf(fileExtension) !== -1);
 
-            if(previewObject !== undefined) {
+              if (previewObject !== undefined) {
                 return previewObject.view;
+              }
             }
 
             return DEFAULT_FILE_PREVIEW;

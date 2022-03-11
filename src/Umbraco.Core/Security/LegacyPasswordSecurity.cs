@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Core.Security
             var saltBytes = Convert.FromBase64String(salt);
             byte[] inArray;
 
-            var hashAlgorithm = GetHashAlgorithm(algorithmType);
+            using var hashAlgorithm = GetHashAlgorithm(algorithmType);
             var algorithm = hashAlgorithm as KeyedHashAlgorithm;
             if (algorithm != null)
             {
@@ -209,11 +209,21 @@ namespace Umbraco.Cms.Core.Security
         {
             // This is for the v6-v8 hashing algorithm
             if (algorithm.InvariantEquals(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName))
+            {
                 return true;
+            }
+
+            // Default validation value for old machine keys (switched to HMACSHA256 aspnet 4 https://docs.microsoft.com/en-us/aspnet/whitepapers/aspnet4/breaking-changes)
+            if (algorithm.InvariantEquals("SHA1"))
+            {
+                return true;
+            }
 
             // This is for the <= v4 hashing algorithm
             if (IsLegacySHA1Algorithm(algorithm))
+            {
                 return true;
+            }
 
             return false;
         }
@@ -227,7 +237,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The encoded password.</returns>
         private string HashLegacySHA1Password(string password)
         {
-            var hashAlgorithm = GetLegacySHA1Algorithm(password);
+            using var hashAlgorithm = GetLegacySHA1Algorithm(password);
             var hash = Convert.ToBase64String(hashAlgorithm.ComputeHash(Encoding.Unicode.GetBytes(password)));
             return hash;
         }

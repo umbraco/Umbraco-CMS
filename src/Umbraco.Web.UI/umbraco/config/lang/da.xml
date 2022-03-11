@@ -18,7 +18,7 @@
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Tøm papirkurv</key>
+    <key alias="emptyrecyclebin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="importdocumenttype">Importér dokumenttype</key>
@@ -1323,6 +1323,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editMultiContentPublishedText">%0% dokumenter udgivet og synlige på hjemmesiden</key>
     <key alias="editVariantPublishedText">%0% udgivet og synligt på hjemmesiden</key>
     <key alias="editMultiVariantPublishedText">%0% dokumenter udgivet for sprogene %1% og synlige på hjemmesiden</key>
+    <key alias="editBlueprintSavedHeader">Indholdsskabelon gemt</key>
+    <key alias="editBlueprintSavedText">Rettelser er blevet gemt</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentScheduledSavedText">En planlægning for udgivelse er blevet opdateret</key>

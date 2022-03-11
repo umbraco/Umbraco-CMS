@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Core.Models
         public bool IsCulturePublished(string culture)
             // just check _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfos != null && _publishInfos.ContainsKey(culture);
+            => !culture.IsNullOrWhiteSpace() && _publishInfos != null && _publishInfos.ContainsKey(culture);
 
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)

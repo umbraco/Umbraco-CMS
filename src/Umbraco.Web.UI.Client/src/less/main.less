@@ -14,6 +14,20 @@
 	box-shadow: 3px 0px 7px rgba(0,0,0,0.16);
 }
 
+img:not([src]):not([srcset]) {
+  visibility: hidden;
+}
+
+img.lazy {
+  -webkit-transition: opacity 1.2s cubic-bezier(0.16, 1.08, 0.38, 0.98);
+  transition: opacity 1.2s cubic-bezier(0.16, 1.08, 0.38, 0.98);
+  opacity: 0;
+}
+
+img.lazy.loaded {
+  opacity: 1;
+}
+
 .umb-scrollable, .umb-auto-overflow {
 	overflow: auto;
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace Umbraco.Cms.Core
 {
     public static partial class Constants
@@ -42,9 +44,11 @@ namespace Umbraco.Cms.Core
             public const string Install = "~/install";
 
             public const string AppPlugins = "/App_Plugins";
-            public static string AppPluginIcons => "/Backoffice/Icons";
-            public const string CreatedPackages = "/created-packages";
 
+            [Obsolete("Use PluginIcons instead")]
+            public static string AppPluginIcons => "/Backoffice/Icons";
+
+            public const string PluginIcons = "/backoffice/icons";
 
             public const string MvcViews = "~/Views";
 
@@ -53,6 +57,8 @@ namespace Umbraco.Cms.Core
             public const string MacroPartials = MvcViews + "/MacroPartials/";
 
             public const string Packages = Data + "/packages";
+
+            public const string CreatedPackages = Data + "/CreatedPackages";
 
             public const string Preview = Data + "/preview";
 

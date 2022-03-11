@@ -5,25 +5,22 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
-    public class SqlMainDomLock : IMainDomLock
+    internal class SqlMainDomLock : IMainDomLock
     {
         private readonly string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
