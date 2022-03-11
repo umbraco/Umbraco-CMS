@@ -1,5 +1,9 @@
+using System;
+using System.Security.Cryptography;
+using System.Text;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Membership;
@@ -15,9 +19,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         // Technically MD5, HMACSHA384 & HMACSHA512 were also possible but opt in as opposed to historic defaults.
         [Test]
         [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!", "uB/pLEhhe1W7EtWMv/pSgg==1y8+aso9+h3AKRtJXlVYeg2TZKJUr64hccj82ZZ7Ksk=")] // Actually HMACSHA256
-        [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!", "t0U8atXTX/efNCtTafukwZeIpr8=")] // v4 site legacy password, with incorrect algorithm specified in database actually HMACSHA1 with password used as key.
         [InlineAutoMoqData("SHA1", "Umbraco9Rocks!", "6tZGfG9NTxJJYp19Fac9og==zzRggqANxhb+CbD/VabEt8cIde8=")] // When SHA1 is set on machine key.
-        public void VerifyHashedPassword_WithValidLegacyPasswordHash_ReturnsSuccessRehashNeeded(
+        public void VerifyHashedPassword_ValidHashWithoutLegacyEncoding_ReturnsSuccessRehashNeeded(
             string algorithm,
             string providedPassword,
             string hashedPassword,
@@ -34,10 +37,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.AreEqual(PasswordVerificationResult.SuccessRehashNeeded, result);
         }
 
-
         [Test]
-        [InlineAutoMoqData("PBKDF2.ASPNETCORE.V3", "Umbraco9Rocks!", "AQAAAAEAACcQAAAAEDCrYcnIhHKr38yuchsDu6AFqqmLNvRooKObV25GC1LC1tLY+gWGU4xNug0lc17PHA==")]
-        public void VerifyHashedPassword_WithValidModernPasswordHash_ReturnsSuccess(
+        [InlineAutoMoqData("HMACSHA1", "Umbraco9Rocks!", "t0U8atXTX/efNCtTafukwZeIpr8=")]
+        [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!", "t0U8atXTX/efNCtTafukwZeIpr8=")]
+        [InlineAutoMoqData("FOOBARBAZQUX", "Umbraco9Rocks!", "t0U8atXTX/efNCtTafukwZeIpr8=")]
+        [InlineAutoMoqData("", "Umbraco9Rocks!", "t0U8atXTX/efNCtTafukwZeIpr8=")]
+        [InlineAutoMoqData(null, "Umbraco9Rocks!", "t0U8atXTX/efNCtTafukwZeIpr8=")]
+        public void VerifyHashedPassword_ValidHashWithLegacyEncoding_ReturnsSuccessRehashNeeded(
             string algorithm,
             string providedPassword,
             string hashedPassword,
@@ -51,7 +57,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
-            Assert.AreEqual(PasswordVerificationResult.Success, result);
+            Assert.AreEqual(PasswordVerificationResult.SuccessRehashNeeded, result);
         }
 
         [Test]
@@ -71,6 +77,46 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
             Assert.AreEqual(PasswordVerificationResult.Failed, result);
+        }
+
+        [Test]
+        [AutoMoqData]
+        public void VerifyHashedPassword_WithIdentityV1OrV2StyleHash_ReturnsSuccessRehashNeeded(
+            TestUserStub aUser,
+            UmbracoPasswordHasher<TestUserStub> sut)
+        {
+            var options = Options.Create(new PasswordHasherOptions
+            {
+                CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+            });
+
+            var upstreamHasher = new PasswordHasher<TestUserStub>(options);
+
+            const string password = "Umbraco9Rocks!";
+            var identityV1Or2StyleHash = upstreamHasher.HashPassword(aUser, password);
+            var result = sut.VerifyHashedPassword(aUser, identityV1Or2StyleHash, password);
+
+            Assert.AreEqual(PasswordVerificationResult.SuccessRehashNeeded, result);
+        }
+
+        [Test]
+        [AutoMoqData]
+        public void VerifyHashedPassword_WithIdentityV3StyleHash_ReturnsSuccess(
+            TestUserStub aUser,
+            UmbracoPasswordHasher<TestUserStub> sut)
+        {
+            var options = Options.Create(new PasswordHasherOptions
+            {
+                CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3
+            });
+
+            var upstreamHasher = new PasswordHasher<TestUserStub>(options);
+
+            const string password = "Umbraco9Rocks!";
+            var identityV1Or2StyleHash = upstreamHasher.HashPassword(aUser, password);
+            var result = sut.VerifyHashedPassword(aUser, identityV1Or2StyleHash, password);
+
+            Assert.AreEqual(PasswordVerificationResult.Success, result);
         }
 
         public class TestUserStub : UmbracoIdentityUser
