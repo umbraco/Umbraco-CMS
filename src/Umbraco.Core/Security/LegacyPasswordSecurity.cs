@@ -15,10 +15,10 @@ namespace Umbraco.Cms.Core.Security
     /// </remarks>
     public class LegacyPasswordSecurity
     {
-        // TODO: Remove v10
+        // TODO: Remove v11
         // Used for tests
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v10")]
+        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
         public string HashPasswordForStorage(string algorithmType, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
@@ -29,10 +29,10 @@ namespace Umbraco.Cms.Core.Security
             return FormatPasswordForStorage(algorithmType, hashed, salt);
         }
 
-        // TODO: Remove v10
+        // TODO: Remove v11
         // Used for tests
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v10")]
+        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
         public string FormatPasswordForStorage(string algorithmType, string hashedPassword, string salt)
         {
             if (!SupportHashAlgorithm(algorithmType))
@@ -99,7 +99,8 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="salt"></param>
         /// <returns></returns>
         // TODO: Do we need this method? We shouldn't be using this class to create new password hashes for storage
-        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v10")]
+        // TODO: Remove v11
+        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
         public string HashNewPassword(string algorithm, string newPassword, out string salt)
         {
             salt = GenerateSalt();
