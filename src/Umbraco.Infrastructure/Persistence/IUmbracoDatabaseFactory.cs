@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
@@ -51,7 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <summary>
         /// Configures the database factory.
         /// </summary>
-        void Configure(string connectionString, string providerName);
+        void Configure(ConnectionStrings umbracoConnectionString);
 
         /// <summary>
         /// Gets the <see cref="ISqlContext"/>.

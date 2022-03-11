@@ -56,7 +56,7 @@ stages:
                   displayName: dotnet build
                   inputs:
                       command: build
-                      projects: '**/umbraco-netcore-only.sln'
+                      projects: '**/umbraco.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
@@ -76,7 +76,7 @@ stages:
                   displayName: dotnet build
                   inputs:
                       command: build
-                      projects: '**/umbraco-netcore-only.sln'
+                      projects: '**/umbraco.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
@@ -103,58 +103,117 @@ stages:
                       command: test
                       projects: '**/*.Tests.UnitTests.csproj'
                       arguments: '--no-build'
+
     - stage: Integration_Tests
       displayName: Integration Tests
       dependsOn: []
       jobs:
-          - job: Linux_Integration_Tests
-            services:
-                mssql: mssql
-            timeoutInMinutes: 120
-            displayName: Linux
-            pool:
-                vmImage: ubuntu-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 6.x
-                  inputs:
-                      version: 6.x
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco-netcore-only.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**/Umbraco.Tests.Integration.csproj'
-                      arguments: '--no-build'
-                  env:
-                      UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
-          - job: Windows_Integration_Tests
-            timeoutInMinutes: 120
-            displayName: Windows
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 6.x
-                  inputs:
-                      version: 6.x
-                - powershell: sqllocaldb start mssqllocaldb
-                  displayName: Start MSSQL LocalDb
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**\Umbraco.Tests.Integration*.csproj'
-                      arguments: '--no-build'
+
+        - job: Linux_Integration_Tests_SQLite
+          timeoutInMinutes: 120
+          displayName: Linux (SQLite)
+          pool:
+              vmImage: ubuntu-latest
+          steps:
+              - task: UseDotNet@2
+                displayName: Use .Net 6.x
+                inputs:
+                    version: 6.x
+              - task: DotNetCoreCLI@2
+                displayName: dotnet build
+                inputs:
+                    command: build
+                    projects: '**/umbraco.sln'
+              - task: DotNetCoreCLI@2
+                displayName: dotnet test
+                inputs:
+                    command: test
+                    projects: '**/Umbraco.Tests.Integration.csproj'
+                    arguments: '--no-build'
+                env:
+                  Tests__Database__DatabaseType: 'Sqlite'
+                  Umbraco__Cms__global__MainDomLock: 'FileSystemMainDomLock'
+
+        - job: Linux_Integration_Tests_SQLServer
+          services:
+            mssql: mssql
+          timeoutInMinutes: 120
+          displayName: Linux (SQL Server)
+          pool:
+            vmImage: ubuntu-latest
+          steps:
+            - task: UseDotNet@2
+              displayName: Use .Net 6.x
+              inputs:
+                version: 6.x
+            - task: DotNetCoreCLI@2
+              displayName: dotnet build
+              inputs:
+                command: build
+                projects: '**/umbraco.sln'
+            - task: DotNetCoreCLI@2
+              displayName: dotnet test
+              inputs:
+                command: test
+                projects: '**/Umbraco.Tests.Integration.csproj'
+                arguments: '--no-build'
+              env:
+                Tests__Database__DatabaseType: 'SqlServer'
+                Tests__Database__SQLServerMasterConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+                Umbraco__Cms__global__MainDomLock: 'SqlMainDomLock'
+
+        - job: macOS_Integration_Tests_SQLite
+          timeoutInMinutes: 120
+          displayName: macOS (SQLite)
+          pool:
+              vmImage: macOS-latest
+          steps:
+              - task: UseDotNet@2
+                displayName: Use .Net 6.x
+                inputs:
+                    version: 6.x
+              - task: DotNetCoreCLI@2
+                displayName: dotnet build
+                inputs:
+                    command: build
+                    projects: '**/umbraco.sln'
+              - task: DotNetCoreCLI@2
+                displayName: dotnet test
+                inputs:
+                    command: test
+                    projects: '**/Umbraco.Tests.Integration.csproj'
+                    arguments: '--no-build'
+                env:
+                  Tests__Database__DatabaseType: 'Sqlite'
+                  Umbraco__Cms__global__MainDomLock: 'FileSystemMainDomLock'
+
+        - job: Windows_Integration_Tests_LocalDb
+          timeoutInMinutes: 120
+          displayName: Windows (LocalDb)
+          pool:
+              vmImage: windows-latest
+          steps:
+              - task: UseDotNet@2
+                displayName: Use .Net 6.x
+                inputs:
+                    version: 6.x
+              - powershell: sqllocaldb start mssqllocaldb
+                displayName: Start MSSQL LocalDb
+              - task: DotNetCoreCLI@2
+                displayName: dotnet build
+                inputs:
+                    command: build
+                    projects: '**/umbraco.sln'
+              - task: DotNetCoreCLI@2
+                displayName: dotnet test
+                inputs:
+                    command: test
+                    projects: '**/Umbraco.Tests.Integration.csproj'
+                    arguments: '--no-build'
+                env:
+                  Tests__Database__DatabaseType: 'LocalDb'
+                  Umbraco__Cms__global__MainDomLock: 'MainDomSemaphoreLock'
+
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
       dependsOn: []
@@ -261,9 +320,10 @@ stages:
                   displayName: "Publish test artifacts"
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                    artifact: 'Test artifacts - Windows'
-          - job: Linux_Acceptance_tests
-            displayName: Linux
+                    artifact: 'Test artifacts - Windows - Attempt #$(System.JobAttempt)'
+
+          - job: Linux_Acceptance_tests_SqlServer
+            displayName: Linux (SQL Server)
             variables:
                 - name: UmbracoDatabaseServer
                   value: localhost
@@ -362,12 +422,94 @@ stages:
                   displayName: "Publish test artifacts"
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                      artifact: 'Test artifacts - Linux'
+                      artifact: 'Test artifacts - Linux (SQL Server) - Attempt #$(System.JobAttempt)'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish run log"
                   inputs:
                       targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
-                      artifact: Test Run logs - Linux
+                      artifact: 'Test Run logs - Linux (SQL Server) - Attempt #$(System.JobAttempt)'
+
+          - job: Linux_Acceptance_tests_SQLite
+            displayName: Linux (SQLite)
+            variables:
+                - name: ConnectionStrings__umbracoDbDSN
+                  value: Data Source=|DataDirectory|/umbraco-cms-cypress.sqlite.db;Cache=Private;Foreign Keys=True
+                - name: ConnectionStrings__umbracoDbDSN_ProviderName
+                  value: Microsoft.Data.SQLite
+            pool:
+                vmImage: ubuntu-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net 6.x
+                  inputs:
+                      version: 6.x
+                - task: NodeTool@0
+                  displayName: Use Node $(nodeVersion)
+                  inputs:
+                      versionSpec: $(nodeVersion)
+                - task: Npm@1
+                  displayName: npm ci (Client)
+                  inputs:
+                      command: ci
+                      workingDir: src/Umbraco.Web.UI.Client
+                      verbose: false
+                - task: gulp@0
+                  displayName: gulp build
+                  inputs:
+                      gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
+                      targets: build
+                      workingDirectory: src/Umbraco.Web.UI.Client
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
+                - task: Bash@3
+                  displayName: dotnet run
+                  inputs:
+                    targetType: 'inline'
+                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
+                - task: Bash@3
+                  displayName: Generate Cypress.env.json
+                  inputs:
+                    targetType: 'inline'
+                    script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
+                  env:
+                    USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
+                    PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
+                - task: Npm@1
+                  name: PrepareTask
+                  displayName: npm ci (AcceptanceTest)
+                  inputs:
+                      command: ci
+                      workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
+                - task: Bash@3
+                  displayName: Run Cypress (Desktop)
+                  condition: always()
+                  continueOnError: true
+                  inputs:
+                      targetType: inline
+                      workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                - task: PublishTestResults@2
+                  condition: always()
+                  inputs:
+                      testResultsFormat: 'JUnit'
+                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+                      mergeTestResults: true
+                      testRunTitle: "Test results Desktop"
+              
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish test artifacts"
+                  inputs:
+                      targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
+                      artifact: 'Test artifacts - Linux (SQLite) - Attempt #$(System.JobAttempt)'
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish run log"
+                  inputs:
+                      targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
+                      artifact: 'Test Run logs - Linux (SQLite) - Attempt #$(System.JobAttempt)'
+
     - stage: Artifacts
       dependsOn: []
       jobs:

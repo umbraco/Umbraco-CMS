@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 return false;
             }
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
+            var databaseSettings = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
 
             if (databaseSettings.IsConnectionStringConfigured())
             {

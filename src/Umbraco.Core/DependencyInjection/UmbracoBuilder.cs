@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
         /// <returns>The collection builder.</returns>
         public TBuilder WithCollectionBuilder<TBuilder>()
-            where TBuilder : ICollectionBuilder, new()
+            where TBuilder : ICollectionBuilder
         {
             Type typeOfBuilder = typeof(TBuilder);
 
@@ -112,7 +112,22 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 return (TBuilder)o;
             }
 
-            var builder = new TBuilder();
+            TBuilder builder;
+
+            if (typeof(TBuilder).GetConstructor(Type.EmptyTypes) != null)
+            {
+                builder = Activator.CreateInstance<TBuilder>();
+            }
+            else if (typeof(TBuilder).GetConstructor(new[] { typeof(IUmbracoBuilder) }) != null)
+            {
+                // Handle those collection builders which need a reference to umbraco builder i.e. DistributedLockingCollectionBuilder.
+                builder = (TBuilder)Activator.CreateInstance(typeof(TBuilder), this);
+            }
+            else
+            {
+                throw new InvalidOperationException("A CollectionBuilder must have either a parameterless constructor or a constructor whose only parameter is of type IUmbracoBuilder");
+            }
+
             _builders[typeOfBuilder] = builder;
             return builder;
         }

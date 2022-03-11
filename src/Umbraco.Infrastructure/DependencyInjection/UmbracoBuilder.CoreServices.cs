@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
@@ -36,6 +37,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -68,6 +70,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddMainDom()
                 .AddLogging();
 
+            builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();

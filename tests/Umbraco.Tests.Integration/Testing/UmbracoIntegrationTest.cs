@@ -20,6 +20,8 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.Sqlite;
+using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
@@ -42,7 +44,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         [SetUp]
         public void Setup()
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
+            InMemoryConfiguration[Core.Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
             IHostBuilder hostBuilder = CreateHostBuilder();
 
             _host = hostBuilder.Build();
@@ -74,6 +76,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
+                    configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
 
                     Configuration = configBuilder.Build();
                 })
@@ -96,7 +99,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         protected void ConfigureServices(IServiceCollection services)
         {
             services.AddUnique(CreateLoggerFactory());
-            services.AddSingleton(TestHelper.DbProviderFactoryCreator);
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
             IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
@@ -125,6 +127,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
                 .AddExamine()
+                .AddUmbracoSqlServerSupport()
+                .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper);
 
             if (TestOptions.Mapper)

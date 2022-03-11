@@ -189,10 +189,6 @@
       --configuration Release --output "$($this.BuildTemp)\WebApp\bin\\" `
       > $log
 
-    & dotnet publish "$src\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" `
-      --configuration Release --output "$($this.BuildTemp)\SqlCe\" `
-      > $log
-
     # remove extra files
     $webAppBin = "$($this.BuildTemp)\WebApp\bin"
     $excludeDirs = @("$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
@@ -278,9 +274,6 @@
       /p:UmbracoBuild=True `
       > $log
 
-      # copy Umbraco.Persistence.SqlCe files into WebApp
-      Copy-Item "$($this.BuildTemp)\tests\Umbraco.Persistence.SqlCe.*" "$($this.BuildTemp)\WebApp\bin"
-
     if (-not $?) { throw "Failed to compile tests." }
 
     # /p:UmbracoBuild tells the csproj that we are building from PS
@@ -325,26 +318,12 @@
       $_.LastWriteTime = $_.LastWriteTime.AddHours(-11)
     }
 
-    # copy libs
-    Write-Host "Copy SqlCE libraries"
-    $nugetPackages = $env:NUGET_PACKAGES
-    if (-not $nugetPackages)
-    {
-      $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
-    }
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\WebApp\bin\amd64")
-
     # copy Belle
     Write-Host "Copy Belle"
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
-
-
 
     # Prepare templates
     Write-Host "Copy template files"
@@ -390,7 +369,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
 	$params = "-Source", $nugetsourceUmbraco
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -401,7 +380,7 @@
 
     Write-Host "Create NuGet packages"
 
-    &dotnet pack "$($this.SolutionRoot)\umbraco-netcore-only.sln" `
+    &dotnet pack "$($this.SolutionRoot)\umbraco.sln" `
         --output "$($this.BuildOutput)" `
         --verbosity detailed `
         -c Release `
@@ -412,12 +391,6 @@
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
-
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.StaticAssets.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
@@ -445,7 +418,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Cms.Persistence.Sqlite", "Umbraco.Cms.Persistence.SqlServer"))
     if ($this.OnError()) { return }
   })
 

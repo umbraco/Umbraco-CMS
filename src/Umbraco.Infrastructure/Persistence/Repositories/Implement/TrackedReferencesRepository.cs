@@ -76,28 +76,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
 
             // Gets the descendants of the parent node
-            Sql<ISqlContext> subQuery;
-
-            if (_scopeAccessor.AmbientScope.Database.DatabaseType.IsSqlCe())
-            {
-                // SqlCE do not support nested selects that returns a scalar. So we need to do this in multiple queries
-
-                var pathForLike = _scopeAccessor.AmbientScope.Database.ExecuteScalar<string>(subsubQuery);
-
-                subQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
-                    .Select<NodeDto>(x => x.NodeId)
-                    .From<NodeDto>()
-                    .WhereLike<NodeDto>(x => x.Path, pathForLike);
-            }
-            else
-            {
-                subQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
-                    .Select<NodeDto>(x => x.NodeId)
-                    .From<NodeDto>()
-                    .WhereLike<NodeDto>(x => x.Path, subsubQuery);
-            }
-
-
+            Sql<ISqlContext> subQuery = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .WhereLike<NodeDto>(x => x.Path, subsubQuery);
 
             // Get all relations where parent is in the sub query
             var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(

@@ -145,10 +145,8 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
             builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
-            // Add supported databases
-            builder.AddUmbracoSqlServerSupport();
-            builder.AddUmbracoSqlCeSupport();
             builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
 
             // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
@@ -156,7 +154,8 @@ namespace Umbraco.Extensions
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
                 factory.GetServices<IDatabaseCreator>(),
-                factory.GetServices<IProviderSpecificMapperFactory>()
+                factory.GetServices<IProviderSpecificMapperFactory>(),
+                factory.GetServices<IProviderSpecificInterceptor>()
             ));
 
             builder.AddCoreInitialServices();
@@ -384,66 +383,6 @@ namespace Umbraco.Extensions
             {
                 options.AllowSynchronousIO = true;
             });
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds SqlCe support for Umbraco
-        /// </summary>
-        private static IUmbracoBuilder AddUmbracoSqlCeSupport(this IUmbracoBuilder builder)
-        {
-            try
-            {
-                var binFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                if (binFolder != null)
-                {
-                    var dllPath = Path.Combine(binFolder, "Umbraco.Persistence.SqlCe.dll");
-                    var umbSqlCeAssembly = Assembly.LoadFrom(dllPath);
-
-                    Type sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
-                    Type sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
-                    Type sqlCeDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeDatabaseCreator");
-                    Type sqlCeSpecificMapperFactory = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSpecificMapperFactory");
-
-                    if (!(sqlCeSyntaxProviderType is null
-                          || sqlCeBulkSqlInsertProviderType is null
-                          || sqlCeDatabaseCreatorType is null
-                          || sqlCeSpecificMapperFactory is null))
-                    {
-                        builder.Services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
-                        builder.Services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
-                        builder.Services.AddSingleton(typeof(IDatabaseCreator), sqlCeDatabaseCreatorType);
-                        builder.Services.AddSingleton(typeof(IProviderSpecificMapperFactory), sqlCeSpecificMapperFactory);
-                    }
-
-                    var sqlCeAssembly = Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
-
-                    var sqlCe = sqlCeAssembly.GetType("System.Data.SqlServerCe.SqlCeProviderFactory");
-                    if (!(sqlCe is null))
-                    {
-                        DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlCe, sqlCe);
-                    }
-                }
-            }
-            catch
-            {
-                // Ignore if SqlCE is not available
-            }
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds Sql Server support for Umbraco
-        /// </summary>
-        private static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
-        {
-            DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
-
-            builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
-            builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
 
             return builder;
         }

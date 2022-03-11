@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models
@@ -5,8 +6,11 @@ namespace Umbraco.Cms.Core.Install.Models
     [DataContract(Name = "database", Namespace = "")]
     public class DatabaseModel
     {
-        [DataMember(Name = "dbType")]
-        public DatabaseType DatabaseType { get; set; } = DatabaseType.SqlServer;
+        [DataMember(Name = "databaseProviderMetadataId")]
+        public Guid DatabaseProviderMetadataId { get; set; }
+
+        [DataMember(Name = "providerName")]
+        public string ProviderName { get; set; }
 
         [DataMember(Name = "server")]
         public string Server { get; set; }

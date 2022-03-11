@@ -3,7 +3,10 @@
 
 using System;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Persistence.Sqlite.Services;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -17,6 +20,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
+            var lockingMechanism = GetRequiredService<IDistributedLockingMechanismFactory>().DistributedLockingMechanism;
+            if (lockingMechanism is SqliteDistributedLockingMechanism)
+            {
+                Assert.Ignore("SqliteDistributedLockingMechanism doesn't query the umbracoLock table for read locks.");
+            }
+
             IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {
