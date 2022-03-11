@@ -2,10 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -54,12 +56,14 @@ namespace Umbraco.Cms.Web.Common.Filters
         {
             if (content != null)
             {
-                IUmbracoContextAccessor umbracoContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+                UriUtility uriUtility = context.HttpContext.RequestServices.GetRequiredService<UriUtility>();
+
+                Uri originalRequestUrl = new Uri(context.HttpContext.Request.GetEncodedUrl());
+                Uri cleanedUrl = uriUtility.UriToUmbraco(originalRequestUrl);
+
                 IPublishedRouter router = context.HttpContext.RequestServices.GetRequiredService<IPublishedRouter>();
 
-                var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-
-                IPublishedRequestBuilder requestBuilder = await router.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
+                IPublishedRequestBuilder requestBuilder = await router.CreateRequestAsync(cleanedUrl);
                 requestBuilder.SetPublishedContent(content);
                 IPublishedRequest publishedRequest = requestBuilder.Build();
 
