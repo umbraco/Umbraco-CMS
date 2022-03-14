@@ -279,6 +279,14 @@ function dependencies() {
                 "./node_modules/wicg-inert/dist/inert.min.js.map"
             ],
             "base": "./node_modules/wicg-inert"
+        },
+        {
+            "name": "umbraco-ui",
+            "src": [
+                "./node_modules/@umbraco-ui/uui/dist/uui.min.js",
+                "./node_modules/@umbraco-ui/uui/dist/uui.min.js.map"
+            ],
+            "base": "./node_modules/@umbraco-ui"
         }
     ];
 
