@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
@@ -77,7 +75,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public DefaultDataCreationOption CreateDefaultMemberTypes { get; set; } = DefaultDataCreationOption.All;
 
         /// <summary>
-        /// Gets or sets a value indicating which default media types should be created when <see cref="CreateDefaultMediaTypes"/> is
+        /// Gets or sets a value indicating which default media types should be created when <see cref="CreateDefaultMemberTypes"/> is
         /// set to <see cref="DefaultDataCreationOption.CreateOnly"/> or <see cref="DefaultDataCreationOption.CreateAllExcept"/>.
         /// </summary>
         /// <remarks>
@@ -85,20 +83,5 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
         /// </remarks>
         public List<string> SelectedDefaultMemberTypes { get; set; } = new List<string>();
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to create default relation type data on installation.
-        /// </summary>
-        public DefaultDataCreationOption CreateDefaultRelationTypes { get; set; } = DefaultDataCreationOption.All;
-
-        /// <summary>
-        /// Gets or sets a value indicating which default relation types should be created when <see cref="CreateDefaultLanguages"/> is
-        /// set to <see cref="DefaultDataCreationOption.CreateOnly"/> or <see cref="DefaultDataCreationOption.CreateAllExcept"/>.
-        /// </summary>
-        /// <remarks>
-        /// The values provided should be the aliases for the relation types, listed at:
-        /// https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Core/Constants-Conventions.cs
-        /// </remarks>
-        public List<string> SelectedDefaultRelationTypes { get; set; } = new List<string>();
     }
 }

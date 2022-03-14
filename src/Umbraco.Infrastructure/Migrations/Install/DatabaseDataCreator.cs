@@ -1046,60 +1046,19 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreateRelationTypeData()
         {
-            var relationType = new RelationTypeDto { Id = 1, Alias = Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = Cms.Core.Constants.ObjectTypes.Document, ParentObjectType = Cms.Core.Constants.ObjectTypes.Document, Dual = true, Name = Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyName, IsDependency = false};
-            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
-            ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultRelationTypes,
-                _defaultDataCreationSettings.SelectedDefaultRelationTypes,
-                relationType.Alias,
-                relationType,
-                Cms.Core.Constants.UdiEntityType.RelationType,
-                Cms.Core.Constants.DatabaseSchema.Tables.RelationType,
-                "id");
+            CreateRelationTypeData(1, Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyName, Cms.Core.Constants.ObjectTypes.Document, Cms.Core.Constants.ObjectTypes.Document, true, false);
+            CreateRelationTypeData(2, Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName, Cms.Core.Constants.ObjectTypes.Document, Cms.Core.Constants.ObjectTypes.Document, false, false);
+            CreateRelationTypeData(3, Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName, Cms.Core.Constants.ObjectTypes.Media, Cms.Core.Constants.ObjectTypes.Media, false, false);
+            CreateRelationTypeData(4, Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaAlias, Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaName, null, null, false, true);
+            CreateRelationTypeData(5, Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias, Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentName, null, null, false, true);
+        }
 
-            relationType = new RelationTypeDto { Id = 2, Alias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, ChildObjectType = Cms.Core.Constants.ObjectTypes.Document, ParentObjectType = Cms.Core.Constants.ObjectTypes.Document, Dual = false, Name = Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName, IsDependency = false };
+        private void CreateRelationTypeData(int id, string alias, string name, Guid? parentObjectType, Guid? childObjectType, bool dual, bool isDependency)
+        {
+            var relationType = new RelationTypeDto { Id = id, Alias = alias, ChildObjectType = childObjectType, ParentObjectType = parentObjectType, Dual = dual, Name = name, IsDependency = isDependency };
             relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
-            ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultRelationTypes,
-                _defaultDataCreationSettings.SelectedDefaultRelationTypes,
-                relationType.Alias,
-                relationType,
-                Cms.Core.Constants.UdiEntityType.RelationType,
-                Cms.Core.Constants.DatabaseSchema.Tables.RelationType,
-                "id");
 
-            relationType = new RelationTypeDto { Id = 3, Alias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Cms.Core.Constants.ObjectTypes.Media, ParentObjectType = Cms.Core.Constants.ObjectTypes.Media, Dual = false, Name = Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName, IsDependency = false };
-            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
-            ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultRelationTypes,
-                _defaultDataCreationSettings.SelectedDefaultRelationTypes,
-                relationType.Alias,
-                relationType,
-                Cms.Core.Constants.UdiEntityType.RelationType,
-                Cms.Core.Constants.DatabaseSchema.Tables.RelationType,
-                "id");
-
-            relationType = new RelationTypeDto { Id = 4, Alias = Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaAlias, ChildObjectType = null, ParentObjectType = null, Dual = false, Name = Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaName, IsDependency = true };
-            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
-            ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultRelationTypes,
-                _defaultDataCreationSettings.SelectedDefaultRelationTypes,
-                relationType.Alias,
-                relationType,
-                Cms.Core.Constants.UdiEntityType.RelationType,
-                Cms.Core.Constants.DatabaseSchema.Tables.RelationType,
-                "id");
-
-            relationType = new RelationTypeDto { Id = 5, Alias = Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias, ChildObjectType = null, ParentObjectType = null, Dual = false, Name = Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentName, IsDependency = true };
-            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
-            ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultRelationTypes,
-                _defaultDataCreationSettings.SelectedDefaultRelationTypes,
-                relationType.Alias,
-                relationType,
-                Cms.Core.Constants.UdiEntityType.RelationType,
-                Cms.Core.Constants.DatabaseSchema.Tables.RelationType,
-                "id");
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
         }
 
         internal static Guid CreateUniqueRelationTypeId(string alias, string name)
