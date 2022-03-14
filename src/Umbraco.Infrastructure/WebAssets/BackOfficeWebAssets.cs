@@ -59,6 +59,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                 BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths(
                     "assets/css/umbraco.min.css",
+                    "lib/umbraco-ui/uui-css/dist/uui-css.css",
                     "lib/bootstrap-social/bootstrap-social.css",
                     "lib/font-awesome/css/font-awesome.min.css"));
 
