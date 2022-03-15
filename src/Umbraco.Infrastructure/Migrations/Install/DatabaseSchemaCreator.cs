@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly ILogger<DatabaseSchemaCreator> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IOptions<DefaultDataCreationSettings> _defaultDataCreationSettings;
+        private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
 
         [Obsolete("Please use constructor taking all parameters. This constructor will be removed in a future version.")]
         public DatabaseSchemaCreator(
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IEventAggregator eventAggregator)
-            : this (database, logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptions<DefaultDataCreationSettings>>())
+            : this (database, logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
         {
         }
 
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IEventAggregator eventAggregator,
-            IOptions<DefaultDataCreationSettings> defaultDataCreationSettings)
+            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

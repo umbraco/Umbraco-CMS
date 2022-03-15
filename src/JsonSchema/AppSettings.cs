@@ -93,7 +93,7 @@ namespace JsonSchema
 
                 public HelpPageSettings HelpPage { get; set; }
 
-                public DefaultDataCreationSettings DefaultDataCreation { get; set; }
+                public InstallDefaultDataSettings DefaultDataCreation { get; set; }
             }
 
             /// <summary>

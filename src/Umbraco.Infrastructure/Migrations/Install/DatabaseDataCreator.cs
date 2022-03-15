@@ -22,12 +22,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IDatabase _database;
         private readonly ILogger<DatabaseDataCreator> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly DefaultDataCreationSettings _defaultDataCreationSettings;
+        private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
 
         private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>()
             {
                 {
-                    Cms.Core.Constants.UdiEntityType.DataType,
+                    Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                     new List<string>
                     {
                         Cms.Core.Constants.DataTypes.Guids.LabelString,
@@ -35,12 +35,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 }
             };
 
-        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion, IOptions<DefaultDataCreationSettings> defaultDataCreationSettings)
+        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion, IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
         {
             _database = database;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _defaultDataCreationSettings = defaultDataCreationSettings.Value;
+            _installDefaultDataSettings = installDefaultDataSettings;
         }
 
         /// <summary>
@@ -157,11 +157,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 };
 
                 ConditionalInsert(
-                    _defaultDataCreationSettings.CreateDefaultDataTypes,
-                    _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                    Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                     uniqueId,
                     nodeDto,
-                    Cms.Core.Constants.UdiEntityType.DataType,
                     Cms.Core.Constants.DatabaseSchema.Tables.Node,
                     "id");
             }
@@ -178,246 +176,186 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             InsertDataTypeNodeDto(Cms.Core.Constants.DataTypes.LabelDecimal, 39, Cms.Core.Constants.DataTypes.Guids.LabelDecimal, "Label (decimal)");
 
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Upload,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Upload, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Upload}", SortOrder = 34, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadGuid, Text = "Upload File", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.UploadVideo,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadVideo, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadVideo}", SortOrder = 35, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadVideoGuid, Text = "Upload Video", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.UploadAudio,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadAudio, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadAudio}", SortOrder = 36, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadAudioGuid, Text = "Upload Audio", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.UploadArticle,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadArticle, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadArticle}", SortOrder = 37, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadArticleGuid, Text = "Upload Article", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.UploadVectorGraphics,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadVectorGraphics, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadVectorGraphics}", SortOrder = 38, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadVectorGraphicsGuid, Text = "Upload Vector Graphics", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Textarea,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Textarea, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Textarea}", SortOrder = 33, UniqueId = Cms.Core.Constants.DataTypes.Guids.TextareaGuid, Text = "Textarea", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.RichtextEditor,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.RichtextEditor, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.RichtextEditor}", SortOrder = 4, UniqueId = Cms.Core.Constants.DataTypes.Guids.RichtextEditorGuid, Text = "Richtext editor", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Numeric,
                 new NodeDto { NodeId = -51, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,-51", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.NumericGuid, Text = "Numeric", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Checkbox,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Boolean, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Boolean}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.CheckboxGuid, Text = "True/false", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.CheckboxList,
                 new NodeDto { NodeId = -43, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,-43", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.CheckboxListGuid, Text = "Checkbox list", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Dropdown,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.DropDownSingle, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.DropDownSingle}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.DropdownGuid, Text = "Dropdown", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.DatePicker,
                 new NodeDto { NodeId = -41, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,-41", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.DatePickerGuid, Text = "Date Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Radiobox,
                 new NodeDto { NodeId = -40, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,-40", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.RadioboxGuid, Text = "Radiobox", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.DropdownMultiple,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.DropDownMultiple, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.DropDownMultiple}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.DropdownMultipleGuid, Text = "Dropdown multiple", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.ApprovedColor,
                 new NodeDto { NodeId = -37, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,-37", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.ApprovedColorGuid, Text = "Approved Color", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.DatePickerWithTime,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.DateTime, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.DateTime}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.DatePickerWithTimeGuid, Text = "Date Picker with time", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.ListViewContent,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.DefaultContentListView, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.DefaultContentListView}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.ListViewContentGuid, Text = Cms.Core.Constants.Conventions.DataTypes.ListViewPrefix + "Content", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.ListViewMedia,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.DefaultMediaListView, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.DefaultMediaListView}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.ListViewMediaGuid, Text = Cms.Core.Constants.Conventions.DataTypes.ListViewPrefix + "Media", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.ListViewMembers,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.DefaultMembersListView, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.DefaultMembersListView}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.ListViewMembersGuid, Text = Cms.Core.Constants.Conventions.DataTypes.ListViewPrefix + "Members", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.Tags,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Tags, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Tags}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.TagsGuid, Text = "Tags", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.ImageCropper,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.ImageCropper, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.ImageCropper}", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.ImageCropperGuid, Text = "Image Cropper", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             // New UDI pickers with newer Ids
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.ContentPicker,
                 new NodeDto { NodeId = 1046, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1046", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.ContentPickerGuid, Text = "Content Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MemberPicker,
                 new NodeDto { NodeId = 1047, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1047", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MemberPickerGuid, Text = "Member Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MediaPicker,
                 new NodeDto { NodeId = 1048, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1048", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPickerGuid, Text = "Media Picker (legacy)", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MultipleMediaPicker,
                 new NodeDto { NodeId = 1049, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1049", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MultipleMediaPickerGuid, Text = "Multiple Media Picker (legacy)", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.RelatedLinks,
                 new NodeDto { NodeId = 1050, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1050", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.RelatedLinksGuid, Text = "Multi URL Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MediaPicker3,
                 new NodeDto { NodeId = 1051, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1051", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3Guid, Text = "Media Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MediaPicker3Multiple,
                 new NodeDto { NodeId = 1052, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1052", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3MultipleGuid, Text = "Multiple Media Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MediaPicker3SingleImage,
                 new NodeDto { NodeId = 1053, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1053", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3SingleImageGuid, Text = "Image Media Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultDataTypes,
-                _defaultDataCreationSettings.SelectedDefaultDataTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.MediaPicker3MultipleImages,
                 new NodeDto { NodeId = 1054, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1054", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid, Text = "Multiple Image Media Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.DataType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
         }
@@ -426,71 +364,57 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             var folderUniqueId = new Guid("f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 folderUniqueId.ToString(),
                 new NodeDto { NodeId = 1031, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1031", SortOrder = 2, UniqueId = folderUniqueId, Text = Cms.Core.Constants.Conventions.MediaTypes.Folder, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             var imageUniqueId = new Guid("cc07b313-0843-4aa8-bbda-871c8da728c8");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 imageUniqueId.ToString(),
                 new NodeDto { NodeId = 1032, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1032", SortOrder = 2, UniqueId = imageUniqueId, Text = Cms.Core.Constants.Conventions.MediaTypes.Image, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             var fileUniqueId = new Guid("4c52d8ab-54e6-40cd-999c-7a5f24903e4d");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 fileUniqueId.ToString(),
                 new NodeDto { NodeId = 1033, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1033", SortOrder = 2, UniqueId = fileUniqueId, Text = Cms.Core.Constants.Conventions.MediaTypes.File, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             var videoUniqueId = new Guid("f6c515bb-653c-4bdc-821c-987729ebe327");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 videoUniqueId.ToString(),
                 new NodeDto { NodeId = 1034, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1034", SortOrder = 2, UniqueId = videoUniqueId, Text = Cms.Core.Constants.Conventions.MediaTypes.Video, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             var audioUniqueId = new Guid("a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 audioUniqueId.ToString(),
                 new NodeDto { NodeId = 1035, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1035", SortOrder = 2, UniqueId = audioUniqueId, Text = Cms.Core.Constants.Conventions.MediaTypes.Audio, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             var articleUniqueId = new Guid("a43e3414-9599-4230-a7d3-943a21b20122");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 articleUniqueId.ToString(),
                 new NodeDto { NodeId = 1036, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1036", SortOrder = 2, UniqueId = articleUniqueId, Text = Cms.Core.Constants.Conventions.MediaTypes.Article, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
 
             var svgUniqueId = new Guid("c4b1efcf-a9d5-41c4-9621-e9d273b52a9c");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMediaTypes,
-                _defaultDataCreationSettings.SelectedDefaultMediaTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
                 svgUniqueId.ToString(),
                 new NodeDto { NodeId = 1037, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1037", SortOrder = 2, UniqueId = svgUniqueId, Text = "Vector Graphics (SVG)", NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MediaType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
         }
@@ -499,11 +423,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             var memberUniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda");
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultMemberTypes,
-                _defaultDataCreationSettings.SelectedDefaultMemberTypes,
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
                 memberUniqueId.ToString(),
                 new NodeDto { NodeId = 1044, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1044", SortOrder = 0, UniqueId = memberUniqueId, Text = Cms.Core.Constants.Conventions.MemberTypes.DefaultAlias, NodeObjectType = Cms.Core.Constants.ObjectTypes.MemberType, CreateDate = DateTime.Now },
-                Cms.Core.Constants.UdiEntityType.MemberType,
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
                 "id");
         }
@@ -721,11 +643,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreateLanguageData() =>
             ConditionalInsert(
-                _defaultDataCreationSettings.CreateDefaultLanguages,
-                _defaultDataCreationSettings.SelectedDefaultLanguages.Select(x => x.ToLowerInvariant()),
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
                 "en-us",
                 new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)", IsDefault = true },
-                Cms.Core.Constants.UdiEntityType.Language,
                 Cms.Core.Constants.DatabaseSchema.Tables.Language,
                 "id");
 
@@ -1089,29 +1009,29 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         }
 
         private void ConditionalInsert<TDto>(
-            DefaultDataCreationOption creationOption,
-            IEnumerable<string> selectedIds,
+            string configKey,
             string id,
             TDto dto,
-            string entityType,
             string tableName,
             string primaryKeyName,
             bool autoIncrement = false)
         {
-            var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(entityType) &&
-                _entitiesToAlwaysCreate[entityType].InvariantContains(id.ToString());
+            var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(configKey) &&
+                _entitiesToAlwaysCreate[configKey].InvariantContains(id.ToString());
 
-            if (!alwaysInsert && creationOption == DefaultDataCreationOption.None)
+            InstallDefaultDataSettings installDefaultDataSettings = _installDefaultDataSettings.Get(configKey);
+
+            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.None)
             {
                 return;
             }
 
-            if (!alwaysInsert && creationOption == DefaultDataCreationOption.CreateOnly && !selectedIds.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.InstallOnly && !installDefaultDataSettings.SelectedValues.InvariantContains(id))
             {
                 return;
             }
 
-            if (!alwaysInsert && creationOption == DefaultDataCreationOption.CreateAllExcept && selectedIds.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.InstallAllExcept && installDefaultDataSettings.SelectedValues.InvariantContains(id))
             {
                 return;
             }

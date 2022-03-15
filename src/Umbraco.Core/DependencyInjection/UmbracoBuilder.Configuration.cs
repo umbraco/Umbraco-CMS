@@ -88,8 +88,20 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
                 .AddUmbracoOptions<PackageMigrationSettings>()
                 .AddUmbracoOptions<ContentDashboardSettings>()
-                .AddUmbracoOptions<HelpPageSettings>()
-                .AddUmbracoOptions<DefaultDataCreationSettings>();
+                .AddUmbracoOptions<HelpPageSettings>();
+
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.Languages}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
             builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 
