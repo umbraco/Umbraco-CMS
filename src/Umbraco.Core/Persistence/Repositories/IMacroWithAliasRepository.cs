@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     public interface IMacroWithAliasRepository : IMacroRepository
     {
         IMacro GetByAlias(string alias);
+
         IEnumerable<IMacro> GetAllByAlias(string[] aliases);
     }
 }

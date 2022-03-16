@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a list of available <see cref="IMacro"/> objects by alias.
         /// </summary>
-        /// <param name="aliases"></param>
-        /// <returns></returns>
+        /// <param name="aliases">Optional array of aliases to limit the results</param>
+        /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         IEnumerable<IMacro> GetAll(params string[] aliases);
     }
 }

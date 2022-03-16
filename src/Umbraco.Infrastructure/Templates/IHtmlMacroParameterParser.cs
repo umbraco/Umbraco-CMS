@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Infrastructure.Templates
     /// <summary>
     /// Provides methods to parse referenced entities as Macro parameters.
     /// </summary>
-
     public interface IHtmlMacroParameterParser
     {
         /// <summary>
