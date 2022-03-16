@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
         /// <summary>
         /// Parses out media UDIs from an HTML string based on embedded macro parameter values.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">HTML string</param>
         /// <returns></returns>
         public IEnumerable<UmbracoEntityReference> FindUmbracoEntityReferencesFromEmbeddedMacros(string text)
         {
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
         }
 
         /// <summary>
-        /// Parses out media UDIs from Macro Grid Control Parameters.
+        /// Parses out media UDIs from Macro Grid Control parameters.
         /// </summary>
         /// <param name="macroGridControls"></param>
         /// <returns></returns>
