@@ -226,7 +226,6 @@
                 };
                 
                 overlayService.open(overlay);
-                //alert("Cannot be edited cause ElementType does not exist.");
             }
 
         };
