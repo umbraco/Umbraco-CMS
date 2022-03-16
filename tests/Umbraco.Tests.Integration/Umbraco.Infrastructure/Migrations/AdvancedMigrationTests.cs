@@ -18,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -47,7 +48,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                     return new CreateTableOfTDtoMigration(c);
                 });
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var upgrader = new Upgrader(
                     new MigrationPlan("test")
@@ -56,11 +57,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
 
                 upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
 
-                var helper = new DatabaseSchemaCreator(ScopeAccessor.AmbientScope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
-                bool exists = helper.TableExists("umbracoUser");
-                Assert.IsTrue(exists);
+                var db = ScopeAccessor.AmbientScope.Database;
+                var exists = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.DoesTableExist(db, "umbracoUser");
 
-                scope.Complete();
+                Assert.IsTrue(exists);
             }
         }
 
@@ -99,6 +99,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         [Test]
         public void CreateKeysAndIndexesOfTDto()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // TODO: Think about this for future migrations.
+                Assert.Ignore("Can't add / drop keys in SQLite.");
+                return;
+            }
+
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
@@ -134,6 +141,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         [Test]
         public void CreateKeysAndIndexes()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // TODO: Think about this for future migrations.
+                Assert.Ignore("Can't add / drop keys in SQLite.");
+                return;
+            }
+
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
@@ -167,7 +181,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         }
 
         [Test]
-        public void CreateColumn()
+        public void AddColumn()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -179,22 +193,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         case "CreateTableOfTDtoMigration":
                             return new CreateTableOfTDtoMigration(c);
                         case "CreateColumnMigration":
-                            return new CreateColumnMigration(c);
+                            return new AddColumnMigration(c);
                         default:
                             throw new NotSupportedException();
                     }
                 });
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var upgrader = new Upgrader(
                     new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
-                        .To<CreateColumnMigration>("done"));
+                        .To<AddColumnMigration>("done"));
 
                 upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
-                scope.Complete();
+
+                var db = ScopeAccessor.AmbientScope.Database;
+
+                var columnInfo = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.GetColumnsInSchema(db)
+                    .Where(x => x.TableName == "umbracoUser")
+                    .FirstOrDefault(x => x.ColumnName == "Foo");
+
+                Assert.Multiple(() =>
+                {
+                    Assert.NotNull(columnInfo);
+                    Assert.IsTrue(columnInfo.DataType.Contains("nvarchar"));
+                });
             }
         }
 
@@ -273,24 +298,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
             }
         }
 
-        public class CreateColumnMigration : MigrationBase
+        public class AddColumnMigration : MigrationBase
         {
-            public CreateColumnMigration(IMigrationContext context)
+            public AddColumnMigration(IMigrationContext context)
                 : base(context)
             {
             }
 
             protected override void Migrate()
             {
-                // cannot delete the column without this, of course
-                Delete.KeysAndIndexes("umbracoUser").Do();
-
-                Delete.Column("id").FromTable("umbracoUser").Do();
-
-                TableDefinition table = DefinitionFactory.GetTableDefinition(typeof(UserDto), SqlSyntax);
-                ColumnDefinition column = table.Columns.First(x => x.Name == "id");
-                string create = SqlSyntax.Format(column); // returns [id] INTEGER NOT NULL IDENTITY(1060,1)
-                Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD " + create);
+                Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo nvarchar(255)");
             }
         }
     }

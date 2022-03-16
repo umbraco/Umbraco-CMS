@@ -17,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_4_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -243,6 +244,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // to 8.17.0
             To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
 
+            // Hack to support migration from 8.18
+            To<NoopMigration>("{03482BB0-CF13-475C-845E-ECB8319DBE3C}");
+
             // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
             // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
             // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
@@ -278,6 +282,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<UpdateExternalLoginToUseKeyInsteadOfId>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
             To<AddTwoFactorLoginTable>("{0828F206-DCF7-4F73-ABBB-6792275532EB}");
 
+            // TO 9.4.0
+            To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
+            To<UpdateRelationTypesToHandleDependencies>("{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}");
         }
     }
 }

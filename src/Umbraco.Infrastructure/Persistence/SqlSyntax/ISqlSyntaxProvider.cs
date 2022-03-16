@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq.Expressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
@@ -16,6 +16,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
+        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString);
+
         string ProviderName { get; }
 
         string EscapeString(string val);
@@ -24,6 +26,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
         string GetConcat(params string[] args);
+
+        string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false);
 
         string GetQuotedTableName(string? tableName);
         string GetQuotedColumnName(string? columnName);
@@ -64,6 +68,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string? tableName, string? oldName, string? newName);
         string FormatTableRename(string? oldName, string? newName);
+
+        void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 
         /// <summary>
         /// Gets a regex matching aliased fields.
@@ -127,16 +133,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// <param name="constraintName">The constraint name.</param>
         /// <returns>A value indicating whether a default constraint was found.</returns>
         /// <remarks>
-        /// <para>Some database engines (e.g. SqlCe) may not have names for default constraints,
+        /// <para>Some database engines may not have names for default constraints,
         /// in which case the function may return true, but <paramref name="constraintName"/> is
         /// unspecified.</para>
         /// </remarks>
         bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
-        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
-        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
-        void ReadLock(IDatabase db, params int[] lockIds);
-        void WriteLock(IDatabase db, params int[] lockIds);
+        string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
+
+        /// <summary>
+        /// Appends the relevant ForUpdate hint.
+        /// </summary>
+        Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql);
+
+        /// <summary>
+        /// Appends the relevant ForUpdate hint.
+        /// </summary>
+        Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql);
+
+        /// <summary>
+        /// Handles left join with nested join
+        /// </summary>
+        Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
+            Sql<ISqlContext> sql,
+            Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
+            string alias = null);
+
+        IDictionary<Type, IScalarMapper> ScalarMappers { get; }
     }
 }

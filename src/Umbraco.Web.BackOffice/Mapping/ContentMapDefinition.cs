@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
             target.AllowedActions = GetActions(source, parent, context);
             target.AllowedTemplates = GetAllowedTemplates(source);
-            target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeKey = source.ContentType.Key;
             target.ContentTypeAlias = source.ContentType.Alias;

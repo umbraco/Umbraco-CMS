@@ -313,7 +313,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         }
 
         private bool CanAutoInstallMissingDatabase(IUmbracoDatabaseFactory databaseFactory)
-            => databaseFactory.ProviderName == Constants.DatabaseProviders.SqlCe ||
-               databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
+            => databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
     }
 }

@@ -11,6 +11,7 @@ using Umbraco.Extensions;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 
@@ -38,6 +39,7 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly IEventAggregator _eventAggregator;
 
         public ScopeProvider(
+            IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
             IUmbracoDatabaseFactory databaseFactory,
             FileSystems fileSystems,
             IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
@@ -45,6 +47,7 @@ namespace Umbraco.Cms.Core.Scoping
             IRequestCache requestCache,
             IEventAggregator eventAggregator)
         {
+            DistributedLockingMechanismFactory = distributedLockingMechanismFactory;
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _coreDebugSettings = coreDebugSettings.CurrentValue;
@@ -57,6 +60,8 @@ namespace Umbraco.Cms.Core.Scoping
 
             coreDebugSettings.OnChange(x => _coreDebugSettings = x);
         }
+
+        public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 

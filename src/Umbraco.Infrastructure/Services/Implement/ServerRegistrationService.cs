@@ -133,13 +133,28 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// time the current server is touched, and the period depends on the configuration. Use the
         /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
         /// from the database.</remarks>
-        public IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false)
+        public IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false) => GetServers(refresh).Where(x => x.IsActive);
+
+        /// <summary>
+        /// Return all servers (active and inactive).
+        /// </summary>
+        /// <param name="refresh">A value indicating whether to force-refresh the cache.</param>
+        /// <returns>All servers.</returns>
+        /// <remarks>By default this method will rely on the repository's cache, which is updated each
+        /// time the current server is touched, and the period depends on the configuration. Use the
+        /// <paramref name="refresh"/> parameter to force a cache refresh and reload all servers
+        /// from the database.</remarks>
+        public IEnumerable<IServerRegistration> GetServers(bool refresh = false)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.Servers);
-                if (refresh) ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache();
-                return _serverRegistrationRepository.GetMany()?.Where(x => x.IsActive).ToArray(); // fast, cached // fast, cached
+                if (refresh)
+                {
+                    ((ServerRegistrationRepository)_serverRegistrationRepository).ClearCache();
+                }
+
+                return _serverRegistrationRepository.GetMany().ToArray(); // fast, cached // fast, cached
             }
         }
 

@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -33,7 +32,7 @@ namespace Umbraco.Cms.Core.Packaging
         private readonly IEntityXmlSerializer _serializer;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly string _packageRepositoryFileName;
-        private readonly string _mediaFolderPath;
+        private readonly string _createdPackagesFolderPath;
         private readonly string _packagesFolderPath;
         private readonly string _tempFolderPath;
         private readonly PackageDefinitionXmlParser _parser;
@@ -93,7 +92,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? Path.Combine(globalSettings.Value.UmbracoMediaPhysicalRootPath, Constants.SystemDirectories.CreatedPackages);
+            _createdPackagesFolderPath = mediaFolderPath ?? Constants.SystemDirectories.CreatedPackages;
 
             _parser = new PackageDefinitionXmlParser();
             _mediaService = mediaService;
@@ -250,15 +249,8 @@ namespace Umbraco.Cms.Core.Packaging
                     }
                 }
 
-
-
-                var directoryName =
-                    _hostingEnvironment.MapPathWebRoot(Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
-
-                if (Directory.Exists(directoryName) == false)
-                {
-                    Directory.CreateDirectory(directoryName);
-                }
+                var directoryName = _hostingEnvironment.MapPathContentRoot(Path.Combine(_createdPackagesFolderPath, definition.Name.Replace(' ', '_')));
+                Directory.CreateDirectory(directoryName);
 
                 var finalPackagePath = Path.Combine(directoryName, fileName);
 
@@ -276,14 +268,14 @@ namespace Umbraco.Cms.Core.Packaging
             }
             finally
             {
-                //Clean up
+                // Clean up
                 Directory.Delete(temporaryPath, true);
             }
         }
 
         private void ValidatePackage(PackageDefinition definition)
         {
-            //ensure it's valid
+            // ensure it's valid
             var context = new ValidationContext(definition, serviceProvider: null, items: null);
             var results = new List<ValidationResult>();
             var isValid = Validator.TryValidateObject(definition, context, results);
@@ -740,7 +732,6 @@ namespace Umbraco.Cms.Core.Packaging
         private XDocument EnsureStorage(out string packagesFile)
         {
             var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
-            //ensure it exists
             Directory.CreateDirectory(packagesFolder);
 
             packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
@@ -748,6 +739,8 @@ namespace Umbraco.Cms.Core.Packaging
             {
                 var xml = new XDocument(new XElement("packages"));
                 xml.Save(packagesFile);
+
+                return xml;
             }
 
             var packagesXml = XDocument.Load(packagesFile);
@@ -757,9 +750,16 @@ namespace Umbraco.Cms.Core.Packaging
         public void DeleteLocalRepositoryFiles()
         {
             var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
-            File.Delete(packagesFile);
+            if (File.Exists(packagesFile))
+            {
+                File.Delete(packagesFile);
+            }
+
             var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
-            Directory.Delete(packagesFolder);
+            if (Directory.Exists(packagesFolder))
+            {
+                Directory.Delete(packagesFolder);
+            }
         }
     }
 }

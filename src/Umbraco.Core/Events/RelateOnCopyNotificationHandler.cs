@@ -33,7 +33,8 @@ namespace Umbraco.Cms.Core.Events
                     Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
                     true,
                     Constants.ObjectTypes.Document,
-                    Constants.ObjectTypes.Document);
+                    Constants.ObjectTypes.Document,
+                    false);
 
                 _relationService.Save(relationType);
             }

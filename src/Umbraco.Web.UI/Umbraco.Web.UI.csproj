@@ -16,16 +16,19 @@
     <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
     <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
 <!--    <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />-->
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
   </ItemGroup>
-  
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
 
-    <RuntimeHostConfigurationOption
-      Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))"
-      Include="System.Globalization.AppLocalIcu"
-      Value="68.2.0.9" />
+    <RuntimeHostConfigurationOption Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +42,7 @@
     <Compile Remove="umbraco/mediacache/**" />
     <Compile Remove="wwwroot/umbraco/**" />
     <Compile Remove="App_Data/**" />
+    <Compile Remove="Controllers\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +50,7 @@
     <EmbeddedResource Remove="umbraco/Data/**" />
     <EmbeddedResource Remove="umbraco/logs/**" />
     <EmbeddedResource Remove="umbraco/mediacache/**" />
+    <EmbeddedResource Remove="Controllers\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +60,7 @@
     <Content Remove="umbraco/mediacache/**" />
     <Content Remove="umbraco\UmbracoWebsite\NotFound.cshtml" />
     <Content Remove="wwwroot/Web.config" />
+    <Content Remove="Controllers\**" />
   </ItemGroup>
 
 
@@ -72,6 +78,7 @@
     <None Remove="umbraco/logs/**" />
     <None Remove="umbraco/mediacache/**" />
     <None Include="umbraco/UmbracoWebsite/NoNodes.cshtml" />
+    <None Remove="Controllers\**" />
   </ItemGroup>
 
   <!-- We don't want to include the generated files, they will throw a lot of errors -->

@@ -90,8 +90,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseSchemaCreator(IUmbracoDatabase? database, ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory, IUmbracoVersion umbracoVersion, IEventAggregator eventAggregator)
+        public DatabaseSchemaCreator(
+            IUmbracoDatabase? database,
+            ILogger<DatabaseSchemaCreator> logger,
+            ILoggerFactory loggerFactory,
+            IUmbracoVersion umbracoVersion,
+            IEventAggregator eventAggregator)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -154,8 +158,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (creatingNotification.Cancel == false)
             {
-                var dataCreation = new DatabaseDataCreator(_database,
-                    _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion);
+                var dataCreation = new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion);
                 foreach (Type table in OrderedTables)
                 {
                     CreateTable(false, table, dataCreation);
@@ -458,12 +461,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             TableDefinition tableDefinition = DefinitionFactory.GetTableDefinition(modelType, SqlSyntax);
             var tableName = tableDefinition.Name;
-
-            var createSql = SqlSyntax.Format(tableDefinition);
-            var createPrimaryKeySql = SqlSyntax.FormatPrimaryKey(tableDefinition);
-            List<string> foreignSql = SqlSyntax.Format(tableDefinition.ForeignKeys);
-            List<string> indexSql = SqlSyntax.Format(tableDefinition.Indexes);
-
             var tableExist = TableExists(tableName);
             if (string.IsNullOrEmpty(tableName))
             {
@@ -485,18 +482,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
 
             //Execute the Create Table sql
-            _database.Execute(new Sql(createSql));
-            _logger.LogInformation("Create Table {TableName}: \n {Sql}", tableName, createSql);
-
-            //If any statements exists for the primary key execute them here
-            if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
-            {
-                _database.Execute(new Sql(createPrimaryKeySql));
-                _logger.LogInformation("Create Primary Key:\n {Sql}", createPrimaryKeySql);
-            }
+            SqlSyntax.HandleCreateTable(_database, tableDefinition);
 
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
             {
+                // This should probably delegate to whole thing to the syntax provider
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} ON "));
             }
 
@@ -508,20 +498,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
             {
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
-            }
-
-            //Loop through index statements and execute sql
-            foreach (var sql in indexSql)
-            {
-                _database.Execute(new Sql(sql));
-                _logger.LogInformation("Create Index:\n {Sql}", sql);
-            }
-
-            //Loop through foreignkey statements and execute sql
-            foreach (var sql in foreignSql)
-            {
-                _database.Execute(new Sql(sql));
-                _logger.LogInformation("Create Foreign Key:\n {Sql}", sql);
             }
 
             if (overwrite)

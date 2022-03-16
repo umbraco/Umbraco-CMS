@@ -33,15 +33,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
             }
             var tableDefinition = DefinitionFactory.GetTableDefinition(TypeOfDto, syntax);
 
-            ExecuteSql(syntax.Format(tableDefinition));
-            if (WithoutKeysAndIndexes)
-                return;
-
-            ExecuteSql(syntax.FormatPrimaryKey(tableDefinition));
-            foreach (var sql in syntax.Format(tableDefinition.ForeignKeys))
-                ExecuteSql(sql);
-            foreach (var sql in syntax.Format(tableDefinition.Indexes))
-                ExecuteSql(sql);
+            syntax.HandleCreateTable(_context.Database, tableDefinition, WithoutKeysAndIndexes);
+            _context.BuildingExpression = false;
         }
 
         private void ExecuteSql(string sql)

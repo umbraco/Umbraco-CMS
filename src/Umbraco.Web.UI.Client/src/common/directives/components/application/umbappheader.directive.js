@@ -16,6 +16,7 @@
                 { value: "assets/img/application/logo@2x.png" },
                 { value: "assets/img/application/logo@3x.png" }
             ];
+            scope.hideBackofficeLogo = Umbraco.Sys.ServerVariables.umbracoSettings.hideBackofficeLogo;
 
             // when a user logs out or timesout
             evts.push(eventsService.on("app.notAuthenticated", function () {
@@ -104,13 +105,24 @@
                 $timeout.cancel(scope.logoModal.timer);
             };
             scope.hideLogoModal = function() {
-                $timeout.cancel(scope.logoModal.timer);
-                scope.logoModal.timer = $timeout(function () {
-                    scope.logoModal.show = false;
-                }, 100);
+                if(scope.logoModal.show === true) {
+                    $timeout.cancel(scope.logoModal.timer);
+                    scope.logoModal.timer = $timeout(function () {
+                        scope.logoModal.show = false;
+                    }, 100);
+                }
             };
             scope.stopClickEvent = function($event) {
                 $event.stopPropagation();
+            };
+
+            scope.toggleLogoModal = function() {
+                if(scope.logoModal.show) {
+                    $timeout.cancel(scope.logoModal.timer);
+                    scope.logoModal.show = false;
+                } else {
+                    scope.showLogoModal();
+                }
             };
 
         }

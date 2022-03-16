@@ -2,21 +2,17 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
@@ -29,10 +25,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoDatabase? _db;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
@@ -41,56 +35,30 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private bool _acquireWhenTablesNotAvailable = false;
 
         public SqlMainDomLock(
-            ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
             IOptionsMonitor<ConnectionStrings> connectionStrings,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IHostingEnvironment hostingEnvironment,
+            IMainDomKeyGenerator mainDomKeyGenerator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers,
-            string? connectionStringName)
+            NPocoMapperCollection npocoMappers)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<SqlMainDomLock>();
             _globalSettings = globalSettings;
-            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
-            _hostingEnvironment = hostingEnvironment;
+
             _dbFactory = new UmbracoDatabaseFactory(
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 _globalSettings,
+                connectionStrings,
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 dbProviderFactoryCreator,
                 databaseSchemaCreatorFactory,
-                npocoMappers,
-                connectionStringName);
-            MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
-        }
+                npocoMappers);
 
-        public SqlMainDomLock(
-            ILogger<SqlMainDomLock> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IHostingEnvironment hostingEnvironment,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers)
-        : this(
-            logger,
-            loggerFactory,
-            globalSettings,
-            connectionStrings,
-            dbProviderFactoryCreator,
-            hostingEnvironment,
-            databaseSchemaCreatorFactory,
-            npocoMappers,
-            connectionStrings.CurrentValue.UmbracoConnectionString.ConnectionString
-            )
-        {
-
+            MainDomKey = MainDomKeyPrefix + "-" + mainDomKeyGenerator.GenerateKey();
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -100,13 +68,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 // if we aren't configured then we're in an install state, in which case we have no choice but to assume we can acquire
                 return true;
             }
-
-            if (!(_dbFactory.SqlContext?.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
-            {
-                throw new NotSupportedException("SqlMainDomLock is only supported for Sql Server");
-            }
-
-            _sqlServerSyntax = sqlServerSyntaxProvider;
 
             _logger.LogDebug("Acquiring lock...");
 
@@ -127,25 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     return true;
                 }
 
-                db!.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                try
-                {
-                    // wait to get a write lock
-                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Cms.Core.Constants.Locks.MainDom);
-                }
-                catch(SqlException ex)
-                {
-                    if (IsLockTimeoutException(ex))
-                    {
-                        _logger.LogError(ex, "Sql timeout occurred, could not acquire MainDom.");
-                        _errorDuringAcquiring = true;
-                        return false;
-                    }
-
-                    // unexpected (will be caught below)
-                    throw;
-                }
+                db!.BeginTransaction(IsolationLevel.Serializable);
 
                 var result = InsertLockRecord(tempId, db); //we change the row to a random Id to signal other MainDom to shutdown
                 if (result == RecordPersistenceType.Insert)
@@ -212,7 +155,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 // poll every couple of seconds
                 // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                Thread.Sleep(2000);
+                Thread.Sleep(_globalSettings.Value.MainDomReleaseSignalPollingInterval);
 
                 if (!_dbFactory.Configured)
                 {
@@ -256,9 +199,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                             InsertLockRecord(_lockId, db!);
                         }
 
-                        db!.BeginTransaction(IsolationLevel.ReadCommitted);
-                        // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
+                        db!.BeginTransaction(IsolationLevel.Serializable);
 
                         if (!IsMainDomValue(_lockId, db))
                         {
@@ -345,12 +286,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             try
             {
-                transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
-                // get a read lock
-                _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
+                transaction = db.GetTransaction(IsolationLevel.Serializable);
 
-                        // the row
-                        var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                // the row
+                var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key",
+                    new {key = MainDomKey});
 
                 if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
                 {
@@ -358,8 +298,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // Or the other maindom shutdown super fast and just deleted the record
                     // which indicates that we
                     // can acquire it and it has shutdown.
-
-                    _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
@@ -378,12 +316,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
             catch (Exception ex)
             {
-                if (IsLockTimeoutException(ex as SqlException))
-                {
-                    _logger.LogError(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
-                    _errorDuringAcquiring = true;
-                    return false;
-                }
                 // unexpected
                 _logger.LogError(ex, "Unexpected error, waiting for existing MainDom is canceled.");
                 _errorDuringAcquiring = true;
@@ -416,9 +348,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             try
             {
-                transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
-
-                _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
+                transaction = db.GetTransaction(IsolationLevel.Serializable);
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
@@ -427,13 +357,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
             catch (Exception ex)
             {
-                if (IsLockTimeoutException(ex as SqlException))
-                {
-                    // something is wrong, we cannot acquire, not much we can do
-                    _logger.LogError(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
-                    _errorDuringAcquiring = true;
-                    return false;
-                }
                 _logger.LogError(ex, "Unexpected error, could not forcibly acquire MainDom.");
                 _errorDuringAcquiring = true;
                 return false;
@@ -471,13 +394,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         }
 
-        /// <summary>
-        /// Checks if the exception is an SQL timeout
-        /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
-        private bool IsLockTimeoutException(SqlException? sqlException) => sqlException?.Number == 1222;
-
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
 
@@ -502,10 +418,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                             try
                             {
                                 db = _dbFactory.CreateDatabase();
-                                db!.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                                // get a write lock
-                                _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
+                                db!.BeginTransaction(IsolationLevel.Serializable);
 
                                 // When we are disposed, it means we have released the MainDom lock
                                 // and called all MainDom release callbacks, in this case

@@ -760,27 +760,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (id == Constants.System.Root && startNodes.Length > 0 &&
                     startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
                 {
-                    if (pageNumber > 0)
-                    {
-                        return new PagedResult<EntityBasic>(0, 0, 0);
-                    }
-
-                    IEntitySlim[] nodes = _entityService.GetAll(objectType.Value, startNodes).ToArray();
-                    if (nodes.Length == 0)
-                    {
-                        return new PagedResult<EntityBasic>(0, 0, 0);
-                    }
-
-                    if (pageSize < nodes.Length)
-                    {
-                        pageSize = nodes.Length; // bah
-                    }
-
-                    var pr = new PagedResult<EntityBasic>(nodes.Length, pageNumber, pageSize)
-                    {
-                        Items = nodes.Select(_umbracoMapper.Map<EntityBasic>)
-                    };
-                    return pr;
+                    return new PagedResult<EntityBasic>(0, 0, 0);
                 }
 
                 // else proceed as usual

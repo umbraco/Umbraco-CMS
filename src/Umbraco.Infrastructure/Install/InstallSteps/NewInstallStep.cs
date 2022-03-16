@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly ICookieManager _cookieManager;
         private readonly IBackOfficeUserManager _userManager;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
+        private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
 
         public NewInstallStep(
             IUserService userService,
@@ -47,7 +50,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             IOptionsMonitor<ConnectionStrings> connectionStrings,
             ICookieManager cookieManager,
             IBackOfficeUserManager userManager,
-            IDbProviderFactoryCreator dbProviderFactoryCreator)
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -58,6 +62,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _cookieManager = cookieManager;
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _databaseProviderMetadata = databaseProviderMetadata;
         }
 
         public override async Task<InstallSetupResult?> ExecuteAsync(UserModel user)
@@ -113,11 +118,22 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             get
             {
+                var quickInstallSettings = _databaseProviderMetadata
+                    .Where(x => x.SupportsQuickInstall)
+                    .Where(x => x.IsAvailable)
+                    .OrderBy(x => x.SortOrder)
+                    .Select(x => new
+                    {
+                        displayName = x.DisplayName,
+                        defaultDatabaseName = x.DefaultDatabaseName,
+                    })
+                    .FirstOrDefault();
+
                 return new
                 {
                     minCharLength = _passwordConfiguration.RequiredLength,
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
-                    quickInstallAvailable = DatabaseConfigureStep.IsSqlCeAvailable() || DatabaseConfigureStep.IsLocalDbAvailable(),
+                    quickInstallSettings,
                     customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
                 };
             }
@@ -139,10 +155,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             var installState = InstallState.Unknown;
 
+
             // TODO: we need to do a null check here since this could be entirely missing and we end up with a null ref
             // exception in the installer.
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
+            var databaseSettings = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
 
             var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
             if (hasConnString)

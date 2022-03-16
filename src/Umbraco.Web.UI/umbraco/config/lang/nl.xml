@@ -18,7 +18,7 @@
     <key alias="delete">Verwijderen</key>
     <key alias="disable">Uitschakelen</key>
     <key alias="editSettings">Instellingen wijzigen</key>
-    <key alias="emptyRecycleBin">Prullenbak leegmaken</key>
+    <key alias="emptyrecyclebin">Prullenbak leegmaken</key>
     <key alias="enable">Inschakelen</key>
     <key alias="exportDocumentType">Documenttype exporteren</key>
     <key alias="importdocumenttype">Documenttype importeren</key>
@@ -533,6 +533,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">Er zijn geen woordenboekitems.</key>
+    <key alias="createNew">Woordenboekitem aanmaken</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[

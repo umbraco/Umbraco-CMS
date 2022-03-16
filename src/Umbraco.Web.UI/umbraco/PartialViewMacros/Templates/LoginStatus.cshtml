@@ -15,7 +15,7 @@
 {
     <div class="login-status">
 
-        <p>Welcome back <strong>@Context.User.Identity.Name</strong>!</p>
+        <p>Welcome back <strong>@Context?.User?.Identity?.Name</strong>!</p>
 
         @using (Html.BeginUmbracoForm<UmbLoginStatusController>("HandleLogout", new { RedirectUrl = logoutModel.RedirectUrl }))
         {

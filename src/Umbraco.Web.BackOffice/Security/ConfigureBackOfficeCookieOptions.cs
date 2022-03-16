@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <inheritdoc />
         public void Configure(CookieAuthenticationOptions options)
         {
-            options.SlidingExpiration = true;
+            options.SlidingExpiration = false;
             options.ExpireTimeSpan = _globalSettings.TimeOut;
             options.Cookie.Domain = _securitySettings.AuthCookieDomain;
             options.Cookie.Name = _securitySettings.AuthCookieName;
@@ -150,8 +151,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     // ensure the thread culture is set
                     backOfficeIdentity.EnsureCulture();
 
-                    await EnsureValidSessionId(ctx);
-                    await securityStampValidator.ValidateAsync(ctx);
                     EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
                     // add or update a claim to track when the cookie expires, we use this to track time remaining
@@ -163,6 +162,28 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         Constants.Security.BackOfficeAuthenticationType,
                         backOfficeIdentity));
 
+                    await securityStampValidator.ValidateAsync(ctx);
+
+                    // This might have been called from GetRemainingTimeoutSeconds, in this case we don't want to ensure valid session
+                    // since that in it self will keep the session valid since we renew the lastVerified date.
+                    // Similarly don't renew the token
+                    if (IsRemainingSecondsRequest(ctx))
+                    {
+                        return;
+                    }
+
+                    // This relies on IssuedUtc, so call it before updating it.
+                    await EnsureValidSessionId(ctx);
+
+                    // We have to manually specify Issued and Expires,
+                    // because the SecurityStampValidator refreshes the principal every 30 minutes,
+                    // When the principal is refreshed the Issued is update to time of refresh, however, the Expires remains unchanged
+                    // When we then try and renew, the difference of issued and expires effectively becomes the new ExpireTimeSpan
+                    // meaning we effectively lose 30 minutes of our ExpireTimeSpan for EVERY principal refresh if we don't
+                    // https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Cookies/src/CookieAuthenticationHandler.cs#L115
+                    ctx.Properties.IssuedUtc = _systemClock.UtcNow;
+                    ctx.Properties.ExpiresUtc = _systemClock.UtcNow.Add(_globalSettings.TimeOut);
+                    ctx.ShouldRenew = true;
                 },
                 OnSigningIn = ctx =>
                 {
@@ -226,7 +247,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     }
 
                     return Task.CompletedTask;
-                }
+                },
             };
         }
 
@@ -275,6 +296,22 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     context.ShouldRenew = true;
                 }
             }
+        }
+
+        private bool IsRemainingSecondsRequest(CookieValidatePrincipalContext context)
+        {
+            var routeValues = context.HttpContext.Request.RouteValues;
+            if (routeValues.TryGetValue("controller", out var controllerName) &&
+                routeValues.TryGetValue("action", out var action))
+            {
+                if (controllerName?.ToString() == ControllerExtensions.GetControllerName<AuthenticationController>()
+                    && action?.ToString() == nameof(AuthenticationController.GetRemainingTimeoutSeconds))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

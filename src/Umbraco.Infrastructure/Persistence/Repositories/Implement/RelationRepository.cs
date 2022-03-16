@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -176,6 +177,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         {
+            return GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
+        {
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
             // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
@@ -188,10 +194,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 sql.Where<RelationDto>(rel => rel.ChildId == childId);
                 sql.Where<RelationDto, NodeDto>((rel, node) => rel.ParentId == childId || node.NodeId != childId);
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
+            });
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildIds(int[] childIds, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
+        {
+            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
+            {
+                SqlJoinRelations(sql);
+
+                sql.WhereIn<RelationDto>(rel => rel.ChildId, childIds);
+                sql.WhereAny(s => s.WhereIn<RelationDto>(rel => rel.ParentId, childIds), s => s.WhereNotIn<NodeDto>(node => node.NodeId, childIds));
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
             });
         }
 
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        {
+            return GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
         {
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
@@ -205,8 +237,28 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 sql.Where<RelationDto>(rel => rel.ParentId == parentId);
                 sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == parentId || node.NodeId != parentId);
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
             });
         }
+
+        public IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] itemIds, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        {
+            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
+            {
+                SqlJoinRelations(sql);
+
+                sql.WhereIn<RelationDto>(rel => rel.ChildId, itemIds);
+                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == node.NodeId);
+                sql.Where<RelationTypeDto>(type => type.IsDependency);
+            });
+        }
+
+
+
 
         public void Save(IEnumerable<IRelation> relations)
         {
@@ -317,8 +369,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)
         {
-            if (Database.DatabaseType.IsSqlCe())
+            // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
+            if (Database.DatabaseType.IsSqlite())
             {
+                var query = Sql().Append(@"delete from umbracoRelation");
+
                 var subQuery = Sql().Select<RelationDto>(x => x.Id)
                     .From<RelationDto>()
                     .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
@@ -329,8 +384,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
                 }
 
-                Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
+                var fullQuery = query.WhereIn<RelationDto>(x => x.Id, subQuery);
 
+                Database.Execute(fullQuery);
             }
             else
             {
@@ -402,5 +458,43 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             else
                 sql.OrderByDescending(orderBy);
         }
+    }
+
+    internal class RelationItemDto
+    {
+        [Column(Name = "nodeId")]
+        public int ChildNodeId { get; set; }
+
+        [Column(Name = "nodeKey")]
+        public Guid ChildNodeKey { get; set; }
+
+        [Column(Name = "nodeName")]
+        public string ChildNodeName { get; set; }
+
+        [Column(Name = "nodeObjectType")]
+        public Guid ChildNodeObjectType { get; set; }
+
+        [Column(Name = "contentTypeIcon")]
+        public string ChildContentTypeIcon { get; set; }
+
+        [Column(Name = "contentTypeAlias")]
+        public string ChildContentTypeAlias { get; set; }
+
+        [Column(Name = "contentTypeName")]
+        public string ChildContentTypeName { get; set; }
+
+
+
+        [Column(Name = "relationTypeName")]
+        public string RelationTypeName { get; set; }
+
+        [Column(Name = "relationTypeAlias")]
+        public string RelationTypeAlias { get; set; }
+
+        [Column(Name = "relationTypeIsDependency")]
+        public bool RelationTypeIsDependency { get; set; }
+
+        [Column(Name = "relationTypeIsBidirectional")]
+        public bool RelationTypeIsBidirectional { get; set; }
     }
 }

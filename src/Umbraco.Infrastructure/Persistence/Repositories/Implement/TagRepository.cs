@@ -210,7 +210,16 @@ WHERE r.tagId IS NULL";
                     sql.Append(" UNION ");
                 }
 
-                sql.Append("SELECT N'");
+                // HACK: SQLite (or rather SQL server setup was a hack)
+                if (SqlContext.DatabaseType.IsSqlServer())
+                {
+                    sql.Append("SELECT N'");
+                }
+                else
+                {
+                    sql.Append("SELECT '");
+                }
+
                 sql.Append(SqlSyntax.EscapeString(tag.Text));
                 sql.Append("' AS tag, '");
                 sql.Append(SqlSyntax.EscapeString(tag.Group));

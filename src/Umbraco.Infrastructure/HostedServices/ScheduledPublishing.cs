@@ -5,13 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -27,20 +29,13 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _serverMessenger;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-        /// <summary>
+ /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
         /// </summary>
-        /// <param name="runtimeState">Representation of the state of the Umbraco runtime.</param>
-        /// <param name="mainDom">Representation of the main application domain.</param>
-        /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
-        /// <param name="contentService">Service for handling content operations.</param>
-        /// <param name="umbracoContextFactory">Service for creating and managing Umbraco context.</param>
-        /// <param name="logger">The typed logger.</param>
-        /// <param name="serverMessenger">Service broadcasting cache notifications to registered servers.</param>
-        /// <param name="backofficeSecurityFactory">Creates and manages <see cref="IBackOfficeSecurity"/> instances.</param>
         public ScheduledPublishing(
             IRuntimeState runtimeState,
             IMainDom mainDom,
@@ -48,7 +43,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IContentService contentService,
             IUmbracoContextFactory umbracoContextFactory,
             ILogger<ScheduledPublishing> logger,
-            IServerMessenger serverMessenger)
+            IServerMessenger serverMessenger,
+            IScopeProvider scopeProvider)
             : base(TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtimeState = runtimeState;
@@ -58,6 +54,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
             _serverMessenger = serverMessenger;
+            _scopeProvider = scopeProvider;
         }
 
         public override Task PerformExecuteAsync(object? state)
@@ -93,8 +90,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
             try
             {
-                // We don't need an explicit scope here because PerformScheduledPublish creates it's own scope
-                // so it's safe as it will create it's own ambient scope.
                 // Ensure we run with an UmbracoContext, because this will run in a background task,
                 // and developers may be using the UmbracoContext in the event handlers.
 
@@ -105,6 +100,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // - and we should definitively *not* have to flush it here (should be auto)
 
                 using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
+                using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+
+                /* We used to assume that there will never be two instances running concurrently where (IsMainDom && ServerRole == SchedulingPublisher)
+                 * However this is possible during an azure deployment slot swap for the SchedulingPublisher instance when trying to achieve zero downtime deployments.
+                 * If we take a distributed write lock, we are certain that the multiple instances of the job will not run in parallel.
+                 * It's possible that during the swapping process we may run this job more frequently than intended but this is not of great concern and it's
+                 * only until the old SchedulingPublisher shuts down. */
+                scope.EagerWriteLock(Constants.Locks.ScheduledPublishing);
                 try
                 {
                     // Run

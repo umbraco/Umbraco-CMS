@@ -27,8 +27,10 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticInstallMissingDatabase = false;
         internal const bool StaticDisableElectionForSingleServer = false;
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
-        internal const string StaticSqlWriteLockTimeOut = "00:00:05";
+        internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
+        internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
         internal const bool StaticSanitizeTinyMce = false;
+        internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
         /// <summary>
         /// Gets or sets a value for the reserved URLs (must end with a comma).
@@ -138,6 +140,26 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string MainDomLock { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets a value to discriminate MainDom boundaries.
+        /// <para>
+        /// Generally the default should suffice but useful for advanced scenarios e.g. azure deployment slot based zero downtime deployments.
+        /// </para>
+        /// </summary>
+        public string MainDomKeyDiscriminator { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the duration (in milliseconds) for which the MainDomLock release signal polling task should sleep.
+        /// </summary>
+        /// <remarks>
+        /// Doesn't apply to MainDomSemaphoreLock.
+        /// <para>
+        ///  The default value is 2000ms.
+        /// </para>
+        /// </remarks>
+        [DefaultValue(StaticMainDomReleaseSignalPollingInterval)]
+        public int MainDomReleaseSignalPollingInterval { get; set; } = StaticMainDomReleaseSignalPollingInterval;
+
+        /// <summary>
         /// Gets or sets the telemetry ID.
         /// </summary>
         public string Id { get; set; } = string.Empty;
@@ -174,18 +196,32 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
 
         /// <summary>
-        /// Gets a value indicating whether TinyMCE scripting sanitization should be applied.
+        /// Gets or sets a value indicating whether TinyMCE scripting sanitization should be applied.
         /// </summary>
         [DefaultValue(StaticSanitizeTinyMce)]
-        public bool SanitizeTinyMce => StaticSanitizeTinyMce;
+        public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
         /// <summary>
-        /// Gets a value representing the time in milliseconds to lock the database for a write operation.
+        /// Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.
         /// </summary>
         /// <remarks>
-        /// The default value is 5000 milliseconds.
+        /// The default value is 60 seconds.
         /// </remarks>
-        [DefaultValue(StaticSqlWriteLockTimeOut)]
-        public TimeSpan SqlWriteLockTimeOut { get; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
+        [DefaultValue(StaticDistributedLockingReadLockDefaultTimeout)]
+        public TimeSpan DistributedLockingReadLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingReadLockDefaultTimeout);
+
+        /// <summary>
+        /// Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed write lock.
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5 seconds.
+        /// </remarks>
+        [DefaultValue(StaticDistributedLockingWriteLockDefaultTimeout)]
+        public TimeSpan DistributedLockingWriteLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingWriteLockDefaultTimeout);
+
+        /// <summary>
+        /// Gets or sets a value representing the DistributedLockingMechanism to use.
+        /// </summary>
+        public string DistributedLockingMechanism { get; set; } = string.Empty;
     }
 }

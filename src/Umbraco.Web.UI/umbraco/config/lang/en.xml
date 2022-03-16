@@ -17,7 +17,7 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Empty recycle bin</key>
+    <key alias="emptyrecyclebin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importdocumenttype">Import Document Type</key>
@@ -332,6 +332,7 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
     <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
@@ -1292,6 +1293,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoResultsDescription">Please try searching for another package or browse through the categories
     </key>
     <key alias="packagesPopular">Popular</key>
+    <key alias="packagesPromoted">Promoted</key>
     <key alias="packagesNew">New releases</key>
     <key alias="packageHas">has</key>
     <key alias="packageKarmaPoints">karma points</key>
@@ -1506,6 +1508,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
+    <key alias="folderUploadNotAllowed">This file is being uploaded as part of a folder, but creating a new folder is not allowed here</key>	
+    <key alias="folderCreationNotAllowed">Creating a new folder is not allowed here</key>
     <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
@@ -1523,6 +1527,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and visible on the website</key>
+    <key alias="editBlueprintSavedHeader">Content Template saved</key>
+    <key alias="editBlueprintSavedText">Changes have been successfully saved</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
@@ -2389,6 +2395,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noRelations">No relations for this Relation Type</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
+    <key alias="isDependency">Is Dependency</key>
+    <key alias="dependency">Yes</key>
+    <key alias="noDependency">No</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Getting Started</key>
@@ -2466,6 +2475,15 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelUsedByDocuments">Used in Documents</key>
     <key alias="labelUsedByMembers">Used in Members</key>
     <key alias="labelUsedByMedia">Used in Media</key>
+    <key alias="labelUsedItems">Items in use</key>
+    <key alias="labelUsedDescendants">Descendants in use</key>
+    <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item.</key>
+    <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item.</key>
+    <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being used in a member.</key>
+    <key alias="deleteWarning">This item or its descendants is being used. Deletion can lead to broken links on your website.</key>
+    <key alias="unpublishWarning">This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
+    <key alias="deleteDisabledWarning">This item or its descendants is being used. Therefore, deletion has been disabled.</key>
+    <key alias="listViewDialogWarning">The following items you are trying to %0% are used by other content.</key>
   </area>
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Delete Saved Search</key>
@@ -2619,9 +2637,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
         Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
     ]]>
     </key>
-    <key alias="bulletPointThree">
+    <key alias="bulletPointTutorials">
       <![CDATA[
-        Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutorial videos</a> (some are free, some require a subscription)
+        Watch our free <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
     ]]>
     </key>
     <key alias="bulletPointFour">

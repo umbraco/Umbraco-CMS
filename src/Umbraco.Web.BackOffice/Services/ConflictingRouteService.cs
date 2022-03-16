@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -15,7 +17,10 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ConflictingRouteService"/> class.
         /// </summary>
-        public ConflictingRouteService(TypeLoader typeLoader) => _typeLoader = typeLoader;
+        public ConflictingRouteService(TypeLoader typeLoader)
+        {
+            _typeLoader = typeLoader;
+        }
 
         /// <inheritdoc/>
         public bool HasConflictingRoutes(out string controllerName)
