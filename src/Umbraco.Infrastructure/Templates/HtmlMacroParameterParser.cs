@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Infrastructure.Templates
 {
     public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     {
-        private readonly IMacroWithAliasService _macroService;
+        private readonly IMacroService _macroService;
         private readonly ILogger<HtmlMacroParameterParser> _logger;
         private readonly ParameterEditorCollection _parameterEditors;
 
-        public HtmlMacroParameterParser(IMacroWithAliasService macroService, ILogger<HtmlMacroParameterParser> logger, ParameterEditorCollection parameterEditors)
+        public HtmlMacroParameterParser(IMacroService macroService, ILogger<HtmlMacroParameterParser> logger, ParameterEditorCollection parameterEditors)
         {
             _macroService = macroService;
             _logger = logger;
@@ -72,12 +72,18 @@ namespace Umbraco.Cms.Infrastructure.Templates
 
         private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(List<Tuple<string, Dictionary<string, string>>> macros)
         {
+
+            if (_macroService is not IMacroWithAliasService macroWithAliasService)
+            {
+                yield break;
+            }
+
             var uniqueMacroAliases = macros.Select(f => f.Item1).Distinct();
             // TODO: Tracking Macro references
             // Here we are finding the used macros' Udis (there should be a Related Macro relation type - but Relations don't accept 'Macro' as an option)
             var foundMacroUmbracoEntityReferences = new List<UmbracoEntityReference>();
             // Get all the macro configs in one hit for these unique macro aliases - this is now cached with a custom cache policy
-            var macroConfigs = _macroService.GetAll(uniqueMacroAliases.ToArray());
+            var macroConfigs = macroWithAliasService.GetAll(uniqueMacroAliases.ToArray());
 
             foreach (var macro in macros)
             {
