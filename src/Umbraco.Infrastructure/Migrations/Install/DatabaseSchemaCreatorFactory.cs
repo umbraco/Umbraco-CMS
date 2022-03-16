@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IEventAggregator eventAggregator)
-            : this (logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
+            : this(logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
         {
         }
 
