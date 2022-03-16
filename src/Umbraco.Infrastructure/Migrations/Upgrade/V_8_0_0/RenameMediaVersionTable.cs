@@ -18,24 +18,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 
             AddColumn<MediaVersionDto>("id", out var sqls);
 
-            if (Database.DatabaseType.IsSqlCe())
-            {
-                // SQLCE does not support UPDATE...FROM
-                var versions = Database.Fetch<dynamic>($@"SELECT v.versionId, v.id
-FROM cmsContentVersion v
-JOIN umbracoNode n on v.contentId=n.id
-WHERE n.nodeObjectType='{Cms.Core.Constants.ObjectTypes.Media}'");
-                foreach (var t in versions)
-                    Execute.Sql($"UPDATE {Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion} SET id={t.id} WHERE versionId='{t.versionId}'").Do();
-            }
-            else
-            {
-                Database.Execute($@"UPDATE {Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion} SET id=v.id
+            Database.Execute($@"UPDATE {Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion} SET id=v.id
 FROM {Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion} m
 JOIN cmsContentVersion v on m.versionId = v.versionId
 JOIN umbracoNode n on v.contentId=n.id
 WHERE n.nodeObjectType='{Cms.Core.Constants.ObjectTypes.Media}'");
-            }
+
             foreach (var sql in sqls)
                 Execute.Sql(sql).Do();
 

@@ -5,6 +5,14 @@
             <p><localize key="prompt_confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</localize></p>
         </div>
 
+        <div style="margin-top: 15px;">
+            <umb-tracked-references-bulk-action selection="vm.selection" on-loading-complete="vm.checkingReferencesComplete()" hide-no-result="true" compact="true" on-warning="vm.onReferencesWarning()"></umb-tracked-references-listview>
+        </div>
+
+        <div class="abstract umb-alert umb-alert--warning" ng-if="vm.warningText">
+            {{vm.warningText}}
+        </div>
+
         <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
                 <umb-load-indicator></umb-load-indicator>
         </div>

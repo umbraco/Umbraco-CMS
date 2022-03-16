@@ -12,6 +12,7 @@
     vm.edit = edit;
     vm.remove = remove;
     vm.changeSortOrderValue = changeSortOrderValue;
+    vm.clickComposition = clickComposition;
 
     function edit () {
       if (vm.onEdit) {
@@ -31,6 +32,12 @@
       }
     }
 
+    function clickComposition(contentTypeId) {
+      if (vm.onClickComposition) {
+        vm.onClickComposition({ contentTypeId: contentTypeId });
+      }
+    }
+
   }
 
   const umbContentTypePropertyComponent = {
@@ -41,6 +48,7 @@
       onEdit: '&',
       onRemove: '&',
       onChangeSortOrderValue: '&',
+      onClickComposition: '&?',
       valServerFieldAlias: '@',
       valServerFieldLabel: '@',
       valTabAlias: '@'

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,116 +20,55 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger<DatabaseConfigureStep> _logger;
+        private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
         private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptionsMonitor<ConnectionStrings> connectionStrings, ILogger<DatabaseConfigureStep> logger)
+        public DatabaseConfigureStep(
+            DatabaseBuilder databaseBuilder,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            ILogger<DatabaseConfigureStep> logger,
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
         {
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings;
             _logger = logger;
+            _databaseProviderMetadata = databaseProviderMetadata;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
+        public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel databaseSettings)
         {
-            //if the database model is null then we will apply the defaults
-            if (database == null)
-            {
-                database = new DatabaseModel();
-
-                if (IsLocalDbAvailable())
-                {
-                    database.DatabaseType = DatabaseType.SqlLocalDb;
-                }
-                else if (IsSqlCeAvailable())
-                {
-                    database.DatabaseType = DatabaseType.SqlCe;
-                }
-            }
-
-            if (_databaseBuilder.CanConnect(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
+            if (!_databaseBuilder.ConfigureDatabaseConnection(databaseSettings, isTrialRun: false))
             {
                 throw new InstallException("Could not connect to the database");
             }
 
-            ConfigureConnection(database);
-
             return Task.FromResult<InstallSetupResult>(null);
-        }
-
-        private void ConfigureConnection(DatabaseModel database)
-        {
-            if (database.ConnectionString.IsNullOrWhiteSpace() == false)
-            {
-                _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString);
-            }
-            else if (database.DatabaseType == DatabaseType.SqlLocalDb)
-            {
-                _databaseBuilder.ConfigureSqlLocalDbDatabaseConnection();
-            }
-            else if (database.DatabaseType == DatabaseType.SqlCe)
-            {
-                _databaseBuilder.ConfigureEmbeddedDatabaseConnection();
-            }
-            else if (database.IntegratedAuth)
-            {
-                _databaseBuilder.ConfigureIntegratedSecurityDatabaseConnection(database.Server, database.DatabaseName);
-            }
-            else
-            {
-                var password = database.Password.Replace("'", "''");
-                password = string.Format("'{0}'", password);
-
-                _databaseBuilder.ConfigureDatabaseConnection(database.Server, database.DatabaseName, database.Login, password, database.DatabaseType.ToString());
-            }
         }
 
         public override object ViewModel
         {
             get
             {
-                var databases = new List<object>()
-                {
-                    new { name = "Microsoft SQL Server", id = DatabaseType.SqlServer.ToString() },
-                    new { name = "Microsoft SQL Azure", id = DatabaseType.SqlAzure.ToString() },
-                    new { name = "Custom connection string", id = DatabaseType.Custom.ToString() },
-                };
-
-                if (IsSqlCeAvailable())
-                {
-                    databases.Insert(0,  new { name = "Microsoft SQL Server Compact (SQL CE)", id = DatabaseType.SqlCe.ToString() });
-                }
-
-                if (IsLocalDbAvailable())
-                {
-                    // Ensure this is always inserted as first when available
-                    databases.Insert(0, new { name = "Microsoft SQL Server Express (LocalDB)", id = DatabaseType.SqlLocalDb.ToString() });
-                }
+                var options = _databaseProviderMetadata
+                    .Where(x => x.IsAvailable)
+                    .OrderBy(x => x.SortOrder)
+                    .ToList();
 
                 return new
                 {
-                    databases
+                    databases = options
                 };
             }
         }
 
-        public static bool IsLocalDbAvailable() => new LocalDb().IsAvailable;
-
-        public static bool IsSqlCeAvailable() =>
-            // NOTE: Type.GetType will only return types that are currently loaded into the appdomain. In this case
-            // that is ok because we know if this is availalbe we will have manually loaded it into the appdomain.
-            // Else we'd have to use Assembly.LoadFrom and need to know the DLL location here which we don't need to do.
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
-            !(Type.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
-
         public override string View => ShouldDisplayView() ? base.View : "";
-
 
         public override bool RequiresExecution(DatabaseModel model) => ShouldDisplayView();
 
         private bool ShouldDisplayView()
         {
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
+            var databaseSettings = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
 
             if (databaseSettings.IsConnectionStringConfigured())
             {

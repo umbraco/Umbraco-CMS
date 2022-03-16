@@ -156,6 +156,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticShowDeprecatedPropertyEditors = false;
         internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
         internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
+        internal const bool StaticHideBackOfficeLogo = false;
+        internal const bool StaticDisableDeleteWhenReferenced = false;
+        internal const bool StaticDisableUnpublishWhenReferenced = false;
 
         /// <summary>
         /// Gets or sets a value for the content notification settings.
@@ -218,6 +221,24 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         [DefaultValue(StaticLoginLogoImage)]
         public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
+        /// </summary>
+        [DefaultValue(StaticHideBackOfficeLogo)]
+        public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to disable the deletion of items referenced by other items.
+        /// </summary>
+        [DefaultValue(StaticDisableDeleteWhenReferenced)]
+        public bool DisableDeleteWhenReferenced { get; set; } = StaticDisableDeleteWhenReferenced;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to disable the unpublishing of items referenced by other items.
+        /// </summary>
+        [DefaultValue(StaticDisableUnpublishWhenReferenced)]
+        public bool DisableUnpublishWhenReferenced { get; set; } = StaticDisableUnpublishWhenReferenced;
 
         /// <summary>
         /// Get or sets the model representing the global content version cleanup policy

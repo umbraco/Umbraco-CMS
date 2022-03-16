@@ -42,10 +42,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IDataTypeService, DataTypeService>();
             builder.Services.AddUnique<IPackagingService, PackagingService>();
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
-            builder.Services.AddUnique<IEntityService, EntityService>();
-            builder.Services.AddUnique<IRelationService, RelationService>();
-            builder.Services.AddUnique<IMemberTypeService, MemberTypeService>();
-            builder.Services.AddUnique<INotificationService, NotificationService>();
             builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             builder.Services.AddTransient(SourcesFactory);
             builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
@@ -84,7 +80,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : appPlugins.GetDirectories()
-                    .SelectMany(x => x.GetDirectories("Lang", SearchOption.AllDirectories))
+                    // Check for both Lang & lang to support case sensitive file systems.
+                    .SelectMany(x => x.GetDirectories("?ang", SearchOption.AllDirectories).Where(x => x.Name.InvariantEquals("lang")))
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
 

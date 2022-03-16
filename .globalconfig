@@ -49,6 +49,7 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severit
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = suggestion
 
 dotnet_diagnostic.SA1636.severity = none # SA1636: File header copyright text should match
+dotnet_diagnostic.SA1101.severity = none # PrefixLocalCallsWithThis - stylecop appears to be ignoring dotnet_style_qualification_for_*
 
 dotnet_diagnostic.SA1503.severity = warning # BracesMustNotBeOmitted
 dotnet_diagnostic.SA1117.severity = warning # ParametersMustBeOnSameLineOrSeparateLines

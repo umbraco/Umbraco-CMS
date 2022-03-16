@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.Website.Security
             // Validate that the prefix is set
             if (!authenticationScheme.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix))
             {
-                throw new InvalidOperationException($"The {nameof(authenticationScheme)} is not prefixed with {Constants.Security.BackOfficeExternalAuthenticationTypePrefix}. The scheme must be created with a call to the method {nameof(SchemeForMembers)}");
+                throw new InvalidOperationException($"The {nameof(authenticationScheme)} is not prefixed with {Constants.Security.MemberExternalAuthenticationTypePrefix}. The scheme must be created with a call to the method {nameof(SchemeForMembers)}");
             }
 
             // add our login provider to the container along with a custom options configuration

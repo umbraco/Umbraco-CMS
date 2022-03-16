@@ -19,6 +19,8 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Persistence.Sqlite;
+using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -139,6 +141,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
+                    configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
 
                     Configuration = configBuilder.Build();
                 })
@@ -224,6 +227,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 })
                 .AddWebServer()
                 .AddWebsite()
+                .AddUmbracoSqlServerSupport()
+                .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper) // This is the important one!
                 .Build();
         }

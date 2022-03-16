@@ -28,7 +28,7 @@ jobs:
         dotnet-version: '6.0.x'
 
     - name: dotnet build
-      run: dotnet build umbraco-netcore-only.sln # also runs npm build
+      run: dotnet build umbraco.sln -c SkipTests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1

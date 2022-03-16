@@ -1977,7 +1977,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             UserService.Save(admin);
 
             RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document,
-                Constants.ObjectTypes.Document));
+                Constants.ObjectTypes.Document, false));
             Assert.IsNotNull(RelationService.Relate(content1, content2, "test"));
 
             PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2,

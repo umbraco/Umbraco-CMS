@@ -1,5 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
+
 using System.Linq;
 using System.Security.Claims;
 using Umbraco.Cms.Core;
@@ -11,7 +12,8 @@ namespace Umbraco.Extensions
     {
         // Ignore these Claims when merging, these claims are dynamically added whenever the ticket
         // is re-issued and we don't want to merge old values of these.
-        private static readonly string[] s_ignoredClaims = new[] { ClaimTypes.CookiePath, Constants.Security.SessionIdClaimType };
+        // We do however want to merge these when the SecurityStampValidator refreshes the principal since it's still the same login session
+        private static readonly string[] s_ignoredClaims = { ClaimTypes.CookiePath, Constants.Security.SessionIdClaimType };
 
         public static void MergeAllClaims(this ClaimsIdentity destination, ClaimsIdentity source)
         {

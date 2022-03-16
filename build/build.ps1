@@ -325,8 +325,6 @@
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
 
-
-
     # Prepare templates
     Write-Host "Copy template files"
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
@@ -371,7 +369,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
 	$params = "-Source", $nugetsourceUmbraco
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -382,7 +380,7 @@
 
     Write-Host "Create NuGet packages"
 
-    &dotnet pack "$($this.SolutionRoot)\umbraco-netcore-only.sln" `
+    &dotnet pack "$($this.SolutionRoot)\umbraco.sln" `
         --output "$($this.BuildOutput)" `
         --verbosity detailed `
         -c Release `
@@ -420,7 +418,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Cms.Persistence.Sqlite", "Umbraco.Cms.Persistence.SqlServer"))
     if ($this.OnError()) { return }
   })
 
@@ -488,8 +486,8 @@
     if ($this.OnError()) { return }
     $this.PrepareTests()
     if ($this.OnError()) { return }
-    # $this.CompileTests()
-    # if ($this.OnError()) { return }
+    $this.CompileTests()
+    if ($this.OnError()) { return }
     # not running tests
     $this.PreparePackages()
     if ($this.OnError()) { return }

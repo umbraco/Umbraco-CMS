@@ -624,7 +624,6 @@ namespace Umbraco.Extensions
             if (type == typeof(sbyte)) return XmlConvert.ToString((sbyte)value);
             if (type == typeof(short)) return XmlConvert.ToString((short)value);
             if (type == typeof(TimeSpan)) return XmlConvert.ToString((TimeSpan)value);
-            if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
             if (type == typeof(uint)) return XmlConvert.ToString((uint)value);
             if (type == typeof(ulong)) return XmlConvert.ToString((ulong)value);
             if (type == typeof(ushort)) return XmlConvert.ToString((ushort)value);

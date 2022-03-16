@@ -8,13 +8,6 @@
     },
     "symbolInfo": [
         {
-            "id": "UseSqlCe",
-            "name": {
-                "text": "Use Sql Compact Edition (SqlCE)"
-            },
-            "isVisible": "true"
-        },
-        {
             "id": "SkipRestore",
             "name": {
                 "text": "Skips the automatic NuGet restore of the project on create"

@@ -10,9 +10,9 @@
     - Finally it outputs the name of the current page (without a link)
 *@
 
-@{ var selection = Model.Content.Ancestors().ToArray(); }
+@{ var selection = Model?.Content.Ancestors().ToArray(); }
 
-@if (selection.Length > 0)
+@if (selection?.Length > 0)
 {
     <ul>
         @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@
@@ -22,6 +22,6 @@
         }
 
         @* Display the current page as the last item in the list *@
-        <li>@Model.Content.Name</li>
+        <li>@Model?.Content.Name</li>
     </ul>
 }

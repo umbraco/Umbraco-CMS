@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (target is IContentTypeWithHistoryCleanup targetWithHistoryCleanup)
             {
-                targetWithHistoryCleanup.HistoryCleanup = source.HistoryCleanup;
+                MapHistoryCleanup(source, targetWithHistoryCleanup);
             }
 
             target.AllowedTemplates = source.AllowedTemplates?
@@ -145,6 +145,34 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.SetDefaultTemplate(source.DefaultTemplate == null
                 ? null
                 : _fileService.GetTemplate(source.DefaultTemplate));
+        }
+
+        private static void MapHistoryCleanup(DocumentTypeSave source, IContentTypeWithHistoryCleanup target)
+        {
+            // If source history cleanup is null we don't have to map all properties
+            if (source.HistoryCleanup is null)
+            {
+                target.HistoryCleanup = null;
+                return;
+            }
+
+            // We need to reset the dirty properties, because it is otherwise true, just because the json serializer has set properties
+            target.HistoryCleanup.ResetDirtyProperties(false);
+            if (target.HistoryCleanup.PreventCleanup != source.HistoryCleanup.PreventCleanup)
+            {
+                target.HistoryCleanup.PreventCleanup = source.HistoryCleanup.PreventCleanup;
+            }
+
+            if (target.HistoryCleanup.KeepAllVersionsNewerThanDays != source.HistoryCleanup.KeepAllVersionsNewerThanDays)
+            {
+                target.HistoryCleanup.KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays;
+            }
+
+            if (target.HistoryCleanup.KeepLatestVersionPerDayForDays !=
+                source.HistoryCleanup.KeepLatestVersionPerDayForDays)
+            {
+                target.HistoryCleanup.KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays;
+            }
         }
 
         // no MapAll - take care
@@ -196,7 +224,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             target.AllowCultureVariant = source.VariesByCulture();
             target.AllowSegmentVariant = source.VariesBySegment();
-            target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
 
             //sync templates
             if (source.AllowedTemplates is not null)
@@ -331,7 +359,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (source.GroupId > 0)
             {
-                target.PropertyGroupId = new Lazy<int>(() => source.GroupId, false);
+                if (target.PropertyGroupId?.Value != source.GroupId)
+                {
+                    target.PropertyGroupId = new Lazy<int>(() => source.GroupId, false);
+                }
             }
 
             target.Alias = source.Alias;
@@ -526,7 +557,15 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Thumbnail = source.Thumbnail;
 
             target.AllowedAsRoot = source.AllowAsRoot;
-            target.AllowedContentTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
+
+            bool allowedContentTypesUnchanged = target.AllowedContentTypes.Select(x => x.Id.Value)
+                .SequenceEqual(source.AllowedContentTypes);
+
+            if (allowedContentTypesUnchanged is false)
+            {
+                target.AllowedContentTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
+            }
+
 
             if (!(target is IMemberType))
             {
@@ -577,13 +616,21 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 // ensure no duplicate alias, then assign the group properties collection
                 EnsureUniqueAliases(destProperties);
-                destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                if (destGroup.PropertyTypes.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false)
+                {
+                    destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                }
+
                 destGroups.Add(destGroup);
             }
 
             // ensure no duplicate name, then assign the groups collection
             EnsureUniqueAliases(destGroups);
-            target.PropertyGroups = new PropertyGroupCollection(destGroups);
+
+            if (target.PropertyGroups.SequenceEqual(destGroups) is false)
+            {
+                target.PropertyGroups = new PropertyGroupCollection(destGroups);
+            }
 
             // because the property groups collection was rebuilt, there is no need to remove
             // the old groups - they are just gone and will be cleared by the repository

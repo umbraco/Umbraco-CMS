@@ -148,7 +148,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 relationType.Name.ToSafeAlias(_shortStringHelper, true),
                 relationType.IsBidirectional,
                 relationType.ParentObjectType,
-                relationType.ChildObjectType);
+                relationType.ChildObjectType,
+                relationType.IsDependency);
 
             try
             {

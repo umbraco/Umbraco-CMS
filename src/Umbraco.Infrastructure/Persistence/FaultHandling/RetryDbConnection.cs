@@ -5,7 +5,7 @@ using Transaction = System.Transactions.Transaction;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
-    class RetryDbConnection : DbConnection
+    public class RetryDbConnection : DbConnection
     {
         private DbConnection _inner;
         private readonly RetryPolicy _conRetryPolicy;

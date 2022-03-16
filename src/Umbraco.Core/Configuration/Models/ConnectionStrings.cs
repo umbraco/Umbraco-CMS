@@ -1,31 +1,34 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
+using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+[UmbracoOptions("ConnectionStrings")]
+public class ConnectionStrings
 {
-    /// <summary>
-    /// Typed configuration options for connection strings.
-    /// </summary>
-    [UmbracoOptions("ConnectionStrings", BindNonPublicProperties = true)]
-    public class ConnectionStrings
-    {
-        // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.
-        // Attributes cannot be applied to map from keys that don't match, and have chosen to retain the key name
-        // used in configuration for older Umbraco versions.
-        // See: https://stackoverflow.com/a/54607296/489433
-#pragma warning disable SA1300  // Element should begin with upper-case letter
-#pragma warning disable IDE1006 // Naming Styles
-        private string? umbracoDbDSN
-#pragma warning restore IDE1006 // Naming Styles
-#pragma warning restore SA1300  // Element should begin with upper-case letter
-        {
-            get => UmbracoConnectionString?.ConnectionString;
-            set => UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, value);
-        }
+    private string _connectionString;
 
-        /// <summary>
-        /// Gets or sets a value for the Umbraco database connection string..
-        /// </summary>
-        public ConfigConnectionString UmbracoConnectionString { get; set; } = new ConfigConnectionString(Constants.System.UmbracoConnectionName, null);
+    /// <summary>
+    /// The default provider name when not present in configuration.
+    /// </summary>
+    public const string DefaultProviderName = "Microsoft.Data.SqlClient";
+
+    /// <summary>
+    /// The DataDirectory placeholder.
+    /// </summary>
+    public const string DataDirectoryPlaceholder = "|DataDirectory|";
+
+    /// <summary>
+    /// The postfix used to identify a connection strings provider setting.
+    /// </summary>
+    public const string ProviderNamePostfix = "_ProviderName";
+
+    public string Name { get; set; }
+
+    public string ConnectionString
+    {
+        get => _connectionString;
+        set => _connectionString = value.ReplaceDataDirectoryPlaceholder();
     }
+
+    public string ProviderName { get; set; } = DefaultProviderName;
 }
