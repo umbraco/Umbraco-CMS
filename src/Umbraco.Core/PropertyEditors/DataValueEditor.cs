@@ -145,16 +145,25 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
-            if (value is JToken jsonValue)
+            if (value is JValue jsonValue)
             {
-                if (jsonValue is JContainer && jsonValue.HasValues == false)
+                // Calling the "ToString(Formatting)" method on a string value results in a new
+                // string enclosed in double quotes (which we don't want), as the method is declared
+                // in the JToken class. Calling either of the "ToString()" or "ToString(CultureInfo)"
+                // methods hits the overridden methods in the JValue class, which correctly doesn't
+                // enclose the value in double quotes.
+                value = jsonValue.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (value is JToken jsonToken)
+            {
+                if (jsonToken is JContainer && jsonToken.HasValues == false)
                 {
                     // Empty JSON array/object
                     value = null;
                 }
                 else
                 {
-                    value = jsonValue.ToString(Formatting.None);
+                    value = jsonToken.ToString(Formatting.None);
                 }
             }
 
