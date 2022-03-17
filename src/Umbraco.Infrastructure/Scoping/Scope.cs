@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Scoping
         private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;
         private HashSet<int>? _writeLocks;
         private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
-        private Queue<IDistributedLock> _acquiredLocks;
+        private Queue<IDistributedLock>? _acquiredLocks;
 
         // initializes a new scope
         private Scope(
@@ -450,7 +450,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
                 {
-                    _acquiredLocks.Dequeue().Dispose();
+                    _acquiredLocks?.Dequeue().Dispose();
                 }
 
                 // We're the parent scope, make sure that locks of all scopes has been cleared
@@ -1104,7 +1104,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 // Something went wrong and we didn't get the lock
                 // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
-                locks[instanceId].Remove(lockId);
+                locks?[instanceId].Remove(lockId);
 
                 // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
                 locksSet.Remove(lockId);
@@ -1118,7 +1118,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainReadLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+            => _acquiredLocks?.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism!.ReadLock(lockId, timeout));
 
         /// <summary>
         ///     Obtains a write lock with a custom timeout.
@@ -1126,6 +1126,6 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainWriteLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+            => _acquiredLocks?.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism!.WriteLock(lockId, timeout));
     }
 }

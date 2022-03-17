@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         }
         */
 
-        protected override object GetPreValueValue(PreValueDto preValue)
+        protected override object? GetPreValueValue(PreValueDto preValue)
         {
             if (preValue.Alias == "multiPicker" ||
                 preValue.Alias == "onlyImages" ||

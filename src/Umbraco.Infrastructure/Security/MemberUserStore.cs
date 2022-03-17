@@ -574,7 +574,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
             if (token == null)
             {
                 user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
@@ -587,7 +587,7 @@ namespace Umbraco.Cms.Core.Security
             return Task.CompletedTask;
         }
 
-        private MemberIdentityUser AssignLoginsCallback(MemberIdentityUser? user)
+        private MemberIdentityUser? AssignLoginsCallback(MemberIdentityUser? user)
         {
             if (user != null)
             {

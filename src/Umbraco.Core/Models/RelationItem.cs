@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models
         public Guid NodeKey { get; set; }
 
         [DataMember(Name = "name")]
-        public string NodeName { get; set; }
+        public string? NodeName { get; set; }
 
         [DataMember(Name = "type")]
         public string NodeType { get; set; }
@@ -23,16 +23,16 @@ namespace Umbraco.Cms.Core.Models
         public Udi NodeUdi => Udi.Create(NodeType, NodeKey);
 
         [DataMember(Name = "icon")]
-        public string ContentTypeIcon { get; set; }
+        public string? ContentTypeIcon { get; set; }
 
         [DataMember(Name = "alias")]
-        public string ContentTypeAlias { get; set; }
+        public string? ContentTypeAlias { get; set; }
 
         [DataMember(Name = "contentTypeName")]
-        public string ContentTypeName { get; set; }
+        public string? ContentTypeName { get; set; }
 
         [DataMember(Name = "relationTypeName")]
-        public string RelationTypeName { get; set; }
+        public string? RelationTypeName { get; set; }
 
         [DataMember(Name = "relationTypeIsBidirectional")]
         public bool RelationTypeIsBidirectional { get; set; }

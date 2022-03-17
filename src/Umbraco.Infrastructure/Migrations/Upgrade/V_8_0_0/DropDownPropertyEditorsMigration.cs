@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         private bool Migrate(IEnumerable<DataTypeDto> dataTypes)
         {
             var refreshCache = false;
-            ConfigurationEditor configurationEditor = null;
+            ConfigurationEditor? configurationEditor = null;
 
             foreach (var dataType in dataTypes)
             {

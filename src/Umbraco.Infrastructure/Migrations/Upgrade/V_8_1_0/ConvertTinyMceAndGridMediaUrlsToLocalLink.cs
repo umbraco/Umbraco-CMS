@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
                 RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             var sqlPropertyData = Sql()
-                .Select<PropertyDataDto80>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
+                .Select<PropertyDataDto80>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x!.DataTypeDto)))
                 .From<PropertyDataDto80>()
                     .InnerJoin<PropertyTypeDto80>().On<PropertyDataDto80, PropertyTypeDto80>((left, right) => left.PropertyTypeId == right.Id)
                     .InnerJoin<DataTypeDto>().On<PropertyTypeDto80, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
 
 
                 bool propertyChanged = false;
-                if (property.PropertyTypeDto.DataTypeDto.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Grid)
+                if (property.PropertyTypeDto?.DataTypeDto?.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Grid)
                 {
                     try
                     {

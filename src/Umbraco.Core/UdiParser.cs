@@ -74,8 +74,8 @@ namespace Umbraco.Cms.Core
         /// <param name="s">The string to convert.</param>
         /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
         /// <returns>A boolean value indicating whether the string could be parsed.</returns>
-        public static bool TryParse<T>(string s, [MaybeNullWhen(returnValue: false)] out T udi)
-            where T : Udi
+        public static bool TryParse<T>(string? s, [MaybeNullWhen(returnValue: false)] out T udi)
+            where T : Udi?
         {
             var result = ParseInternal(s, true, false, out var parsed);
             if (result && parsed is T)
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Core
             return ParseInternal(s, true, knownTypes, out udi);
         }
 
-        private static bool ParseInternal(string s, bool tryParse, bool knownTypes,[MaybeNullWhen(returnValue: false)] out Udi udi)
+        private static bool ParseInternal(string? s, bool tryParse, bool knownTypes,[MaybeNullWhen(returnValue: false)] out Udi udi)
         {
             udi = null;
             if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
