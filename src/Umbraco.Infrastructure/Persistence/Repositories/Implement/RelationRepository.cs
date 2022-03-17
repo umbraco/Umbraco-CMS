@@ -475,8 +475,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         [Column(Name = "contentTypeName")]
         public string ChildContentTypeName { get; set; }
 
-
-
         [Column(Name = "relationTypeName")]
         public string RelationTypeName { get; set; }
 
