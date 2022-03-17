@@ -253,9 +253,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             });
         }
 
-
-
-
         public void Save(IEnumerable<IRelation> relations)
         {
             foreach (var hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
