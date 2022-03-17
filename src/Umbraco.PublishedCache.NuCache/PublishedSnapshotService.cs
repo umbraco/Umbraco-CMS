@@ -337,7 +337,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 _localContentDb?.Clear();
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
-                var kits = _publishedContentService.GetAllContentSources();
+
+                // By using ToList() here we are forcing the database query result extraction to complete straight away,
+                // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
+                // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
+                // here results in the calling method to not release the lock.
+                var kits = _publishedContentService.GetAllContentSources().ToList();
                 try
                 {
                     return onStartup ? _contentStore.SetAllFastSortedLocked(kits, true) : _contentStore.SetAllLocked(kits);
@@ -345,7 +350,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 catch (ThreadAbortException tae)
                 {
                     // Caught a ThreadAbortException, most likely from a database timeout.
-                    // If we don't catch it here, the whole local cache can remain locked causing widespread panic.
+                    // If we don't catch it here, the whole local cache can remain locked causing widespread panic (see above comment).
                     _logger.LogWarning(tae, tae.Message);
                 }
                 return false;
@@ -395,7 +400,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                 _logger.LogDebug("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
-                var kits = _publishedContentService.GetAllMediaSources();
+
+                // By using ToList() here we are forcing the database query result extraction to complete straight away,
+                // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
+                // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
+                // here results in the calling method to not release the lock.
+                var kits = _publishedContentService.GetAllMediaSources().ToList();
 
                 try
                 {
@@ -404,7 +414,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 catch (ThreadAbortException tae)
                 {
                     // Caught a ThreadAbortException, most likely from a database timeout.
-                    // If we don't catch it here, the whole local cache can remain locked causing widespread panic.
+                    // If we don't catch it here, the whole local cache can remain locked causing widespread panic (see above comment).
                     _logger.LogWarning(tae, tae.Message);
                 }
                 return false;
