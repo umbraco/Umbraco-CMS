@@ -1090,7 +1090,7 @@ namespace Umbraco.Cms.Core.Scoping
             locksSet ??= new HashSet<int>();
 
             // Only acquire the lock if we haven't done so yet.
-            if (!locksSet.Contains(lockId))
+            if (locksSet.Contains(lockId))
             {
                 return;
             }
