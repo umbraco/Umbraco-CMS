@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// Gets a paged result of items used in any kind of relation from selected integer ids.
+        /// Gets a page of items used in any kind of relation from selected integer ids.
         /// </summary>
         public IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
         {
@@ -47,7 +47,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (ids.Any())
             {
                 sql = sql.Where<NodeDto>(x => ids.Contains(x.NodeId), "pn");
-                //sql = sql.WhereIn<NodeDto>(x => x.NodeId, ids, "pn"); // TODO: not possible
             }
 
             if (filterMustBeIsDependency)
@@ -59,13 +58,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             sql = sql.OrderBy<RelationTypeDto>(x => x.Alias);
 
             var pagedResult = _scopeAccessor.AmbientScope.Database.Page<RelationItemDto>(pageIndex + 1, pageSize, sql);
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            totalRecords = pagedResult.TotalItems;
 
             return pagedResult.Items.Select(MapDtoToEntity);
         }
 
         /// <summary>
-        /// Gets a paged result of the descending items that have any references, given a parent id.
+        /// Gets a page of the descending items that have any references, given a parent id.
         /// </summary>
         public IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
         {
@@ -130,16 +129,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             sql = sql.OrderBy<RelationTypeDto>(x => x.Alias);
 
             var pagedResult = _scopeAccessor.AmbientScope.Database.Page<RelationItemDto>(pageIndex + 1, pageSize, sql);
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            totalRecords = pagedResult.TotalItems;
 
             return pagedResult.Items.Select(MapDtoToEntity);
         }
 
         /// <summary>
-        /// Gets a paged result of items which are in relation with the current item.
+        /// Gets a page of items which are in relation with the current item.
         /// Basically, shows the items which depend on the current item.
         /// </summary>
-        public IEnumerable<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
+        public IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
         {
             var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().SelectDistinct(
                     "[cn].[id] as nodeId",
@@ -159,12 +158,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .InnerJoin<NodeDto>("pn").On<RelationDto, NodeDto, NodeDto>((r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) || (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), aliasLeft: "r", aliasRight: "pn", aliasOther: "cn")
                 .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "cn", aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c", aliasRight: "ct")
-                .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn");
-
-            if (ids.Any())
-            {
-                sql = sql.Where<NodeDto>(x => ids.Contains(x.NodeId), "pn");
-            }
+                .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn")
+                .Where<NodeDto>(x => x.NodeId == id, "pn");
 
             if (filterMustBeIsDependency)
             {
@@ -175,7 +170,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             sql = sql.OrderBy<RelationTypeDto>(x => x.Alias);
 
             var pagedResult = _scopeAccessor.AmbientScope.Database.Page<RelationItemDto>(pageIndex + 1, pageSize, sql);
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            totalRecords = pagedResult.TotalItems;
 
             return pagedResult.Items.Select(MapDtoToEntity);
         }

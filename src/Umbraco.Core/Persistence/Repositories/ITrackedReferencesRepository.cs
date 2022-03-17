@@ -9,13 +9,13 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// Gets a page of items which are in relation with the current item.
         /// Basically, shows the items which depend on the current item.
         /// </summary>
-        /// <param name="ids">The identifier of the entity to retrieve relations for.</param>
+        /// <param name="id">The identifier of the entity to retrieve relations for.</param>
         /// <param name="pageIndex">The page index.</param>
         /// <param name="pageSize">The page size.</param>
         /// <param name="filterMustBeIsDependency">A boolean indicating whether to filter only the RelationTypes which are dependencies (isDependency field is set to true).</param>
         /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
         /// <returns>An enumerable list of <see cref="RelationItem"/> objects.</returns>
-        IEnumerable<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
+        IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 
         /// <summary>
         /// Gets a page of items used in any kind of relation from selected integer ids.

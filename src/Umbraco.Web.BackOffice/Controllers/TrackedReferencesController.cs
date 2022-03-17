@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <remarks>
         /// Used by info tabs on content, media etc. and for the delete and unpublish of single items.
-        /// This is basically finding childs of relations.
+        /// This is basically finding parents of relations.
         /// </remarks>
         public ActionResult<PagedResult<RelationItem>> GetPagedReferences(int id, int pageNumber = 1, int pageSize = 100, bool filterMustBeIsDependency = false)
         {
@@ -34,17 +34,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return BadRequest("Both pageNumber and pageSize must be greater than zero");
             }
 
-            return _relationService.GetPagedRelationsForItems(new[] { id }, pageNumber - 1, pageSize, filterMustBeIsDependency);
+            return _relationService.GetPagedRelationsForItem(id, pageNumber - 1, pageSize, filterMustBeIsDependency);
         }
-
-        // Used on delete, finds
 
         /// <summary>
         /// Gets a page list of the child nodes of the current item used in any kind of relation.
         /// </summary>
         /// <remarks>
         /// Used when deleting and unpublishing a single item to check if this item has any descending items that are in any kind of relation.
-        /// This is basically finding ...
+        /// This is basically finding the descending items which are children in relations.
         /// </remarks>
         public ActionResult<PagedResult<RelationItem>> GetPagedDescendantsInReferences(int parentId, int pageNumber = 1, int pageSize = 100, bool filterMustBeIsDependency = true)
         {
@@ -56,14 +54,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _relationService.GetPagedDescendantsInReferences(parentId, pageNumber - 1, pageSize, filterMustBeIsDependency);
         }
 
-        // Used by unpublish content. So this is basically finding parents of relations.
-
         /// <summary>
         /// Gets a page list of the items used in any kind of relation from selected integer ids.
         /// </summary>
         /// <remarks>
         /// Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
-        /// This is basically finding ...
+        /// This is basically finding children of relations.
         /// </remarks>
         [HttpGet]
         [HttpPost]

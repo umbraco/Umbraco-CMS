@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a paged result of items which are in relation with the current item.
         /// Basically, shows the items which depend on the current item.
         /// </summary>
-        /// <param name="ids">The identifier of the entity to retrieve relations for.</param>
+        /// <param name="id">The identifier of the entity to retrieve relations for.</param>
         /// <param name="pageIndex">The page index.</param>
         /// <param name="pageSize">The page size.</param>
         /// <param name="filterMustBeIsDependency">A boolean indicating whether to filter only the RelationTypes which are dependencies (isDependency field is set to true).</param>
         /// <returns>A paged result of <see cref="RelationItem"/> objects.</returns>
-        PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency);
+        PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency);
 
         /// <summary>
         /// Gets a paged result of the descending items that have any references, given a parent id.
