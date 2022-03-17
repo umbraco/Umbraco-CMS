@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         public IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
         {
-            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().SelectDistinct(
                     "[pn].[id] as nodeId",
                     "[pn].[uniqueId] as nodeKey",
                     "[pn].[text] as nodeName",
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // Get all relations where parent is in the sub query
-            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().SelectDistinct(
                     "[pn].[id] as nodeId",
                     "[pn].[uniqueId] as nodeKey",
                     "[pn].[text] as nodeName",
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         public IEnumerable<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
         {
-            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().SelectDistinct(
                     "[cn].[id] as nodeId",
                     "[cn].[uniqueId] as nodeKey",
                     "[cn].[text] as nodeName",
