@@ -1,14 +1,42 @@
-using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface ITrackedReferencesRepository
     {
-        IEnumerable<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency,out long totalRecords);
-        IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency,out long totalRecords);
-        IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency,out long totalRecords);
+        /// <summary>
+        /// Gets a page of items which are in relation with the current item.
+        /// Basically, shows the items which depend on the current item.
+        /// </summary>
+        /// <param name="ids">The identifier of the entity to retrieve relations for.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="filterMustBeIsDependency">A boolean indicating whether to filter only the RelationTypes which are dependencies (isDependency field is set to true).</param>
+        /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
+        /// <returns>An enumerable list of <see cref="RelationItem"/> objects.</returns>
+        IEnumerable<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
+
+        /// <summary>
+        /// Gets a page of items used in any kind of relation from selected integer ids.
+        /// </summary>
+        /// <param name="ids">The identifiers of the entities to check for relations.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="filterMustBeIsDependency">A boolean indicating whether to filter only the RelationTypes which are dependencies (isDependency field is set to true).</param>
+        /// <param name="totalRecords">The total count of the items in any kind of relation.</param>
+        /// <returns>An enumerable list of <see cref="RelationItem"/> objects.</returns>
+        IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
+
+        /// <summary>
+        /// Gets a page of the descending items that have any references, given a parent id.
+        /// </summary>
+        /// <param name="parentId">The unique identifier of the parent to retrieve descendants for.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="filterMustBeIsDependency">A boolean indicating whether to filter only the RelationTypes which are dependencies (isDependency field is set to true).</param>
+        /// <param name="totalRecords">The total count of descending items.</param>
+        /// <returns>An enumerable list of <see cref="RelationItem"/> objects.</returns>
+        IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
     }
 }
