@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<string> ViewPathForProviderName(string providerName)
         {
             var options = _twoFactorLoginViewOptions.Get(providerName);
-            return options.ViewPath;
+            return options.SetupViewPath;
         }
     }
 }
