@@ -71,6 +71,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _connectionStrings = connectionStrings;
             _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+            _databaseProviderMetadata = databaseProviderMetadata;
         }
 
         #region Status
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </summary>
         public bool CanConnect(string? connectionString, string providerName)
         {
-            DbProviderFactory factory = _dbProviderFactoryCreator.CreateFactory(providerName);
+            DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(providerName);
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, factory);
         }
 
@@ -133,7 +134,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public bool ConfigureDatabaseConnection(DatabaseModel databaseSettings, bool isTrialRun)
         {
-            IDatabaseProviderMetadata providerMeta;
+            IDatabaseProviderMetadata? providerMeta;
 
             // if the database model is null then we will attempt quick install.
             if (databaseSettings == null)
@@ -145,7 +146,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 databaseSettings = new DatabaseModel
                 {
-                    DatabaseName = providerMeta?.DefaultDatabaseName,
+                    DatabaseName = providerMeta?.DefaultDatabaseName!,
                 };
             }
             else
@@ -162,15 +163,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var connectionString = providerMeta.GenerateConnectionString(databaseSettings);
             var providerName = databaseSettings.ProviderName ?? providerMeta.ProviderName;
 
-            if (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName))
+            if (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName!))
             {
                 return false;
             }
 
             if (!isTrialRun)
             {
-                _configManipulator.SaveConnectionString(connectionString, providerName);
-                Configure(connectionString, providerName, _globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
+                _configManipulator.SaveConnectionString(connectionString!, providerName);
+                Configure(connectionString!, providerName, _globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
             }
 
             return true;

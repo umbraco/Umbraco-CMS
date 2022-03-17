@@ -469,27 +469,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public Guid ChildNodeKey { get; set; }
 
         [Column(Name = "nodeName")]
-        public string ChildNodeName { get; set; }
+        public string? ChildNodeName { get; set; }
 
         [Column(Name = "nodeObjectType")]
         public Guid ChildNodeObjectType { get; set; }
 
         [Column(Name = "contentTypeIcon")]
-        public string ChildContentTypeIcon { get; set; }
+        public string? ChildContentTypeIcon { get; set; }
 
         [Column(Name = "contentTypeAlias")]
-        public string ChildContentTypeAlias { get; set; }
+        public string? ChildContentTypeAlias { get; set; }
 
         [Column(Name = "contentTypeName")]
-        public string ChildContentTypeName { get; set; }
+        public string? ChildContentTypeName { get; set; }
 
 
 
         [Column(Name = "relationTypeName")]
-        public string RelationTypeName { get; set; }
+        public string? RelationTypeName { get; set; }
 
         [Column(Name = "relationTypeAlias")]
-        public string RelationTypeAlias { get; set; }
+        public string? RelationTypeAlias { get; set; }
 
         [Column(Name = "relationTypeIsDependency")]
         public bool RelationTypeIsDependency { get; set; }

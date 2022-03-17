@@ -342,7 +342,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 return base.ExecuteScalar<T>(sql, commandType, args);
             }
 
-            if (!SqlContext.SqlSyntax.ScalarMappers.TryGetValue(typeof(T), out IScalarMapper mapper))
+            if (!SqlContext.SqlSyntax.ScalarMappers.TryGetValue(typeof(T), out IScalarMapper? mapper))
             {
                 return base.ExecuteScalar<T>(sql, commandType, args);
             }

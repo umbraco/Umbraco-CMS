@@ -36,11 +36,11 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             else // check if it's a valid expression
             {
                 // If the expression evaluates then make it into a filter
-                if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression compiled, out var error))
+                if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression? compiled, out var error))
                 {
                     filter = evt =>
                     {
-                        LogEventPropertyValue result = compiled(evt);
+                        LogEventPropertyValue? result = compiled(evt);
                         return ExpressionResult.IsTrue(result);
                     };
                 }
@@ -63,12 +63,12 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         private Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression)
         {
             var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%'";
-            if (SerilogExpression.TryCompile(filterSearch, out CompiledExpression compiled, out var error))
+            if (SerilogExpression.TryCompile(filterSearch, out CompiledExpression? compiled, out var error))
             {
                 // `compiled` is a function that can be executed against `LogEvent`s:
                 return evt =>
                 {
-                    LogEventPropertyValue result = compiled(evt);
+                    LogEventPropertyValue? result = compiled(evt);
                     return ExpressionResult.IsTrue(result);
                 };
             }

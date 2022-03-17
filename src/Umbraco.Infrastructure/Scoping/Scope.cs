@@ -1083,7 +1083,7 @@ namespace Umbraco.Cms.Core.Scoping
             Guid instanceId,
             ref Dictionary<Guid, Dictionary<int, int>>? locks,
             ref HashSet<int>? locksSet,
-            Action<int, TimeSpan> obtainLock,
+            Action<int, TimeSpan?> obtainLock,
             TimeSpan? timeout,
             int lockId)
         {

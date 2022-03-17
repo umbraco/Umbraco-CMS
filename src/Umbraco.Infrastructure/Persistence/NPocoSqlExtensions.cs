@@ -75,20 +75,20 @@ namespace Umbraco.Extensions
             return WhereIn(sql, field, values, false, null);
         }
 
-        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, Sql<ISqlContext> values, string tableAlias)
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext>? values, string tableAlias)
         {
             return sql.WhereIn(field, values, false, tableAlias);
         }
 
 
-        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, Sql<ISqlContext> valuesSql)
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
-            sql.Where(fieldName + " LIKE (" + valuesSql.SQL + ")", valuesSql.Arguments);
+            sql.Where(fieldName + " LIKE (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
             return sql;
         }
 
-        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, string likeValue)
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, string likeValue)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
             sql.Where(fieldName + " LIKE ('" + likeValue + "')");
@@ -153,7 +153,7 @@ namespace Umbraco.Extensions
             return WhereIn(sql, fieldSelector, valuesSql, not, null);
         }
 
-        private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object?>> fieldSelector, Sql? valuesSql, bool not, string tableAlias)
+        private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object?>> fieldSelector, Sql? valuesSql, bool not, string? tableAlias)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector, tableAlias);
             sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
@@ -916,7 +916,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets fields for a Dto.
         /// </summary>
-        public static string ColumnsForInsert<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+        public static string ColumnsForInsert<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object?>>[]? fields)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, forInsert: true));
@@ -1113,7 +1113,7 @@ namespace Umbraco.Extensions
             }
 
             return queryColumns
-                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value), referenceName, forInsert: forInsert))
+                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value)!, referenceName, forInsert: forInsert))
                 .ToArray();
         }
 

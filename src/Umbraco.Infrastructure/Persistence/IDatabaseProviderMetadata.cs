@@ -34,7 +34,7 @@ public interface IDatabaseProviderMetadata
     /// Gets the database factory provider name.
     /// </summary>
     [DataMember(Name = "providerName")]
-    string ProviderName { get; }
+    string? ProviderName { get; }
 
     /// <summary>
     /// Gets a value indicating whether can be used for one click install.
@@ -58,7 +58,7 @@ public interface IDatabaseProviderMetadata
     /// Gets a value used as input placeholder for server/hostnmae field.
     /// </summary>
     [DataMember(Name = "serverPlaceholder")]
-    string ServerPlaceholder { get; }
+    string? ServerPlaceholder { get; }
 
     /// <summary>
     /// Gets a value indicating whether a username and password are required (in general) to connect to the database
@@ -86,5 +86,5 @@ public interface IDatabaseProviderMetadata
     /// <summary>
     /// Creates a connection string for this provider.
     /// </summary>
-    string GenerateConnectionString(DatabaseModel databaseModel);
+    string? GenerateConnectionString(DatabaseModel databaseModel);
 }

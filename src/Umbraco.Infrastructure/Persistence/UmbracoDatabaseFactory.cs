@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private bool _upgrading;
         private bool _initialized;
 
-        private ConnectionStrings _umbracoConnectionString;
+        private ConnectionStrings? _umbracoConnectionString;
 
         private DbProviderFactory? _dbProviderFactory = null;
 
@@ -239,7 +239,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 cfg.UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
                     .WithFluentConfig(config); // with proper configuration
 
-                foreach (IProviderSpecificInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName))
+                foreach (IProviderSpecificInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName!))
                 {
                     cfg.WithInterceptor(interceptor);
                 }
@@ -274,6 +274,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 return null;
             }
+
             return new UmbracoDatabase(
                 ConnectionString,
                 SqlContext,
@@ -282,6 +283,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 _bulkSqlInsertProvider,
                 _databaseSchemaCreatorFactory,
                 _pocoMappers);
+        }
 
         protected override void DisposeResources()
         {

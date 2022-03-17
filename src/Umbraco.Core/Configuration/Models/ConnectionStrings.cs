@@ -30,5 +30,5 @@ public class ConnectionStrings
         set => _connectionString = value.ReplaceDataDirectoryPlaceholder();
     }
 
-    public string ProviderName { get; set; } = DefaultProviderName;
+    public string? ProviderName { get; set; } = DefaultProviderName;
 }

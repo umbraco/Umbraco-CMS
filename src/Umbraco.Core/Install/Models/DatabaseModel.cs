@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Install.Models
         public Guid DatabaseProviderMetadataId { get; set; }
 
         [DataMember(Name = "providerName")]
-        public string ProviderName { get; set; }
+        public string? ProviderName { get; set; }
 
         [DataMember(Name = "server")]
         public string Server { get; set; } = null!;

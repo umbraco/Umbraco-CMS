@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
-        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString);
+        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString);
 
         string ProviderName { get; }
 
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
         string GetConcat(params string[] args);
 
-        string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false);
+        string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false);
 
         string GetQuotedTableName(string? tableName);
         string GetQuotedColumnName(string? columnName);
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
 
-        string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
+        string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null);
 
         /// <summary>
         /// Appends the relevant ForUpdate hint.
@@ -158,8 +158,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
             Sql<ISqlContext> sql,
             Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
-            string alias = null);
+            string? alias = null);
 
-        IDictionary<Type, IScalarMapper> ScalarMappers { get; }
+        IDictionary<Type, IScalarMapper>? ScalarMappers { get; }
     }
 }

@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return dbTypeMap.Create();
         }
 
-        public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString) => current;
+        public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
         public abstract string ProviderName { get; }
 
@@ -222,7 +222,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) => $"{GetSpecialDbType(dbType)}({customSize})";
 
-        public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false)
+        public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
         {
             tableName = GetQuotedTableName(tableName);
             columnName = GetQuotedColumnName(columnName);
@@ -263,16 +263,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public abstract bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
-        public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
+        public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
 
         public virtual Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql) => sql;
 
         public virtual Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql) => sql;
 
-        public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null);
+        public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null);
 
 
-        public virtual IDictionary<Type, IScalarMapper> ScalarMappers => null;
+        public virtual IDictionary<Type, IScalarMapper>? ScalarMappers => null;
 
         public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 

@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
             return Id == other.Id;
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             return
                 !ReferenceEquals(null, other) // other is not null
