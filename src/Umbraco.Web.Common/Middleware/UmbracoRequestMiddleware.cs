@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             // do not process if client-side request
-            if (context.Request.IsClientSideRequest() && _umbracoRequestOptions.Value.HandleAsClientSideRequest(context.Request))
+            if (context.Request.IsClientSideRequest() && !_umbracoRequestOptions.Value.HandleAsServerSideRequest(context.Request))
             {
                 // we need this here because for bundle requests, these are 'client side' requests that we need to handle
                 LazyInitializeBackOfficeServices(context.Request.Path);
