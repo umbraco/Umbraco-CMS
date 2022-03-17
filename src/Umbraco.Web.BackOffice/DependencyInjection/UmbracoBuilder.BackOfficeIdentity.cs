@@ -42,7 +42,8 @@ namespace Umbraco.Extensions
                     factory.GetRequiredService<IOptions<GlobalSettings>>(),
                     factory.GetRequiredService<IUmbracoMapper>(),
                     factory.GetRequiredService<BackOfficeErrorDescriber>(),
-                    factory.GetRequiredService<AppCaches>()
+                    factory.GetRequiredService<AppCaches>(),
+                    factory.GetRequiredService<ITwoFactorLoginService>()
                 ))
                 .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
