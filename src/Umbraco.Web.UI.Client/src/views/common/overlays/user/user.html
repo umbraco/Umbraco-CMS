@@ -25,6 +25,14 @@
       type="button">
     </umb-button>
 
+    <umb-button type="button"
+                button-style="action"
+                action="toggleConfigureTwoFactor()"
+                label="Configure Two-Factor"
+                label-key="user_configureTwoFactor"
+                ng-if="hasTwoFactorProviders">
+    </umb-button>
+
     <umb-button
       action="logout()"
       alias="logOut"

@@ -2174,6 +2174,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       you. Click the circle above to upload your photo.
     </key>
     <key alias="writer">Writer</key>
+    <key alias="configureTwoFactor">Configure Two-Factor</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>

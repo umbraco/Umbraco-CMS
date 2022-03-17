@@ -1,0 +1,74 @@
+<div ng-controller="Umbraco.Editors.ConfigureTwoFactorController as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="vm.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+          <umb-box ng-repeat="provider in vm.providers">
+            <umb-box-content>
+              <umb-box-header title="{{provider.providerName}}"></umb-box-header>
+              <umb-control-group>
+                <umb-button type="button" ng-if="provider.isEnabledOnUser && !model.isCurrentUser"
+                            button-style="[warning,block]"
+                            action="vm.disable(provider.providerName)"
+                            label="Disable"
+                            label-key="actions_disable"
+                            size="s">
+                </umb-button>
+
+                <div ng-if="provider.isEnabledOnUser && model.isCurrentUser ">
+                  <p>Scan the code above with your authenticator app <br /> and enter the resulting code here to validate:</p>
+                  <input type="password" ng-model="vm.code" no-dirty-check  ng-if="model.isCurrentUser" />
+
+                  <umb-button type="button"
+                              button-style="[warning,block]"
+                              action="vm.disableWithCode(provider.providerName)"
+                              label="Disable"
+                              label-key="actions_disable"
+                              size="s"
+                              disabled="vm.code.length === 0">
+                  </umb-button>
+                </div>
+
+
+                <umb-button type="button" ng-if="!provider.isEnabledOnUser"
+                            button-style="[action,block]"
+                            disabled="!model.isCurrentUser"
+                            action="vm.enable(provider.providerName)"
+                            label="Enable"
+                            label-key="actions_enable"
+                            size="s">
+                </umb-button>
+
+              </umb-control-group>
+
+
+            </umb-box-content>
+          </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+
+            <umb-editor-footer-content-right>
+
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+
+            </umb-editor-footer-content-right>
+
+        </umb-editor-footer>
+
+    </umb-editor-view>
+</div>

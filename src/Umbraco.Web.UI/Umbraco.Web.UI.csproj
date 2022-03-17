@@ -88,6 +88,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\umbraco\views\common\infiniteeditors\twofactor\enabletwofactor.html" />
+  </ItemGroup>
+
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>

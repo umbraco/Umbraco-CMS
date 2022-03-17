@@ -59,6 +59,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [ReadOnly(true)]
         public bool IsCurrentUser { get; set; }
 
+        [DataMember(Name = "isTwoFactorEnabled")]
+        [ReadOnly(true)]
+        public bool IsTwoFactorEnabled { get; set; }
+
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>

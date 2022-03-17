@@ -1,0 +1,26 @@
+﻿<div ng-controller="Umbraco.Login2faController" class="umb-login-container">
+    <div id="twoFactorlogin" ng-cloak="">
+        <div class="form">
+            <p><strong>One last step</strong></p>
+
+            <!-- if there's only one provider active, it will skip this step! -->
+            <form method="POST" name="twoFactorSendForm" ng-submit="send(provider)" ng-if="step=='send'">
+                <div class="control-group">
+                    <select ng-model="provider" ng-show="providers.length > 0">
+                        <option ng-repeat="provider in providers" value="{{provider}}">{{provider}}</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Send</button>
+            </form>
+
+            <form method="POST" name="twoFactorCodeForm" ng-submit="validate(provider, code)" ng-if="step=='code'">
+                <p>Your verification code, please?</p>
+                <div class="control-group">
+                    <input type="password" name="code" class="input-xlarge" ng-model="code" ui-keypress="{13:'validate(provider, code)'}" />
+                </div>
+                <div class="text-error ng-binding" ng-if="error2FA !== ''">{{error2FA}}</div>
+                <button type="submit" class="btn">Validate</button>
+            </form>
+        </div>
+    </div>
+</div>

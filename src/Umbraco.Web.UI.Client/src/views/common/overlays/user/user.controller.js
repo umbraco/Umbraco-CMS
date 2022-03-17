@@ -2,13 +2,14 @@ angular.module("umbraco")
     .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout,
         dashboardResource, userService, historyService, eventsService,
         externalLoginInfo, externalLoginInfoService, authResource,
-        currentUserResource, formHelper, localizationService) {
+        currentUserResource, formHelper, localizationService, editorService, twoFactorLoginResource) {
 
         $scope.history = historyService.getCurrent();
         //$scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
         $scope.showPasswordFields = false;
         $scope.changePasswordButtonState = "init";
         $scope.model.title = "user.name";
+        $scope.hasTwoFactorProviders = false;
         //$scope.model.subtitle = "Umbraco version" + " " + $scope.version;
         /*
         if(!$scope.model.title) {
@@ -105,8 +106,14 @@ angular.module("umbraco")
                         $scope.changePasswordModel.config.disableToggle = true;
                     });
 
+                  twoFactorLoginResource.get2FAProvidersForUser($scope.user.id).then(function (providers) {
+                    $scope.hasTwoFactorProviders = providers.length > 0;
+                  });
+
                 }
             });
+
+
         }
 
         $scope.linkProvider = function (e) {
@@ -132,6 +139,7 @@ angular.module("umbraco")
         };
 
         updateUserInfo();
+
 
         //remove all event handlers
         $scope.$on('$destroy', function () {
@@ -187,6 +195,22 @@ angular.module("umbraco")
             .path('/users/users/user/' + $scope.user.id);
           $scope.model.close();
         }
+
+      $scope.toggleConfigureTwoFactor = function() {
+
+        const configureTwoFactorSettings = {
+          create: true,
+          user: $scope.user,
+          isCurrentUser:  true,// From this view we are always current user (used by the overlay)
+          size: "small",
+          view: "views/common/infiniteeditors/twofactor/configuretwofactor.html",
+          close: function() {
+            editorService.close();
+          }
+        };
+
+        editorService.open(configureTwoFactorSettings);
+      }
 
         dashboardResource.getDashboard("user-dialog").then(function (dashboard) {
             $scope.dashboard = dashboard;

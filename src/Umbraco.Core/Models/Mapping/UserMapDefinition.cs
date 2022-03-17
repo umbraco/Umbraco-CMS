@@ -292,6 +292,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
             target.FailedPasswordAttempts = source.FailedPasswordAttempts;
             target.Id = source.Id;
+            target.IsTwoFactorEnabled = false;
             target.Key = source.Key;
             target.LastLockoutDate = source.LastLockoutDate;
             target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
@@ -319,6 +320,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Email = source.Email;
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
             target.Id = source.Id;
+            target.IsTwoFactorEnabled = false;
             target.Key = source.Key;
             target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
             target.Name = source.Name;
