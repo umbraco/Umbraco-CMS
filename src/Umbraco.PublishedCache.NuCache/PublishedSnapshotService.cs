@@ -338,13 +338,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
 
-                // By using ToList() here we are forcing the database query result extraction to complete straight away,
-                // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
-                // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
-                // here results in the calling method to not release the lock.
-                var kits = _publishedContentService.GetAllContentSources().ToList();
                 try
                 {
+                    // By using ToList() here we are forcing the database query result extraction to complete straight away,
+                    // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
+                    // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
+                    // here results in the calling method to not release the lock.
+                    var kits = _publishedContentService.GetAllContentSources().ToList();
                     return onStartup ? _contentStore.SetAllFastSortedLocked(kits, true) : _contentStore.SetAllLocked(kits);
                 }
                 catch (ThreadAbortException tae)
@@ -401,14 +401,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 _logger.LogDebug("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
 
-                // By using ToList() here we are forcing the database query result extraction to complete straight away,
-                // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
-                // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
-                // here results in the calling method to not release the lock.
-                var kits = _publishedContentService.GetAllMediaSources().ToList();
-
                 try
                 {
+                    // By using ToList() here we are forcing the database query result extraction to complete straight away,
+                    // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
+                    // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
+                    // here results in the calling method to not release the lock.
+                    var kits = _publishedContentService.GetAllMediaSources().ToList();
                     return onStartup ? _mediaStore.SetAllFastSortedLocked(kits, true) : _mediaStore.SetAllLocked(kits);
                 }
                 catch (ThreadAbortException tae)
