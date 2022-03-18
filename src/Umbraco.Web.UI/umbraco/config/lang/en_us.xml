@@ -809,7 +809,7 @@
     <key alias="new">New</key>
     <key alias="next">Next</key>
     <key alias="no">No</key>
-    <key alias="nodename">Node Name</key>
+    <key alias="nodeName">Node Name</key>
     <key alias="of">of</key>
     <key alias="off">Off</key>
     <key alias="ok">OK</key>
@@ -850,7 +850,7 @@
     <key alias="submit">Submit</key>
     <key alias="success">Success</key>
     <key alias="type">Type</key>
-    <key alias="typename">Type Name</key>
+    <key alias="typeName">Type Name</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="under">under</key>
     <key alias="up">Up</key>
@@ -1495,7 +1495,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="umbracoForum">Visit our.umbraco.com</key>
     <key alias="umbracoTv">Visit umbraco.tv</key>
     <key alias="umbracoLearningBase">Watch our free tutorial videos</key>
-    <key alias="umbracoLearningBaseDescription">on the Umbraco Learning Base</key>	
+    <key alias="umbracoLearningBaseDescription">on the Umbraco Learning Base</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -2562,15 +2562,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="usedByProperties">Referenced by</key>
     <key alias="labelUsedByItems">Referenced by the following items</key>
     <key alias="labelDependsOnThis">The following items depend on this</key>
-    <key alias="labelUsedByDocuments">Referenced by the following Documents</key>
-    <key alias="labelUsedByMembers">Referenced by the following Members</key>
-    <key alias="labelUsedByMedia">Referenced by the following Media</key>
     <key alias="labelUsedItems">The following items are referenced</key>
     <key alias="labelUsedDescendants">The following descendant items have dependencies</key>
-    <key alias="labelDependentDescendants">The following descending items has dependencies</key>
-    <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being referenced in a media item.</key>
-    <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being referenced in a content item.</key>
-    <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being referenced in a member.</key>
+    <key alias="labelDependentDescendants">The following descending items have dependencies</key>
     <key alias="deleteWarning">This item or its descendants is being referenced. Deletion can lead to broken links on your website.</key>
     <key alias="unpublishWarning">This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
     <key alias="deleteDisabledWarning">This item or its descendants is being referenced. Therefore, deletion has been disabled.</key>

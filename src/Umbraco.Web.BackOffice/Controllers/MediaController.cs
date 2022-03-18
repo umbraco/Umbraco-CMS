@@ -1082,7 +1082,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return new ActionResult<IMedia>(toMove);
         }
 
-        [Obsolete("Please use TrackedReferencesController.GetPagedReferences() instead. Scheduled for removal in V11.")]
+        [Obsolete("Please use TrackedReferencesController.GetPagedRelationsForItem() instead. Scheduled for removal in V11.")]
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)
