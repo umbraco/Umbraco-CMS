@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IEnumerable<IMacro> GetAllByAlias(string[] aliases)
         {
-            if (aliases.Any() == false)
+            if (aliases.Any() is false)
             {
                 return base.GetMany();
             }
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private IEnumerable<IMacro> PerformGetAllByAlias(params string[] aliases)
         {
-            if (aliases.Any() == false)
+            if (aliases.Any() is false)
             {
                 return base.GetMany();
             }

@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
             {
-                return GetAll().FirstOrDefault(x=>x.Alias == alias);
+                return GetAll().FirstOrDefault(x => x.Alias == alias);
             }
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
             {
                 var hashset = new HashSet<string>(aliases);
-                return GetAll().Where(x=> hashset.Contains(x.Alias));
+                return GetAll().Where(x => hashset.Contains(x.Alias));
             }
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
                 // Deserialise JSON of Macro Grid Control to a class
                 var gridMacro = macroGridControl.Value.ToObject<GridMacro>();
                 // Collect any macro parameters that contain the media udi format
-                if (gridMacro != null && gridMacro.MacroParameters != null && gridMacro.MacroParameters.Any())
+                if (gridMacro is not null && gridMacro.MacroParameters is not null && gridMacro.MacroParameters.Any())
                 {
                     foundMacros.Add(new Tuple<string, Dictionary<string, string>>(gridMacro.MacroAlias, gridMacro.MacroParameters));
                 }
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
                 }
                 foundMacroUmbracoEntityReferences.Add(new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Macro, macroConfig.Key)));
                 // Only do this if the macros actually have parameters
-                if (macroConfig.Properties != null && macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
+                if (macroConfig.Properties is not null && macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
                 {
                     foreach (var umbracoEntityReference in GetUmbracoEntityReferencesFromMacroParameters(macro.Item2, macroConfig, _parameterEditors))
                     {
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
                     var parameterEditorAlias = parameter.EditorAlias;
                     // Lookup propertyEditor from the registered ParameterEditors with the implmementation to avoid looking up for each parameter
                     var parameterEditor = parameterEditors.FirstOrDefault(f => string.Equals(f.Alias, parameterEditorAlias, StringComparison.OrdinalIgnoreCase));
-                    if (parameterEditor != null)
+                    if (parameterEditor is not null)
                     {
                         // Get the ParameterValueEditor for this PropertyEditor (where the GetReferences method is implemented) - cast as IDataValueReference to determine if 'it is' implemented for the editor
                         if (parameterEditor.GetValueEditor() is IDataValueReference parameterValueEditor)
