@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
             {
-                return GetAll().First();
+                return GetAll().FirstOrDefault(x=>x.Alias == alias);
             }
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -68,7 +68,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
             {
-                return GetAll();
+                var hashset = new HashSet<string>(aliases);
+                return GetAll().Where(x=> hashset.Contains(x.Alias));
             }
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

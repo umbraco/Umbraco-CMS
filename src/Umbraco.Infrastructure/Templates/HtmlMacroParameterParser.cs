@@ -88,6 +88,10 @@ namespace Umbraco.Cms.Infrastructure.Templates
             foreach (var macro in macros)
             {
                 var macroConfig = macroConfigs.FirstOrDefault(f => f.Alias == macro.Item1);
+                if (macroConfig is null)
+                {
+                    continue;
+                }
                 foundMacroUmbracoEntityReferences.Add(new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Macro, macroConfig.Key)));
                 // Only do this if the macros actually have parameters
                 if (macroConfig.Properties != null && macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
