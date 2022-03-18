@@ -46,6 +46,11 @@ namespace Umbraco.Cms.Core.Cache
         {
             var payloads = Deserialize(json);
 
+            Refresh(payloads);
+        }
+
+        public override void Refresh(JsonPayload[] payloads)
+        {
             foreach (var payload in payloads)
             {
                 foreach (var alias in GetCacheKeysForAlias(payload.Alias))
@@ -59,8 +64,9 @@ namespace Umbraco.Cms.Core.Cache
                 }
             }
 
-            base.Refresh(json);
+            base.Refresh(payloads);
         }
+
         #endregion
 
         #region Json
