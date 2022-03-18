@@ -198,22 +198,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             });
         }
 
-        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildIds(int[] childIds, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes)
-        {
-            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
-            {
-                SqlJoinRelations(sql);
-
-                sql.WhereIn<RelationDto>(rel => rel.ChildId, childIds);
-                sql.WhereAny(s => s.WhereIn<RelationDto>(rel => rel.ParentId, childIds), s => s.WhereNotIn<NodeDto>(node => node.NodeId, childIds));
-
-                if (relationTypes != null && relationTypes.Any())
-                {
-                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
-                }
-            });
-        }
-
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         {
             return GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
@@ -240,21 +224,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
             });
         }
-
-        public IEnumerable<IUmbracoEntity> GetPagedEntitiesForItemsInRelation(int[] itemIds, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        {
-            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
-            {
-                SqlJoinRelations(sql);
-
-                sql.WhereIn<RelationDto>(rel => rel.ChildId, itemIds);
-                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == node.NodeId);
-                sql.Where<RelationTypeDto>(type => type.IsDependency);
-            });
-        }
-
-
-
 
         public void Save(IEnumerable<IRelation> relations)
         {
@@ -474,8 +443,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         [Column(Name = "contentTypeName")]
         public string ChildContentTypeName { get; set; }
-
-
 
         [Column(Name = "relationTypeName")]
         public string RelationTypeName { get; set; }

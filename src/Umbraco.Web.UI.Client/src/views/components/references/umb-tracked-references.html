@@ -26,11 +26,11 @@
     </div>
 
     <div ng-if="vm.hasReferencesInDescendants">
-        <umb-tracked-references-table  items="vm.referencedDescendants.items"
-                                                total-pages="vm.referencedDescendants.totalPages"
-                                                page-number="vm.referencedDescendants.pageNumber"
-                                                headline="vm.referencedDescendantsTitle"
-                                                on-page-changed="vm.changeDescendantsPageNumber(pageNumber)">
+        <umb-tracked-references-table items="vm.referencedDescendants.items"
+                                      total-pages="vm.referencedDescendants.totalPages"
+                                      page-number="vm.referencedDescendants.pageNumber"
+                                      headline="vm.referencedDescendantsTitle"
+                                      on-page-changed="vm.changeDescendantsPageNumber(pageNumber)">
         </umb-tracked-references-table>
     </div>
 </div>
