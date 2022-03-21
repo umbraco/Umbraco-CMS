@@ -61,12 +61,8 @@ namespace Umbraco.Cms.Web.BackOffice.Install
 
         internal InstallHelper InstallHelper { get; }
 
-        public bool PostValidateDatabaseConnection(DatabaseModel model)
-        {
-            var canConnect = _databaseBuilder.CanConnect(model.DatabaseType.ToString(), model.ConnectionString,
-                model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
-            return canConnect;
-        }
+        public bool PostValidateDatabaseConnection(DatabaseModel databaseSettings)
+            => _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, isTrialRun: true);
 
         /// <summary>
         ///     Gets the install setup.

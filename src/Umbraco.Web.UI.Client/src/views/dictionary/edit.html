@@ -1,63 +1,45 @@
-﻿<div ng-controller="Umbraco.Editors.Dictionary.EditController as vm">
-    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
-    
-    <form name="contentForm"
-          ng-submit="vm.save()"
-          novalidate
-          val-form-manager>
+<div ng-controller="Umbraco.Editors.Dictionary.EditController as vm">
+  <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
-        <umb-editor-view ng-if="!vm.page.loading">
-            <umb-editor-header
-                name="vm.content.name"
-                name-locked="vm.page.nameLocked"
-                hide-icon="true"
-                hide-description="true"
-                hide-alias="true"
-                on-back="vm.back()"
-                show-back-button="vm.showBackButton"
-                editorfor="vm.header.editorfor"
-                setpagetitle="vm.header.setPageTitle">
-            </umb-editor-header>
-            
-            <umb-editor-container class="form-horizontal">
-                <umb-box>
-                    <umb-box-content>
-                        <p ng-bind-html="vm.description"></p>
-                        <umb-property ng-repeat="translation in vm.content.translations | orderBy:'displayName'" property="translation.property">
+  <form name="contentForm"
+        ng-submit="vm.save()"
+        novalidate
+        val-form-manager>
 
-                            <textarea rows="2" class="autogrow w-100"
-                                      id="{{translation.property.alias}}"
-                                      ng-model="translation.translation"
-                                      maxlength="1000"
-                                      ng-keyup="vm.change(translation)"
-                                      ng-trim="false"></textarea>
-                            <div class="help" ng-if="translation.nearMaxLimit">
-                                <p tabindex="0">
-                                    <span class="sr-only">{{ translation.displayName }} </span>
-                                    <localize key="textbox_characters_left" tokens="[vm.maxlength - translation.translation.length]" watch-tokens="true">%0% characters left.</localize>
-                                </p>
-                            </div>
-                        </umb-property>
-                    </umb-box-content>
-                </umb-box>
-            </umb-editor-container>
-            
-            <umb-editor-footer>
+    <umb-editor-view ng-if="!vm.page.loading">
+      <umb-editor-header name="vm.content.name"
+                         name-locked="vm.page.nameLocked"
+                         hide-icon="true"
+                         hide-description="true"
+                         hide-alias="true"
+                         navigation="vm.page.navigation"
+                         on-back="vm.back()"
+                         show-back-button="vm.showBackButton"
+                         editorfor="vm.header.editorfor"
+                         setpagetitle="vm.header.setPageTitle">
+      </umb-editor-header>
 
-                <umb-editor-footer-content-right>
+      <umb-editor-container class="form-horizontal">
+        <umb-editor-sub-views sub-views="vm.page.navigation"
+                              model="vm">
+        </umb-editor-sub-views>
+      </umb-editor-container>
 
-                    <umb-button
-                        type="submit"
-                        button-style="success"
-                        state="vm.page.saveButtonState"                  
-                        shortcut="ctrl+s"
-                        label="Save"
-                        label-key="buttons_save">
-                    </umb-button>
+      <umb-editor-footer>
 
-                </umb-editor-footer-content-right>
+        <umb-editor-footer-content-right>
 
-            </umb-editor-footer>
-        </umb-editor-view>
-    </form>
+          <umb-button type="submit"
+                      button-style="success"
+                      state="vm.page.saveButtonState"
+                      shortcut="ctrl+s"
+                      label="Save"
+                      label-key="buttons_save">
+          </umb-button>
+
+        </umb-editor-footer-content-right>
+
+      </umb-editor-footer>
+    </umb-editor-view>
+  </form>
 </div>

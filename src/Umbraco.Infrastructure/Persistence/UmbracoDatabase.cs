@@ -27,8 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private readonly ILogger<UmbracoDatabase> _logger;
         private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
-        private readonly RetryPolicy _connectionRetryPolicy;
-        private readonly RetryPolicy _commandRetryPolicy;
         private readonly IEnumerable<IMapper> _mapperCollection;
         private readonly Guid _instanceGuid = Guid.NewGuid();
         private List<CommandInfo> _commands;
@@ -49,8 +47,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             ILogger<UmbracoDatabase> logger,
             IBulkSqlInsertProvider bulkSqlInsertProvider,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            RetryPolicy connectionRetryPolicy = null,
-            RetryPolicy commandRetryPolicy = null,
             IEnumerable<IMapper> mapperCollection = null)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
@@ -58,8 +54,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _logger = logger;
             _bulkSqlInsertProvider = bulkSqlInsertProvider;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
-            _connectionRetryPolicy = connectionRetryPolicy;
-            _commandRetryPolicy = commandRetryPolicy;
             _mapperCollection = mapperCollection;
 
             Init();
@@ -98,27 +92,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         /// <inheritdoc />
         public ISqlContext SqlContext { get; }
-
-        #region Temp
-
-        // work around NPoco issue https://github.com/schotime/NPoco/issues/517 while we wait for the fix
-        public override DbCommand CreateCommand(DbConnection connection, CommandType commandType, string sql, params object[] args)
-        {
-            var command = base.CreateCommand(connection, commandType, sql, args);
-
-            if (!DatabaseType.IsSqlCe())
-                return command;
-
-            foreach (DbParameter parameter in command.Parameters)
-            {
-                if (parameter.Value == DBNull.Value)
-                    parameter.DbType = DbType.String;
-            }
-
-            return command;
-        }
-
-        #endregion
 
         #region Testing, Debugging and Troubleshooting
 
@@ -218,12 +191,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         #region OnSomething
 
-        // TODO: has new interceptors to replace OnSomething?
-
         protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
-            if (connection == null) throw new ArgumentNullException(nameof(connection));
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
 
+            // TODO: this should probably move to a SQL Server ProviderSpecificInterceptor.
 #if DEBUG_DATABASES
             // determines the database connection SPID for debugging
             if (DatabaseType.IsSqlServer())
@@ -239,15 +214,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 // includes SqlCE
                 _spid = 0;
             }
+
 #endif
-
-            // wrap the connection with a profiling connection that tracks timings
-            connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
-
-            // wrap the connection with a retrying connection
-            if (_connectionRetryPolicy != null || _commandRetryPolicy != null)
-                connection = new RetryDbConnection(connection, _connectionRetryPolicy, _commandRetryPolicy);
-
             return connection;
         }
 
@@ -353,6 +321,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             public object Value { get; }
             public DbType DbType { get; }
             public int Size { get; }
+        }
+
+        /// <inheritdoc cref="Database.ExecuteScalar{T}(string,object[])"/>
+        public new T ExecuteScalar<T>(string sql, params object[] args)
+            => ExecuteScalar<T>(new Sql(sql, args));
+
+        /// <inheritdoc cref="Database.ExecuteScalar{T}(sql)"/>
+        public new T ExecuteScalar<T>(Sql sql)
+            => ExecuteScalar<T>(sql.SQL, CommandType.Text, sql.Arguments);
+
+        /// <inheritdoc cref="Database.ExecuteScalar{T}(string,CommandType,object[])"/>
+        /// <remarks>
+        /// Be nice if handled upstream <a href="https://github.com/schotime/NPoco/issues/653">GH issue</a>
+        /// </remarks>
+        public new T ExecuteScalar<T>(string sql, CommandType commandType, params object[] args)
+        {
+            if (SqlContext.SqlSyntax.ScalarMappers == null)
+            {
+                return base.ExecuteScalar<T>(sql, commandType, args);
+            }
+
+            if (!SqlContext.SqlSyntax.ScalarMappers.TryGetValue(typeof(T), out IScalarMapper mapper))
+            {
+                return base.ExecuteScalar<T>(sql, commandType, args);
+            }
+
+            var result = base.ExecuteScalar<object>(sql, commandType, args);
+            return (T)mapper.Map(result);
         }
     }
 }

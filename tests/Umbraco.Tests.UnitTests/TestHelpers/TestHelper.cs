@@ -38,6 +38,7 @@ using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
@@ -60,8 +61,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
                 : base(typeof(TestHelperInternal).Assembly)
             {
             }
-
-            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = Mock.Of<IDbProviderFactoryCreator>();
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = Mock.Of<IBulkSqlInsertProvider>();
 
@@ -112,8 +111,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         public static IJsonSerializer JsonSerializer => s_testHelperInternal.JsonSerializer;
 
         public static IVariationContextAccessor VariationContextAccessor => s_testHelperInternal.VariationContextAccessor;
-
-        public static IDbProviderFactoryCreator DbProviderFactoryCreator => s_testHelperInternal.DbProviderFactoryCreator;
 
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => s_testHelperInternal.BulkSqlInsertProvider;
 

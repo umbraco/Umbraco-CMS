@@ -72,7 +72,27 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, Sql<ISqlContext> values)
         {
-            return sql.WhereIn(field, values, false);
+            return WhereIn(sql, field, values, false, null);
+        }
+
+        public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, Sql<ISqlContext> values, string tableAlias)
+        {
+            return sql.WhereIn(field, values, false, tableAlias);
+        }
+
+
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, Sql<ISqlContext> valuesSql)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            sql.Where(fieldName + " LIKE (" + valuesSql.SQL + ")", valuesSql.Arguments);
+            return sql;
+        }
+
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> fieldSelector, string likeValue)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            sql.Where(fieldName + " LIKE ('" + likeValue + "')");
+            return sql;
         }
 
         /// <summary>
@@ -130,7 +150,12 @@ namespace Umbraco.Extensions
 
         private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql valuesSql, bool not)
         {
-            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
+            return WhereIn(sql, fieldSelector, valuesSql, not, null);
+        }
+
+        private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql valuesSql, bool not, string tableAlias)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector, tableAlias);
             sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + valuesSql.SQL + ")", valuesSql.Arguments);
             return sql;
         }
@@ -252,7 +277,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderByDescending<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ") DESC");
+            return sql.OrderByDescending(sql.SqlContext.SqlSyntax.GetFieldName(field));
         }
 
         /// <summary>
@@ -268,7 +293,7 @@ namespace Umbraco.Extensions
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
                 : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
-            return sql.OrderBy(columns.Select(x => x + " DESC"));
+            return sql.OrderByDescending(columns);
         }
 
         /// <summary>
@@ -424,20 +449,11 @@ namespace Umbraco.Extensions
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
         /// <remarks>Nested statement produces LEFT JOIN xxx JOIN yyy ON ... ON ...</remarks>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null)
-        {
-            var type = typeof(TDto);
-            var tableName = type.GetTableName();
-            var join = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
-            if (alias != null) join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
-
-            var nestedSql = new Sql<ISqlContext>(sql.SqlContext);
-            nestedSql = nestedJoin(nestedSql);
-
-            var sqlJoin = sql.LeftJoin(join);
-            sql.Append(nestedSql);
-            return sqlJoin;
-        }
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(
+            this Sql<ISqlContext> sql,
+            Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
+            string alias = null) =>
+            sql.SqlContext.SqlSyntax.LeftJoinWithNestedJoin<TDto>(sql, nestedJoin, alias);
 
         /// <summary>
         /// Appends an LEFT JOIN clause using a nested query.
@@ -936,6 +952,15 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets fields for a Dto.
         /// </summary>
+        public static string ColumnsForInsert<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, forInsert: true));
+        }
+
+        /// <summary>
+        /// Gets fields for a Dto.
+        /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The origin sql.</param>
         /// <param name="alias">The Dto table alias.</param>
@@ -965,7 +990,8 @@ namespace Umbraco.Extensions
             var type = typeof(TDto);
             var tableName = type.GetTableName();
 
-            sql.Append($"DELETE {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
+            // FROM optional SQL server, but not elsewhere.
+            sql.Append($"DELETE FROM {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
             return sql;
         }
 
@@ -1034,7 +1060,7 @@ namespace Umbraco.Extensions
 
             public SqlUpd<TDto> Set(Expression<Func<TDto, object>> fieldSelector, object value)
             {
-                var fieldName = _sqlContext.SqlSyntax.GetFieldName(fieldSelector);
+                var fieldName = _sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
                 _setExpressions.Add(new Tuple<string, object>(fieldName, value));
                 return this;
             }
@@ -1051,62 +1077,14 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="sql">The Sql statement.</param>
         /// <returns>The Sql statement.</returns>
-        /// <remarks>NOTE: This method will not work for all queries, only simple ones!</remarks>
+        /// <remarks>
+        /// NOTE: This method will not work for all queries, only simple ones!
+        /// </remarks>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
-        {
-            // go find the first FROM clause, and append the lock hint
-            Sql s = sql;
-            var updated = false;
+            => sql.SqlContext.SqlSyntax.InsertForUpdateHint(sql);
 
-            while (s != null)
-            {
-                var sqlText = SqlInspector.GetSqlText(s);
-                if (sqlText.StartsWith("FROM ", StringComparison.OrdinalIgnoreCase))
-                {
-                    SqlInspector.SetSqlText(s, sqlText + " WITH (UPDLOCK)");
-                    updated = true;
-                    break;
-                }
-
-                s = SqlInspector.GetSqlRhs(sql);
-            }
-
-            if (updated)
-                SqlInspector.Reset(sql);
-
-            return sql;
-        }
-
-        #endregion
-
-        #region Sql Inspection
-
-        private static SqlInspectionUtilities _sqlInspector;
-
-        private static SqlInspectionUtilities SqlInspector => _sqlInspector ?? (_sqlInspector = new SqlInspectionUtilities());
-
-        private class SqlInspectionUtilities
-        {
-            private readonly Func<Sql, string> _getSqlText;
-            private readonly Action<Sql, string> _setSqlText;
-            private readonly Func<Sql, Sql> _getSqlRhs;
-            private readonly Action<Sql, string> _setSqlFinal;
-
-            public SqlInspectionUtilities()
-            {
-                (_getSqlText, _setSqlText) = ReflectionUtilities.EmitFieldGetterAndSetter<Sql, string>("_sql");
-                _getSqlRhs = ReflectionUtilities.EmitFieldGetter<Sql, Sql>("_rhs");
-                _setSqlFinal = ReflectionUtilities.EmitFieldSetter<Sql, string>("_sqlFinal");
-            }
-
-            public string GetSqlText(Sql sql) => _getSqlText(sql);
-
-            public void SetSqlText(Sql sql, string sqlText) => _setSqlText(sql, sqlText);
-
-            public Sql GetSqlRhs(Sql sql) => _getSqlRhs(sql);
-
-            public void Reset(Sql sql) => _setSqlFinal(sql, null);
-        }
+        public static Sql<ISqlContext> AppendForUpdateHint(this Sql<ISqlContext> sql)
+            => sql.SqlContext.SqlSyntax.AppendForUpdateHint(sql);
 
         #endregion
 
@@ -1131,7 +1109,7 @@ namespace Umbraco.Extensions
 
         #region Utilities
 
-        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true)
+        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
@@ -1171,24 +1149,11 @@ namespace Umbraco.Extensions
             }
 
             return queryColumns
-                .Select(x => GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value), referenceName))
+                .Select(x => sql.SqlContext.SqlSyntax.GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value), referenceName, forInsert: forInsert))
                 .ToArray();
         }
 
-        private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)
-        {
-            tableName = dbType.EscapeTableName(tableName);
-            columnName = dbType.EscapeSqlIdentifier(columnName);
-            var column = tableName + "." + columnName;
-            if (columnAlias == null) return column;
-
-            referenceName = referenceName == null ? string.Empty : referenceName + "__";
-            columnAlias = dbType.EscapeSqlIdentifier(referenceName + columnAlias);
-            column += " AS " + columnAlias;
-            return column;
-        }
-
-        private static string GetTableName(this Type type)
+        public static string GetTableName(this Type type)
         {
             // TODO: returning string.Empty for now
             // BUT the code bits that calls this method cannot deal with string.Empty so we

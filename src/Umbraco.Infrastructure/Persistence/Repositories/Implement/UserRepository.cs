@@ -225,10 +225,10 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             // that query is going to run a *lot*, make it a template
             var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
                 .Select<UserLoginDto>()
-                .SelectTop(1)
                 .From<UserLoginDto>()
                 .Where<UserLoginDto>(x => x.SessionId == SqlTemplate.Arg<Guid>("sessionId"))
-                .ForUpdate());
+                .ForUpdate()
+                .SelectTop(1)); // Stick at end, SQL server syntax provider will insert at start of query after "select ", but sqlite will append limit to end.
 
             var sql = t.Sql(sessionId);
 

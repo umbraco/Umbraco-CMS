@@ -76,8 +76,6 @@ namespace Umbraco.Cms.Web.Common.Security
             }
             else
             {
-                string username;
-
                 MemberIdentityUser currentMember = await GetCurrentMemberAsync();
 
                 // If a member could not be resolved from the provider, we are clearly not authorized and can break right here
@@ -87,7 +85,6 @@ namespace Umbraco.Cms.Web.Common.Security
                 }
 
                 int memberId = int.Parse(currentMember.Id, CultureInfo.InvariantCulture);
-                username = currentMember.UserName;
 
                 // If types defined, check member is of one of those types
                 IList<string> allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
@@ -98,10 +95,11 @@ namespace Umbraco.Cms.Web.Common.Security
                 }
 
                 // If specific members defined, check member is of one of those
-                if (allowAction && allowMembers.Any())
+                var allowMembersList = allowMembers.ToList();
+                if (allowAction && allowMembersList.Any())
                 {
                     // Allow only if member's Id is in the list
-                    allowAction = allowMembers.Contains(memberId);
+                    allowAction = allowMembersList.Contains(memberId);
                 }
 
                 // If groups defined, check member is of one of those groups
@@ -121,7 +119,7 @@ namespace Umbraco.Cms.Web.Common.Security
         public bool IsLoggedIn()
         {
             HttpContext httpContext = _httpContextAccessor.HttpContext;
-            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated;
+            return httpContext?.User.Identity?.IsAuthenticated ?? false;
         }
 
         /// <inheritdoc />

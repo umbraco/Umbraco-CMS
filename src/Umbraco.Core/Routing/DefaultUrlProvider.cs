@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Core.Routing
                 : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current, culture);
 
             var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
-            if (domainUri is not null || culture is null || culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+            if (domainUri is not null || string.IsNullOrEmpty(culture) || culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
             {
                 var url = AssembleUrl(domainUri, path, current, mode).ToString();
                 return UrlInfo.Url(url, culture);

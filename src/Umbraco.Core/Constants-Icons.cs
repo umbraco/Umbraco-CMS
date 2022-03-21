@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -8,6 +8,11 @@
             /// System default icon
             /// </summary>
             public const string DefaultIcon = Content;
+
+            /// <summary>
+            /// System blueprint icon
+            /// </summary>
+            public const string Blueprint = "icon-blueprint";
 
             /// <summary>
             /// System content icon

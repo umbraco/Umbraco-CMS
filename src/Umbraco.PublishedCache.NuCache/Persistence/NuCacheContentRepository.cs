@@ -364,7 +364,7 @@ AND cmsContentNu.nodeId IS NULL
             foreach (IProperty prop in content.Properties)
             {
                 var pdatas = new List<PropertyData>();
-                foreach (IPropertyValue pvalue in prop.Values)
+                foreach (IPropertyValue pvalue in prop.Values.OrderBy(x => x.Culture))
                 {
                     // sanitize - properties should be ok but ... never knows
                     if (!prop.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment))

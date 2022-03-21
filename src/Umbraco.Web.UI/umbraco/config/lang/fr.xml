@@ -16,7 +16,7 @@
     <key alias="createGroup">Créer un groupe</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyRecycleBin">Vider la corbeille</key>
+    <key alias="emptyrecyclebin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
     <key alias="importdocumenttype">Importer un type de document</key>

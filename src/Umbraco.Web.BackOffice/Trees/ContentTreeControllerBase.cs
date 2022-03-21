@@ -470,7 +470,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {
-                    menu.Items.Add(new MenuItem("emptyRecycleBin", LocalizedTextService)
+                    menu.Items.Add(new MenuItem("emptyrecyclebin", LocalizedTextService)
                     {
                         Icon = "trash",
                         OpensDialog = true

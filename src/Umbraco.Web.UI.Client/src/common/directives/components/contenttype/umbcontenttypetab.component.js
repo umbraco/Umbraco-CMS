@@ -59,9 +59,9 @@
       }
     }
 
-    function clickComposition (documentTypeId) {
+    function clickComposition(contentTypeId) {
       if (vm.onClickComposition) {
-        vm.onClickComposition({documentTypeId: documentTypeId});
+        vm.onClickComposition({ contentTypeId: contentTypeId});
       }
     }
 

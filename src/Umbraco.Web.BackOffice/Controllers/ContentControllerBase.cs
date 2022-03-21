@@ -224,7 +224,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             // if there's already a default event message, don't add our default one
             IEventMessagesFactory messages = EventMessages;
-            if (messages != null && messages.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage))
+            if (messages?.GetOrDefault()?.GetAll().Any(x => x.IsDefaultEventMessage) == true)
             {
                 return;
             }
