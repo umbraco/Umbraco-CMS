@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -21,6 +22,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
+        private readonly ILogger _logger;
         private TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
@@ -29,10 +31,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringHostedServiceBase"/> class.
         /// </summary>
-        /// <param name="period">Timepsan representing how often the task should recur.</param>
-        /// <param name="delay">Timespan represeting the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
+        /// <param name="logger">Logger.</param>
+        /// <param name="period">Timespan representing how often the task should recur.</param>
+        /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
+        protected RecurringHostedServiceBase(ILogger logger, TimeSpan period, TimeSpan delay)
         {
+            _logger = logger;
             _period = period;
             _delay = delay;
         }
@@ -64,6 +68,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // running process to crash.
                 // Hat-tip: https://stackoverflow.com/a/14207615/489433
                 await PerformExecuteAsync(state);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled exception in recurring hosted service {serviceName}.", GetType().Name);
             }
             finally
             {

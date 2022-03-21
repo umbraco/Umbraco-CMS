@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IProfilingLogger profilingLogger,
             IServerRoleAccessor serverRegistrar,
             IHttpClientFactory httpClientFactory)
-            : base(TimeSpan.FromMinutes(5), DefaultDelay)
+            : base(logger, TimeSpan.FromMinutes(5), DefaultDelay)
         {
             _hostingEnvironment = hostingEnvironment;
             _mainDom = mainDom;
