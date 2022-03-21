@@ -2728,7 +2728,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="bulletPointTutorials">
       <![CDATA[
-            Watch our free <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
+            Watch our free <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
         ]]>
     </key>
     <key alias="bulletPointFour">
