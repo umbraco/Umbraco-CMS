@@ -174,13 +174,13 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             var urlHash = url.GenerateHash<SHA1>();
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash &&
-                    (x.Culture == culture.ToLower() || x.Culture == string.Empty))
+                    (x.Culture == culture.ToLower() || x.Culture == null || x.Culture == string.Empty))
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             var dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
 
             if (dto == null)
-                dto = dtos.FirstOrDefault(f => f.Culture == string.Empty);
+                dto = dtos.FirstOrDefault(f => string.IsNullOrWhiteSpace(f.Culture));
 
             return dto == null ? null : Map(dto);
         }
