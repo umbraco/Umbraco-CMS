@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray jsonInstructions)
         {
-            if (instruction.Instructions == null)
+            if (instruction.Instructions is null)
             {
                 _logger.LogError("Failed to deserialize instructions ({DtoId}: 'null').", instruction.Id);
                 jsonInstructions = null;
