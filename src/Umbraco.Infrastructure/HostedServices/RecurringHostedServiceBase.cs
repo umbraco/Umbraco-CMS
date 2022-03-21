@@ -40,14 +40,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            if (!ExecutionContext.IsFlowSuppressed())
-            {
-                using (ExecutionContext.SuppressFlow())
-                {
-                    _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
-                }
-            }
-            else
+            using (!ExecutionContext.IsFlowSuppressed() ? (IDisposable)ExecutionContext.SuppressFlow() : null)
             {
                 _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
             }
