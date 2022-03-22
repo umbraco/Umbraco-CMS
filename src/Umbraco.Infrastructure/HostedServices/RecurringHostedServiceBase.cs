@@ -119,14 +119,4 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             GC.SuppressFinalize(this);
         }
     }
-
-    public class RecurringHostedServiceBaseImpl : RecurringHostedServiceBase
-    {
-
-        public RecurringHostedServiceBaseImpl(TimeSpan period, TimeSpan delay) : base(period, delay)
-        {
-        }
-
-        public override Task PerformExecuteAsync(object state) => Task.CompletedTask;
-    }
 }
