@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly ILogger _logger;
+        private readonly ILogger<RecurringHostedServiceBase> _logger;
         private TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="logger">Logger.</param>
         /// <param name="period">Timespan representing how often the task should recur.</param>
         /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(ILogger logger, TimeSpan period, TimeSpan delay)
+        protected RecurringHostedServiceBase(ILogger<RecurringHostedServiceBase> logger, TimeSpan period, TimeSpan delay)
         {
             _logger = logger;
             _period = period;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         // Scheduled for removal in V11
         [Obsolete("Please use constructor that takes an ILogger instead")]
         protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
-        : this(StaticServiceProvider.Instance.GetRequiredService<ILogger>(), period, delay)
+        : this(StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>().CreateLogger<RecurringHostedServiceBase>(), period, delay)
         {
         }
 
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception in recurring hosted service {serviceName}.", GetType().Name);
+                _logger.LogError(ex, "Unhandled exception in recurring hosted service {serviceName}.");
             }
             finally
             {
@@ -119,5 +119,15 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+    }
+
+    public class RecurringHostedServiceBaseImpl : RecurringHostedServiceBase
+    {
+
+        public RecurringHostedServiceBaseImpl(TimeSpan period, TimeSpan delay) : base(period, delay)
+        {
+        }
+
+        public override Task PerformExecuteAsync(object state) => Task.CompletedTask;
     }
 }
