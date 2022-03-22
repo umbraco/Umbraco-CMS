@@ -19,10 +19,5 @@ namespace Umbraco.Cms.Core
         {
             return _loggerFactory?.CreateLogger<T>() ?? NullLoggerFactory.Instance.CreateLogger<T>();
         }
-
-        public static ILogger CreateLogger(Type type)
-        {
-            return _loggerFactory?.CreateLogger(type) ?? NullLoggerFactory.Instance.CreateLogger(type);
-        }
     }
 }

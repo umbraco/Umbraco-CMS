@@ -4,9 +4,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             _period = period;
             _delay = delay;
-            _logger = StaticApplicationLogging.CreateLogger(GetType());
+            _logger = StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>().CreateLogger(GetType());
         }
 
         /// <inheritdoc/>
