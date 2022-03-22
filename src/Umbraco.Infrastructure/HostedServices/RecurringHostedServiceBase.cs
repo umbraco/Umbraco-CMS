@@ -4,10 +4,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -46,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         // Scheduled for removal in V11
         [Obsolete("Please use constructor that takes an ILogger instead")]
         protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
-        : this(StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>().CreateLogger<RecurringHostedServiceBase>(), period, delay)
+        : this(StaticApplicationLogging.CreateLogger<RecurringHostedServiceBase>(), period, delay)
         {
         }
 
