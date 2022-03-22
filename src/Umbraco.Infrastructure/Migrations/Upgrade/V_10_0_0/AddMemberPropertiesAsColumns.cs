@@ -26,49 +26,49 @@ public class AddMemberPropertiesAsColumns : MigrationBase
         AddColumnIfNotExists<MemberDto>(columns, "lastPasswordChangeDate");
 
         Sql<ISqlContext> newestContentVersionQuery = Database.SqlContext.Sql()
-            .Select("MAX([cv].[id]) as [id]", "[cv].[nodeId]")
+            .Select($"MAX({GetQuotedSelector("cv", "id")}) as {SqlSyntax.GetQuotedColumnName("id")}", GetQuotedSelector("cv", "nodeId"))
             .From<ContentVersionDto>("cv")
-            .GroupBy("[cv].[nodeId]");
+            .GroupBy(GetQuotedSelector("cv", "nodeId"));
 
         Sql<ISqlContext> passwordAttemptsQuery = Database.SqlContext.Sql()
-            .Select("[contentTypeId]", "[dataTypeId]", "[id]")
+            .Select(GetSubQueryColumns())
             .From<PropertyTypeDto>("pt")
-            .Where("[pt].[Alias] = 'umbracoMemberFailedPasswordAttempts'");
+            .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberFailedPasswordAttempts'");
 
         Sql<ISqlContext> memberApprovedQuery = Database.SqlContext.Sql()
-            .Select("[contentTypeId]", "[dataTypeId]", "[id]")
+            .Select(GetSubQueryColumns())
             .From<PropertyTypeDto>("pt")
-            .Where("[pt].[Alias] = 'umbracoMemberApproved'");
+            .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberApproved'");
 
         Sql<ISqlContext> memberLockedOutQuery = Database.SqlContext.Sql()
-            .Select("[contentTypeId]", "[dataTypeId]", "[id]")
+            .Select(GetSubQueryColumns())
             .From<PropertyTypeDto>("pt")
-            .Where("[pt].[Alias] = 'umbracoMemberLockedOut'");
+            .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberLockedOut'");
 
         Sql<ISqlContext> memberLastLockoutDateQuery = Database.SqlContext.Sql()
-            .Select("[contentTypeId]", "[dataTypeId]", "[id]")
+            .Select(GetSubQueryColumns())
             .From<PropertyTypeDto>("pt")
-            .Where("[pt].[Alias] = 'umbracoMemberLastLockoutDate'");
+            .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberLastLockoutDate'");
 
         Sql<ISqlContext> memberLastLoginDateQuery = Database.SqlContext.Sql()
-            .Select("[contentTypeId]", "[dataTypeId]", "[id]")
+            .Select(GetSubQueryColumns())
             .From<PropertyTypeDto>("pt")
-            .Where("[pt].[Alias] = 'umbracoMemberLastLogin'");
+            .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberLastLogin'");
 
         Sql<ISqlContext> memberLastPasswordChangeDateQuery = Database.SqlContext.Sql()
-            .Select("[contentTypeId]", "[dataTypeId]", "[id]")
+            .Select(GetSubQueryColumns())
             .From<PropertyTypeDto>("pt")
-            .Where("[pt].[Alias] = 'umbracoMemberLastPasswordChangeDate'");
+            .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberLastPasswordChangeDate'");
 
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.AppendLine($"UPDATE {Constants.DatabaseSchema.Tables.Member}");
         queryBuilder.AppendLine("SET");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.FailedPasswordAttempts)} = [umbracoPropertyData].[intValue],");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsApproved)} = [pdmp].[intValue],");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsLockedOut)} = [pdlo].[intValue],");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLockoutDate)} = [pdlout].[dateValue],");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLoginDate)} = [pdlin].[dateValue],");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate)} = [pdlpc].[dateValue]");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.FailedPasswordAttempts)} = {GetQuotedSelector("umbracoPropertyData", "intValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsApproved)} = {GetQuotedSelector("pdmp", "intValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsLockedOut)} = {GetQuotedSelector("pdlo", "intValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLockoutDate)} = {GetQuotedSelector("pdlout", "dateValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLoginDate)} = {GetQuotedSelector("pdlin", "dateValue")},");
+        queryBuilder.Append($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate)} = {GetQuotedSelector("pdlpc", "dateValue")}");
 
         Sql<ISqlContext> updateMemberColumnsQuery = Database.SqlContext.Sql(queryBuilder.ToString())
             .From<NodeDto>()
@@ -120,6 +120,16 @@ public class AddMemberPropertiesAsColumns : MigrationBase
 
         Database.Execute(updateMemberColumnsQuery);
     }
+
+    private string GetQuotedSelector(string tableName, string columnName)
+        => $"{SqlSyntax.GetQuotedTableName(tableName)}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+
+    private object[] GetSubQueryColumns() => new object[]
+    {
+        SqlSyntax.GetQuotedColumnName("contentTypeId"),
+        SqlSyntax.GetQuotedColumnName("dataTypeId"),
+        SqlSyntax.GetQuotedColumnName("id"),
+    };
 
     [TableName("failedAttemptsType")]
     private class FailedAttempts
