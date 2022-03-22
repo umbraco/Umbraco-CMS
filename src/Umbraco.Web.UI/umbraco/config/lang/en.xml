@@ -1469,6 +1469,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
     <key alias="umbracoForum">Visit our.umbraco.com</key>
     <key alias="umbracoTv">Visit umbraco.tv</key>
+    <key alias="umbracoLearningBase">Watch our free tutorial videos</key>
+    <key alias="umbracoLearningBaseDescription">on the Umbraco Learning Base</key>	
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -2639,7 +2641,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="bulletPointTutorials">
       <![CDATA[
-        Watch our free <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
+        Watch our free <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
     ]]>
     </key>
     <key alias="bulletPointFour">
