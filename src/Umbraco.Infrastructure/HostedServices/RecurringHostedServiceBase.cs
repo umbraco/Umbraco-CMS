@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception in recurring hosted service {serviceName}.");
+                _logger.LogError(ex, "Unhandled exception in recurring hosted service.");
             }
             finally
             {
