@@ -45,8 +45,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         // Scheduled for removal in V11
         [Obsolete("Please use constructor that takes an ILogger instead")]
         protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
-        : this(StaticApplicationLogging.CreateLogger<RecurringHostedServiceBase>(), period, delay)
         {
+            _period = period;
+            _delay = delay;
+            _logger = StaticApplicationLogging.CreateLogger(GetType());
         }
 
         /// <inheritdoc/>
