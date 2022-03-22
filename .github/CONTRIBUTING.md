@@ -84,13 +84,13 @@ Great question! The short version goes like this:
 
     Create a fork of [`Umbraco-CMS` on GitHub][Umbraco CMS repo]
     
-    ![Fork the repository](img\forkrepository.png)
+    ![Fork the repository](img/forkrepository.png)
     
 1. **Clone**
 
     When GitHub has created your fork, you can clone it in your favorite Git tool
     
-    ![Clone the fork](img\clonefork.png) 
+    ![Clone the fork](img/clonefork.png) 
     
 1. **Switch to the correct branch**
 
@@ -158,7 +158,7 @@ Exciting! You're ready to show us your changes.
 We recommend you to [sync with our repository][sync fork] before you submit your pull request. That way, you can fix any potential merge conflicts and make our lives a little bit easier.
 
 GitHub will have picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
-![Create a pull request](img\createpullrequest.png)
+![Create a pull request](img/createpullrequest.png)
 
 We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v9/contrib`. If you are working on v9, this is the branch you should be targeting.
 
