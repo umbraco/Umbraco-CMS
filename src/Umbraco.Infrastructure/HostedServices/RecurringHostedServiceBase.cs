@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly ILogger<RecurringHostedServiceBase> _logger;
+        private readonly ILogger _logger;
         private TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
