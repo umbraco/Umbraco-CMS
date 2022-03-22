@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="logger">Logger.</param>
         /// <param name="period">Timespan representing how often the task should recur.</param>
         /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(ILogger<RecurringHostedServiceBase> logger, TimeSpan period, TimeSpan delay)
+        protected RecurringHostedServiceBase(ILogger logger, TimeSpan period, TimeSpan delay)
         {
             _logger = logger;
             _period = period;
