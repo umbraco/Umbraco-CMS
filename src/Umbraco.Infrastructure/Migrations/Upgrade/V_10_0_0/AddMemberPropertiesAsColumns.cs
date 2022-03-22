@@ -63,12 +63,12 @@ public class AddMemberPropertiesAsColumns : MigrationBase
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.AppendLine($"UPDATE {Constants.DatabaseSchema.Tables.Member}");
         queryBuilder.AppendLine("SET");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.FailedPasswordAttempts)} = {GetQuotedSelector("umbracoPropertyData", "intValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsApproved)} = {GetQuotedSelector("pdmp", "intValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.IsLockedOut)} = {GetQuotedSelector("pdlo", "intValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLockoutDate)} = {GetQuotedSelector("pdlout", "dateValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastLoginDate)} = {GetQuotedSelector("pdlin", "dateValue")},");
-        queryBuilder.Append($"\t{Database.SqlContext.SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate)} = {GetQuotedSelector("pdlpc", "dateValue")}");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.FailedPasswordAttempts)} = {GetQuotedSelector("umbracoPropertyData", "intValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.IsApproved)} = {GetQuotedSelector("pdmp", "intValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.IsLockedOut)} = {GetQuotedSelector("pdlo", "intValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastLockoutDate)} = {GetQuotedSelector("pdlout", "dateValue")},");
+        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastLoginDate)} = {GetQuotedSelector("pdlin", "dateValue")},");
+        queryBuilder.Append($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastPasswordChangeDate)} = {GetQuotedSelector("pdlpc", "dateValue")}");
 
         Sql<ISqlContext> updateMemberColumnsQuery = Database.SqlContext.Sql(queryBuilder.ToString())
             .From<NodeDto>()
