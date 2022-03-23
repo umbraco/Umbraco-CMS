@@ -35,4 +35,8 @@
           vm.error = "invalid";
         });
     };
+
+    vm.goBack = function () {
+      $scope.vm.twoFactor.cancelCallback();
+    }
   });

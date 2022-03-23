@@ -48,9 +48,12 @@
           </p>
         </div>
 
-        <umb-button button-style="success" size="m" label-key="general_validate" state="cvm.stateValidateButton"
-          type="submit">
-        </umb-button>
+        <div class="flex justify-between items-center">
+          <umb-button button-style="success" size="m" label-key="general_validate" state="cvm.stateValidateButton"
+            type="submit"></umb-button>
+          <umb-button size="m" label-key="general_back" type="button" action="cvm.goBack()">
+          </umb-button>
+        </div>
       </form>
     </div>
   </div>
