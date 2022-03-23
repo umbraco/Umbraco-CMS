@@ -29,22 +29,23 @@
           </umb-box-content>
         </umb-box>
 
-        <div class="umb-control-group external-logins" ng-if="vm.externalLoginProviders.length > 0">
+        <umb-box class="umb-control-group external-logins" ng-if="vm.externalLoginProviders.length > 0">
+          <umb-box-content>
+            <umb-box-header title-key="defaultdialogs_externalLoginProviders" title="External login providers">
+            </umb-box-header>
 
-        <h5>
-          <localize key="defaultdialogs_externalLoginProviders">External login providers</localize>
-        </h5>
-
+            <umb-control-group>
         <div ng-repeat="login in vm.externalLoginProviders">
 
           <div ng-if="login.customView" ng-include="login.customView"></div>
 
           <div ng-if="!login.customView && login.properties.AutoLinkOptions.AllowManualLinking">
             <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
-              name="oauthloginform" ng-if="login.linkedProviderKey == undefined" ng-submit="vm.linkProvider($event)">
+                    name="oauthloginform" ng-if="login.linkedProviderKey == undefined"
+                    ng-submit="vm.linkProvider($event)">
               <input name="provider" type="hidden" value="{{login.authType}}" />
                 <button class="btn btn-block btn-social" id="{{login.authType}}"
-                  ng-class="login.properties.ButtonStyle">
+                      ng-class="login.properties.ButtonStyle" title="{{login.caption}}">
 
                 <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
                 <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
@@ -58,16 +59,18 @@
               ng-click="vm.unlink($event, login.authType, login.linkedProviderKey)"
               ng-if="login.linkedProviderKey != undefined" value="{{login.authType}}">
               <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
-              <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
-                key="defaultdialogs_account">account
+                    <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;
+                    <localize key="defaultdialogs_account">account
               </localize>
             </button>
           </div>
 
         </div>
+            </umb-control-group>
 
-      </div>
+          </umb-box-content>
 
+        </umb-box>
 
       <div class="umb-control-group" ng-if="!vm.showPasswordFields && vm.history.length">
         <h5>
