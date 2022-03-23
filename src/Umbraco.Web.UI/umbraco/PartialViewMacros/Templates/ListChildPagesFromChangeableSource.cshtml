@@ -18,7 +18,7 @@
     Alias:startNodeId     Name:Select starting page    Type:Content Picker
 *@
 
-@{ var startNodeId = Model.MacroParameters["startNodeId"]; }
+@{ var startNodeId = Model?.MacroParameters["startNodeId"]; }
 
 @if (startNodeId != null)
 {

@@ -20,6 +20,9 @@
                 </ul>
             </umb-box-content>
         </umb-box>
+
+        <umb-tracked-references id="node.id" ng-if="loadingReferences" ></umb-tracked-references>
+
         <umb-box data-element="node-info-redirects" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
             <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
             <umb-box-content class="block-form">

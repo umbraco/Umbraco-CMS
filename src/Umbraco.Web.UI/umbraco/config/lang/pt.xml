@@ -13,7 +13,7 @@
     <key alias="createPackage">Criar Pacote</key>
     <key alias="delete">Remover</key>
     <key alias="disable">Desabilitar</key>
-    <key alias="emptyRecycleBin">Esvaziar Lixeira</key>
+    <key alias="emptyrecyclebin">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
     <key alias="importdocumenttype">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>

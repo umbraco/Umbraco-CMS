@@ -1,0 +1,36 @@
+<umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
+
+<umb-box ng-if="(vm.hasContentReferences === false) && (vm.hasContentReferencesInDescendants === false) && (vm.hasMediaReferences === false) && (vm.hasMediaReferencesInDescendants === false) && (vm.hasMemberReferences === false) && (vm.loading === false) && (vm.hideNoResult === false)">
+    <umb-box-header title-key="references_tabName"></umb-box-header>
+    <umb-box-content>
+        <umb-empty-state size="small">
+            <localize key="references_itemHasNoReferences">This item is not referenced</localize>
+        </umb-empty-state>
+    </umb-box-content>
+</umb-box>
+
+<div ng-if="vm.loading === false">
+
+    <!-- Combined list -->
+    <div ng-if="vm.hasReferences">
+        <umb-tracked-references-table items="vm.references.items"
+                                      total-pages="vm.references.totalPages"
+                                      page-number="vm.references.pageNumber"
+                                      headline="vm.referencesTitle"
+                                      on-page-changed="vm.changeReferencesPageNumber(pageNumber)"
+                                      show-type-name="true"
+                                      show-type="!vm.compact"
+                                      show-relation-type-name="!vm.compact"
+                                      type-label-key="content_documentType">
+        </umb-tracked-references-table>
+    </div>
+
+    <div ng-if="vm.hasReferencesInDescendants">
+        <umb-tracked-references-table items="vm.referencedDescendants.items"
+                                      total-pages="vm.referencedDescendants.totalPages"
+                                      page-number="vm.referencedDescendants.pageNumber"
+                                      headline="vm.referencedDescendantsTitle"
+                                      on-page-changed="vm.changeDescendantsPageNumber(pageNumber)">
+        </umb-tracked-references-table>
+    </div>
+</div>

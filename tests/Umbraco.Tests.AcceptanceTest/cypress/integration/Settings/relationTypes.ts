@@ -25,6 +25,8 @@ context('Relation Types', () => {
       cy.get('select[name="relationType-parent"]').select('Document');
 
       cy.get('select[name="relationType-child"]').select('Media');
+      
+      cy.get('[name="relationType-isdependency"]').last().click({force: true})
 
       cy.get(".btn-primary").click();
     });

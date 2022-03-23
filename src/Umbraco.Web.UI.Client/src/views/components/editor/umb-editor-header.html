@@ -14,7 +14,7 @@
             <ng-form data-element="editor-icon" name="iconForm">
                 <button
                     type="button" class="umb-panel-header-icon"
-                    ng-if="hideIcon !== 'true'"
+                    ng-if="!hideIcon"
                     ng-click="openIconPicker()"
                     ng-class="{'-placeholder': $parent.icon === '' || $parent.icon === null}"
                     title="{{$parent.icon}}">
