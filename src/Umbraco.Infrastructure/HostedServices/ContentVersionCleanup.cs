@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IContentVersionService service,
             IMainDom mainDom,
             IServerRoleAccessor serverRoleAccessor)
-            : base(logger, TimeSpan.FromHours(1), TimeSpan.FromMinutes(1))
+            : base(logger, TimeSpan.FromHours(1), TimeSpan.FromMinutes(3))
         {
             _runtimeState = runtimeState;
             _logger = logger;

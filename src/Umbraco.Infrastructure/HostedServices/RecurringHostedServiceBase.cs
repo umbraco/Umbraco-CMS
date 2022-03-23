@@ -4,8 +4,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -41,6 +43,15 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _delay = delay;
         }
 
+        // Scheduled for removal in V11
+        [Obsolete("Please use constructor that takes an ILogger instead")]
+        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
+        {
+            _period = period;
+            _delay = delay;
+            _logger = StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>().CreateLogger(GetType());
+        }
+
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -71,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception in recurring hosted service {serviceName}.", GetType().Name);
+                _logger.LogError(ex, "Unhandled exception in recurring hosted service.");
             }
             finally
             {
