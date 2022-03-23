@@ -23,11 +23,6 @@
         <umb-button type="button" button-style="action" action="vm.toggleConfigureTwoFactor()"
           label="Configure Two-Factor" label-key="user_configureTwoFactor" ng-if="vm.hasTwoFactorProviders">
         </umb-button>
-
-        <umb-button action="vm.logout()" alias="logOut" button-style="danger" label="Log out" label-key="general_logout"
-          shortcut="ctrl+shift+l" type="button">
-        </umb-button>
-
       </div>
 
       <div class="umb-control-group external-logins"
@@ -118,6 +113,12 @@
     </umb-editor-container>
 
     <umb-editor-footer>
+
+      <umb-editor-footer-content-left>
+        <umb-button type="button" label-key="general_logout" shortcut="ctrl+shift+l" action="vm.logout()" alias="logOut"
+          button-style="danger" label="Log out">
+        </umb-button>
+      </umb-editor-footer-content-left>
 
       <umb-editor-footer-content-right>
 
