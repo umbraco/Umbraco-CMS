@@ -15,16 +15,16 @@
               <div class="flex">
                 <umb-button action="vm.editUser()" alias="editUser" button-style="action" label="Edit"
                   label-key="general_edit" ng-if="vm.canEditProfile" type="button">
-        </umb-button>
+                </umb-button>
 
-        <umb-button action="vm.togglePasswordFields()" alias="changePassword" button-style="action"
-          label="Change password" label-key="general_changePassword" ng-if="!vm.denyLocalLogin" type="button">
-        </umb-button>
+                <umb-button action="vm.togglePasswordFields()" alias="changePassword" button-style="action"
+                  label="Change password" label-key="general_changePassword" ng-if="!vm.denyLocalLogin" type="button">
+                </umb-button>
 
-        <umb-button type="button" button-style="action" action="vm.toggleConfigureTwoFactor()"
-          label="Configure Two-Factor" label-key="user_configureTwoFactor" ng-if="vm.hasTwoFactorProviders">
-        </umb-button>
-      </div>
+                <umb-button type="button" button-style="action" action="vm.toggleConfigureTwoFactor()"
+                  label="Configure Two-Factor" label-key="user_configureTwoFactor" ng-if="vm.hasTwoFactorProviders">
+                </umb-button>
+              </div>
             </umb-control-group>
           </umb-box-content>
         </umb-box>
@@ -35,55 +35,59 @@
             </umb-box-header>
 
             <umb-control-group>
-        <div ng-repeat="login in vm.externalLoginProviders">
+              <div ng-repeat="login in vm.externalLoginProviders">
 
-          <div ng-if="login.customView" ng-include="login.customView"></div>
+                <div ng-if="login.customView" ng-include="login.customView"></div>
 
-          <div ng-if="!login.customView && login.properties.AutoLinkOptions.AllowManualLinking">
-            <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
+                <div ng-if="!login.customView && login.properties.AutoLinkOptions.AllowManualLinking">
+                  <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
                     name="oauthloginform" ng-if="login.linkedProviderKey == undefined"
                     ng-submit="vm.linkProvider($event)">
-              <input name="provider" type="hidden" value="{{login.authType}}" />
-                <button class="btn btn-block btn-social" id="{{login.authType}}"
+                    <input name="provider" type="hidden" value="{{login.authType}}" />
+                    <button class="btn btn-block btn-social" id="{{login.authType}}"
                       ng-class="login.properties.ButtonStyle" title="{{login.caption}}">
 
-                <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
-                <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
-                  key="defaultdialogs_account">account
-                </localize>
-              </button>
-            </form>
+                      <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
+                      <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
+                        key="defaultdialogs_account">account
+                      </localize>
+                    </button>
+                  </form>
 
-            <button class="btn btn-block btn-social" id="{{login.authType}}" name="provider"
-              ng-class="login.properties.ButtonStyle"
-              ng-click="vm.unlink($event, login.authType, login.linkedProviderKey)"
-              ng-if="login.linkedProviderKey != undefined" value="{{login.authType}}">
-              <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
+                  <button class="btn btn-block btn-social" id="{{login.authType}}" name="provider"
+                    ng-class="login.properties.ButtonStyle"
+                    ng-click="vm.unlink($event, login.authType, login.linkedProviderKey)"
+                    ng-if="login.linkedProviderKey != undefined" value="{{login.authType}}">
+                    <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
                     <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;
                     <localize key="defaultdialogs_account">account
-              </localize>
-            </button>
-          </div>
+                    </localize>
+                  </button>
+                </div>
 
-        </div>
+              </div>
             </umb-control-group>
 
           </umb-box-content>
 
         </umb-box>
 
-      <div class="umb-control-group" ng-if="!vm.showPasswordFields && vm.history.length">
-        <h5>
-          <localize key="user_yourHistory">Your recent history</localize>
-        </h5>
-        <ul class="umb-tree">
-          <li ng-repeat="item in vm.history | orderBy:'time':true">
-            <a ng-click="vm.gotoHistory(item.link)" ng-href="{{item.link}}" prevent-default>
-              <umb-icon icon="{{item.icon}}"></umb-icon>
-              {{item.name}}
-            </a>
-          </li>
-        </ul>
+        <umb-box ng-if="vm.history.length">
+          <umb-box-content>
+            <umb-box-header title-key="user_yourHistory"></umb-box-header>
+            <umb-control-group>
+              <ul class="umb-tree">
+                <li ng-repeat="item in vm.history | orderBy:'time':true">
+                  <a ng-click="vm.gotoHistory(item.link)" ng-href="{{item.link}}" prevent-default>
+                    <umb-icon icon="{{item.icon}}"></umb-icon>
+                    {{item.name}}
+                    ({{ item.time | date : 'medium' }})
+                  </a>
+                </li>
+              </ul>
+            </umb-control-group>
+          </umb-box-content>
+        </umb-box>
       </div>
 
       <div ng-if="vm.showPasswordFields && !vm.denyLocalLogin">
