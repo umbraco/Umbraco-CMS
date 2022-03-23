@@ -5,7 +5,7 @@
   <PropertyGroup>
     <Version>9.4.0</Version>
     <AssemblyVersion>9.4.0</AssemblyVersion>
-    <InformationalVersion>9.4.0-rc</InformationalVersion>
+    <InformationalVersion>9.4.0</InformationalVersion>
     <FileVersion>9.4.0</FileVersion>
     <LangVersion Condition="'$(LangVersion)' == ''">9.0</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
