@@ -1,34 +1,38 @@
 ﻿angular.module("umbraco").controller("Umbraco.Login2faController",
-    function($scope, userService, authResource) {
-        $scope.code = "";
-        $scope.provider = "";
-        $scope.providers = [];
-        $scope.step = "send";
+  function ($scope, userService, authResource) {
+    let vm = this;
+    vm.code = "";
+    vm.provider = "";
+    vm.providers = [];
+    vm.step = "send";
+    vm.error = "";
+    vm.stateValidateButton = "";
 
-        authResource.get2FAProviders()
-            .then(function (data) {
-                $scope.providers = data;
-                console.log($scope.providers);
-                if ($scope.providers.length === 1) {
-                    $scope.step = "code";
-                    $scope.provider = $scope.providers[0];
-                }
-            });
+    authResource.get2FAProviders()
+      .then(function (data) {
+        vm.providers = data;
+        if (vm.providers.length === 1) {
+          vm.step = "code";
+          vm.provider = vm.providers[0];
+        }
+      });
 
-        $scope.send = function (provider) {
-            $scope.provider = provider;
-            $scope.step = "code";
-        };
+    vm.send = function (provider) {
+      vm.provider = provider;
+      vm.step = "code";
+    };
 
-        $scope.validate = function (provider, code) {
-            $scope.error2FA = "";
-            $scope.code = code;
-            authResource.verify2FACode(provider, code)
-                .then(function (data) {
-                    userService.setAuthenticationSuccessful(data);
-                    $scope.vm.twoFactor.submitCallback();
-                }, function() {
-                     $scope.error2FA = "Invalid code entered.";
-                });
-        };
-    });
+    vm.validate = function () {
+      vm.error = "";
+      vm.stateValidateButton = "busy";
+      authResource.verify2FACode(vm.provider, vm.code)
+        .then(function (data) {
+          vm.stateValidateButton = "success";
+          userService.setAuthenticationSuccessful(data);
+          $scope.vm.twoFactor.submitCallback();
+        }, function () {
+          vm.stateValidateButton = "error";
+          vm.error = "invalid";
+        });
+    };
+  });

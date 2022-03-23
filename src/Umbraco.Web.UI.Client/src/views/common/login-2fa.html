@@ -1,26 +1,57 @@
-﻿<div ng-controller="Umbraco.Login2faController" class="umb-login-container">
-    <div id="twoFactorlogin" ng-cloak="">
-        <div class="form">
-            <p><strong>One last step</strong></p>
+﻿<div ng-controller="Umbraco.Login2faController as cvm" class="umb-login-container">
+  <div id="twoFactorlogin" ng-cloak="">
+    <div class="form">
+      <h2>
+        <localize key="login_2fatitle">One last step</localize>
+      </h2>
 
-            <!-- if there's only one provider active, it will skip this step! -->
-            <form method="POST" name="twoFactorSendForm" ng-submit="send(provider)" ng-if="step=='send'">
-                <div class="control-group">
-                    <select ng-model="provider" ng-show="providers.length > 0">
-                        <option ng-repeat="provider in providers" value="{{provider}}">{{provider}}</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn">Send</button>
-            </form>
+      <p>
+        <localize key="login_2faText">You have enabled 2-factor authentication and must verify your identity.</localize>
+      </p>
 
-            <form method="POST" name="twoFactorCodeForm" ng-submit="validate(provider, code)" ng-if="step=='code'">
-                <p>Your verification code, please?</p>
-                <div class="control-group">
-                    <input type="password" name="code" class="input-xlarge" ng-model="code" ui-keypress="{13:'validate(provider, code)'}" />
-                </div>
-                <div class="text-error ng-binding" ng-if="error2FA !== ''">{{error2FA}}</div>
-                <button type="submit" class="btn">Validate</button>
-            </form>
+      <br>
+
+      <!-- if there's only one provider active, it will skip this step! -->
+      <div ng-if="cvm.step=='send'">
+        <p>
+          <localize key="login_2faMultipleText">You have multiple 2-factor providers enabled. Please choose one of them
+            to proceed.</localize>
+        </p>
+        <form method="POST" name="twoFactorSendForm" ng-submit="cvm.send(provider)">
+          <div class="control-group">
+            <select ng-model="cvm.provider" ng-show="cvm.providers.length > 0">
+              <option ng-repeat="provider in cvm.providers" value="{{provider}}">{{provider}}</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">
+            <localize key="general_submit">Send</localize>
+          </button>
+        </form>
+      </div>
+
+      <form method="POST" name="twoFactorCodeForm" ng-submit="cvm.validate()" ng-if="cvm.step=='code'">
+        <div class="control-group">
+          <label for="2facode" class="control-label">
+            <localize key="login_2faCodeInput">Verification code</localize>
+          </label>
+
+          <div class="controls">
+            <input id="2facode" class="-full-width-input input-xlarge" type="text" name="token" inputmode="numeric"
+              autocomplete="one-time-code" ng-model="cvm.code" ui-keypress="{13:'validate()'}" localize="placeholder"
+              placeholder="@login_2faCodeInputHelp" aria-required="true" />
+          </div>
         </div>
+
+        <div class="control-group" ng-if="cvm.error">
+          <p class="text-error" role="alert" aria-live="assertive">
+            <localize *ngIf="cvm.error === 'invalid'" key="login_2faInvalidCode">Invalid code entered</localize>
+          </p>
+        </div>
+
+        <umb-button button-style="success" size="m" label-key="general_validate" state="cvm.stateValidateButton"
+          type="submit">
+        </umb-button>
+      </form>
     </div>
+  </div>
 </div>
