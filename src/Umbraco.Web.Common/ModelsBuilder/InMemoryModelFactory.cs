@@ -799,8 +799,12 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             {
                 if (disposing)
                 {
-                    _watcher.EnableRaisingEvents = false;
-                    _watcher.Dispose();
+                    if (_watcher != null) 
+                    {
+                        _watcher.EnableRaisingEvents = false;
+                        _watcher.Dispose();
+                    }
+                    
                     _locker.Dispose();
                 }
 
