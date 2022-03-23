@@ -213,6 +213,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 "id");
             ConditionalInsert(
                 Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+                Cms.Core.Constants.DataTypes.Guids.Textstring,
+                new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Textbox, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Textbox}", SortOrder = 32, UniqueId = Cms.Core.Constants.DataTypes.Guids.TextstringGuid, Text = "Textstring", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
+                Cms.Core.Constants.DatabaseSchema.Tables.Node,
+                "id");
+            ConditionalInsert(
+                Cms.Core.Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
                 Cms.Core.Constants.DataTypes.Guids.RichtextEditor,
                 new NodeDto { NodeId = Cms.Core.Constants.DataTypes.RichtextEditor, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.RichtextEditor}", SortOrder = 4, UniqueId = Cms.Core.Constants.DataTypes.Guids.RichtextEditorGuid, Text = "Richtext editor", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now },
                 Cms.Core.Constants.DatabaseSchema.Tables.Node,
@@ -1020,6 +1026,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 _entitiesToAlwaysCreate[configKey].InvariantContains(id.ToString());
 
             InstallDefaultDataSettings installDefaultDataSettings = _installDefaultDataSettings.Get(configKey);
+
+            // If there's no configuration, we assume to create.
+            if (installDefaultDataSettings == null)
+            {
+                alwaysInsert = true;
+            }
 
             if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.None)
             {
