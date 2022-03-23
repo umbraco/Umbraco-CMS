@@ -479,7 +479,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (userSave == null)
             {
-                throw new ArgumentNullException("userSave");
+                throw new ArgumentNullException(nameof(userSave));
             }
 
             if (userSave.Message.IsNullOrWhiteSpace())
@@ -487,7 +487,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ModelState.AddModelError("Message", "Message cannot be empty");
             }
 
-            IUser user;
             if (_securitySettings.UsernameIsEmail)
             {
                 // ensure it's the same
@@ -496,16 +495,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else
             {
                 // first validate the username if we're showing it
-                var userResult = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
-                if (!(userResult.Result is null))
+                ActionResult<IUser> userResult = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                if (userResult.Result is not null)
                 {
                     return userResult.Result;
                 }
-
-                user = userResult.Value;
             }
 
-            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+            IUser user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
 
             if (ModelState.IsValid == false)
             {

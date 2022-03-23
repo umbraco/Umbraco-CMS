@@ -27,7 +27,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
             IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
         {
             _hostingEnvironment = hostingEnvironment;
-            _indexOptions = indexOptions.Get(index.Name);
+            if (indexOptions != null)
+            {
+                _indexOptions = indexOptions.Get(index.Name);
+
+            }
             Index = index;
             Logger = logger;
         }
@@ -35,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public LuceneIndex Index { get; }
         public ILogger<LuceneIndexDiagnostics> Logger { get; }
 
-       
+
 
         public Attempt<string> IsHealthy()
         {
@@ -72,12 +76,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     {
                         d[nameof(LuceneDirectoryIndexOptions.DirectoryFactory)] = _indexOptions.DirectoryFactory.GetType();
                     }
-                    
+
                     if (_indexOptions.IndexDeletionPolicy != null)
                     {
                         d[nameof(LuceneDirectoryIndexOptions.IndexDeletionPolicy)] = _indexOptions.IndexDeletionPolicy.GetType();
-                    } 
-                    
+                    }
+
                 }
 
                 return d;

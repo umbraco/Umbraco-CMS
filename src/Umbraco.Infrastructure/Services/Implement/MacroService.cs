@@ -13,13 +13,12 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    internal class MacroService : RepositoryService, IMacroService
+    internal class MacroService : RepositoryService, IMacroWithAliasService
     {
         private readonly IMacroRepository _macroRepository;
         private readonly IAuditRepository _auditRepository;
 
-        public MacroService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            IMacroRepository macroRepository, IAuditRepository auditRepository)
+        public MacroService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMacroRepository macroRepository, IAuditRepository auditRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _macroRepository = macroRepository;
@@ -33,10 +32,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
+            if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
+            {
+                return GetAll().FirstOrDefault(x => x.Alias == alias);
+            }
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var q = Query<IMacro>().Where(x => x.Alias == alias);
-                return _macroRepository.Get(q).FirstOrDefault();
+                return macroWithAliasRepository.GetByAlias(alias);
             }
         }
 
@@ -58,6 +61,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _macroRepository.GetMany(ids);
+            }
+        }
+
+        public IEnumerable<IMacro> GetAll(params string[] aliases)
+        {
+            if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
+            {
+                var hashset = new HashSet<string>(aliases);
+                return GetAll().Where(x => hashset.Contains(x.Alias));
+            }
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return macroWithAliasRepository.GetAllByAlias(aliases);
             }
         }
 

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Telemetry.Models;
 
 namespace Umbraco.Cms.Core.Telemetry.DataCollectors
@@ -12,7 +10,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
     /// <seealso cref="Umbraco.Cms.Core.Telemetry.ITelemetryDataCollector" />
     internal class MetadataTelemetryDataCollector : ITelemetryDataCollector
     {
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly ISiteIdentifierService _siteIdentifierService;
 
         private static readonly IEnumerable<TelemetryData> s_data = new[]
         {
@@ -23,7 +21,7 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         /// <summary>
         /// Initializes a new instance of the <see cref="MetadataTelemetryDataCollector" /> class.
         /// </summary>
-        public MetadataTelemetryDataCollector(IOptionsMonitor<GlobalSettings> globalSettings) => _globalSettings = globalSettings;
+        public MetadataTelemetryDataCollector(ISiteIdentifierService siteIdentifierService) => _siteIdentifierService = siteIdentifierService;
 
         /// <inheritdoc/>
         public IEnumerable<TelemetryData> Data => s_data;
@@ -37,6 +35,6 @@ namespace Umbraco.Cms.Core.Telemetry.DataCollectors
         };
 
         private Guid? GetTelemetryId()
-            => Guid.TryParse(_globalSettings.CurrentValue.Id, out var telemetryId) ? telemetryId : null;
+            => _siteIdentifierService.TryGetSiteIdentifier(out var telemetryId) ? telemetryId : null;
     }
 }

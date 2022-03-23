@@ -9,7 +9,7 @@ namespace Umbraco.Extensions
     public static class FriendlyUrlHelperExtensions
     {
 
-        private static IUmbracoContext UmbracoContext { get; } =
+        private static IUmbracoContext UmbracoContext =>
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>().GetRequiredUmbracoContext();
 
         private static IDataProtectionProvider DataProtectionProvider { get; } =

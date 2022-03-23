@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
     /// <summary>
     /// An <see cref="IServerMessenger"/> that works by storing messages in the database.
     /// </summary>
-    public abstract class DatabaseServerMessenger : ServerMessengerBase
+    public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     {
         /*
          * this messenger writes ALL instructions to the database,
@@ -39,6 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         private DateTime _lastPruned;
         private readonly Lazy<SyncBootState?> _initialized;
         private bool _syncing;
+        private bool _disposedValue;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly CancellationToken _cancellationToken;
 
@@ -278,6 +279,28 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
                 _syncIdle.Set();
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _syncIdle?.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion

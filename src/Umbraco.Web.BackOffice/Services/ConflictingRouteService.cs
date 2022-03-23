@@ -13,15 +13,13 @@ namespace Umbraco.Cms.Web.BackOffice.Services
     public class ConflictingRouteService : IConflictingRouteService
     {
         private readonly TypeLoader _typeLoader;
-        private readonly IEnumerable<EndpointDataSource> _endpointDataSources;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConflictingRouteService"/> class.
         /// </summary>
-        public ConflictingRouteService(TypeLoader typeLoader, IEnumerable<EndpointDataSource> endpointDataSources)
+        public ConflictingRouteService(TypeLoader typeLoader)
         {
             _typeLoader = typeLoader;
-            _endpointDataSources = endpointDataSources;
         }
 
         /// <inheritdoc/>

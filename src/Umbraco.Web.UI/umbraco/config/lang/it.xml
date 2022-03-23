@@ -18,7 +18,7 @@
     <key alias="delete">Cancella</key>
     <key alias="disable">Disabilita</key>
     <key alias="editSettings">Modifica impostazioni</key>
-    <key alias="emptyRecycleBin">Svuota il cestino</key>
+    <key alias="emptyrecyclebin">Svuota il cestino</key>
     <key alias="enable">Abilita</key>
     <key alias="exportDocumentType">Esporta il tipo di documento</key>
     <key alias="importdocumenttype">Importa il tipo di documento</key>

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
@@ -47,6 +46,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IPublicAccessRepository, PublicAccessRepository>();
             builder.Services.AddUnique<IRedirectUrlRepository, RedirectUrlRepository>();
             builder.Services.AddUnique<IRelationRepository, RelationRepository>();
+            builder.Services.AddUnique<ITrackedReferencesRepository, TrackedReferencesRepository>();
             builder.Services.AddUnique<IRelationTypeRepository, RelationTypeRepository>();
             builder.Services.AddUnique<IServerRegistrationRepository, ServerRegistrationRepository>();
             builder.Services.AddUnique<ITagRepository, TagRepository>();
