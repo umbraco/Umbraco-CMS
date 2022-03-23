@@ -6,14 +6,15 @@
     </umb-editor-header>
 
     <umb-editor-container>
-      <div class="umb-control-group" ng-if="!vm.showPasswordFields">
+      <div ng-if="!vm.showPasswordFields">
+        <umb-box>
+          <umb-box-content>
+            <umb-box-header title-key="user_yourProfile"></umb-box-header>
 
-        <h5>
-          <localize key="user_yourProfile">Your profile</localize>
-        </h5>
-
-        <umb-button action="vm.editUser()" alias="editUser" button-style="action" label="Edit" label-key="general_edit"
-          ng-if="vm.canEditProfile" type="button">
+            <umb-control-group>
+              <div class="flex">
+                <umb-button action="vm.editUser()" alias="editUser" button-style="action" label="Edit"
+                  label-key="general_edit" ng-if="vm.canEditProfile" type="button">
         </umb-button>
 
         <umb-button action="vm.togglePasswordFields()" alias="changePassword" button-style="action"
@@ -24,9 +25,11 @@
           label="Configure Two-Factor" label-key="user_configureTwoFactor" ng-if="vm.hasTwoFactorProviders">
         </umb-button>
       </div>
+            </umb-control-group>
+          </umb-box-content>
+        </umb-box>
 
-      <div class="umb-control-group external-logins"
-        ng-if="vm.externalLoginProviders.length > 0 && !vm.showPasswordFields">
+        <div class="umb-control-group external-logins" ng-if="vm.externalLoginProviders.length > 0">
 
         <h5>
           <localize key="defaultdialogs_externalLoginProviders">External login providers</localize>
@@ -40,7 +43,8 @@
             <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
               name="oauthloginform" ng-if="login.linkedProviderKey == undefined" ng-submit="vm.linkProvider($event)">
               <input name="provider" type="hidden" value="{{login.authType}}" />
-              <button class="btn btn-block btn-social" id="{{login.authType}}" ng-class="login.properties.ButtonStyle">
+                <button class="btn btn-block btn-social" id="{{login.authType}}"
+                  ng-class="login.properties.ButtonStyle">
 
                 <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
                 <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
