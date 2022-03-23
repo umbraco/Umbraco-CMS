@@ -538,7 +538,7 @@ stages:
                   inputs:
                       targetType: inline
                       script: |
-                        choco install docfx --version=2.58.5 -y
+                        choco install docfx --version=2.59.0 -y
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }

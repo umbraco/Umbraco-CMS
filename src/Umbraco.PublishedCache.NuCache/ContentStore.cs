@@ -750,6 +750,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 }
 
                 LogParentContentIdSet(thisNode.Id, thisNode.ParentContentId);
+
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                 // if we are initializing from the database source ensure the local db is updated
@@ -814,7 +815,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     ok = false;
                     continue; // skip that one
                 }
+
                 LogParentContentIdSet(kit.Node.Id, kit.Node.ParentContentId);
+
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
@@ -903,6 +906,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (link?.Value == null) return false;
 
             var content = link.Value;
+
             LogClearContentId(content.Id);
 
             // clear the entire branch

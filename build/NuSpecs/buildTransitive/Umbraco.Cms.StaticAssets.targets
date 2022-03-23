@@ -39,6 +39,7 @@
 
             <ContentWithTargetPath
                 Include="@(_AppPluginsFiles)"
+                Exclude="@(ContentWithTargetPath)"
                 TargetPath="%(Identity)"
                 CopyToOutputDirectory="PreserveNewest"
                 CopyToPublishDirectory="PreserveNewest"/>
@@ -65,6 +66,7 @@
 
             <ContentWithTargetPath
                 Include="@(_UmbracoFolderFiles)"
+                Exclude="@(ContentWithTargetPath)"
                 TargetPath="%(Identity)"
                 CopyToOutputDirectory="PreserveNewest"
                 CopyToPublishDirectory="PreserveNewest"/>
@@ -92,7 +94,7 @@
 
     <Target Name="IncludeUmbracoRazorFiles" BeforeTargets="ResolveRazorGenerateInputs">
         <ItemGroup>
-            <Content Include="$(MSBuildProjectDirectory)\umbraco\**\*.cshtml" />
+            <Content Include="$(MSBuildProjectDirectory)\umbraco\**\*.cshtml" Exclude="@(Content)" />
         </ItemGroup>
     </Target>
 

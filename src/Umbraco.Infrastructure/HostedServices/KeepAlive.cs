@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
@@ -48,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IProfilingLogger profilingLogger,
             IServerRoleAccessor serverRegistrar,
             IHttpClientFactory httpClientFactory)
-            : base(TimeSpan.FromMinutes(5), DefaultDelay)
+            : base(logger, TimeSpan.FromMinutes(5), DefaultDelay)
         {
             _hostingEnvironment = hostingEnvironment;
             _mainDom = mainDom;
@@ -99,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 try
                 {
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
-                    HttpClient httpClient = _httpClientFactory.CreateClient();
+                    HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.IgnoreCertificateErrors);
                     _ = await httpClient.SendAsync(request);
                 }
                 catch (Exception ex)
