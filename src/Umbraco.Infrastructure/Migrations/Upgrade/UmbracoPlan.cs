@@ -16,6 +16,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_4_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -280,6 +281,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<UpdateExternalLoginToUseKeyInsteadOfId>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
             To<AddTwoFactorLoginTable>("{0828F206-DCF7-4F73-ABBB-6792275532EB}");
 
+            // TO 9.4.0
+            To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
+            To<UpdateRelationTypesToHandleDependencies>("{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}");
         }
     }
 }

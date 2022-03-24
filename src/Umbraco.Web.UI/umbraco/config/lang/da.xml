@@ -1323,6 +1323,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editMultiContentPublishedText">%0% dokumenter udgivet og synlige på hjemmesiden</key>
     <key alias="editVariantPublishedText">%0% udgivet og synligt på hjemmesiden</key>
     <key alias="editMultiVariantPublishedText">%0% dokumenter udgivet for sprogene %1% og synlige på hjemmesiden</key>
+    <key alias="editBlueprintSavedHeader">Indholdsskabelon gemt</key>
+    <key alias="editBlueprintSavedText">Rettelser er blevet gemt</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentScheduledSavedText">En planlægning for udgivelse er blevet opdateret</key>

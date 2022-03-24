@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.ContentApps;
@@ -48,6 +48,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
         }
 
         public IEnumerable<ContentApp> GetContentApps(IUmbracoEntity source)
+        {
+            return GetContentAppsForEntity(source);
+        }
+
+        public IEnumerable<ContentApp> GetContentAppsForEntity(IEntity source)
         {
             var apps = _contentAppDefinitions.GetContentAppsFor(source).ToArray();
 

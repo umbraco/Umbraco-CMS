@@ -40,5 +40,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Length(100)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_alias")]
         public string Alias { get; set; }
+
+        [Constraint(Default = "0")]
+        [Column("isDependency")]
+        public bool IsDependency { get; set; }
     }
 }

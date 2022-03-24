@@ -323,6 +323,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
         }
 
         [Test]
+        [Retry(5)] // TODO make this test non-flaky.
         public async Task EventuallyCollectNulls()
         {
             var d = new SnapDictionary<int, string>();

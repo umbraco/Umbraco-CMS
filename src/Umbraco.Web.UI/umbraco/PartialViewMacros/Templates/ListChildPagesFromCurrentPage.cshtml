@@ -13,9 +13,9 @@
     - It then generates links so the visitor can go to each page
 *@
 
-@{ var selection = Model.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
-@if (selection.Length > 0)
+@if (selection?.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

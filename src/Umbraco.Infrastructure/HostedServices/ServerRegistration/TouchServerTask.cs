@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             ILogger<TouchServerTask> logger,
             IOptions<GlobalSettings> globalSettings,
             IServerRoleAccessor serverRoleAccessor)
-            : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
+            : base(logger, globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
         {
             _runtimeState = runtimeState;
             _serverRegistrationService = serverRegistrationService ?? throw new ArgumentNullException(nameof(serverRegistrationService));
