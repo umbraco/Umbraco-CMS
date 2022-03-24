@@ -19,12 +19,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
     public class InstallDefaultDataSettings
     {
         /// <summary>
-        /// Gets or sets a value indicating whether to create default language data on installation.
+        /// Gets or sets a value indicating whether to create default data on installation.
         /// </summary>
         public InstallDefaultDataOption InstallData { get; set; } = InstallDefaultDataOption.All;
 
         /// <summary>
-        /// Gets or sets a value indicating which default languages should be created when <see cref="CreateDefaultLanguages"/> is
+        /// Gets or sets a value indicating which default data (languages, data types, etc.) should be created when <see cref="InstallData"/> is
         /// set to <see cref="InstallDefaultDataOption.InstallOnly"/> or <see cref="InstallDefaultDataOption.InstallAllExcept"/>.
         /// </summary>
         /// <remarks>
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         ///     </para>
         ///     <para>
         ///         For data types, the values provided should be the Guid values used by Umbraco for the data type, listed at:
-        ///         https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Core/Constants-DataTypes.cs.
+        ///         <see cref="Constants.DataTypes"/>
         ///         Some data types - such as the string label - cannot be excluded from install as they are required for core Umbraco
         ///         functionality.
         ///         Otherwise take care not to remove data types required for default Umbraco media and member types, unless you also
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         ///         https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
         ///     </para>
         ///     <para>
-        ///         For member types, the values provided should be the Guid values used by Umbraco for the media type, listed at:
+        ///         For member types, the values provided should be the Guid values used by Umbraco for the member type, listed at:
         ///         https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
         ///     </para>
         /// </remarks>

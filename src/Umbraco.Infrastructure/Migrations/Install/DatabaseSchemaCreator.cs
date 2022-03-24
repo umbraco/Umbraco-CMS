@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
 
-        [Obsolete("Please use constructor taking all parameters. This constructor will be removed in a future version.")]
+        [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
         public DatabaseSchemaCreator(
             IUmbracoDatabase database,
             ILogger<DatabaseSchemaCreator> logger,
