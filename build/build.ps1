@@ -11,7 +11,7 @@
     [Alias("loc")]
     [switch] $local = $false,
 
-	# enable docfx
+	  # enable docfx
     [Parameter(Mandatory=$false)]
     [Alias("doc")]
     [switch] $docfx = $false,
@@ -40,7 +40,7 @@
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
-  Write-Host "Umbraco Cms Build"
+  Write-Host "Umbraco CMS Build"
   Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
   # ################################################################
@@ -84,7 +84,7 @@
     $this.SetEnvVar("NPM_CONFIG_CACHE", $node_npmcache)
     $this.SetEnvVar("NPM_CONFIG_PREFIX", $node_npmprefix)
 
-    $ignore = $this.ClearEnvVar("NODE_NO_HTTP2")
+    $this.ClearEnvVar("NODE_NO_HTTP2")
   })
 
   $ubuild.DefineMethod("CompileBelle",
@@ -171,11 +171,6 @@
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\build.umbraco.log"
 
-    if ($this.BuildEnv.VisualStudio -eq $null)
-    {
-      throw "Build environment does not provide VisualStudio."
-    }
-
     Write-Host "Compile Umbraco"
     Write-Host "Logging to $log"
 
@@ -255,27 +250,21 @@
     $buildConfiguration = "Release"
     $log = "$($this.BuildTemp)\msbuild.tests.log"
 
-    if ($this.BuildEnv.VisualStudio -eq $null)
-    {
-      throw "Build environment does not provide VisualStudio."
-    }
-
     Write-Host "Compile Tests"
     Write-Host "Logging to $log"
 
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\tests\Umbraco.Tests\Umbraco.Tests.csproj" `
-      /p:WarningLevel=0 `
-      /p:Configuration=$buildConfiguration `
-      /p:Platform=AnyCPU `
-      /p:UseWPP_CopyWebApplication=True `
-      /p:PipelineDependsOnBuild=False `
-      /p:OutDir="$($this.BuildTemp)\tests\\" `
-      /p:Verbosity=minimal `
-      /t:Build `
-      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
-      /p:UmbracoBuild=True `
+    &dotnet msbuild "$($this.SolutionRoot)\tests\Umbraco.Tests\Umbraco.Tests.csproj" `
+      -target:Build `
+      -property:WarningLevel=0 `
+      -property:Configuration=$buildConfiguration `
+      -property:Platform=AnyCPU `
+      -property:UseWPP_CopyWebApplication=True `
+      -property:PipelineDependsOnBuild=False `
+      -property:OutDir="$($this.BuildTemp)\tests\\" `
+      -property:Verbosity=minimal `
+      -property:UmbracoBuild=True `
       > $log
 
       # copy Umbraco.Persistence.SqlCe files into WebApp
@@ -292,10 +281,6 @@
 
     $src = "$($this.SolutionRoot)\src"
     $tmp = "$($this.BuildTemp)"
-    $out = "$($this.BuildOutput)"
-    $templates = "$($this.SolutionRoot)\build\templates"
-
-    $buildConfiguration = "Release"
 
     # cleanup build
     Write-Host "Clean build"
@@ -309,7 +294,6 @@
     # create directories
     Write-Host "Create directories"
     mkdir "$tmp\WebApp\App_Data" > $null
-    mkdir "$tmp\Templates" > $null
     #mkdir "$tmp\WebApp\Media" > $null
     #mkdir "$tmp\WebApp\Views" > $null
 
@@ -332,10 +316,6 @@
     {
       $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
     }
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")
-    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\WebApp\bin\amd64")
 
     # copy Belle
     Write-Host "Copy Belle"
@@ -343,19 +323,6 @@
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
-
-
-
-    # Prepare templates
-    Write-Host "Copy template files"
-    $this.CopyFiles("$templates", "*", "$tmp\Templates")
-
-    Write-Host "Copy files for dotnet templates"
-    $this.CopyFiles("$src\Umbraco.Web.UI", "Program.cs", "$tmp\Templates\UmbracoProject")
-    $this.CopyFiles("$src\Umbraco.Web.UI", "Startup.cs", "$tmp\Templates\UmbracoProject")
-    $this.CopyFiles("$src\Umbraco.Web.UI\Views", "*", "$tmp\Templates\UmbracoProject\Views")
-
-  $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
   })
 
 
@@ -389,7 +356,7 @@
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-	$params = "-Source", $nugetsourceUmbraco
+  	$params = "-Source", $nugetsourceUmbraco
     &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
@@ -397,7 +364,7 @@
   $ubuild.DefineMethod("PackageNuGet",
   {
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $templates = "$($this.BuildTemp)\Templates"
+    $templates = "$($this.SolutionRoot)\templates"
 
     Write-Host "Create NuGet packages"
 
