@@ -859,7 +859,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (_database.Exists<NodeDto>(1048))
             {
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1048, EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MemberPicker, DbType = "Nvarchar" });
+                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1048, EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MemberPicker, DbType = "Ntext" });
             }
 
             if (_database.Exists<NodeDto>(1049))
