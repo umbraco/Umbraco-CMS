@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDictionary<string, TContentTypeComposition> importedContentTypes,
             IContentTypeBaseService<TContentTypeComposition> typeService,
             IContentServiceBase<TContentBase> service)
-            where TContentBase : class?, IContentBase
+            where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
         {
             var contents = new List<TContentBase>();
@@ -378,7 +378,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
                 : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
 
-            var foundLanguages = new HashSet<string>();
+            var foundLanguages = new HashSet<string?>();
             foreach (var property in properties)
             {
                 string propertyTypeAlias = property.Name.LocalName;
@@ -387,14 +387,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var propertyValue = property.Value;
 
                     // Handle properties language attributes
-                    var propertyLang = property.Attribute(XName.Get("lang"))?.Value ?? string.Empty;
+                    var propertyLang = property.Attribute(XName.Get("lang"))?.Value ?? null;
                     foundLanguages.Add(propertyLang);
                     if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
                     {
                         // set property value
                         // Skip unsupported language variation, otherwise we'll get a "not supported error"
                         // We allow null, because that's invariant
-                        if (installedLanguages.InvariantContains(propertyLang) || propertyLang is null)
+                        if ( propertyLang is null || installedLanguages.InvariantContains(propertyLang))
                         {
                             content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
                         }
@@ -404,7 +404,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             foreach (var propertyLang in foundLanguages)
             {
-                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) &&
+                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) && propertyLang is not null &&
                     installedLanguages.InvariantContains(propertyLang))
                 {
                     content.SetCultureName(nodeName, propertyLang);
