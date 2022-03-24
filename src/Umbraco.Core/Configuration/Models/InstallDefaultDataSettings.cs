@@ -5,11 +5,29 @@ using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
+    /// <summary>
+    /// An enumeration of options available for control over installation of default Umbraco data.
+    /// </summary>
     public enum InstallDefaultDataOption
     {
+        /// <summary>
+        /// Do not install any items of this type (other than Umbraco defined essential ones).
+        /// </summary>
         None,
-        InstallOnly,
-        InstallAllExcept,
+
+        /// <summary>
+        /// Only install the default data specified in the <see cref="InstallDefaultDataSettings.Values"/>
+        /// </summary>
+        Values,
+
+        /// <summary>
+        /// Install all default data, except that specified in the <see cref="InstallDefaultDataSettings.Values"/>
+        /// </summary>
+        ExceptValues,
+
+        /// <summary>
+        /// Install all default data.
+        /// </summary>
         All
     }
 
@@ -25,7 +43,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
         /// <summary>
         /// Gets or sets a value indicating which default data (languages, data types, etc.) should be created when <see cref="InstallData"/> is
-        /// set to <see cref="InstallDefaultDataOption.InstallOnly"/> or <see cref="InstallDefaultDataOption.InstallAllExcept"/>.
+        /// set to <see cref="InstallDefaultDataOption.Values"/> or <see cref="InstallDefaultDataOption.ExceptValues"/>.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -50,6 +68,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         ///         https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
         ///     </para>
         /// </remarks>
-        public List<string> SelectedValues { get; set; } = new List<string>();
+        public IList<string> Values { get; set; } = new List<string>();
     }
 }

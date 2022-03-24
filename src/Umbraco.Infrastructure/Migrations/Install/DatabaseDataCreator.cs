@@ -1039,12 +1039,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.InstallOnly && !installDefaultDataSettings.SelectedValues.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.InstallAllExcept && installDefaultDataSettings.SelectedValues.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }
