@@ -22,13 +22,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         public void CanCollectMetadataTelemetryData()
         {
             var telemetryOptions = CreateTelemetrySettings(TelemetryLevel.Basic);
-            var globalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings
-            {
-                Id = "0f1785c5-7ba0-4c52-ab62-863bd2c8f3fe"
-            });
+
+            var siteIdentifier = Guid.NewGuid();
+            var siteIdentifierServiceMock = new Mock<ISiteIdentifierService>();
+            siteIdentifierServiceMock.Setup(x => x.TryGetSiteIdentifier(out siteIdentifier)).Returns(true);
+
             var telemetryDataCollectors = new[]
             {
-                new MetadataTelemetryDataCollector(globalSettings)
+                new MetadataTelemetryDataCollector(siteIdentifierServiceMock.Object)
             };
 
             var telemetryService = new TelemetryService(telemetryOptions, telemetryDataCollectors);
@@ -38,7 +39,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             Assert.IsTrue(result);
 
             Assert.Contains(TelemetryData.TelemetryId, telemetry.Keys);
-            Assert.AreEqual(Guid.Parse("0f1785c5-7ba0-4c52-ab62-863bd2c8f3fe"), telemetry[TelemetryData.TelemetryId]);
+            Assert.AreEqual(siteIdentifier, telemetry[TelemetryData.TelemetryId]);
 
             Assert.Contains(TelemetryData.Network, telemetry.Keys);
             Assert.AreEqual(true, telemetry[TelemetryData.Network]);
