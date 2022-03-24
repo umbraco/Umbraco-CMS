@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         // Scheduled for removal in V11
         [Obsolete("Please use constructor that takes an ILogger instead")]
         protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
-            : this(NullLogger.Instance, period, delay)
+            : this(null, period, delay)
         { }
 
         /// <inheritdoc/>
@@ -78,7 +78,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception in recurring hosted service.");
+                ILogger logger = _logger ?? StaticApplicationLogging.CreateLogger(GetType());
+                logger.LogError(ex, "Unhandled exception in recurring hosted service.");
             }
             finally
             {
