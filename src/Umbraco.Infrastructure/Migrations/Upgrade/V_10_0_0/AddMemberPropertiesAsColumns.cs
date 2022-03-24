@@ -10,7 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 
 public class AddMemberPropertiesAsColumns : MigrationBase
 {
-    public AddMemberPropertiesAsColumns(IMigrationContext context) : base(context)
+    public AddMemberPropertiesAsColumns(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -78,7 +79,7 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
             .InnerJoin(newestContentVersionQuery, "umbracoContentVersion")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<MemberDto>("m")
+            .LeftJoin<MemberDto>("m")
             .On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId, null, "m")
             .LeftJoin(passwordAttemptsQuery, "failedAttemptsType")
             .On<ContentDto, FailedAttempts>((left, right) => left.ContentTypeId == right.ContentTypeId)
