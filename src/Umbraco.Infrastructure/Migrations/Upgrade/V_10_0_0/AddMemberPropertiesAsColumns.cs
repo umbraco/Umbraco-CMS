@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -79,7 +80,7 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
             .InnerJoin(newestContentVersionQuery, "umbracoContentVersion")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
-            .LeftJoin<MemberDto>("m")
+            .InnerJoin<MemberDto>("m")
             .On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId, null, "m")
             .LeftJoin(passwordAttemptsQuery, "failedAttemptsType")
             .On<ContentDto, FailedAttempts>((left, right) => left.ContentTypeId == right.ContentTypeId)
@@ -120,6 +121,35 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Member);
 
         Database.Execute(updateMemberColumnsQuery);
+
+        // Removing old property types and values, since these are no longer needed
+        // Hard coding the aliases, since we want to be able to delete the constants...
+        string[] propertyTypesToDelete =
+        {
+            "umbracoMemberFailedPasswordAttempts",
+            "umbracoMemberApproved",
+            "umbracoMemberLockedOut",
+            "umbracoMemberLastLockoutDate",
+            "umbracoMemberLastLogin",
+            "umbracoMemberLastPasswordChangeDate"
+        };
+
+        Sql<ISqlContext> idQuery = Database.SqlContext.Sql().Select<PropertyTypeDto>(x => x.Id)
+            .From<PropertyTypeDto>()
+            .WhereIn<PropertyTypeDto>(x => x.Alias, propertyTypesToDelete);
+        List<int> idsToDelete = Database.Fetch<int>(idQuery);
+
+        // Firstly deleting the property data due to FK constraints
+        Sql<ISqlContext> propertyDataDelete = Database.SqlContext.Sql()
+            .Delete<PropertyDataDto>()
+            .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, idsToDelete);
+        Database.Execute(propertyDataDelete);
+
+        // Then we can remove the property
+        Sql<ISqlContext> propertyTypeDelete = Database.SqlContext.Sql()
+            .Delete<PropertyTypeDto>()
+            .WhereIn<PropertyTypeDto>(x => x.Id, idsToDelete);
+        Database.Execute(propertyTypeDelete);
     }
 
     private string GetQuotedSelector(string tableName, string columnName)
