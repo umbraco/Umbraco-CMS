@@ -71,6 +71,9 @@ angular.module("umbraco").controller("Umbraco.Editors.ConfigureTwoFactorControll
     function onResponse(response) {
       if (response) {
         vm.buttonState = "success";
+        localizationService.localize("user_2faProviderIsDisabledMsg").then(function (value) {
+          notificationsService.success(value);
+        });
         onInit();
       } else {
         vm.buttonState = "error";
