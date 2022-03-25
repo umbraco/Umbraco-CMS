@@ -64,11 +64,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "lastLockoutDate")]
         [ReadOnly(true)]
-        public DateTime LastLockoutDate { get; set; }
+        public DateTime? LastLockoutDate { get; set; }
 
         [DataMember(Name = "lastPasswordChangeDate")]
         [ReadOnly(true)]
-        public DateTime LastPasswordChangeDate { get; set; }
+        public DateTime? LastPasswordChangeDate { get; set; }
 
         [DataMember(Name = "createDate")]
         [ReadOnly(true)]

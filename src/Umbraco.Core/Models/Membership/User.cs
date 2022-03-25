@@ -116,9 +116,9 @@ namespace Umbraco.Cms.Core.Models.Membership
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
-        private DateTime _lastPasswordChangedDate;
-        private DateTime _lastLoginDate;
-        private DateTime _lastLockoutDate;
+        private DateTime? _lastPasswordChangedDate;
+        private DateTime? _lastLoginDate;
+        private DateTime? _lastLockoutDate;
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
@@ -184,21 +184,21 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [IgnoreDataMember]
-        public DateTime LastLoginDate
+        public DateTime? LastLoginDate
         {
             get => _lastLoginDate;
             set => SetPropertyValueAndDetectChanges(value, ref _lastLoginDate, nameof(LastLoginDate));
         }
 
         [IgnoreDataMember]
-        public DateTime LastPasswordChangeDate
+        public DateTime? LastPasswordChangeDate
         {
             get => _lastPasswordChangedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangedDate, nameof(LastPasswordChangeDate));
         }
 
         [IgnoreDataMember]
-        public DateTime LastLockoutDate
+        public DateTime? LastLockoutDate
         {
             get => _lastLockoutDate;
             set => SetPropertyValueAndDetectChanges(value, ref _lastLockoutDate, nameof(LastLockoutDate));

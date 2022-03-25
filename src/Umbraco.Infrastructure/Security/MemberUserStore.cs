@@ -595,7 +595,7 @@ namespace Umbraco.Cms.Core.Security
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
                 || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-                || (identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+                || (identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
                 changeType = MemberDataChangeType.LoginOnly;
 
@@ -606,7 +606,7 @@ namespace Umbraco.Cms.Core.Security
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDateUtc))
                 || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
-                || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
+                || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
                 changeType = MemberDataChangeType.FullSave;
                 member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();

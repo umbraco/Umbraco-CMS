@@ -1267,7 +1267,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IMember result = MemberService.GetById(member.Id);
             Assert.AreEqual(
                 date.TruncateTo(DateTimeExtensions.DateTruncate.Second),
-                result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
+                result.LastLoginDate?.TruncateTo(DateTimeExtensions.DateTruncate.Second));
 
             // now ensure the col is correct
             ISqlContext sqlContext = GetRequiredService<ISqlContext>();
