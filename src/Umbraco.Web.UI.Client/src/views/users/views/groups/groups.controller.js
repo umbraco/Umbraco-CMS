@@ -26,7 +26,7 @@
             userService.getCurrentUser().then(function(user) {
                 currentUser = user;
                 // Get usergroups
-                userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
+                userGroupsResource.getUserGroups().then(function (userGroups) {
 
                     // only allow editing and selection if user is member of the group or admin
                     vm.userGroups = _.map(userGroups, function (ug) {
