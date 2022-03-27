@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         };
 
         /// <inheritdoc/>
-        public FormattedImage Process(FormattedImage image, ILogger logger, IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
+        public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
             RectangleF? coordinates = GetCoordinates(commands, parser, culture);
             if (coordinates != null)
@@ -41,14 +41,17 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
                 int height = (int)MathF.Round(coordinates.Value.Height * sourceHeight);
 
                 var cropRectangle = new Rectangle(x, y, width, height);
-                
+
                 image.Image.Mutate(x => x.Crop(cropRectangle));
             }
 
             return image;
         }
 
-        private static RectangleF? GetCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
+        /// <inheritdoc />
+        public bool RequiresTrueColorPixelFormat(CommandCollection commands, CommandParser parser, CultureInfo culture) => false;
+
+        private static RectangleF? GetCoordinates(CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
             float[] coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Coordinates), culture);
 
