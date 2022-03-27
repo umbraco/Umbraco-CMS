@@ -32,7 +32,7 @@ namespace Umbraco.Extensions
                 // options.Configuration is set using ImageSharpConfigurationOptions below
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
-                options.CacheHashLength = imagingSettings.Cache.CachedNameLength;
+                options.CacheHashLength = imagingSettings.Cache.CacheHashLength;
 
                 // Use configurable maximum width and height (overwrite ImageSharps default)
                 options.OnParseCommandsAsync = context =>
@@ -71,7 +71,13 @@ namespace Umbraco.Extensions
                     return Task.CompletedTask;
                 };
             })
-                .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
+                // Configure cache options
+                .Configure<PhysicalFileSystemCacheOptions>(options =>
+                {
+                    options.CacheFolder = builder.BuilderHostingEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder);
+                    options.CacheFolderDepth = imagingSettings.Cache.CacheFolderDepth;
+                })
+                // Add custom processors
                 .AddProcessor<CropWebProcessor>();
 
             // Configure middleware to use the registered/shared ImageSharp configuration
