@@ -10,10 +10,12 @@ using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
+using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
+using Umbraco.Cms.Web.Common.ImageProviders;
 
 namespace Umbraco.Extensions
 {
@@ -71,6 +73,8 @@ namespace Umbraco.Extensions
                     return Task.CompletedTask;
                 };
             })
+                // Replace default image provider
+                .RemoveProvider<PhysicalFileSystemProvider>().AddProvider<WebRootImageProvider>()
                 // Configure cache options
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
