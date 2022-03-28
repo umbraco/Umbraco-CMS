@@ -272,6 +272,20 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 },
             };
 
+            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() is false)
+            {
+                // Current member doesn't have access to sensitive data so explicitly set the views and remove the value from sensitive data
+                foreach (var property in properties)
+                {
+                    if (property.IsSensitive)
+                    {
+                        property.Value = null;
+                        property.View = "sensitivevalue";
+                        property.Readonly = true;
+                    }
+                }
+            }
+
             return properties;
         }
     }
