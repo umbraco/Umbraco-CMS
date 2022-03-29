@@ -56,6 +56,7 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Runtime;
 using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
@@ -229,6 +230,11 @@ namespace Umbraco.Extensions
                 FixForDotnet6Preview1(builder.Services);
 
                 mvcBuilder.AddRazorRuntimeCompilation();
+            }
+            else
+            {
+                // Validate runtime mode when in production
+                builder.AddNotificationHandler<UmbracoApplicationStartingNotification, RuntimeModeProductionValidator>();
             }
 
             mvcBuilding?.Invoke(mvcBuilder);
