@@ -19,82 +19,84 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest.Controllers
             var intId = 0;
             Guid guidId = Guid.Empty;
             var udiId = Udi.Create(Constants.UdiEntityType.Script, "test");
+            string pathBase = string.Empty;
 
             Assert.Multiple(() =>
             {
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetById(udiId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(udiId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetEmpty("test", 0)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetChildren(intId, string.Empty, 0, 0, "SortOrder", Direction.Ascending, true, string.Empty, string.Empty)));
+                
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetById(udiId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(udiId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetEmpty("test", 0), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetChildren(intId, string.Empty, 0, 0, "SortOrder", Direction.Ascending, true, string.Empty, string.Empty), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DataTypeController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DataTypeController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DataTypeController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DataTypeController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DataTypeController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DataTypeController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DictionaryController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DictionaryController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DictionaryController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DictionaryController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DictionaryController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<DictionaryController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPath(intId, UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPath(guidId, UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPath(udiId, UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrl(intId, UmbracoEntityTypes.Document, null)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrl(udiId, null)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrlAndAnchors(intId, null)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrlAndAnchors(udiId, null)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetById(intId, UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetById(guidId, UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetById(udiId, UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new Guid[0], UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new Udi[0], UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new int[0], UmbracoEntityTypes.Document)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPagedChildren(intId, UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPagedChildren(guidId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPagedChildren(udiId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPath(intId, UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPath(guidId, UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPath(udiId, UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrl(intId, UmbracoEntityTypes.Document, null), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrl(udiId, null), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrlAndAnchors(intId, null), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetUrlAndAnchors(udiId, null), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetById(intId, UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetById(guidId, UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetById(udiId, UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new Guid[0], UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new Udi[0], UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new int[0], UmbracoEntityTypes.Document), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPagedChildren(intId, UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPagedChildren(guidId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x => x.GetPagedChildren(udiId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<IconController>(x => x.GetIcon(string.Empty)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<IconController>(x => x.GetIcon(string.Empty), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(udiId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetChildren(intId, 0, 1, "SortOrder", Direction.Ascending, true, string.Empty)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetChildren(guidId, 0, 1, "SortOrder", Direction.Ascending, true, string.Empty)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetChildren(udiId, 0, 1, "SortOrder", Direction.Ascending, true, string.Empty)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(udiId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetChildren(intId, 0, 1, "SortOrder", Direction.Ascending, true, string.Empty), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetChildren(guidId, 0, 1, "SortOrder", Direction.Ascending, true, string.Empty), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetChildren(udiId, 0, 1, "SortOrder", Direction.Ascending, true, string.Empty), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetById(udiId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetAllowedChildren(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetAllowedChildren(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetAllowedChildren(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetById(udiId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetAllowedChildren(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetAllowedChildren(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaTypeController>(x => x.GetAllowedChildren(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberGroupController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberGroupController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberGroupController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberGroupController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberGroupController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberGroupController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberTypeController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberTypeController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberTypeController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberTypeController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberTypeController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MemberTypeController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<RelationTypeController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<RelationTypeController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<RelationTypeController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<RelationTypeController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<RelationTypeController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<RelationTypeController>(x => x.GetById(udiId), pathBase));
 
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<TemplateController>(x => x.GetById(intId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<TemplateController>(x => x.GetById(guidId)));
-                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<TemplateController>(x => x.GetById(udiId)));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<TemplateController>(x => x.GetById(intId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<TemplateController>(x => x.GetById(guidId), pathBase));
+                EnsureNotAmbiguousActionName(PrepareApiControllerUrl<TemplateController>(x => x.GetById(udiId), pathBase));
             });
         }
 

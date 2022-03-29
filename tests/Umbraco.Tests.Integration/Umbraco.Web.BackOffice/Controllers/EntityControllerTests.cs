@@ -48,7 +48,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Media
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -82,7 +83,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Media
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -131,7 +133,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Media
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -184,7 +187,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Media
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -218,7 +222,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Document
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -268,12 +273,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 }
             }
 
+            var pathBase = string.Empty;
             var queryParameters = new Dictionary<string, object>
             {
                 ["type"] = Constants.UdiEntityType.Document
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -332,7 +338,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Document
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -391,7 +398,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Document
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), pathBase, queryParameters);
 
             var payload = new
             {
@@ -450,7 +458,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 ["type"] = Constants.UdiEntityType.Document
             };
 
-            var url = LinkGenerator.GetUmbracoControllerUrl("GetByIds", typeof(EntityController), queryParameters);
+            var pathBase = string.Empty;
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetByIds", typeof(EntityController), pathBase, queryParameters);
 
             var udiPayload = new
             {

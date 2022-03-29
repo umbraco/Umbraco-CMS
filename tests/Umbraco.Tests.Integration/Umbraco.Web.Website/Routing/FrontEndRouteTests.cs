@@ -24,7 +24,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
         [Test]
         public async Task Auto_Routes_For_Default_Action()
         {
-            string url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Index());
+            var pathBase = string.Empty;
+            string url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Index(), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(url);
@@ -38,7 +39,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
         [Test]
         public async Task Auto_Routes_For_Custom_Action()
         {
-            string url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.News());
+            var pathBase = string.Empty;
+            string url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.News(), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(url);

@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         public async Task EnsureSuccessStatusCode()
         {
             // Arrange
-            string url = PrepareApiControllerUrl<BackOfficeAssetsController>(x => x.GetSupportedLocales());
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<BackOfficeAssetsController>(x => x.GetSupportedLocales(), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(url);

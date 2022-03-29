@@ -106,10 +106,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// This returns the url but also sets the HttpContext.request into to use this url.
         /// </summary>
         /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
+        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector, string pathBase)
             where T : UmbracoApiController
         {
-            string url = LinkGenerator.GetUmbracoApiService(methodSelector);
+            string url = LinkGenerator.GetUmbracoApiService(methodSelector, pathBase);
             return PrepareUrl(url);
         }
 
@@ -118,10 +118,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// This returns the url but also sets the HttpContext.request into to use this url.
         /// </summary>
         /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareSurfaceControllerUrl<T>(Expression<Func<T, object>> methodSelector)
+        protected string PrepareSurfaceControllerUrl<T>(Expression<Func<T, object>> methodSelector, string pathBase)
             where T : SurfaceController
         {
-            string url = LinkGenerator.GetUmbracoSurfaceUrl(methodSelector);
+            string url = LinkGenerator.GetUmbracoSurfaceUrl(methodSelector, pathBase);
             return PrepareUrl(url);
         }
 

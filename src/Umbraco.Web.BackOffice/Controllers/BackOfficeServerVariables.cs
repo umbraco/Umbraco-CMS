@@ -51,6 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly PreviewRoutes _previewRoutes;
         private readonly IEmailSender _emailSender;
         private readonly MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
+        private readonly string pathBase;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -88,6 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
             _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.Value;
+            this.pathBase = this._hostingEnvironment.ApplicationVirtualPath;
         }
 
         /// <summary>
@@ -135,7 +137,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 = _linkGenerator.GetPathByAction(
                     nameof(BackOfficeController.ServerVariables),
                     ControllerExtensions.GetControllerName<BackOfficeController>(),
-                    new { area = Constants.Web.Mvc.BackOfficeArea });
+                    new { area = Constants.Web.Mvc.BackOfficeArea },
+                    this.pathBase);
 
             return defaults;
         }
@@ -158,229 +161,229 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         // having each URL defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
-                        {"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
-                        {"externalLinkLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
-                        {"gridConfig", _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
+                        {"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea }, pathBase)},
+                        {"externalLinkLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea }, pathBase)},
+                        {"gridConfig", _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea }, pathBase)},
                         // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
-                        {"serverVarsJs", _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
+                        {"serverVarsJs", _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea }, pathBase)},
                         //API URLs
                         {
                             "packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl
                         },
                         {
                             "redirectUrlManagementApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
-                                controller => controller.GetEnableState())
+                                controller => controller.GetEnableState(), this.pathBase)
                         },
                         {
                             "tourApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TourController>(
-                                controller => controller.GetTours())
+                                controller => controller.GetTours(), this.pathBase)
                         },
                         {
                             "embedApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                                controller => controller.GetEmbed("", 0, 0))
+                                controller => controller.GetEmbed("", 0, 0), this.pathBase)
                         },
                         {
                             "userApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UsersController>(
-                                controller => controller.PostSaveUser(null))
+                                controller => controller.PostSaveUser(null), this.pathBase)
                         },
                         {
                             "userGroupsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
-                                controller => controller.PostSaveUserGroup(null))
+                                controller => controller.PostSaveUserGroup(null), this.pathBase)
                         },
                         {
                             "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
-                                controller => controller.PostSave(null))
+                                controller => controller.PostSave(null), this.pathBase)
                         },
                         {
                             "publicAccessApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublicAccessController>(
-                                controller => controller.GetPublicAccess(0))
+                                controller => controller.GetPublicAccess(0), this.pathBase)
                         },
                         {
                             "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
-                                controller => controller.GetRootMedia())
+                                controller => controller.GetRootMedia(), this.pathBase)
                         },
                         {
                             "iconApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<IconController>(
-                                controller => controller.GetIcon(""))
+                                controller => controller.GetIcon(""), this.pathBase)
                         },
                         {
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(""))
+                                controller => controller.GetBigThumbnail(""), this.pathBase)
                         },
                         {
                             "sectionApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SectionController>(
-                                controller => controller.GetSections())
+                                controller => controller.GetSections(), this.pathBase)
                         },
                         {
                             "treeApplicationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
+                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None), this.pathBase)
                         },
                         {
                             "contentTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
-                                controller => controller.GetAllowedChildren(0))
+                                controller => controller.GetAllowedChildren(0), this.pathBase)
                         },
                         {
                             "mediaTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
-                                controller => controller.GetAllowedChildren(0))
+                                controller => controller.GetAllowedChildren(0), this.pathBase)
                         },
                         {
                             "macroRenderingApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
-                                controller => controller.GetMacroParameters(0))
+                                controller => controller.GetMacroParameters(0), this.pathBase)
                         },
                         {
                             "macroApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacrosController>(
-                                controller => controller.Create(null))
+                                controller => controller.Create(null), this.pathBase)
                         },
                         {
                             "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
-                                controller => controller.PostLogin(null))
+                                controller => controller.PostLogin(null), this.pathBase)
                         },
                         {
                             "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                                controller => controller.PostChangePassword(null))
+                                controller => controller.PostChangePassword(null), this.pathBase)
                         },
                         {
                             "entityApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<EntityController>(
-                                controller => controller.GetById(0, UmbracoEntityTypes.Media))
+                                controller => controller.GetById(0, UmbracoEntityTypes.Media), this.pathBase)
                         },
                         {
                             "dataTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DataTypeController>(
-                                controller => controller.GetById(0))
+                                controller => controller.GetById(0), this.pathBase)
                         },
                         {
                             "dashboardApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                                controller => controller.GetDashboard(null))
+                                controller => controller.GetDashboard(null), this.pathBase)
                         },
                         {
                             "logApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
+                                controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null), this.pathBase)
                         },
                         {
                             "memberApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberController>(
-                                controller => controller.GetByKey(Guid.Empty))
+                                controller => controller.GetByKey(Guid.Empty), this.pathBase)
                         },
                         {
                             "packageApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PackageController>(
-                                controller => controller.GetCreatedPackages())
+                                controller => controller.GetCreatedPackages(), this.pathBase)
                         },
                         {
                             "relationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RelationController>(
-                                controller => controller.GetById(0))
+                                controller => controller.GetById(0), this.pathBase)
                         },
                         {
                             "rteApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
-                                controller => controller.GetConfiguration())
+                                controller => controller.GetConfiguration(), this.pathBase)
                         },
                         {
                             "stylesheetApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<StylesheetController>(
-                                controller => controller.GetAll())
+                                controller => controller.GetAll(), this.pathBase)
                         },
                         {
                             "memberTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
-                                controller => controller.GetAllTypes())
+                                controller => controller.GetAllTypes(), this.pathBase)
                         },
                         {
                             "memberTypeQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeQueryController>(
-                                controller => controller.GetAllTypes())
+                                controller => controller.GetAllTypes(), this.pathBase)
                         },
                         {
                             "memberGroupApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
-                                controller => controller.GetAllGroups())
+                                controller => controller.GetAllGroups(), this.pathBase)
                         },
                         {
                             "updateCheckApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
-                                controller => controller.GetCheck())
+                                controller => controller.GetCheck(), this.pathBase)
                         },
                         {
                             "templateApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TemplateController>(
-                                controller => controller.GetById(0))
+                                controller => controller.GetById(0), this.pathBase)
                         },
                         {
                             "memberTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
-                                controller => controller.GetNodes("-1", null))
+                                controller => controller.GetNodes("-1", null), this.pathBase)
                         },
                         {
                             "mediaTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
-                                controller => controller.GetNodes("-1", null))
+                                controller => controller.GetNodes("-1", null), this.pathBase)
                         },
                         {
                             "contentTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
-                                controller => controller.GetNodes("-1", null))
+                                controller => controller.GetNodes("-1", null), this.pathBase)
                         },
                         {
                             "tagsDataBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags("", "", null))
+                                controller => controller.GetTags("", "", null), this.pathBase)
                         },
                         {
                             "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
-                                controller => controller.GetIndexerDetails())
+                                controller => controller.GetIndexerDetails(), this.pathBase)
                         },
                         {
                             "healthCheckBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
-                                controller => controller.GetAllHealthChecks())
+                                controller => controller.GetAllHealthChecks(), this.pathBase)
                         },
                         {
                             "templateQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
-                                controller => controller.PostTemplateQuery(null))
+                                controller => controller.PostTemplateQuery(null), this.pathBase)
                         },
                         {
                             "codeFileApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CodeFileController>(
-                                controller => controller.GetByPath("", ""))
+                                controller => controller.GetByPath("", ""), this.pathBase)
                         },
                         {
                             "publishedStatusBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
-                                controller => controller.GetPublishedStatusUrl())
+                                controller => controller.GetPublishedStatusUrl(), this.pathBase)
                         },
                         {
                             "dictionaryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DictionaryController>(
-                                controller => controller.DeleteById(int.MaxValue))
+                                controller => controller.DeleteById(int.MaxValue), this.pathBase)
                         },
                         {
                             "publishedSnapshotCacheStatusBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
-                                controller => controller.GetStatus())
+                                controller => controller.GetStatus(), this.pathBase)
                         },
                         {
                             "helpApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HelpController>(
-                                controller => controller.GetContextHelpForPage("","",""))
+                                controller => controller.GetContextHelpForPage("","",""), this.pathBase)
                         },
                         {
                             "backOfficeAssetsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedLocales())
+                                controller => controller.GetSupportedLocales(), this.pathBase)
                         },
                         {
                             "languageApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<LanguageController>(
-                                controller => controller.GetAllLanguages())
+                                controller => controller.GetAllLanguages(), this.pathBase)
                         },
                         {
                             "relationTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
-                                controller => controller.GetById(1))
+                                controller => controller.GetById(1), this.pathBase)
                         },
                         {
                             "logViewerApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<LogViewerController>(
-                                controller => controller.GetNumberOfErrors(null, null))
+                                controller => controller.GetNumberOfErrors(null, null), this.pathBase)
                         },
                         {
                             "webProfilingBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
-                                controller => controller.GetStatus())
+                                controller => controller.GetStatus(), this.pathBase)
                         },
                         {
                             "tinyMceApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TinyMceController>(
-                                controller => controller.UploadImage(null))
+                                controller => controller.UploadImage(null), this.pathBase)
                         },
                         {
                             "imageUrlGeneratorApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
-                                controller => controller.GetCropUrl(null, null, null, null))
+                                controller => controller.GetCropUrl(null, null, null, null), this.pathBase)
                         },
                         {
                             "elementTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
-                                controller => controller.GetAll())
+                                controller => controller.GetAll(), this.pathBase)
                         },
                         {
                             "previewHubUrl", _previewRoutes.GetPreviewHubRoute()
                         },
                         {
                             "trackedReferencesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TrackedReferencesController>(
-                                controller => controller.GetPagedReferences(0,  1, 1, false))
+                                controller => controller.GetPagedReferences(0,  1, 1, false), this.pathBase)
                         }
                     }
                 },
