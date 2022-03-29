@@ -207,58 +207,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
+        [Obsolete(
+            "This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
         public void SetLastLogin(string username, DateTime date)
         {
-            // Important - these queries are designed to execute without an exclusive WriteLock taken in our distributed lock
-            // table. However due to the data that we are updating which relies on version data we cannot update this data
-            // without taking some locks, otherwise we'll end up with strange situations because when a member is updated, that operation
-            // deletes and re-inserts all property data. So if there are concurrent transactions, one deleting and re-inserting and another trying
-            // to update there can be problems. This is only an issue for cmsPropertyData, not umbracoContentVersion because that table just
-            // maintains a single row and it isn't deleted/re-inserted.
-            // So the important part here is the ForUpdate() call on the select to fetch the property data to update.
 
-            // Update the cms property value for the member
-
-            SqlTemplate sqlSelectTemplateProperty = SqlContext.Templates.Get(
-                "Umbraco.Core.MemberRepository.SetLastLogin1", s => s
-                    .Select<PropertyDataDto>(x => x.Id)
-                    .From<PropertyDataDto>()
-                    .InnerJoin<PropertyTypeDto>()
-                    .On<PropertyTypeDto, PropertyDataDto>((l, r) => l.Id == r.PropertyTypeId)
-                    .InnerJoin<ContentVersionDto>()
-                    .On<ContentVersionDto, PropertyDataDto>((l, r) => l.Id == r.VersionId)
-                    .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
-                    .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
-                    .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
-                    .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username"))
-                    .ForUpdate());
-            Sql<ISqlContext> sqlSelectProperty = sqlSelectTemplateProperty.Sql(Constants.ObjectTypes.Member,
-                Constants.Conventions.Member.LastLoginDate, username);
-
-            Sql<ISqlContext> update = Sql()
-                .Update<PropertyDataDto>(u => u
-                    .Set(x => x.DateValue, date))
-                .WhereIn<PropertyDataDto>(x => x.Id, sqlSelectProperty);
-
-            Database.Execute(update);
-
-            // Update the umbracoContentVersion value for the member
-
-            SqlTemplate sqlSelectTemplateVersion = SqlContext.Templates.Get(
-                "Umbraco.Core.MemberRepository.SetLastLogin2", s => s
-                    .Select<ContentVersionDto>(x => x.Id)
-                    .From<ContentVersionDto>()
-                    .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
-                    .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
-                    .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
-            Sql<ISqlContext> sqlSelectVersion = sqlSelectTemplateVersion.Sql(Constants.ObjectTypes.Member, username);
-
-            Database.Execute(Sql()
-                .Update<ContentVersionDto>(u => u
-                    .Set(x => x.VersionDate, date))
-                .WhereIn<ContentVersionDto>(x => x.Id, sqlSelectVersion));
         }
 
         /// <summary>
@@ -807,7 +760,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 memberDto.PasswordConfig = DefaultPasswordConfigJson;
                 changedCols.Add("passwordConfig");
-            }else if (memberDto.PasswordConfig == Constants.Security.UnknownPasswordConfigJson)
+            }
+            else if (memberDto.PasswordConfig == Constants.Security.UnknownPasswordConfigJson)
             {
                 changedCols.Add("passwordConfig");
             }

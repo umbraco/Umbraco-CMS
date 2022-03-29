@@ -748,13 +748,9 @@ namespace Umbraco.Cms.Core.Services
         #region Save
 
         /// <inheritdoc />
+        [Obsolete("This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
         public void SetLastLogin(string username, DateTime date)
         {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _memberRepository.SetLastLogin(username, date);
-                scope.Complete();
-            }
         }
 
         /// <inheritdoc />
