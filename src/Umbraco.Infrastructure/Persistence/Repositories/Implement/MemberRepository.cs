@@ -772,6 +772,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 changedCols.Add("LoginName");
             }
 
+            if (entity.IsPropertyDirty(nameof(entity.FailedPasswordAttempts)))
+            {
+                changedCols.Add(nameof(entity.FailedPasswordAttempts));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.IsApproved)))
+            {
+                changedCols.Add(nameof(entity.IsApproved));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.IsLockedOut)))
+            {
+                changedCols.Add(nameof(entity.IsLockedOut));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.LastLockoutDate)))
+            {
+                changedCols.Add(nameof(entity.LastLockoutDate));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.LastLoginDate)))
+            {
+                changedCols.Add(nameof(entity.LastLoginDate));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.LastPasswordChangeDate)))
+            {
+                changedCols.Add(nameof(entity.LastPasswordChangeDate));
+            }
+
             // this can occur from an upgrade
             if (memberDto.PasswordConfig.IsNullOrWhiteSpace())
             {

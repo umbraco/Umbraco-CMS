@@ -225,7 +225,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 EmailConfirmedDate = entity.EmailConfirmedDate,
                 ContentDto = contentDto,
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto),
-                PasswordConfig = entity.PasswordConfiguration
+                PasswordConfig = entity.PasswordConfiguration,
+                FailedPasswordAttempts = entity.FailedPasswordAttempts,
+                IsApproved = entity.IsApproved,
+                IsLockedOut = entity.IsLockedOut,
+                LastLockoutDate = entity.LastLockoutDate,
+                LastLoginDate = entity.LastLoginDate,
+                LastPasswordChangeDate = entity.LastPasswordChangeDate,
             };
             return dto;
         }

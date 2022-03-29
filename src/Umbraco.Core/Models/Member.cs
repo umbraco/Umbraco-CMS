@@ -364,7 +364,7 @@ namespace Umbraco.Cms.Core.Models
         public int FailedPasswordAttempts
         {
             get => _failedPasswordAttempts;
-            set => SetPropertyValueAndDetectChanges(value, ref _failedPasswordAttempts, nameof(_failedPasswordAttempts));
+            set => SetPropertyValueAndDetectChanges(value, ref _failedPasswordAttempts, nameof(FailedPasswordAttempts));
         }
 
         /// <summary>
