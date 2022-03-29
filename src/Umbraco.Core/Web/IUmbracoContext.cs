@@ -45,14 +45,14 @@ namespace Umbraco.Cms.Core.Web
         /// <summary>
         /// Gets the domains cache.
         /// </summary>
-        IDomainCache Domains { get; }
+        IDomainCache? Domains { get; }
 
         /// <summary>
         /// Gets or sets the PublishedRequest object
         /// </summary>
         //// TODO: Can we refactor this so it's not a settable thing required for routing?
         //// The only nicer way would be to have a RouteRequest method directly on IUmbracoContext but that means adding another dep to the ctx/factory.
-        IPublishedRequest PublishedRequest { get; set; }
+        IPublishedRequest? PublishedRequest { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled

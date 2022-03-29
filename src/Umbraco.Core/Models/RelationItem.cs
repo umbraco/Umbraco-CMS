@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models
         public string? NodeName { get; set; }
 
         [DataMember(Name = "type")]
-        public string NodeType { get; set; }
+        public string? NodeType { get; set; }
 
         [DataMember(Name = "udi")]
         public Udi NodeUdi => Udi.Create(NodeType, NodeKey);

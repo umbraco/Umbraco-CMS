@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public abstract object Get(string key, Func<object?> factory);
+        public abstract object? Get(string key, Func<object?> factory);
 
         /// <inheritdoc />
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)

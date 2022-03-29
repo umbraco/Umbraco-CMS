@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Composing
         private List<Assembly>? _discovered;
 
         public DefaultUmbracoAssemblyProvider(
-            Assembly entryPointAssembly,
+            Assembly? entryPointAssembly,
             ILoggerFactory loggerFactory,
             IEnumerable<string>? additionalTargetAssemblies = null)
         {

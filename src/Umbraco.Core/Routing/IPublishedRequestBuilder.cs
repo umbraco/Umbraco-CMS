@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Sets the culture for the request
         /// </summary>
-        IPublishedRequestBuilder SetCulture(string culture);
+        IPublishedRequestBuilder SetCulture(string? culture);
 
         /// <summary>
         /// Sets the found <see cref="IPublishedContent"/> for the request

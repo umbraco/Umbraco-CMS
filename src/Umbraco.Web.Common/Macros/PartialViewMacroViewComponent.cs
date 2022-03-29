@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.Common.Macros
                 _macro.Id,
                 _macro.Alias,
                 _macro.Name,
-                _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
+                _macro.Properties.ToDictionary(x => x.Key, x => (object?)x.Value));
 
             ViewViewComponentResult result =  View(_macro.MacroSource, model);
 

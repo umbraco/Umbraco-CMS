@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.Common.Security
     {
         public MemberExternalLoginProviderScheme(
             MemberExternalLoginProvider externalLoginProvider,
-            AuthenticationScheme authenticationScheme)
+            AuthenticationScheme? authenticationScheme)
         {
             ExternalLoginProvider = externalLoginProvider ?? throw new ArgumentNullException(nameof(externalLoginProvider));
             AuthenticationScheme = authenticationScheme ?? throw new ArgumentNullException(nameof(authenticationScheme));

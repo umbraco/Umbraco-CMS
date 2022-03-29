@@ -27,11 +27,11 @@ namespace Umbraco.Extensions
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(
+        public static object? Value(
             this IPublishedElement content,
             string alias,
-            string culture = null,
-            string segment = null,
+            string? culture = null,
+            string? segment = null,
             Fallback fallback = default,
             object? defaultValue = default)
             => content.Value(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
@@ -53,13 +53,13 @@ namespace Umbraco.Extensions
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(
+        public static T? Value<T>(
             this IPublishedElement content,
             string alias,
-            string culture = null,
-            string segment = null,
+            string? culture = null,
+            string? segment = null,
             Fallback fallback = default,
-            T defaultValue = default)
+            T? defaultValue = default)
             => content.Value<T>(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the value of a property.
         /// </summary>
-        public static TValue ValueFor<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string? culture = null, string? segment = null, Fallback fallback = default, TValue defaultValue = default)
+        public static TValue? ValueFor<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string? culture = null, string? segment = null, Fallback fallback = default, TValue? defaultValue = default)
             where TModel : IPublishedElement =>
             model.ValueFor(PublishedValueFallback, property, culture, segment, fallback);
     }

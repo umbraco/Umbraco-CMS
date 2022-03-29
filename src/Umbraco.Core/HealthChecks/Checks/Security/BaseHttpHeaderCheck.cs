@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);
+            var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
             try
             {
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url?.ToString(), ex.Message });
             }
 
             return

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Web.Common.Security
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private readonly object _currentUserLock = new object();
-        private IUser _currentUser;
+        private IUser? _currentUser;
 
         public BackOfficeSecurity(
             IUserService userService,
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public IUser CurrentUser
+        public IUser? CurrentUser
         {
             get
             {
@@ -55,15 +55,15 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <inheritdoc />
         public Attempt<int?> GetUserId()
         {
-            ClaimsIdentity identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
+            ClaimsIdentity? identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
             return identity == null ? Attempt.Fail<int?>() : Attempt.Succeed(identity.GetId());
         }
 
         /// <inheritdoc />
         public bool IsAuthenticated()
         {
-            HttpContext httpContext = _httpContextAccessor.HttpContext;
-            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity() != null;
+            HttpContext? httpContext = _httpContextAccessor.HttpContext;
+            return httpContext?.User != null && (httpContext.User.Identity?.IsAuthenticated ?? false) && httpContext.GetCurrentIdentity() != null;
         }
 
         /// <inheritdoc />

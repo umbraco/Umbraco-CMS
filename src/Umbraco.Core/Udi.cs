@@ -91,9 +91,9 @@ namespace Umbraco.Cms.Core
         /// <param name="entityType">The entity type.</param>
         /// <param name="id">The identifier.</param>
         /// <returns>The Guid Udi for the entity type and identifier.</returns>
-        public static Udi Create(string entityType, Guid id)
+        public static Udi Create(string? entityType, Guid id)
         {
-            if (UdiParser.UdiTypes.TryGetValue(entityType, out var udiType) == false)
+            if (entityType is null || UdiParser.UdiTypes.TryGetValue(entityType, out var udiType) == false)
                 throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
 
             if (udiType != UdiType.GuidUdi)

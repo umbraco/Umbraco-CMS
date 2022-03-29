@@ -50,25 +50,25 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <param name="type">The type.</param>
         /// <param name="modelTypes">The model types map.</param>
         /// <returns>The actual CLR type.</returns>
-        public static Type Map(Type type, Dictionary<string, Type> modelTypes)
+        public static Type Map(Type type, Dictionary<string, Type>? modelTypes)
             => Map(type, modelTypes, false);
 
-        public static Type Map(Type type, Dictionary<string, Type> modelTypes, bool dictionaryIsInvariant)
+        public static Type Map(Type type, Dictionary<string, Type>? modelTypes, bool dictionaryIsInvariant)
         {
             // it may be that senders forgot to send an invariant dictionary (garbage-in)
-            if (!dictionaryIsInvariant)
+            if (modelTypes is not null && !dictionaryIsInvariant)
                 modelTypes = new Dictionary<string, Type>(modelTypes, StringComparer.InvariantCultureIgnoreCase);
 
             if (type is ModelType modelType)
             {
-                if (modelTypes.TryGetValue(modelType.ContentTypeAlias, out var actualType))
+                if (modelTypes?.TryGetValue(modelType.ContentTypeAlias, out var actualType) ?? false)
                     return actualType;
                 throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
             }
 
             if (type is ModelTypeArrayType arrayType)
             {
-                if (modelTypes.TryGetValue(arrayType.ContentTypeAlias, out var actualType))
+                if (modelTypes?.TryGetValue(arrayType.ContentTypeAlias, out var actualType) ?? false)
                     return actualType.MakeArrayType();
                 throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
             }

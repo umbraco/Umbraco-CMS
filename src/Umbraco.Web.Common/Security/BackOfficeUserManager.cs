@@ -169,18 +169,18 @@ namespace Umbraco.Cms.Web.Common.Security
             return result;
         }
 
-        private string GetCurrentUserId(IPrincipal currentUser)
+        private string GetCurrentUserId(IPrincipal? currentUser)
         {
-            ClaimsIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
+            ClaimsIdentity? umbIdentity = currentUser?.GetUmbracoIdentity();
             var currentUserId = umbIdentity?.GetUserId<string>() ?? Core.Constants.Security.SuperUserIdAsString;
             return currentUserId;
         }
 
-        public void NotifyAccountLocked(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyAccountLocked(IPrincipal? currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserLockedNotification(ip, userId, currentUserId)
         );
 
-        public void NotifyAccountUnlocked(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyAccountUnlocked(IPrincipal? currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserUnlockedNotification(ip, userId, currentUserId)
         );
 
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Web.Common.Security
             (currentUserId, ip) => new UserForgotPasswordChangedNotification(ip, userId, currentUserId)
         );
 
-        public void NotifyLoginFailed(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyLoginFailed(IPrincipal? currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserLoginFailedNotification(ip, userId, currentUserId)
         );
 
@@ -213,19 +213,19 @@ namespace Umbraco.Cms.Web.Common.Security
             return new SignOutSuccessResult { SignOutRedirectUrl = notification.SignOutRedirectUrl };
         }
 
-        public void NotifyPasswordChanged(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyPasswordChanged(IPrincipal? currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserPasswordChangedNotification(ip, userId, currentUserId)
         );
 
-        public void NotifyPasswordReset(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyPasswordReset(IPrincipal? currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserPasswordResetNotification(ip, userId, currentUserId)
         );
 
-        public void NotifyResetAccessFailedCount(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyResetAccessFailedCount(IPrincipal? currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserResetAccessFailedCountNotification(ip, userId, currentUserId)
         );
 
-        private T Notify<T>(IPrincipal currentUser, Func<string, string, T> createNotification) where T : INotification
+        private T Notify<T>(IPrincipal? currentUser, Func<string, string, T> createNotification) where T : INotification
         {
             var currentUserId = GetCurrentUserId(currentUser);
             var ip = IpResolver.GetCurrentRequestIpAddress();

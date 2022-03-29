@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         private readonly Lazy<PreProcessPipeline> _jsNonOptimizedPipeline;
         private readonly Lazy<PreProcessPipeline> _cssOptimizedPipeline;
         private readonly Lazy<PreProcessPipeline> _cssNonOptimizedPipeline;
-        private ICacheBuster _cacheBuster;
+        private ICacheBuster? _cacheBuster;
         private readonly Type _cacheBusterType;
 
         public SmidgeRuntimeMinifier(
@@ -88,9 +88,9 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         public string CacheBuster => (_cacheBuster ??= _cacheBusterResolver.GetCacheBuster(_cacheBusterType)).GetValue();
 
         // only issue with creating bundles like this is that we don't have full control over the bundle options, though that could
-        public void CreateCssBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths)
+        public void CreateCssBundle(string bundleName, BundlingOptions bundleOptions, params string[]? filePaths)
         {
-            if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
+            if (filePaths?.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")) ?? false)
             {
                 throw new InvalidOperationException("All file paths must be absolute");
             }
@@ -110,9 +110,9 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
 
         public async Task<string> RenderCssHereAsync(string bundleName) => (await _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
-        public void CreateJsBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths)
+        public void CreateJsBundle(string bundleName, BundlingOptions bundleOptions, params string[]? filePaths)
         {
-            if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
+            if (filePaths?.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")) ?? false)
             {
                 throw new InvalidOperationException("All file paths must be absolute");
             }

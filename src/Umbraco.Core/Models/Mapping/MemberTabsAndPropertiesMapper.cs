@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 // check if this property is flagged as sensitive
                 var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
                 // check permissions for viewing sensitive data
-                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false))
+                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false))
                 {
                     // mark this property as sensitive
                     prop.IsSensitive = true;

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public Task CollectAsync() => Task.CompletedTask;
 
-        public IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
+        public IPublishedSnapshot CreatePublishedSnapshot(string? previewToken)
         {
             if (previewToken.IsNullOrWhiteSpace())
             {

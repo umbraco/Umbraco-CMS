@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.Common.Routing
         private readonly object _routeLocker = new object();
         private object _initLocker = new object();
         private bool _isInit = false;
-        private HashSet<string> _reservedList;
+        private HashSet<string>? _reservedList;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RoutableDocumentFilter"/> class.
@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Web.Common.Routing
             }
 
             // return true if URL starts with an element of the reserved list
-            var isReserved = _reservedList.Any(x => absPath.InvariantStartsWith(x));
+            var isReserved = _reservedList?.Any(x => absPath.InvariantStartsWith(x)) ?? false;
 
             if (isReserved)
             {
@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Web.Common.Routing
             // Borrowed and modified from https://stackoverflow.com/a/59550580
 
             // Return a collection of Microsoft.AspNetCore.Http.Endpoint instances.
-            IEnumerable<RouteEndpoint> routeEndpoints = _endpointDataSource?.Endpoints
+            IEnumerable<RouteEndpoint>? routeEndpoints = _endpointDataSource?.Endpoints
                 .OfType<RouteEndpoint>()
                 .Where(x =>
                 {
@@ -195,10 +195,10 @@ namespace Umbraco.Cms.Web.Common.Routing
             var routeValues = new RouteValueDictionary();
 
             // To get the matchedEndpoint of the provide url
-            RouteEndpoint matchedEndpoint = routeEndpoints?
+            RouteEndpoint? matchedEndpoint = routeEndpoints?
                 .Where(e => e.RoutePattern.RawText != null)
                 .Where(e => new TemplateMatcher(
-                        TemplateParser.Parse(e.RoutePattern.RawText),
+                        TemplateParser.Parse(e.RoutePattern.RawText!),
                         new RouteValueDictionary())
                     .TryMatch(absPath, routeValues))
                 .OrderBy(c => c.Order)

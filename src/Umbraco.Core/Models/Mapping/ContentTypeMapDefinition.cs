@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             // We need to reset the dirty properties, because it is otherwise true, just because the json serializer has set properties
-            target.HistoryCleanup.ResetDirtyProperties(false);
+            target.HistoryCleanup!.ResetDirtyProperties(false);
             if (target.HistoryCleanup.PreventCleanup != source.HistoryCleanup.PreventCleanup)
             {
                 target.HistoryCleanup.PreventCleanup = source.HistoryCleanup.PreventCleanup;
@@ -558,8 +558,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             target.AllowedAsRoot = source.AllowAsRoot;
 
-            bool allowedContentTypesUnchanged = target.AllowedContentTypes.Select(x => x.Id.Value)
-                .SequenceEqual(source.AllowedContentTypes);
+            bool allowedContentTypesUnchanged = target.AllowedContentTypes?.Select(x => x.Id.Value)
+                .SequenceEqual(source.AllowedContentTypes) ?? false;
 
             if (allowedContentTypesUnchanged is false)
             {
@@ -617,7 +617,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 // ensure no duplicate alias, then assign the group properties collection
                 EnsureUniqueAliases(destProperties);
-                if (destGroup is not null && (destGroup.PropertyTypes.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false))
+                if (destGroup is not null && (destGroup.PropertyTypes?.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false))
                 {
                     destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
                     destGroups.Add(destGroup);

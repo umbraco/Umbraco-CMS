@@ -974,7 +974,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
-        public IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
+        public IPublishedSnapshot CreatePublishedSnapshot(string? previewToken)
         {
             EnsureCaches();
 

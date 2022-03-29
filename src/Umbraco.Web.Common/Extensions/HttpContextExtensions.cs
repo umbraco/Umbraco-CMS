@@ -14,7 +14,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Try to get the basic auth username and password from the http context.
         /// </summary>
-        public static bool TryGetBasicAuthCredentials(this HttpContext httpContext, out string username, out string password)
+        public static bool TryGetBasicAuthCredentials(this HttpContext httpContext, out string? username, out string? password)
         {
             username = null;
             password = null;
@@ -70,9 +70,12 @@ namespace Umbraco.Extensions
             return value ?? request.Query[key];
         }
 
-        public static void SetPrincipalForRequest(this HttpContext context, ClaimsPrincipal principal)
+        public static void SetPrincipalForRequest(this HttpContext context, ClaimsPrincipal? principal)
         {
-            context.User = principal;
+            if (principal is not null)
+            {
+                context.User = principal;
+            }
         }
 
 
@@ -94,7 +97,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null
         /// </returns>
-        public static ClaimsIdentity GetCurrentIdentity(this HttpContext http)
+        public static ClaimsIdentity? GetCurrentIdentity(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
             if (http.User == null) return null; //there's no user at all so no identity

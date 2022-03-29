@@ -11,7 +11,7 @@ namespace Umbraco.Extensions
         public const string DefaultFolder = "blocklist/";
         public const string DefaultTemplate = "default";
 
-        public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, BlockListModel model, string template = DefaultTemplate)
+        public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, BlockListModel? model, string template = DefaultTemplate)
         {
             if (model?.Count == 0) return new HtmlString(string.Empty);
 

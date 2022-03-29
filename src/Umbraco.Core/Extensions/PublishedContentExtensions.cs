@@ -1054,7 +1054,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return SiblingsAndSelf(content, publishedSnapshot, variationContextAccessor, culture)?.Where(x => x.Id != content.Id);
         }
@@ -1071,7 +1071,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
+        public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return SiblingsAndSelfOfType(content, publishedSnapshot, variationContextAccessor, contentTypeAlias, culture)?.Where(x => x.Id != content.Id);
         }
@@ -1088,7 +1088,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<T>? Siblings<T>(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IEnumerable<T>? Siblings<T>(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return SiblingsAndSelf<T>(content, publishedSnapshot, variationContextAccessor, culture)?.Where(x => x.Id != content.Id);
@@ -1102,11 +1102,11 @@ namespace Umbraco.Extensions
         /// <param name="variationContextAccessor">Variation context accessor.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The siblings of the content including the node itself.</returns>
-        public static IEnumerable<IPublishedContent>? SiblingsAndSelf(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IEnumerable<IPublishedContent>? SiblingsAndSelf(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.Parent != null
                 ? content.Parent.Children(variationContextAccessor, culture)
-                : publishedSnapshot.Content.GetAtRoot().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content.GetAtRoot().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1118,11 +1118,11 @@ namespace Umbraco.Extensions
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <param name="contentTypeAlias">The content type alias.</param>
         /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-        public static IEnumerable<IPublishedContent>? SiblingsAndSelfOfType(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
+        public static IEnumerable<IPublishedContent>? SiblingsAndSelfOfType(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.Parent != null
                 ? content.Parent.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture)
-                : publishedSnapshot.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1134,12 +1134,12 @@ namespace Umbraco.Extensions
         /// <param name="variationContextAccessor">Variation context accessor.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-        public static IEnumerable<T>? SiblingsAndSelf<T>(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IEnumerable<T>? SiblingsAndSelf<T>(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Parent != null
                 ? content.Parent.Children<T>(variationContextAccessor, culture)
-                : publishedSnapshot.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         #endregion

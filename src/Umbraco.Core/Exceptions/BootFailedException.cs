@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Exceptions
         /// <remarks>
         /// The exception can be null, in which case a default message is used.
         /// </remarks>
-        public static void Rethrow(BootFailedException bootFailedException)
+        public static void Rethrow(BootFailedException? bootFailedException)
         {
             if (bootFailedException == null)
                 throw new BootFailedException(DefaultMessage);

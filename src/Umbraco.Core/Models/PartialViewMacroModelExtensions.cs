@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
         /// <returns>Parameter value if available, the default value that was passed otherwise.</returns>
         public static T? GetParameterValue<T>(this PartialViewMacroModel partialViewMacroModel, string parameterAlias, T defaultValue)
         {
-            if (partialViewMacroModel.MacroParameters.ContainsKey(parameterAlias) == false || string.IsNullOrEmpty(partialViewMacroModel.MacroParameters[parameterAlias].ToString()))
+            if (partialViewMacroModel.MacroParameters.ContainsKey(parameterAlias) == false || string.IsNullOrEmpty(partialViewMacroModel.MacroParameters[parameterAlias]?.ToString()))
                 return defaultValue;
 
             var attempt = partialViewMacroModel.MacroParameters[parameterAlias].TryConvertTo(typeof(T));

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Templates
         /// <param name="contentId">The content id</param>
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
-        Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object> parameters);
+        Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object>? parameters);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.

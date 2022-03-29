@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public override async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
+        public override async Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null)
         {
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
             // to replace the auth scheme
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.Common.Security
             var providerDisplayName = (await GetExternalAuthenticationSchemesAsync()).FirstOrDefault(p => p.Name == provider)?.DisplayName ?? provider;
             return new ExternalLoginInfo(auth.Principal, provider, providerKey, providerDisplayName)
             {
-                AuthenticationTokens = auth.Properties.GetTokens(),
+                AuthenticationTokens = auth.Properties?.GetTokens(),
                 AuthenticationProperties = auth.Properties
             };
         }
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Web.Common.Security
             var info = await RetrieveTwoFactorInfoAsync();
             if (info == null)
             {
-                return null;
+                return null!;
             }
             return await UserManager.FindByIdAsync(info.UserId);
         }
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public override async Task SignInWithClaimsAsync(TUser user, AuthenticationProperties authenticationProperties, IEnumerable<Claim> additionalClaims)
+        public override async Task SignInWithClaimsAsync(TUser user, AuthenticationProperties? authenticationProperties, IEnumerable<Claim> additionalClaims)
         {
             // override to replace IdentityConstants.ApplicationScheme with custom AuthenticationType
             // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
@@ -308,7 +308,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <param name="username"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        protected virtual async Task<SignInResult> HandleSignIn(TUser user, string username, SignInResult result)
+        protected virtual async Task<SignInResult> HandleSignIn(TUser? user, string? username, SignInResult result)
         {
             // TODO: Here I believe we can do all (or most) of the usermanager event raising so that it is not in the AuthenticationController
 
@@ -320,7 +320,7 @@ namespace Umbraco.Cms.Web.Common.Security
             if (result.Succeeded)
             {
                 //track the last login date
-                user.LastLoginDateUtc = DateTime.UtcNow;
+                user!.LastLoginDateUtc = DateTime.UtcNow;
                 if (user.AccessFailedCount > 0)
                 {
                     //we have successfully logged in, reset the AccessFailedCount
@@ -351,7 +351,7 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        protected override async Task<SignInResult> SignInOrTwoFactorAsync(TUser user, bool isPersistent, string loginProvider = null, bool bypassTwoFactor = false)
+        protected override async Task<SignInResult> SignInOrTwoFactorAsync(TUser user, bool isPersistent, string? loginProvider = null, bool bypassTwoFactor = false)
         {
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
             // to replace custom auth types
@@ -391,7 +391,7 @@ namespace Umbraco.Cms.Web.Common.Security
 
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L743
         // to replace custom auth types
-        private ClaimsPrincipal StoreTwoFactorInfo(string userId, string loginProvider)
+        private ClaimsPrincipal StoreTwoFactorInfo(string userId, string? loginProvider)
         {
             var identity = new ClaimsIdentity(TwoFactorAuthenticationType);
             identity.AddClaim(new Claim(ClaimTypes.Name, userId));
@@ -419,7 +419,7 @@ namespace Umbraco.Cms.Web.Common.Security
 
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // copy is required in order to use a custom auth type
-        private async Task<TwoFactorAuthenticationInfo> RetrieveTwoFactorInfoAsync()
+        private async Task<TwoFactorAuthenticationInfo?> RetrieveTwoFactorInfoAsync()
         {
             var result = await Context.AuthenticateAsync(TwoFactorAuthenticationType);
             if (result?.Principal != null)
@@ -463,8 +463,8 @@ namespace Umbraco.Cms.Web.Common.Security
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L891
         private class TwoFactorAuthenticationInfo
         {
-            public string UserId { get; set; }
-            public string LoginProvider { get; set; }
+            public string? UserId { get; set; }
+            public string? LoginProvider { get; set; }
         }
     }
 }

@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Templates
         public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, object parameters) => await RenderMacroAsync(contentId, alias, parameters.ToDictionary<object>());
 
         /// <inheritdoc/>
-        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object> parameters)
+        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object>? parameters)
         {
             if (contentId == default)
             {
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Templates
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
         /// </summary>
-        private async Task<IHtmlEncodedString> RenderMacroAsync(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        private async Task<IHtmlEncodedString> RenderMacroAsync(IPublishedContent content, string alias, IDictionary<string, object>? parameters)
         {
             if (content == null)
             {

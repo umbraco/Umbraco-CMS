@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Events
                 SendNotification(user, entities, action, _hostingEnvironment.ApplicationMainUrl);
             }
 
-            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction? action, Uri siteUri)
+            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction? action, Uri? siteUri)
             {
                 if (sender == null)
                     throw new ArgumentNullException(nameof(sender));

@@ -141,8 +141,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// </summary>
         public void Handle(ModelBindingErrorNotification notification)
         {
-            ModelsBuilderAssemblyAttribute sourceAttr = notification.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
-            ModelsBuilderAssemblyAttribute modelAttr = notification.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            ModelsBuilderAssemblyAttribute? sourceAttr = notification.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            ModelsBuilderAssemblyAttribute? modelAttr = notification.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
 
             // if source or model is not a ModelsBuider type...
             if (sourceAttr == null || modelAttr == null)
@@ -180,8 +180,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 {
                     // both are pure - report, and if different versions, restart
                     // if same version... makes no sense... and better not restart (loops?)
-                    Version sourceVersion = notification.SourceType.Assembly.GetName().Version;
-                    Version modelVersion = notification.ModelType.Assembly.GetName().Version;
+                    Version? sourceVersion = notification.SourceType.Assembly.GetName().Version;
+                    Version? modelVersion = notification.ModelType.Assembly.GetName().Version;
                     notification.Message.Append(" Both view and content models are in memory generated, with ");
                     notification.Message.Append(sourceVersion == modelVersion
                         ? "same version. The application is in an unstable state and should be restarted."

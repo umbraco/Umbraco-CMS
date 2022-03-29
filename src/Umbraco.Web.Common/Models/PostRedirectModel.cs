@@ -10,6 +10,6 @@ namespace Umbraco.Cms.Web.Common.Models
         /// The path to redirect to when update is successful, if not specified then the user will be
         /// redirected to the current Umbraco page
         /// </summary>
-        public string RedirectUrl { get; set; }
+        public string? RedirectUrl { get; set; }
     }
 }

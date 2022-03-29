@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Security
         // needed in most cases. Where an IUser is required this could be an ext method on the ClaimsIdentity/ClaimsPrincipal that passes in
         // an IUserService, like HttpContext.User.GetUmbracoUser(_userService);
         // This one isn't as easy to remove as the others below.
-        IUser CurrentUser { get; }
+        IUser? CurrentUser { get; }
 
         /// <summary>
         /// Gets the current user's id.

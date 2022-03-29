@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private SmidgeOptions _smidgeOptions;
-        private readonly WebProfiler _profiler;
+        private readonly WebProfiler? _profiler;
 
 #pragma warning disable IDE0044 // Add readonly modifier
         private static bool s_firstBackOfficeRequest;
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _variationContextAccessor.VariationContext ??= new VariationContext(_defaultCultureAccessor.DefaultCulture);
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
-            Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
+            Uri? currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
             _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
 
             var pathAndQuery = context.Request.GetEncodedPathAndQuery();
@@ -181,8 +181,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
 
             if (_umbracoRequestPaths.IsBackOfficeRequest(absPath)
-                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}")
-                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}"))
+                || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}") ?? false)
+                || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}") ?? false))
             {
                 LazyInitializer.EnsureInitialized(ref s_firstBackOfficeRequest, ref s_firstBackOfficeReqestFlag, ref s_firstBackOfficeRequestLocker, () =>
                 {
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
         }
 
-        private Uri GetApplicationUrlFromCurrentRequest(HttpRequest request)
+        private Uri? GetApplicationUrlFromCurrentRequest(HttpRequest request)
         {
             // We only consider GET and POST.
             // Especially the DEBUG sent when debugging the application is annoying because it uses http, even when the https is available.

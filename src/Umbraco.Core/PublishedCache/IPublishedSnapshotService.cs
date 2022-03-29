@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <remarks>If <paramref name="previewToken"/> is null, the snapshot is not previewing, else it
         /// is previewing, and what is or is not visible in preview depends on the content of the token,
         /// which is not specified and depends on the actual published snapshot service implementation.</remarks>
-        IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
+        IPublishedSnapshot CreatePublishedSnapshot(string? previewToken);
 
         /// <summary>
         /// Rebuilds internal database caches (but does not reload).

@@ -21,14 +21,14 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="content">The content item.</param>
         /// <param name="userService"></param>
-        public static string CreatorName(this IPublishedContent content, IUserService userService) => userService.GetProfileById(content.CreatorId)?.Name;
+        public static string? CreatorName(this IPublishedContent content, IUserService userService) => userService.GetProfileById(content.CreatorId)?.Name;
 
         /// <summary>
         /// Gets the name of the content item writer.
         /// </summary>
         /// <param name="content">The content item.</param>
         /// <param name="userService"></param>
-        public static string WriterName(this IPublishedContent content, IUserService userService) => userService.GetProfileById(content.WriterId)?.Name;
+        public static string? WriterName(this IPublishedContent content, IUserService userService) => userService.GetProfileById(content.WriterId)?.Name;
 
         #endregion
 
@@ -47,7 +47,7 @@ namespace Umbraco.Extensions
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        public static string GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri current = null)
+        public static string? GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri? current = null)
         {
             var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
             return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
@@ -57,7 +57,7 @@ namespace Umbraco.Extensions
 
         #region Search
 
-        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term, string indexName = null)
+        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term, string ?indexName = null)
         {
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!examineManager.TryGetIndex(indexName, out var index))
@@ -76,7 +76,7 @@ namespace Umbraco.Extensions
             return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }
 
-        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term, string indexName = null)
+        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term, string? indexName = null)
         {
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!examineManager.TryGetIndex(indexName, out var index))

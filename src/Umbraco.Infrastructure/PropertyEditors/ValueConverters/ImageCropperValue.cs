@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <summary>
         /// Gets a crop.
         /// </summary>
-        public ImageCropperCrop? GetCrop(string alias)
+        public ImageCropperCrop? GetCrop(string? alias)
         {
             if (Crops == null)
                 return null;
@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override bool Equals(object? obj)
             => ReferenceEquals(this, obj) || obj is ImageCropperValue other && Equals(this, other);
 
-        private static bool Equals(ImageCropperValue left, ImageCropperValue? right)
+        private static bool Equals(ImageCropperValue? left, ImageCropperValue? right)
             => ReferenceEquals(left, right) // deals with both being null, too
                 || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                    && string.Equals(left.Src, right.Src)
@@ -238,10 +238,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private IEnumerable<ImageCropperCrop> ComparableCrops
             => Crops?.OrderBy(x => x.Alias) ?? Enumerable.Empty<ImageCropperCrop>();
 
-        public static bool operator ==(ImageCropperValue left, ImageCropperValue right)
+        public static bool operator ==(ImageCropperValue? left, ImageCropperValue? right)
             => Equals(left, right);
 
-        public static bool operator !=(ImageCropperValue left, ImageCropperValue right)
+        public static bool operator !=(ImageCropperValue? left, ImageCropperValue? right)
             => !Equals(left, right);
 
         public override int GetHashCode()
@@ -330,7 +330,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             public override bool Equals(object? obj)
                 => ReferenceEquals(this, obj) || obj is ImageCropperCrop other && Equals(this, other);
 
-            private static bool Equals(ImageCropperCrop left, ImageCropperCrop? right)
+            private static bool Equals(ImageCropperCrop? left, ImageCropperCrop? right)
                 => ReferenceEquals(left, right) // deals with both being null, too
                     || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                        && string.Equals(left.Alias, right.Alias)
@@ -338,10 +338,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                        && left.Height == right.Height
                        && Equals(left.Coordinates, right.Coordinates);
 
-            public static bool operator ==(ImageCropperCrop left, ImageCropperCrop right)
+            public static bool operator ==(ImageCropperCrop? left, ImageCropperCrop? right)
                 => Equals(left, right);
 
-            public static bool operator !=(ImageCropperCrop left, ImageCropperCrop right)
+            public static bool operator !=(ImageCropperCrop? left, ImageCropperCrop? right)
                 => !Equals(left, right);
 
             public override int GetHashCode()
@@ -387,7 +387,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             public override bool Equals(object? obj)
                 => ReferenceEquals(this, obj) || obj is ImageCropperCropCoordinates other && Equals(this, other);
 
-            private static bool Equals(ImageCropperCropCoordinates left, ImageCropperCropCoordinates? right)
+            private static bool Equals(ImageCropperCropCoordinates? left, ImageCropperCropCoordinates? right)
                 => ReferenceEquals(left, right) // deals with both being null, too
                    || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                       && left.X1 == right.X1
@@ -395,7 +395,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                       && left.Y1 == right.Y1
                       && left.Y2 == right.Y2;
 
-            public static bool operator ==(ImageCropperCropCoordinates left, ImageCropperCropCoordinates right)
+            public static bool operator ==(ImageCropperCropCoordinates? left, ImageCropperCropCoordinates? right)
                 => Equals(left, right);
 
             public static bool operator !=(ImageCropperCropCoordinates left, ImageCropperCropCoordinates right)

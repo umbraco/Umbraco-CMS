@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
     public class DictionaryMapDefinition : IMapDefinition
     {
         private readonly ILocalizationService _localizationService;
-        private readonly CommonMapper _commonMapper;
+        private readonly CommonMapper? _commonMapper;
 
         [Obsolete("Use the constructor with the CommonMapper")]
         public DictionaryMapDefinition(ILocalizationService localizationService)

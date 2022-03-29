@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
         public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             _siteIdentifierService.TryCreateSiteIdentifier(out _);
-            return Task.FromResult<InstallSetupResult>(null);
+            return Task.FromResult<InstallSetupResult?>(null);
         }
 
         public override bool RequiresExecution(object model)

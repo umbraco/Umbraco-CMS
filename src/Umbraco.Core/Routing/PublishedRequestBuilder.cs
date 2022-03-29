@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetCulture(string culture)
+        public IPublishedRequestBuilder SetCulture(string? culture)
         {
             Culture = culture;
             return this;
