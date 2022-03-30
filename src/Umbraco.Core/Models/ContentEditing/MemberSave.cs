@@ -31,15 +31,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         public string Comments => GetPropertyValue<string>(Constants.Conventions.Member.Comments);
 
-        /// <summary>
-        /// Returns the value from the IsLockedOut property
-        /// </summary>
-        public bool IsLockedOut => GetPropertyValue<bool>(Constants.Conventions.Member.IsLockedOut);
+        [DataMember(Name = "isLockedOut")]
+        public bool IsLockedOut { get; set; }
 
-        /// <summary>
-        /// Returns the value from the IsApproved property
-        /// </summary>
-        public bool IsApproved => GetPropertyValue<bool>(Constants.Conventions.Member.IsApproved);
+        [DataMember(Name = "isApproved")]
+        public bool IsApproved { get; set; }
 
         private T GetPropertyValue<T>(string alias)
         {

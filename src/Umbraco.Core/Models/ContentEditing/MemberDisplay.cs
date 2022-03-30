@@ -24,6 +24,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "email")]
         public string Email { get; set; }
 
+        [DataMember(Name = "isLockedOut")]
+        public bool IsLockedOut { get; set; }
+
+        [DataMember(Name = "isApproved")]
+        public bool IsApproved { get; set; }
+
         //[DataMember(Name = "membershipScenario")]
         //public MembershipScenario MembershipScenario { get; set; }
 
