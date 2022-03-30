@@ -2764,7 +2764,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
-    <key alias="headlineEditorAppearance">Editor apperance</key>
+    <key alias="headlineEditorAppearance">Editor appearance</key>
     <key alias="headlineDataModels">Data models</key>
     <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
     <key alias="labelBackgroundColor">Background color</key>
