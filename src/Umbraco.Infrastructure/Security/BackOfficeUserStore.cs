@@ -450,11 +450,11 @@ namespace Umbraco.Cms.Core.Security
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
-                || (user.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
+                || (user.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate.Value != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
                 || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
                 anythingChanged = true;
-                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
+                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime();
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
