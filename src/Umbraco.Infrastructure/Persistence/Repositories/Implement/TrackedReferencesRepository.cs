@@ -159,7 +159,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "cn", aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c", aliasRight: "ct")
                 .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn")
-                .Where<NodeDto>(x => x.NodeId == id, "pn");
+                .Where<NodeDto>(x => x.NodeId == id, "pn")
+                .Where<RelationDto>(x => x.ChildId == id || x.ParentId == id, "r"); // This last Where is purely to help SqlServer make a smarter query plan. More info https://github.com/umbraco/Umbraco-CMS/issues/12190
 
             if (filterMustBeIsDependency)
             {
