@@ -83,6 +83,9 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
 
+        // Add runtime mode validation
+        builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
+
         // composers
         builder
             .AddRepositories()
@@ -102,9 +105,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
         builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
 
-            builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
+        builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
         builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<IAmbientScopeStack>());
-            builder.Services.AddSingleton<IAmbientScopeContextStack, AmbientScopeContextStack>();
+        builder.Services.AddSingleton<IAmbientScopeContextStack, AmbientScopeContextStack>();
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
