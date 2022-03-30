@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        public IActionResult PostMove(DictionaryMove move)
+        public IActionResult PostMove(MoveOrCopy move)
         {
             var dictionaryItem =
                 _localizationService.GetDictionaryItemById(int.Parse(move.Id.ToString(), CultureInfo.InvariantCulture));

@@ -49,7 +49,6 @@ angular.module("umbraco")
                     eventsService.emit('app.refreshEditor');
 
                 }, function (err) {
-                  console.log(err)
                     $scope.success = false;
                     $scope.error = err;
                     $scope.busy = false;
