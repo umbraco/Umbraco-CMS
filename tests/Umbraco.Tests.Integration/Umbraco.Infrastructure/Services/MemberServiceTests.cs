@@ -698,14 +698,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // just a c# property of the Member object
             resolved.Email = "changed@test.com";
 
+            // NOTE: This will not trigger a property isDirty for the same reason above, but this is a new change, so leave this to make sure.
+            resolved.FailedPasswordAttempts = 1234;
+
             // NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
             // the underlying 'Property'
-            resolved.FailedPasswordAttempts = 1234;
+            resolved.Comments = "This will make it dirty";
 
             var dirtyMember = (ICanBeDirty)resolved;
             var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
             Assert.IsTrue(dirtyMember.IsDirty());
             Assert.AreEqual(1, dirtyProperties.Count);
+
+            // Assert that email and failed password attempts is still set as dirty on the member it self
+            Assert.IsTrue(dirtyMember.IsPropertyDirty(nameof(resolved.Email)));
+            Assert.IsTrue(dirtyMember.IsPropertyDirty(nameof(resolved.FailedPasswordAttempts)));
+
+            // Comment will also be marked as dirty on the member object because content base merges dirty properties.
+            Assert.IsTrue(dirtyMember.IsPropertyDirty(Constants.Conventions.Member.Comments));
+            Assert.AreEqual(3, dirtyMember.GetDirtyProperties().Count());
         }
 
         [Test]
