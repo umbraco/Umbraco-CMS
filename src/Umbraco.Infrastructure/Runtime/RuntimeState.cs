@@ -150,14 +150,18 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 // local version *does* match code version, but the database is not configured
                 // install - may happen with Deploy/Cloud/etc
                 _logger.LogDebug("Database is not configured, need to install Umbraco.");
+
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
+
                 return;
             }
 
             // Validate runtime mode
             if (_runtimeModeValidationService.Validate(out var validationErrorMessage) == false)
             {
+                _logger.LogError(validationErrorMessage);
+
                 Level = RuntimeLevel.BootFailed;
                 Reason = RuntimeLevelReason.BootFailedOnException;
                 BootFailedException = new BootFailedException(validationErrorMessage);
@@ -168,9 +172,12 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Check if we have multiple controllers with the same name.
             if (_conflictingRouteService.HasConflictingRoutes(out string controllerName))
             {
+                var message = $"Conflicting routes, you cannot have multiple controllers with the same name: {controllerName}";
+                _logger.LogError(message);
+
                 Level = RuntimeLevel.BootFailed;
                 Reason = RuntimeLevelReason.BootFailedOnException;
-                BootFailedException = new BootFailedException($"Conflicting routes, you cannot have multiple controllers with the same name: {controllerName}");
+                BootFailedException = new BootFailedException(message);
 
                 return;
             }
