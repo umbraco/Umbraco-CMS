@@ -42,11 +42,11 @@ namespace Umbraco.Cms.Web.Common.ImageProviders
         public Func<HttpContext, bool> Match { get; set; } = _ => true;
 
         /// <inheritdoc/>
-        public virtual bool IsValidRequest(HttpContext context)
+        public bool IsValidRequest(HttpContext context)
             => _formatUtilities.TryGetExtensionFromUri(context.Request.GetDisplayUrl(), out _);
 
         /// <inheritdoc/>
-        public virtual Task<IImageResolver> GetAsync(HttpContext context)
+        public Task<IImageResolver> GetAsync(HttpContext context)
         {
             IFileInfo fileInfo = _fileProvider.GetFileInfo(context.Request.Path);
             if (!fileInfo.Exists)
