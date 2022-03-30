@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             Member = member;
         }
 
-        public static IPublishedContent Create(
+        public static IPublishedContent? Create(
             IMember member,
             IPublishedContentType contentType,
             bool previewing,
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return properties;
         }
 
-        private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
+        private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
         {
             var propertyType = contentType.GetPropertyType(alias);
             if (propertyType == null || propertyType.IsUserProperty) return;
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public string UserName => Member.Username;
 
-        public string Comments => Member.Comments;
+        public string? Comments => Member.Comments;
 
         public bool IsApproved => Member.IsApproved;
 

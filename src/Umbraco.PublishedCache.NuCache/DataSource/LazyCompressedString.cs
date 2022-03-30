@@ -12,8 +12,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     [DebuggerDisplay("{Display}")]
     internal struct LazyCompressedString
     {
-        private byte[] _bytes;
-        private string _str;
+        private byte[]? _bytes;
+        private string? _str;
         private readonly object _locker;
 
         /// <summary>

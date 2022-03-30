@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
-            ILocalizationService languageService = null)
+            ILocalizationService? languageService = null)
             : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)
         {
             LanguageService = languageService;
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        protected ILocalizationService LanguageService { get; }
+        protected ILocalizationService? LanguageService { get; }
 
         /// <summary>
         /// Explicitly override because we need to do validation differently than the underlying logic
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             // Then we'll index the Value group all together.
             var invalidOrValid = values.GroupBy(v =>
             {
-                if (!v.Values.TryGetValue("path", out List<object> paths) || paths.Count <= 0 || paths[0] == null)
+                if (!v.Values.TryGetValue("path", out List<object>? paths) || paths.Count <= 0 || paths[0] == null)
                 {
                     return ValueSetValidationResult.Failed;
                 }
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// </remarks>
         /// <param name="itemIds">ID of the node to delete</param>
         /// <param name="onComplete"></param>
-        protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs> onComplete)
+        protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs>? onComplete)
         {
             var idsAsList = itemIds.ToList();
 

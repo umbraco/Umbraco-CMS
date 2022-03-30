@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Core
     {
         IPublishedContent? Content(int id);
 
-        IPublishedContent Content(Guid id);
+        IPublishedContent? Content(Guid id);
 
         IPublishedContent? Content(Udi id);
 
         IPublishedContent? Content(object id);
 
-        IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
+        IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
 
         IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
 
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core
 
         IPublishedContent? Media(int id);
 
-        IPublishedContent Media(Guid id);
+        IPublishedContent? Media(Guid id);
 
         IPublishedContent? Media(Udi id);
 

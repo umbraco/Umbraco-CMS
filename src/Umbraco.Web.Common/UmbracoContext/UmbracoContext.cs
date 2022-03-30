@@ -88,10 +88,10 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
         /// <inheritdoc/>
-        public IPublishedContentCache Content => PublishedSnapshot.Content;
+        public IPublishedContentCache? Content => PublishedSnapshot.Content;
 
         /// <inheritdoc/>
-        public IPublishedMediaCache Media => PublishedSnapshot.Media;
+        public IPublishedMediaCache? Media => PublishedSnapshot.Media;
 
         /// <inheritdoc/>
         public IDomainCache? Domains => PublishedSnapshot.Domains;

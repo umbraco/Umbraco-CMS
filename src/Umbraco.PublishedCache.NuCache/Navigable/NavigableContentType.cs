@@ -14,7 +14,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
 
         // called by the conditional weak table -- must be public
 // ReSharper disable EmptyConstructor
+#pragma warning disable CS8618
         public NavigableContentType()
+#pragma warning restore CS8618
 // ReSharper restore EmptyConstructor
         { }
 

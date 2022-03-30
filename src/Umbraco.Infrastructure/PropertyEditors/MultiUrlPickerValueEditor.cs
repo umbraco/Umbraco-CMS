@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = publishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Content?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             icon = contentEntity.ContentTypeIcon;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = publishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Media?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else

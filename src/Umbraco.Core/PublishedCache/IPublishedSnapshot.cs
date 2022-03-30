@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <summary>
         /// Gets the <see cref="IPublishedContentCache"/>.
         /// </summary>
-        IPublishedContentCache Content { get; }
+        IPublishedContentCache? Content { get; }
 
         /// <summary>
         /// Gets the <see cref="IPublishedMediaCache"/>.
         /// </summary>
-        IPublishedMediaCache Media { get; }
+        IPublishedMediaCache? Media { get; }
 
         /// <summary>
         /// Gets the <see cref="IPublishedMemberCache"/>.

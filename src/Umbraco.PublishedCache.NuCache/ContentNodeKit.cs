@@ -8,18 +8,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     public struct ContentNodeKit
     {
         [Obsolete("This will be changed to a property in future versions")]
-        public ContentNode Node;
+        public ContentNode Node = null!;
 
         [Obsolete("This will be changed to a property in future versions")]
         public int ContentTypeId;
 
         [Obsolete("This will be changed to a property in future versions")]
-        public ContentData DraftData;
+        public ContentData? DraftData;
 
         [Obsolete("This will be changed to a property in future versions")]
-        public ContentData PublishedData;
+        public ContentData? PublishedData;
 
-        public ContentNodeKit(ContentNode node, int contentTypeId, ContentData draftData, ContentData publishedData)
+        public ContentNodeKit(ContentNode node, int contentTypeId, ContentData? draftData, ContentData? publishedData)
         {
             Node = node;
             ContentTypeId = contentTypeId;
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public bool IsNull => ContentTypeId < 0;
 
         public static ContentNodeKit Empty { get; } = new ContentNodeKit();
-        public static ContentNodeKit Null { get; } = new ContentNodeKit(null, -1, null, null);
+        public static ContentNodeKit Null { get; } = new ContentNodeKit(null!, -1, null, null);
 
         public void Build(
             IPublishedContentType contentType,
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (draftData == null && !canBePublished)
                 draftData = PublishedData;
 
-            Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory);
+            Node?.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory);
         }
 
         public ContentNodeKit Clone(IPublishedModelFactory publishedModelFactory)

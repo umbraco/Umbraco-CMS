@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {
         private readonly IDomainCache _domainCache;
-        private readonly IAppCache _elementsCache;
+        private readonly IAppCache? _elementsCache;
         private readonly GlobalSettings _globalSettings;
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IAppCache _snapshotCache;
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
 
         public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache,
-            IAppCache elementsCache, IDomainCache domainCache, IOptions<GlobalSettings> globalSettings,
+            IAppCache? elementsCache, IDomainCache domainCache, IOptions<GlobalSettings> globalSettings,
             IVariationContextAccessor variationContextAccessor)
             : base(previewDefault)
         {
@@ -66,11 +66,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // at the moment we try our best to be backward compatible, but really,
         // should get rid of hideTopLevelNode and other oddities entirely, eventually
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
+        public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
             GetByRoute(PreviewDefault, route, hideTopLevelNode, culture);
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null,
-            string culture = null)
+        public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null,
+            string? culture = null)
         {
             if (route == null)
             {
@@ -78,14 +78,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
 
 
-            IAppCache cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
+            IAppCache? cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
                 ? _elementsCache
                 : _snapshotCache;
             var key = CacheKeys.ContentCacheContentByRoute(route, preview, culture);
-            return cache.GetCacheItem(key, () => GetByRouteInternal(preview, route, hideTopLevelNode, culture));
+            return cache?.GetCacheItem(key, () => GetByRouteInternal(preview, route, hideTopLevelNode, culture));
         }
 
-        private IPublishedContent GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode, string culture)
+        private IPublishedContent? GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode, string? culture)
         {
             hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture);
             var parts = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
-            IPublishedContent content;
+            IPublishedContent? content;
 
             if (startNodeId > 0)
             {
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children(_variationContextAccessor, culture))
+                    ? GetAtRoot(preview).SelectMany(x => x.Children(_variationContextAccessor, culture)!) // Do we suppress here?
                         .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0])
                     : GetAtRoot(preview)
                         .FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
@@ -139,21 +139,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return content;
         }
 
-        public string GetRouteById(int contentId, string? culture = null) =>
+        public string? GetRouteById(int contentId, string? culture = null) =>
             GetRouteById(PreviewDefault, contentId, culture);
 
-        public string GetRouteById(bool preview, int contentId, string? culture = null)
+        public string? GetRouteById(bool preview, int contentId, string? culture = null)
         {
-            IAppCache cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
+            IAppCache? cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
                 ? _elementsCache
                 : _snapshotCache;
             var key = CacheKeys.ContentCacheRouteByContent(contentId, preview, culture);
-            return cache.GetCacheItem(key, () => GetRouteByIdInternal(preview, contentId, null, culture));
+            return cache?.GetCacheItem(key, () => GetRouteByIdInternal(preview, contentId, null, culture));
         }
 
-        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string culture)
+        private string? GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string? culture)
         {
-            IPublishedContent node = GetById(preview, contentId);
+            IPublishedContent? node = GetById(preview, contentId);
             if (node == null)
             {
                 return null;
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // walk up from that node until we hit a node with a domain,
             // or we reach the content root, collecting URLs in the way
             var pathParts = new List<string>();
-            IPublishedContent n = node;
+            IPublishedContent? n = node;
             var urlSegment = n.UrlSegment(_variationContextAccessor, culture);
             var hasDomains = _domainCache.GetAssignedWithCulture(culture, n.Id);
             while (hasDomains == false && n != null) // n is null at root
@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     return null;
                 }
 
-                pathParts.Add(urlSegment);
+                pathParts.Add(urlSegment!);
 
                 // move to parent node
                 n = n.Parent;
@@ -209,14 +209,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return route;
         }
 
-        private IPublishedContent FollowRoute(IPublishedContent content, IReadOnlyList<string> parts, int start,
-            string culture)
+        private IPublishedContent? FollowRoute(IPublishedContent? content, IReadOnlyList<string> parts, int start,
+            string? culture)
         {
             var i = start;
             while (content != null && i < parts.Count)
             {
                 var part = parts[i++];
-                content = content.Children(_variationContextAccessor, culture).FirstOrDefault(x =>
+                content = content.Children(_variationContextAccessor, culture)?.FirstOrDefault(x =>
                 {
                     var urlSegment = x.UrlSegment(_variationContextAccessor, culture);
                     return urlSegment == part;
@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (content.Parent == null)
             {
-                IPublishedContent rootNode = GetByRoute(preview, "/", true);
+                IPublishedContent? rootNode = GetByRoute(preview, "/", true);
                 if (rootNode == null)
                 {
                     throw new Exception("Failed to get node at /.");
@@ -259,19 +259,19 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Get, Has
 
-        public override IPublishedContent GetById(bool preview, int contentId)
+        public override IPublishedContent? GetById(bool preview, int contentId)
         {
-            ContentNode node = _snapshot.Get(contentId);
+            ContentNode? node = _snapshot.Get(contentId);
             return GetNodePublishedContent(node, preview);
         }
 
-        public override IPublishedContent GetById(bool preview, Guid contentId)
+        public override IPublishedContent? GetById(bool preview, Guid contentId)
         {
-            ContentNode node = _snapshot.Get(contentId);
+            ContentNode? node = _snapshot.Get(contentId);
             return GetNodePublishedContent(node, preview);
         }
 
-        public override IPublishedContent GetById(bool preview, Udi contentId)
+        public override IPublishedContent? GetById(bool preview, Udi contentId)
         {
             var guidUdi = contentId as GuidUdi;
             if (guidUdi == null)
@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public override bool HasById(bool preview, int contentId)
         {
-            ContentNode n = _snapshot.Get(contentId);
+            ContentNode? n = _snapshot.Get(contentId);
             if (n == null)
             {
                 return false;
@@ -329,7 +329,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return atRoot;
         }
 
-        private static IPublishedContent GetNodePublishedContent(ContentNode node, bool preview)
+        private static IPublishedContent? GetNodePublishedContent(ContentNode? node, bool preview)
         {
             if (node == null)
             {
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         // gets a published content as a previewing draft, if preview is true
         // this is for published content when previewing
-        private static IPublishedContent GetPublishedContentAsDraft(IPublishedContent content /*, bool preview*/)
+        private static IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content /*, bool preview*/)
         {
             if (content == null /*|| preview == false*/)
             {
@@ -369,21 +369,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region XPath
 
-        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
+        public override IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
         {
             XPathNavigator navigator = CreateNavigator(preview);
             XPathNodeIterator iterator = navigator.Select(xpath, vars);
             return GetSingleByXPath(iterator);
         }
 
-        public override IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
+        public override IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
         {
             XPathNavigator navigator = CreateNavigator(preview);
             XPathNodeIterator iterator = navigator.Select(xpath, vars);
             return GetSingleByXPath(iterator);
         }
 
-        private static IPublishedContent GetSingleByXPath(XPathNodeIterator iterator)
+        private static IPublishedContent? GetSingleByXPath(XPathNodeIterator iterator)
         {
             if (iterator.MoveNext() == false)
             {
@@ -433,7 +433,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return navigator;
         }
 
-        public override XPathNavigator CreateNodeNavigator(int id, bool preview)
+        public override XPathNavigator? CreateNodeNavigator(int id, bool preview)
         {
             var source = new Source(this, preview);
             var navigator = new NavigableNavigator(source);
@@ -444,11 +444,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id) => _snapshot.GetContentType(id);
+        public override IPublishedContentType? GetContentType(int id) => _snapshot.GetContentType(id);
 
-        public override IPublishedContentType GetContentType(string alias) => _snapshot.GetContentType(alias);
+        public override IPublishedContentType? GetContentType(string alias) => _snapshot.GetContentType(alias);
 
-        public override IPublishedContentType GetContentType(Guid key) => _snapshot.GetContentType(key);
+        public override IPublishedContentType? GetContentType(Guid key) => _snapshot.GetContentType(key);
 
         #endregion
     }

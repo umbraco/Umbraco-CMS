@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Infrastructure
         public IPublishedContent? Content(int id)
             => ItemById(id, _publishedSnapshot.Content);
 
-        public IPublishedContent Content(Guid id)
+        public IPublishedContent? Content(Guid id)
             => ItemById(id, _publishedSnapshot.Content);
 
         public IPublishedContent? Content(Udi? id)
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Infrastructure
             return null;
         }
 
-        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
             => ItemByXPath(xpath, vars, _publishedSnapshot.Content);
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
@@ -160,7 +160,7 @@ namespace Umbraco.Cms.Infrastructure
         public IPublishedContent? Media(int id)
             => ItemById(id, _publishedSnapshot.Media);
 
-        public IPublishedContent Media(Guid id)
+        public IPublishedContent? Media(Guid id)
             => ItemById(id, _publishedSnapshot.Media);
 
         public IPublishedContent? Media(Udi? id)
@@ -209,29 +209,29 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Used by Content/Media
 
-        private static IPublishedContent? ItemById(int id, IPublishedCache cache)
-            => cache.GetById(id);
+        private static IPublishedContent? ItemById(int id, IPublishedCache? cache)
+            => cache?.GetById(id);
 
-        private static IPublishedContent ItemById(Guid id, IPublishedCache cache)
-            => cache.GetById(id);
+        private static IPublishedContent? ItemById(Guid id, IPublishedCache? cache)
+            => cache?.GetById(id);
 
-        private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
-            => cache.GetSingleByXPath(xpath, vars);
+        private static IPublishedContent? ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache? cache)
+            => cache?.GetSingleByXPath(xpath, vars);
 
-        private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<int> ids)
+        private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<int> ids)
             => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-        private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<Guid> ids)
+        private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
             => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
-            => cache.GetByXPath(xpath, vars);
+        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache? cache)
+            => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
 
-        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
-            => cache.GetByXPath(xpath, vars);
+        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache? cache)
+            => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
 
-        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache cache)
-            => cache.GetAtRoot();
+        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
+            => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
 
         #endregion
 

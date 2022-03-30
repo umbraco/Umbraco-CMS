@@ -9,16 +9,16 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     public struct ContentCacheDataSerializationResult : IEquatable<ContentCacheDataSerializationResult>
     {
-        public ContentCacheDataSerializationResult(string stringData, byte[] byteData)
+        public ContentCacheDataSerializationResult(string? stringData, byte[]? byteData)
         {
             StringData = stringData;
             ByteData = byteData;
         }
 
-        public string StringData { get; }
-        public byte[] ByteData { get; }
+        public string? StringData { get; }
+        public byte[]? ByteData { get; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is ContentCacheDataSerializationResult result && Equals(result);
 
         public bool Equals(ContentCacheDataSerializationResult other)
@@ -28,8 +28,16 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         public override int GetHashCode()
         {
             var hashCode = 1910544615;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StringData);
-            hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(ByteData);
+            if (StringData is not null)
+            {
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StringData);
+            }
+
+            if (ByteData is not null)
+            {
+                hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(ByteData);
+            }
+
             return hashCode;
         }
 

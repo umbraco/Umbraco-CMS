@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             foreach (var dto in dtos)
             {
-                var mediaItem = publishedSnapshot.Media.GetById(preview, dto.MediaKey);
+                var mediaItem = publishedSnapshot.Media?.GetById(preview, dto.MediaKey);
                 if (mediaItem != null)
                 {
                     var localCrops = new ImageCropperValue

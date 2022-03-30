@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     [DebuggerDisplay("{Alias}")]
     public class PublishedContentType : IPublishedContentType
     {
-        private readonly IPublishedPropertyType[]? _propertyTypes;
+        private readonly IPublishedPropertyType[] _propertyTypes = null!;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         #region Properties
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedPropertyType>? PropertyTypes => _propertyTypes;
+        public IEnumerable<IPublishedPropertyType> PropertyTypes => _propertyTypes;
 
         /// <inheritdoc />
         public int GetPropertyIndex(string alias)

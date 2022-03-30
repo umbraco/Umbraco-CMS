@@ -29,14 +29,14 @@ namespace Umbraco.Cms.Core.PublishedCache
         public IPublishedContent? GetById(int contentId)
             => GetById(PreviewDefault, contentId);
 
-        public abstract IPublishedContent GetById(bool preview, Guid contentId);
+        public abstract IPublishedContent? GetById(bool preview, Guid contentId);
 
-        public IPublishedContent GetById(Guid contentId)
+        public IPublishedContent? GetById(Guid contentId)
             => GetById(PreviewDefault, contentId);
 
-        public abstract IPublishedContent GetById(bool preview, Udi contentId);
+        public abstract IPublishedContent? GetById(bool preview, Udi contentId);
 
-        public IPublishedContent GetById(Udi contentId)
+        public IPublishedContent? GetById(Udi contentId)
             => GetById(PreviewDefault, contentId);
 
         public abstract bool HasById(bool preview, int contentId);
@@ -51,16 +51,16 @@ namespace Umbraco.Cms.Core.PublishedCache
             return GetAtRoot(PreviewDefault, culture);
         }
 
-        public abstract IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars);
+        public abstract IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars);
 
-        public IPublishedContent GetSingleByXPath(string xpath, XPathVariable[] vars)
+        public IPublishedContent? GetSingleByXPath(string xpath, XPathVariable[] vars)
         {
             return GetSingleByXPath(PreviewDefault, xpath, vars);
         }
 
-        public abstract IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars);
+        public abstract IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars);
 
-        public IPublishedContent GetSingleByXPath(XPathExpression xpath, XPathVariable[] vars)
+        public IPublishedContent? GetSingleByXPath(XPathExpression xpath, XPathVariable[] vars)
         {
             return GetSingleByXPath(PreviewDefault, xpath, vars);
         }
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             return CreateNavigator(PreviewDefault);
         }
 
-        public abstract XPathNavigator CreateNodeNavigator(int id, bool preview);
+        public abstract XPathNavigator? CreateNodeNavigator(int id, bool preview);
 
         public abstract bool HasContent(bool preview);
 
@@ -95,9 +95,9 @@ namespace Umbraco.Cms.Core.PublishedCache
             return HasContent(PreviewDefault);
         }
 
-        public abstract IPublishedContentType GetContentType(int id);
-        public abstract IPublishedContentType GetContentType(string alias);
-        public abstract IPublishedContentType GetContentType(Guid key);
+        public abstract IPublishedContentType? GetContentType(int id);
+        public abstract IPublishedContentType? GetContentType(string alias);
+        public abstract IPublishedContentType? GetContentType(Guid key);
 
         public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {

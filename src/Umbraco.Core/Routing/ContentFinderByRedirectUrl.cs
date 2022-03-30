@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Routing
                 return false;
             }
 
-            IPublishedContent? content = umbracoContext.Content.GetById(redirectUrl.ContentId);
+            IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {

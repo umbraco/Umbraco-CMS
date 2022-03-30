@@ -7,9 +7,9 @@
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     internal class LinkedNode<TValue>
-        where TValue : class
+        where TValue : class?
     {
-        public LinkedNode(TValue value, long gen, LinkedNode<TValue> next = null)
+        public LinkedNode(TValue? value, long gen, LinkedNode<TValue>? next = null)
         {
             Value = value; // This is allowed to be null, we actually explicitly set this to null in ClearLocked
             Gen = gen;
@@ -20,7 +20,7 @@
 
         // reading & writing references is thread-safe on all .NET platforms
         // mark as volatile to ensure we always read the correct value
-        public volatile TValue Value;
-        public volatile LinkedNode<TValue> Next;
+        public volatile TValue? Value;
+        public volatile LinkedNode<TValue>? Next;
     }
 }

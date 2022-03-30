@@ -26,17 +26,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly object _locko = new object();
 
         // the invariant-neutral source and inter values
-        private readonly object _sourceValue;
+        private readonly object? _sourceValue;
         private bool _interInitialized;
-        private object _interValue;
+        private object? _interValue;
 
         // the variant source and inter values
-        private Dictionary<CompositeStringStringKey, SourceInterValue> _sourceValues;
+        private Dictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
         // the variant and non-variant object values
-        private CacheValues _cacheValues;
+        private CacheValues? _cacheValues;
 
-        private string _valuesCacheKey;
+        private string? _valuesCacheKey;
 
         // initializes a published content property with no value
         public Property(IPublishedPropertyType propertyType, PublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         { }
 
         // initializes a published content property with a value
-        public Property(IPublishedPropertyType propertyType, PublishedContent content, PropertyData[] sourceValues, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        public Property(IPublishedPropertyType propertyType, PublishedContent content, PropertyData[]? sourceValues, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
             : base(propertyType, referenceCacheLevel)
         {
             if (sourceValues != null)
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         // determines whether a property has value
-        public override bool HasValue(string culture = null, string? segment = null)
+        public override bool HasValue(string? culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             CacheValues cacheValues;
             IPublishedSnapshot publishedSnapshot;
-            IAppCache cache;
+            IAppCache? cache;
             switch (cacheLevel)
             {
                 case PropertyCacheLevel.None:
@@ -163,15 +163,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return cacheValues;
         }
 
-        private CacheValues GetCacheValues(IAppCache cache)
+        private CacheValues GetCacheValues(IAppCache? cache)
         {
             if (cache == null) // no cache, don't cache
                 return new CacheValues();
-            return (CacheValues) cache.Get(ValuesCacheKey, () => new CacheValues());
+            return (CacheValues) cache.Get(ValuesCacheKey, () => new CacheValues())!;
         }
 
         // this is always invoked from within a lock, so does not require its own lock
-        private object GetInterValue(string culture, string segment)
+        private object? GetInterValue(string? culture, string? segment)
         {
             if (culture == "" && segment == "")
             {
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return vvalue.InterValue;
         }
 
-        public override object GetSourceValue(string culture = null, string? segment = null)
+        public override object? GetSourceValue(string? culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -208,11 +208,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
-        public override object GetValue(string culture = null, string? segment = null)
+        public override object? GetValue(string? culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
-            object value;
+            object? value;
             lock (_locko)
             {
                 var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -229,7 +229,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return value;
         }
 
-        public override object GetXPathValue(string culture = null, string? segment = null)
+        public override object? GetXPathValue(string? culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -252,17 +252,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private class CacheValue
         {
             public bool ObjectInitialized { get; set; }
-            public object ObjectValue { get; set; }
+            public object? ObjectValue { get; set; }
             public bool XPathInitialized { get; set; }
-            public object XPathValue { get; set; }
+            public object? XPathValue { get; set; }
         }
 
         private class CacheValues : CacheValue
         {
-            private Dictionary<CompositeStringStringKey, CacheValue> _values;
+            private Dictionary<CompositeStringStringKey, CacheValue>? _values;
 
             // this is always invoked from within a lock, so does not require its own lock
-            public CacheValue For(string culture, string segment)
+            public CacheValue For(string? culture, string? segment)
             {
                 if (culture == "" && segment == "")
                     return this;
@@ -280,22 +280,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private class SourceInterValue
         {
-            private string _culture;
-            private string _segment;
+            private string? _culture;
+            private string? _segment;
 
-            public string Culture
+            public string? Culture
             {
                 get => _culture;
                 internal set => _culture = value?.ToLowerInvariant();
             }
-            public string Segment
+            public string? Segment
             {
                 get => _segment;
                 internal set => _segment = value?.ToLowerInvariant();
             }
-            public object SourceValue { get; set; }
+            public object? SourceValue { get; set; }
             public bool InterInitialized { get; set; }
-            public object InterValue { get; set; }
+            public object? InterValue { get; set; }
         }
 
         #endregion

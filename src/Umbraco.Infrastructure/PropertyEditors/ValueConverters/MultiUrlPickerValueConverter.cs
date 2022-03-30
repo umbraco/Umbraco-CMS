@@ -75,8 +75,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                             : LinkType.Content;
 
                         var content = type == LinkType.Media ?
-                             publishedSnapshot.Media.GetById(preview, dto.Udi.Guid) :
-                             publishedSnapshot.Content.GetById(preview, dto.Udi.Guid);
+                             publishedSnapshot.Media?.GetById(preview, dto.Udi.Guid) :
+                             publishedSnapshot.Content?.GetById(preview, dto.Udi.Guid);
 
                         if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                         {

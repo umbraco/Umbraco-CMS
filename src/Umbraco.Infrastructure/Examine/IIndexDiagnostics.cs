@@ -25,6 +25,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <remarks>
         /// Used to display in the UI
         /// </remarks>
-        IReadOnlyDictionary<string, object> Metadata { get; }
+        IReadOnlyDictionary<string, object?> Metadata { get; }
     }
 }

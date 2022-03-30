@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Core.Routing
             bool IsPublishedContentDomain(Domain domain)
             {
                 // just get it from content cache - optimize there, not here
-                IPublishedContent? domainDocument = umbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
+                IPublishedContent? domainDocument = umbracoContext.PublishedSnapshot.Content?.GetById(domain.ContentId);
 
                 // not published - at all
                 if (domainDocument == null)
@@ -297,7 +297,7 @@ namespace Umbraco.Cms.Core.Routing
                 }
 
                 // variant, ensure that the culture corresponding to the domain's language is published
-                return domainDocument.Cultures.ContainsKey(domain.Culture);
+                return domain.Culture is not null && domainDocument.Cultures.ContainsKey(domain.Culture);
             }
 
             domains = domains?.Where(IsPublishedContentDomain).ToList();
@@ -510,7 +510,7 @@ namespace Umbraco.Cms.Core.Routing
             {
                 // try and get the redirect node from a legacy integer ID
                 valid = true;
-                internalRedirectNode = umbracoContext.Content.GetById(internalRedirectId);
+                internalRedirectNode = umbracoContext.Content?.GetById(internalRedirectId);
             }
             else
             {
@@ -519,7 +519,7 @@ namespace Umbraco.Cms.Core.Routing
                 {
                     // try and get the redirect node from a UDI Guid
                     valid = true;
-                    internalRedirectNode = umbracoContext.Content.GetById(udiInternalRedirectId.Guid);
+                    internalRedirectNode = umbracoContext.Content?.GetById(udiInternalRedirectId.Guid);
                 }
             }
 

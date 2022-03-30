@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class EnumerableExtensions
     {
-        public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T> list) => list == null || list.Count == 0;
+        public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? list) => list == null || list.Count == 0;
 
         internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
         {

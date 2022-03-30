@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        public static string? Name(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static string? Name(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
         {
             if (content == null)
             {
@@ -54,7 +54,7 @@ namespace Umbraco.Extensions
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the URL segment for. If null is used the current culture is used (Default is null).</param>
-        public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
         {
             if (content == null)
             {
@@ -927,7 +927,7 @@ namespace Umbraco.Extensions
         /// However, if an empty string is specified only invariant children are returned.
         /// </para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent>? Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IEnumerable<IPublishedContent>? Children(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
         {
             // handle context culture for variant
             if (culture == null)
@@ -1106,7 +1106,7 @@ namespace Umbraco.Extensions
         {
             return content.Parent != null
                 ? content.Parent.Children(variationContextAccessor, culture)
-                : publishedSnapshot?.Content.GetAtRoot().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content?.GetAtRoot().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1122,7 +1122,7 @@ namespace Umbraco.Extensions
         {
             return content.Parent != null
                 ? content.Parent.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture)
-                : publishedSnapshot?.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content?.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1139,7 +1139,7 @@ namespace Umbraco.Extensions
         {
             return content.Parent != null
                 ? content.Parent.Children<T>(variationContextAccessor, culture)
-                : publishedSnapshot?.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content?.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         #endregion

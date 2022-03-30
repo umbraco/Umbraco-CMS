@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 // Get the new persisted image URL
                 _umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext);
-                var mediaTyped = umbracoContext?.Media.GetById(udi.Guid);
+                var mediaTyped = umbracoContext?.Media?.GetById(udi.Guid);
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
 

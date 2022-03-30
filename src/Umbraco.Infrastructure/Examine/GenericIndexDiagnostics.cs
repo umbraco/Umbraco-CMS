@@ -46,11 +46,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         public IEnumerable<string> GetFieldNames() => Enumerable.Empty<string>();
 
-        public IReadOnlyDictionary<string, object> Metadata
+        public IReadOnlyDictionary<string, object?> Metadata
         {
             get
             {
-                var result = new Dictionary<string, object>();
+                var result = new Dictionary<string, object?>();
 
                 var props = TypeHelper.CachedDiscoverableProperties(_index.GetType(), mustWrite: false)
                     .Where(x => s_ignoreProperties.InvariantContains(x.Name) == false)

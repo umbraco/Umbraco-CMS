@@ -35,12 +35,12 @@ namespace Umbraco.Cms.Core.Web
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        IPublishedContentCache Content { get; }
+        IPublishedContentCache? Content { get; }
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
-        IPublishedMediaCache Media { get; }
+        IPublishedMediaCache? Media { get; }
 
         /// <summary>
         /// Gets the domains cache.

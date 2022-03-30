@@ -52,17 +52,17 @@ namespace Umbraco.Cms.Core.Routing
         private IPublishedContent? GetDocument(int id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Content.GetById(id);
+            return umbracoContext.Content?.GetById(id);
         }
-        private IPublishedContent GetDocument(Guid id)
+        private IPublishedContent? GetDocument(Guid id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Content.GetById(id);
+            return umbracoContext.Content?.GetById(id);
         }
-        private IPublishedContent GetMedia(Guid id)
+        private IPublishedContent? GetMedia(Guid id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Media.GetById(id);
+            return umbracoContext.Media?.GetById(id);
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="current"></param>
         /// <returns></returns>
         public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
-            => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
+            => GetMediaUrl( GetMedia(id), mode, culture, propertyAlias, current);
 
         /// <summary>
         /// Gets the URL of a media item.
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        public string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
+        public string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
         {
             if (propertyAlias == null)
                 throw new ArgumentNullException(nameof(propertyAlias));

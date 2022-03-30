@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                 throw new ArgumentException("Not the identifier of a content within the source.", nameof(rootId));
             _state = new State(content, null, null, 0, StatePosition.Root);
 
-            _contents = new ConcurrentDictionary<int, INavigableContent>();
+            _contents = new ConcurrentDictionary<int, INavigableContent?>();
         }
 
         ///// <summary>
@@ -261,9 +261,9 @@ namespace Umbraco.Cms.Core.Xml.XPath
 
         #region Source management
 
-        private readonly ConcurrentDictionary<int, INavigableContent> _contents;
+        private readonly ConcurrentDictionary<int, INavigableContent?> _contents;
 
-        private INavigableContent SourceGet(int id)
+        private INavigableContent? SourceGet(int id)
         {
             // original version, would keep creating INavigableContent objects
             //return _source.Get(id);
@@ -704,7 +704,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
                             _state = new State(state.Content, null, null, 0, StatePosition.Element);
                             while (content != null)
                             {
-                                _state = new State(content, _state, _state.Content?.ChildIds, _state.Content?.ChildIds.IndexOf(content.Id) ?? -1, StatePosition.Element);
+                                _state = new State(content, _state, _state.Content?.ChildIds, _state.Content?.ChildIds?.IndexOf(content.Id) ?? -1, StatePosition.Element);
                                 content = s.Count == 0 ? null : s.Pop();
                             }
                             DebugState();

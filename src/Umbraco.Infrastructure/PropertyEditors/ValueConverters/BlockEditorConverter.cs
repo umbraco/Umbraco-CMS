@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
 
             // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-            var publishedContentType = publishedContentCache.GetContentType(data.ContentTypeKey);
+            var publishedContentType = publishedContentCache?.GetContentType(data.ContentTypeKey);
             if (publishedContentType == null || publishedContentType.IsElement == false)
             {
                 return null;
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public Type GetModelType(Guid contentTypeKey)
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
-            var publishedContentType = publishedContentCache.GetContentType(contentTypeKey);
+            var publishedContentType = publishedContentCache?.GetContentType(contentTypeKey);
             if (publishedContentType != null)
             {
                 var modelType = ModelType.For(publishedContentType.Alias);

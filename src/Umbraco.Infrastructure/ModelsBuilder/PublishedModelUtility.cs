@@ -37,9 +37,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             switch (itemType)
             {
                 case PublishedItemType.Content:
-                    return publishedSnapshot.Content.GetContentType(alias);
+                    return publishedSnapshot.Content?.GetContentType(alias);
                 case PublishedItemType.Media:
-                    return publishedSnapshot.Media.GetContentType(alias);
+                    return publishedSnapshot.Media?.GetContentType(alias);
                 case PublishedItemType.Member:
                     return publishedSnapshot.Members?.GetContentType(alias);
                 default:

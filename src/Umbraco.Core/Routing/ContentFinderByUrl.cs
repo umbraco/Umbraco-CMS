@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Routing
 
             _logger.LogDebug("Test route {Route}", route);
 
-            IPublishedContent? node = umbracoContext?.Content.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
+            IPublishedContent? node = umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
             if (node != null)
             {
                 docreq.SetPublishedContent(node);

@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Web.Common
 
         private IPublishedContent? ContentForObject(object id) => _publishedContentQuery.Content(id);
 
-        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
         }
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Web.Common
         /// </summary>
         /// <param name="id">The key of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(Guid id) => _publishedContentQuery.Content(id);
+        public IPublishedContent? Content(Guid id) => _publishedContentQuery.Content(id);
 
         /// <summary>
         /// Gets a content item from the cache.
@@ -322,7 +322,7 @@ namespace Umbraco.Cms.Web.Common
 
         public IPublishedContent? Media(Udi id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(Guid id) => _publishedContentQuery.Media(id);
+        public IPublishedContent? Media(Guid id) => _publishedContentQuery.Media(id);
 
         /// <summary>
         /// Overloaded method accepting an 'object' type

@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Routing
                 if (nodeId > 0)
                 {
                     _logger.LogDebug("Id={NodeId}", nodeId);
-                    node = umbracoContext?.Content.GetById(nodeId);
+                    node = umbracoContext?.Content?.GetById(nodeId);
 
                     if (node != null)
                     {

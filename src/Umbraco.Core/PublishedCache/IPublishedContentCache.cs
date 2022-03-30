@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// <para>The value of <paramref name="preview"/> overrides defaults.</para>
         /// </remarks>
-        IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null);
+        IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null);
 
         /// <summary>
         /// Gets content identified by a route.
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// <para>Considers published or unpublished content depending on defaults.</para>
         /// </remarks>
-        IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null);
+        IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// </para>
         /// <para>The value of <paramref name="preview"/> overrides defaults.</para>
         /// </remarks>
-        string GetRouteById(bool preview, int contentId, string? culture = null);
+        string? GetRouteById(bool preview, int contentId, string? culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
@@ -56,6 +56,6 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// The resulting string is a special encoded route string that may contain the domain ID
         /// for the current route. If a domain is present the string will be prefixed with the domain ID integer, example: {domainId}/route-path-of-item
         /// </para>
-        string GetRouteById(int contentId, string? culture = null);
+        string? GetRouteById(int contentId, string? culture = null);
     }
 }

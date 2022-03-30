@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Core
         /// <para>If <paramref name="knownTypes"/> is <c>true</c>, assemblies are not scanned for types,
         /// and therefore only builtin types may be known. Unless scanning already took place.</para>
         /// </remarks>
-        public static bool TryParse(string s, bool knownTypes, [MaybeNullWhen(returnValue: false)] out Udi udi)
+        public static bool TryParse(string? s, bool knownTypes, [MaybeNullWhen(returnValue: false)] out Udi udi)
         {
             return ParseInternal(s, true, knownTypes, out udi);
         }

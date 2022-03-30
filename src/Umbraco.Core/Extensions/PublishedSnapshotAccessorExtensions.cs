@@ -11,6 +11,7 @@ namespace Umbraco.Extensions
             {
                 return publishedSnapshot!;
             }
+
             throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
         }
     }

@@ -39,8 +39,8 @@ namespace Umbraco.Cms.Core.Routing
 
             // get the published route, else the preview route
             // if both are null then the content does not exist
-            var route = umbracoContext.Content.GetRouteById(contentId) ??
-                        umbracoContext.Content.GetRouteById(true, contentId);
+            var route = umbracoContext.Content?.GetRouteById(contentId) ??
+                        umbracoContext.Content?.GetRouteById(true, contentId);
 
             if (route == null)
                 return null;

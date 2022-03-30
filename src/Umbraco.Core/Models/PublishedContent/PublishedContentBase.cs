@@ -13,9 +13,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IVariationContextAccessor? _variationContextAccessor;
 
-        protected PublishedContentBase(IVariationContextAccessor variationContextAccessor)
+        protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor)
         {
             _variationContextAccessor = variationContextAccessor;
         }
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         #region Tree
 
         /// <inheritdoc />
-        public abstract IPublishedContent Parent { get; }
+        public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent>? Children => this.Children(_variationContextAccessor);
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
-        public abstract IPublishedProperty GetProperty(string alias);
+        public abstract IPublishedProperty? GetProperty(string alias);
 
         #endregion
     }

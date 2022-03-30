@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Routing
         public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IPublishedContent? node = umbracoContext.Content.GetById(id);
+            IPublishedContent? node = umbracoContext.Content?.GetById(id);
             if (node == null)
             {
                 yield break;
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Routing
                 var culture = d.Culture;
 
                 // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-                var route = umbracoContext.Content.GetRouteById(id, culture);
+                var route = umbracoContext.Content?.GetRouteById(id, culture);
                 if (route == null)
                 {
                     continue;
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Routing
 
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             // will not use cache if previewing
-            var route = umbracoContext.Content.GetRouteById(content.Id, culture);
+            var route = umbracoContext.Content?.GetRouteById(content.Id, culture);
 
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }

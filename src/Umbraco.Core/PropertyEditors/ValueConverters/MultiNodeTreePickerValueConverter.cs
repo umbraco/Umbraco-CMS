@@ -96,10 +96,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                             switch (udi.EntityType)
                             {
                                 case Constants.UdiEntityType.Document:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot?.Content.GetById(guidUdi.Guid));
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot.Content?.GetById(guidUdi.Guid));
                                     break;
                                 case Constants.UdiEntityType.Media:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot?.Media.GetById(guidUdi.Guid));
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot.Media?.GetById(guidUdi.Guid));
                                     break;
                                 case Constants.UdiEntityType.Member:
                                     multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id =>

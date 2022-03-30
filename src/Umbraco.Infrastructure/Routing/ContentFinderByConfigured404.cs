@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Routing
             int? domainContentId = null;
 
             // try to find a culture as best as we can
-            string errorCulture = CultureInfo.CurrentUICulture.Name;
+            string? errorCulture = CultureInfo.CurrentUICulture.Name;
             if (frequest.Domain != null)
             {
                 errorCulture = frequest.Domain.Culture;
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Routing
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = umbracoContext.Content.GetByRoute(route, culture: frequest?.Culture);
+                    node = umbracoContext.Content?.GetByRoute(route, culture: frequest?.Culture);
                     if (node != null)
                     {
                         break;
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Routing
             {
                 _logger.LogDebug("Got id={ErrorNodeId}.", error404.Value);
 
-                content = umbracoContext.Content.GetById(error404.Value);
+                content = umbracoContext.Content?.GetById(error404.Value);
 
                 _logger.LogDebug(content == null
                     ? "Could not find content with that id."

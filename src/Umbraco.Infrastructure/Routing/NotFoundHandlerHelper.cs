@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Routing
             ContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
-            string errorCulture,
+            string? errorCulture,
             int? domainContentId)
         {
             if (error404Collection.Length > 1)
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Routing
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 
                     // now we'll try to execute the expression
-                    IPublishedContent nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
+                    IPublishedContent? nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
                     if (nodeResult != null)
                     {
                         return nodeResult.Id;
