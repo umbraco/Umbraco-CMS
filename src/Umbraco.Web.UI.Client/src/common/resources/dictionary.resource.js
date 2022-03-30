@@ -114,8 +114,8 @@ function dictionaryResource($q, $http, $location, localizationService, umbReques
       *    });
       * </pre>
       * @param {Object} args arguments object
-      * @param {Guid} args.id the Guid of the dictionary item to move
-      * @param {Guid} args.parentId the Guid of the parent dictionary item to move to
+      * @param {int} args.id the int of the dictionary item to move
+      * @param {int} args.parentId the int of the parent dictionary item to move to
       * @returns {Promise} resourcePromise object.
       *
       */

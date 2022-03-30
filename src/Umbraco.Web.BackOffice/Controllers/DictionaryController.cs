@@ -200,15 +200,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public IActionResult PostMove(MoveOrCopy move)
         {
-            var dictionaryItem =
-                _localizationService.GetDictionaryItemById(int.Parse(move.Id.ToString(), CultureInfo.InvariantCulture));
-
-            var parent =
-                _localizationService.GetDictionaryItemById(int.Parse(move.ParentId.ToString(), CultureInfo.InvariantCulture));
-
+            var dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
             if (dictionaryItem == null)
                 return ValidationProblem("Dictionary item does not exist");
 
+            var parent = _localizationService.GetDictionaryItemById(move.ParentId);
             if (parent == null)
             {
                 dictionaryItem.ParentId = null;
