@@ -88,6 +88,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
         builder.Services.AddTransient<IRuntimeModeValidator, JITOptimizerValidator>();
         builder.Services.AddTransient<IRuntimeModeValidator, UmbracoApplicationUrlValidator>();
+        builder.Services.AddTransient<IRuntimeModeValidator, UseHttpsValidator>();
 
         // composers
         builder
