@@ -67,10 +67,10 @@ namespace Umbraco.Cms.Core.Services
                         query = Query<IMember>();
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>().Where(x => x.IsLockedOut == true);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsApproved && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>().Where(x => x.IsApproved == true);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(countType));

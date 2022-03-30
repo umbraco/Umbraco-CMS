@@ -1314,7 +1314,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(members);
 
             Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            customMember.SetValue(Constants.Conventions.Member.IsLockedOut, true);
+            customMember.IsLockedOut = true;
             MemberService.Save(customMember);
 
             int found = MemberService.GetCount(MemberCountType.LockedOut);
@@ -1331,7 +1331,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(members);
 
             Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            customMember.SetValue(Constants.Conventions.Member.IsApproved, false);
+            customMember.IsApproved = false;
             MemberService.Save(customMember);
 
             int found = MemberService.GetCount(MemberCountType.Approved);
