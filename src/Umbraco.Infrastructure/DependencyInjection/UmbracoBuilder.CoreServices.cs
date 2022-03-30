@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds all core Umbraco services required to run which may be replaced later in the pipeline
+    /// Adds all core Umbraco services required to run which may be replaced later in the pipeline.
     /// </summary>
     public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
     {
@@ -87,6 +87,7 @@ public static partial class UmbracoBuilderExtensions
         // Add runtime mode validation
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
         builder.Services.AddTransient<IRuntimeModeValidator, JITOptimizerValidator>();
+        builder.Services.AddTransient<IRuntimeModeValidator, UmbracoApplicationUrlValidator>();
 
         // composers
         builder
