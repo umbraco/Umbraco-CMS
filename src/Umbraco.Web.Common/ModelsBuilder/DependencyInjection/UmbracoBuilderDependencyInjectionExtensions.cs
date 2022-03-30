@@ -122,14 +122,7 @@ namespace Umbraco.Extensions
             // even if the community MB is in place.
             builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
             {
-                RuntimeSettings runtimeSettings = factory.GetRequiredService<IOptions<RuntimeSettings>>().Value;
                 ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-
-                if (runtimeSettings.IsProduction() && modelsBuilderSettings.ModelsMode != ModelsMode.Nothing)
-                {
-                    throw new InvalidOperationException("ModelsBuilder mode needs to be set to Nothing in production mode.");
-                }
-
                 if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
                 {
                     return factory.GetRequiredService<InMemoryModelFactory>();
@@ -139,7 +132,6 @@ namespace Umbraco.Extensions
                     return factory.CreateDefaultPublishedModelFactory();
                 }
             });
-
 
             return builder;
         }
