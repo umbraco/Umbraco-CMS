@@ -25,6 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
     public class RuntimeState : IRuntimeState
     {
         internal const string PendingPacakgeMigrationsStateKey = "PendingPackageMigrations";
+
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IOptions<UnattendedSettings> _unattendedSettings;
         private readonly IUmbracoVersion _umbracoVersion;
@@ -33,6 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly PendingPackageMigrations _packageMigrationState;
         private readonly Dictionary<string, object> _startupState = new Dictionary<string, object>();
         private readonly IConflictingRouteService _conflictingRouteService;
+        private readonly IRuntimeModeValidationService _runtimeModeValidationService;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -40,10 +42,15 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// </summary>
         public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+        /// </summary>
         private RuntimeState()
-        {
-        }
+        { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+        /// </summary>
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
             IOptions<UnattendedSettings> unattendedSettings,
@@ -51,7 +58,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
             PendingPackageMigrations packageMigrationState,
-            IConflictingRouteService conflictingRouteService)
+            IConflictingRouteService conflictingRouteService,
+            IRuntimeModeValidationService runtimeModeValidationService)
         {
             _globalSettings = globalSettings;
             _unattendedSettings = unattendedSettings;
@@ -60,10 +68,34 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _logger = logger;
             _packageMigrationState = packageMigrationState;
             _conflictingRouteService = conflictingRouteService;
+            _runtimeModeValidationService = runtimeModeValidationService;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
+        /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+        /// </summary>
+        [Obsolete("use ctor with all params")]
+        public RuntimeState(
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoDatabaseFactory databaseFactory,
+            ILogger<RuntimeState> logger,
+            PendingPackageMigrations packageMigrationState,
+            IConflictingRouteService conflictingRouteService)
+       : this(
+                globalSettings,
+                unattendedSettings,
+                umbracoVersion,
+                databaseFactory,
+                logger,
+                packageMigrationState,
+                conflictingRouteService,
+                StaticServiceProvider.Instance.GetRequiredService<IRuntimeModeValidationService>())
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeState" /> class.
         /// </summary>
         [Obsolete("use ctor with all params")]
         public RuntimeState(
@@ -81,8 +113,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 logger,
                 packageMigrationState,
                 StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
-        {
-        }
+        { }
 
         /// <inheritdoc />
         public Version Version => _umbracoVersion.Version;
@@ -121,6 +152,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 _logger.LogDebug("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
+                return;
+            }
+
+            // Validate runtime mode
+            if (_runtimeModeValidationService.Validate(out var validationErrorMessage) == false)
+            {
+                Level = RuntimeLevel.BootFailed;
+                Reason = RuntimeLevelReason.BootFailedOnException;
+                BootFailedException = new BootFailedException(validationErrorMessage);
+
                 return;
             }
 

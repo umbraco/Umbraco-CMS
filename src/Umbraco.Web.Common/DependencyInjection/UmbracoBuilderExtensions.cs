@@ -45,6 +45,7 @@ using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
@@ -56,8 +57,8 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
-using Umbraco.Cms.Web.Common.Runtime;
 using Umbraco.Cms.Web.Common.RuntimeMinification;
+using Umbraco.Cms.Web.Common.RuntimeModeValidators;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
@@ -231,11 +232,9 @@ namespace Umbraco.Extensions
 
                 mvcBuilder.AddRazorRuntimeCompilation();
             }
-            else
-            {
-                // Validate runtime mode when in production
-                builder.AddNotificationHandler<UmbracoApplicationStartingNotification, RuntimeModeProductionValidator>();
-            }
+
+            // Validate Razor compile
+            builder.Services.AddTransient<IRuntimeModeValidator, RazorCompileValidator>();
 
             mvcBuilding?.Invoke(mvcBuilder);
 

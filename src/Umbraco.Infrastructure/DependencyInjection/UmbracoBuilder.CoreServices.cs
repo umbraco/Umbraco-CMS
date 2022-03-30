@@ -45,11 +45,12 @@ using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
-using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
@@ -78,6 +79,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<PendingPackageMigrations>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
+
+            // Add runtime mode validation
+            builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
 
             // composers
             builder
