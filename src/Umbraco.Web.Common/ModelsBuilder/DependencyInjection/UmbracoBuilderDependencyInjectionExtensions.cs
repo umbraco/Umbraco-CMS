@@ -92,53 +92,45 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         builder.Services.Add(umbServices);
 
-            if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
+        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
+        {
+            builder.AddInMemoryModelsRazorEngine();
+
+            builder.Services.AddSingleton<InMemoryModelFactory>();
+
+            // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
+            // would automatically just register for all implemented INotificationHandler{T}?
+            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+
+            builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+        }
+
+        builder.Services.AddSingleton<ModelsGenerator>();
+        builder.Services.AddSingleton<OutOfDateModelsStatus>();
+        builder.Services.AddSingleton<ModelsGenerationError>();
+
+        // This is what the community MB would replace, all of the above services are fine to be registered
+        // even if the community MB is in place.
+        builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
+        {
+            ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
+            if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
             {
-                builder.AddInMemoryModelsRazorEngine();
-
-                builder.Services.AddSingleton<InMemoryModelFactory>();
-
-                // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
-                // would automatically just register for all implemented INotificationHandler{T}?
-                builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
-                builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
-                builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
-                builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
-                builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
-                builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
-                builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
-                builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-                builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-
-                builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+                return factory.GetRequiredService<InMemoryModelFactory>();
             }
-
-            builder.Services.AddSingleton<ModelsGenerator>();
-            builder.Services.AddSingleton<OutOfDateModelsStatus>();
-            builder.Services.AddSingleton<ModelsGenerationError>();
-
-            // This is what the community MB would replace, all of the above services are fine to be registered
-            // even if the community MB is in place.
-            builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
+            else
             {
-                RuntimeSettings runtimeSettings = factory.GetRequiredService<IOptions<RuntimeSettings>>().Value;
-                ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-
-                if (runtimeSettings.Mode == RuntimeMode.Production && modelsBuilderSettings.ModelsMode != ModelsMode.Nothing)
-                {
-                    throw new InvalidOperationException("ModelsBuilder mode needs to be set to Nothing in production mode.");
-                }
-
-                if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
-                {
-                    return factory.GetRequiredService<InMemoryModelFactory>();
-                }
-                else
-                {
-                    return factory.CreateDefaultPublishedModelFactory();
-                }
-            });
-
+                return factory.CreateDefaultPublishedModelFactory();
+            }
+        });
 
         return builder;
     }

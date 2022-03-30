@@ -90,6 +90,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRuntimeModeValidator, UmbracoApplicationUrlValidator>();
         builder.Services.AddTransient<IRuntimeModeValidator, UseHttpsValidator>();
         builder.Services.AddTransient<IRuntimeModeValidator, RuntimeMinificationValidator>();
+        builder.Services.AddTransient<IRuntimeModeValidator, ModelsBuilderModeValidator>();
 
         // composers
         builder
