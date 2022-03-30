@@ -83,6 +83,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // Add runtime mode validation
             builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
             builder.Services.AddTransient<IRuntimeModeValidator, JITOptimizerValidator>();
+            builder.Services.AddTransient<IRuntimeModeValidator, UmbracoApplicationUrlValidator>();
 
             // composers
             builder
