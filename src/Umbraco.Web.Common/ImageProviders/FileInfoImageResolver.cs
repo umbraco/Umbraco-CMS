@@ -12,21 +12,16 @@ namespace Umbraco.Cms.Web.Common.ImageProviders
     public class FileInfoImageResolver : IImageResolver
     {
         private readonly IFileInfo _fileInfo;
-        private readonly ImageMetadata _metadata;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileInfoImageResolver"/> class.
         /// </summary>
         /// <param name="fileInfo">The file info.</param>
-        /// <param name="metadata">The image metadata associated with this file.</param>
-        public FileInfoImageResolver(IFileInfo fileInfo, in ImageMetadata metadata)
-        {
-            _fileInfo = fileInfo;
-            _metadata = metadata;
-        }
+        public FileInfoImageResolver(IFileInfo fileInfo)
+            => _fileInfo = fileInfo;
 
         /// <inheritdoc/>
-        public Task<ImageMetadata> GetMetaDataAsync() => Task.FromResult(_metadata);
+        public Task<ImageMetadata> GetMetaDataAsync() => Task.FromResult(new ImageMetadata(_fileInfo.LastModified.UtcDateTime, _fileInfo.Length));
 
         /// <inheritdoc/>
         public Task<Stream> OpenReadAsync() => Task.FromResult(_fileInfo.CreateReadStream());

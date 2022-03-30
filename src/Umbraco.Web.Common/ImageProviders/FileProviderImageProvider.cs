@@ -54,9 +54,7 @@ namespace Umbraco.Cms.Web.Common.ImageProviders
                 return Task.FromResult<IImageResolver>(null);
             }
 
-            var metadata = new ImageMetadata(fileInfo.LastModified.UtcDateTime, fileInfo.Length);
-
-            return Task.FromResult<IImageResolver>(new FileInfoImageResolver(fileInfo, metadata));
+            return Task.FromResult<IImageResolver>(new FileInfoImageResolver(fileInfo));
         }
     }
 }
