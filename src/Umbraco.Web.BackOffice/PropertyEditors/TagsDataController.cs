@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
         /// <returns></returns>
         ///
         [AllowHttpJsonConfigration]
-        public IEnumerable<TagModel> GetTags(string tagGroup, string culture, string query = null)
+        public IEnumerable<TagModel> GetTags(string tagGroup, string? culture, string? query = null)
         {
             if (culture == string.Empty) culture = null;
 

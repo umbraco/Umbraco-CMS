@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <summary>
         /// Gets the querystring parameter name.
         /// </summary>
-        public string QueryStringName { get; }
+        public string? QueryStringName { get; }
 
         /// <summary>
         /// Gets the permission to authorize the current user against.

@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="ids">Ids of the users to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IEnumerable<IUser> GetUsersById(params int[] ids);
+        IEnumerable<IUser> GetUsersById(params int[]? ids);
 
         /// <summary>
         /// Removes a specific section from all user groups

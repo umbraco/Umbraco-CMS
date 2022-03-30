@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, SectionRequirement requirement)
         {
-            var authorized = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null &&
+            var authorized = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser != null &&
                 requirement.SectionAliases
                     .Any(app => _backOfficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
                         app, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser));

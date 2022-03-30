@@ -36,10 +36,10 @@ namespace Umbraco.Cms.Core.Editors
         /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
         /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
         /// <returns></returns>
-        public Attempt<string?> IsAuthorized(IUser currentUser,
+        public Attempt<string?> IsAuthorized(IUser? currentUser,
             IUser savingUser,
-            IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds,
-            IEnumerable<string> userGroupAliases)
+            IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds,
+            IEnumerable<string>? userGroupAliases)
         {
             var currentIsAdmin = currentUser.IsAdmin();
 

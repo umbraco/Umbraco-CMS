@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Web.Common.Security
             (currentUserId, ip) => new UserLoginSuccessNotification(ip, userId, currentUserId)
         );
 
-        public SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string userId)
+        public SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string? userId)
         {
             var notification = Notify(currentUser,
                 (currentUserId, ip) => new UserLogoutSuccessNotification(ip, userId, currentUserId)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -33,17 +34,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="currentUser"></param>
         /// <param name="groupIds"></param>
         /// <returns></returns>
-        public Attempt<string> AuthorizeGroupAccess(IUser currentUser, params int[] groupIds)
+        public Attempt<string?> AuthorizeGroupAccess(IUser? currentUser, params int[] groupIds)
         {
-            if (currentUser.IsAdmin())
-                return Attempt<string>.Succeed();
+            if (currentUser?.IsAdmin() ?? false)
+            {
+                return Attempt<string?>.Succeed();
+            }
 
             var groups = _userService.GetAllUserGroups(groupIds.ToArray());
             var groupAliases = groups.Select(x => x.Alias).ToArray();
-            var userGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
+            var userGroups = currentUser?.Groups.Select(x => x.Alias).ToArray() ?? Array.Empty<string>();
             var missingAccess = groupAliases.Except(userGroups).ToArray();
             return missingAccess.Length == 0
-                ? Attempt<string>.Succeed()
+                ? Attempt<string?>.Succeed()
                 : Attempt.Fail("User is not a member of " + string.Join(", ", missingAccess));
         }
 
@@ -53,10 +56,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="currentUser"></param>
         /// <param name="groupAliases"></param>
         /// <returns></returns>
-        public Attempt<string> AuthorizeGroupAccess(IUser currentUser, params string[] groupAliases)
+        public Attempt<string?> AuthorizeGroupAccess(IUser currentUser, params string[] groupAliases)
         {
             if (currentUser.IsAdmin())
-                return Attempt<string>.Succeed();
+                return Attempt<string?>.Succeed();
 
             var existingGroups = _userService.GetUserGroupsByAlias(groupAliases);
 
@@ -65,32 +68,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // We're dealing with new groups,
                 // so authorization should be given to any user with access to Users section
                 if (currentUser.AllowedSections.Contains(Constants.Applications.Users))
-                    return Attempt<string>.Succeed();
+                    return Attempt<string?>.Succeed();
             }
 
             var userGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
             var missingAccess = groupAliases.Except(userGroups).ToArray();
             return missingAccess.Length == 0
-                ? Attempt<string>.Succeed()
+                ? Attempt<string?>.Succeed()
                 : Attempt.Fail("User is not a member of " + string.Join(", ", missingAccess));
         }
 
         /// <summary>
         /// Authorize that the user is not adding a section to the group that they don't have access to
         /// </summary>
-        public Attempt<string> AuthorizeSectionChanges(
+        public Attempt<string?> AuthorizeSectionChanges(
             IUser currentUser,
             IEnumerable<string> existingSections,
             IEnumerable<string> proposedAllowedSections)
         {
             if (currentUser.IsAdmin())
-                return Attempt<string>.Succeed();
+                return Attempt<string?>.Succeed();
 
             var sectionsAdded = proposedAllowedSections.Except(existingSections).ToArray();
             var sectionAccessMissing = sectionsAdded.Except(currentUser.AllowedSections).ToArray();
             return sectionAccessMissing.Length > 0
                 ? Attempt.Fail("Current user doesn't have access to add these sections " + string.Join(", ", sectionAccessMissing))
-                : Attempt<string>.Succeed();
+                : Attempt<string?>.Succeed();
         }
 
         /// <summary>
@@ -102,7 +105,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="currentMediaStartId"></param>
         /// <param name="proposedMediaStartId"></param>
         /// <returns></returns>
-        public Attempt<string> AuthorizeStartNodeChanges(IUser currentUser,
+        public Attempt<string?> AuthorizeStartNodeChanges(IUser currentUser,
             int? currentContentStartId,
             int? proposedContentStartId,
             int? currentMediaStartId,
@@ -128,7 +131,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            return Attempt<string>.Succeed();
+            return Attempt<string?>.Succeed();
         }
     }
 }

@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            Attempt<int?> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            Attempt<int?> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int?>.Fail();
             return _passwordConfiguration.GetConfiguration(
                 currentUserId.Success
                     ? currentUserId.Result != userId
@@ -592,7 +592,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            var userId = result.Principal.Identity.GetUserId();
+            var userId = result.Principal.Identity?.GetUserId();
             var args = _userManager.NotifyLogoutSuccess(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
@@ -612,13 +612,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="user"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
-        private UserDetail GetUserDetail(IUser user)
+        private UserDetail? GetUserDetail(IUser? user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             var userDetail = _umbracoMapper.Map<UserDetail>(user);
-            // update the userDetail and set their remaining seconds
-            userDetail.SecondsUntilTimeout = _globalSettings.TimeOut.TotalSeconds;
+
+            if (userDetail is not null)
+            {
+                // update the userDetail and set their remaining seconds
+                userDetail.SecondsUntilTimeout = _globalSettings.TimeOut.TotalSeconds;
+            }
 
             return userDetail;
         }

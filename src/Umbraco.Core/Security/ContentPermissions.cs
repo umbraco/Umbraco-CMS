@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Security
 
         public ContentAccess CheckPermissions(
             IContent content,
-            IUser user,
+            IUser? user,
             IReadOnlyList<char> permissionsToCheck)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -70,12 +70,12 @@ namespace Umbraco.Cms.Core.Security
 
         public ContentAccess CheckPermissions(
             IUmbracoEntity entity,
-            IUser user,
+            IUser? user,
             char permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck });
 
         public ContentAccess CheckPermissions(
             IUmbracoEntity entity,
-            IUser user,
+            IUser? user,
             IReadOnlyList<char> permissionsToCheck)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns></returns>
         public ContentAccess CheckPermissions(
             int nodeId,
-            IUser user,
+            IUser? user,
             out IContent? contentItem,
             IReadOnlyList<char>? permissionsToCheck = null)
         {

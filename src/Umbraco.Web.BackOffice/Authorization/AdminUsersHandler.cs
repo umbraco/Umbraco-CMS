@@ -57,35 +57,35 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 return Task.FromResult(true);
             }
 
-            int[] userIds;
+            int[]? userIds;
             if (int.TryParse(queryString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var userId))
             {
                 userIds = new[] { userId };
             }
             else
             {
-                var ids = queryString.ToString().Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (ids.Count == 0)
+                var ids = queryString.ToString()?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (ids?.Count == 0)
                 {
                     // Must succeed this requirement since we cannot process it.
                     return Task.FromResult(true);
                 }
 
-                userIds = ids
+                userIds = ids?
                     .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
                     .Where(x => x.Success)
                     .Select(x => x.Result)
                     .ToArray();
             }
 
-            if (userIds.Length == 0)
+            if (userIds?.Length == 0)
             {
                 // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 
             IEnumerable<IUser> users = _userService.GetUsersById(userIds);
-            var isAuth = users.All(user => _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, null) != false);
+            var isAuth = users.All(user => _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, user, null, null, null) != false);
 
             return Task.FromResult(isAuth);
         }

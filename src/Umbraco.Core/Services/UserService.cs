@@ -687,9 +687,9 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IUser> GetUsersById(params int[] ids)
+        public IEnumerable<IUser> GetUsersById(params int[]? ids)
         {
-            if (ids.Length <= 0) return Enumerable.Empty<IUser>();
+            if (ids?.Length <= 0) return Enumerable.Empty<IUser>();
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

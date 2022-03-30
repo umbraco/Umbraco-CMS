@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         }
 
         public int? NodeId { get; }
-        public IMedia Media { get; }
+        public IMedia? Media { get; }
     }
 }
