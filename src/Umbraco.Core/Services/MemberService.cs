@@ -392,7 +392,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember? GetByUsername(string username)
+        public IMember? GetByUsername(string? username)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

@@ -813,7 +813,7 @@ namespace Umbraco.Cms.Core.Services
         /// than all users will be removed from this group and only these users will be added
         /// </param>
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup userGroup, int[]? userIds = null)
+        public void Save(IUserGroup? userGroup, int[]? userIds = null)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -826,7 +826,7 @@ namespace Umbraco.Cms.Core.Services
 
                 if (userIds != null)
                 {
-                    var groupUsers = userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
+                    var groupUsers = userGroup?.HasIdentity ?? false ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
                     var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
                     var groupIds = groupUsers.Select(x => x.Id).ToArray();
                     var addedUserIds = userIds.Except(groupIds);

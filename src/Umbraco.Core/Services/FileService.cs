@@ -368,7 +368,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="masterTemplate"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId)
+        public ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId)
         {
             if (name == null)
             {

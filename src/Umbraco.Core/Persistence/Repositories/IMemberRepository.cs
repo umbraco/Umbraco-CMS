@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         int[] GetMemberIds(string[] names);
 
-        IMember? GetByUsername(string username);
+        IMember? GetByUsername(string? username);
 
         /// <summary>
         /// Finds members in a given role

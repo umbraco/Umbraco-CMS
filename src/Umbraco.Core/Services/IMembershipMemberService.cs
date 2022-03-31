@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="username">Username to use for retrieval</param>
         /// <returns><see cref="IMembershipUser"/></returns>
-        T? GetByUsername(string username);
+        T? GetByUsername(string? username);
 
         /// <summary>
         /// Deletes an <see cref="IMembershipUser"/>

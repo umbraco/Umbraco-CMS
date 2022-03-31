@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Core.Services
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        void Save(IUserGroup userGroup, int[]? userIds = null);
+        void Save(IUserGroup? userGroup, int[]? userIds = null);
 
         /// <summary>
         /// Deletes a UserGroup

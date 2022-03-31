@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public bool IsMasterTemplate { get; set; }
 
-        public void SetMasterTemplate(ITemplate masterTemplate)
+        public void SetMasterTemplate(ITemplate? masterTemplate)
         {
             if (masterTemplate == null)
             {

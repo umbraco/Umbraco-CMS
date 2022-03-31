@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 ordering);
         }
 
-        public IMember? GetByUsername(string username) =>
+        public IMember? GetByUsername(string? username) =>
             _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
 
         public int[] GetMemberIds(string[] usernames)

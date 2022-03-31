@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                BackOfficeExternaLoginProviderScheme opt = await _externalAuthenticationOptions.GetAsync(authType.Name);
+                BackOfficeExternaLoginProviderScheme? opt = await _externalAuthenticationOptions.GetAsync(authType.Name);
                 if (opt == null)
                 {
                     return BadRequest($"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");

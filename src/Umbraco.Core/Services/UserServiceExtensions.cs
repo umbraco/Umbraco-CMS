@@ -32,7 +32,7 @@ namespace Umbraco.Extensions
         /// </param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup? group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             return service.GetPermissions(new[] {group}, fallbackToDefaultPermissions, nodeIds);
         }

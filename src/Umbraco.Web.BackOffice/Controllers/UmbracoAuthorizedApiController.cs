@@ -63,17 +63,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         // creates validation problem details instance.
         // borrowed from netcore: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ControllerBase.cs#L1970
-        protected ValidationProblemDetails GetValidationProblemDetails(
-            string detail = null,
-            string instance = null,
+        protected ValidationProblemDetails? GetValidationProblemDetails(
+            string? detail = null,
+            string? instance = null,
             int? statusCode = null,
-            string title = null,
-            string type = null,
-            [ActionResultObjectValue] ModelStateDictionary modelStateDictionary = null)
+            string? title = null,
+            string? type = null,
+            [ActionResultObjectValue] ModelStateDictionary? modelStateDictionary = null)
         {
             modelStateDictionary ??= ModelState;
 
-            ValidationProblemDetails validationProblem;
+            ValidationProblemDetails? validationProblem;
             if (ProblemDetailsFactory == null)
             {
                 // ProblemDetailsFactory may be null in unit testing scenarios. Improvise to make this more testable.
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         protected virtual ActionResult ValidationProblem(string errorMessage)
         {
-            ValidationProblemDetails problemDetails = GetValidationProblemDetails(errorMessage);
+            ValidationProblemDetails? problemDetails = GetValidationProblemDetails(errorMessage);
             return new ValidationErrorResult(problemDetails);
         }
 
@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="value"></param>
         /// <param name="statusCode"></param>
         /// <returns></returns>
-        protected virtual ActionResult ValidationProblem(object value, int statusCode)
+        protected virtual ActionResult ValidationProblem(object? value, int statusCode)
             => new ValidationErrorResult(value, statusCode);
 
         /// <summary>

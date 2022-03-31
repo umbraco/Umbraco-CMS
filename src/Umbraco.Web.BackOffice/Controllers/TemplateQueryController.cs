@@ -75,11 +75,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
             var queryExpression = new StringBuilder();
-            IEnumerable<IPublishedContent> contents;
+            IEnumerable<IPublishedContent>? contents;
 
             if (model == null)
             {
-                contents = _publishedContentQuery.ContentAtRoot().FirstOrDefault().Children(_variationContextAccessor);
+                contents = _publishedContentQuery.ContentAtRoot().FirstOrDefault()?.Children(_variationContextAccessor);
                 queryExpression.Append("Umbraco.ContentAtRoot().FirstOrDefault().Children()");
             }
             else
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // timing should be fairly correct, due to the fact that all the linq statements are yield returned.
             var timer = new Stopwatch();
             timer.Start();
-            var results = contents.ToList();
+            var results = contents?.ToList() ?? new List<IPublishedContent>();
             timer.Stop();
 
             return new QueryResultModel
@@ -106,12 +106,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             };
         }
 
-        private IEnumerable<IPublishedContent> PostTemplateValue(QueryModel model, StringBuilder queryExpression)
+        private IEnumerable<IPublishedContent>? PostTemplateValue(QueryModel model, StringBuilder queryExpression)
         {
             var indent = Environment.NewLine + "    ";
 
             // set the source
-            IPublishedContent sourceDocument;
+            IPublishedContent? sourceDocument;
             if (model.Source != null && model.Source.Id > 0)
             {
                 sourceDocument = _publishedContentQuery.Content(model.Source.Id);
@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // get children, optionally filtered by type
-            IEnumerable<IPublishedContent> contents;
+            IEnumerable<IPublishedContent>? contents;
             queryExpression.Append(indent);
             if (model.ContentType != null && !model.ContentType.Alias.IsNullOrWhiteSpace())
             {
@@ -145,25 +145,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 queryExpression.Append(".Children()");
             }
 
-            // apply filters
-            foreach (var condition in model.Filters.Where(x => !x.ConstraintValue.IsNullOrWhiteSpace()))
+            if (model.Filters is not null)
             {
-                //x is passed in as the parameter alias for the linq where statement clause
-                var operation = condition.BuildCondition<IPublishedContent>("x");
+                // apply filters
+                foreach (var condition in model.Filters.Where(x => !x.ConstraintValue.IsNullOrWhiteSpace()))
+                {
+                    //x is passed in as the parameter alias for the linq where statement clause
+                    var operation = condition.BuildCondition<IPublishedContent>("x");
 
                     //for review - this uses a tonized query rather then the normal linq query.
-                contents = contents.Where(operation.Compile());
-                queryExpression.Append(indent);
-                queryExpression.AppendFormat(".Where({0})", operation);
+                    contents = contents?.Where(operation.Compile());
+                    queryExpression.Append(indent);
+                    queryExpression.AppendFormat(".Where({0})", operation);
+                }
             }
 
             // always add IsVisible() to the query
-            contents = contents.Where(x => x.IsVisible(_publishedValueFallback));
+            contents = contents?.Where(x => x.IsVisible(_publishedValueFallback));
             queryExpression.Append(indent);
             queryExpression.Append(".Where(x => x.IsVisible())");
 
             // apply sort
-            if (model.Sort != null && !model.Sort.Property.Alias.IsNullOrWhiteSpace())
+            if (model.Sort != null && (!model.Sort.Property?.Alias.IsNullOrWhiteSpace() ?? false))
             {
                 contents = SortByDefaultPropertyValue(contents, model.Sort);
 
@@ -177,7 +180,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // take
             if (model.Take > 0)
             {
-                contents = contents.Take(model.Take);
+                contents = contents?.Take(model.Take);
                 queryExpression.Append(indent);
                 queryExpression.AppendFormat(".Take({0})", model.Take);
             }
@@ -199,30 +202,30 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private IEnumerable<IPublishedContent> SortByDefaultPropertyValue(IEnumerable<IPublishedContent> contents, SortExpression sortExpression)
+        private IEnumerable<IPublishedContent>? SortByDefaultPropertyValue(IEnumerable<IPublishedContent>? contents, SortExpression sortExpression)
         {
-            switch (sortExpression.Property.Alias)
+            switch (sortExpression.Property?.Alias)
             {
                 case "id":
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.Id)
-                        : contents.OrderByDescending(x => x.Id);
+                        ? contents?.OrderBy(x => x.Id)
+                        : contents?.OrderByDescending(x => x.Id);
                 case "createDate":
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.CreateDate)
-                        : contents.OrderByDescending(x => x.CreateDate);
+                        ? contents?.OrderBy(x => x.CreateDate)
+                        : contents?.OrderByDescending(x => x.CreateDate);
                 case "publishDate":
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.UpdateDate)
-                        : contents.OrderByDescending(x => x.UpdateDate);
+                        ? contents?.OrderBy(x => x.UpdateDate)
+                        : contents?.OrderByDescending(x => x.UpdateDate);
                 case "name":
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.Name)
-                        : contents.OrderByDescending(x => x.Name);
+                        ? contents?.OrderBy(x => x.Name)
+                        : contents?.OrderByDescending(x => x.Name);
                 default:
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.Name)
-                        : contents.OrderByDescending(x => x.Name);
+                        ? contents?.OrderBy(x => x.Name)
+                        : contents?.OrderByDescending(x => x.Name);
             }
         }
 
@@ -233,7 +236,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
             var contentTypes = _contentTypeService.GetAll()
-                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = _localizedTextService.Localize("template", "contentOfType", tokens: new string[] { x.Name }) })
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = _localizedTextService.Localize("template", "contentOfType", tokens: new string[] { x.Name ?? string.Empty }) })
                 .OrderBy(x => x.Name).ToList();
 
             contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = _localizedTextService.Localize("template", "allContent") });

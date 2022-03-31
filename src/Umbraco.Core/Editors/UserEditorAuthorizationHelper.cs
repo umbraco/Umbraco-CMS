@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Editors
         /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
         /// <returns></returns>
         public Attempt<string?> IsAuthorized(IUser? currentUser,
-            IUser savingUser,
+            IUser? savingUser,
             IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds,
             IEnumerable<string>? userGroupAliases)
         {

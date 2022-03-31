@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models
         public string? Name { get; set; }
 
         [DataMember(Name = "alias")]
-        public string? Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [DataMember(Name = "group")]
         public string? Group { get; set; }

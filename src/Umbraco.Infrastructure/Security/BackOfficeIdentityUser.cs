@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Security
         ///  Used to construct a new instance without an identity
         /// </summary>
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
-        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture, string? name = null)
+        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
             {

@@ -31,6 +31,6 @@ namespace Umbraco.Cms.Core.Models
         /// Set the mastertemplate
         /// </summary>
         /// <param name="masterTemplate"></param>
-        void SetMasterTemplate(ITemplate masterTemplate);
+        void SetMasterTemplate(ITemplate? masterTemplate);
     }
 }

@@ -391,7 +391,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
-            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
+            ExternalLoginInfo? info = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
 
             if (info == null)
             {
@@ -448,7 +448,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
                     if (!oauthRedirectAuthProvider.IsNullOrWhiteSpace())
                     {
-                        return ExternalLogin(oauthRedirectAuthProvider);
+                        return ExternalLogin(oauthRedirectAuthProvider!);
                     }
                 }
 
