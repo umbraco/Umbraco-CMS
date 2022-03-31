@@ -294,7 +294,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.LastLockoutDate = source.LastLockoutDate;
-            target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
+            target.LastLoginDate = source.LastLoginDate == default(DateTime) ? null : (DateTime?)source.LastLoginDate;
             target.LastPasswordChangeDate = source.LastPasswordChangeDate;
             target.Name = source.Name;
             target.Navigation = CreateUserEditorNavigation();

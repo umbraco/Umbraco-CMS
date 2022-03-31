@@ -438,7 +438,7 @@ namespace Umbraco.Cms.Core.Security
                 anythingChanged = true;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-                DateTime dt = identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;
+                DateTime? dt = identityUser.LastLoginDateUtc?.ToLocalTime();
                 user.LastLoginDate = dt;
             }
 
