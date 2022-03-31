@@ -92,6 +92,19 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
 
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.Languages}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
+
             builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 
             return builder;

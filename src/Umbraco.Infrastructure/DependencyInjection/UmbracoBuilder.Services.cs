@@ -8,17 +8,15 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -48,6 +46,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
             builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
+            builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
 
             return builder;
         }

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Routing;
@@ -34,7 +35,8 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations
                 .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
                 .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
                 .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
-                .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()));
+                .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
+                .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()));
 
             // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
             fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>));
