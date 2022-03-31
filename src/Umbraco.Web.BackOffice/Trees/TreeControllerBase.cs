@@ -275,7 +275,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="title"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection? queryStrings, string? title, string? icon)
         {
             var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
@@ -315,7 +315,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="queryStrings"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormCollection queryStrings, bool hasChildren)
+        public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormCollection? queryStrings, bool hasChildren)
         {
             var contentTypeIcon = entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, contentTypeIcon);
@@ -393,7 +393,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="icon"></param>
         /// <param name="udi"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string icon, bool hasChildren, string? routePath, Udi udi)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection? queryStrings, string? title, string icon, bool hasChildren, string? routePath, Udi udi)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;

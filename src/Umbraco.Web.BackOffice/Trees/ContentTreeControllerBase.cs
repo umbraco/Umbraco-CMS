@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public ActionResult<TreeNode?> GetTreeNode([FromRoute] string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+        public ActionResult<TreeNode?> GetTreeNode([FromRoute] string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
         {
             int asInt;
             Guid asGuid = Guid.Empty;
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return node;
         }
 
-        protected abstract TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings);
+        protected abstract TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings);
 
         /// <summary>
         /// Returns a <see cref="TreeNode"/> for the <see cref="IUmbracoEntity"/> and

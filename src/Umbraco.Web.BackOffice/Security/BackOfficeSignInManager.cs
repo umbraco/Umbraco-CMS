@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="username"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        protected override async Task<SignInResult> HandleSignIn(BackOfficeIdentityUser user, string username, SignInResult result)
+        protected override async Task<SignInResult> HandleSignIn(BackOfficeIdentityUser? user, string? username, SignInResult result)
         {
             result = await base.HandleSignIn(user, username, result);
 
@@ -138,11 +138,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             }
             else if (result.IsLockedOut)
             {
-                _userManager.NotifyAccountLocked(Context.User, user.Id);
+                _userManager.NotifyAccountLocked(Context.User, user?.Id);
             }
             else if (result.RequiresTwoFactor)
             {
-                _userManager.NotifyLoginRequiresVerification(Context.User, user.Id);
+                _userManager.NotifyLoginRequiresVerification(Context.User, user?.Id);
             }
             else if (!result.Succeeded || result.IsNotAllowed)
             {
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="loginInfo"></param>
         /// <param name="autoLinkOptions"></param>
         /// <returns></returns>
-        private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions autoLinkOptions)
+        private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions? autoLinkOptions)
         {
             // If there are no autolink options then the attempt is failed (user does not exist)
             if (autoLinkOptions == null || !autoLinkOptions.AutoLinkExternalAccount)

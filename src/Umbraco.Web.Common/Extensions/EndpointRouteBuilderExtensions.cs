@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
             Type controllerType,
             string rootSegment,
             string areaName,
-            string prefixPathSegment,
+            string? prefixPathSegment,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
             object? constraints = null)
@@ -72,7 +72,7 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             string rootSegment,
             string areaName,
-            string prefixPathSegment,
+            string? prefixPathSegment,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
             object? constraints = null)
@@ -98,14 +98,14 @@ namespace Umbraco.Extensions
         /// </summary>
         public static void MapUmbracoApiRoute(
             this IEndpointRouteBuilder endpoints,
-            Type controllerType,
+            Type? controllerType,
             string rootSegment,
-            string areaName,
+            string? areaName,
             bool isBackOffice,
             string defaultAction = "Index",
             object? constraints = null)
         {
-            string prefixPathSegment = isBackOffice
+            string? prefixPathSegment = isBackOffice
                 ? areaName.IsNullOrWhiteSpace()
                     ? $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/Api"
                     : $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"

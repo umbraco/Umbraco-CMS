@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -113,7 +114,7 @@ namespace Umbraco.Extensions
         /// <param name="identity"></param>
         /// <param name="verifiedIdentity">Verified identity wrapped in a ClaimsIdentity with BackOfficeAuthentication type</param>
         /// <returns>True if ClaimsIdentity</returns>
-        public static bool VerifyBackOfficeIdentity(this ClaimsIdentity identity, out ClaimsIdentity? verifiedIdentity)
+        public static bool VerifyBackOfficeIdentity(this ClaimsIdentity identity, [MaybeNullWhen(false)] out ClaimsIdentity verifiedIdentity)
         {
             if (identity is null)
             {

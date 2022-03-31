@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string? ContentTypeAlias { get; set; }
+        public string ContentTypeAlias { get; set; } = null!;
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }

@@ -23,11 +23,11 @@ namespace Umbraco.Cms.Core.Services
         IEnumerable<ValidationResult> ValidatePropertyValue(
             IDataEditor editor,
             IDataType dataType,
-            object postedValue,
+            object? postedValue,
             bool isRequired,
-            string validationRegExp,
-            string isRequiredMessage,
-            string validationRegExpMessage);
+            string? validationRegExp,
+            string? isRequiredMessage,
+            string? validationRegExpMessage);
 
         /// <summary>
         /// Validates a property value.

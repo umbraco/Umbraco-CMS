@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <param name="content">The content.</param>
         /// <param name="nodeId">The node Id.</param>
         /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
-        public ContentPermissionsResource(IContent content, int nodeId, IReadOnlyList<char> permissionsToCheck)
+        public ContentPermissionsResource(IContent? content, int nodeId, IReadOnlyList<char> permissionsToCheck)
         {
             Content = content;
             NodeId = nodeId;
@@ -59,6 +59,6 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <summary>
         /// Gets the content.
         /// </summary>
-        public IContent Content { get; }
+        public IContent? Content { get; }
     }
 }

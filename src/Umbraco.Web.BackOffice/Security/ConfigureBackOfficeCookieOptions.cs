@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     // Same goes for the signinmanager
                     IBackOfficeSignInManager signInManager = ctx.HttpContext.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
 
-                    ClaimsIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    ClaimsIdentity? backOfficeIdentity = ctx.Principal?.GetUmbracoIdentity();
                     if (backOfficeIdentity == null)
                     {
                         ctx.RejectPrincipal();
@@ -149,14 +149,14 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     }
 
                     // ensure the thread culture is set
-                    backOfficeIdentity.EnsureCulture();
+                    backOfficeIdentity?.EnsureCulture();
 
                     EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
                     // add or update a claim to track when the cookie expires, we use this to track time remaining
-                    backOfficeIdentity.AddOrUpdateClaim(new Claim(
+                    backOfficeIdentity?.AddOrUpdateClaim(new Claim(
                         Constants.Security.TicketExpiresClaimType,
-                        ctx.Properties.ExpiresUtc.Value.ToString("o"),
+                        ctx.Properties.ExpiresUtc!.Value.ToString("o"),
                         ClaimValueTypes.DateTime,
                         Constants.Security.BackOfficeAuthenticationType,
                         Constants.Security.BackOfficeAuthenticationType,
@@ -188,13 +188,13 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 OnSigningIn = ctx =>
                 {
                     // occurs when sign in is successful but before the ticket is written to the outbound cookie
-                    ClaimsIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    ClaimsIdentity? backOfficeIdentity = ctx.Principal?.GetUmbracoIdentity();
                     if (backOfficeIdentity != null)
                     {
                         // generate a session id and assign it
                         // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
                         Guid session = _runtimeState.Level == RuntimeLevel.Run
-                            ? _userService.CreateLoginSession(backOfficeIdentity.GetId().Value, _ipResolver.GetCurrentRequestIpAddress())
+                            ? _userService.CreateLoginSession(backOfficeIdentity.GetId()!.Value, _ipResolver.GetCurrentRequestIpAddress())
                             : Guid.NewGuid();
 
                         // add our session claim
@@ -221,7 +221,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     if (ctx.HttpContext?.User?.Identity != null)
                     {
                         var claimsIdentity = ctx.HttpContext.User.Identity as ClaimsIdentity;
-                        var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                        var sessionId = claimsIdentity?.FindFirstValue(Constants.Security.SessionIdClaimType);
                         if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out Guid guidSession))
                         {
                             _userService.ClearLoginSession(guidSession);
@@ -240,7 +240,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     };
                     foreach (var cookie in cookies)
                     {
-                        ctx.Options.CookieManager.DeleteCookie(ctx.HttpContext, cookie, new CookieOptions
+                        ctx.Options.CookieManager.DeleteCookie(ctx.HttpContext!, cookie, new CookieOptions
                         {
                             Path = "/"
                         });

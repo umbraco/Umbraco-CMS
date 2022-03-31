@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Gets an individual tree node
         /// </summary>
-        public ActionResult<TreeNode?> GetTreeNode([FromRoute]string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNode?> GetTreeNode([FromRoute]string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection? queryStrings)
         {
             ActionResult<TreeNode?> node = GetSingleTreeNode(id, queryStrings);
 
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return node;
         }
 
-        protected ActionResult<TreeNode?> GetSingleTreeNode(string id, FormCollection queryStrings)
+        protected ActionResult<TreeNode?> GetSingleTreeNode(string id, FormCollection? queryStrings)
         {
             Guid asGuid;
             if (Guid.TryParse(id, out asGuid) == false)

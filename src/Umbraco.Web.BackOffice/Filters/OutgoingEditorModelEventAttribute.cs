@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 if (context.Result == null) return;
 
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
                 if (currentUser == null) return;
 
                 if (context.Result is ObjectResult objectContent)

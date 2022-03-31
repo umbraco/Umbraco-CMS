@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Web.Common.Security
             return result;
         }
 
-        public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
+        public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
         {
             IdentityResult result = await base.ChangePasswordWithResetAsync(userId, token, newPassword);
             if (result.Succeeded)
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.Common.Security
             return result;
         }
 
-        public override async Task<IdentityResult> ChangePasswordAsync(BackOfficeIdentityUser user, string currentPassword, string newPassword)
+        public override async Task<IdentityResult> ChangePasswordAsync(BackOfficeIdentityUser user, string? currentPassword, string? newPassword)
         {
             IdentityResult result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
             if (result.Succeeded)
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Web.Common.Security
             return currentUserId;
         }
 
-        public void NotifyAccountLocked(IPrincipal? currentUser, string userId) => Notify(currentUser,
+        public void NotifyAccountLocked(IPrincipal? currentUser, string? userId) => Notify(currentUser,
             (currentUserId, ip) => new UserLockedNotification(ip, userId, currentUserId)
         );
 
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Web.Common.Security
             (currentUserId, ip) => new UserLoginFailedNotification(ip, userId, currentUserId)
         );
 
-        public void NotifyLoginRequiresVerification(IPrincipal currentUser, string userId) => Notify(currentUser,
+        public void NotifyLoginRequiresVerification(IPrincipal currentUser, string? userId) => Notify(currentUser,
             (currentUserId, ip) => new UserLoginRequiresVerificationNotification(ip, userId, currentUserId)
         );
 

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             {
                 if (context.Result == null) return;
 
-                var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
                 if (user == null) return;
 
                 var objectContent = context.Result as ObjectResult;
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                     var model = objectContent.Value as UserBasic;
                     if (model != null)
                     {
-                        model.IsCurrentUser = (int) model.Id == user.Id;
+                        model.IsCurrentUser = (int?) model.Id == user.Id;
                     }
                     else
                     {
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         {
                             foreach (var userBasic in collection)
                             {
-                                userBasic.IsCurrentUser = (int) userBasic.Id == user.Id;
+                                userBasic.IsCurrentUser = (int?) userBasic.Id == user.Id;
                             }
                         }
                         else
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             {
                                 foreach (var userBasic in paged.Items)
                                 {
-                                    userBasic.IsCurrentUser = (int)userBasic.Id == user.Id;
+                                    userBasic.IsCurrentUser = (int?)userBasic.Id == user.Id;
                                 }
                             }
                         }

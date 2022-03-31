@@ -151,7 +151,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         public async Task<IEnumerable<string>> GetCssAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateCssUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 
         /// <inheritdoc />
-        public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
+        public async Task<string> MinifyAsync(string? fileContent, AssetType assetType)
         {
             switch (assetType)
             {

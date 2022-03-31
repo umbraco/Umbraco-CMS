@@ -90,9 +90,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
 
         /// <inheritdoc />
-        protected override TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings)
+        protected override TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings)
         {
-            var culture = queryStrings["culture"].ToString();
+            var culture = queryStrings?["culture"].ToString();
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, culture))

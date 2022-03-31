@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings)
+        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings)
         {
             var node = CreateTreeNode(
                 entity,

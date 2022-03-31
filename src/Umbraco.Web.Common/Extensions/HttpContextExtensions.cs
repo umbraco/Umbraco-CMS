@@ -79,7 +79,7 @@ namespace Umbraco.Extensions
         }
 
 
-        public static void SetReasonPhrase(this HttpContext httpContext, string reasonPhrase)
+        public static void SetReasonPhrase(this HttpContext httpContext, string? reasonPhrase)
         {
             //TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
             // https://github.com/aspnet/HttpAbstractions/issues/395

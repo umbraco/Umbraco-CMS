@@ -2,7 +2,7 @@
 {
     public class NoopBackOfficeTwoFactorOptions : IBackOfficeTwoFactorOptions
     {
-        public string GetTwoFactorView(string username) => null;
+        public string? GetTwoFactorView(string username) => null;
     }
 
 }

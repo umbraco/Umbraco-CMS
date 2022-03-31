@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <returns></returns>
         ActionResult<TreeNode?> GetTreeNode(
             string id,
-            [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings
+            [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings
             );
     }
 }

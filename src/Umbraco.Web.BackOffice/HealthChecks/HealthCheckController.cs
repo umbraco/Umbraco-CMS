@@ -49,12 +49,12 @@ namespace Umbraco.Cms.Web.BackOffice.HealthChecks
         /// <returns>Returns a collection of anonymous objects representing each group.</returns>
         public object GetAllHealthChecks()
         {
-            IOrderedEnumerable<IGrouping<string, HealthCheck>> groups = _checks
+            IOrderedEnumerable<IGrouping<string?, HealthCheck>> groups = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)
                 .GroupBy(x => x.Group)
                 .OrderBy(x => x.Key);
             var healthCheckGroups = new List<HealthCheckGroup>();
-            foreach (IGrouping<string, HealthCheck> healthCheckGroup in groups)
+            foreach (IGrouping<string?, HealthCheck> healthCheckGroup in groups)
             {
                 var hcGroup = new HealthCheckGroup
                 {
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Web.BackOffice.HealthChecks
 
         private HealthCheck GetCheckById(Guid? id)
         {
-            HealthCheck check = _checks
+            HealthCheck? check = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)
                 .FirstOrDefault(x => x.Id == id);
 

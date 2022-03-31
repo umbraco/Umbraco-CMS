@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <remarks>
         /// <para>The value can be a string, a Json structure (JObject, JArray...)... corresponding to what was posted by an editor.</para>
         /// </remarks>
-        IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration);
+        IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration);
     }
 }

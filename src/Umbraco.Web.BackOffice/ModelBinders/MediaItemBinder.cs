@@ -59,12 +59,12 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
-            model.Name = model.Name.Trim();
+            model.Name = model.Name?.Trim();
 
             bindingContext.Result = ModelBindingResult.Success(model);
         }
 
-        private IMedia GetExisting(MediaItemSave model)
+        private IMedia? GetExisting(MediaItemSave model)
         {
             return _mediaService.GetById(Convert.ToInt32(model.Id));
         }

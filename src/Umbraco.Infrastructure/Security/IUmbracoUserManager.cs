@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
+        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword);
 
         /// <summary>
         /// Validates that an email confirmation token matches the specified <paramref name="user"/>.
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing true if
         /// the specified <paramref name="password" /> matches the one store for the <paramref name="user"/>,
         /// otherwise false.</returns>
-        Task<bool> CheckPasswordAsync(TUser user, string password);
+        Task<bool> CheckPasswordAsync(TUser user, string? password);
 
         /// <summary>
         /// Changes a user's password after confirming the specified <paramref name="currentPassword"/> is correct,
@@ -199,13 +199,13 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword, string newPassword);
+        Task<IdentityResult> ChangePasswordAsync(TUser user, string? currentPassword, string? newPassword);
 
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
         /// <returns>Returns true if the session is valid, otherwise false</returns>
-        Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
+        Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId);
 
         /// <summary>
         /// Creates the specified <paramref name="user"/> in the backing store with no password,

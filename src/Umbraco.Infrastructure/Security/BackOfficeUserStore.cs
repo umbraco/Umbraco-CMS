@@ -582,7 +582,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
+        public Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
         {
             if (Guid.TryParse(sessionId, out Guid guidSessionId))
             {

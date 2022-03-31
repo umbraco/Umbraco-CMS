@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int TemplateId { get; set; }
 
         [DataMember(Name = "allowedTemplates")]
-        public IDictionary<string, string>? AllowedTemplates { get; set; }
+        public IDictionary<string, string?>? AllowedTemplates { get; set; }
 
         [DataMember(Name = "documentType")]
         public ContentTypeBasic? DocumentType { get; set; }

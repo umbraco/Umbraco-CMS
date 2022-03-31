@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="userId">The user id</param>
         /// <param name="sessionId">The session id</param>
         /// <returns>True if the session is valid, else false</returns>
-        public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
+        public virtual async Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
         {
             // if this is not set, for backwards compat (which would be super rare), we'll just approve it
             // TODO: This should be removed after members supports this
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override async Task<bool> CheckPasswordAsync(TUser user, string password)
+        public override async Task<bool> CheckPasswordAsync(TUser user, string? password)
         {
             // we cannot proceed if the user passed in does not have an identity
             if (user.HasIdentity == false)
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Core.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
+        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
         {
             TUser user = await FindByIdAsync(userId);
             if (user == null)
