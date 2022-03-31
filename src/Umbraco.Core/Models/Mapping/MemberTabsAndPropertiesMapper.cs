@@ -227,7 +227,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 new()
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved",
-                    Label = Constants.Conventions.Member.IsApprovedLabel, // TODO: Use localized text?
+                    Label = _localizedTextService.Localize("user", "stateApproved"),
                     Value = member.IsApproved,
                     View = "boolean",
                     IsSensitive = true,
