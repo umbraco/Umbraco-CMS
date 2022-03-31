@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Trees
         /// <param name="parentId">The parent id for the current node</param>
         /// <param name="getChildNodesUrl"></param>
         /// <param name="menuUrl"></param>
-        public TreeNode(string nodeId, string? parentId, string getChildNodesUrl, string menuUrl)
+        public TreeNode(string nodeId, string? parentId, string? getChildNodesUrl, string? menuUrl)
         {
             if (nodeId == null) throw new ArgumentNullException(nameof(nodeId));
             if (string.IsNullOrWhiteSpace(nodeId)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(nodeId));
@@ -65,13 +65,13 @@ namespace Umbraco.Cms.Core.Trees
         /// The JSON URL to load the nodes children
         /// </summary>
         [DataMember(Name = "childNodesUrl")]
-        public string ChildNodesUrl { get; set; }
+        public string? ChildNodesUrl { get; set; }
 
         /// <summary>
         /// The JSON URL to load the menu from
         /// </summary>
         [DataMember(Name = "menuUrl")]
-        public string MenuUrl { get; set; }
+        public string? MenuUrl { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path

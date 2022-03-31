@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets documents.
         /// </summary>
-        IEnumerable<IContent>? GetByIds(IEnumerable<int> ids);
+        IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
 
         /// <summary>
         /// Gets documents.
@@ -250,7 +250,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, ContentScheduleCollection? contentSchedule = null);
+        OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
 
         /// <summary>
         /// Saves documents.
@@ -460,7 +460,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document and raises the "sent to publication" events.
         /// </summary>
-        bool SendToPublication(IContent content, int userId = Constants.Security.SuperUserId);
+        bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Publishes and unpublishes scheduled documents.

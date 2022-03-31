@@ -116,12 +116,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 foreach (var t in allTrees)
                 {
                     var nodeResult = await TryGetRootNode(t, queryStrings);
-                    if (!(nodeResult.Result is null))
+                    if (!(nodeResult?.Result is null))
                     {
                         return nodeResult.Result;
                     }
 
-                    var node = nodeResult.Value;
+                    var node = nodeResult?.Value;
                     if (node != null)
                     {
                         nodes.Add(node);
@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// loading multiple trees we will just return null so that it's not added
         /// to the list</para>
         /// </remarks>
-        private async Task<ActionResult<TreeNode>> TryGetRootNode(Tree tree, FormCollection querystring)
+        private async Task<ActionResult<TreeNode?>?> TryGetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null)
             {
@@ -210,24 +210,24 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             var childrenResult = await GetChildren(tree, id, querystring);
-            if (!(childrenResult.Result is null))
+            if (!(childrenResult?.Result is null))
             {
                 return new ActionResult<TreeRootNode>(childrenResult.Result);
             }
 
-            var children = childrenResult.Value;
+            var children = childrenResult?.Value;
             var rootNodeResult = await GetRootNode(tree, querystring);
-            if (!(rootNodeResult.Result is null))
+            if (!(rootNodeResult?.Result is null))
             {
                 return rootNodeResult.Result;
             }
 
-            var rootNode = rootNodeResult.Value;
+            var rootNode = rootNodeResult?.Value;
 
 
             var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
                 Constants.System.RootString,
-                rootNode.ChildNodesUrl,
+                rootNode!.ChildNodesUrl,
                 rootNode.MenuUrl,
                 rootNode.Name,
                 children,
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Gets the root node of a tree.
         /// </summary>
-        private async Task<ActionResult<TreeNode>> GetRootNode(Tree tree, FormCollection querystring)
+        private async Task<ActionResult<TreeNode?>?> GetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null)
             {
@@ -259,23 +259,27 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var result = await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
 
             // return null if the user isn't authorized to view that tree
-            if (!((ForbidResult)result.Result is null))
+            if (!((ForbidResult?)result.Result is null))
             {
                 return null;
             }
 
-            var controller = (TreeControllerBase)result.Value;
-            var rootNodeResult = await controller.GetRootNode(querystring);
-            if (!(rootNodeResult.Result is null))
+            var controller = (TreeControllerBase?)result.Value;
+            TreeNode? rootNode = null;
+            if (controller is not null)
             {
-                return rootNodeResult.Result;
-            }
+                var rootNodeResult = await controller.GetRootNode(querystring);
+                if (!(rootNodeResult.Result is null))
+                {
+                    return rootNodeResult.Result;
+                }
 
-            var rootNode = rootNodeResult.Value;
+                 rootNode = rootNodeResult.Value;
 
-            if (rootNode == null)
-            {
-                throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
+                if (rootNode == null)
+                {
+                    throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
+                }
             }
 
             return rootNode;
@@ -284,7 +288,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Get the child nodes of a tree node.
         /// </summary>
-        private async Task<ActionResult<TreeNodeCollection>> GetChildren(Tree tree, int id, FormCollection querystring)
+        private async Task<ActionResult<TreeNodeCollection?>?> GetChildren(Tree tree, int id, FormCollection querystring)
         {
             if (tree == null)
             {
@@ -294,18 +298,18 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             // the method we proxy has an 'id' parameter which is *not* in the querystring,
             // we need to add it for the proxy to work (else, it does not find the method,
             // when trying to run auth filters etc).
-            var d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            var d = querystring.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
             d["id"] = StringValues.Empty;
             var proxyQuerystring = new FormCollection(d);
 
             var controllerResult = await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
             if (!(controllerResult.Result is null))
             {
-                return new ActionResult<TreeNodeCollection>(controllerResult.Result);
+                return new ActionResult<TreeNodeCollection?>(controllerResult.Result);
             }
 
-            var controller = (TreeControllerBase)controllerResult.Value;
-            return await controller.GetNodes(id.ToInvariantString(), querystring);
+            var controller = (TreeControllerBase?)controllerResult.Value;
+            return controller is not null ? await controller.GetNodes(id.ToInvariantString(), querystring) : null;
         }
 
         /// <summary>

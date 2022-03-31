@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <param name="groups"></param>
         /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
         /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-        public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[]? groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
 

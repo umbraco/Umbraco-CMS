@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// <param name="pageIndex"></param>
         /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
-        public IEnumerable<SearchResultEntity>? ExamineSearch(
+        public IEnumerable<SearchResultEntity> ExamineSearch(
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
@@ -145,8 +145,8 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultEntity>? MediaFromSearchResults(IEnumerable<ISearchResult> results)
-            => _mapper.Map<IEnumerable<SearchResultEntity>>(results);
+        private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
+            => _mapper.Map<IEnumerable<SearchResultEntity>>(results) ?? Enumerable.Empty<SearchResultEntity>();
 
         /// <summary>
         /// Returns a collection of entities for content based on search results

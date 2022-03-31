@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// to the back end to be used in the query for model data.
         /// </remarks>
         [Obsolete("See GetTreeNodesAsync")]
-        protected abstract ActionResult<TreeNodeCollection> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
+        protected abstract ActionResult<TreeNodeCollection?> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// Returns the menu structure for the node
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         [Obsolete("See GetMenuForNodeAsync")]
-        protected abstract ActionResult<MenuItemCollection> GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
+        protected abstract ActionResult<MenuItemCollection>? GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// The method called to render the contents of the tree structure
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected virtual async Task<ActionResult<TreeNodeCollection>> GetTreeNodesAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+        protected virtual async Task<ActionResult<TreeNodeCollection?>> GetTreeNodesAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
         {
             return GetTreeNodes(id, queryStrings);
         }
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <remarks>
         /// If overriden, GetMenuForNode will not be called
         /// </remarks>
-        protected virtual async Task<ActionResult<MenuItemCollection>> GetMenuForNodeAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+        protected virtual async Task<ActionResult<MenuItemCollection>?> GetMenuForNodeAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
         {
             return GetMenuForNode(id, queryStrings);
         }
@@ -93,16 +93,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// The name to display on the root node
         /// </summary>
-        public abstract string RootNodeDisplayName { get; }
+        public abstract string? RootNodeDisplayName { get; }
 
         /// <inheritdoc />
-        public abstract string TreeGroup { get; }
+        public abstract string? TreeGroup { get; }
 
         /// <inheritdoc />
         public abstract string TreeAlias { get; }
 
         /// <inheritdoc />
-        public abstract string TreeTitle { get; }
+        public abstract string? TreeTitle { get; }
 
         /// <inheritdoc />
         public abstract TreeUse TreeUse { get; }
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public async Task<ActionResult<TreeNode>> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<TreeNode?>> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodeResult = CreateRootNode(queryStrings);
@@ -132,20 +132,22 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var node = nodeResult.Value;
 
-            //add the tree alias to the root
-            node.AdditionalData["treeAlias"] = TreeAlias;
+            if (node is not null)
+            {
+                // Add the tree alias to the root
+                node.AdditionalData["treeAlias"] = TreeAlias;
+                AddQueryStringsToAdditionalData(node, queryStrings);
 
-            AddQueryStringsToAdditionalData(node, queryStrings);
+                // Check if the tree is searchable and add that to the meta data as well
+                if (this is ISearchableTree)
+                    node.AdditionalData.Add("searchable", "true");
 
-            //check if the tree is searchable and add that to the meta data as well
-            if (this is ISearchableTree)
-                node.AdditionalData.Add("searchable", "true");
+                // Now update all data based on some of the query strings, like if we are running in dialog mode
+                if (IsDialog(queryStrings))
+                    node.RoutePath = "#";
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode
-            if (IsDialog(queryStrings))
-                node.RoutePath = "#";
-
-            await _eventAggregator.PublishAsync(new RootNodeRenderingNotification(node, queryStrings, TreeAlias));
+                await _eventAggregator.PublishAsync(new RootNodeRenderingNotification(node, queryStrings, TreeAlias));
+            }
 
             return node;
         }
@@ -162,7 +164,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        public async Task<ActionResult<TreeNodeCollection>> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<TreeNodeCollection?>> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodesResult = await GetTreeNodesAsync(id, queryStrings);
@@ -174,16 +176,25 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var nodes = nodesResult.Value;
 
-            foreach (var node in nodes)
-                AddQueryStringsToAdditionalData(node, queryStrings);
-
-            //now update all data based on some of the query strings, like if we are running in dialog mode
-            if (IsDialog(queryStrings))
+            if (nodes is not null)
+            {
                 foreach (var node in nodes)
-                    node.RoutePath = "#";
+                {
+                    AddQueryStringsToAdditionalData(node, queryStrings);
+                }
 
-            //raise the event
-            await _eventAggregator.PublishAsync(new TreeNodesRenderingNotification(nodes, queryStrings, TreeAlias, id));
+                // Now update all data based on some of the query strings, like if we are running in dialog mode
+                if (IsDialog(queryStrings))
+                {
+                    foreach (var node in nodes)
+                    {
+                        node.RoutePath = "#";
+                    }
+                }
+
+                // Raise the event
+                await _eventAggregator.PublishAsync(new TreeNodesRenderingNotification(nodes, queryStrings, TreeAlias, id));
+            }
 
             return nodes;
         }
@@ -194,18 +205,23 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public async Task<ActionResult<MenuItemCollection>> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<MenuItemCollection?>> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var menuResult = await GetMenuForNodeAsync(id, queryStrings);
-            if (!(menuResult.Result is null))
+            if (!(menuResult?.Result is null))
             {
                 return menuResult.Result;
             }
 
-            var menu = menuResult.Value;
-            //raise the event
-            await _eventAggregator.PublishAsync(new MenuRenderingNotification(id, menu, queryStrings, TreeAlias));
+            var menu = menuResult?.Value;
+
+            if (menu is not null)
+            {
+                //raise the event
+                await _eventAggregator.PublishAsync(new MenuRenderingNotification(id, menu, queryStrings, TreeAlias));
+            }
+
             return menu;
         }
 
@@ -213,7 +229,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected virtual ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected virtual ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootNodeAsString = Constants.System.RootString;
             queryStrings.TryGetValue(TreeQueryStringParameters.Application, out var currApp);
@@ -259,7 +275,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="title"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon)
         {
             var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
@@ -339,7 +355,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="icon"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, bool hasChildren)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon, bool hasChildren)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
@@ -357,7 +373,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="hasChildren"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, bool hasChildren, string routePath)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon, bool hasChildren, string routePath)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
@@ -377,7 +393,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="icon"></param>
         /// <param name="udi"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, bool hasChildren, string routePath, Udi udi)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string icon, bool hasChildren, string? routePath, Udi udi)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;

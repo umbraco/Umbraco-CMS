@@ -41,9 +41,9 @@ namespace Umbraco.Extensions
         /// The cookie value can either be a simple string value
         /// </para>
         /// </remarks>
-        public static bool FromBase64CookieData<T>(this ViewDataDictionary viewData, HttpContext httpContext, string cookieName, IJsonSerializer serializer)
+        public static bool FromBase64CookieData<T>(this ViewDataDictionary viewData, HttpContext? httpContext, string cookieName, IJsonSerializer serializer)
         {
-            var hasCookie = httpContext.Request.Cookies.ContainsKey(cookieName);
+            var hasCookie = httpContext?.Request.Cookies.ContainsKey(cookieName) ?? false;
             if (!hasCookie) return false;
 
             // get the cookie value

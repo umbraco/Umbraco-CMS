@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="savingCultures"></param>
         /// <param name="defaultCulture"></param>
         /// <returns></returns>
-        public static string? GetCultureForInvariantErrors(IContent content, string[] savingCultures, string defaultCulture)
+        public static string? GetCultureForInvariantErrors(IContent? content, string[] savingCultures, string? defaultCulture)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (savingCultures == null) throw new ArgumentNullException(nameof(savingCultures));

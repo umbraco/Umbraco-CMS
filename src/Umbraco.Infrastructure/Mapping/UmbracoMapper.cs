@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        public TTarget? Map<TTarget>(object source)
+        public TTarget? Map<TTarget>(object? source)
             => Map<TTarget>(source, new MapperContext(this));
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>The target object.</returns>
-        public TTarget? Map<TTarget>(object source, Action<MapperContext> f)
+        public TTarget? Map<TTarget>(object? source, Action<MapperContext> f)
         {
             var context = new MapperContext(this);
             f(context);

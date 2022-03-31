@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// This will return the default permissions for the user's groups for node ids that don't have explicitly defined permissions
         /// </remarks>
-        EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUser? user, params int[] nodeIds);
 
         /// <summary>
         /// Get explicitly assigned permissions for groups and optional node Ids
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
-        EntityPermissionSet GetPermissionsForPath(IUser user, string? path);
+        EntityPermissionSet GetPermissionsForPath(IUser? user, string? path);
 
         /// <summary>
         /// Gets the permissions for the provided groups and path

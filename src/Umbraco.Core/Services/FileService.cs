@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IStylesheet? GetStylesheet(string path)
+        public IStylesheet? GetStylesheet(string? path)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -74,8 +74,13 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId)
+        public void SaveStylesheet(IStylesheet? stylesheet, int? userId = null)
         {
+            if (stylesheet is null)
+            {
+                return;
+            }
+
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
@@ -86,17 +91,17 @@ namespace Umbraco.Cms.Core.Services
                     return;
                 }
 
-
+                userId ??= Constants.Security.SuperUserId;
                 _stylesheetRepository.Save(stylesheet);
                 scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
-                Audit(AuditType.Save, userId, -1, "Stylesheet");
+                Audit(AuditType.Save, userId.Value, -1, "Stylesheet");
 
                 scope.Complete();
             }
         }
 
         /// <inheritdoc />
-        public void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId)
+        public void DeleteStylesheet(string path, int? userId)
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
@@ -115,10 +120,11 @@ namespace Umbraco.Cms.Core.Services
                     return; // causes rollback
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 _stylesheetRepository.Delete(stylesheet);
 
                 scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
-                Audit(AuditType.Delete, userId, -1, "Stylesheet");
+                Audit(AuditType.Delete, userId.Value, -1, "Stylesheet");
 
                 scope.Complete();
             }
@@ -186,7 +192,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IScript? GetScript(string name)
+        public IScript? GetScript(string? name)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -195,8 +201,13 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public void SaveScript(IScript script, int userId = Constants.Security.SuperUserId)
+        public void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId)
         {
+            if (script is null)
+            {
+                return;
+            }
+
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
@@ -210,13 +221,13 @@ namespace Umbraco.Cms.Core.Services
                 _scriptRepository.Save(script);
                 scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
 
-                Audit(AuditType.Save, userId, -1, "Script");
+                Audit(AuditType.Save, userId.Value, -1, "Script");
                 scope.Complete();
             }
         }
 
         /// <inheritdoc />
-        public void DeleteScript(string path, int userId = Constants.Security.SuperUserId)
+        public void DeleteScript(string path, int? userId = null)
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
@@ -235,10 +246,11 @@ namespace Umbraco.Cms.Core.Services
                     return;
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 _scriptRepository.Delete(script);
                 scope.Notifications.Publish(new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
 
-                Audit(AuditType.Delete, userId, -1, "Script");
+                Audit(AuditType.Delete, userId.Value, -1, "Script");
                 scope.Complete();
             }
         }
@@ -622,7 +634,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Partial Views
 
-        public IEnumerable<string?> GetPartialViewSnippetNames(params string[] filterNames)
+        public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {
             var snippetPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/");
             var files = Directory.GetFiles(snippetPath, "*.cshtml")
@@ -635,7 +647,7 @@ namespace Umbraco.Cms.Core.Services
                 .OrderBy(x => x?.Length)
                 .ToArray();
 
-            return empty.Union(files.Except(empty));
+            return empty.Union(files.Except(empty)).WhereNotNull();
         }
 
         public void DeletePartialViewFolder(string folderPath)
@@ -680,13 +692,13 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
             CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
 
-        public Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
             CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
 
-        private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string? snippetName = null, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string? snippetName = null, int? userId = Constants.Security.SuperUserId)
         {
             string partialViewHeader;
             switch (partialViewType)
@@ -735,7 +747,7 @@ namespace Umbraco.Cms.Core.Services
                 if (scope.Notifications.PublishCancelable(creatingNotification))
                 {
                     scope.Complete();
-                    return Attempt<IPartialView>.Fail();
+                    return Attempt<IPartialView?>.Fail();
                 }
 
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
@@ -748,24 +760,25 @@ namespace Umbraco.Cms.Core.Services
 
                 scope.Notifications.Publish(new PartialViewCreatedNotification(partialView, eventMessages).WithStateFrom(creatingNotification));
 
-                Audit(AuditType.Save, userId, -1, partialViewType.ToString());
+                Audit(AuditType.Save, userId!.Value, -1, partialViewType.ToString());
 
                 scope.Complete();
             }
 
-            return Attempt<IPartialView>.Succeed(partialView);
+            return Attempt<IPartialView?>.Succeed(partialView);
         }
 
-        public bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId) =>
+        public bool DeletePartialView(string path, int? userId = null) =>
             DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
 
-        public bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId) =>
+        public bool DeletePartialViewMacro(string path, int? userId = null) =>
             DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
 
-        private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int? userId = null)
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
+
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
                 IPartialView? partialView = repository.Get(path);
                 if (partialView == null)
@@ -782,9 +795,10 @@ namespace Umbraco.Cms.Core.Services
                     return false;
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 repository.Delete(partialView);
                 scope.Notifications.Publish(new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
-                Audit(AuditType.Delete, userId, -1, partialViewType.ToString());
+                Audit(AuditType.Delete, userId.Value, -1, partialViewType.ToString());
 
                 scope.Complete();
             }
@@ -792,13 +806,13 @@ namespace Umbraco.Cms.Core.Services
             return true;
         }
 
-        public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
             SavePartialView(partialView, PartialViewType.PartialView, userId);
 
-        public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null) =>
             SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
-        private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
@@ -810,10 +824,11 @@ namespace Umbraco.Cms.Core.Services
                     return Attempt<IPartialView?>.Fail();
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
                 repository.Save(partialView);
 
-                Audit(AuditType.Save, userId, -1, partialViewType.ToString());
+                Audit(AuditType.Save, userId.Value, -1, partialViewType.ToString());
                 scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
 
                 scope.Complete();

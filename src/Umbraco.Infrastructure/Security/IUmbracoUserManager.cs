@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the user matching the specified <paramref name="userId"/> if it exists.
         /// </returns>
-        Task<TUser> FindByIdAsync(string userId);
+        Task<TUser> FindByIdAsync(string? userId);
 
         /// <summary>
         /// Generates a password reset token for the specified <paramref name="user"/>, using
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ConfirmEmailAsync(TUser user, string token);
+        Task<IdentityResult> ConfirmEmailAsync(TUser user, string? token);
 
         /// <summary>
         /// Gets the user, if any, associated with the normalized value of the specified email address.
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ResetPasswordAsync(TUser user, string token, string newPassword);
+        Task<IdentityResult> ResetPasswordAsync(TUser user, string? token, string? newPassword);
 
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
-        
+
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="loginProvider">The login provide whose information should be removed.</param>
         /// <param name="providerKey">The key given by the external login provider for the specified user.</param>
         /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the Microsoft.AspNetCore.Identity.IdentityResult of the operation.</returns>
-        Task<IdentityResult> RemoveLoginAsync(TUser user, string loginProvider, string providerKey);
+        Task<IdentityResult> RemoveLoginAsync(TUser user, string? loginProvider, string? providerKey);
 
         /// <summary>
         /// Resets the access failed count for the user

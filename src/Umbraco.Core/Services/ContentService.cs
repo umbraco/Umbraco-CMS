@@ -951,7 +951,7 @@ namespace Umbraco.Cms.Core.Services
         #region Save, Publish, Unpublish
 
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId,
+        public OperationResult Save(IContent content, int? userId = null,
             ContentScheduleCollection? contentSchedule = null)
         {
             PublishedState publishedState = content.PublishedState;
@@ -979,13 +979,14 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 scope.WriteLock(Constants.Locks.ContentTree);
+                userId ??= Constants.Security.SuperUserId;
 
                 if (content.HasIdentity == false)
                 {
-                    content.CreatorId = userId;
+                    content.CreatorId = userId.Value;
                 }
 
-                content.WriterId = userId;
+                content.WriterId = userId.Value;
 
                 //track the cultures that have changed
                 List<string>? culturesChanging = content.ContentType.VariesByCulture()
@@ -1021,12 +1022,12 @@ namespace Umbraco.Cms.Core.Services
                     if (languages is not null)
                     {
                         var langs = string.Join(", ", languages);
-                        Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+                        Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
                     }
                 }
                 else
                 {
-                    Audit(AuditType.Save, userId, content.Id);
+                    Audit(AuditType.Save, userId.Value, content.Id);
                 }
 
                 scope.Complete();
@@ -2752,8 +2753,12 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="content">The <see cref="IContent" /> to send to publication</param>
         /// <param name="userId">Optional Id of the User issuing the send to publication</param>
         /// <returns>True if sending publication was successful otherwise false</returns>
-        public bool SendToPublication(IContent content, int userId = Constants.Security.SuperUserId)
+        public bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId)
         {
+            if (content is null)
+            {
+                return false;
+            }
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using (IScope scope = ScopeProvider.CreateScope())

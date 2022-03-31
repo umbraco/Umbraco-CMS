@@ -915,11 +915,11 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="user">User to retrieve permissions for</param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IUser? user, params int[] nodeIds)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, nodeIds);
+                return _userGroupRepository.GetPermissions(user?.Groups.ToArray(), true, nodeIds);
             }
         }
 
@@ -964,7 +964,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
-        public EntityPermissionSet GetPermissionsForPath(IUser user, string? path)
+        public EntityPermissionSet GetPermissionsForPath(IUser? user, string? path)
         {
             var nodeIds = path?.GetIdsFromPathReversed();
 

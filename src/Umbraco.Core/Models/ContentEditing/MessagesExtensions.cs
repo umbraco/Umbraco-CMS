@@ -29,7 +29,7 @@ namespace Umbraco.Extensions
             });
         }
 
-        public static void AddErrorNotification(this INotificationModel model, string header, string msg)
+        public static void AddErrorNotification(this INotificationModel model, string? header, string msg)
         {
             if (model.Exists(header, msg, NotificationStyle.Error)) return;
 
@@ -65,6 +65,6 @@ namespace Umbraco.Extensions
             });
         }
 
-        private static bool Exists(this INotificationModel model, string header, string message, NotificationStyle notificationType) => model.Notifications?.Any(x => (x.Header?.InvariantEquals(header) ?? false) && (x.Message?.InvariantEquals(message) ?? false) && x.NotificationType == notificationType) ?? false;
+        private static bool Exists(this INotificationModel model, string? header, string message, NotificationStyle notificationType) => model.Notifications?.Any(x => (x.Header?.InvariantEquals(header) ?? false) && (x.Message?.InvariantEquals(message) ?? false) && x.NotificationType == notificationType) ?? false;
     }
 }

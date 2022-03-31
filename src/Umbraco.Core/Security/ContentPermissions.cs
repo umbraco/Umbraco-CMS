@@ -243,18 +243,18 @@ namespace Umbraco.Cms.Core.Security
             return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x.ToString(CultureInfo.InvariantCulture), ",")));
         }
 
-        public static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
+        public static bool IsInBranchOfStartNode(string path, int[]? startNodeIds, string[]? startNodePaths, out bool hasPathAccess)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             hasPathAccess = false;
 
             // check for no access
-            if (startNodeIds.Length == 0)
+            if (startNodeIds?.Length == 0)
                 return false;
 
             // check for root access
-            if (startNodeIds.Contains(Constants.System.Root))
+            if (startNodeIds?.Contains(Constants.System.Root) ?? false)
             {
                 hasPathAccess = true;
                 return true;

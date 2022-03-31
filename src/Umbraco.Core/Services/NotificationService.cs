@@ -167,8 +167,13 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// Notifications are inherited from the parent so any child node will also have notifications assigned based on it's parent (ancestors)
         /// </remarks>
-        public IEnumerable<Notification>? GetUserNotifications(IUser user, string path)
+        public IEnumerable<Notification>? GetUserNotifications(IUser? user, string path)
         {
+            if (user is null)
+            {
+                return null;
+            }
+
             var userNotifications = GetUserNotifications(user);
             return FilterUserNotificationsByPath(userNotifications, path);
         }
@@ -246,8 +251,13 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// This performs a full replace
         /// </remarks>
-        public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
+        public IEnumerable<Notification>? SetNotifications(IUser? user, IEntity entity, string[] actions)
         {
+            if (user is null)
+            {
+                return null;
+            }
+
             using (var scope = _uowProvider.CreateScope())
             {
                 var notifications = _notificationsRepository.SetNotifications(user, entity, actions);

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Mapping
     public class MapperContext
     {
         private readonly IUmbracoMapper _mapper;
-        private IDictionary<string, object>? _items;
+        private IDictionary<string, object?>? _items;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MapperContext"/> class.
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <summary>
         /// Gets the context items.
         /// </summary>
-        public IDictionary<string, object> Items => _items ?? (_items = new Dictionary<string, object>());
+        public IDictionary<string, object?> Items => _items ?? (_items = new Dictionary<string, object?>());
 
         #region Map
 

@@ -297,7 +297,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem> GetAll(IEnumerable<Guid> ids)
+        public IEnumerable<TItem> GetAll(IEnumerable<Guid>? ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

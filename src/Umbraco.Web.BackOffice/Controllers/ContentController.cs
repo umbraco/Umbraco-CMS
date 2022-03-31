@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILogger<ContentController> _logger;
         private readonly IScopeProvider _scopeProvider;
 
-        public object Domains { get; private set; }
+        public object? Domains { get; private set; }
 
         public ContentController(
             ICultureDictionary cultureDictionary,
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to update
         /// </remarks>
-        public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions>>> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
+        public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions?>?>> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
         {
             if (saveModel.ContentId <= 0) return NotFound();
 
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             foreach (var userGroup in allUserGroups)
             {
                 //check if there's a permission set posted up for this user group
-                IEnumerable<string> groupPermissions;
+                IEnumerable<string>? groupPermissions;
                 if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
                 {
                     if (groupPermissions is null)
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to view
         /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
-        public ActionResult<IEnumerable<AssignedUserGroupPermissions>> GetDetailedPermissions(int contentId)
+        public ActionResult<IEnumerable<AssignedUserGroupPermissions?>?> GetDetailedPermissions(int contentId)
         {
             if (contentId <= 0) return NotFound();
             var content = _contentService.GetById(contentId);
@@ -209,14 +209,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return GetDetailedPermissions(content, allUserGroups);
         }
 
-        private ActionResult<IEnumerable<AssignedUserGroupPermissions>> GetDetailedPermissions(IContent content, IEnumerable<IUserGroup> allUserGroups)
+        private ActionResult<IEnumerable<AssignedUserGroupPermissions?>?> GetDetailedPermissions(IContent content, IEnumerable<IUserGroup> allUserGroups)
         {
             //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
             //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
 
             var defaultPermissionsByGroup = _umbracoMapper.MapEnumerable<IUserGroup, AssignedUserGroupPermissions>(allUserGroups);
 
-            var defaultPermissionsAsDictionary = defaultPermissionsByGroup
+            var defaultPermissionsAsDictionary = defaultPermissionsByGroup.WhereNotNull()
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
 
             //get the actual assigned permissions
@@ -288,12 +288,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return content;
         }
 
-        private static void SetupBlueprint(ContentItemDisplay content, IContent persistedContent)
+        private static void SetupBlueprint(ContentItemDisplay content, IContent? persistedContent)
         {
             content.AllowPreview = false;
 
             //set a custom path since the tree that renders this has the content type id as the parent
-            content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
+            content.Path = string.Format("-1,{0},{1}", persistedContent?.ContentTypeId, content.Id);
 
             content.AllowedActions = new[] { "A" };
             content.IsBlueprint = true;
@@ -390,7 +390,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             // It's important to do this operation within a scope to reduce the amount of readlock queries.
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
-            var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => _contentTypeService.Get(alias));
+            var contentTypes = contentTypesByAliases.ContentTypeAliases?.Select(alias => _contentTypeService.Get(alias)).WhereNotNull();
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
         }
 
@@ -419,7 +419,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private ContentItemDisplay GetEmptyInner(IContentType contentType, int parentId)
         {
-            var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
+            var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
             var mapped = MapToDisplay(emptyContent);
 
             return CleanContentItemDisplay(mapped);
@@ -446,13 +446,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="contentTypes"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        private IEnumerable<ContentItemDisplay> GetEmpties(IEnumerable<IContentType> contentTypes, int parentId)
+        private IEnumerable<ContentItemDisplay> GetEmpties(IEnumerable<IContentType>? contentTypes, int parentId)
         {
             var result = new List<ContentItemDisplay>();
             var backOfficeSecurity = _backofficeSecurityAccessor.BackOfficeSecurity;
 
-            var userId = backOfficeSecurity.GetUserId().Result ?? 0;
-            var currentUser = backOfficeSecurity.CurrentUser;
+            var userId = backOfficeSecurity?.GetUserId().Result ?? -1;
+            var currentUser = backOfficeSecurity?.CurrentUser;
             // We know that if the ID is less than 0 the parent is null.
             // Since this is called with parent ID it's safe to assume that the parent is the same for all the content types.
             var parent = parentId > 0 ? _contentService.GetById(parentId) : null;
@@ -463,26 +463,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 [path] = _userService.GetPermissionsForPath(currentUser, path)
             };
 
-            foreach (var contentType in contentTypes)
+            if (contentTypes is not null)
             {
-                var emptyContent = _contentService.Create("", parentId, contentType, userId);
-
-                var mapped = MapToDisplay(emptyContent, context =>
+                foreach (var contentType in contentTypes)
                 {
-                    // Since the permissions depend on current user and path, we add both of these to context as well,
-                    // that way we can compare the path and current user when mapping, if they're the same just take permissions
-                    // and skip getting them again, in theory they should always be the same, but better safe than sorry.,
-                    context.Items["Parent"] = parent;
-                    context.Items["CurrentUser"] = currentUser;
-                    context.Items["Permissions"] = permissions;
-                });
-                result.Add(CleanContentItemDisplay(mapped));
+                    var emptyContent = _contentService.Create("", parentId, contentType, userId);
+
+                    var mapped = MapToDisplay(emptyContent, context =>
+                    {
+                        // Since the permissions depend on current user and path, we add both of these to context as well,
+                        // that way we can compare the path and current user when mapping, if they're the same just take permissions
+                        // and skip getting them again, in theory they should always be the same, but better safe than sorry.,
+                        context.Items["Parent"] = parent;
+                        context.Items["CurrentUser"] = currentUser;
+                        context.Items["Permissions"] = permissions;
+                    });
+                    if (mapped is not null)
+                    {
+                        result.Add(CleanContentItemDisplay(mapped));
+                    }
+                }
             }
 
             return result;
         }
 
-        private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(Guid[] contentTypeKeys, int parentId)
+        private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(Guid[]? contentTypeKeys, int parentId)
         {
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
@@ -516,7 +522,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [OutgoingEditorModelEvent]
-        public ActionResult<ContentItemDisplay> GetEmptyBlueprint(int blueprintId, int parentId)
+        public ActionResult<ContentItemDisplay?> GetEmptyBlueprint(int blueprintId, int parentId)
         {
             var blueprint = _contentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
@@ -530,8 +536,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var mapped = _umbracoMapper.Map<ContentItemDisplay>(blueprint);
 
-            //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+            if (mapped is not null)
+            {
+                //remove the listview app if it exists
+                mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+            }
 
             return mapped;
         }
@@ -605,12 +614,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (pageNumber > 0 && pageSize > 0)
             {
-                IQuery<IContent> queryFilter = null;
+                IQuery<IContent>? queryFilter = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
                     //add the default text filter
                     queryFilter = _sqlContext.Query<IContent>()
-                        .Where(x => x.Name.Contains(filter));
+                        .Where(x => x.Name != null)
+                        .Where(x => x.Name!.Contains(filter));
                 }
 
                 children = _contentService
@@ -642,6 +652,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         if (!includeProperties.IsNullOrWhiteSpace())
                             context.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
                     }))
+                .WhereNotNull()
                 .ToList(); // evaluate now
 
             return pagedResult;
@@ -670,9 +681,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
+            var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
-            _contentService.SaveBlueprint(blueprint, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
+            _contentService.SaveBlueprint(blueprint, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -683,10 +694,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return notificationModel;
         }
 
-        private bool EnsureUniqueName(string name, IContent content, string modelName)
+        private bool EnsureUniqueName(string? name, IContent content, string modelName)
         {
             var existing = _contentService.GetBlueprintsForContentTypes(content.ContentTypeId);
-            if (existing.Any(x => x.Name == name && x.Id != content.Id))
+            if (existing?.Any(x => x.Name == name && x.Id != content.Id) ?? false)
             {
                 ModelState.AddModelError(modelName, _localizedTextService.Localize("blueprints", "duplicateBlueprintMessage"));
                 return false;
@@ -706,12 +717,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 contentItem,
                 (content, _) =>
                 {
-                    if (!EnsureUniqueName(content.Name, content, "Name"))
+                    if (!EnsureUniqueName(content.Name, content, "Name") || contentItem.PersistedContent is null)
                     {
                         return OperationResult.Cancel(new EventMessages());
                     }
 
-                    _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                    _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
                     // we need to reuse the underlying logic so return the result that it wants
                     return OperationResult.Succeed(new EventMessages());
@@ -736,13 +747,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
-                (content, contentSchedule) => _contentService.Save(content, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id, contentSchedule),
+                (content, contentSchedule) => _contentService.Save(content, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id, contentSchedule),
                 MapToDisplayWithSchedule);
 
             return contentItemDisplay;
         }
 
-        private async Task<ActionResult<ContentItemDisplay<TVariant>>> PostSaveInternal<TVariant>(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, Func<IContent, ContentItemDisplay<TVariant>> mapToDisplay)
+        private async Task<ActionResult<ContentItemDisplay<TVariant>>> PostSaveInternal<TVariant>(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, Func<IContent?, ContentItemDisplay<TVariant>> mapToDisplay)
             where TVariant : ContentVariantDisplay
         {
             // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
@@ -816,11 +827,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
             var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
-                contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
+                contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).WhereNotNull().ToArray(),
                 defaultCulture);
 
             //get the updated model
-            bool isBlueprint = contentItem.PersistedContent.Blueprint;
+            bool isBlueprint = contentItem.PersistedContent?.Blueprint ?? false;
 
             var contentSavedHeader = isBlueprint ? "editBlueprintSavedHeader" : "editContentSavedHeader";
             var contentSavedText = isBlueprint ? "editBlueprintSavedText" : "editContentSavedText";
@@ -845,7 +856,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
-                    var sendResult = _contentService.SendToPublication(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                    var sendResult = _contentService.SendToPublication(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
                     wasCancelled = sendResult == false;
                     if (sendResult)
                     {
@@ -1047,7 +1058,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, int variantCount,
             Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-            string savedContentHeaderLocalizationAlias, string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors, ContentScheduleCollection contentSchedule,
+            string savedContentHeaderLocalizationAlias, string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string? cultureForInvariantErrors, ContentScheduleCollection? contentSchedule,
             out bool wasCancelled)
         {
             var saveResult = saveMethod(contentItem.PersistedContent, contentSchedule);
@@ -2461,7 +2472,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private ContentItemDisplay MapToDisplay(IContent content) =>
+        private ContentItemDisplay MapToDisplay(IContent? content) =>
             MapToDisplay(content, context =>
             {
                 context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
@@ -2485,10 +2496,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="content"></param>
         /// <param name="contextOptions"></param>
         /// <returns></returns>
-        private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
+        private ContentItemDisplay? MapToDisplay(IContent? content, Action<MapperContext> contextOptions)
         {
-            ContentItemDisplay display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
-            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
+            ContentItemDisplay? display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
+            if (display is not null)
+            {
+                display.AllowPreview = display.AllowPreview && content?.Trashed == false && content.ContentType.IsElement == false;
+            }
+
             return display;
         }
 
@@ -2501,14 +2516,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var content = _contentService.GetById(contentId);
             if (content == null) return NotFound();
 
-            var userNotifications = _notificationService.GetUserNotifications(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, content.Path).ToList();
+            var userNotifications = _notificationService.GetUserNotifications(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content.Path)?.ToList();
 
             foreach (var a in _actionCollection.Where(x => x.ShowInNotifier))
             {
                 var n = new NotifySetting
                 {
                     Name = _localizedTextService.Localize("actions", a.Alias),
-                    Checked = userNotifications.FirstOrDefault(x => x.Action == a.Letter.ToString()) != null,
+                    Checked = userNotifications?.FirstOrDefault(x => x.Action == a.Letter.ToString()) != null,
                     NotifyCode = a.Letter.ToString()
                 };
                 notifications.Add(n);
@@ -2523,7 +2538,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var content = _contentService.GetById(contentId);
             if (content == null) return NotFound();
 
-            _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, content, notifyOptions);
+            _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content, notifyOptions);
 
             return NoContent();
         }
@@ -2534,7 +2549,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             int contentId,
             int pageNumber = 1,
             int pageSize = 10,
-            string culture = null)
+            string? culture = null)
         {
             if (!string.IsNullOrEmpty(culture))
             {
@@ -2544,7 +2559,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            IEnumerable<ContentVersionMeta> results = _contentVersionService.GetPagedContentVersions(
+            IEnumerable<ContentVersionMeta>? results = _contentVersionService.GetPagedContentVersions(
                 contentId,
                 pageNumber - 1,
                 pageSize,
@@ -2563,14 +2578,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
         public IActionResult PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
         {
-            IContent content = _contentService.GetVersion(versionId);
+            IContent? content = _contentService.GetVersion(versionId);
 
             if (content == null || content.Id != contentId)
             {
                 return NotFound();
             }
 
-            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
+            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             return NoContent();
         }
@@ -2621,21 +2636,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ContentVariantDisplay GetRollbackVersion(int versionId, string? culture = null)
+        public ContentVariantDisplay? GetRollbackVersion(int versionId, string? culture = null)
         {
             var version = _contentService.GetVersion(versionId);
             var content = MapToDisplay(version);
 
             return culture == null
-                ? content.Variants.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
-                : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
+                ? content.Variants?.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
+                : content.Variants?.FirstOrDefault(x => x.Language?.IsoCode == culture);
         }
 
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionRollbackById)]
         [HttpPost]
         public IActionResult PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
-            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? 0);
+            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             if (rollbackResult.Success)
                 return Ok();

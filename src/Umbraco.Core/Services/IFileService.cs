@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IFileService : IService
     {
-        IEnumerable<string?> GetPartialViewSnippetNames(params string[] filterNames);
+        IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
         void CreatePartialViewFolder(string folderPath);
         void CreatePartialViewMacroFolder(string folderPath);
         void DeletePartialViewFolder(string folderPath);
@@ -24,12 +24,12 @@ namespace Umbraco.Cms.Core.Services
 
         IPartialView? GetPartialView(string path);
         IPartialView? GetPartialViewMacro(string path);
-        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int userId = Constants.Security.SuperUserId);
-        bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId);
-        bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView?> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
+        bool DeletePartialView(string path, int? userId = null);
+        bool DeletePartialViewMacro(string path, int? userId = null);
+        Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
+        Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null);
 
         /// <summary>
         /// Gets the content of a partial view as a stream.
@@ -84,21 +84,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="path">Path of the stylesheet incl. extension</param>
         /// <returns>A <see cref="IStylesheet"/> object</returns>
-        IStylesheet? GetStylesheet(string path);
+        IStylesheet? GetStylesheet(string? path);
 
         /// <summary>
         /// Saves a <see cref="IStylesheet"/>
         /// </summary>
         /// <param name="stylesheet"><see cref="IStylesheet"/> to save</param>
         /// <param name="userId">Optional id of the user saving the stylesheet</param>
-        void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId);
+        void SaveStylesheet(IStylesheet? stylesheet, int? userId = null);
 
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
-        void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
+        void DeleteStylesheet(string path, int? userId = null);
 
         /// <summary>
         /// Creates a folder for style sheets
@@ -145,21 +145,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
         /// <returns>A <see cref="IScript"/> object</returns>
-        IScript? GetScript(string name);
+        IScript? GetScript(string? name);
 
         /// <summary>
         /// Saves a <see cref="Script"/>
         /// </summary>
         /// <param name="script"><see cref="IScript"/> to save</param>
         /// <param name="userId">Optional id of the user saving the script</param>
-        void SaveScript(IScript script, int userId = Constants.Security.SuperUserId);
+        void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId">Optional id of the user deleting the script</param>
-        void DeleteScript(string path, int userId = Constants.Security.SuperUserId);
+        void DeleteScript(string path, int? userId = null);
 
         /// <summary>
         /// Creates a folder for scripts

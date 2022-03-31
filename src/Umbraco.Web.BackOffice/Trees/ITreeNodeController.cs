@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        ActionResult<TreeNode> GetTreeNode(
+        ActionResult<TreeNode?> GetTreeNode(
             string id,
             [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings
             );

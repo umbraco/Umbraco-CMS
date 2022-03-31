@@ -65,6 +65,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "metaData")]
         [ReadOnly(true)]
-        public IDictionary<string, object> AdditionalData { get; private set; }
+        public IDictionary<string, object?> AdditionalData { get; private set; }
     }
 }

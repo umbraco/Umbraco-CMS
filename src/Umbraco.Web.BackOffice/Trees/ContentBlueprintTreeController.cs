@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -61,15 +61,19 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
+            if (root is not null)
+            {
+                //this will load in a custom UI instead of the dashboard for the root node
+                root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
 
-            //check if there are any content blueprints
-            root.HasChildren = _contentService.GetBlueprintsForContentTypes().Any();
+                //check if there are any content blueprints
+                root.HasChildren = _contentService.GetBlueprintsForContentTypes()?.Any() ?? false;
+            }
+
 
             return root;
         }
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
@@ -142,7 +146,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 var ct = _contentTypeService.Get(cte.Id);
                 var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true);
-                createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
+                createItem?.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct?.Alias);
 
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
