@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
 {
     public static class ModelStateExtensions
     {
-        
+
 
         /// <summary>
         /// Adds the <see cref="ValidationResult"/> to the model state with the appropriate keys for property errors
@@ -73,7 +73,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// A list of cultures that have property validation errors. The default culture will be returned for any invariant property errors.
         /// </returns>
-        internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithPropertyErrors(this ModelStateDictionary modelState,
+        internal static IReadOnlyList<(string culture, string? segment)>? GetVariantsWithPropertyErrors(this ModelStateDictionary modelState,
             string cultureForInvariantErrors)
         {
             //Add any variant specific errors here
@@ -106,12 +106,12 @@ namespace Umbraco.Extensions
         /// <returns>
         /// A list of cultures that have validation errors. The default culture will be returned for any invariant errors.
         /// </returns>
-        internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithErrors(this ModelStateDictionary modelState, string cultureForInvariantErrors)
+        internal static IReadOnlyList<(string culture, string? segment)>? GetVariantsWithErrors(this ModelStateDictionary modelState, string cultureForInvariantErrors)
         {
-            IReadOnlyList<(string culture, string segment)> propertyVariantErrors = modelState.GetVariantsWithPropertyErrors(cultureForInvariantErrors);
+            IReadOnlyList<(string culture, string? segment)>? propertyVariantErrors = modelState.GetVariantsWithPropertyErrors(cultureForInvariantErrors);
 
             //now check the other special variant errors that are
-            IEnumerable<(string culture, string segment)> genericVariantErrors = modelState.Keys
+            IEnumerable<(string culture, string? segment)>? genericVariantErrors = modelState.Keys
                 .Where(x => x.StartsWith("_content_variant_") && x.EndsWith("_"))
                 .Select(x => x.TrimStart("_content_variant_").TrimEnd("_"))
                 .Select(x =>
@@ -132,7 +132,7 @@ namespace Umbraco.Extensions
                 })
                 .Distinct();
 
-            return propertyVariantErrors.Union(genericVariantErrors).Distinct().ToList();
+            return propertyVariantErrors?.Union(genericVariantErrors).Distinct().ToList();
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Umbraco.Extensions
             var delimitedParts = string.Join(".", parts);
             foreach (var memberName in result.MemberNames)
             {
-                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
+                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage ?? string.Empty);
                 withNames = true;
             }
             if (!withNames)
