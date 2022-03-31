@@ -122,8 +122,8 @@ namespace Umbraco.Extensions
             // even if the community MB is in place.
             builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
             {
-                ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-                if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
+                ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
+                if (config.ModelsMode == ModelsMode.InMemoryAuto)
                 {
                     return factory.GetRequiredService<InMemoryModelFactory>();
                 }
@@ -156,7 +156,8 @@ namespace Umbraco.Extensions
                             // is produced, if we don't re-create the container then it will just return the same instance.
                             ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
                             return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                        }, s.GetRequiredService<InMemoryModelFactory>()));
+                        },
+                        s.GetRequiredService<InMemoryModelFactory>()));
 
             return builder;
         }

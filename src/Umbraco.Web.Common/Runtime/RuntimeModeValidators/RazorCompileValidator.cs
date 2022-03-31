@@ -2,7 +2,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
-namespace Umbraco.Cms.Web.Common.RuntimeModeValidators
+namespace Umbraco.Cms.Web.Common.Runtime.RuntimeModeValidators
 {
     internal class RazorCompileValidator : RuntimeModeProductionValidatorBase
     {

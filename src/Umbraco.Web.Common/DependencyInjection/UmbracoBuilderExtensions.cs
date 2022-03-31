@@ -57,8 +57,9 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Runtime;
+using Umbraco.Cms.Web.Common.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Web.Common.RuntimeMinification;
-using Umbraco.Cms.Web.Common.RuntimeModeValidators;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
@@ -162,6 +163,27 @@ namespace Umbraco.Extensions
 
             builder.AddCoreInitialServices();
 
+            // Add runtime mode validation
+            builder.Services.AddTransient<IRuntimeModeValidator, RazorCompileValidator>();
+
+            // Cancel not allowed changes while production mode is enabled
+            if (builder.Config.IsRuntimeMode(RuntimeMode.Production))
+            {
+                builder.AddNotificationHandler<ContentTypeSavingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<ContentTypeDeletingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<MediaTypeSavingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<MediaTypeDeletingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<MemberTypeSavingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<MemberTypeDeletingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<DataTypeSavingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<DataTypeDeletingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<TemplateSavingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<TemplateDeletingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<PartialViewCreatingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<PartialViewSavingNotification, RuntimeModeProductionHandler>();
+                builder.AddNotificationHandler<PartialViewDeletingNotification, RuntimeModeProductionHandler>();
+            }
+
             // aspnet app lifetime mgmt
             builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
             builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
@@ -232,9 +254,6 @@ namespace Umbraco.Extensions
 
                 mvcBuilder.AddRazorRuntimeCompilation();
             }
-
-            // Validate Razor compile
-            builder.Services.AddTransient<IRuntimeModeValidator, RazorCompileValidator>();
 
             mvcBuilding?.Invoke(mvcBuilder);
 
