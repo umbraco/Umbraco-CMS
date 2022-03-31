@@ -637,10 +637,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             // Membership property types.
             if (_database.Exists<PropertyTypeGroupDto>(11))
-            {_database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 28, UniqueId = 28.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Textarea, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.Comments, Name = Cms.Core.Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
-        }
-
-
+            {
+                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+                    new PropertyTypeDto
+                    {
+                        Id = 28, UniqueId = 28.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Textarea,
+                        ContentTypeId = 1044, PropertyTypeGroupId = 11,
+                        Alias = Cms.Core.Constants.Conventions.Member.Comments,
+                        Name = Cms.Core.Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false,
+                        ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing
+                    });
+            }
         }
 
         private void CreateLanguageData() =>
