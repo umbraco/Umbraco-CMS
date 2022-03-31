@@ -191,7 +191,7 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 [Obsolete("IsApproved is no longer property data, access the property directly on IMember instead, scheduled for removal in V11")]
                 public const string IsApproved = "umbracoMemberApproved";
-
+                [Obsolete("Use the stateApproved translation in the user area instead, scheduled for removal in V11")]
                 public const string IsApprovedLabel = "Is Approved";
 
                 /// <summary>
@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 [Obsolete("IsLockedOut is no longer property data, access the property directly on IMember instead, scheduled for removal in V11")]
                 public const string IsLockedOut = "umbracoMemberLockedOut";
-
+                [Obsolete("Use the stateLockedOut translation in the user area instead, scheduled for removal in V11")]
                 public const string IsLockedOutLabel = "Is Locked Out";
 
                 /// <summary>
@@ -207,7 +207,7 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 [Obsolete("LastLoginDate is no longer property data, access the property directly on IMember instead, scheduled for removal in V11")]
                 public const string LastLoginDate = "umbracoMemberLastLogin";
-
+                [Obsolete("Use the lastLogin translation in the user area instead, scheduled for removal in V11")]
                 public const string LastLoginDateLabel = "Last Login Date";
 
                 /// <summary>
@@ -215,7 +215,7 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 [Obsolete("LastPasswordChangeDate is no longer property data, access the property directly on IMember instead, scheduled for removal in V11")]
                 public const string LastPasswordChangeDate = "umbracoMemberLastPasswordChangeDate";
-
+                [Obsolete("Use the lastPasswordChangeDate translation in the user area instead, scheduled for removal in V11")]
                 public const string LastPasswordChangeDateLabel = "Last Password Change Date";
 
                 /// <summary>
@@ -223,7 +223,7 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 [Obsolete("LastLockoutDate is no longer property data, access the property directly on IMember instead, scheduled for removal in V11")]
                 public const string LastLockoutDate = "umbracoMemberLastLockoutDate";
-
+                [Obsolete("Use the lastLockoutDate translation in the user area instead, scheduled for removal in V11")]
                 public const string LastLockoutDateLabel = "Last Lockout Date";
 
                 /// <summary>
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 [Obsolete("FailedPasswordAttempts is no longer property data, access the property directly on IMember instead, scheduled for removal in V11")]
                 public const string FailedPasswordAttempts = "umbracoMemberFailedPasswordAttempts";
-
+                [Obsolete("Use the failedPasswordAttempts translation in the user area instead, scheduled for removal in V11")]
                 public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 
                 /// <summary>
