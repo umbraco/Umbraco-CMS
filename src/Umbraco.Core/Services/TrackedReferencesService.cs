@@ -1,4 +1,3 @@
-﻿using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -18,22 +17,32 @@ namespace Umbraco.Cms.Core.Services
             _entityService = entityService;
         }
 
-        public PagedResult<RelationItem> GetPagedRelationsForItems(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
+        /// <summary>
+        /// Gets a paged result of items which are in relation with the current item.
+        /// Basically, shows the items which depend on the current item.
+        /// </summary>
+        public PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            var items =  _trackedReferencesRepository.GetPagedRelationsForItems(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+            var items = _trackedReferencesRepository.GetPagedRelationsForItem(id, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
 
-            return new PagedResult<RelationItem>(totalItems, pageIndex+1, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
         }
 
+        /// <summary>
+        /// Gets a paged result of items used in any kind of relation from selected integer ids.
+        /// </summary>
         public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-            var items =  _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize,  filterMustBeIsDependency, out var totalItems);
+            var items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
 
-            return new PagedResult<RelationItem>(totalItems, pageIndex+1, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
         }
 
+        /// <summary>
+        /// Gets a paged result of the descending items that have any references, given a parent id.
+        /// </summary>
         public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
@@ -44,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
                 pageSize,
                 filterMustBeIsDependency,
                 out var totalItems);
-            return new PagedResult<RelationItem>(totalItems, pageIndex+1, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
         }
     }
 }

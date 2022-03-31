@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IScopeProvider scopeProvider,
             ILogger<LogScrubber> logger,
             IProfilingLogger profilingLogger)
-            : base(TimeSpan.FromHours(4), DefaultDelay)
+            : base(logger, TimeSpan.FromHours(4), DefaultDelay)
         {
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;

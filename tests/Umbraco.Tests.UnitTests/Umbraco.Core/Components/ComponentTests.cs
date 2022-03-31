@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 Mock.Of<IOptionsMonitor<ConnectionStrings>>(x => x.Get(It.IsAny<string>()) == connectionStrings),
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 Mock.Of<IDbProviderFactoryCreator>(),
-                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()),
+                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>(), Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>()),
                 mapperCollection);
 
             var fs = new FileSystems(loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());

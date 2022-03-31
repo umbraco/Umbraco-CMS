@@ -18,14 +18,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
-    internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroRepository
+    internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAliasRepository
     {
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IRepositoryCachePolicy<IMacro, string> _macroByAliasCachePolicy;
 
         public MacroRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MacroRepository> logger, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _shortStringHelper = shortStringHelper;
+            _macroByAliasCachePolicy = new DefaultRepositoryCachePolicy<IMacro, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
         }
 
         protected override IMacro PerformGet(int id)
@@ -66,6 +68,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public bool Exists(Guid id)
         {
             return Get(id) != null;
+        }
+
+        public IMacro GetByAlias(string alias)
+        {
+            return _macroByAliasCachePolicy.Get(alias, PerformGetByAlias, PerformGetAllByAlias);
+        }
+
+        public IEnumerable<IMacro> GetAllByAlias(string[] aliases)
+        {
+            if (aliases.Any() is false)
+            {
+                return base.GetMany();
+            }
+
+            return _macroByAliasCachePolicy.GetAll(aliases, PerformGetAllByAlias);
+        }
+
+        private IMacro PerformGetByAlias(string alias)
+        {
+            var query = Query<IMacro>().Where(x => x.Alias.Equals(alias));
+            return PerformGetByQuery(query).FirstOrDefault();
+        }
+
+        private IEnumerable<IMacro> PerformGetAllByAlias(params string[] aliases)
+        {
+            if (aliases.Any() is false)
+            {
+                return base.GetMany();
+            }
+
+            var query = Query<IMacro>().Where(x => aliases.Contains(x.Alias));
+            return PerformGetByQuery(query);
         }
 
         protected override IEnumerable<IMacro> PerformGetAll(params int[] ids)

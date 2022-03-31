@@ -162,7 +162,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "trackedReferencesApiBaseUrl",
-                        "getPagedReferencedItems",
+                        "GetPagedReferencedItems",
                         query),
                         {
                             ids: ids,
