@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Security
             char permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck });
 
         public ContentAccess CheckPermissions(
-            IContent content,
+            IContent? content,
             IUser? user,
             IReadOnlyList<char> permissionsToCheck)
         {
