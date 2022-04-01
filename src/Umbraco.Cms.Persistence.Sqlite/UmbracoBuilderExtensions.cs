@@ -1,12 +1,15 @@
 using System.Data.Common;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Persistence.Sqlite.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.Sqlite;
 
@@ -35,6 +38,30 @@ public static class UmbracoBuilderExtensions
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);
+
+
+        builder.Services.PostConfigure<ConnectionStrings>(Core.Constants.System.UmbracoConnectionName, opt =>
+        {
+            if (!opt.IsConnectionStringConfigured())
+            {
+                return;
+            }
+
+            if (opt.ProviderName != Constants.ProviderName)
+            {
+                // Not us.
+                return;
+            }
+
+            // Prevent accidental creation of database files.
+            var connectionStringBuilder = new SqliteConnectionStringBuilder(opt.ConnectionString);
+            if (connectionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
+            {
+                connectionStringBuilder.Mode = SqliteOpenMode.ReadWrite;
+            }
+
+            opt.ConnectionString = connectionStringBuilder.ConnectionString;
+        });
 
         return builder;
     }
