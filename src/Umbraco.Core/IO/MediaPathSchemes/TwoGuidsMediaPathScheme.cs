@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
     public class TwoGuidsMediaPathScheme : IMediaPathScheme
     {
         /// <inheritdoc />
-        public string GetFilePath(MediaFileManager fileManager, Guid? itemGuid, Guid? propertyGuid, string filename)
+        public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
         {
-            return Path.Combine(itemGuid?.ToString("N"), propertyGuid?.ToString("N"), filename).Replace('\\', '/');
+            return Path.Combine(itemGuid.ToString("N"), propertyGuid.ToString("N"), filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />

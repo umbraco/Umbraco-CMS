@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         }
 
-        private string? ProcessFile(ContentPropertyFile file, object? dataTypeConfiguration, Guid? cuid, Guid? puid)
+        private string? ProcessFile(ContentPropertyFile file, object? dataTypeConfiguration, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change

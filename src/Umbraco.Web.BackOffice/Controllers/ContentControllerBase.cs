@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 // get the property
-                IProperty? property = contentItem.PersistedContent?.Properties[propertyDto.Alias];
+                IProperty property = contentItem.PersistedContent.Properties[propertyDto.Alias]!;
 
                 // prepare files, if any matching property and culture
                 ContentPropertyFile[] files = contentItem.UploadedFiles
@@ -133,11 +133,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     file.FileName = file.FileName?.ToSafeFileName(ShortStringHelper);
                 }
 
+
                 // create the property data for the property editor
                 var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.Configuration)
                 {
-                    ContentKey = contentItem.PersistedContent?.Key,
-                    PropertyTypeKey = property?.PropertyType.Key,
+                    ContentKey = contentItem.PersistedContent!.Key,
+                    PropertyTypeKey = property.PropertyType.Key,
                     Files = files
                 };
 

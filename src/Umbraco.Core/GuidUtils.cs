@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core
         /// <param name="b">The seconds guid.</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Guid? Combine(Guid? a, Guid? b)
+        public static Guid? Combine(Guid a, Guid b)
         {
             var ad = new DecomposedGuid(a);
             var bd = new DecomposedGuid(b);
@@ -34,11 +34,11 @@ namespace Umbraco.Cms.Core
         [StructLayout(LayoutKind.Explicit)]
         private struct DecomposedGuid
         {
-            [FieldOffset(00)] public Guid? Value;
+            [FieldOffset(00)] public Guid Value;
             [FieldOffset(00)] public long Hi;
             [FieldOffset(08)] public long Lo;
 
-            public DecomposedGuid(Guid? value) : this() => this.Value = value;
+            public DecomposedGuid(Guid value) : this() => this.Value = value;
         }
 
         private static readonly char[] Base32Table =

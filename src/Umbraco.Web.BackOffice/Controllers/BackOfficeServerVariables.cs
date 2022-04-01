@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "iconApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<IconController>(
-                                controller => controller.GetIcon("") ?? new IconModel())
+                                controller => controller.GetIcon("")!)
                         },
                         {
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
@@ -266,7 +266,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "memberApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberController>(
-                                controller => controller.GetByKey(Guid.Empty) ?? new MemberDisplay())
+                                controller => controller.GetByKey(Guid.Empty)!)
                         },
                         {
                             "packageApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PackageController>(
@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "relationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RelationController>(
-                                controller => controller.GetById(0) ?? new RelationDisplay())
+                                controller => controller.GetById(0)!)
                         },
                         {
                             "rteApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
@@ -358,7 +358,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "languageApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<LanguageController>(
-                                controller => controller.GetAllLanguages() ?? Enumerable.Empty<Language>())
+                                controller => controller.GetAllLanguages()!)
                         },
                         {
                             "relationTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
@@ -378,7 +378,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "imageUrlGeneratorApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
-                                controller => controller.GetCropUrl(string.Empty, null, null, null) ?? string.Empty)
+                                controller => controller.GetCropUrl(string.Empty, null, null, null)!)
                         },
                         {
                             "elementTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
