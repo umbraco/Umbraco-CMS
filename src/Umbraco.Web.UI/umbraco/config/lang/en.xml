@@ -569,6 +569,8 @@
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
+    <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>

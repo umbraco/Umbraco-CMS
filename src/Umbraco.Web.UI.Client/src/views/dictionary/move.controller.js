@@ -13,7 +13,6 @@ angular.module("umbraco")
                 //un-select if there's a current one selected
                 $scope.target.selected = false;
             }
-          console.log($scope.source)
             $scope.target = args.node;
             $scope.target.selected = true;
         }

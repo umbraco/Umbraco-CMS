@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Change the sort order for media
+        /// Changes the structure for dictionary items
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
@@ -202,12 +202,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
             if (dictionaryItem == null)
-                return ValidationProblem("Dictionary item does not exist");
+                return ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists"));
 
             var parent = _localizationService.GetDictionaryItemById(move.ParentId);
             if (parent == null)
             {
-                dictionaryItem.ParentId = null;
+                if (move.ParentId == Constants.System.Root)
+                    return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
+                else
+                    dictionaryItem.ParentId = null;
             }
             else
             {

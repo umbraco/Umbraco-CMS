@@ -3,7 +3,7 @@
     * @name umbraco.resources.dictionaryResource
     * @description Loads in data for dictionary items
 **/
-function dictionaryResource($q, $http, $location, localizationService, umbRequestHelper, umbDataFormatter) {
+function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataFormatter) {
 
   /**
          * @ngdoc method
