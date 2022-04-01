@@ -26,7 +26,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     private readonly ILogger<AutoModelsNotificationHandler> _logger;
     private readonly IMainDom _mainDom;
     private readonly ModelsGenerationError _mbErrors;
-    private readonly ModelsGenerator _modelGenerator;
+    private readonly IModelsGenerator _modelGenerator;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AutoModelsNotificationHandler" /> class.
@@ -34,7 +34,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     public AutoModelsNotificationHandler(
         ILogger<AutoModelsNotificationHandler> logger,
         IOptionsMonitor<ModelsBuilderSettings> config,
-        ModelsGenerator modelGenerator,
+        IModelsGenerator modelGenerator,
         ModelsGenerationError mbErrors,
         IMainDom mainDom)
     {

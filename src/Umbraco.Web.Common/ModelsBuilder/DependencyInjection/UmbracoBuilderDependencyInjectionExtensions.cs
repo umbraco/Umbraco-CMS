@@ -133,7 +133,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
 
         // Register required services for ModelsBuilderDashboardController
-        builder.Services.AddSingleton<ModelsGenerator>();
+        builder.Services.AddSingleton<IModelsGenerator, ModelsGenerator>();
         builder.Services.AddSingleton<OutOfDateModelsStatus>();
         builder.Services.AddSingleton<ModelsGenerationError>();
 

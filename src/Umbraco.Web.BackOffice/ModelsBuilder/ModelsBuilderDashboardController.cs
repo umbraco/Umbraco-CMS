@@ -33,7 +33,7 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     private readonly ModelsBuilderSettings _config;
     private readonly DashboardReport _dashboardReport;
     private readonly ModelsGenerationError _mbErrors;
-    private readonly ModelsGenerator _modelGenerator;
+    private readonly IModelsGenerator _modelGenerator;
     private readonly OutOfDateModelsStatus _outOfDateModels;
 
     public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config, ModelsGenerator modelsGenerator,
