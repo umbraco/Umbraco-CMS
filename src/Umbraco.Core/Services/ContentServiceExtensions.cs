@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
 
         private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
-        public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string culture = "*")
+        public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
         {
             var result = new List<string>();
             var content = contentService.GetById(id);

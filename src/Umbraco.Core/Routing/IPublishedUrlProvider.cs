@@ -99,6 +99,6 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
+        string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
     }
 }

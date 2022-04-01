@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Validation
 
-        public Attempt<string[]?> ValidateComposition(TItem compo)
+        public Attempt<string[]?> ValidateComposition(TItem? compo)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        protected void ValidateLocked(TItem compositionContentType)
+        protected void ValidateLocked(TItem? compositionContentType)
         {
             // performs business-level validation of the composition
             // should ensure that it is absolutely safe to save the composition
@@ -449,8 +449,13 @@ namespace Umbraco.Cms.Core.Services
 
         #region Save
 
-        public void Save(TItem item, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public void Save(TItem? item, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
+            if (item is null)
+            {
+                return;
+            }
+
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
@@ -957,12 +962,17 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(TItem item)
+        public IEnumerable<EntityContainer>? GetContainers(TItem? item)
         {
-            var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = item?.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
                 .Where(x => x != int.MinValue && x != item.Id)
                 .ToArray();
+
+            if (ancestorIds is null)
+            {
+                return null;
+            }
 
             return GetContainers(ancestorIds);
         }

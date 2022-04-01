@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
     public class GridValidator : IValueValidator
     {
-        public IEnumerable<ValidationResult> Validate(object? rawValue, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? rawValue, string? valueType, object? dataTypeConfiguration)
         {
             if (rawValue == null)
                 yield break;

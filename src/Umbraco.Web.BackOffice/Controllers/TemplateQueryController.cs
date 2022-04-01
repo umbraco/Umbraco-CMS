@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 queryExpression.AppendFormat(model.Sort.Direction == "ascending"
                     ? ".OrderBy(x => x.{0})"
                     : ".OrderByDescending(x => x.{0})"
-                    , model.Sort.Property.Alias);
+                    , model.Sort?.Property?.Alias);
             }
 
             // take

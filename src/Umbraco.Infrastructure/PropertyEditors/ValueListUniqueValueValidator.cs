@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class ValueListUniqueValueValidator : IValueValidator
     {
-        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             // the value we get should be a JArray
             // [ { "value": <value>, "sortOrder": 1 }, { ... }, ... ]

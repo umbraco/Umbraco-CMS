@@ -215,7 +215,7 @@ namespace Umbraco.Extensions
         }
 
         // sets the edited cultures on the content
-        public static void SetCultureEdited(this IContent content, IEnumerable<string?> cultures)
+        public static void SetCultureEdited(this IContent content, IEnumerable<string?>? cultures)
         {
             if (cultures == null)
                 content.EditedCultures = null;

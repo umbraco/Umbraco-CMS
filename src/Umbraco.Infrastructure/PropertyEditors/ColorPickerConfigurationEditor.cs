@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         internal class ColorListValidator : IValueValidator
         {
-            public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
             {
                 if (!(value is JArray json)) yield break;
 

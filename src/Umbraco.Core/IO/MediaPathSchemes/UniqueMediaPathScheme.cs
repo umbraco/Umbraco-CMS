@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
         private const int DirectoryLength = 8;
 
         /// <inheritdoc />
-        public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
+        public string GetFilePath(MediaFileManager fileManager, Guid? itemGuid, Guid? propertyGuid, string filename)
         {
             var combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
             var directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength);

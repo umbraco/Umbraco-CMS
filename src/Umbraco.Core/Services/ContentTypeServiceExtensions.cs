@@ -45,7 +45,7 @@ namespace Umbraco.Extensions
         /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         public static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
-            IContentTypeComposition source,
+            IContentTypeComposition? source,
             IContentTypeComposition[] allContentTypes,
             string[]? filterContentTypes = null,
             string[]? filterPropertyTypes = null,

@@ -166,7 +166,10 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private async Task ReSync(IUser user, ActionExecutingContext actionContext)
             {
                 BackOfficeIdentityUser? backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
-                await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                if (backOfficeIdentityUser is not null)
+                {
+                    await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                }
 
                 // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);

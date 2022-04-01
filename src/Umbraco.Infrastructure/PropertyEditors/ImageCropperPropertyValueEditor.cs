@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return editorJson.ToString(Formatting.None);
         }
 
-        private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
+        private string? ProcessFile(ContentPropertyFile file, Guid? cuid, Guid? puid)
         {
             // process the file
             // no file, invalid file, reject change

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             contentSettings.OnChange(x => _contentSettings = x);
         }
 
-        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             string? selectedFiles = null;
             if (value is JObject jobject && jobject["selectedFiles"] is JToken jToken)

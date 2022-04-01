@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _textService = textService;
             }
 
-            public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
             {
                 var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
                 if (blockConfig == null) yield break;

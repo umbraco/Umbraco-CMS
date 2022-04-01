@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="puid">The unique identifier of the property type owning the file.</param>
         /// <returns>The filesystem-relative path to the media file.</returns>
         /// <remarks>With the old media path scheme, this CREATES a new media path each time it is invoked.</remarks>
-        public string GetMediaPath(string? filename, Guid cuid, Guid puid)
+        public string GetMediaPath(string? filename, Guid? cuid, Guid? puid)
         {
             filename = Path.GetFileName(filename);
             if (filename == null)

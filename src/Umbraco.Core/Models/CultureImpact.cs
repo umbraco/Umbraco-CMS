@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-        public static CultureImpact Explicit(string culture, bool isDefault)
+        public static CultureImpact Explicit(string? culture, bool isDefault)
         {
             if (culture == null)
                 throw new ArgumentException("Culture <null> is not explicit.");

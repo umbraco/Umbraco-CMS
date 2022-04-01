@@ -344,7 +344,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId);
+        OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
         #endregion
 

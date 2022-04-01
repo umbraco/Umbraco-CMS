@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="OperationResult{TResultType}"/> class.
         /// </summary>
-        public OperationResult(TResultType result, EventMessages eventMessages)
+        public OperationResult(TResultType result, EventMessages? eventMessages)
         {
             Result = result;
             EventMessages = eventMessages;
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the event messages produced by the operation.
         /// </summary>
-        public EventMessages EventMessages { get; }
+        public EventMessages? EventMessages { get; }
     }
 
     /// <inheritdoc />
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="OperationResult{TResultType, TEntity}"/> class.
         /// </summary>
-        public OperationResult(TResultType result, EventMessages eventMessages, TEntity entity)
+        public OperationResult(TResultType result, EventMessages? eventMessages, TEntity? entity)
             : base(result, eventMessages)
         {
             Entity = entity;

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="filename">The file name.</param>
         ///
         /// <returns>The filesystem-relative complete file path.</returns>
-        string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename);
+        string GetFilePath(MediaFileManager fileManager, Guid? itemGuid, Guid? propertyGuid, string filename);
 
         /// <summary>
         /// Gets the directory that can be deleted when the file is deleted.

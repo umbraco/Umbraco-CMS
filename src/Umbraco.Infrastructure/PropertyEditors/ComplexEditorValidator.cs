@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="valueType"></param>
         /// <param name="dataTypeConfiguration"></param>
         /// <returns></returns>
-        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             var elementTypeValues = GetElementTypeValidation(value).ToList();
             var rowResults = GetNestedValidationResults(elementTypeValues).ToList();

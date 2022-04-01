@@ -56,13 +56,13 @@ namespace Umbraco.Cms.Core.Services
         bool HasChildren(int id);
         bool HasChildren(Guid id);
 
-        void Save(TItem item, int userId = Constants.Security.SuperUserId);
+        void Save(TItem? item, int userId = Constants.Security.SuperUserId);
         void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
         void Delete(TItem item, int userId = Constants.Security.SuperUserId);
         void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId);
 
 
-        Attempt<string[]?> ValidateComposition(TItem compo);
+        Attempt<string[]?> ValidateComposition(TItem? compo);
 
         /// <summary>
         /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.Services
         EntityContainer? GetContainer(int containerId);
         EntityContainer? GetContainer(Guid containerId);
         IEnumerable<EntityContainer>? GetContainers(int[] containerIds);
-        IEnumerable<EntityContainer>? GetContainers(TItem contentType);
+        IEnumerable<EntityContainer>? GetContainers(TItem? contentType);
         IEnumerable<EntityContainer>? GetContainers(string folderName, int level);
         Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);

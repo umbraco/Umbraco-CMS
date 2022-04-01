@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>When <paramref name="culture"/> is not null, throws if the content
         /// type does not vary by culture.</para>
         /// </remarks>
-        void SetCultureName(string? value, string culture);
+        void SetCultureName(string? value, string? culture);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.

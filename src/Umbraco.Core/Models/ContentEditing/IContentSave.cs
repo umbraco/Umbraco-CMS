@@ -18,6 +18,6 @@
         /// <remarks>
         /// This is not used for outgoing model information.
         /// </remarks>
-        TPersisted? PersistedContent { get; set; }
+        TPersisted PersistedContent { get; set; }
     }
 }

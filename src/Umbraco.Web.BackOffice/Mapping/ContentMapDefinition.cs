@@ -332,7 +332,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
                 {
                     // return false if this is the user's actual start node, the node will be rendered in the tree
                     // regardless of if it's a list view or not
-                    if (userStartNodes.Contains(source.Id))
+                    if (userStartNodes?.Contains(source.Id) ?? false)
                         return false;
                 }
             }

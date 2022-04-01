@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishResult"/> class.
         /// </summary>
-        public PublishResult(PublishResultType resultType, EventMessages eventMessages, IContent content)
+        public PublishResult(PublishResultType resultType, EventMessages? eventMessages, IContent? content)
             : base(resultType, eventMessages, content)
         { }
 

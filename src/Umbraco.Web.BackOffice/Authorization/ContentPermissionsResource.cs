@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="permissionToCheck">The permission to authorize.</param>
-        public ContentPermissionsResource(IContent content, char permissionToCheck)
+        public ContentPermissionsResource(IContent? content, char permissionToCheck)
         {
             PermissionsToCheck = new List<char> { permissionToCheck };
             Content = content;

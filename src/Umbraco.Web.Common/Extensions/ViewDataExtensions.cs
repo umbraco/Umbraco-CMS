@@ -86,7 +86,7 @@ namespace Umbraco.Extensions
             return (string?)viewData[TokenInstallApiBaseUrl];
         }
 
-        public static void SetInstallApiBaseUrl(this ViewDataDictionary viewData, string value)
+        public static void SetInstallApiBaseUrl(this ViewDataDictionary viewData, string? value)
         {
             viewData[TokenInstallApiBaseUrl] = value;
         }

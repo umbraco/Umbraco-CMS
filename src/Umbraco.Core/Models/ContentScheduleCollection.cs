@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="releaseDate"></param>
         /// <param name="expireDate"></param>
         /// <returns>true if successfully added, false if validation fails</returns>
-        public bool Add(string culture, DateTime? releaseDate, DateTime? expireDate)
+        public bool Add(string? culture, DateTime? releaseDate, DateTime? expireDate)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (releaseDate.HasValue && expireDate.HasValue && releaseDate >= expireDate)
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="culture"></param>
         /// <param name="action"></param>
         /// <param name="date">If specified, will clear all entries with dates less than or equal to the value</param>
-        public void Clear(string culture, ContentScheduleAction action, DateTime? date = null)
+        public void Clear(string? culture, ContentScheduleAction action, DateTime? date = null)
         {
             if (!_schedule.TryGetValue(culture, out var schedules))
                 return;
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="culture"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public IEnumerable<ContentSchedule> GetSchedule(string culture, ContentScheduleAction? action = null)
+        public IEnumerable<ContentSchedule> GetSchedule(string? culture, ContentScheduleAction? action = null)
         {
             if (_schedule.TryGetValue(culture, out var changes))
                 return action == null ? changes.Values : changes.Values.Where(x => x.Action == action.Value);

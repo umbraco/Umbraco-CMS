@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
                 var jo = new JObject();
                 if (!validationResult?.ErrorMessage.IsNullOrWhiteSpace() ?? false)
                 {
-                    var errObj = JToken.FromObject(validationResult.ErrorMessage!, camelCaseSerializer);
+                    var errObj = JToken.FromObject(validationResult!.ErrorMessage!, camelCaseSerializer);
                     jo.Add("errorMessage", errObj);
                 }
                 if (validationResult?.MemberNames.Any() ?? false)

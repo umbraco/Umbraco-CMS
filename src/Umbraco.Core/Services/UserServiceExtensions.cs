@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
 {
     public static class UserServiceExtensions
     {
-        public static EntityPermission? GetPermissions(this IUserService userService, IUser user, string path)
+        public static EntityPermission? GetPermissions(this IUserService userService, IUser? user, string path)
         {
             var ids = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? Attempt<int>.Succeed(value) : Attempt<int>.Fail())
