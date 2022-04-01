@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValues">The values posted by the configuration editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        object? FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration);
+        object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration);
 
         /// <summary>
         /// Converts the configuration object to values for the configuration editor.

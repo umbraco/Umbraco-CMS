@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public async Task<ActionResult<TreeNode?>> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<TreeNode?>> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection? queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodeResult = CreateRootNode(queryStrings);
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        public async Task<ActionResult<TreeNodeCollection?>> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<TreeNodeCollection?>> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection? queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodesResult = await GetTreeNodesAsync(id, queryStrings);

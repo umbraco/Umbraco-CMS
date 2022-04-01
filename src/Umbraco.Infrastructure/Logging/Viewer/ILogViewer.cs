@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// Adds a new saved search to chosen data source and returns the updated searches
         /// </summary>
-        IReadOnlyList<SavedLogSearch>? AddSavedSearch(string name, string query);
+        IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query);
 
         /// <summary>
         /// Deletes a saved search to chosen data source and returns the remaining searches
         /// </summary>
-        IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string name, string query);
+        IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string? name, string? query);
 
         /// <summary>
         /// A count of number of errors

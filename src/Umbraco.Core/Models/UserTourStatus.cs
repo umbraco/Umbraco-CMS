@@ -47,12 +47,12 @@ namespace Umbraco.Cms.Core.Models
             return Alias.GetHashCode();
         }
 
-        public static bool operator ==(UserTourStatus left, UserTourStatus right)
+        public static bool operator ==(UserTourStatus? left, UserTourStatus? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(UserTourStatus left, UserTourStatus right)
+        public static bool operator !=(UserTourStatus? left, UserTourStatus? right)
         {
             return !Equals(left, right);
         }

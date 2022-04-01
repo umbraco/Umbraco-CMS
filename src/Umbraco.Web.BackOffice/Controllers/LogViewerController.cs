@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<PagedResult<LogMessage>> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromQuery(Name = "logLevels[]")]string[] logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
+        public ActionResult<PagedResult<LogMessage>> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string? filterExpression = null, [FromQuery(Name = "logLevels[]")]string[]? logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
 
@@ -131,19 +131,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<SavedLogSearch> GetSavedSearches()
+        public IEnumerable<SavedLogSearch>? GetSavedSearches()
         {
             return _logViewer.GetSavedSearches();
         }
 
         [HttpPost]
-        public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item)
+        public IEnumerable<SavedLogSearch>? PostSavedSearch(SavedLogSearch item)
         {
             return _logViewer.AddSavedSearch(item.Name, item.Query);
         }
 
         [HttpPost]
-        public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item)
+        public IEnumerable<SavedLogSearch>? DeleteSavedSearch(SavedLogSearch item)
         {
             return _logViewer.DeleteSavedSearch(item.Name, item.Query);
         }

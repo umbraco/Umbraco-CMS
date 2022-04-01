@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IMemberGroup? GetByName(string name);
+        IMemberGroup? GetByName(string? name);
 
         /// <summary>
         /// Creates the new member group if it doesn't already exist

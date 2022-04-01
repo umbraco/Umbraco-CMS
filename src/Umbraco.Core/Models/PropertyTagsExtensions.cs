@@ -190,7 +190,7 @@ namespace Umbraco.Extensions
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>
         /// </remarks>
-        public static void SetTagsValue(this IProperty property, IJsonSerializer serializer, object value, TagConfiguration tagConfiguration, string culture)
+        public static void SetTagsValue(this IProperty property, IJsonSerializer serializer, object? value, TagConfiguration? tagConfiguration, string? culture)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
             if (tagConfiguration == null) throw new ArgumentNullException(nameof(tagConfiguration));

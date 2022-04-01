@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter);
+            string orderBy, Direction orderDirection, bool orderBySystemField, string? memberTypeAlias, string filter);
 
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it

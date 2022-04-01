@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        TTarget? Map<TSource, TTarget>(TSource source);
+        TTarget? Map<TSource, TTarget>(TSource? source);
 
         /// <summary>
         /// Maps a source object to a new target object.

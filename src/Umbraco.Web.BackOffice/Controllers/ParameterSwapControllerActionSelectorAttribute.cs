@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // if it's a post we can try to read from the body and bind from the json value
             if (context.RouteContext.HttpContext.Request.Method.Equals(HttpMethod.Post.Method))
             {
-                JObject postBodyJson;
+                JObject? postBodyJson;
 
                 if (httpContext.Items.TryGetValue(Constants.HttpContext.Items.RequestBodyAsJObject, out var value) && value is JObject cached)
                 {
@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private bool TryBindFromUri(ActionConstraintContext context, out ActionSelectorCandidate? foundCandidate)
         {
 
-            string requestParam = null;
+            string? requestParam = null;
             if (context.RouteContext.HttpContext.Request.Query.TryGetValue(_parameterName, out var stringValues))
             {
                 requestParam = stringValues.ToString();

@@ -16,6 +16,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IEnumerable<PackageDefinition> GetCreatedPackages()
         {
-            return _packagingService.GetAllCreatedPackages();
+            return _packagingService.GetAllCreatedPackages().WhereNotNull();
         }
 
         public ActionResult<PackageDefinition> GetCreatedPackageById(int id)
@@ -91,7 +92,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpDelete]
         public IActionResult DeleteCreatedPackage(int packageId)
         {
-            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().Result ?? -1);
+            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             return Ok();
         }
@@ -144,7 +145,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<InstalledPackage> GetInstalledPackageByName([FromQuery] string packageName)
         {
-            InstalledPackage pack = _packagingService.GetInstalledPackageByName(packageName);
+            InstalledPackage? pack = _packagingService.GetInstalledPackageByName(packageName);
             if (pack == null)
             {
                 return NotFound();

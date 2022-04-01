@@ -82,11 +82,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
         {
-            var user = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            var allowedSections = string.Join(",", user.AllowedSections);
-            var language = user.Language;
+            var user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            var allowedSections = string.Join(",", user?.AllowedSections ?? Array.Empty<string>());
+            var language = user?.Language;
             var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
-            var isAdmin = user.IsAdmin();
+            var isAdmin = user?.IsAdmin() ?? false;
             _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
 
             if (!IsAllowedUrl(baseUrl))
@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             return _dashboardService.GetDashboards(section, currentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,
@@ -270,7 +270,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 Type = x.Type,
                 Expanded = x.Expanded,
                 IsActive = x.IsActive,
-                Properties = x.Properties.Select(y => new DashboardSlim
+                Properties = x.Properties?.Select(y => new DashboardSlim
                 {
                     Alias = y.Alias,
                     View = y.View

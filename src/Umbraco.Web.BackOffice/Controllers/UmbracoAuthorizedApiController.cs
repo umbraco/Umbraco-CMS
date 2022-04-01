@@ -41,9 +41,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="modelStateDictionary"></param>
         /// <param name="statusCode"></param>
         /// <returns></returns>
-        protected virtual ActionResult ValidationProblem(IErrorModel model, ModelStateDictionary modelStateDictionary, int statusCode = StatusCodes.Status400BadRequest)
+        protected virtual ActionResult ValidationProblem(IErrorModel? model, ModelStateDictionary modelStateDictionary, int statusCode = StatusCodes.Status400BadRequest)
         {
-            model.Errors = modelStateDictionary.ToErrorDictionary();
+            if (model is not null)
+            {
+                model.Errors = modelStateDictionary.ToErrorDictionary();
+            }
+
             return ValidationProblem(model, statusCode);
         }
 
@@ -127,7 +131,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="model"></param>
         /// <param name="statusCode"></param>
         /// <returns></returns>
-        protected virtual ActionResult ValidationProblem(INotificationModel model, int statusCode = StatusCodes.Status400BadRequest)
+        protected virtual ActionResult ValidationProblem(INotificationModel? model, int statusCode = StatusCodes.Status400BadRequest)
             => new ValidationErrorResult(model, statusCode);
     }
 }

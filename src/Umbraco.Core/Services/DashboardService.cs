@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Services
 
 
         /// <inheritdoc />
-        public IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser currentUser)
+        public IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser? currentUser)
         {
             var tabs = new List<Tab<IDashboard>>();
             var tabId = 0;
@@ -56,14 +56,14 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser currentUser)
+        public IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser? currentUser)
         {
             return _sectionService.GetSections().ToDictionary(x => x.Alias, x => GetDashboards(x.Alias, currentUser));
         }
 
-        private bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
+        private bool CheckUserAccessByRules(IUser? user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
         {
-            if (user.Id == Constants.Security.SuperUserId)
+            if (user?.Id == Constants.Security.SuperUserId)
                 return true;
 
             var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);

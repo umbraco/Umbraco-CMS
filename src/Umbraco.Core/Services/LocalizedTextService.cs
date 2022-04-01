@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Core.Services
             return Localize(area, alias, culture, tokens);
         }
 
-        public string Localize(string? area, string? alias, CultureInfo culture,
+        public string Localize(string? area, string? alias, CultureInfo? culture,
             IDictionary<string, string?>? tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));

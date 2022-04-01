@@ -251,7 +251,7 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> CreateAsync(TUser user, string password);
+        Task<IdentityResult> CreateAsync(TUser user, string? password);
 
         /// <summary>
         /// Generate a password for a user based on the current password validator
@@ -267,7 +267,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="password">The password.</param>
         /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
 
-        Task<IdentityResult> ValidatePasswordAsync(string password);
+        Task<IdentityResult> ValidatePasswordAsync(string? password);
 
         /// <summary>
         /// Generates an email confirmation token for the specified user.

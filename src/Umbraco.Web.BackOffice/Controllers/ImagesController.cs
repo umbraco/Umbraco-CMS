@@ -54,19 +54,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult GetResized(string imagePath, int width)
         {
             var ext = Path.GetExtension(imagePath);
-            
+
             // check if imagePath is local to prevent open redirect
             if (!Uri.IsWellFormedUriString(imagePath, UriKind.Relative))
             {
                 return Unauthorized();
             }
-            
+
             // we need to check if it is an image by extension
             if (_imageUrlGenerator.IsSupportedImageFormat(ext) == false)
             {
                 return NotFound();
             }
-            
+
             // redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             DateTimeOffset? imageLastModified = null;
             try
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
-        public string GetProcessedImageUrl(string imagePath,
+        public string? GetProcessedImageUrl(string imagePath,
             int? width = null,
             int? height = null,
             decimal? focalPointLeft = null,

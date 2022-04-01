@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        public ActionResult<MediaTypeDisplay> GetById(int id)
+        public ActionResult<MediaTypeDisplay?> GetById(int id)
         {
             var ct = _mediaTypeService.Get(id);
             if (ct == null)
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        public ActionResult<MediaTypeDisplay> GetById(Guid id)
+        public ActionResult<MediaTypeDisplay?> GetById(Guid id)
         {
             var mediaType = _mediaTypeService.Get(id);
             if (mediaType == null)
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        public ActionResult<MediaTypeDisplay> GetById(Udi id)
+        public ActionResult<MediaTypeDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             return Ok();
         }
 
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return actionResult.Result;
             }
 
-            var result = actionResult.Value.Select(x => new
+            var result = actionResult.Value?.Select(x => new
                 {
                     contentType = x.Item1,
                     allowed = x.Item2
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
             var result =
-                PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType).Value
+                PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType).Value?
                     .Select(x => new
                     {
                         contentType = x
@@ -215,7 +215,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-        public MediaTypeDisplay GetEmpty(int parentId)
+        public MediaTypeDisplay? GetEmpty(int parentId)
         {
             IMediaType mt;
             if (parentId != Constants.System.Root)
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IEnumerable<ContentTypeBasic> GetAll() =>
             _mediaTypeService.GetAll()
-                .Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>);
+                .Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>).WhereNotNull();
 
         /// <summary>
         /// Deletes a media type container with a given ID
@@ -253,7 +253,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult DeleteContainer(int id)
         {
-            _mediaTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _mediaTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             return Ok();
         }
@@ -261,27 +261,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _mediaTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             if (result.Success)
                 return Ok(result.Result); //return the id
             else
-                return ValidationProblem(result.Exception.Message);
+                return ValidationProblem(result.Exception?.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             if (result.Success)
                 return Ok(result.Result); //return the id
             else
-                return ValidationProblem(result.Exception.Message);
+                return ValidationProblem(result.Exception?.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-        public ActionResult<MediaTypeDisplay> PostSave(MediaTypeSave contentTypeSave)
+        public ActionResult<MediaTypeDisplay?> PostSave(MediaTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
                 contentTypeSave,
@@ -296,7 +296,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<MediaTypeDisplay>(savedCt.Value);
 
 
-            display.AddSuccessNotification(
+            display?.AddSuccessNotification(
                 _localizedTextService.Localize("speechBubbles","mediaTypeSavedHeader"),
                 string.Empty);
 
@@ -362,14 +362,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 var contentType = _mediaTypeService.Get(contentItem.ContentTypeId);
-                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
+                var ids = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
-                if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
+                if (ids is null || ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
                 types = _mediaTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
-            var basics = types.Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>).ToList();
+            var basics = types.Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>).WhereNotNull().ToList();
 
             foreach (var basic in basics)
             {

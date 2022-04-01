@@ -79,11 +79,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         protected ActionResult<IEnumerable<Tuple<EntityBasic, bool>>> PerformGetAvailableCompositeContentTypes(
             int contentTypeId,
             UmbracoObjectTypes type,
-            string[] filterContentTypes,
-            string[] filterPropertyTypes,
+            string[]? filterContentTypes,
+            string[]? filterPropertyTypes,
             bool isElement)
         {
-            IContentTypeComposition source = null;
+            IContentTypeComposition? source = null;
 
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
 
@@ -266,7 +266,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 .ToList();
         }
 
-        protected string TranslateItem(string text)
+        protected string? TranslateItem(string? text)
         {
             if (text == null)
             {
@@ -284,9 +284,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         protected ActionResult<TContentType> PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             TContentTypeSave contentTypeSave,
-            Func<int, TContentType> getContentType,
+            Func<int, TContentType?> getContentType,
             Action<TContentType> saveContentType,
-            Action<TContentTypeSave> beforeCreateNew = null)
+            Action<TContentTypeSave>? beforeCreateNew = null)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
@@ -454,16 +454,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         protected IActionResult PerformMove(
             MoveOrCopy move,
-            Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>>> doMove)
+            Func<int, TContentType?> getContentType,
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>?>> doMove)
         {
-            TContentType toMove = getContentType(move.Id);
+            TContentType? toMove = getContentType(move.Id);
             if (toMove == null)
             {
                 return NotFound();
             }
 
-            Attempt<OperationResult<MoveOperationStatusType>> result = doMove(toMove, move.ParentId);
+            Attempt<OperationResult<MoveOperationStatusType>?> result = doMove(toMove, move.ParentId);
             if (result.Success)
             {
                 return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
@@ -491,8 +491,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         protected IActionResult PerformCopy(
             MoveOrCopy move,
-            Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType, TContentType>>> doCopy)
+            Func<int, TContentType?> getContentType,
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType, TContentType>?>> doCopy)
         {
             TContentType toMove = getContentType(move.Id);
             if (toMove == null)

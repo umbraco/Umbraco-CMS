@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         /// <param name="password">The password.</param>
         /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
-        public async Task<IdentityResult> ValidatePasswordAsync(string password)
+        public async Task<IdentityResult> ValidatePasswordAsync(string? password)
         {
             var errors = new List<IdentityError>();
             var isValid = true;

@@ -30,12 +30,12 @@ namespace Umbraco.Cms.Core.Models.Editors
         /// <summary>
         /// Gets or sets the unique identifier of the content owning the property.
         /// </summary>
-        public Guid ContentKey { get; set; }
+        public Guid? ContentKey { get; set; }
 
         /// <summary>
         /// Gets or sets the unique identifier of the property type.
         /// </summary>
-        public Guid PropertyTypeKey { get; set; }
+        public Guid? PropertyTypeKey { get; set; }
 
         /// <summary>
         /// Gets or sets the uploaded files.

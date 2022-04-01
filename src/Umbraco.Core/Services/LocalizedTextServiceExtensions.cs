@@ -31,7 +31,7 @@ namespace Umbraco.Extensions
         /// <param name="alias"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string area, string alias, string?[] tokens)
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, string?[]? tokens)
                     => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
 
         /// <summary>

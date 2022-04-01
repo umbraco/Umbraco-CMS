@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IMemberGroup? GetByName(string name)
+        public IMemberGroup? GetByName(string? name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

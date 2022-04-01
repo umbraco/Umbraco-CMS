@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
         }
 
-        public IMemberGroup? GetByName(string name)
+        public IMemberGroup? GetByName(string? name)
         {
             return IsolatedCache.GetCacheItem<IMemberGroup>(
                 typeof(IMemberGroup).FullName + "." + name,

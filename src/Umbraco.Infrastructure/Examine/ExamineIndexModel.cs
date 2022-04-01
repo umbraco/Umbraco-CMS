@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public bool IsHealthy => HealthStatus == "Healthy";
 
         [DataMember(Name = "providerProperties")]
-        public IReadOnlyDictionary<string, object>? ProviderProperties { get; set; }
+        public IReadOnlyDictionary<string, object?>? ProviderProperties { get; set; }
 
         [DataMember(Name = "canRebuild")]
         public bool CanRebuild { get; set; }

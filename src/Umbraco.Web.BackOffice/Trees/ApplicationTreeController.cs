@@ -59,9 +59,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="tree">An optional single tree alias, if specified will only load the single tree for the request app</param>
         /// <param name="queryStrings">The query strings</param>
         /// <param name="use">Tree use.</param>
-        public async Task<ActionResult<TreeRootNode>> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings, TreeUse use = TreeUse.Main)
+        public async Task<ActionResult<TreeRootNode>> GetApplicationTrees(string? application, string? tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings, TreeUse use = TreeUse.Main)
         {
-            application = application.CleanForXss();
+            application = application?.CleanForXss();
 
             if (string.IsNullOrEmpty(application))
             {
@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// loading multiple trees we will just return null so that it's not added
         /// to the list</para>
         /// </remarks>
-        private async Task<ActionResult<TreeNode?>?> TryGetRootNode(Tree tree, FormCollection querystring)
+        private async Task<ActionResult<TreeNode?>?> TryGetRootNode(Tree tree, FormCollection? querystring)
         {
             if (tree == null)
             {
@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Get the tree root node of a tree.
         /// </summary>
-        private async Task<ActionResult<TreeRootNode>> GetTreeRootNode(Tree tree, int id, FormCollection querystring)
+        private async Task<ActionResult<TreeRootNode>> GetTreeRootNode(Tree tree, int id, FormCollection? querystring)
         {
             if (tree == null)
             {
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Gets the root node of a tree.
         /// </summary>
-        private async Task<ActionResult<TreeNode?>?> GetRootNode(Tree tree, FormCollection querystring)
+        private async Task<ActionResult<TreeNode?>?> GetRootNode(Tree tree, FormCollection? querystring)
         {
             if (tree == null)
             {
@@ -288,7 +288,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Get the child nodes of a tree node.
         /// </summary>
-        private async Task<ActionResult<TreeNodeCollection?>?> GetChildren(Tree tree, int id, FormCollection querystring)
+        private async Task<ActionResult<TreeNodeCollection?>?> GetChildren(Tree tree, int id, FormCollection? querystring)
         {
             if (tree == null)
             {
@@ -298,7 +298,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             // the method we proxy has an 'id' parameter which is *not* in the querystring,
             // we need to add it for the proxy to work (else, it does not find the method,
             // when trying to run auth filters etc).
-            var d = querystring.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            var d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
             d["id"] = StringValues.Empty;
             var proxyQuerystring = new FormCollection(d);
 
@@ -324,7 +324,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// and context etc. so it can execute the specified <paramref name="action"/>. Runs the authorization
         /// filters for that action, to ensure that the user has permission to execute it.</para>
         /// </remarks>
-        private async Task<ActionResult<object>> GetApiControllerProxy(Type controllerType, string action, FormCollection querystring)
+        private async Task<ActionResult<object>> GetApiControllerProxy(Type controllerType, string action, FormCollection? querystring)
         {
             // note: this is all required in order to execute the auth-filters for the sub request, we
             // need to "trick" mvc into thinking that it is actually executing the proxied controller.

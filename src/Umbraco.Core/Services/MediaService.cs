@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)

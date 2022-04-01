@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Templates
         }
 
         /// <inheritdoc/>
-        public async Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        public async Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object>? parameters)
         {
             if(content == null)
             {

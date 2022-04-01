@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// This does not save the item, that needs to be done explicitly
         /// </remarks>
-        public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value)
+        public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string? value)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             if (language == null) throw new ArgumentNullException(nameof(language));
