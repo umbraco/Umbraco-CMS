@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services.Implement;
 
@@ -29,7 +30,6 @@ namespace Umbraco.Extensions
             builder.Services.AddTransient(sp =>
             {
                 return GetSupplementaryFileSources(
-                    sp.GetRequiredService<IHostingEnvironment>(),
                     sp.GetRequiredService<IWebHostEnvironment>());
             });
 
@@ -41,7 +41,6 @@ namespace Umbraco.Extensions
         ///  Loads the suplimentary localization files from plugins and user config
         /// </summary>
         private static IEnumerable<LocalizedTextServiceSupplementaryFileSource> GetSupplementaryFileSources(
-            IHostingEnvironment hostingEnvironment,
             IWebHostEnvironment webHostEnvironment)
         {
             var webFileProvider = webHostEnvironment.WebRootFileProvider;
@@ -54,15 +53,15 @@ namespace Umbraco.Extensions
             var razorPluginFolders = GetPluginLanguageFileSources(webFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
 
             // user defined langs that overwrite the default, these should not be used by plugin creators
-            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Cms.Core.Constants.SystemDirectories.Config, "lang")));
+            var userConfigLangFolder = Cms.Core.Constants.SystemDirectories.Config
+                                            .TrimStart(Cms.Core.Constants.CharArrays.Tilde);
 
-            var userLangFolders = configLangFolder.Exists == false
-                ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
-                : configLangFolder
-                    .GetFiles("*.user.xml", SearchOption.TopDirectoryOnly)
+            var userLangFolders = contentFileProvider.GetDirectoryContents(userConfigLangFolder)
+                    .Where(x => x.IsDirectory && x.Name.InvariantEquals("lang"))
+                    .Select(x => new DirectoryInfo(x.PhysicalPath))
+                    .SelectMany(x => x.GetFiles("*.user.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
-            // returned in order where userLangFolders takes precedence over plugins
             return pluginLangFolders
                 .Concat(razorPluginFolders)
                 .Concat(userLangFolders);
