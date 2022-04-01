@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(testLastLoginDate, member.LastLoginDate);
             Assert.AreEqual(testLastPasswordChangeDate, member.LastPasswordChangeDate);
             Assert.AreEqual(testGroups, member.Groups.ToArray());
-            Assert.AreEqual(4, member.Properties.Count);   // 7 from membership properties group, 3 custom
+            Assert.AreEqual(4, member.Properties.Count);   // 1 from membership properties group, 3 custom
             Assert.AreEqual(testPropertyData1.Value, member.GetValue<string>(testPropertyData1.Key));
             Assert.AreEqual(testPropertyData2.Value, member.GetValue<string>(testPropertyData2.Key));
             Assert.AreEqual(testPropertyData3.Value, member.GetValue<string>(testPropertyData3.Key));
