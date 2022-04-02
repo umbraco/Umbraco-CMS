@@ -208,9 +208,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (parent == null)
             {
                 if (move.ParentId == Constants.System.Root)
-                    return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
-                else
                     dictionaryItem.ParentId = null;
+                else                   
+                    return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
             }
             else
             {
