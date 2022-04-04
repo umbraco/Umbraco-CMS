@@ -843,7 +843,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
             var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
-                contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).WhereNotNull().ToArray(),
+                contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
                 defaultCulture);
 
             //get the updated model
