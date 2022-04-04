@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
-using Umbraco.Cms.Web.Common.ImageProviders;
 
 namespace Umbraco.Extensions
 {
@@ -74,7 +73,7 @@ namespace Umbraco.Extensions
                 };
             })
                 // Replace default image provider
-                .RemoveProvider<PhysicalFileSystemProvider>().AddProvider<WebRootImageProvider>()
+                .ClearProviders().AddProvider<WebRootImageProvider>()
                 // Configure cache options
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
