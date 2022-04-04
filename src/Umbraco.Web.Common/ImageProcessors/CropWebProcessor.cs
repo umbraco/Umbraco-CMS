@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Commands;
@@ -20,29 +22,25 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         /// </summary>
         public const string Coordinates = "cc";
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// The command constant for the resize orientation handling mode.
+        /// </summary>
+        public const string Orient = "orient";
+
+        /// <inheritdoc />
         public IEnumerable<string> Commands { get; } = new[]
         {
-            Coordinates
+            Coordinates,
+            Orient
         };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
-            RectangleF? coordinates = GetCoordinates(commands, parser, culture);
-            if (coordinates != null)
+            Rectangle? cropRectangle = GetCropRectangle(image, commands, parser, culture);
+            if (cropRectangle.HasValue)
             {
-                // Convert the coordinates to a pixel based rectangle
-                int sourceWidth = image.Image.Width;
-                int sourceHeight = image.Image.Height;
-                int x = (int)MathF.Round(coordinates.Value.X * sourceWidth);
-                int y = (int)MathF.Round(coordinates.Value.Y * sourceHeight);
-                int width = (int)MathF.Round(coordinates.Value.Width * sourceWidth);
-                int height = (int)MathF.Round(coordinates.Value.Height * sourceHeight);
-
-                var cropRectangle = new Rectangle(x, y, width, height);
-
-                image.Image.Mutate(x => x.Crop(cropRectangle));
+                image.Image.Mutate(x => x.Crop(cropRectangle.Value));
             }
 
             return image;
@@ -51,17 +49,44 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         /// <inheritdoc />
         public bool RequiresTrueColorPixelFormat(CommandCollection commands, CommandParser parser, CultureInfo culture) => false;
 
-        private static RectangleF? GetCoordinates(CommandCollection commands, CommandParser parser, CultureInfo culture)
+        private static Rectangle? GetCropRectangle(FormattedImage image, CommandCollection commands, CommandParser parser, CultureInfo culture)
         {
             float[] coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Coordinates), culture);
-
-            if (coordinates.Length != 4)
+            if (coordinates.Length != 4 ||
+                (coordinates[0] == 0 && coordinates[1] == 0 && coordinates[2] == 0 && coordinates[3] == 0))
             {
                 return null;
             }
 
-            // The right and bottom values are actually the distance from those sides, so convert them into real coordinates
-            return RectangleF.FromLTRB(coordinates[0], coordinates[1], 1 - coordinates[2], 1 - coordinates[3]);
+            // The right and bottom values are actually the distance from those sides, so convert them into real coordinates and transform to correct orientation
+            float left = Math.Clamp(coordinates[0], 0, 1);
+            float top = Math.Clamp(coordinates[1], 0, 1);
+            float right = Math.Clamp(1 - coordinates[2], 0, 1);
+            float bottom = Math.Clamp(1 - coordinates[3], 0, 1);
+            ushort orientation = GetExifOrientation(image, commands, parser, culture);
+            Vector2 xy1 = ExifOrientationUtilities.Transform(new Vector2(left, top), Vector2.Zero, Vector2.One, orientation);
+            Vector2 xy2 = ExifOrientationUtilities.Transform(new Vector2(right, bottom), Vector2.Zero, Vector2.One, orientation);
+
+            // Scale points to a pixel based rectangle
+            Size size = image.Image.Size();
+            int x = (int)MathF.Round(MathF.Min(xy1.X, xy2.X) * size.Width);
+            int y = (int)MathF.Round(MathF.Min(xy1.Y, xy2.Y) * size.Height);
+            int width = (int)MathF.Round(MathF.Max(xy1.X, xy2.X) * size.Width) - x;
+            int height = (int)MathF.Round(MathF.Max(xy1.Y, xy2.Y) * size.Height) - y;
+
+            return new Rectangle(x, y, width, height);
+        }
+
+        private static ushort GetExifOrientation(FormattedImage image, CommandCollection commands, CommandParser parser, CultureInfo culture)
+        {
+            if (commands.Contains(Orient) && !parser.ParseValue<bool>(commands.GetValueOrDefault(Orient), culture))
+            {
+                return ExifOrientationMode.Unknown;
+            }
+
+            image.TryGetExifOrientation(out ushort orientation);
+
+            return orientation;
         }
     }
 }
