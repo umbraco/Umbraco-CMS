@@ -62,7 +62,7 @@ namespace Umbraco.Extensions
                 options.OnPrepareResponseAsync = context =>
                 {
                     // Change Cache-Control header when cache buster value is present
-                    if (context.Request.Query.ContainsKey("rnd"))
+                    if (context.Request.Query.ContainsKey("rnd") || context.Request.Query.ContainsKey("v"))
                     {
                         var headers = context.Response.GetTypedHeaders();
 
