@@ -80,8 +80,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         // TODO(V10) : change return type to Task<ActionResult<JObject>> and consider removing baseUrl as parameter
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string? baseUrl)
         {
+            if (baseUrl is null)
+            {
+                baseUrl = "https://dashboard.umbraco.com/";
+            }
+
             var user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             var allowedSections = string.Join(",", user?.AllowedSections ?? Array.Empty<string>());
             var language = user?.Language;
@@ -141,8 +146,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         // TODO(V10) : consider removing baseUrl as parameter
-        public async Task<IActionResult> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<IActionResult> GetRemoteDashboardCss(string section, string? baseUrl)
         {
+            if (baseUrl is null)
+            {
+                baseUrl = "https://dashboard.umbraco.org/";
+            }
+
             if (!IsAllowedUrl(baseUrl))
             {
                 _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}");

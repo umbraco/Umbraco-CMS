@@ -54,7 +54,7 @@ namespace Umbraco.Extensions
         public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, IDictionary<string, object?>? values)
             where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), values);
 
-        public static string? GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
+        public static string? GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object?>> methodSelector)
             where T : UmbracoApiControllerBase
         {
             var method = ExpressionHelper.GetMethodInfo(methodSelector);
