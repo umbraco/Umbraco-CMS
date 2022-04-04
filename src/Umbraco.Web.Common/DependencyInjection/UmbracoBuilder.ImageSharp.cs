@@ -43,11 +43,15 @@ namespace Umbraco.Extensions
                         return Task.CompletedTask;
                     }
 
-                    uint width = context.Parser.ParseValue<uint>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width), context.Culture);
-                    uint height = context.Parser.ParseValue<uint>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height), context.Culture);
-                    if (width > imagingSettings.Resize.MaxWidth || height > imagingSettings.Resize.MaxHeight)
+                    int width = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width), context.Culture);
+                    if (width <= 0 || width > imagingSettings.Resize.MaxWidth)
                     {
                         context.Commands.Remove(ResizeWebProcessor.Width);
+                    }
+
+                    int height = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height), context.Culture);
+                    if (height <= 0 || height > imagingSettings.Resize.MaxHeight)
+                    {
                         context.Commands.Remove(ResizeWebProcessor.Height);
                     }
 
