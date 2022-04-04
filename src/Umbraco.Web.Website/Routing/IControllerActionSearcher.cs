@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Web.Website.Routing
 {
     public interface IControllerActionSearcher
     {
-        ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action);
+        ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action);
     }
 }

@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="alias">Alias of the PropertyType</param>
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
-        public override bool PropertyTypeExists(string alias) => CompositionPropertyTypes.Any(x => x.Alias == alias);
+        public override bool PropertyTypeExists(string? alias) => CompositionPropertyTypes.Any(x => x.Alias == alias);
 
         /// <inheritdoc />
         public override bool AddPropertyGroup(string alias, string name) => AddAndReturnPropertyGroup(alias, name) != null;

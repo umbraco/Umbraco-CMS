@@ -127,13 +127,13 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             Type controllerType,
             string rootSegment,
-            string areaName,
+            string? areaName,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
             object? constraints = null)
         {
             // If there is an area name it's a plugin controller, and we should use the area name instead of surface
-            string prefixPathSegment = areaName.IsNullOrWhiteSpace() ? "Surface" : areaName;
+            string prefixPathSegment = areaName.IsNullOrWhiteSpace() ? "Surface" : areaName!;
 
             endpoints.MapUmbracoRoute(
                 controllerType,

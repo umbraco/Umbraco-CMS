@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                     // If it's not a local URL we'll redirect to the root of the current site.
                     return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                         ? model.RedirectUrl
-                        : CurrentPage.AncestorOrSelf(1).Url(PublishedUrlProvider));
+                        : CurrentPage!.AncestorOrSelf(1)!.Url(PublishedUrlProvider));
                 }
 
                 // Redirect to current URL by default.

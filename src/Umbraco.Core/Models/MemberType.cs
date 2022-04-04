@@ -88,9 +88,9 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="propertyTypeAlias">PropertyType Alias of the Property to check</param>
         /// <returns></returns>
-        public bool MemberCanEditProperty(string propertyTypeAlias)
+        public bool MemberCanEditProperty(string? propertyTypeAlias)
         {
-            return _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
+            return propertyTypeAlias is not null && _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
         }
 
         /// <summary>

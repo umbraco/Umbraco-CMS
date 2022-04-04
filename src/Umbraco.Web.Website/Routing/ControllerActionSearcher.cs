@@ -35,11 +35,11 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// Determines if a custom controller can hijack the current route
         /// </summary>
         /// <typeparam name="T">The controller type to find</typeparam>
-        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action)
+        public ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action)
         {
-            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates<T>(httpContext, controller, action, DefaultActionName);
+            IReadOnlyList<ControllerActionDescriptor>? candidates = FindControllerCandidates<T>(httpContext, controller, action, DefaultActionName);
 
-            if (candidates.Count > 0)
+            if (candidates?.Count > 0)
             {
                 return candidates[0];
             }
@@ -50,10 +50,10 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// <summary>
         /// Return a list of controller candidates that match the custom controller and action names
         /// </summary>
-        private IReadOnlyList<ControllerActionDescriptor> FindControllerCandidates<T>(
+        private IReadOnlyList<ControllerActionDescriptor>? FindControllerCandidates<T>(
             HttpContext httpContext,
-            string customControllerName,
-            string customActionName,
+            string? customControllerName,
+            string? customActionName,
             string defaultActionName)
         {
             // Use aspnetcore's IActionSelector to do the finding since it uses an optimized cache lookup
@@ -69,12 +69,12 @@ namespace Umbraco.Cms.Web.Website.Routing
             };
 
             // try finding candidates for the custom action
-            var candidates = _actionSelector.SelectCandidates(routeContext)
+            var candidates = _actionSelector.SelectCandidates(routeContext)?
                 .Cast<ControllerActionDescriptor>()
                 .Where(x => TypeHelper.IsTypeAssignableFrom<T>(x.ControllerTypeInfo))
                 .ToList();
 
-            if (candidates.Count > 0)
+            if (candidates?.Count > 0)
             {
                 // return them if found
                 return candidates;
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             // now find for the default action since we couldn't find the custom one
             routeValues[ActionToken] = defaultActionName;
-            candidates = _actionSelector.SelectCandidates(routeContext)
+            candidates = _actionSelector.SelectCandidates(routeContext)?
                 .Cast<ControllerActionDescriptor>()
                 .Where(x => TypeHelper.IsTypeAssignableFrom<T>(x.ControllerTypeInfo))
                 .ToList();

@@ -301,7 +301,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="alias">Alias of the PropertyType</param>
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
-        public abstract bool PropertyTypeExists(string alias);
+        public abstract bool PropertyTypeExists(string? alias);
 
         /// <inheritdoc />
         public abstract bool AddPropertyGroup(string alias, string name);

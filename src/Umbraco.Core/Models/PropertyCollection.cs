@@ -142,13 +142,13 @@ namespace Umbraco.Cms.Core.Models
         {
             get
             {
-                return this.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyType.Alias) ?? false);
+                return this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyType.Alias));
             }
         }
 
         public bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property)
         {
-            property = this.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
+            property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             return property != null;
         }
 

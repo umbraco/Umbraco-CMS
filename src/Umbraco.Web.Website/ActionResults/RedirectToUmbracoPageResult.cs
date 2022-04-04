@@ -17,11 +17,11 @@ namespace Umbraco.Cms.Web.Website.ActionResults
     /// </summary>
     public class RedirectToUmbracoPageResult : IActionResult, IKeepTempDataResult
     {
-        private IPublishedContent _publishedContent;
+        private IPublishedContent? _publishedContent;
         private readonly QueryString _queryString;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private string _url;
+        private string? _url;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedirectToUmbracoPageResult"/> class.
@@ -47,10 +47,10 @@ namespace Umbraco.Cms.Web.Website.ActionResults
         /// <summary>
         /// Initializes a new instance of the <see cref="RedirectToUmbracoPageResult"/> class.
         /// </summary>
-        public RedirectToUmbracoPageResult(IPublishedContent publishedContent, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectToUmbracoPageResult(IPublishedContent? publishedContent, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
-            Key = publishedContent.Key;
+            Key = publishedContent?.Key ?? Guid.Empty;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -58,10 +58,10 @@ namespace Umbraco.Cms.Web.Website.ActionResults
         /// <summary>
         /// Initializes a new instance of the <see cref="RedirectToUmbracoPageResult"/> class.
         /// </summary>
-        public RedirectToUmbracoPageResult(IPublishedContent publishedContent, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectToUmbracoPageResult(IPublishedContent? publishedContent, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
-            Key = publishedContent.Key;
+            Key = publishedContent?.Key ?? Guid.Empty;
             _queryString = queryString;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Web.Website.ActionResults
 
         public Guid Key { get; }
 
-        private IPublishedContent PublishedContent
+        private IPublishedContent? PublishedContent
         {
             get
             {
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Web.Website.ActionResults
                 }
 
                 // need to get the URL for the page
-                _publishedContent = _umbracoContextAccessor.GetRequiredUmbracoContext().Content.GetById(Key);
+                _publishedContent = _umbracoContextAccessor.GetRequiredUmbracoContext().Content?.GetById(Key);
 
                 return _publishedContent;
             }

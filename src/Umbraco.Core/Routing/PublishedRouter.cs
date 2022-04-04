@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public async Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent publishedContent)
+        public async Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent? publishedContent)
         {
             // store the original (if any)
             IPublishedContent? content = request.PublishedContent;
