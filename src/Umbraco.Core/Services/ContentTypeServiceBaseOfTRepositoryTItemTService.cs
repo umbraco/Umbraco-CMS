@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Services
                 using (var scope = ScopeProvider.CreateScope(autoComplete: true))
                 {
                     scope.ReadLock(ReadLockIds);
-                    ValidateLocked(compo);
+                    ValidateLocked(compo!);
                 }
                 return Attempt<string[]?>.Succeed();
             }
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        protected void ValidateLocked(TItem? compositionContentType)
+        protected void ValidateLocked(TItem compositionContentType)
         {
             // performs business-level validation of the composition
             // should ensure that it is absolutely safe to save the composition
@@ -299,6 +299,11 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<TItem> GetAll(IEnumerable<Guid>? ids)
         {
+            if (ids is null)
+            {
+                return Enumerable.Empty<TItem>();
+            }
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);

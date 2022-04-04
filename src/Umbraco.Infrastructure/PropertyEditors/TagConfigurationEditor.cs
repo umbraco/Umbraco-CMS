@@ -33,14 +33,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return dictionary;
         }
 
-        public override TagConfiguration? FromConfigurationEditor(IDictionary<string, object> editorValues, TagConfiguration? configuration)
+        public override TagConfiguration? FromConfigurationEditor(IDictionary<string, object?>? editorValues, TagConfiguration? configuration)
         {
             // the front-end editor returns the string value of the storage type
             // pure Json could do with
             // [JsonConverter(typeof(StringEnumConverter))]
             // but here we're only deserializing to object and it's too late
 
-            editorValues["storageType"] = Enum.Parse(typeof(TagsStorageType), (string) editorValues["storageType"]);
+            if (editorValues is not null)
+            {
+                editorValues["storageType"] = Enum.Parse(typeof(TagsStorageType), (string) editorValues["storageType"]!);
+            }
+
             return base.FromConfigurationEditor(editorValues, configuration);
         }
     }

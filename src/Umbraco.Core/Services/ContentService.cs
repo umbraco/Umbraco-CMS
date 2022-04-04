@@ -2850,12 +2850,12 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="ids"></param>
         /// <param name="userId"></param>
         /// <returns>Result indicating what action was taken when handling the command.</returns>
-        public OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId)
+        public OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            var idsA = ids.ToArray();
-            if (idsA.Length == 0)
+            var idsA = ids?.ToArray();
+            if (idsA is null || idsA.Length == 0)
             {
                 return new OperationResult(OperationResultType.NoOperation, evtMsgs);
             }

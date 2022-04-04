@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Gets or sets the key of the field.
         /// </summary>
         [DataMember(Name = "key", IsRequired = true)]
-        public string? Key { get; set; }
+        public string Key { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the name of the field.

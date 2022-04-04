@@ -67,11 +67,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ValueListConfiguration? configuration)
+        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, ValueListConfiguration? configuration)
         {
             var output = new ValueListConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // auto-assigning our ids, get next id from existing values

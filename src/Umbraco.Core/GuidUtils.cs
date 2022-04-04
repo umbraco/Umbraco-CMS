@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core
         /// <param name="b">The seconds guid.</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Guid? Combine(Guid a, Guid b)
+        public static Guid Combine(Guid a, Guid b)
         {
             var ad = new DecomposedGuid(a);
             var bd = new DecomposedGuid(b);
@@ -58,12 +58,13 @@ namespace Umbraco.Cms.Core
         /// that is case insensitive (base-64 is case sensitive).</para>
         /// <para>Length must be 1-26, anything else becomes 26.</para>
         /// </remarks>
-        public static string ToBase32String(Guid? guid, int length = 26)
+        public static string ToBase32String(Guid guid, int length = 26)
         {
+
             if (length <= 0 || length > 26)
                 length = 26;
 
-            var bytes = guid?.ToByteArray(); // a Guid is 128 bits ie 16 bytes
+            var bytes = guid.ToByteArray(); // a Guid is 128 bits ie 16 bytes
 
             // this could be optimized by making it unsafe,
             // and fixing the table + bytes + chars (see Convert.ToBase64CharArray)

@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 throw new ArgumentException("Null umbracoUrls");
             }
 
-            if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
+            if (!(umbracoUrlsObject is Dictionary<string, object?> umbracoUrls))
             {
                 throw new ArgumentException("Invalid umbracoUrls");
             }

@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
 
         /// <summary>
         /// Gets the implicit/inherited permissions for the user for the given path
@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Core.Services
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        void Save(IUserGroup? userGroup, int[]? userIds = null);
+        void Save(IUserGroup userGroup, int[]? userIds = null);
 
         /// <summary>
         /// Deletes a UserGroup

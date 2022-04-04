@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override object? FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
+        public sealed override object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration)
         {
             return FromConfigurationEditor(editorValues, (TConfiguration?) configuration);
         }
@@ -135,7 +135,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValues">The configuration object posted by the editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        public virtual TConfiguration? FromConfigurationEditor(IDictionary<string, object> editorValues, TConfiguration? configuration)
+        public virtual TConfiguration? FromConfigurationEditor(IDictionary<string, object?>? editorValues, TConfiguration? configuration)
         {
             // note - editorValue contains a mix of CLR types (string, int...) and JToken
             // turning everything back into a JToken... might not be fastest but is simplest
@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // field only, JsonPropertyAttribute is ignored here
                 // only keep fields that have a non-null/empty value
                 // rest will fall back to default during ToObject()
-                if (editorValues.TryGetValue(field.Key!, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
+                if (editorValues is not null && editorValues.TryGetValue(field.Key!, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
                 {
                     if (value is JToken jtoken)
                     {

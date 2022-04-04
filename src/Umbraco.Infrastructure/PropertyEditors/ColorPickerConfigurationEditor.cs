@@ -105,11 +105,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         // send: { "items": { "<id>": { "value": "<color>", "label": "<label>", "sortOrder": <sortOrder> } , ... }, "useLabel": <bool> }
         // recv: { "items": ..., "useLabel": <bool> }
 
-        public override ColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ColorPickerConfiguration? configuration)
+        public override ColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, ColorPickerConfiguration? configuration)
         {
             var output = new ColorPickerConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // handle useLabel

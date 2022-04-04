@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Web.Mvc
     /// </summary>
     public class PluginControllerMetadata
     {
-        public Type? ControllerType { get; set; }
+        public Type ControllerType { get; set; } = null!;
         public string? ControllerName { get; set; }
         public string? ControllerNamespace { get; set; }
         public string? AreaName { get; set; }

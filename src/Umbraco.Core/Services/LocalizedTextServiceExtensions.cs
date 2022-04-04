@@ -51,7 +51,7 @@ namespace Umbraco.Extensions
          /// </summary>
          /// <param name="variables"></param>
          /// <returns></returns>
-         internal static IDictionary<string, string?>? ConvertToDictionaryVars(string?[] variables)
+         internal static IDictionary<string, string?>? ConvertToDictionaryVars(string?[]? variables)
          {
              if (variables == null) return null;
              if (variables.Any() == false) return null;

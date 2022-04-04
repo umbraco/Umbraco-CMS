@@ -261,7 +261,7 @@ namespace Umbraco.Cms.Core.Security
             }
 
             //is it self?
-            var self = startNodePaths.Any(x => x == path);
+            var self = startNodePaths?.Any(x => x == path) ?? false;
             if (self)
             {
                 hasPathAccess = true;
@@ -269,7 +269,7 @@ namespace Umbraco.Cms.Core.Security
             }
 
             //is it ancestor?
-            var ancestor = startNodePaths.Any(x => x.StartsWith(path));
+            var ancestor = startNodePaths?.Any(x => x.StartsWith(path)) ?? false;
             if (ancestor)
             {
                 //hasPathAccess = false;
@@ -277,7 +277,7 @@ namespace Umbraco.Cms.Core.Security
             }
 
             //is it descendant?
-            var descendant = startNodePaths.Any(x => path.StartsWith(x));
+            var descendant = startNodePaths?.Any(x => path.StartsWith(x)) ?? false;
             if (descendant)
             {
                 hasPathAccess = true;

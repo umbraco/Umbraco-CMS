@@ -86,17 +86,23 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson)!;
 
         /// <inheritdoc />
-        public virtual object? FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
+        public virtual object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration)
         {
             // by default, return the posted dictionary
             // but only keep entries that have a non-null/empty value
             // rest will fall back to default during ToConfigurationEditor()
 
-            var keys = editorValues.Where(x =>
+            var keys = editorValues?.Where(x =>
                     x.Value == null || x.Value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
                 .Select(x => x.Key).ToList();
 
-            foreach (var key in keys) editorValues.Remove(key);
+            if (keys is not null)
+            {
+                foreach (var key in keys)
+                {
+                    editorValues?.Remove(key);
+                }
+            }
 
             return editorValues;
         }

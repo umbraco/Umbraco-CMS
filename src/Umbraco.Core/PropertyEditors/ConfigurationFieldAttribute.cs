@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public ConfigurationFieldAttribute(Type type)
         {
             Type = type;
+            Key = string.Empty;
         }
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             Name = name;
             View = view;
+            Key = string.Empty;
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <remarks>When null or empty, the <see cref="ConfigurationEditor"/> should derive a key
         /// from the name of the property marked with this attribute.</remarks>
-        public string? Key { get; }
+        public string Key { get; }
 
         /// <summary>
         /// Gets the friendly name of the field.

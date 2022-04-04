@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         //These need explicit implementation because we are using internal models
         /// <inheritdoc />
         [IgnoreDataMember]
-        IContent IContentSave<IContent>.PersistedContent { get; set; }
+        IContent IContentSave<IContent>.PersistedContent { get; set; } = null!;
 
         //Non explicit internal getter so we don't need to explicitly cast in our own code
         [IgnoreDataMember]

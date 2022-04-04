@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Services
             foreach (var dashboard in _dashboardCollection.Where(x => x.Sections.InvariantContains(section)))
             {
                 // validate access
-                if (!CheckUserAccessByRules(currentUser, _sectionService, dashboard.AccessRules))
+                if (currentUser is null || !CheckUserAccessByRules(currentUser, _sectionService, dashboard.AccessRules))
                     continue;
 
                 if (dashboard.View?.InvariantEndsWith(".ascx") ?? false)
@@ -61,9 +61,9 @@ namespace Umbraco.Cms.Core.Services
             return _sectionService.GetSections().ToDictionary(x => x.Alias, x => GetDashboards(x.Alias, currentUser));
         }
 
-        private bool CheckUserAccessByRules(IUser? user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
+        private bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
         {
-            if (user?.Id == Constants.Security.SuperUserId)
+            if (user.Id == Constants.Security.SuperUserId)
                 return true;
 
             var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);

@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Benchmarks
         private static readonly Guid _b = Guid.NewGuid();
 
         [Benchmark]
-        public byte[] CombineUtils() => GuidUtils.Combine(_a, _b)?.ToByteArray();
+        public byte[] CombineUtils() => GuidUtils.Combine(_a, _b).ToByteArray();
 
         [Benchmark]
         public byte[] CombineLoop() => Combine(_a, _b);

@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="date">If specified, will clear all entries with dates less than or equal to the value</param>
         public void Clear(string? culture, ContentScheduleAction action, DateTime? date = null)
         {
-            if (!_schedule.TryGetValue(culture, out var schedules))
+            if (culture is null || !_schedule.TryGetValue(culture, out var schedules))
                 return;
 
             var removes = schedules.Where(x => x.Value.Action == action && (!date.HasValue || x.Value.Date <= date.Value)).ToList();
@@ -178,7 +178,7 @@ namespace Umbraco.Cms.Core.Models
         /// <returns></returns>
         public IEnumerable<ContentSchedule> GetSchedule(string? culture, ContentScheduleAction? action = null)
         {
-            if (_schedule.TryGetValue(culture, out var changes))
+            if (culture is not null && _schedule.TryGetValue(culture, out var changes))
                 return action == null ? changes.Values : changes.Values.Where(x => x.Action == action.Value);
             return Enumerable.Empty<ContentSchedule>();
         }

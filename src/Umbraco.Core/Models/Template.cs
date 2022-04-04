@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models
         private string? _masterTemplateAlias;
         private Lazy<int>? _masterTemplateId;
 
-        public Template(IShortStringHelper shortStringHelper, string? name, string alias)
+        public Template(IShortStringHelper shortStringHelper, string? name, string? alias)
             : this(shortStringHelper, name, alias, null)
         { }
 

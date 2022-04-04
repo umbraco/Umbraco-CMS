@@ -201,8 +201,12 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId)
+        public void SaveScript(IScript? script, int? userId)
         {
+            if (userId is null)
+            {
+                userId = Constants.Security.SuperUserId;
+            }
             if (script is null)
             {
                 return;
@@ -316,7 +320,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
         {
             var template = new Template(_shortStringHelper, contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't

@@ -588,7 +588,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // IMember on the PersistedContent with what is stored since it will be mapped to display.
             if (needsResync && contentItem.PersistedContent is not null)
             {
-                contentItem.PersistedContent = _memberService.GetById(contentItem.PersistedContent.Id);
+                contentItem.PersistedContent = _memberService.GetById(contentItem.PersistedContent.Id)!;
             }
 
             return true;

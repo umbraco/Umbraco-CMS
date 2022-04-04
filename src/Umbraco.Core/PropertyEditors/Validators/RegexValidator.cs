@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         }
 
         /// <inheritdoc cref="IValueValidator.Validate"/>
-        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             if (_regex == null)
             {
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         }
 
         /// <inheritdoc cref="IValueFormatValidator.ValidateFormat"/>
-        public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
+        public IEnumerable<ValidationResult> ValidateFormat(object? value, string? valueType, string format)
         {
             if (format == null) throw new ArgumentNullException(nameof(format));
             if (string.IsNullOrWhiteSpace(format)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(format));

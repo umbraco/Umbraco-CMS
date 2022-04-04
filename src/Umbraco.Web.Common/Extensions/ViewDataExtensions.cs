@@ -47,7 +47,7 @@ namespace Umbraco.Extensions
             if (!hasCookie) return false;
 
             // get the cookie value
-            if (!httpContext.Request.Cookies.TryGetValue(cookieName, out var cookieVal))
+            if (httpContext is null || !httpContext.Request.Cookies.TryGetValue(cookieName, out var cookieVal))
             {
                 return false;
             }

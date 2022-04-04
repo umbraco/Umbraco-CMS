@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
             // for a single content cannot store two different files with the same name
 
             var combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
-            var directory = HexEncoder.Encode(combinedGuid?.ToByteArray()/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
+            var directory = HexEncoder.Encode(combinedGuid.ToByteArray()/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
             return Path.Combine(directory, filename).Replace('\\', '/');
         }
 

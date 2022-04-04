@@ -15,7 +15,7 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             Type controllerType,
             string rootSegment,
-            string areaName,
+            string? areaName,
             string? prefixPathSegment,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
@@ -57,7 +57,7 @@ namespace Umbraco.Extensions
 
                     // named consistently
                     $"umbraco-{areaName}-{controllerName}".ToLowerInvariant(),
-                    areaName,
+                    areaName!,
                     pattern.ToString().ToLowerInvariant(),
                     defaults,
                     constraints);
@@ -98,7 +98,7 @@ namespace Umbraco.Extensions
         /// </summary>
         public static void MapUmbracoApiRoute(
             this IEndpointRouteBuilder endpoints,
-            Type? controllerType,
+            Type controllerType,
             string rootSegment,
             string? areaName,
             bool isBackOffice,

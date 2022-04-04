@@ -192,8 +192,13 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser? GetByUsername(string username)
+        public IUser? GetByUsername(string? username)
         {
+            if (username is null)
+            {
+                return null;
+            }
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 try
@@ -813,7 +818,7 @@ namespace Umbraco.Cms.Core.Services
         /// than all users will be removed from this group and only these users will be added
         /// </param>
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup? userGroup, int[]? userIds = null)
+        public void Save(IUserGroup userGroup, int[]? userIds = null)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -826,7 +831,7 @@ namespace Umbraco.Cms.Core.Services
 
                 if (userIds != null)
                 {
-                    var groupUsers = userGroup?.HasIdentity ?? false ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
+                    var groupUsers = userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
                     var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
                     var groupIds = groupUsers.Select(x => x.Id).ToArray();
                     var addedUserIds = userIds.Except(groupIds);
@@ -951,12 +956,12 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _userGroupRepository.GetPermissions(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
+                return _userGroupRepository.GetPermissions(groups.WhereNotNull().Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
             }
         }
         /// <summary>

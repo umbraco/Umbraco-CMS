@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
             var a = Guid.NewGuid();
             var b = Guid.NewGuid();
 
-            Assert.AreEqual(GuidUtils.Combine(a, b)?.ToByteArray(), Combine(a, b));
+            Assert.AreEqual(GuidUtils.Combine(a, b).ToByteArray(), Combine(a, b));
         }
 
         [Test]

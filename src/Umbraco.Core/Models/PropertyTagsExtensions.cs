@@ -203,7 +203,7 @@ namespace Umbraco.Extensions
 
         // assumes that parameters are consistent with the datatype configuration
         // value can be an enumeration of string, or a serialized value using storageType format
-        private static void SetTagsValue(IProperty property, object value, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string culture)
+        private static void SetTagsValue(IProperty property, object? value, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string? culture)
         {
             if (value == null) value = Enumerable.Empty<string>();
 

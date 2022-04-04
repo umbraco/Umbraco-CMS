@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="language"></param
         /// <param name="value"></param>
         /// <returns></returns>
-        void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string? value);
+        void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value);
 
         /// <summary>
         /// Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.

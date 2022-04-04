@@ -21,11 +21,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
             items.Validators.Add(new ValueListUniqueValueValidator());
         }
 
-        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, DropDownFlexibleConfiguration? configuration)
+        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, DropDownFlexibleConfiguration? configuration)
         {
             var output = new DropDownFlexibleConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // handle multiple

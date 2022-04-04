@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         public string ValidationName => "Integer";
 
         /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             if (value != null && value.ToString() != string.Empty)
             {

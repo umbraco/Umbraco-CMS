@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 return;
             }
 
-            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model)!;
 
             //create the dto from the persisted model
             if (model.PersistedContent != null)

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
 
 
         /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object? value, string valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             // TODO: localize these!
             if (value != null)

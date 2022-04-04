@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     {
         public EntityBasic()
         {
-            AdditionalData = new Dictionary<string, object>();
+            AdditionalData = new Dictionary<string, object?>();
             Alias = string.Empty;
             Path = string.Empty;
         }

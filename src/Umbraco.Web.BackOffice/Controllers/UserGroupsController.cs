@@ -92,8 +92,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //map the model to the persisted instance
             _umbracoMapper.Map(userGroupSave, userGroupSave.PersistedUserGroup);
 
-            //save the group
-            _userService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users?.ToArray());
+            if (userGroupSave.PersistedUserGroup is not null)
+            {
+                //save the group
+                _userService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users?.ToArray());
+            }
 
             //deal with permissions
 
