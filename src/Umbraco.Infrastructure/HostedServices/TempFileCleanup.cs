@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="mainDom">Representation of the main application domain.</param>
         /// <param name="logger">The typed logger.</param>
         public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger)
-            : base(TimeSpan.FromMinutes(60), DefaultDelay)
+            : base(logger, TimeSpan.FromMinutes(60), DefaultDelay)
         {
             _ioHelper = ioHelper;
             _mainDom = mainDom;

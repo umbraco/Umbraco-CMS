@@ -61,6 +61,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IProfilingLogger profilingLogger,
             ICronTabParser cronTabParser)
             : base(
+                logger,
                 healthChecksSettings.CurrentValue.Notification.Period,
                 healthChecksSettings.CurrentValue.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
         {

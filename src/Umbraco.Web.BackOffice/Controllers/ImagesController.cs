@@ -1,9 +1,11 @@
 using System;
 using System.IO;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -53,10 +55,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         public IActionResult GetResized(string imagePath, int width)
         {
-            var ext = Path.GetExtension(imagePath);
+            // We have to use HttpUtility to encode the path here, for non-ASCII characters
+            // We cannot use the WebUtility, as we only want to encode the path, and not the entire string
+            var encodedImagePath = HttpUtility.UrlPathEncode(imagePath);
+
+
+            var ext = Path.GetExtension(encodedImagePath);
 
             // check if imagePath is local to prevent open redirect
-            if (!Uri.IsWellFormedUriString(imagePath, UriKind.Relative))
+            if (!Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
             {
                 return Unauthorized();
             }
@@ -82,7 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath)
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath)
             {
                 Width = width,
                 ImageCropMode = ImageCropMode.Max,

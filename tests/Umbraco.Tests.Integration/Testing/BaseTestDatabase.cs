@@ -9,6 +9,11 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Moq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.Integration.Testing

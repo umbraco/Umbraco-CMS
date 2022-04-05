@@ -71,6 +71,7 @@ namespace Umbraco.Cms.Core.Security
                     return result;
                 }
             }
+
             // We need to check for clear text passwords from members as the first thing. This was possible in v8 :(
             else if (IsSuccessfulLegacyPassword(hashedPassword, providedPassword))
             {
@@ -138,7 +139,7 @@ namespace Umbraco.Cms.Core.Security
             }
 
             var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
-            return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
+            return result || LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
         }
 
         private static string DecryptLegacyPassword(string encryptedPassword, string algorithmName, string decryptionKey)

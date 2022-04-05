@@ -226,6 +226,8 @@ stages:
             value: cypress@umbraco.com
           - name: Umbraco__CMS__Unattended__UnattendedUserPassword
             value: UmbracoAcceptance123!
+          - name: Umbraco__CMS__Global__InstallMissingDatabase
+            value: true
       jobs:
           - job: Windows_Acceptance_tests
             variables:

@@ -3,8 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -16,6 +15,8 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Cms.Infrastructure.Templates;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -36,12 +37,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
+        private readonly IHtmlMacroParameterParser _macroParameterParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IIOHelper _ioHelper;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// The constructor will setup the property editor based on the attribute if one is found.
         /// </summary>
         public RichTextPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
@@ -50,7 +52,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             HtmlLocalLinkParser localLinkParser,
             RichTextEditorPastedImages pastedImages,
             IIOHelper ioHelper,
-            IImageUrlGenerator imageUrlGenerator)
+            IImageUrlGenerator imageUrlGenerator,
+            IHtmlMacroParameterParser macroParameterParser)
             : base(dataValueEditorFactory)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -59,6 +62,20 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _pastedImages = pastedImages;
             _ioHelper = ioHelper;
             _imageUrlGenerator = imageUrlGenerator;
+            _macroParameterParser = macroParameterParser;
+        }
+
+        [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
+        public RichTextPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator)
+            : this (dataValueEditorFactory, backOfficeSecurityAccessor, imageSourceParser, localLinkParser, pastedImages, ioHelper, imageUrlGenerator, StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
+        {
         }
 
         /// <summary>
@@ -81,6 +98,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly HtmlLocalLinkParser _localLinkParser;
+            private readonly IHtmlMacroParameterParser _macroParameterParser;
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly IImageUrlGenerator _imageUrlGenerator;
             private readonly IHtmlSanitizer _htmlSanitizer;
@@ -96,7 +114,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 IImageUrlGenerator imageUrlGenerator,
                 IJsonSerializer jsonSerializer,
                 IIOHelper ioHelper,
-                IHtmlSanitizer htmlSanitizer)
+                IHtmlSanitizer htmlSanitizer,
+                IHtmlMacroParameterParser macroParameterParser)
                 : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -105,6 +124,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _pastedImages = pastedImages;
                 _imageUrlGenerator = imageUrlGenerator;
                 _htmlSanitizer = htmlSanitizer;
+                _macroParameterParser = macroParameterParser;
+            }
+
+            [Obsolete("Use the constructor which takes an HtmlMacroParameterParser instead")]
+            public RichTextPropertyValueEditor(
+                DataEditorAttribute attribute,
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                HtmlImageSourceParser imageSourceParser,
+                HtmlLocalLinkParser localLinkParser,
+                RichTextEditorPastedImages pastedImages,
+                IImageUrlGenerator imageUrlGenerator,
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
+                IHtmlSanitizer htmlSanitizer)
+                : this(attribute, backOfficeSecurityAccessor, localizedTextService, shortStringHelper, imageSourceParser,
+                       localLinkParser, pastedImages, imageUrlGenerator, jsonSerializer, ioHelper, htmlSanitizer,
+                       StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
+            {
             }
 
             /// <inheritdoc />
@@ -203,6 +242,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
 
                 //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
+                //UPDATE: We are getting the Macros in 'FindUmbracoEntityReferencesFromEmbeddedMacros' - perhaps we just return the macro Udis here too or do they need their own relationAlias?
+
+                foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromEmbeddedMacros(asString))
+                    yield return umbracoEntityReference;
             }
         }
 

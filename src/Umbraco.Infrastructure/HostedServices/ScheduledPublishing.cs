@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             ILogger<ScheduledPublishing> logger,
             IServerMessenger serverMessenger,
             IScopeProvider scopeProvider)
-            : base(TimeSpan.FromMinutes(1), DefaultDelay)
+            : base(logger, TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtimeState = runtimeState;
             _mainDom = mainDom;
