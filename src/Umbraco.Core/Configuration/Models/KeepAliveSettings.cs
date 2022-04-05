@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool DisableKeepAliveTask { get; set; } = StaticDisableKeepAliveTask;
 
         /// <summary>
-        /// Gets a value for the keep alive ping URL.
+        /// Gets or sets a value for the keep alive ping URL.
         /// </summary>
         [DefaultValue(StaticKeepAlivePingUrl)]
         public string KeepAlivePingUrl { get; set; } = StaticKeepAlivePingUrl;
