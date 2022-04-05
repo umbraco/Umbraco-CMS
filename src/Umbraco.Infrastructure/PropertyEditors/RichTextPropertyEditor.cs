@@ -225,15 +225,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <returns></returns>
             public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
-                var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+                var asString = value == null ? string.Empty : value is string str ? str : value.ToString()!;
 
-                foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString!))
+                foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
                 {
                     yield return new UmbracoEntityReference(udi);
                 }
 
-                IEnumerable<Udi?> udis = _localLinkParser.FindUdisFromLocalLinks(asString!);
-                foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString!))
+                foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
                 {
                     if (udi is not null)
                     {

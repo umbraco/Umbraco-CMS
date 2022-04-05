@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value == null)
                     return null;
@@ -222,7 +222,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return grid;
             }
 
-            private GridValue? DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl>? richTextValues, out IEnumerable<GridValue.GridControl>? mediaValues, out IEnumerable<GridValue.GridControl> macroValues)
+            private GridValue? DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl>? richTextValues, out IEnumerable<GridValue.GridControl>? mediaValues, out IEnumerable<GridValue.GridControl>? macroValues)
             {
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
 
@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 mediaValues = controls?.Where(x => x.Editor.Alias.ToLowerInvariant() == "media");
 
                 // Find all the macros
-                macroValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "macro");
+                macroValues = controls?.Where(x => x.Editor.Alias.ToLowerInvariant() == "macro");
 
                 return grid;
             }
@@ -251,7 +251,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     yield break;
                 }
 
-                DeserializeGridValue(rawJson, out var richTextEditorValues, out var mediaValues, out var macroValues);
+                DeserializeGridValue(rawJson!, out var richTextEditorValues, out var mediaValues, out var macroValues);
 
                 if (richTextEditorValues is not null)
                 {
@@ -262,12 +262,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     }
                 }
 
-                foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value.HasValues)
-                    .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
-                    yield return umbracoEntityReference;
+                if (mediaValues is not null)
+                {
+                    foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value.HasValues)
+                                 .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
+                    {
+                        yield return umbracoEntityReference;
+                    }
+                }
 
-                foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromGridControlMacros(macroValues))
-                    yield return umbracoEntityReference;
+                if (macroValues is not null)
+                {
+                    foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromGridControlMacros(macroValues))
+                    {
+                        yield return umbracoEntityReference;
+                    }
+                }
             }
         }
     }

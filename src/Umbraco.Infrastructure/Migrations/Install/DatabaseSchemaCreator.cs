@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         }
 
         public DatabaseSchemaCreator(
-            IUmbracoDatabase database,
+            IUmbracoDatabase? database,
             ILogger<DatabaseSchemaCreator> logger,
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,

@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Services
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return macroWithAliasRepository.GetAllByAlias(aliases);
+                return macroWithAliasRepository.GetAllByAlias(aliases) ?? Enumerable.Empty<IMacro>();
             }
         }
 

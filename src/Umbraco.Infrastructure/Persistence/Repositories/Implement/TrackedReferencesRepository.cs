@@ -58,8 +58,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // Ordering is required for paging
             sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias);
 
-            var pagedResult = _scopeAccessor.AmbientScope.Database.Page<RelationItemDto>(pageIndex + 1, pageSize, sql);
-            totalRecords = pagedResult.TotalItems;
+            var pagedResult = _scopeAccessor.AmbientScope?.Database.Page<RelationItemDto>(pageIndex + 1, pageSize, sql);
+            totalRecords = Convert.ToInt32(pagedResult?.TotalItems);
 
             return pagedResult?.Items.Select(MapDtoToEntity) ?? Enumerable.Empty<RelationItem>();
         }

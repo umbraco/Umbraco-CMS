@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -1033,17 +1034,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 alwaysInsert = true;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.None)
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.None)
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }

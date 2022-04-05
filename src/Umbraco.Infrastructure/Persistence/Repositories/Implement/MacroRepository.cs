@@ -70,12 +70,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Get(id) != null;
         }
 
-        public IMacro GetByAlias(string alias)
+        public IMacro? GetByAlias(string alias)
         {
             return _macroByAliasCachePolicy.Get(alias, PerformGetByAlias, PerformGetAllByAlias);
         }
 
-        public IEnumerable<IMacro> GetAllByAlias(string[] aliases)
+        public IEnumerable<IMacro>? GetAllByAlias(string[] aliases)
         {
             if (aliases.Any() is false)
             {
@@ -85,15 +85,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _macroByAliasCachePolicy.GetAll(aliases, PerformGetAllByAlias);
         }
 
-        private IMacro PerformGetByAlias(string alias)
+        private IMacro? PerformGetByAlias(string? alias)
         {
             var query = Query<IMacro>().Where(x => x.Alias.Equals(alias));
-            return PerformGetByQuery(query).FirstOrDefault();
+            return PerformGetByQuery(query)?.FirstOrDefault();
         }
 
-        private IEnumerable<IMacro> PerformGetAllByAlias(params string[] aliases)
+        private IEnumerable<IMacro>? PerformGetAllByAlias(params string[]? aliases)
         {
-            if (aliases.Any() is false)
+            if (aliases is null || aliases.Any() is false)
             {
                 return base.GetMany();
             }
