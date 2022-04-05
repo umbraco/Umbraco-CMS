@@ -2,15 +2,15 @@
 
 namespace Umbraco.Cms.Core.Models
 {
-    public class Metric
+    public class UsageInformation
     {
         [DataMember(Name = "name")]
         public string Name { get; }
 
         [DataMember(Name = "data")]
-        public string Data { get; }
+        public object Data { get; }
 
-        public Metric(string name, string data)
+        public UsageInformation(string name, object data)
         {
             Name = name;
             Data = data;

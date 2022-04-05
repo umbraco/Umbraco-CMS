@@ -3,8 +3,8 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services
 {
-    public interface IMetricsService
+    public interface IUsageInformationService
     {
-        public IEnumerable<Metric> GetMetrics();
+        public IEnumerable<UsageInformation> GetDetailed();
     }
 }
