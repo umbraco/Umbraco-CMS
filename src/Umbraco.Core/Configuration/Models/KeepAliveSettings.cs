@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     public class KeepAliveSettings
     {
         internal const bool StaticDisableKeepAliveTask = false;
+        internal const string StaticKeepAlivePingUrl = "~/api/keepalive/ping";
 
         /// <summary>
         /// Gets or sets a value indicating whether the keep alive task is disabled.
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets a value for the keep alive ping URL.
         /// </summary>
-        public string KeepAlivePingUrl => "~/api/keepalive/ping";
+        [DefaultValue(StaticKeepAlivePingUrl)]
+        public string KeepAlivePingUrl { get; set; } = StaticKeepAlivePingUrl;
     }
 }
