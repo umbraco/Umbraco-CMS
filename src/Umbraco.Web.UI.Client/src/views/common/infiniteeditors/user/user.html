@@ -8,9 +8,8 @@
     <umb-editor-container>
       <div ng-if="!vm.showPasswordFields">
         <umb-box>
+          <umb-box-header title-key="user_yourProfile"></umb-box-header>
           <umb-box-content>
-            <umb-box-header title-key="user_yourProfile"></umb-box-header>
-
             <umb-control-group>
               <div class="flex">
                 <umb-button action="vm.editUser()" alias="editUser" button-style="action" label="Edit"
@@ -30,10 +29,10 @@
         </umb-box>
 
         <umb-box class="umb-control-group external-logins" ng-if="vm.externalLoginProviders.length > 0">
-          <umb-box-content>
-            <umb-box-header title-key="defaultdialogs_externalLoginProviders" title="External login providers">
-            </umb-box-header>
+          <umb-box-header title-key="defaultdialogs_externalLoginProviders" title="External login providers">
+          </umb-box-header>
 
+          <umb-box-content>
             <umb-control-group>
               <div ng-repeat="login in vm.externalLoginProviders">
 
@@ -63,9 +62,11 @@
                     <localize key="defaultdialogs_account">account
                     </localize>
                   </button>
+
                 </div>
 
               </div>
+
             </umb-control-group>
 
           </umb-box-content>
@@ -73,8 +74,8 @@
         </umb-box>
 
         <umb-box ng-if="vm.history.length">
+          <umb-box-header title-key="user_yourHistory"></umb-box-header>
           <umb-box-content>
-            <umb-box-header title-key="user_yourHistory"></umb-box-header>
             <umb-control-group>
               <ul class="umb-tree">
                 <li ng-repeat="item in vm.history | orderBy:'time':true">
