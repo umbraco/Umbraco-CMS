@@ -127,8 +127,23 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (id != Constants.System.RootString)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
                 menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add(new MenuItem("export", LocalizedTextService)
+                {
+                    Icon = "download-alt",
+                    SeparatorBefore = true,
+                    OpensDialog = true
+                });
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+            }
+            else
+            {
+                menu.Items.Add(new MenuItem("import", LocalizedTextService)
+                {
+                    Icon = "page-up",
+                    SeparatorBefore = true,
+                    OpensDialog = true
+                });
             }
 
 
