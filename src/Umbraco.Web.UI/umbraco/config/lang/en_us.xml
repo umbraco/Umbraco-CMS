@@ -1169,7 +1169,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="2faText">You have enabled 2-factor authentication and must verify your identity.</key>
     <key alias="2faMultipleText">You have multiple 2-factor providers enabled. Please choose one of them to proceed.</key>
     <key alias="2faCodeInput">Verification code</key>
-    <key alias="2faCodeInputHelp">Please enter the verification code from your authentication device</key>
+    <key alias="2faCodeInputHelp">Please enter the verification code</key>
     <key alias="2faInvalidCode">Invalid code entered</key>
   </area>
   <area alias="main">
