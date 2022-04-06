@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Core.Models
 {
+    [DataContract]
     public class UsageInformation
     {
         [DataMember(Name = "name")]
