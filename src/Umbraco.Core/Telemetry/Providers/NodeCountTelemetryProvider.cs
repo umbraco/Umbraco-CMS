@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
             result.Add(new UsageInformation("MediaCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Media)));
             result.Add(new UsageInformation("TemplateCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Template)));
             result.Add(new UsageInformation("DocumentTypeCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.DocumentType)));
-            result.Add(new UsageInformation("LanguageCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Language)));
 
             return result;
         }
