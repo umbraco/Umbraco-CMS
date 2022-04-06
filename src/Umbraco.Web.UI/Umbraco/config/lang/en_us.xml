@@ -333,7 +333,8 @@
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
-    <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key><key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
+    <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
+    <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
     <key alias="moveFailed">Failed to move media</key>
