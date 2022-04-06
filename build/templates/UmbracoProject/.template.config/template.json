@@ -57,7 +57,7 @@
         "version": {
             "type": "parameter",
             "datatype": "string",
-            "defaultValue": "9.4.2",
+            "defaultValue": "9.4.3",
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
         },

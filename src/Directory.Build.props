@@ -3,10 +3,10 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <PropertyGroup>
-    <Version>9.4.2</Version>
-    <AssemblyVersion>9.4.2</AssemblyVersion>
-    <InformationalVersion>9.4.2</InformationalVersion>
-    <FileVersion>9.4.2</FileVersion>
+    <Version>9.4.3</Version>
+    <AssemblyVersion>9.4.3</AssemblyVersion>
+    <InformationalVersion>9.4.3</InformationalVersion>
+    <FileVersion>9.4.3</FileVersion>
     <LangVersion Condition="'$(LangVersion)' == ''">9.0</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Company>Umbraco CMS</Company>
