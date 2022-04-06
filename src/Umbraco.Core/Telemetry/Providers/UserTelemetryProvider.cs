@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         public IEnumerable<UsageInformation> GetInformation()
         {
             var result = new List<UsageInformation>();
-            _userService.GetAll(0, 0, out long total);
+            _userService.GetAll(1, 1, out long total);
             int userGroups = _userService.GetAllUserGroups().Count();
 
             result.Add( new UsageInformation("UserCount", total));

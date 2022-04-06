@@ -93,6 +93,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
             builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
+            builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
 
             return builder;
         }

@@ -6,11 +6,11 @@ namespace Umbraco.Cms.Core.Services
     public class UsageInformationService : IUsageInformationService
     {
         private readonly IMetricsConsentService _metricsConsentService;
-        private readonly IDetailedTelemetryProvider[] _providers;
+        private readonly IEnumerable<IDetailedTelemetryProvider> _providers;
 
         public UsageInformationService(
             IMetricsConsentService metricsConsentService,
-            IDetailedTelemetryProvider[] providers)
+            IEnumerable<IDetailedTelemetryProvider> providers)
         {
             _metricsConsentService = metricsConsentService;
             _providers = providers;

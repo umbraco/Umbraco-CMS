@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
             result.Add(new UsageInformation("DocumentTypeCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.DocumentType)));
             result.Add(new UsageInformation("LanguageCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Language)));
 
-            return null;
+            return result;
         }
     }
 }
