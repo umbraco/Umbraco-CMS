@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         private IUserService UserService => GetRequiredService<IUserService>();
 
         private LanguageBuilder _languageBuilder = new();
-        
+
         private UserBuilder _userBuilder = new();
-        
+
         private UserGroupBuilder _userGroupBuilder = new();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
             Assert.AreEqual(6, result.Data);
         }
-        
+
         [Test]
         public void UserTelemetry_Can_Get_More_UserGroups()
         {
@@ -205,6 +205,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 .WithName("Test")
                 .WithEmail("test@test.com")
                 .Build();
+
         private IUserGroup BuildUserGroup(string alias) =>
             _userGroupBuilder
                 .WithAlias(alias)
