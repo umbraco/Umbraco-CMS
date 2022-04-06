@@ -4,13 +4,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry.Providers;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -41,15 +46,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
         private UserTelemetryProvider UserTelemetryProvider => GetRequiredService<UserTelemetryProvider>();
 
+        private MacroTelemetryProvider MacroTelemetryProvider => GetRequiredService<MacroTelemetryProvider>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
         private IUserService UserService => GetRequiredService<IUserService>();
+
+        private IMacroService MacroService => GetRequiredService<IMacroService>();
 
         private LanguageBuilder _languageBuilder = new();
 
         private UserBuilder _userBuilder = new();
 
         private UserGroupBuilder _userGroupBuilder = new();
+        
+        private MacroBuilder _macroBuilder = new();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -57,6 +68,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             builder.Services.AddTransient<ContentTelemetryProvider>();
             builder.Services.AddTransient<LanguagesTelemetryProvider>();
             builder.Services.AddTransient<UserTelemetryProvider>();
+            builder.Services.AddTransient<MacroTelemetryProvider>();
             base.CustomTestSetup(builder);
         }
 
@@ -128,7 +140,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         [Test]
         public void MacroTelemetry_Can_Get_Macros()
         {
-            // TODO: Test MacroTelemetryProvider by creating macros & asserting telemetry reports the correct number
+            BuildMacros();
+            var result = MacroTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MacrosCount");
+            Assert.AreEqual(3, result.Data);
         }
 
         [Test]
@@ -145,7 +159,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         }
 
         [Test]
-        public void UserTelemetry_Can_GetUser()
+        public void UserTelemetry_Can_Get_Default_User()
         {
             var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
 
@@ -153,9 +167,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         }
 
         [Test]
-        public void UserTelemetry_Can_Get_More_Users()
+        public void UserTelemetry_Can_Get_With_Saved_User()
         {
-            var user = BuildUser();
+            var user = BuildUser(0);
 
             UserService.Save(user);
 
@@ -165,15 +179,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         }
 
         [Test]
+        public void UserTelemetry_Can_Get_More_Users()
+        {
+            int totalUsers = 99;
+            var users = BuildUsers(totalUsers);
+            UserService.Save(users);
+
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+
+            Assert.AreEqual(totalUsers + 1, result.Data);
+        }
+
+        [Test]
         public void UserTelemetry_Can_Get_Default_UserGroups()
         {
             var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
-
             Assert.AreEqual(5, result.Data);
         }
 
         [Test]
-        public void UserTelemetry_Can_Get_Saved_UserGroups()
+        public void UserTelemetry_Can_Get_With_Saved_UserGroups()
         {
             var userGroup = BuildUserGroup("testGroup");
 
@@ -199,12 +224,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             Assert.AreEqual(105, result.Data);
         }
 
-        private User BuildUser() =>
+        private User BuildUser(int count) =>
             _userBuilder
-                .WithLogin("username", "test pass")
-                .WithName("Test")
-                .WithEmail("test@test.com")
+                .WithLogin($"username{count}", "test pass")
+                .WithName("Test" + count)
+                .WithEmail($"test{count}@test.com")
                 .Build();
+
+        private IEnumerable<User> BuildUsers(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return BuildUser(count);
+            }
+        }
 
         private IUserGroup BuildUserGroup(string alias) =>
             _userGroupBuilder
@@ -218,6 +251,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             for (int i = 0; i < count; i++)
             {
                 yield return BuildUserGroup(i.ToString());
+            }
+        }
+
+        private void BuildMacros()
+        {
+            IScopeProvider scopeProvider = ScopeProvider;
+            using (IScope scope = scopeProvider.CreateScope())
+            {
+                var repository = new MacroRepository((IScopeAccessor)scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
+
+                repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
+                repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
+                repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml"));
+                scope.Complete();
             }
         }
     }
