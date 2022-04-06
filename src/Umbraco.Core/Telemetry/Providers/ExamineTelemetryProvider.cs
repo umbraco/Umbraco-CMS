@@ -8,18 +8,12 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
     {
         private readonly IExamineIndexCountService _examineIndexCountService;
 
-        public ExamineTelemetryProvider(IExamineIndexCountService examineIndexCountService)
-        {
-            _examineIndexCountService = examineIndexCountService;
-        }
+        public ExamineTelemetryProvider(IExamineIndexCountService examineIndexCountService) => _examineIndexCountService = examineIndexCountService;
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            var result = new List<UsageInformation>();
             var indexes = _examineIndexCountService.GetCount();
-
-            result.Add(new UsageInformation("IndexCount", indexes));
-            return result;
+            yield return new UsageInformation("IndexCount", indexes);
         }
     }
 }

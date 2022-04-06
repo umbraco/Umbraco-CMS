@@ -8,18 +8,11 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
     {
         private readonly INodeCountService _nodeCountService;
 
-        public MediaTelemetryProvider(INodeCountService nodeCountService)
-        {
-            _nodeCountService = nodeCountService;
-        }
+        public MediaTelemetryProvider(INodeCountService nodeCountService) => _nodeCountService = nodeCountService;
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            var result = new List<UsageInformation>();
-
-            result.Add(new UsageInformation("MediaCount", _nodeCountService.GetMediaCount()));
-
-            return result;
+            yield return new UsageInformation("MediaCount", _nodeCountService.GetMediaCount());
         }
     }
 }

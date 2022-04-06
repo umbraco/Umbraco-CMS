@@ -16,11 +16,8 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            var result = new List<UsageInformation>();
             int languages = _localizationService.GetAllLanguages().Count();
-
-            result.Add(new ("LanguageCount", languages));
-            return result;
+            yield return new UsageInformation("LanguageCount", languages);
         }
     }
 }

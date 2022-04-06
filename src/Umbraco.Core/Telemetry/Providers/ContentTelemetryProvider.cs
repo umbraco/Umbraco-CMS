@@ -14,12 +14,8 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         public IEnumerable<UsageInformation> GetInformation()
         {
             var rootNodes = _contentService.GetRootContent();
-
             int nodes = rootNodes.Count();
-
-            var result = new List<UsageInformation>();
-            result.Add(new("RootCount", nodes));
-            return result;
+            yield return new UsageInformation("RootCount", nodes);
         }
     }
 }

@@ -8,14 +8,11 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
     public class PropertyEditorTelemetryProvider : IDetailedTelemetryProvider
     {
         private readonly IContentTypeService _contentTypeService;
-        public PropertyEditorTelemetryProvider(IContentTypeService contentTypeService)
-        {
-            _contentTypeService = contentTypeService;
-        }
+
+        public PropertyEditorTelemetryProvider(IContentTypeService contentTypeService) => _contentTypeService = contentTypeService;
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            var result = new List<UsageInformation>();
             var contentTypes = _contentTypeService.GetAll();
             var propertyTypes = new HashSet<string>();
             foreach (IContentType contentType in contentTypes)
@@ -23,8 +20,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
                 propertyTypes.UnionWith(contentType.PropertyTypes.Select(x => x.PropertyEditorAlias));
             }
 
-            result.Add(new UsageInformation("Properties", propertyTypes));
-            return result;
+            yield return new UsageInformation("Properties", propertyTypes);
         }
     }
 }

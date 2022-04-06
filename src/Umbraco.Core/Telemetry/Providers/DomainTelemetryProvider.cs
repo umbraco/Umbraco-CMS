@@ -13,11 +13,8 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            var result = new List<UsageInformation>();
             var domains = _domainService.GetAll(true).Count();
-
-            result.Add(new UsageInformation("DomainCount", domains));
-            return result;
+            yield return new UsageInformation("DomainCount", domains);
         }
     }
 }

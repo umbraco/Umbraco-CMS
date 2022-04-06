@@ -13,14 +13,10 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            var result = new List<UsageInformation>();
-
-            result.Add(new UsageInformation("MemberCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Member)));
-            result.Add(new UsageInformation("TemplateCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Template)));
-            result.Add(new UsageInformation("ContentCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Document)));
-            result.Add(new UsageInformation("DocumentTypeCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.DocumentType)));
-
-            return result;
+            yield return new UsageInformation("MemberCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Member));
+            yield return new UsageInformation("TemplateCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Template));
+            yield return new UsageInformation("ContentCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.Document));
+            yield return new UsageInformation("DocumentTypeCount", _nodeCountService.GetNodeCount(Constants.ObjectTypes.DocumentType));
         }
     }
 }
