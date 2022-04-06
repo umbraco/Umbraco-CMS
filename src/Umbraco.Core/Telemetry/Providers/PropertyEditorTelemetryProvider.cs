@@ -17,13 +17,13 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         {
             var result = new List<UsageInformation>();
             var contentTypes = _contentTypeService.GetAll();
-            var propertyTypes = new HashSet<IPropertyType>();
+            var propertyTypes = new HashSet<string>();
             foreach (IContentType contentType in contentTypes)
             {
-                propertyTypes.UnionWith(contentType.PropertyTypes);
+                propertyTypes.UnionWith(contentType.PropertyTypes.Select(x => x.PropertyEditorAlias));
             }
 
-            result.Add(new UsageInformation("Properties", propertyTypes.Select(x => x.PropertyEditorAlias)));
+            result.Add(new UsageInformation("Properties", propertyTypes));
             return result;
         }
     }

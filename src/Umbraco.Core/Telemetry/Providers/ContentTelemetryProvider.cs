@@ -8,8 +8,13 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
     public class ContentTelemetryProvider : IDetailedTelemetryProvider
     {
         private readonly IContentService _contentService;
+        private readonly INodeCountService _nodeCountService;
 
-        public ContentTelemetryProvider(IContentService contentService) => _contentService = contentService;
+        public ContentTelemetryProvider(IContentService contentService, INodeCountService nodeCountService)
+        {
+            _contentService = contentService;
+            _nodeCountService = nodeCountService;
+        }
 
         public IEnumerable<UsageInformation> GetInformation()
         {

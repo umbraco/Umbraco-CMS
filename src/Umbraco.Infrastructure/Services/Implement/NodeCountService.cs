@@ -15,7 +15,6 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
 
         public int GetNodeCount(Guid nodeType)
         {
-            int count = 0;
             using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 var query = scope.Database.SqlContext.Sql()
@@ -23,10 +22,8 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.NodeObjectType == nodeType && x.Trashed == false);
 
-                count = scope.Database.ExecuteScalar<int>(query);
+                return scope.Database.ExecuteScalar<int>(query);
             }
-
-            return count;
         }
 
         public int GetMediaCount()
@@ -46,6 +43,11 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
 
                 return scope.Database.ExecuteScalar<int>(query);
             }
+        }
+
+        public int GetContentCount()
+        {
+            return 0;
         }
     }
 }
