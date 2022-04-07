@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Telemetry
         private readonly IManifestParser _manifestParser;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ISiteIdentifierService _siteIdentifierService;
-        private readonly UsageInformationService _usageInformationService;
+        private readonly IUsageInformationService _usageInformationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelemetryService"/> class.
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Telemetry
         public TelemetryService(
             IManifestParser manifestParser,
             IUmbracoVersion umbracoVersion,
-            ISiteIdentifierService siteIdentifierService, UsageInformationService usageInformationService)
+            ISiteIdentifierService siteIdentifierService, IUsageInformationService usageInformationService)
         {
             _manifestParser = manifestParser;
             _umbracoVersion = umbracoVersion;
