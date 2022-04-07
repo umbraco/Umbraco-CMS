@@ -3,30 +3,39 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Telemetry;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {
+    [Obsolete("Use the IUserDataService interface instead")]
     public class UserDataService : IUserDataService
     {
-        private readonly ISystemInformationTableDataProvider _tableDataProvider;
+        private readonly IUmbracoVersion _version;
+        private readonly ILocalizationService _localizationService;
 
-        public UserDataService(ISystemInformationTableDataProvider tableDataProvider)
-        {
-            _tableDataProvider = tableDataProvider;
-        }
 
-        [Obsolete("Use constructor that takes ISystemInformationTableDataProvider")]
         public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
-            : this(StaticServiceProvider.Instance.GetRequiredService<ISystemInformationTableDataProvider>())
         {
+            _version = version;
+            _localizationService = localizationService;
         }
 
-        public IEnumerable<UserData> GetUserData() => _tableDataProvider.GetSystemInformationTableData();
+        public IEnumerable<UserData> GetUserData() =>
+            new List<UserData>
+            {
+                new("Server OS", RuntimeInformation.OSDescription),
+                new("Server Framework", RuntimeInformation.FrameworkDescription),
+                new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
+                new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
+                new("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
+                new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
+                new("Current Webserver", GetCurrentWebServer())
+            };
+
+        private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
 
         public bool IsRunningInProcessIIS()
         {
