@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -17,9 +18,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _metricsConsentService.GetConsentLevel();
         }
 
-        public ConsentLevel SetConsentLevel(ConsentLevel consentLevel)
+        [HttpPost]
+        public ConsentLevel SetConsentLevel(string consentLevel)
         {
-            return _metricsConsentService.SetConsentLevel(consentLevel);
+            if (consentLevel == "Minimal")
+            {
+                return _metricsConsentService.SetConsentLevel(ConsentLevel.Minimal);
+            }
+
+            if (consentLevel == "Basic")
+            {
+                return _metricsConsentService.SetConsentLevel(ConsentLevel.Basic);
+            }
+
+            if (consentLevel == "Detailed")
+            {
+                return _metricsConsentService.SetConsentLevel(ConsentLevel.Detailed);
+            }
+
+            return ConsentLevel.Minimal;
         }
 
         public IEnumerable<ConsentLevel> GetAllLevels() => new[] { ConsentLevel.Minimal, ConsentLevel.Basic, ConsentLevel.Detailed };

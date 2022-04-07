@@ -11,9 +11,10 @@
     vm.consentLevel = '';
     vm.consentLevels = [];
     vm.val = 2;
-    vm.sliderVal = '';
     getConsentLevel();
+    vm.sliderVal = vm.consentLevel;
     getAllConsentLevels();
+    vm.startPos = calculateStartPositionForSlider();
 
     vm.sliderOptions = {
       "start": 2,
@@ -50,7 +51,10 @@
 
     function sliderChange(values) {
       vm.sliderVal = values[0];
-      console.log(vm.sliderVal);
+    }
+
+    function calculateStartPositionForSlider(){
+      return vm.consentLevels.find(element => element === vm.consentLevel);
     }
   }
     angular.module("umbraco").controller("Umbraco.Dashboard.AnalyticsController", AnalyticsController);

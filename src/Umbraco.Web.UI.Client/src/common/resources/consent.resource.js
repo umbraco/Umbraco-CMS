@@ -34,7 +34,9 @@
         $http.post(
           umbRequestHelper.getApiUrl(
             "analyticsApiBaseUrl",
-            "SetConsentLevel"), value),
+            "SetConsentLevel"),
+          { consentLevel : value }
+        ),
         'Server call failed for getting current consent level');
     }
 
