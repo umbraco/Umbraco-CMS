@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  function consentResource($http, umbRequestHelper) {
+  function analyticResource($http, umbRequestHelper) {
 
     function getConsentLevel () {
       return umbRequestHelper.resourcePromise(
@@ -39,7 +39,7 @@
   }
 
 
-  angular.module('umbraco.resources').factory('consentResource', consentResource);
+  angular.module('umbraco.resources').factory('analyticResource', analyticResource);
 
 
 })();

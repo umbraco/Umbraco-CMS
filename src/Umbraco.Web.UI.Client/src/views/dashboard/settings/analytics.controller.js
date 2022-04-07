@@ -1,7 +1,7 @@
 ﻿(function () {
   "use strict";
 
-  function AnalyticsController(consentResource) {
+  function AnalyticsController(analyticResource) {
 
     var vm = this;
     vm.getConsentLevel = getConsentLevel;
@@ -35,12 +35,12 @@
 
 
     function getConsentLevel() {
-      consentResource.getConsentLevel().then(function (response) {
+      analyticResource.getConsentLevel().then(function (response) {
         vm.consentLevel = response;
       })
     }
     function getAllConsentLevels(){
-      consentResource.getAllConsentLevels().then(function (response) {
+      analyticResource.getAllConsentLevels().then(function (response) {
         vm.consentLevels = response;
       })
     }
