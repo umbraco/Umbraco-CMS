@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             builder.Services.AddTransient<IDetailedTelemetryProvider, NodeCountTelemetryProvider>();
             builder.Services.AddTransient<IDetailedTelemetryProvider, PropertyEditorTelemetryProvider>();
             builder.Services.AddTransient<IDetailedTelemetryProvider, UserTelemetryProvider>();
+            builder.Services.AddTransient<IDetailedTelemetryProvider, SystemInformationTelemetryProvider>();
             return builder;
         }
     }
