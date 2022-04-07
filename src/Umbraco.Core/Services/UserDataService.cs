@@ -1,38 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Telemetry;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Services
 {
     public class UserDataService : IUserDataService
     {
-        private readonly IUmbracoVersion _version;
-        private readonly ILocalizationService _localizationService;
+        private readonly ISystemInformationTableDataProvider _tableDataProvider;
 
-        public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
+        public UserDataService(ISystemInformationTableDataProvider tableDataProvider)
         {
-            _version = version;
-            _localizationService = localizationService;
+            _tableDataProvider = tableDataProvider;
         }
 
-        public IEnumerable<UserData> GetUserData() =>
-            new List<UserData>
-            {
-                new("Server OS", RuntimeInformation.OSDescription),
-                new("Server Framework", RuntimeInformation.FrameworkDescription),
-                new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
-                new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
-                new("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
-                new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
-                new("Current Webserver", GetCurrentWebServer())
-            };
+        [Obsolete("Use constructor that takes ISystemInformationTableDataProvider")]
+        public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
+            : this(StaticServiceProvider.Instance.GetRequiredService<ISystemInformationTableDataProvider>())
+        {
+        }
 
-        private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
+        public IEnumerable<UserData> GetUserData() => _tableDataProvider.GetSystemInformationTableData();
 
         public bool IsRunningInProcessIIS()
         {
