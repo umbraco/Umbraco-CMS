@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         public IEnumerable<UsageInformation> GetInformation()
         {
             var macros = _macroService.GetAll().Count();
-            yield return new UsageInformation("MacrosCount", macros);
+            yield return new UsageInformation(Constants.Telemetry.MacroCount, macros);
         }
     }
 }

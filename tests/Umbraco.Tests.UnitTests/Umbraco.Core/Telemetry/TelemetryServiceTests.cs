@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
@@ -20,7 +19,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         {
             var version = CreateUmbracoVersion(9, 3, 1);
             var siteIdentifierServiceMock = new Mock<ISiteIdentifierService>();
-            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, siteIdentifierServiceMock.Object);
+            var usageInformationServiceMock = new Mock<IUsageInformationService>();
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, siteIdentifierServiceMock.Object, usageInformationServiceMock.Object);
             Guid guid;
 
             var result = sut.TryGetTelemetryReportData(out var telemetryReportData);
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         public void SkipsIfCantGetOrCreateId()
         {
             var version = CreateUmbracoVersion(9, 3, 1);
-            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(false));
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(false), Mock.Of<IUsageInformationService>());
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         {
             var version = CreateUmbracoVersion(9, 1, 1, "-rc", "-ad2f4k2d");
 
-            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService());
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>());
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = noVersionPackageName }
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService());
+            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>());
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = "TrackingAllowed", AllowPackageTelemetry = true },
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService());
+            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>());
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 

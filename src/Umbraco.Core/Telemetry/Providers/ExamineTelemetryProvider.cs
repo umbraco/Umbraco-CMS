@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         public IEnumerable<UsageInformation> GetInformation()
         {
             var indexes = _examineIndexCountService.GetCount();
-            yield return new UsageInformation("IndexCount", indexes);
+            yield return new UsageInformation(Constants.Telemetry.ExamineIndexCount, indexes);
         }
     }
 }

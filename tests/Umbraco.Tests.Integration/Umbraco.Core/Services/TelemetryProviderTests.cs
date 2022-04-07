@@ -48,19 +48,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
         private MacroTelemetryProvider MacroTelemetryProvider => GetRequiredService<MacroTelemetryProvider>();
 
+        private MediaTelemetryProvider MediaTelemetryProvider => GetRequiredService<MediaTelemetryProvider>();
+        
+        private PropertyEditorTelemetryProvider PropertyEditorTelemetryProvider => GetRequiredService<PropertyEditorTelemetryProvider>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
         private IUserService UserService => GetRequiredService<IUserService>();
 
-        private IMacroService MacroService => GetRequiredService<IMacroService>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         private LanguageBuilder _languageBuilder = new();
 
         private UserBuilder _userBuilder = new();
 
         private UserGroupBuilder _userGroupBuilder = new();
-        
-        private MacroBuilder _macroBuilder = new();
+
+        private ContentTypeBuilder _contentTypeBuilder = new ();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -69,6 +75,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             builder.Services.AddTransient<LanguagesTelemetryProvider>();
             builder.Services.AddTransient<UserTelemetryProvider>();
             builder.Services.AddTransient<MacroTelemetryProvider>();
+            builder.Services.AddTransient<MediaTelemetryProvider>();
+            builder.Services.AddTransient<PropertyEditorTelemetryProvider>();
             base.CustomTestSetup(builder);
         }
 
@@ -141,27 +149,84 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         public void MacroTelemetry_Can_Get_Macros()
         {
             BuildMacros();
-            var result = MacroTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MacrosCount");
+            var result = MacroTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.MacroCount);
             Assert.AreEqual(3, result.Data);
         }
 
         [Test]
-        public void MediaTelemetry_Can_Get_Media()
+        public void MediaTelemetry_Can_Get_Media_In_Folders()
         {
-            // TODO: Test MediaTelemetryProvider by creating media & asserting telemetry reports the correct number
+            IMediaType folderType = MediaTypeService.Get(1031);
+            IMediaType imageMediaType = MediaTypeService.Get(1032);
+
+            Media root = MediaBuilder.CreateMediaFolder(folderType, -1);
+            MediaService.Save(root);
+            int createdMediaCount = 10;
+            for (int i = 0; i < createdMediaCount; i++)
+            {
+                Media c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
+                MediaService.Save(c1);
+            }
+
+            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.MediaCount);
+            Assert.AreEqual(createdMediaCount, result.Data);
         }
 
         [Test]
-        public void PropertyEditorTelemetry_Can_Get_PropertyTypes()
+        public void MediaTelemetry_Can_Get_Media_In_Root()
         {
-            // TODO: Test PropertyEditorTelemetryProvider by creating documentTypes and using propertyTypes, and creating custom PropertyTypes
-            // and assert that the telemetry reports the correct numbers/properties
+            IMediaType imageMediaType = MediaTypeService.Get(1032);
+            int createdMediaCount = 10;
+            for (int i = 0; i < createdMediaCount; i++)
+            {
+                Media c1 = MediaBuilder.CreateMediaImage(imageMediaType, -1);
+                MediaService.Save(c1);
+            }
+
+            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.MediaCount);
+            Assert.AreEqual(createdMediaCount, result.Data);
+        }
+
+        [Test]
+        public void PropertyEditorTelemetry_Counts_Same_Editor_As_One()
+        {
+            ContentType ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
+            AddPropType("title", -88, ct2);
+            ContentType ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3", null);
+            AddPropType("title",-88, ct3);
+            ContentType ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5", null);
+            AddPropType("blah", -88, ct5);
+
+            ContentTypeService.Save(ct2);
+            ContentTypeService.Save(ct3);
+            ContentTypeService.Save(ct5);
+
+            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
+            var result = properties.Data as IEnumerable<string>;
+            Assert.AreEqual(1, result?.Count());
+        }
+        
+        [Test]
+        public void PropertyEditorTelemetry_Can_Get_All_PropertyTypes()
+        {
+            ContentType ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
+            AddPropType("title", -88, ct2);
+            AddPropType("title",-99, ct2);
+            ContentType ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5", null);
+            AddPropType("blah", -88, ct5);
+
+            ContentTypeService.Save(ct2);
+            ContentTypeService.Save(ct5);
+
+            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
+            var result = properties.Data as IEnumerable<string>;
+            Assert.AreEqual(2, result?.Count());
         }
 
         [Test]
         public void UserTelemetry_Can_Get_Default_User()
         {
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
             Assert.AreEqual(1, result.Data);
         }
@@ -173,7 +238,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
             UserService.Save(user);
 
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
             Assert.AreEqual(2, result.Data);
         }
@@ -185,7 +250,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             var users = BuildUsers(totalUsers);
             UserService.Save(users);
 
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
             Assert.AreEqual(totalUsers + 1, result.Data);
         }
@@ -193,7 +258,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         [Test]
         public void UserTelemetry_Can_Get_Default_UserGroups()
         {
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
             Assert.AreEqual(5, result.Data);
         }
 
@@ -203,7 +268,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             var userGroup = BuildUserGroup("testGroup");
 
             UserService.Save(userGroup);
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
             Assert.AreEqual(6, result.Data);
         }
@@ -219,7 +284,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 UserService.Save(userGroup);
             }
 
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
             Assert.AreEqual(105, result.Data);
         }
@@ -266,6 +331,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml"));
                 scope.Complete();
             }
+        }
+        
+        private void AddPropType(string alias, int dataTypeId, IContentType ct)
+        {
+            var contentCollection = new PropertyTypeCollection(true)
+            {
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = alias, Name = "Title", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = dataTypeId },
+            };
+            var pg = new PropertyGroup(contentCollection)
+            {
+                Alias = "test",
+                Name = "test",
+                SortOrder = 1
+            };
+            ct.PropertyGroups.Add(pg);
         }
     }
 }
