@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models
+﻿using System.Runtime.Serialization;
+
+namespace Umbraco.Cms.Core.Models
 {
+    [DataContract]
     public enum ConsentLevel
     {
         Minimal,

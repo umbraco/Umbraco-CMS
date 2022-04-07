@@ -4,6 +4,8 @@ namespace Umbraco.Cms.Core.Models
 {
     public class MetricsConsentService : IMetricsConsentService
     {
-        public ConsentLevel GetConsentLevel() => ConsentLevel.Detailed;
+        private ConsentLevel _consentLevel = ConsentLevel.Detailed;
+        public ConsentLevel GetConsentLevel() => _consentLevel;
+        public ConsentLevel SetConsentLevel(ConsentLevel consentLevel) => _consentLevel = consentLevel;
     }
 }

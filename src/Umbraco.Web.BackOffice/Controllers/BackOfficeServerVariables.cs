@@ -381,7 +381,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "trackedReferencesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TrackedReferencesController>(
                                 controller => controller.GetPagedReferences(0,  1, 1, false))
-                        }
+                        },
+                        {
+                            "analyticsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AnalyticsController>(
+                                controller => controller.GetConsentLevel())
+                        },
                     }
                 },
                 {

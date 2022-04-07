@@ -1,0 +1,15 @@
+﻿<div ng-controller="Umbraco.Dashboard.AnalyticsController as vm">
+  <h1>{{vm.consentLevel}}</h1>
+  <div ng-repeat="level in vm.consentLevels">
+    <p>{{level}}</p>
+  </div>
+
+  <div style="padding-top: 50px; padding-bottom: 40px; padding-left: 40px; padding-right: 40px">
+    <umb-range-slider
+      ng-model="vm.val"
+      options="vm.sliderOptions">
+    </umb-range-slider>
+  </div>
+</div>
+
+
