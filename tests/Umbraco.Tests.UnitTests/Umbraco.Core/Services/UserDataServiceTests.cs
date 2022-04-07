@@ -2,12 +2,16 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Telemetry.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
 {
@@ -86,10 +90,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
             });
         }
 
-        private UserDataService CreateUserDataService(string culture)
+        private SystemInformationTelemetryProvider CreateUserDataService(string culture)
         {
             var localizationService = CreateILocalizationService(culture);
-            return new UserDataService(_umbracoVersion, localizationService);
+            return new SystemInformationTelemetryProvider(
+                _umbracoVersion,
+                localizationService,
+                Mock.Of<IOptions<ModelsBuilderSettings>>(x => x.Value == new ModelsBuilderSettings()),
+                Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings()),
+                Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings()),
+                Mock.Of<IHostEnvironment>());
         }
 
         private ILocalizationService CreateILocalizationService(string culture)
