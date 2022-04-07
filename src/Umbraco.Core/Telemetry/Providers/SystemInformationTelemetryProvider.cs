@@ -57,14 +57,14 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         public IEnumerable<UsageInformation> GetInformation() =>
             new UsageInformation[]
             {
-                new("ServerOs", ServerOs),
-                new("ServerFramework", ServerFramework),
-                new("OsLanguage", CurrentCulture),
-                new("Webserver", CurrentWebServer),
-                new("ModelsBuilderMode", ModelsBuilderMode),
-                new("CustomUmbracoPath", UmbracoPathCustomized),
-                new("AspEnvironment", AspEnvironment),
-                new("IsDebug", IsDebug),
+                new(Constants.Telemetry.ServerOs, ServerOs),
+                new(Constants.Telemetry.ServerFramework, ServerFramework),
+                new(Constants.Telemetry.OsLanguage, CurrentCulture),
+                new(Constants.Telemetry.WebServer, CurrentWebServer),
+                new(Constants.Telemetry.ModelsBuilderMode, ModelsBuilderMode),
+                new(Constants.Telemetry.CustomUmbracoPath, UmbracoPathCustomized),
+                new(Constants.Telemetry.AspEnvironment, AspEnvironment),
+                new(Constants.Telemetry.IsDebug, IsDebug),
             };
 
         public IEnumerable<UserData> GetUserData() =>

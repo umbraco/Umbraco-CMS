@@ -18,6 +18,14 @@
             public static string Properties = "Properties";
             public static string UserCount = "UserCount";
             public static string UserGroupCount = "UserGroupCount";
+            public static string ServerOs = "ServerOs";
+            public static string ServerFramework = "ServerFramework";
+            public static string OsLanguage = "OsLanguage";
+            public static string WebServer = "WebServer";
+            public static string ModelsBuilderMode = "ModelBuilderMode";
+            public static string CustomUmbracoPath = "CustomUmbracoPath";
+            public static string AspEnvironment = "AspEnvironment";
+            public static string IsDebug = "IsDebug";
         }
     }
 }
