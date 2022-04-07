@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
             _userService.GetAll(1, 1, out long total);
             int userGroups = _userService.GetAllUserGroups().Count();
 
-            yield return new UsageInformation("UserCount", total);
-            yield return new UsageInformation("UserGroupCount", userGroups);
+            yield return new UsageInformation(Constants.Telemetry.UserCount, total);
+            yield return new UsageInformation(Constants.Telemetry.UserGroupCount, userGroups);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
 
         public IEnumerable<UsageInformation> GetInformation()
         {
-            yield return new UsageInformation("MediaCount", _nodeCountService.GetMediaCount());
+            yield return new UsageInformation(Constants.Telemetry.MediaCount, _nodeCountService.GetMediaCount());
         }
     }
 }

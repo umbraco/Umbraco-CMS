@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
                 propertyTypes.UnionWith(contentType.PropertyTypes.Select(x => x.PropertyEditorAlias));
             }
 
-            yield return new UsageInformation("Properties", propertyTypes);
+            yield return new UsageInformation(Constants.Telemetry.Properties, propertyTypes);
         }
     }
 }

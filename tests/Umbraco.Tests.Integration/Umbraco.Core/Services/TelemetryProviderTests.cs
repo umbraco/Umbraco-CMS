@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         public void MacroTelemetry_Can_Get_Macros()
         {
             BuildMacros();
-            var result = MacroTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MacrosCount");
+            var result = MacroTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.MacroCount);
             Assert.AreEqual(3, result.Data);
         }
 
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 MediaService.Save(c1);
             }
 
-            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MediaCount");
+            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.MediaCount);
             Assert.AreEqual(createdMediaCount, result.Data);
         }
 
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 MediaService.Save(c1);
             }
 
-            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MediaCount");
+            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.MediaCount);
             Assert.AreEqual(createdMediaCount, result.Data);
         }
 
@@ -201,7 +201,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             ContentTypeService.Save(ct3);
             ContentTypeService.Save(ct5);
 
-            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "Properties");
+            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
             var result = properties.Data as IEnumerable<string>;
             Assert.AreEqual(1, result?.Count());
         }
@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             ContentTypeService.Save(ct2);
             ContentTypeService.Save(ct5);
 
-            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "Properties");
+            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
             var result = properties.Data as IEnumerable<string>;
             Assert.AreEqual(2, result?.Count());
         }
@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         [Test]
         public void UserTelemetry_Can_Get_Default_User()
         {
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
             Assert.AreEqual(1, result.Data);
         }
@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
             UserService.Save(user);
 
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
             Assert.AreEqual(2, result.Data);
         }
@@ -250,7 +250,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             var users = BuildUsers(totalUsers);
             UserService.Save(users);
 
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserCount);
 
             Assert.AreEqual(totalUsers + 1, result.Data);
         }
@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         [Test]
         public void UserTelemetry_Can_Get_Default_UserGroups()
         {
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
             Assert.AreEqual(5, result.Data);
         }
 
@@ -268,7 +268,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             var userGroup = BuildUserGroup("testGroup");
 
             UserService.Save(userGroup);
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
             Assert.AreEqual(6, result.Data);
         }
@@ -284,7 +284,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 UserService.Save(userGroup);
             }
 
-            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "UserGroupCount");
+            var result = UserTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
             Assert.AreEqual(105, result.Data);
         }
