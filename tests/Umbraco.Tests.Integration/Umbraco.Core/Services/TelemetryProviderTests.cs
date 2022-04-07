@@ -49,6 +49,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         private MacroTelemetryProvider MacroTelemetryProvider => GetRequiredService<MacroTelemetryProvider>();
 
         private MediaTelemetryProvider MediaTelemetryProvider => GetRequiredService<MediaTelemetryProvider>();
+        
+        private PropertyEditorTelemetryProvider PropertyEditorTelemetryProvider => GetRequiredService<PropertyEditorTelemetryProvider>();
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
@@ -64,7 +66,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
         private UserGroupBuilder _userGroupBuilder = new();
 
-        private MediaBuilder _mediaBuilder = new();
+        private ContentTypeBuilder _contentTypeBuilder = new ();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -74,6 +76,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             builder.Services.AddTransient<UserTelemetryProvider>();
             builder.Services.AddTransient<MacroTelemetryProvider>();
             builder.Services.AddTransient<MediaTelemetryProvider>();
+            builder.Services.AddTransient<PropertyEditorTelemetryProvider>();
             base.CustomTestSetup(builder);
         }
 
@@ -185,10 +188,39 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         }
 
         [Test]
-        public void PropertyEditorTelemetry_Can_Get_PropertyTypes()
+        public void PropertyEditorTelemetry_Counts_Same_Editor_As_One()
         {
-            // TODO: Test PropertyEditorTelemetryProvider by creating documentTypes and using propertyTypes, and creating custom PropertyTypes
-            // and assert that the telemetry reports the correct numbers/properties
+            ContentType ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
+            AddPropType("title", -88, ct2);
+            ContentType ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3", null);
+            AddPropType("title",-88, ct3);
+            ContentType ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5", null);
+            AddPropType("blah", -88, ct5);
+
+            ContentTypeService.Save(ct2);
+            ContentTypeService.Save(ct3);
+            ContentTypeService.Save(ct5);
+
+            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "Properties");
+            var result = properties.Data as IEnumerable<string>;
+            Assert.AreEqual(1, result?.Count());
+        }
+        
+        [Test]
+        public void PropertyEditorTelemetry_Can_Get_All_PropertyTypes()
+        {
+            ContentType ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
+            AddPropType("title", -88, ct2);
+            AddPropType("title",-99, ct2);
+            ContentType ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5", null);
+            AddPropType("blah", -88, ct5);
+
+            ContentTypeService.Save(ct2);
+            ContentTypeService.Save(ct5);
+
+            var properties = PropertyEditorTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "Properties");
+            var result = properties.Data as IEnumerable<string>;
+            Assert.AreEqual(2, result?.Count());
         }
 
         [Test]
@@ -299,6 +331,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml"));
                 scope.Complete();
             }
+        }
+        
+        private void AddPropType(string alias, int dataTypeId, IContentType ct)
+        {
+            var contentCollection = new PropertyTypeCollection(true)
+            {
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = alias, Name = "Title", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = dataTypeId },
+            };
+            var pg = new PropertyGroup(contentCollection)
+            {
+                Alias = "test",
+                Name = "test",
+                SortOrder = 1
+            };
+            ct.PropertyGroups.Add(pg);
         }
     }
 }
