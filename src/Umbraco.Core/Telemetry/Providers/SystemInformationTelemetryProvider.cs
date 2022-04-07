@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Telemetry.Providers
 {
-    internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, ISystemInformationTableDataProvider
+    internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, IUserDataService
     {
         private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
                 new("IsDebug", IsDebug),
             };
 
-        public IEnumerable<UserData> GetSystemInformationTableData() =>
+        public IEnumerable<UserData> GetUserData() =>
             new UserData[]
             {
                 new("Server OS", ServerOs),

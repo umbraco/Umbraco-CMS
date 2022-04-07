@@ -184,8 +184,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
-            Services.AddUnique<ISystemInformationTableDataProvider, SystemInformationTelemetryProvider>();
-            Services.AddUnique<IUserDataService>(provider => new UserDataService(provider.GetRequiredService<ISystemInformationTableDataProvider>()));
+            Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
             Services.AddUnique<IUsageInformationService, UsageInformationService>();
             Services.AddUnique<IMetricsConsentService, MetricsConsentService>();
 
