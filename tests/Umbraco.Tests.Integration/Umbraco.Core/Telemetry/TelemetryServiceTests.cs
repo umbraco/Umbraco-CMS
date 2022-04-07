@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Telemetry
                 foreach (var expectedInfo in expectedData)
                 {
                     var expected = detailed.FirstOrDefault(x => x.Name == expectedInfo);
-                    Assert.IsNotNull(expected);
+                    Assert.IsNotNull(expected, $"Expected {expectedInfo} to exists in the detailed list");
                 }
             });
         }
