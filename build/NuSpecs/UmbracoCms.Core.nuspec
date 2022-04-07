@@ -30,7 +30,7 @@
                 <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.7,5.999999)" />
                 <dependency id="Microsoft.Owin" version="[4.0.1,4.999999)" />
                 <dependency id="MiniProfiler" version="[4.0.138,4.999999)" />
-                <dependency id="Newtonsoft.Json" version="[12.0.1,12.999999)" />
+                <dependency id="Newtonsoft.Json" version="[12.0.1,13.999999)" />
                 <dependency id="Semver" version="[2.0.4,2.999999)" />
                 <dependency id="Serilog" version="[2.10.0,2.999999)" />
                 <dependency id="Serilog.Enrichers.Process" version="[2.0.2,2.999999)" />
