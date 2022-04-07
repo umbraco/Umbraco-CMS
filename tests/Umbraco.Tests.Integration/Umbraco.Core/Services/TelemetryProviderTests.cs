@@ -48,19 +48,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
         private MacroTelemetryProvider MacroTelemetryProvider => GetRequiredService<MacroTelemetryProvider>();
 
+        private MediaTelemetryProvider MediaTelemetryProvider => GetRequiredService<MediaTelemetryProvider>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
         private IUserService UserService => GetRequiredService<IUserService>();
 
-        private IMacroService MacroService => GetRequiredService<IMacroService>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         private LanguageBuilder _languageBuilder = new();
 
         private UserBuilder _userBuilder = new();
 
         private UserGroupBuilder _userGroupBuilder = new();
-        
-        private MacroBuilder _macroBuilder = new();
+
+        private MediaBuilder _mediaBuilder = new();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -69,6 +73,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             builder.Services.AddTransient<LanguagesTelemetryProvider>();
             builder.Services.AddTransient<UserTelemetryProvider>();
             builder.Services.AddTransient<MacroTelemetryProvider>();
+            builder.Services.AddTransient<MediaTelemetryProvider>();
             base.CustomTestSetup(builder);
         }
 
@@ -146,9 +151,37 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         }
 
         [Test]
-        public void MediaTelemetry_Can_Get_Media()
+        public void MediaTelemetry_Can_Get_Media_In_Folders()
         {
-            // TODO: Test MediaTelemetryProvider by creating media & asserting telemetry reports the correct number
+            IMediaType folderType = MediaTypeService.Get(1031);
+            IMediaType imageMediaType = MediaTypeService.Get(1032);
+
+            Media root = MediaBuilder.CreateMediaFolder(folderType, -1);
+            MediaService.Save(root);
+            int createdMediaCount = 10;
+            for (int i = 0; i < createdMediaCount; i++)
+            {
+                Media c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
+                MediaService.Save(c1);
+            }
+
+            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MediaCount");
+            Assert.AreEqual(createdMediaCount, result.Data);
+        }
+
+        [Test]
+        public void MediaTelemetry_Can_Get_Media_In_Root()
+        {
+            IMediaType imageMediaType = MediaTypeService.Get(1032);
+            int createdMediaCount = 10;
+            for (int i = 0; i < createdMediaCount; i++)
+            {
+                Media c1 = MediaBuilder.CreateMediaImage(imageMediaType, -1);
+                MediaService.Save(c1);
+            }
+
+            var result = MediaTelemetryProvider.GetInformation().FirstOrDefault(x => x.Name == "MediaCount");
+            Assert.AreEqual(createdMediaCount, result.Data);
         }
 
         [Test]
