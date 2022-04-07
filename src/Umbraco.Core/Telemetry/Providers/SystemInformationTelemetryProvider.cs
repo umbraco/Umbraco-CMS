@@ -50,14 +50,27 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
 
         private bool UmbracoPathCustomized => _globalSettings.UmbracoPath != GlobalSettings.StaticUmbracoPath;
 
-        private string ASPEnvironment => _hostEnvironment.EnvironmentName;
+        private string AspEnvironment => _hostEnvironment.EnvironmentName;
 
-        public IEnumerable<UsageInformation> GetInformation() => throw new System.NotImplementedException();
+        private string ServerOs => RuntimeInformation.OSDescription;
+
+        public IEnumerable<UsageInformation> GetInformation() =>
+            new UsageInformation[]
+            {
+                new("ServerOs", ServerOs),
+                new("ServerFramework", ServerFramework),
+                new("OsLanguage", CurrentCulture),
+                new("Webserver", CurrentWebServer),
+                new("ModelsBuilderMode", ModelsBuilderMode),
+                new("CustomUmbracoPath", UmbracoPathCustomized),
+                new("AspEnvironment", AspEnvironment),
+                new("IsDebug", IsDebug),
+            };
 
         public IEnumerable<UserData> GetSystemInformationTableData() =>
-            new List<UserData>
+            new UserData[]
             {
-                new("Server OS", RuntimeInformation.OSDescription),
+                new("Server OS", ServerOs),
                 new("Server Framework", ServerFramework),
                 new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
                 new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
