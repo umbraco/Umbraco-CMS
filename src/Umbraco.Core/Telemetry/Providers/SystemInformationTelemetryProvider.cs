@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -16,15 +17,24 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
     {
         private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
+        private readonly IHostEnvironment _hostEnvironment;
+        private readonly GlobalSettings _globalSettings;
+        private readonly HostingSettings _hostingSettings;
         private readonly ModelsBuilderSettings _modelsBuilderSettings;
 
         public SystemInformationTelemetryProvider(
             IUmbracoVersion version,
             ILocalizationService localizationService,
-            IOptions<ModelsBuilderSettings> modelsBuilderSettings)
+            IOptions<ModelsBuilderSettings> modelsBuilderSettings,
+            IOptions<HostingSettings> hostingSettings,
+            IOptions<GlobalSettings> globalSettings,
+            IHostEnvironment hostEnvironment)
         {
             _version = version;
             _localizationService = localizationService;
+            _hostEnvironment = hostEnvironment;
+            _globalSettings = globalSettings.Value;
+            _hostingSettings = hostingSettings.Value;
             _modelsBuilderSettings = modelsBuilderSettings.Value;
         }
 
@@ -33,6 +43,14 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
         private string ServerFramework => RuntimeInformation.FrameworkDescription;
 
         private string ModelsBuilderMode => _modelsBuilderSettings.ModelsMode.ToString();
+
+        private string CurrentCulture => Thread.CurrentThread.CurrentCulture.ToString();
+
+        private bool IsDebug => _hostingSettings.Debug;
+
+        private bool UmbracoPathCustomized => _globalSettings.UmbracoPath != GlobalSettings.StaticUmbracoPath;
+
+        private string ASPEnvironment => _hostEnvironment.EnvironmentName;
 
         public IEnumerable<UsageInformation> GetInformation() => throw new System.NotImplementedException();
 
@@ -43,10 +61,11 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
                 new("Server Framework", ServerFramework),
                 new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
                 new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
-                new("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
+                new("Current Culture", CurrentCulture),
                 new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
                 new("Current Webserver", CurrentWebServer),
                 new("Models Builder Mode", ModelsBuilderMode),
+                new("Debug Mode", IsDebug.ToString()),
             };
 
         private bool IsRunningInProcessIIS()
