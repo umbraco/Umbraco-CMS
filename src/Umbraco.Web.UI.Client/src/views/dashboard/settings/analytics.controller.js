@@ -6,12 +6,12 @@
     var vm = this;
     vm.getConsentLevel = getConsentLevel;
     vm.getAllConsentLevels = getAllConsentLevels;
+    vm.saveConsentLevel = saveConsentLevel;
+    vm.sliderChange = sliderChange;
     vm.consentLevel = '';
     vm.consentLevels = [];
-
-    vm.value = ["minimal", "basic", "detailed"];
-
-    vm.val = "minimal";
+    vm.val = 2;
+    vm.sliderVal = '';
     getConsentLevel();
     getAllConsentLevels();
 
@@ -43,6 +43,14 @@
       analyticResource.getAllConsentLevels().then(function (response) {
         vm.consentLevels = response;
       })
+    }
+    function saveConsentLevel(){
+      analyticResource.saveConsentLevel(vm.sliderVal);
+    }
+
+    function sliderChange(values) {
+      vm.sliderVal = values[0];
+      console.log(vm.sliderVal);
     }
   }
     angular.module("umbraco").controller("Umbraco.Dashboard.AnalyticsController", AnalyticsController);

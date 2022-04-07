@@ -11,7 +11,8 @@
         <div style="padding-left: 12px;padding-top: 50px; padding-bottom: 50px; width: 25%">
           <umb-range-slider
             ng-model="vm.val"
-            options="vm.sliderOptions">
+            options="vm.sliderOptions"
+            on-change="vm.sliderChange(values)">
           </umb-range-slider>
         </div>
 
@@ -32,7 +33,7 @@
         <umb-button type="button"
                     button-style="success"
                     label="Save"
-                    action="">
+                    action="saveConsentLevel">
         </umb-button>
       </div>
     </umb-box-content>

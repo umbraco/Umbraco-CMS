@@ -29,9 +29,19 @@
         'Server call failed for getting current consent level');
     }
 
+    function saveConsentLevel (value) {
+      return umbRequestHelper.resourcePromise(
+        $http.post(
+          umbRequestHelper.getApiUrl(
+            "analyticsApiBaseUrl",
+            "SetConsentLevel"), value),
+        'Server call failed for getting current consent level');
+    }
+
     var resource = {
       getConsentLevel: getConsentLevel,
-      getAllConsentLevels : getAllConsentLevels
+      getAllConsentLevels : getAllConsentLevels,
+      saveConsentLevel : saveConsentLevel
     };
 
     return resource;
