@@ -90,14 +90,42 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
             });
         }
 
-        private SystemInformationTelemetryProvider CreateUserDataService(string culture)
+        [Test]
+        [TestCase(ModelsMode.Nothing)]
+        [TestCase(ModelsMode.InMemoryAuto)]
+        [TestCase(ModelsMode.SourceCodeAuto)]
+        [TestCase(ModelsMode.SourceCodeManual)]
+        public void ReportsModelsModeCorrectly(ModelsMode modelsMode)
+        {
+            var userDataService = CreateUserDataService(modelsMode: modelsMode);
+            UserData[] userData = userDataService.GetUserData().ToArray();
+
+            var actual = userData.FirstOrDefault(x => x.Name == "Models Builder Mode");
+            Assert.IsNotNull(actual?.Data);
+            Assert.AreEqual(modelsMode.ToString(), actual.Data);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ReportsDebugModeCorrectly(bool isDebug)
+        {
+            var userDataService = CreateUserDataService(isDebug: isDebug);
+            UserData[] userData = userDataService.GetUserData().ToArray();
+
+            var actual = userData.FirstOrDefault(x => x.Name == "Debug Mode");
+            Assert.IsNotNull(actual?.Data);
+            Assert.AreEqual(isDebug.ToString(), actual.Data);
+        }
+
+        private SystemInformationTelemetryProvider CreateUserDataService(string culture = "", ModelsMode modelsMode = ModelsMode.InMemoryAuto, bool isDebug = true)
         {
             var localizationService = CreateILocalizationService(culture);
             return new SystemInformationTelemetryProvider(
                 _umbracoVersion,
                 localizationService,
-                Mock.Of<IOptions<ModelsBuilderSettings>>(x => x.Value == new ModelsBuilderSettings()),
-                Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings()),
+                Mock.Of<IOptions<ModelsBuilderSettings>>(x => x.Value == new ModelsBuilderSettings { ModelsMode = modelsMode }),
+                Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings { Debug = isDebug }),
                 Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings()),
                 Mock.Of<IHostEnvironment>());
         }
