@@ -1,15 +1,42 @@
 ﻿<div ng-controller="Umbraco.Dashboard.AnalyticsController as vm">
-  <h1>{{vm.consentLevel}}</h1>
-  <div ng-repeat="level in vm.consentLevels">
-    <p>{{level}}</p>
-  </div>
+  <umb-box>
+    <umb-box-content>
+      <div class="umb-healthcheck-help-text">
+          <p>In order to improve Umbraco and add new functionality based on as relevant information as possible,
+            <br>we would like to collect system- and usage information from your installation.
+            <br>We will NOT collect any personal data like content, code or users, and all data will be fully anonymous.
+            <br>
+            <br>We will on a regular basis share some of the overall learnings from these metrics.
+          Hopefully, you'll help us collect some valuable data.</p>
+        <div style="padding-left: 12px;padding-top: 50px; padding-bottom: 50px; width: 25%">
+          <umb-range-slider
+            ng-model="vm.val"
+            options="vm.sliderOptions">
+          </umb-range-slider>
+        </div>
 
-  <div style="padding-top: 50px; padding-bottom: 40px; padding-left: 40px; padding-right: 40px">
-    <umb-range-slider
-      ng-model="vm.val"
-      options="vm.sliderOptions">
-    </umb-range-slider>
-  </div>
+        <p>Description of levels:
+          <br>
+          <br>Minimal: We'll only send an anonymous site ID to let us know that the site exists.
+          <br>Basic: We'll send site ID, umbraco version and packages installed
+          <br>Detailed: In addition to the basic level, we will also send:
+          <br>- System information like Server OS and Webserver
+          <br>- Statistics, like number of content nodes and number of media items
+          <br>- Configuration settings, like modelsbuilder mode and used languages
+          <br>
+          <br>We might change/extend what we send on the detailed level in the future, but if so, it will be listed in this view.
+          By choosing "detailed" I accept these future changes
+        </p>
+      </div>
+      <div class="umb-panel-group__details-status-actions">
+        <umb-button type="button"
+                    button-style="success"
+                    label="Save"
+                    action="">
+        </umb-button>
+      </div>
+    </umb-box-content>
+  </umb-box>
 </div>
 
 
