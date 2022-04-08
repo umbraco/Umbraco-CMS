@@ -104,6 +104,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             var hostEnvironment = new Mock<IHostEnvironment>();
             hostEnvironment.Setup(x => x.EnvironmentName).Returns(environment);
 
+            var databaseMock = new Mock<IUmbracoDatabase>();
+            databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
 
             return new SystemInformationTelemetryProvider(
                 Mock.Of<IUmbracoVersion>(),
@@ -112,7 +114,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings { Debug = isDebug }),
                 Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings{ UmbracoPath = umbracoPath }),
                 hostEnvironment.Object,
-                Mock.Of<IUmbracoDatabase>());
+                databaseMock.Object);
         }
     }
 }

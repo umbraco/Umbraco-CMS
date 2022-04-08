@@ -122,6 +122,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         private SystemInformationTelemetryProvider CreateUserDataService(string culture = "", ModelsMode modelsMode = ModelsMode.InMemoryAuto, bool isDebug = true)
         {
             var localizationService = CreateILocalizationService(culture);
+
+            var databaseMock = new Mock<IUmbracoDatabase>();
+            databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
+
             return new SystemInformationTelemetryProvider(
                 _umbracoVersion,
                 localizationService,
@@ -129,7 +133,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
                 Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings { Debug = isDebug }),
                 Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings()),
                 Mock.Of<IHostEnvironment>(),
-                Mock.Of<IUmbracoDatabase>());
+                databaseMock.Object);
         }
 
         private ILocalizationService CreateILocalizationService(string culture)
