@@ -30,6 +30,18 @@
         "range": {
           "min": 1,
           "max": 3
+        },
+        pips: {
+          mode: 'range',
+          density: 50,
+          "format": {
+            to: function (value) {
+              return vm.consentLevels[value.toFixed(0) - 1];
+            },
+            from: function (value) {
+              return Number(value);
+            }
+          }
         }
       };
     $q.all(
