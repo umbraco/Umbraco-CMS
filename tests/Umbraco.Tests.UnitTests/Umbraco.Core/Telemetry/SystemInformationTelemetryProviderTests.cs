@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
@@ -110,7 +111,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 Mock.Of<IOptions<ModelsBuilderSettings>>(x => x.Value == new ModelsBuilderSettings{ ModelsMode = modelsMode }),
                 Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings { Debug = isDebug }),
                 Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings{ UmbracoPath = umbracoPath }),
-                hostEnvironment.Object);
+                hostEnvironment.Object,
+                Mock.Of<IUmbracoDatabase>());
         }
     }
 }

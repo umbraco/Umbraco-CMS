@@ -49,6 +49,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Telemetry
                 Constants.Telemetry.CustomUmbracoPath,
                 Constants.Telemetry.AspEnvironment,
                 Constants.Telemetry.IsDebug,
+                Constants.Telemetry.DatabaseProvider,
             };
 
             var success = TelemetryService.TryGetTelemetryReportData(out var telemetryReportData);

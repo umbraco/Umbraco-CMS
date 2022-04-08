@@ -26,6 +26,7 @@
             public static string CustomUmbracoPath = "CustomUmbracoPath";
             public static string AspEnvironment = "AspEnvironment";
             public static string IsDebug = "IsDebug";
+            public static string DatabaseProvider = "DatabaseProvider";
         }
     }
 }

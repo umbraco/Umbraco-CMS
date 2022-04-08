@@ -20,7 +20,7 @@ context('System Information', () => {
 
     it('Check System Info Displays', () => {
         openSystemInformation();
-        cy.get('.table').find('tr').should('have.length', 12);
+        cy.get('.table').find('tr').should('have.length', 13);
         cy.contains('Current Culture').parent().should('contain', 'en-US');
         cy.contains('Current UI Culture').parent().should('contain', 'en-US');
     });

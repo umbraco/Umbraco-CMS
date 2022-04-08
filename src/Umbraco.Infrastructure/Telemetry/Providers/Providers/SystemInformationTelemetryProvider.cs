@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
         private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly IUmbracoDatabase _database;
         private readonly GlobalSettings _globalSettings;
         private readonly HostingSettings _hostingSettings;
         private readonly ModelsBuilderSettings _modelsBuilderSettings;
@@ -29,11 +31,13 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
             IOptions<ModelsBuilderSettings> modelsBuilderSettings,
             IOptions<HostingSettings> hostingSettings,
             IOptions<GlobalSettings> globalSettings,
-            IHostEnvironment hostEnvironment)
+            IHostEnvironment hostEnvironment,
+            IUmbracoDatabase database)
         {
             _version = version;
             _localizationService = localizationService;
             _hostEnvironment = hostEnvironment;
+            _database = database;
             _globalSettings = globalSettings.Value;
             _hostingSettings = hostingSettings.Value;
             _modelsBuilderSettings = modelsBuilderSettings.Value;
@@ -55,6 +59,8 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
 
         private string ServerOs => RuntimeInformation.OSDescription;
 
+        private string DatabaseProvider => _database.DatabaseType.GetProviderName();
+
         public IEnumerable<UsageInformation> GetInformation() =>
             new UsageInformation[]
             {
@@ -66,6 +72,7 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
                 new(Constants.Telemetry.CustomUmbracoPath, UmbracoPathCustomized),
                 new(Constants.Telemetry.AspEnvironment, AspEnvironment),
                 new(Constants.Telemetry.IsDebug, IsDebug),
+                new(Constants.Telemetry.DatabaseProvider, DatabaseProvider),
             };
 
         public IEnumerable<UserData> GetUserData() =>
@@ -80,6 +87,7 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
                 new("Current Webserver", CurrentWebServer),
                 new("Models Builder Mode", ModelsBuilderMode),
                 new("Debug Mode", IsDebug.ToString()),
+                new("Database Provider", DatabaseProvider),
             };
 
         private bool IsRunningInProcessIIS()
