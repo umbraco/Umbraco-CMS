@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.Services
 {
     public class MetricsConsentService : IMetricsConsentService
     {
-
         internal const string Key = "UmbracoAnalyticsLevel";
 
         private readonly IKeyValueService _keyValueService;
