@@ -3,25 +3,20 @@
 
   function AnalyticsController($q, analyticResource) {
 
+    let sliderRef = null;
+
     var vm = this;
     vm.getConsentLevel = getConsentLevel;
     vm.getAllConsentLevels = getAllConsentLevels;
     vm.saveConsentLevel = saveConsentLevel;
     vm.sliderChange = sliderChange;
+    vm.setup = setup;
     vm.consentLevel = '';
     vm.consentLevels = [];
     vm.val = 1;
-    vm.sliderOptions = {};
-    $q.all(
-      [getConsentLevel(),
-      getAllConsentLevels()
-    ]).then( () => {
-      vm.startPos = calculateStartPositionForSlider();
-      vm.val = calculateStartPositionForSlider();
-      vm.sliderVal = vm.consentLevels[vm.startPos];
-      vm.sliderOptions =
-        {
-        "start": vm.startPos,
+    vm.sliderOptions =
+      {
+        "start": 1,
         "step": 1,
         "tooltips": [true],
         "format": {
@@ -37,7 +32,22 @@
           "max": 3
         }
       };
+    $q.all(
+      [getConsentLevel(),
+      getAllConsentLevels()
+    ]).then( () => {
+      vm.startPos = calculateStartPositionForSlider();
+      vm.sliderVal = vm.consentLevels[vm.startPos];
+      vm.sliderOptions.start = vm.startPos;
+      vm.val = vm.startPos;
+      if (sliderRef) {
+        sliderRef.noUiSlider.set(vm.startPos);
+      }
+
     });
+    function setup(slider) {
+      sliderRef = slider;
+    };
 
     function getConsentLevel() {
       return analyticResource.getConsentLevel().then(function (response) {
@@ -58,10 +68,9 @@
     }
 
     function calculateStartPositionForSlider(){
-      vm.sliderVal = vm.consentLevel;
       let startPosition = vm.consentLevels.indexOf(vm.consentLevel) + 1;
-      if(startPosition === -1){
-        return 2;
+      if(startPosition === 0){
+        return 2;// Default start value
       }
       return startPosition;
     }
