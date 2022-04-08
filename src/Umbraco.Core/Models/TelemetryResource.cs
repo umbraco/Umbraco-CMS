@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.Models
     [DataContract]
     public class TelemetryResource
     {
-        [DataMember] public string TelemetryLevel { get; set; }
+        [DataMember]
+        public TelemetryLevel TelemetryLevel { get; set; }
     }
 }

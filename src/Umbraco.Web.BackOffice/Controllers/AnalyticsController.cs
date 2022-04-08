@@ -22,14 +22,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult SetConsentLevel([FromBody]TelemetryResource telemetryResource)
         {
-            if (!Enum.TryParse(telemetryResource.TelemetryLevel, out TelemetryLevel telemetryLevel))
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            _metricsConsentService.SetConsentLevel(telemetryLevel);
+            _metricsConsentService.SetConsentLevel(telemetryResource.TelemetryLevel);
             return Ok();
-
         }
 
         public IEnumerable<TelemetryLevel> GetAllLevels() => new[] { TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed };
