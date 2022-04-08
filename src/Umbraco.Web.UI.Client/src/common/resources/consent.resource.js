@@ -30,8 +30,6 @@
     }
 
     function saveConsentLevel (value) {
-      console.log("POSTING VALUE IN FUNCTION");
-      console.log(value);
       return umbRequestHelper.resourcePromise(
         $http.post(
           umbRequestHelper.getApiUrl(

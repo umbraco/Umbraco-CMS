@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return _metricsConsentService.SetConsentLevel(ConsentLevel.Detailed);
             }
 
-            return ConsentLevel.Minimal;
+            return ConsentLevel.Basic;
         }
 
         public IEnumerable<ConsentLevel> GetAllLevels() => new[] { ConsentLevel.Minimal, ConsentLevel.Basic, ConsentLevel.Detailed };
