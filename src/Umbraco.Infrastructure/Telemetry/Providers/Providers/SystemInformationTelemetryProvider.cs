@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
         private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
         private readonly IHostEnvironment _hostEnvironment;
-        private readonly IUmbracoDatabase _database;
+        private readonly Lazy<IUmbracoDatabase> _database;
         private readonly GlobalSettings _globalSettings;
         private readonly HostingSettings _hostingSettings;
         private readonly ModelsBuilderSettings _modelsBuilderSettings;
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
             IOptions<HostingSettings> hostingSettings,
             IOptions<GlobalSettings> globalSettings,
             IHostEnvironment hostEnvironment,
-            IUmbracoDatabase database)
+            Lazy<IUmbracoDatabase> database)
         {
             _version = version;
             _localizationService = localizationService;
@@ -59,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
 
         private string ServerOs => RuntimeInformation.OSDescription;
 
-        private string DatabaseProvider => _database.DatabaseType.GetProviderName();
+        private string DatabaseProvider => _database.Value.DatabaseType.GetProviderName();
 
         public IEnumerable<UsageInformation> GetInformation() =>
             new UsageInformation[]
