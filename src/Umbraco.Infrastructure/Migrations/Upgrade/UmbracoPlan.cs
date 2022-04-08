@@ -284,6 +284,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
             // TO 9.4.0
             To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
+            To<UpdateRelationTypesToHandleDependencies>("{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}");
 
             // TO 9.5.0
             To<UpdateLanguageTable>("{15635DAB-3AFB-480B-A504-BF42950E85AF}");

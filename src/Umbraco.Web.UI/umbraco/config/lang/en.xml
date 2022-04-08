@@ -569,6 +569,8 @@
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
+    <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
@@ -2395,6 +2397,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noRelations">No relations for this Relation Type</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
+    <key alias="isDependency">Is Dependency</key>
+    <key alias="dependency">Yes</key>
+    <key alias="noDependency">No</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Getting Started</key>
@@ -2472,6 +2477,15 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelUsedByDocuments">Used in Documents</key>
     <key alias="labelUsedByMembers">Used in Members</key>
     <key alias="labelUsedByMedia">Used in Media</key>
+    <key alias="labelUsedItems">Items in use</key>
+    <key alias="labelUsedDescendants">Descendants in use</key>
+    <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item.</key>
+    <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item.</key>
+    <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being used in a member.</key>
+    <key alias="deleteWarning">This item or its descendants is being used. Deletion can lead to broken links on your website.</key>
+    <key alias="unpublishWarning">This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
+    <key alias="deleteDisabledWarning">This item or its descendants is being used. Therefore, deletion has been disabled.</key>
+    <key alias="listViewDialogWarning">The following items you are trying to %0% are used by other content.</key>
   </area>
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Delete Saved Search</key>
@@ -2663,7 +2677,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
-    <key alias="headlineEditorAppearance">Editor apperance</key>
+    <key alias="headlineEditorAppearance">Editor appearance</key>
     <key alias="headlineDataModels">Data models</key>
     <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
     <key alias="labelBackgroundColor">Background color</key>

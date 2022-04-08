@@ -3,7 +3,7 @@
  * @name umbraco.resources.mediaResource
  * @description Loads in data for media
  **/
-function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function mediaResource($q, $http, umbDataFormatter, umbRequestHelper, trackedReferencesResource) {
 
     /** internal method process the saving of data and post processing the result */
     function saveMediaItem(content, action, files) {
@@ -552,36 +552,41 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve media items for search: ' + query);
         },
 
+         /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#getPagedReferences
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Gets a page list of tracked references for the current item, so you can see where an item is being used
+         *
+         * @deprecated
+         * Use umbraco.resources.trackedReferencesResource#getPagedReferences instead
+         *
+         * ##usage
+         * <pre>
+         * var options = {
+         *      pageSize : 25,
+         *      pageNumber : 1,
+         *      entityType : 'DOCUMENT'
+         *  };
+         * trackedReferencesResource.getPagedReferences(1, options)
+         *    .then(function(data) {
+         *        console.log(data);
+         *    });
+         * </pre>
+         *
+         * @param {int} id Id of the item to query for tracked references
+         * @param {Object} args optional args object
+         * @param {Int} args.pageSize the pagesize of the returned list (default 25)
+         * @param {Int} args.pageNumber the current page index (default 1)
+         * @param {Int} args.entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         getPagedReferences: function (id, options) {
-
-            var defaults = {
-                pageSize: 25,
-                pageNumber: 1,
-                entityType: "DOCUMENT"
-            };
-            if (options === undefined) {
-                options = {};
-            }
-            //overwrite the defaults if there are any specified
-            Utilities.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
-
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "mediaApiBaseUrl",
-                        "GetPagedReferences",
-                        {
-                            id: id,
-                            entityType: options.entityType,
-                            pageNumber: options.pageNumber,
-                            pageSize: options.pageSize
-                        }
-                    )),
-                "Failed to retrieve usages for media of id " + id);
+            return trackedReferencesResource.getPagedReferences(id, options);
         }
-
     };
 }
 

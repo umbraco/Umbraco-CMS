@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly IMacroService _macroService;
         private readonly IContentTypeService _contentTypeService;
         private readonly string _tempFolderPath;
-        private readonly string _mediaFolderPath;
+        private readonly string _createdPackagesFolderPath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreatedPackageSchemaRepository"/> class.
@@ -76,9 +76,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _macroService = macroService;
             _contentTypeService = contentTypeService;
             _xmlParser = new PackageDefinitionXmlParser();
-            _mediaFolderPath = mediaFolderPath ?? Path.Combine(globalSettings.Value.UmbracoMediaPhysicalRootPath,  Constants.SystemDirectories.CreatedPackages);
-            _tempFolderPath =
-                tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
+            _createdPackagesFolderPath = mediaFolderPath ?? Constants.SystemDirectories.CreatedPackages;
+            _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData + "/PackageFiles";
         }
 
         public IEnumerable<PackageDefinition> GetAll()
@@ -192,17 +191,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public string ExportPackage(PackageDefinition definition)
         {
-
             // Ensure it's valid
             ValidatePackage(definition);
 
             // Create a folder for building this package
-            var temporaryPath =
-                _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
-            if (Directory.Exists(temporaryPath) == false)
-            {
-                Directory.CreateDirectory(temporaryPath);
-            }
+            var temporaryPath = _hostingEnvironment.MapPathContentRoot(Path.Combine(_tempFolderPath, Guid.NewGuid().ToString()));
+            Directory.CreateDirectory(temporaryPath);
 
             try
             {
@@ -218,8 +212,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 PackageTemplates(definition, root);
                 PackageStylesheets(definition, root);
                 PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem);
-                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View",
-                    _fileSystems.PartialViewsFileSystem);
+                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem);
                 PackageMacros(definition, root);
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
@@ -265,27 +258,25 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
                 }
 
-                var directoryName =
-                    _hostingEnvironment.MapPathWebRoot(
-                        Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
-
-                if (Directory.Exists(directoryName) == false)
-                {
-                    Directory.CreateDirectory(directoryName);
-                }
+                var directoryName = _hostingEnvironment.MapPathContentRoot(Path.Combine(_createdPackagesFolderPath, definition.Name.Replace(' ', '_')));
+                Directory.CreateDirectory(directoryName);
 
                 var finalPackagePath = Path.Combine(directoryName, fileName);
 
-                if (File.Exists(finalPackagePath))
+                // Clean existing files
+                foreach (var packagePath in new[]
                 {
-                    File.Delete(finalPackagePath);
+                    definition.PackagePath,
+                    finalPackagePath
+                })
+                {
+                    if (File.Exists(packagePath))
+                    {
+                        File.Delete(packagePath);
+                    }
                 }
 
-                if (File.Exists(finalPackagePath.Replace("zip", "xml")))
-                {
-                    File.Delete(finalPackagePath.Replace("zip", "xml"));
-                }
-
+                // Move to final package path
                 File.Move(tempPackagePath, finalPackagePath);
 
                 definition.PackagePath = finalPackagePath;

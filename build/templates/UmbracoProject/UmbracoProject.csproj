@@ -31,7 +31,7 @@
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
     </PropertyGroup>
 
-    <!-- Set this to true if ModelsBuilder mode is not InMemoryAuto-->
+    <!-- Keep this as false if ModelsBuilder mode is InMemoryAuto -->
     <PropertyGroup>
         <RazorCompileOnBuild>false</RazorCompileOnBuild>
         <RazorCompileOnPublish>false</RazorCompileOnPublish>
