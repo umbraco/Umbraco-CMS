@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Core.Services
     {
         public ConsentLevel GetConsentLevel();
 
-        public ConsentLevel SetConsentLevel(ConsentLevel consentLevel);
+        public void SetConsentLevel(ConsentLevel consentLevel);
     }
 }

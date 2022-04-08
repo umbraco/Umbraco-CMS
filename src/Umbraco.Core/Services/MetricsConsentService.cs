@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Services
 {
     public class MetricsConsentService : IMetricsConsentService
     {
@@ -27,10 +27,9 @@ namespace Umbraco.Cms.Core.Models
             return analyticsLevel;
         }
 
-        public ConsentLevel SetConsentLevel(ConsentLevel consentLevel)
+        public void SetConsentLevel(ConsentLevel consentLevel)
         {
             _keyValueService.SetValue(Key, consentLevel.ToString());
-            return consentLevel;
         }
     }
 }

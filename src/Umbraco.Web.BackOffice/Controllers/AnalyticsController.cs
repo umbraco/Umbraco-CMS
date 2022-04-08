@@ -19,24 +19,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public ConsentLevel SetConsentLevel([FromBody]TelemetryResource telemetryResource)
+        public IActionResult SetConsentLevel([FromBody]TelemetryResource telemetryResource)
         {
             if (telemetryResource.TelemetryLevel == "Minimal")
             {
-                return _metricsConsentService.SetConsentLevel(ConsentLevel.Minimal);
+                _metricsConsentService.SetConsentLevel(ConsentLevel.Minimal);
+                return Ok();
             }
 
             if (telemetryResource.TelemetryLevel == "Basic")
             {
-                return _metricsConsentService.SetConsentLevel(ConsentLevel.Basic);
+                _metricsConsentService.SetConsentLevel(ConsentLevel.Basic);
+                return Ok();
             }
 
             if (telemetryResource.TelemetryLevel == "Detailed")
             {
-                return _metricsConsentService.SetConsentLevel(ConsentLevel.Detailed);
+                _metricsConsentService.SetConsentLevel(ConsentLevel.Detailed);
+                return Ok();
             }
 
-            return ConsentLevel.Basic;
+            return BadRequest();
         }
 
         public IEnumerable<ConsentLevel> GetAllLevels() => new[] { ConsentLevel.Minimal, ConsentLevel.Basic, ConsentLevel.Detailed };
