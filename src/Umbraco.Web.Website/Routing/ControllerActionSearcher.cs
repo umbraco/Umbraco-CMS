@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -31,12 +32,18 @@ namespace Umbraco.Cms.Web.Website.Routing
             _actionSelector = actionSelector;
         }
 
-   
+
         /// <summary>
         /// Determines if a custom controller can hijack the current route
         /// </summary>
         /// <typeparam name="T">The controller type to find</typeparam>
-        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action, string area = null)
+        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action) => Find<T>(httpContext, controller, action, null);
+
+        /// <summary>
+        /// Determines if a custom controller can hijack the current route
+        /// </summary>
+        /// <typeparam name="T">The controller type to find</typeparam>
+        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action, string area)
         {
             IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates<T>(httpContext, controller, action, DefaultActionName, area);
 
@@ -47,6 +54,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             return null;
         }
+
 
         /// <summary>
         /// Return a list of controller candidates that match the custom controller and action names
