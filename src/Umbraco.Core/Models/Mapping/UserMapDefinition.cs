@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         // Umbraco.Code.MapAll -Alias -AdditionalData
         private void Map(IUser source, UserDisplay target, MapperContext context)
         {
-            target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
+            target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.EnglishName);
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService,_appCaches), UmbracoObjectTypes.Document, "content","contentRoot", context);
             target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media, "media","mediaRoot", context);

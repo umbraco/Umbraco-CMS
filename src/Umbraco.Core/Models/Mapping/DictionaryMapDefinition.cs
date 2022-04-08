@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target.Translations.Add(new DictionaryTranslationDisplay
                 {
                     IsoCode = lang.IsoCode,
-                    DisplayName = lang.CultureInfo.DisplayName,
+                    DisplayName = lang.CultureInfo.EnglishName,
                     Translation = (translation != null) ? translation.Value : string.Empty,
                     LanguageId = lang.Id
                 });
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target.Translations.Add(
                     new DictionaryOverviewTranslationDisplay
                     {
-                        DisplayName = lang.CultureInfo.DisplayName,
+                        DisplayName = lang.CultureInfo.EnglishName,
                         HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false
                     });
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Models
                     Thread.CurrentThread.CurrentUICulture = defaultUiCulture;
 
                     // get name - new-ing an instance to get proper display name
-                    return new CultureInfo(IsoCode).DisplayName;
+                    return new CultureInfo(IsoCode).EnglishName;
                 }
                 finally
                 {

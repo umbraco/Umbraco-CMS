@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
         {
             DefineMap<Language, LanguageDto>(nameof(Language.Id), nameof(LanguageDto.Id));
             DefineMap<Language, LanguageDto>(nameof(Language.IsoCode), nameof(LanguageDto.IsoCode));
-            DefineMap<Language, LanguageDto>(nameof(Language.CultureName), nameof(LanguageDto.CultureName));
         }
     }
 }

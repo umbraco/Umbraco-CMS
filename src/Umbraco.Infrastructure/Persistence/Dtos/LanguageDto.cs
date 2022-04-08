@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
@@ -25,14 +25,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(14)]
         public string IsoCode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the culture name of the language.
-        /// </summary>
-        [Column("languageCultureName")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(100)]
-        public string CultureName { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the language is the default language.

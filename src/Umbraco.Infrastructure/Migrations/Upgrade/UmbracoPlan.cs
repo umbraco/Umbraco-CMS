@@ -17,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_4_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_5_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -283,6 +284,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
             // TO 9.4.0
             To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
+
+            // TO 9.5.0
+            To<UpdateLanguageTable>("{15635DAB-3AFB-480B-A504-BF42950E85AF}");
         }
     }
 }
