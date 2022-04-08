@@ -5,13 +5,14 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Telemetry.Providers
+namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
 {
     internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, IUserDataService
     {
@@ -48,7 +49,7 @@ namespace Umbraco.Cms.Core.Telemetry.Providers
 
         private bool IsDebug => _hostingSettings.Debug;
 
-        private bool UmbracoPathCustomized => _globalSettings.UmbracoPath != GlobalSettings.StaticUmbracoPath;
+        private bool UmbracoPathCustomized => _globalSettings.UmbracoPath != Constants.System.DefaultUmbracoPath;
 
         private string AspEnvironment => _hostEnvironment.EnvironmentName;
 

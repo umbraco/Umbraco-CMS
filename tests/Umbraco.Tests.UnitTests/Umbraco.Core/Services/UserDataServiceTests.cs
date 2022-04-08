@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Telemetry.Providers;
+using Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
 {

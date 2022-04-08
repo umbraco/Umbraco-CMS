@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Telemetry.Providers;
+using Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers;
 
-namespace Umbraco.Cms.Core.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static class UmbracoBuilder_TelemetryProviders
     {

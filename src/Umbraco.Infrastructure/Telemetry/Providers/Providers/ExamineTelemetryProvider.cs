@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Telemetry.Providers
+namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
 {
     public class ExamineTelemetryProvider : IDetailedTelemetryProvider
     {
