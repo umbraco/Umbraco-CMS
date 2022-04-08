@@ -25,7 +25,6 @@ using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -38,10 +37,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
-using Umbraco.Cms.Core.Telemetry.Providers;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
@@ -184,7 +181,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
-            Services.AddUnique<IUserDataService, UserDataService>();
             Services.AddUnique<IUsageInformationService, UsageInformationService>();
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
