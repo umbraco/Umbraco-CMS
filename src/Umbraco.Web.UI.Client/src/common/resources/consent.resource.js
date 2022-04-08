@@ -30,12 +30,14 @@
     }
 
     function saveConsentLevel (value) {
+      console.log("POSTING VALUE IN FUNCTION");
+      console.log(value);
       return umbRequestHelper.resourcePromise(
         $http.post(
           umbRequestHelper.getApiUrl(
             "analyticsApiBaseUrl",
             "SetConsentLevel"),
-          { consentLevel : value }
+          { telemetryLevel : value }
         ),
         'Server call failed for getting current consent level');
     }
