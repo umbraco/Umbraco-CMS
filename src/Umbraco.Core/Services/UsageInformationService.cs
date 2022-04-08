@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<UsageInformation> GetDetailed()
         {
-            if (_metricsConsentService.GetConsentLevel() != ConsentLevel.Detailed)
+            if (_metricsConsentService.GetConsentLevel() != TelemetryLevel.Detailed)
             {
                 return null;
             }

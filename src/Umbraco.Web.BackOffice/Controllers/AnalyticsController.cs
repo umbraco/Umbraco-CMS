@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _metricsConsentService = metricsConsentService;
         }
 
-        public ConsentLevel GetConsentLevel()
+        public TelemetryLevel GetConsentLevel()
         {
             return _metricsConsentService.GetConsentLevel();
         }
@@ -21,27 +22,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult SetConsentLevel([FromBody]TelemetryResource telemetryResource)
         {
-            if (telemetryResource.TelemetryLevel == "Minimal")
+            if (!Enum.TryParse(telemetryResource.TelemetryLevel, out TelemetryLevel telemetryLevel))
             {
-                _metricsConsentService.SetConsentLevel(ConsentLevel.Minimal);
-                return Ok();
+                return BadRequest();
             }
 
-            if (telemetryResource.TelemetryLevel == "Basic")
-            {
-                _metricsConsentService.SetConsentLevel(ConsentLevel.Basic);
-                return Ok();
-            }
+            _metricsConsentService.SetConsentLevel(telemetryLevel);
+            return Ok();
 
-            if (telemetryResource.TelemetryLevel == "Detailed")
-            {
-                _metricsConsentService.SetConsentLevel(ConsentLevel.Detailed);
-                return Ok();
-            }
-
-            return BadRequest();
         }
 
-        public IEnumerable<ConsentLevel> GetAllLevels() => new[] { ConsentLevel.Minimal, ConsentLevel.Basic, ConsentLevel.Detailed };
+        public IEnumerable<TelemetryLevel> GetAllLevels() => new[] { TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed };
     }
 }

@@ -3,7 +3,7 @@
 namespace Umbraco.Cms.Core.Models
 {
     [DataContract]
-    public enum ConsentLevel
+    public enum TelemetryLevel
     {
         Minimal,
         Basic,
