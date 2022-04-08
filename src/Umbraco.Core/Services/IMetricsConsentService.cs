@@ -4,8 +4,8 @@ namespace Umbraco.Cms.Core.Services
 {
     public interface IMetricsConsentService
     {
-        public ConsentLevel GetConsentLevel();
+        ConsentLevel GetConsentLevel();
 
-        public void SetConsentLevel(ConsentLevel consentLevel);
+        void SetConsentLevel(ConsentLevel consentLevel);
     }
 }
