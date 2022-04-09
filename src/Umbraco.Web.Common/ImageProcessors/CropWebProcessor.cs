@@ -69,12 +69,12 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
             // Scale points to a pixel based rectangle
             Size size = image.Image.Size();
-            int x = (int)MathF.Round(MathF.Min(xy1.X, xy2.X) * size.Width);
-            int y = (int)MathF.Round(MathF.Min(xy1.Y, xy2.Y) * size.Height);
-            int width = (int)MathF.Round(MathF.Max(xy1.X, xy2.X) * size.Width) - x;
-            int height = (int)MathF.Round(MathF.Max(xy1.Y, xy2.Y) * size.Height) - y;
 
-            return new Rectangle(x, y, width, height);
+            return Rectangle.Round(RectangleF.FromLTRB(
+                MathF.Min(xy1.X, xy2.X) * size.Width,
+                MathF.Min(xy1.Y, xy2.Y) * size.Height,
+                MathF.Max(xy1.X, xy2.X) * size.Width,
+                MathF.Max(xy1.Y, xy2.Y) * size.Height));
         }
 
         private static ushort GetExifOrientation(FormattedImage image, CommandCollection commands, CommandParser parser, CultureInfo culture)
