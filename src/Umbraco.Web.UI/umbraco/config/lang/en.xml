@@ -331,6 +331,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
+    <key alias="failedFileUpload">Failed to upload file</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
     <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
@@ -576,6 +577,7 @@
     <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="noItemsInFile">There are no dictionary items in this file.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">

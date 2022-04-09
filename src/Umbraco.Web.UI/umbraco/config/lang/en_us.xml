@@ -334,6 +334,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
+    <key alias="failedFileUpload">Failed to upload file</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
     <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
@@ -586,6 +587,7 @@
     <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="noItemsInFile">There are no dictionary items in this file.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -1582,6 +1584,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="editUserGroupSaved">User group saved</key>
     <key alias="editCulturesAndHostnamesSaved">Cultures and hostnames saved</key>
     <key alias="editCulturesAndHostnamesError">Error saving cultures and hostnames</key>
+    <key alias="fileErrorNotFound">File not found</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>

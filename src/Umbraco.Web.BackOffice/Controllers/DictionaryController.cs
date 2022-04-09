@@ -379,8 +379,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IActionResult ImportDictionary(string file)
         {
+            if (string.IsNullOrEmpty(file))
+                return NotFound();
+
             var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
-            if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
+            if (!System.IO.File.Exists(filePath))
                 return NotFound();
 
             var xd = new XmlDocument { XmlResolver = null };
@@ -408,52 +411,57 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<DictionaryImportModel> Upload(IFormFile file)
         {
-            var model = new DictionaryImportModel()
-            {
-                DictionaryItems = new List<string>()
-            };
+
+            if (file == null)
+                return ValidationProblem(
+                    _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
 
             var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
             var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             var tempPath = Path.Combine(root, fileName);
 
-            if (Path.GetFullPath(tempPath).StartsWith(Path.GetFullPath(root)))
+            if (!Path.GetFullPath(tempPath).StartsWith(Path.GetFullPath(root)))
+                return ValidationProblem(
+                     _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("media", "invalidFileName"));
+
+
+            using (var stream = System.IO.File.Create(tempPath))
             {
-                using (var stream = System.IO.File.Create(tempPath))
-                {
-                    file.CopyToAsync(stream).GetAwaiter().GetResult();
-                }
-
-                if (ext.InvariantEquals("udt"))
-                {
-                    model.TempFileName = Path.Combine(root, fileName);
-
-                    var xd = new XmlDocument
-                    {
-                        XmlResolver = null
-                    };
-                    xd.Load(model.TempFileName);
-
-                    if (xd.DocumentElement != null)
-                        foreach (XmlNode dictionaryItem in xd.GetElementsByTagName("DictionaryItem"))
-                            model.DictionaryItems.Add(dictionaryItem.Attributes.GetNamedItem("Name")?.Value);
-                }
-                else
-                {
-                    model.Notifications.Add(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                        _localizedTextService.Localize("media", "disallowedFileType"),
-                        NotificationStyle.Warning));
-                }
+                file.CopyToAsync(stream).GetAwaiter().GetResult();
             }
-            else
+
+            if (!ext.InvariantEquals("udt"))
+                return ValidationProblem(
+                     _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("media", "disallowedFileType"));
+
+
+            var xd = new XmlDocument
             {
-                model.Notifications.Add(new BackOfficeNotification(
-                    _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                    _localizedTextService.Localize("media", "invalidFileName"),
-                    NotificationStyle.Warning));
-            }
+                XmlResolver = null
+            };
+            xd.Load(tempPath);
+
+            if (xd.DocumentElement == null)
+                return ValidationProblem(
+                    _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
+
+            DictionaryImportModel model = new DictionaryImportModel()
+            {
+                TempFileName = tempPath,
+                DictionaryItems = new List<string>()
+            };
+            foreach (XmlNode dictionaryItem in xd.GetElementsByTagName("DictionaryItem"))
+                model.DictionaryItems.Add(dictionaryItem.Attributes.GetNamedItem("Name")?.Value);
+
+            if(!model.DictionaryItems.Any())
+                return ValidationProblem(
+                    _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("dictionary", "noItemsInFile"));
 
             return model;
         }
