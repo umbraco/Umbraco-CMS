@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,7 +47,6 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Packaging;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
@@ -62,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
     public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
-        /// Adds all core Umbraco services required to run which may be replaced later in the pipeline
+        /// Adds all core Umbraco services required to run which may be replaced later in the pipeline.
         /// </summary>
         public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
         {
@@ -82,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
 
-            // composers
+            // Composers
             builder
                 .AddRepositories()
                 .AddServices()
@@ -90,16 +88,15 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddFileSystems()
                 .AddWebAssets();
 
-            // register persistence mappers - required by database factory so needs to be done here
+            // Register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
             builder.Mappers().AddCoreMappers();
 
-            // register the scope provider
+            // Register the scope provider
             builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
             builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
-
 
             builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
@@ -107,14 +104,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
             builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
-            // register database builder
-            // *not* a singleton, don't want to keep it around
+            // Register database builder (not a singleton, don't want to keep it around)
             builder.Services.AddTransient<DatabaseBuilder>();
 
-            // register manifest parser, will be injected in collection builders where needed
+            // Register manifest parser, will be injected in collection builders where needed
             builder.Services.AddSingleton<IManifestParser, ManifestParser>();
 
-            // register the manifest filter collection builder (collection is empty by default)
+            // Register the manifest filter collection builder (collection is empty by default)
             builder.ManifestFilters();
 
             builder.MediaUrlGenerators()
@@ -129,11 +125,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
             builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-            builder.AddPreValueMigrators();
-
-            builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
-
-            // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
+            // Register the published snapshot accessor - the "current" published snapshot is in the Umbraco context
             builder.Services.AddSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
@@ -144,20 +136,20 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<RichTextEditorPastedImages>();
             builder.Services.AddSingleton<BlockEditorConverter>();
 
-            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+            // Both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We will remove the basic one defined
             // in core so that the more enhanced version is active.
             builder.PropertyValueConverters()
                 .Remove<SimpleTinyMceValueConverter>();
 
-            // register *all* checks, except those marked [HideFromTypeFinder] of course
+            // Register all checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
             builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             builder.Services.AddScoped<UmbracoTreeSearcher>();
 
-            // replace
+            // Replace
             builder.Services.AddSingleton<IEmailSender, EmailSender>(
                 services => new EmailSender(
                     services.GetRequiredService<ILogger<EmailSender>>(),
@@ -171,17 +163,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
-            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
-                new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>())
-            );
+            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp => new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
                 var umbracoContext = umbCtx.GetRequiredUmbracoContext();
+
                 return new PublishedContentQuery(umbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             });
 
-            // register accessors for cultures
+            // Register accessors for cultures
             builder.Services.AddSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
             builder.Services.AddSingleton<IFilePermissionHelper, FilePermissionHelper>();
@@ -210,7 +201,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         }
 
         /// <summary>
-        /// Adds logging requirements for Umbraco
+        /// Adds logging requirements for Umbraco.
         /// </summary>
         private static IUmbracoBuilder AddLogging(this IUmbracoBuilder builder)
         {
@@ -260,31 +251,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             return builder;
         }
 
-
-        private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
-        {
-            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
-                .Append<RenamingPreValueMigrator>()
-                .Append<RichTextPreValueMigrator>()
-                .Append<UmbracoSliderPreValueMigrator>()
-                .Append<MediaPickerPreValueMigrator>()
-                .Append<ContentPickerPreValueMigrator>()
-                .Append<NestedContentPreValueMigrator>()
-                .Append<DecimalPreValueMigrator>()
-                .Append<ListViewPreValueMigrator>()
-                .Append<DropDownFlexiblePreValueMigrator>()
-                .Append<ValueListPreValueMigrator>()
-                .Append<MarkdownEditorPreValueMigrator>();
-
-            return builder;
-        }
-
         public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
             builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
             builder.SetLogViewer<SerilogJsonLogViewer>();
-            builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
+            builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(
+                factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
                 factory.GetRequiredService<ILogViewerConfig>(),
                 factory.GetRequiredService<ILoggingConfiguration>(),
                 factory.GetRequiredService<ILogLevelLoader>(),
@@ -295,7 +268,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {
-            // add handlers for sending user notifications (i.e. emails)
+            // Add handlers for sending user notifications (i.e. emails)
             builder.Services.AddSingleton<UserNotificationsHandler.Notifier>();
             builder
                 .AddNotificationHandler<ContentSavedNotification, UserNotificationsHandler>()
@@ -310,7 +283,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddNotificationHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
                 .AddNotificationHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();
 
-            // add handlers for building content relations
+            // Add handlers for building content relations
             builder
                 .AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
                 .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
@@ -318,7 +291,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
                 .AddNotificationHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
-            // add notification handlers for property editors
+            // Add notification handlers for property editors
             builder
                 .AddNotificationHandler<ContentSavingNotification, BlockEditorPropertyHandler>()
                 .AddNotificationHandler<ContentCopyingNotification, BlockEditorPropertyHandler>()
@@ -335,7 +308,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
                 .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>();
 
-            // add notification handlers for redirect tracking
+            // Add notification handlers for redirect tracking
             builder
                 .AddNotificationHandler<ContentPublishingNotification, RedirectTrackingHandler>()
                 .AddNotificationHandler<ContentPublishedNotification, RedirectTrackingHandler>()
@@ -372,9 +345,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddNotificationHandler<ContentTypeChangedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MediaTypeChangedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MemberTypeChangedNotification, DistributedCacheBinder>()
-                .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>()
-                ;
-            // add notification handlers for auditing
+                .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>();
+
+            // Add notification handlers for auditing
             builder
                 .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<MemberDeletedNotification, AuditNotificationsHandler>()
