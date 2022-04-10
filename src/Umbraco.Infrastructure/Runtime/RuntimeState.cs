@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string> keyValues)
         {
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+            var upgrader = new Upgrader(new UmbracoPlan());
             var stateValueKey = upgrader.StateValueKey;
 
             _ = keyValues.TryGetValue(stateValueKey, out var value);

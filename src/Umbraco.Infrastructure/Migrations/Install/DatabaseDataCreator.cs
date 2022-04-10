@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
@@ -20,7 +19,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
     {
         private readonly IDatabase _database;
         private readonly ILogger<DatabaseDataCreator> _logger;
-        private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
 
         internal static readonly IEnumerable<LogViewerQueryDto> DefaultLogQueries = new LogViewerQueryDto[]
@@ -88,11 +86,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 }
             };
 
-        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion, IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
         {
             _database = database;
             _logger = logger;
-            _umbracoVersion = umbracoVersion;
             _installDefaultDataSettings = installDefaultDataSettings;
         }
 
@@ -1049,7 +1046,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private void CreateKeyValueData()
         {
             // On install, initialize the umbraco migration plan with the final state.
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+            var upgrader = new Upgrader(new UmbracoPlan());
             var stateValueKey = upgrader.StateValueKey;
             var finalState = upgrader.Plan.FinalState;
 
