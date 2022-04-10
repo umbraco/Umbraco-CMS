@@ -66,9 +66,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         {
             var allLangs = isoCodes
                 .Select(CultureInfo.GetCultureInfo)
-                .Select(culture => new Language(GlobalSettings, culture.Name)
+                .Select(culture => new Language(culture.Name, culture.DisplayName)
                 {
-                    CultureName = culture.DisplayName,
                     IsDefault = true,
                     IsMandatory = true
                 }).ToArray();

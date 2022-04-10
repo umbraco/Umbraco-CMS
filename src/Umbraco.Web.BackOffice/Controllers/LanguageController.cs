@@ -152,9 +152,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 // create it (creating a new language cannot create a fallback cycle)
-                var newLang = new Cms.Core.Models.Language(_globalSettings, culture.Name)
+                var newLang = new Cms.Core.Models.Language(culture.Name, language.Name)
                 {
-                    CultureName = culture.DisplayName,
                     IsDefault = language.IsDefault,
                     IsMandatory = language.IsMandatory,
                     FallbackLanguageId = language.FallbackLanguageId
@@ -164,7 +163,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return _umbracoMapper.Map<Language>(newLang);
             }
 
-            existingById.IsMandatory = language.IsMandatory;
+            existingById.IsoCode = language.IsoCode;
+            existingById.CultureName = language.Name;
 
             // note that the service will prevent the default language from being "un-defaulted"
             // but does not hurt to test here - though the UI should prevent it too
@@ -174,22 +174,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            // Update language
-            CultureInfo cultureAfterChange;
-            try
-            {
-                // language has the CultureName of the previous lang so we get information about new culture.
-                cultureAfterChange = CultureInfo.GetCultureInfo(language.IsoCode);
-            }
-            catch (CultureNotFoundException)
-            {
-                ModelState.AddModelError("IsoCode", "No Culture found with name " + language.IsoCode);
-                return ValidationProblem(ModelState);
-            }
-            existingById.CultureName = cultureAfterChange.DisplayName;
             existingById.IsDefault = language.IsDefault;
+            existingById.IsMandatory = language.IsMandatory;
             existingById.FallbackLanguageId = language.FallbackLanguageId;
-            existingById.IsoCode = language.IsoCode;
 
             // modifying an existing language can create a fallback, verify
             // note that the service will check again, dealing with race conditions

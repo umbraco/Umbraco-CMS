@@ -6,11 +6,8 @@ using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -35,11 +32,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly GlobalSettings _globalSettings;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -57,11 +52,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
             IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IHostingEnvironment hostingEnvironment)
+            IMediaTypeService mediaTypeService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -69,17 +62,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _macroService = macroService;
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
-            _propertyEditors = propertyEditors;
-            _scopeProvider = scopeProvider;
-            _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings.Value;
-            _serializer = serializer;
-            _mediaService = mediaService;
-            _mediaTypeService = mediaTypeService;
-            _hostingEnvironment = hostingEnvironment;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
+            _propertyEditors = propertyEditors;
+            _scopeProvider = scopeProvider;
+            _shortStringHelper = shortStringHelper;
+            _serializer = serializer;
+            _mediaService = mediaService;
+            _mediaTypeService = mediaTypeService;
         }
 
         #region Install/Uninstall
@@ -1351,11 +1342,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var isoCode = languageElement.AttributeValue<string>("CultureAlias");
                 var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
                 if (existingLanguage != null)
-                    continue;
-                var langauge = new Language(_globalSettings, isoCode)
                 {
-                    CultureName = languageElement.AttributeValue<string>("FriendlyName")
-                };
+                    continue;
+                }
+
+                var langauge = new Language(isoCode, languageElement.AttributeValue<string>("FriendlyName"));
                 _localizationService.Save(langauge, userId);
                 list.Add(langauge);
             }

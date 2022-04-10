@@ -1919,6 +1919,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
+    <key alias="culture">ISO code</key>
     <key alias="mandatoryLanguage">Mandatory language</key>
     <key alias="mandatoryLanguageHelp">Properties on this language have to be filled out before the node can be
       published.
