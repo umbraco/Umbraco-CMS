@@ -1,16 +1,17 @@
-<div ng-controller="Umbraco.Login2faController as cvm" class="umb-login-container">
+﻿<div ng-controller="Umbraco.Login2faController as cvm" class="umb-login-container">
   <div id="twoFactorlogin" ng-cloak="">
-    <header class="h4">
-      <localize key="login_2fatitle">One last step</localize>
-    </header>
+    <form name="cvm.authForm" method="POST" name="twoFactorCodeForm" ng-submit="cvm.validate()">
+      <header class="h4">
+        <localize key="login_2fatitle">One last step</localize>
+      </header>
 
-    <p>
-      <localize key="login_2faText">You have enabled 2-factor authentication and must verify your identity.</localize>
-    </p>
+      <p>
+        <localize key="login_2faText">You have enabled 2-factor authentication and must verify your identity.</localize>
+      </p>
 
-    <br>
+      <br>
 
-    <!-- if there's only one provider active, it will skip this step! -->
+      <!-- if there's only one provider active, it will skip this step! -->
       <div class="control-group" ng-if="cvm.providers.length > 1">
         <label for="2faprovider" class="control-label">
           <localize key="login_2faMultipleText">Please choose a 2-factor provider</localize>
@@ -20,7 +21,7 @@
             <option ng-repeat="provider in cvm.providers" ng-value="provider">{{provider}}</option>
           </select>
         </div>
-    </div>
+      </div>
 
       <div class="control-group">
         <label for="2facode" class="control-label">
@@ -29,15 +30,15 @@
 
         <div class="controls">
           <input id="2facode" class="-full-width-input input-xlarge" type="text" name="token" inputmode="numeric"
-            autocomplete="one-time-code" ng-model="cvm.code" ui-keypress="{13:'validate()'}" localize="placeholder"
-            placeholder="@login_2faCodeInputHelp" aria-required="true" />
-        </div>
-      </div>
+            autocomplete="one-time-code" ng-model="cvm.code" localize="placeholder"
+            placeholder="@login_2faCodeInputHelp" aria-required="true" required />
 
-      <div class="control-group" ng-if="cvm.error">
-        <p class="text-error" role="alert" aria-live="assertive">
-          <localize *ngIf="cvm.error === 'invalid'" key="login_2faInvalidCode">Invalid code entered</localize>
-        </p>
+          <div ng-messages="cvm.authForm.token.$error" role="alert">
+            <span class="umb-validation-label" ng-message="token">
+              <localize key="login_2faInvalidCode">Invalid code entered</localize>
+            </span>
+          </div>
+        </div>
       </div>
 
       <div class="flex justify-between items-center">

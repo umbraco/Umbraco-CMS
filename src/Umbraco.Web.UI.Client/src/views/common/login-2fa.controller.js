@@ -1,12 +1,11 @@
-angular.module("umbraco").controller("Umbraco.Login2faController",
+﻿angular.module("umbraco").controller("Umbraco.Login2faController",
   function ($scope, userService, authResource) {
     let vm = this;
     vm.code = "";
     vm.provider = "";
     vm.providers = [];
-    vm.step = "send";
-    vm.error = "";
-    vm.stateValidateButton = "";
+    vm.stateValidateButton = "init";
+    vm.authForm = {};
 
     authResource.get2FAProviders()
       .then(function (data) {
@@ -16,22 +15,20 @@ angular.module("umbraco").controller("Umbraco.Login2faController",
         }
       });
 
-    vm.send = function (provider) {
-      vm.provider = provider;
-      vm.step = "code";
-    };
-
     vm.validate = function () {
       vm.error = "";
       vm.stateValidateButton = "busy";
+      vm.authForm.token.$setValidity('token', true);
+
       authResource.verify2FACode(vm.provider, vm.code)
         .then(function (data) {
           vm.stateValidateButton = "success";
           userService.setAuthenticationSuccessful(data);
           $scope.vm.twoFactor.submitCallback();
-        }, function () {
+        })
+        .catch(function () {
           vm.stateValidateButton = "error";
-          vm.error = "invalid";
+          vm.authForm.token.$setValidity('token', false);
         });
     };
 
