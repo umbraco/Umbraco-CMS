@@ -43,7 +43,7 @@
 
       <div class="flex justify-between items-center">
         <umb-button button-style="success" size="m" label-key="general_validate" state="cvm.stateValidateButton"
-          type="submit"></umb-button>
+          type="submit" disabled="cvm.code.length === 0"></umb-button>
         <umb-button size="m" label-key="general_back" type="button" action="cvm.goBack()">
         </umb-button>
       </div>
