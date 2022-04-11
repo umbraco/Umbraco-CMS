@@ -2,7 +2,9 @@ using System;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.Logging;
 
 /*
  * OVERVIEW:
@@ -48,16 +50,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *    requires re-resolving the original services from a pre-built DI container. In effect this re-creates these
  *    services from scratch which means there is no caches.
  *
- * ... Option C works, we will use that but need to verify how this affects memory since ideally the old services will be GC'd.
- *
- * Option C, how its done:
- * - Before we add our custom razor services to the container, we make a copy of the services collection which is the snapshot of registered services
- *   with razor defaults before ours are added.
- * - We replace the default implementation of IRazorViewEngine with our own. This is a wrapping service that wraps the default RazorViewEngine instance.
- *   The ctor for this service takes in a Factory method to re-construct the default RazorViewEngine and all of it's dependency graph.
- * - When the models change, the Factory is invoked and the default razor services are all re-created, thus clearing their caches and the newly
- *   created instance is wrapped. The RazorViewEngine is the only service that needs to be replaced and wrapped for this to work because it's dependency
- *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
+ * ... Option b works, we will use that.
  */
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
@@ -71,24 +64,24 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
     /// </remarks>
     internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
     {
-        private IRazorViewEngine _current;
         private bool _disposedValue;
+        private readonly ILogger<RefreshingRazorViewEngine> _logger;
+        private readonly InvalidatableRazorViewEngine _inner;
         private readonly InMemoryModelFactory _inMemoryModelFactory;
-        private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
-        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+        private readonly IViewCompilerProvider _viewCompilerProvider;
+        private readonly ReaderWriterLockSlim _locker = new();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RefreshingRazorViewEngine"/> class.
-        /// </summary>
-        /// <param name="defaultRazorViewEngineFactory">
-        /// A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine"/>
-        /// </param>
-        /// <param name="inMemoryModelFactory">The <see cref="InMemoryModelFactory"/></param>
-        public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, InMemoryModelFactory inMemoryModelFactory)
+        public RefreshingRazorViewEngine(
+            ILogger<RefreshingRazorViewEngine> logger,
+            InvalidatableRazorViewEngine inner,
+            InMemoryModelFactory inMemoryModelFactory,
+            IViewCompilerProvider viewCompilerProvider)
         {
+            _logger = logger;
+            _inner = inner;
             _inMemoryModelFactory = inMemoryModelFactory;
-            _defaultRazorViewEngineFactory = defaultRazorViewEngineFactory;
-            _current = _defaultRazorViewEngineFactory();
+            _viewCompilerProvider = viewCompilerProvider;
+
             _inMemoryModelFactory.ModelsChanged += InMemoryModelFactoryModelsChanged;
         }
 
@@ -100,7 +93,15 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _locker.EnterWriteLock();
             try
             {
-                _current = _defaultRazorViewEngineFactory();
+                if (!_inner.Invalidate())
+                {
+                    _logger.LogWarning("Failed to invalidate RazorViewEngine caches.");
+                }
+
+                if (!_viewCompilerProvider.GetCompiler().Invalidate())
+                {
+                    _logger.LogWarning("Failed to invalidate ViewCompiler caches.");
+                }
             }
             finally
             {
@@ -113,7 +114,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _locker.EnterReadLock();
             try
             {
-                return _current.FindPage(context, pageName);
+                return _inner.FindPage(context, pageName);
             }
             finally
             {
@@ -126,7 +127,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _locker.EnterReadLock();
             try
             {
-                return _current.GetAbsolutePath(executingFilePath, pagePath);
+                return _inner.GetAbsolutePath(executingFilePath, pagePath);
             }
             finally
             {
@@ -139,7 +140,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _locker.EnterReadLock();
             try
             {
-                return _current.GetPage(executingFilePath, pagePath);
+                return _inner.GetPage(executingFilePath, pagePath);
             }
             finally
             {
@@ -152,7 +153,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _locker.EnterReadLock();
             try
             {
-                return _current.FindView(context, viewName, isMainPage);
+                return _inner.FindView(context, viewName, isMainPage);
 
             }
             finally
@@ -166,7 +167,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _locker.EnterReadLock();
             try
             {
-                return _current.GetView(executingFilePath, viewPath, isMainPage);
+                return _inner.GetView(executingFilePath, viewPath, isMainPage);
             }
             finally
             {
