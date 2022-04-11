@@ -16,7 +16,7 @@
           <umb-control-group>
 
             <div ng-if="provider.isEnabledOnUser">
-              <div ng-if="!provider.showOptions">
+              <div ng-if="!provider.showDisable">
                 <p>
                   <localize key="user_2faProviderIsEnabled"></localize>
                   <umb-icon icon="icon-check" class="success"></umb-icon>
@@ -29,11 +29,11 @@
               </div>
 
               <div ng-if="model.isCurrentUser">
-                <umb-button type="button" ng-click="provider.showOptions = true" ng-if="!provider.showOptions"
-                  label="Options" label-key="general_options">
+                <umb-button type="button" ng-click="provider.showDisable = true" ng-if="!provider.showDisable"
+                  label="Disable" label-key="actions_disable">
                 </umb-button>
 
-                <div ng-if="provider.showOptions">
+                <div ng-if="provider.showDisable">
                   <div class="h5">
                     <localize key="actions_disable"></localize>
                   </div>
