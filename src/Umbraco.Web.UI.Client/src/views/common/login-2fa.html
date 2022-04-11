@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.Login2faController as cvm" class="umb-login-container">
+<div ng-controller="Umbraco.Login2faController as cvm" class="umb-login-container">
   <div id="twoFactorlogin" ng-cloak="">
     <header class="h4">
       <localize key="login_2fatitle">One last step</localize>
@@ -11,24 +11,17 @@
     <br>
 
     <!-- if there's only one provider active, it will skip this step! -->
-    <div ng-if="cvm.step=='send'">
-      <p>
-        <localize key="login_2faMultipleText">You have multiple 2-factor providers enabled. Please choose one of them
-          to proceed.</localize>
-      </p>
-      <form method="POST" name="twoFactorSendForm" ng-submit="cvm.send(provider)">
-        <div class="control-group">
-          <select ng-model="cvm.provider" ng-show="cvm.providers.length > 0">
-            <option ng-repeat="provider in cvm.providers" value="{{provider}}">{{provider}}</option>
+      <div class="control-group" ng-if="cvm.providers.length > 1">
+        <label for="2faprovider" class="control-label">
+          <localize key="login_2faMultipleText">Please choose a 2-factor provider</localize>
+        </label>
+        <div class="controls">
+          <select id="2faprovider" ng-model="cvm.provider">
+            <option ng-repeat="provider in cvm.providers" ng-value="provider">{{provider}}</option>
           </select>
         </div>
-        <button type="submit" class="btn">
-          <localize key="general_submit">Send</localize>
-        </button>
-      </form>
     </div>
 
-    <form method="POST" name="twoFactorCodeForm" ng-submit="cvm.validate()" ng-if="cvm.step=='code'">
       <div class="control-group">
         <label for="2facode" class="control-label">
           <localize key="login_2faCodeInput">Verification code</localize>

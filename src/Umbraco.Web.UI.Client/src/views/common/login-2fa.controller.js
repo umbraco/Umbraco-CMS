@@ -1,4 +1,4 @@
-﻿angular.module("umbraco").controller("Umbraco.Login2faController",
+angular.module("umbraco").controller("Umbraco.Login2faController",
   function ($scope, userService, authResource) {
     let vm = this;
     vm.code = "";
@@ -11,8 +11,7 @@
     authResource.get2FAProviders()
       .then(function (data) {
         vm.providers = data;
-        if (vm.providers.length === 1) {
-          vm.step = "code";
+        if (vm.providers.length > 0) {
           vm.provider = vm.providers[0];
         }
       });
