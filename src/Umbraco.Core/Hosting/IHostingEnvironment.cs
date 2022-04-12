@@ -58,6 +58,7 @@ namespace Umbraco.Cms.Core.Hosting
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
         /// </remarks>
+        [Obsolete("Please use the MapPathWebRoot extension method on an instance of IWebHostEnvironment instead")]
         string MapPathWebRoot(string path);
 
         /// <summary>
@@ -67,6 +68,7 @@ namespace Umbraco.Cms.Core.Hosting
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
         /// </remarks>
+        [Obsolete("Please use the MapPathContentRoot extension method on an instance of IHostEnvironment (or IWebHostEnvironment) instead")]
         string MapPathContentRoot(string path);
 
         /// <summary>
