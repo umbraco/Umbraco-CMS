@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Reflection;
 using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -15,7 +16,6 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
@@ -142,7 +142,8 @@ namespace Umbraco.Extensions
 
             // Add ASP.NET specific services
             builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
-            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
+            builder.Services.AddUnique<IHostingEnvironment>(sp => ActivatorUtilities.CreateInstance<AspNetCoreHostingEnvironment>(sp, sp.GetRequiredService<IApplicationDiscriminator>()));
+
             builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             // Add supported databases
@@ -473,18 +474,12 @@ namespace Umbraco.Extensions
         private static IHostingEnvironment GetTemporaryHostingEnvironment(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
             var hostingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
-            var webRoutingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigWebRouting).Get<WebRoutingSettings>() ?? new WebRoutingSettings();
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
+
+            var webRoutingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigWebRouting).Get<WebRoutingSettings>() ?? new WebRoutingSettings();
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
-            // This is needed in order to create a unique Application Id
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddDataProtection();
-            serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-
             return new AspNetCoreHostingEnvironment(
-                serviceProvider,
                 wrappedHostingSettings,
                 wrappedWebRoutingSettings,
                 webHostEnvironment);
