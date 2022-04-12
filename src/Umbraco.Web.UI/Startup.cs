@@ -56,11 +56,11 @@ namespace Umbraco.Cms.Web.UI
             {
                 app.UseDeveloperExceptionPage();
             }
-
 #if (UseHttpsRedirect)
-            app.UseHttpsRedirection();
 
+            app.UseHttpsRedirection();
 #endif
+
             app.UseUmbraco()
                 .WithMiddleware(u =>
                 {
