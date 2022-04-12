@@ -12,7 +12,6 @@ angular.module("umbraco").controller("Umbraco.Editors.ConfigureTwoFactorControll
     vm.close = close;
     vm.enable = enable;
     vm.disable = disable;
-    vm.disableWithCode = disableWithCode;
     vm.code = "";
     vm.buttonState = "init";
 
@@ -68,29 +67,6 @@ angular.module("umbraco").controller("Umbraco.Editors.ConfigureTwoFactorControll
       };
 
       editorService.open(disableTwoFactorSettings);
-    }
-
-    function disableWithCode(providerName) {
-      vm.buttonState = "busy";
-      twoFactorLoginResource.disableWithCode(providerName, vm.code)
-        .then(onResponse)
-        .catch(onError);
-    }
-
-    function onResponse(response) {
-      if (response) {
-        vm.buttonState = "success";
-        localizationService.localize("user_2faProviderIsDisabledMsg").then(function (value) {
-          notificationsService.success(value);
-        });
-        onInit();
-      } else {
-        vm.buttonState = "error";
-        vm.error = "invalid";
-        localizationService.localize("login_2faInvalidCode").then(function (value) {
-          notificationsService.error(value);
-        });
-      }
     }
 
     function onError(error) {
