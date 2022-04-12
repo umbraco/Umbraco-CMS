@@ -14,11 +14,12 @@
 
           <umb-box-content>
 
-            <umb-control-group labelFor="2facode" label="@login_2faCodeInput" description="@user_2faDisableText">
+            <umb-control-group label-for="token" alias="2facode" label="@login_2faCodeInput"
+              description="@user_2faDisableText" required="true">
 
               <input umb-auto-focus id="2facode" class="-full-width-input input-xlarge" type="text" name="token"
                 inputmode="numeric" autocomplete="one-time-code" ng-model="vm.code" localize="placeholder"
-                placeholder="@login_2faCodeInputHelp" aria-required="true" no-dirty-check />
+                placeholder="@login_2faCodeInputHelp" aria-required="true" required no-dirty-check />
 
               <div ng-messages="vm.authForm.token.$error" role="alert">
                 <span class="umb-validation-label" ng-message="token">
