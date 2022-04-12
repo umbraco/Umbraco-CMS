@@ -7,7 +7,7 @@
 
     <umb-editor-container>
 
-      <umb-box ng-repeat="provider in vm.providers">
+      <umb-box ng-repeat="provider in vm.providers track by provider.providerName">
 
         <umb-box-header title="{{provider.providerName}}"></umb-box-header>
 
