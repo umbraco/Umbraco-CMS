@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -23,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
 
@@ -36,7 +40,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<AccessDto>();
@@ -50,7 +54,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<AccessDto>();
@@ -65,7 +69,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentType2ContentTypeDto>();
@@ -79,7 +83,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -94,7 +98,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -108,7 +112,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -124,7 +128,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<DataTypeDto>();
@@ -138,7 +142,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<DictionaryDto>();
 
@@ -151,7 +155,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<DictionaryDto>();
                 helper.CreateTable<LanguageDto>();
@@ -166,7 +170,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<TemplateDto>();
@@ -180,7 +184,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -197,7 +201,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -213,7 +217,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<DomainDto>();
@@ -227,7 +231,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<LogViewerQueryDto>();
 
@@ -240,7 +244,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<LanguageDto>();
 
@@ -253,7 +257,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<LogDto>();
 
@@ -266,7 +270,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<MacroDto>();
 
@@ -279,7 +283,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -295,7 +299,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -312,7 +316,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -327,7 +331,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -345,7 +349,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -362,7 +366,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -377,7 +381,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<RelationTypeDto>();
@@ -392,7 +396,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<RelationTypeDto>();
 
@@ -405,7 +409,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<TagDto>();
 
@@ -418,7 +422,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
@@ -439,7 +443,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<UserDto>();
 
@@ -452,7 +456,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<UserGroupDto>();
@@ -466,7 +470,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<UserDto>();
@@ -480,7 +484,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<UserGroupDto>();
@@ -495,7 +499,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator);
+                var helper = CreateDatabaseSchemaCreator(scope);
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<UserGroupDto>();
@@ -504,5 +508,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 scope.Complete();
             }
         }
+
+        private DatabaseSchemaCreator CreateDatabaseSchemaCreator(IScope scope) =>
+            new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion, EventAggregator, Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x => x.CurrentValue == new InstallDefaultDataSettings()));
     }
 }

@@ -14,8 +14,15 @@
         <tags>umbraco</tags>
         <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <packageTypes>
-            <packageType name="Template" />
+          <packageType name="Template" />
         </packageTypes>
     </metadata>
+  <files>
+      <file src="icon.png" />
+      <file src="UmbracoPackage\**" target="UmbracoPackage" exclude="bin;obj" />
+      <file src="UmbracoProject\**" target="UmbracoProject" exclude="bin;obj" />
+      <file src="..\src\Umbraco.Web.UI\Program.cs" target="UmbracoProject" />
+      <file src="..\src\Umbraco.Web.UI\Startup.cs" target="UmbracoProject" />
+      <file src="..\src\Umbraco.Web.UI\Views\**" target="UmbracoProject\Views" />
+  </files>
 </package>
-

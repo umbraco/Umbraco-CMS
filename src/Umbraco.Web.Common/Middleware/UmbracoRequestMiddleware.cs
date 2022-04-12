@@ -22,7 +22,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.WebAssets;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware
@@ -53,6 +55,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IRuntimeState _runtimeState;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+        private readonly IOptions<UmbracoRequestOptions> _umbracoRequestOptions;
         private readonly SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
 
@@ -65,6 +68,43 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private static bool s_firstBackOfficeReqestFlag;
         private static object s_firstBackOfficeRequestLocker = new object();
 #pragma warning restore IDE0044 // Add readonly modifier
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
+        /// </summary>
+        // Obsolete, scheduled for removal in V11
+        [Obsolete("Use constructor that takes an IOptions<UmbracoRequestOptions>")]
+        public UmbracoRequestMiddleware(
+            ILogger<UmbracoRequestMiddleware> logger,
+            IUmbracoContextFactory umbracoContextFactory,
+            IRequestCache requestCache,
+            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
+            IEventAggregator eventAggregator,
+            IProfiler profiler,
+            IHostingEnvironment hostingEnvironment,
+            UmbracoRequestPaths umbracoRequestPaths,
+            BackOfficeWebAssets backOfficeWebAssets,
+            IOptions<SmidgeOptions> smidgeOptions,
+            IRuntimeState runtimeState,
+            IVariationContextAccessor variationContextAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor)
+            : this(
+                logger,
+                umbracoContextFactory,
+                requestCache,
+                publishedSnapshotServiceEventHandler,
+                eventAggregator,
+                profiler,
+                hostingEnvironment,
+                umbracoRequestPaths,
+                backOfficeWebAssets,
+                smidgeOptions,
+                runtimeState,
+                variationContextAccessor,
+                defaultCultureAccessor,
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestOptions>>())
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
@@ -82,7 +122,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             IOptions<SmidgeOptions> smidgeOptions,
             IRuntimeState runtimeState,
             IVariationContextAccessor variationContextAccessor,
-            IDefaultCultureAccessor defaultCultureAccessor)
+            IDefaultCultureAccessor defaultCultureAccessor,
+            IOptions<UmbracoRequestOptions> umbracoRequestOptions)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
@@ -95,6 +136,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _runtimeState = runtimeState;
             _variationContextAccessor = variationContextAccessor;
             _defaultCultureAccessor = defaultCultureAccessor;
+            _umbracoRequestOptions = umbracoRequestOptions;
             _smidgeOptions = smidgeOptions.Value;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
@@ -103,7 +145,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             // do not process if client-side request
-            if (context.Request.IsClientSideRequest())
+            if (context.Request.IsClientSideRequest() && !_umbracoRequestOptions.Value.HandleAsServerSideRequest(context.Request))
             {
                 // we need this here because for bundle requests, these are 'client side' requests that we need to handle
                 LazyInitializeBackOfficeServices(context.Request.Path);
