@@ -2,11 +2,9 @@
 // See LICENSE for more details.
 
 using System;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -64,10 +62,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         {
             IPublishedSnapshotAccessor publishedSnapshotAccessor = GetPublishedSnapshotAccessor();
             var publishedModelFactory = new NoopPublishedModelFactory();
-            var modelsBuilderSettings = Mock.Of<IOptions<ModelsBuilderSettings>>(x => x.Value == new ModelsBuilderSettings());
             var editor = new BlockListPropertyValueConverter(
                 Mock.Of<IProfilingLogger>(),
-                new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory), modelsBuilderSettings);
+                new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory));
             return editor;
         }
 
