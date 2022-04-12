@@ -2299,7 +2299,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noUserGroupsAdded">No user groups have been added</key>
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
     <key alias="2faProviderIsEnabled">This two-factor provider is enabled</key>
-    <key alias="2faProviderIsDisabledMsg">Two-factor authentication is now disabled</key>
+    <key alias="2faProviderIsDisabledMsg">This two-factor provider is now disabled</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
