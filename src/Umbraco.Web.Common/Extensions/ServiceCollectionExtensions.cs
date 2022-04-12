@@ -5,13 +5,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Serilog.Core;
 using Serilog.Extensions.Hosting;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Serilog;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -23,6 +26,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Create and configure the logger
         /// </summary>
+        [Obsolete("Use the extension method that takes an IHostEnvironment instance instead.")]
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
             IHostingEnvironment hostingEnvironment,
@@ -31,6 +35,49 @@ namespace Umbraco.Extensions
         {
             // Create a serilog logger
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out var umbracoFileConfig);
+            services.AddSingleton(umbracoFileConfig);
+
+            // This is nessasary to pick up all the loggins to MS ILogger.
+            Log.Logger = logger.SerilogLog;
+
+            // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
+            // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which
+            // is the only other option that these ext methods allow.
+            // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
+            // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
+
+            services.AddLogging(configure =>
+            {
+                configure.AddSerilog(logger.SerilogLog, false);
+            });
+
+            // This won't (and shouldn't) take ownership of the logger.
+            services.AddSingleton(logger.SerilogLog);
+
+            // Registered to provide two services...
+            var diagnosticContext = new DiagnosticContext(logger.SerilogLog);
+
+            // Consumed by e.g. middleware
+            services.AddSingleton(diagnosticContext);
+
+            // Consumed by user code
+            services.AddSingleton<IDiagnosticContext>(diagnosticContext);
+            services.AddSingleton(loggingConfiguration);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Create and configure the logger
+        /// </summary>
+        public static IServiceCollection AddLogger(
+            this IServiceCollection services,
+            IHostEnvironment hostEnvironment,
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration)
+        {
+            // Create a serilog logger
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostEnvironment, loggingConfiguration, configuration, out var umbracoFileConfig);
             services.AddSingleton(umbracoFileConfig);
 
             // This is nessasary to pick up all the loggins to MS ILogger.

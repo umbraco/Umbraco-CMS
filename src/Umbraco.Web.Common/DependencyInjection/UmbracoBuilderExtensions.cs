@@ -91,12 +91,10 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(config));
             }
 
-            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-
             var loggingDir = webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
-            services.AddLogger(tempHostingEnvironment, loggingConfig, config);
+            services.AddLogger(webHostEnvironment, loggingConfig, config);
 
             // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
             AppDomain.CurrentDomain.SetData("DataDirectory", webHostEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
@@ -116,6 +114,8 @@ namespace Umbraco.Extensions
             IProfiler profiler = GetWebProfiler(config);
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+
+            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
             TypeLoader typeLoader = services.AddTypeLoader(
                 Assembly.GetEntryAssembly(),
