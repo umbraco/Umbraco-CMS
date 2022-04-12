@@ -85,6 +85,8 @@ src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
 src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/views/*
 src/Umbraco.Web.UI/wwwroot/Media/*
 src/Umbraco.Web.UI/Smidge/
+src/Umbraco.Web.UI/App_Code/
+src/Umbraco.Web.UI/App_Plugins/
 
 # Tests
 cypress.env.json
