@@ -1,304 +1,329 @@
 {
-    "$schema": "http://json.schemastore.org/template",
-    "author": "Umbraco HQ",
-    "description": "An empty Umbraco Project ready to get started",
-    "classifications": [ "Web", "CMS", "Umbraco"],
-    "groupIdentity": "Umbraco.Templates.UmbracoProject",
-    "identity": "Umbraco.Templates.UmbracoProject.CSharp",
-    "name": "Umbraco Project",
-    "shortName": "umbraco",
-    "defaultName": "UmbracoProject1",
-    "preferNameDirectory": true,
-    "tags": {
-        "language": "C#",
-        "type": "project"
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Umbraco HQ",
+  "classifications": [
+    "Web",
+    "CMS",
+    "Umbraco"
+  ],
+  "name": "Umbraco Project",
+  "description": "An empty Umbraco project ready to get started",
+  "groupIdentity": "Umbraco.Templates.UmbracoProject",
+  "identity": "Umbraco.Templates.UmbracoProject.CSharp",
+  "shortName": "umbraco",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "UmbracoProject",
+  "defaultName": "UmbracoProject1",
+  "preferNameDirectory": true,
+  "symbols": {
+    "Framework": {
+      "displayName": "Framework",
+      "description": "The target framework for the project.",
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "displayName": ".NET 5.0",
+          "description": "Target net5.0",
+          "choice": "net5.0"
+        },
+        {
+          "displayName": ".NET 6.0",
+          "description": "Target net6.0",
+          "choice": "net6.0"
+        }
+      ],
+      "defaultValue": "net5.0",
+      "replaces": "net5.0"
     },
-    "primaryOutputs": [
-        {
-            "path": "UmbracoProject.csproj"
-        }
-    ],
-    "postActions": [
-        {
-            "condition": "(!SkipRestore)",
-            "description": "Restore NuGet packages required by this project",
-            "manualInstructions": [{
-              "text": "Run 'dotnet restore'"
-            }],
-            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
-            "continueOnError": true
-        }
-    ],
-    "sourceName": "UmbracoProject",
-    "symbols": {
-        "namespaceReplacer": {
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "replaces": "Umbraco.Cms.Web.UI",
-            "parameters": {
-                "source": "name",
-                "steps": [
-                    {
-                        "regex": "\\s",
-                        "replacement": "_"
-                    },
-                    {
-                        "regex": "-",
-                        "replacement": "_"
-                    },
-                    {
-                        "regex": "^[^a-zA-Z_]+",
-                        "replacement": "_"
-                    }
-                ]
-            }
-        },
-        "version": {
-            "type": "parameter",
-            "datatype": "string",
-            "defaultValue": "9.5.0-rc",
-            "description": "The version of Umbraco to load using NuGet",
-            "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
-        },
-        "PackageTestSiteName": {
-            "type": "parameter",
-            "datatype":"text",
-            "defaultValue": "",
-            "replaces":"PackageTestSiteName",
-            "description": "The name of the package this should be a test site for (Default: '')"
-        },
-        "UseSqlCe":{
-            "type": "parameter",
-            "datatype":"bool",
-            "defaultValue": "false",
-            "description": "Adds the required dependencies to use SqlCE (Windows only) (Default: false)"
-        },
-        "Framework": {
-            "type": "parameter",
-            "description": "The target framework for the project",
-            "datatype": "choice",
-            "choices": [
-                {
-                    "choice": "net5.0",
-                    "description": "Target net5.0"
-                },
-                {
-                    "choice": "net6.0",
-                    "description": "Target net6.0"
-                }
-            ],
-            "replaces": "net5.0",
-            "defaultValue": "net5.0"
-        },
-        "SkipRestore": {
-            "type": "parameter",
-            "datatype": "bool",
-            "description": "If specified, skips the automatic restore of the project on create",
-            "defaultValue": "false"
-        },
-        "HttpPort": {
-            "type": "generated",
-            "generator": "port",
-            "replaces": "HTTP_PORT_FROM_TEMPLATE",
-            "parameters": {
-                "high": 65535,
-                "low": 1024,
-                "fallback": 5000
-            }
-        },
-        "HttpsPort": {
-            "type": "generated",
-            "generator": "port",
-            "replaces": "HTTPS_PORT_FROM_TEMPLATE",
-            "parameters": {
-                "low": 44300,
-                "high": 44399,
-                "fallback": 5001
-            }
-        },
-        "FriendlyName":{
-            "type": "parameter",
-            "datatype":"text",
-            "description": "The friendly name of the user for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "defaultValue": ""
-        },
-        "FriendlyNameReplaced":{
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "replaces": "FRIENDLY_NAME_FROM_TEMPLATE",
-            "parameters": {
-                "source": "FriendlyName",
-                "steps": [
-                    {
-                        "regex": "\\\\",
-                        "replacement": "\\\\"
-                    },
-                    {
-                        "regex": "\\\"",
-                        "replacement": "\\\""
-                    },
-                    {
-                        "regex": "\\\n",
-                        "replacement": "\\\n"
-                    },
-                    {
-                        "regex": "\\\t",
-                        "replacement": "\\\t"
-                    }
-                ]
-            }
-        },
-        "Email":{
-            "type": "parameter",
-            "datatype":"text",
-            "description": "Email to use for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "defaultValue": ""
-        },
-        "EmailReplaced":{
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "replaces": "EMAIL_FROM_TEMPLATE",
-            "parameters": {
-                "source": "Email",
-                "steps": [
-                    {
-                        "regex": "\\\\",
-                        "replacement": "\\\\"
-                    },
-                    {
-                        "regex": "\\\"",
-                        "replacement": "\\\""
-                    },
-                    {
-                        "regex": "\\\n",
-                        "replacement": "\\\n"
-                    },
-                    {
-                        "regex": "\\\t",
-                        "replacement": "\\\t"
-                    }
-                ]
-            }
-        },
-        "Password":{
-            "type": "parameter",
-            "datatype":"text",
-            "description": "Password to use for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "defaultValue": ""
-        },
-        "PasswordReplaced":{
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "replaces": "PASSWORD_FROM_TEMPLATE",
-            "parameters": {
-                "source": "Password",
-                "steps": [
-                    {
-                        "regex": "\\\\",
-                        "replacement": "\\\\"
-                    },
-                    {
-                        "regex": "\\\"",
-                        "replacement": "\\\""
-                    },
-                    {
-                        "regex": "\\\n",
-                        "replacement": "\\\n"
-                    },
-                    {
-                        "regex": "\\\t",
-                        "replacement": "\\\t"
-                    }
-                ]
-              }
-        },
-        "ConnectionString":{
-            "type": "parameter",
-            "datatype":"text",
-            "description": "Database connection string when using Unattended install (Without installer wizard UI)",
-            "defaultValue": ""
-        },
-        "ConnectionStringReplaced":{
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "replaces": "CONNECTION_FROM_TEMPLATE",
-            "parameters": {
-                "source": "ConnectionString",
-                "steps": [
-                    {
-                        "regex": "\\\\",
-                        "replacement": "\\\\"
-                    },
-                    {
-                        "regex": "\\\"",
-                        "replacement": "\\\""
-                    },
-                    {
-                        "regex": "\\\n",
-                        "replacement": "\\\n"
-                    },
-                    {
-                        "regex": "\\\t",
-                        "replacement": "\\\t"
-                    }
-                ]
-              }
-        },
-        "NoNodesViewPath":{
-            "type": "parameter",
-            "datatype":"text",
-            "description": "Path to a custom view presented with the Umbraco installation contains no published content",
-            "defaultValue": ""
-        },
-        "NoNodesViewPathReplaced":{
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "replaces": "NO_NODES_VIEW_PATH_FROM_TEMPLATE",
-            "parameters": {
-                "source": "NoNodesViewPath",
-                "steps": [
-                    {
-                        "regex": "\\\\",
-                        "replacement": "\\\\"
-                    },
-                    {
-                        "regex": "\\\"",
-                        "replacement": "\\\""
-                    },
-                    {
-                        "regex": "\\\n",
-                        "replacement": "\\\n"
-                    },
-                    {
-                        "regex": "\\\t",
-                        "replacement": "\\\t"
-                    }
-                ]
-              }
-        },
-        "HasConnectionString":{
-            "type": "computed",
-            "value": "(ConnectionString != \"\")"
-        },
-        "HasNoNodesViewPath":{
-            "type": "computed",
-            "value": "(NoNodesViewPath != \"\")"
-        },
-        "UsingUnattenedInstall":{
-            "type": "computed",
-            "value": "(FriendlyName != \"\" && Email != \"\" && Password != \"\" && ConnectionString != \"\")"
-        },
-        "UseHttpsRedirect":{
-            "type": "parameter",
-            "datatype":"bool",
-            "defaultValue": "false",
-            "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting (Default: false)"
-        }
+    "UmbracoVersion": {
+      "displayName": "Umbraco version",
+      "description": "The version of Umbraco.Cms to add as PackageReference.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "9.5.0-rc",
+      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
+    },
+    "UseHttpsRedirect": {
+      "displayName": "Use HTTPS redirect",
+      "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "UseSqlCe": {
+      "displayName": "Add dependencies to use SQL CE database provider",
+      "description": "Adds the required dependencies to use SQL Compact Edition as database provider (Windows only).",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "SkipRestore": {
+      "displayName": "Skip restore",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "UnattendedUserName": {
+      "displayName": "Unattended user name",
+      "description": "Used to specify the name of the default admin user when using unattended install (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": ""
+    },
+    "UnattendedUserNameReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "UnattendedUserName",
+        "steps": [
+          {
+            "regex": "\\\\",
+            "replacement": "\\\\"
+          },
+          {
+            "regex": "\\\"",
+            "replacement": "\\\""
+          },
+          {
+            "regex": "\\\n",
+            "replacement": "\\\n"
+          },
+          {
+            "regex": "\\\t",
+            "replacement": "\\\t"
+          }
+        ]
+      },
+      "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
+    },
+    "UnattendedUserEmail": {
+      "displayName": "Unattended user email",
+      "description": "Used to specify the email of the default admin user when using unattended install (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": ""
+    },
+    "UnattendedUserEmailReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "UnattendedUserEmail",
+        "steps": [
+          {
+            "regex": "\\\\",
+            "replacement": "\\\\"
+          },
+          {
+            "regex": "\\\"",
+            "replacement": "\\\""
+          },
+          {
+            "regex": "\\\n",
+            "replacement": "\\\n"
+          },
+          {
+            "regex": "\\\t",
+            "replacement": "\\\t"
+          }
+        ]
+      },
+      "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
+    },
+    "UnattendedUserPassword": {
+      "displayName": "Unattended user password",
+      "description": "Used to specify the password of the default admin user when using unattended install (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": ""
+    },
+    "UnattendedUserPasswordReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "UnattendedUserPassword",
+        "steps": [
+          {
+            "regex": "\\\\",
+            "replacement": "\\\\"
+          },
+          {
+            "regex": "\\\"",
+            "replacement": "\\\""
+          },
+          {
+            "regex": "\\\n",
+            "replacement": "\\\n"
+          },
+          {
+            "regex": "\\\t",
+            "replacement": "\\\t"
+          }
+        ]
+      },
+      "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
+    },
+    "ConnectionString": {
+      "displayName": "Connection string",
+      "description": "Database connection string used by Umbraco.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": ""
+    },
+    "ConnectionStringReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "ConnectionString",
+        "steps": [
+          {
+            "regex": "\\\\",
+            "replacement": "\\\\"
+          },
+          {
+            "regex": "\\\"",
+            "replacement": "\\\""
+          },
+          {
+            "regex": "\\\n",
+            "replacement": "\\\n"
+          },
+          {
+            "regex": "\\\t",
+            "replacement": "\\\t"
+          }
+        ]
+      },
+      "replaces": "CONNECTION_STRING_FROM_TEMPLATE"
+    },
+    "HasConnectionString": {
+      "type": "computed",
+      "value": "(ConnectionString != \"\")"
+    },
+    "UsingUnattenedInstall": {
+      "type": "computed",
+      "value": "(UnattendedUserName != \"\" && UnattendedUserEmail != \"\" && UnattendedUserPassword != \"\" && ConnectionString != \"\")"
+    },
+    "NoNodesViewPath": {
+      "displayName": "No nodes view path",
+      "description": "Path to a custom view presented with the Umbraco installation contains no published content",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": ""
+    },
+    "NoNodesViewPathReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "NoNodesViewPath",
+        "steps": [
+          {
+            "regex": "\\\\",
+            "replacement": "\\\\"
+          },
+          {
+            "regex": "\\\"",
+            "replacement": "\\\""
+          },
+          {
+            "regex": "\\\n",
+            "replacement": "\\\n"
+          },
+          {
+            "regex": "\\\t",
+            "replacement": "\\\t"
+          }
+        ]
+      },
+      "replaces": "NO_NODES_VIEW_PATH_FROM_TEMPLATE"
+    },
+    "HasNoNodesViewPath": {
+      "type": "computed",
+      "value": "(NoNodesViewPath != \"\")"
+    },
+    "PackageProjectName": {
+      "displayName": "Umbraco package project name",
+      "description": "The name of the package project this should be a test site for.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
+    },
+    "NamespaceReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "name",
+        "steps": [
+          {
+            "regex": "\\s",
+            "replacement": "_"
+          },
+          {
+            "regex": "-",
+            "replacement": "_"
+          },
+          {
+            "regex": "^[^a-zA-Z_]+",
+            "replacement": "_"
+          }
+        ]
+      },
+      "replaces": "Umbraco.Cms.Web.UI"
+    },
+    "HttpPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "fallback": 5000
+      },
+      "replaces": "HTTP_PORT_FROM_TEMPLATE"
+    },
+    "HttpsPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 44300,
+        "high": 44399,
+        "fallback": 5001
+      },
+      "replaces": "HTTPS_PORT_FROM_TEMPLATE"
+    },
+    "TelemetryId": {
+      "type": "generated",
+      "generator": "guid",
+      "parameters": {
+        "defaultFormat": "d"
+      },
+      "replaces": "TELEMETRYID_FROM_TEMPLATE"
     }
+  },
+  "primaryOutputs": [
+    {
+      "path": "UmbracoProject.csproj"
+    }
+  ],
+  "postActions": [
+    {
+      "condition": "(!SkipRestore)",
+      "description": "Restore NuGet packages required by this project",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
 }

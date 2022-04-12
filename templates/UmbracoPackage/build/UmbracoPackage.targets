@@ -9,11 +9,7 @@
             <UmbracoPackageMsBuildContentFiles Include="$(UmbracoPackageMsBuildContentFilesPath)" />
         </ItemGroup>
         <Message Text="Copying UmbracoPackage files: $(UmbracoPackageMsBuildContentFilesPath) - #@(UmbracoPackageMsBuildContentFiles->Count()) files"  Importance="high" />
-        <Copy
-            SourceFiles="@(UmbracoPackageMsBuildContentFiles)"
-            DestinationFiles="@(UmbracoPackageMsBuildContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\%(RecursiveDir)%(Filename)%(Extension)')"
-            SkipUnchangedFiles="true" />
-
+        <Copy SourceFiles="@(UmbracoPackageMsBuildContentFiles)" DestinationFiles="@(UmbracoPackageMsBuildContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     </Target>
 
     <Target Name="ClearUmbracoPackageMsBuildAssets" BeforeTargets="Clean">
