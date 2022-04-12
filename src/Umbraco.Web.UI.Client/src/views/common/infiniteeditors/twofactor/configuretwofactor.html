@@ -16,52 +16,19 @@
           <umb-control-group>
 
             <div ng-if="provider.isEnabledOnUser">
-              <div ng-if="!provider.showDisable">
-                <p>
-                  <localize key="user_2faProviderIsEnabled"></localize>
-                  <umb-icon icon="icon-check" class="success"></umb-icon>
-                </p>
+              <p>
+                <localize key="user_2faProviderIsEnabled"></localize>
+                <umb-icon icon="icon-check" class="success"></umb-icon>
+              </p>
 
-                <umb-button type="button" ng-if="!model.isCurrentUser" button-style="[warning,block]"
-                  action="vm.disable(provider.providerName)" label="Disable" label-key="actions_disable" size="m"
-                  state="vm.buttonState">
-                </umb-button>
-              </div>
+              <umb-button type="button" ng-if="!model.isCurrentUser" button-style="[warning,block]"
+                action="vm.disable(provider.providerName)" label="Disable" label-key="actions_disable" size="m"
+                state="vm.buttonState">
+              </umb-button>
 
               <div ng-if="model.isCurrentUser">
-                <umb-button type="button" ng-click="provider.showDisable = true" ng-if="!provider.showDisable"
-                  label="Disable" label-key="actions_disable">
+                <umb-button type="button" action="vm.disable(provider)" label="Disable" label-key="actions_disable">
                 </umb-button>
-
-                <div ng-if="provider.showDisable">
-                  <div class="h5">
-                    <localize key="actions_disable"></localize>
-                  </div>
-
-                  <form method="POST" ng-submit="vm.disableWithCode(provider.providerName)">
-
-                    <p>
-                      <localize key="user_2faDisableText"></localize>
-                    </p>
-
-                    <umb-control-group>
-                      <label for="2facode_{{$index}}" class="control-label">
-                        <localize key="login_2faCodeInput">Verification code</localize>
-                      </label>
-
-                      <div class="controls">
-                        <input umb-auto-focus id="2facode_{{$index}}" class="-full-width-input input-xlarge" type="text"
-                          name="token" inputmode="numeric" autocomplete="one-time-code" ng-model="vm.code"
-                          localize="placeholder" placeholder="@login_2faCodeInputHelp" aria-required="true"
-                          no-dirty-check />
-                      </div>
-                    </umb-control-group>
-
-                    <umb-button button-style="[warning,block]" label="Disable" label-key="actions_disable" size="m"
-                      disabled="vm.code.length === 0" state="vm.buttonState">
-                    </umb-button>
-                  </form>
-                </div>
               </div>
             </div>
 

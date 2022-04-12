@@ -54,11 +54,20 @@ angular.module("umbraco").controller("Umbraco.Editors.ConfigureTwoFactorControll
         }).catch(onError);
     }
 
-    function disable(providerName) {
-      vm.buttonState = "busy";
-      twoFactorLoginResource.disable(providerName, $scope.model.user.key)
-        .then(onResponse)
-        .catch(onError);
+    function disable(provider) {
+
+      const disableTwoFactorSettings = {
+        provider,
+        user: vm.user,
+        size: "small",
+        view: "views/common/infiniteeditors/twofactor/disabletwofactor.html",
+        close: function () {
+          editorService.close();
+          onInit();
+        }
+      };
+
+      editorService.open(disableTwoFactorSettings);
     }
 
     function disableWithCode(providerName) {
