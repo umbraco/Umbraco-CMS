@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;
+using Serilog.Enrichers;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
@@ -17,8 +18,6 @@ namespace Umbraco.Extensions
 {
     public static class LoggerConfigExtensions
     {
-        private const string AppDomainId = "AppDomainId";
-
         /// <summary>
         /// This configures Serilog with some defaults
         /// Such as adding ProcessID, Thread, AppDomain etc
@@ -57,7 +56,6 @@ namespace Umbraco.Extensions
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
-                .Enrich.WithProperty(AppDomainId, AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
@@ -129,7 +127,7 @@ namespace Umbraco.Extensions
             }
 
             return configuration.Async(
-                asyncConfiguration => asyncConfiguration.Map(AppDomainId, (_,mapConfiguration) =>
+                asyncConfiguration => asyncConfiguration.Map(ProcessIdEnricher.ProcessIdPropertyName, (_,mapConfiguration) =>
                         mapConfiguration.File(
                             formatter,
                             path,
