@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Extensions
 {
@@ -9,6 +10,8 @@ namespace Umbraco.Cms.Core.Extensions
     /// </summary>
     public static class HostEnvironmentExtensions
     {
+        private static string s_temporaryApplicationId;
+
         /// <summary>
         /// Maps a virtual path to a physical path to the application's content root.
         /// </summary>
@@ -32,6 +35,19 @@ namespace Umbraco.Cms.Core.Extensions
             }
 
             return Path.Combine(root, newPath.TrimStart(Constants.CharArrays.TildeForwardSlashBackSlash));
+        }
+
+        /// <summary>
+        /// Gets a temporary application id for use before the ioc container is built.
+        /// </summary>
+        public static string GetTemporaryApplicationId(this IHostEnvironment hostEnvironment)
+        {
+            if (s_temporaryApplicationId != null)
+            {
+                return s_temporaryApplicationId;
+            }
+
+            return s_temporaryApplicationId = hostEnvironment.ContentRootPath.GenerateHash();
         }
     }
 }
