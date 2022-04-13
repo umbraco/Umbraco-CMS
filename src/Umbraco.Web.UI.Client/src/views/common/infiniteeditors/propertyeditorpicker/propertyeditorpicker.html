@@ -24,8 +24,6 @@
                         auto-focus="true">
                     </umb-search-filter>
 
-                    <umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
-
                     <ul class="umb-card-grid -six-in-row">
                         <li ng-repeat="propertyEditor in model.propertyEditors | orderBy:'name' | filter: vm.searchTerm" data-element="propertyeditor-{{propertyeditor.name}}">
                             <button type="button"
