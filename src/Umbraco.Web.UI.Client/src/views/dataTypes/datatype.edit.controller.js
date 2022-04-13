@@ -27,7 +27,10 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         selectedEditor: {
             alias: "selectedEditor",
             description: "Select a property editor",
-            label: "Property editor"
+            label: "Property editor",
+            validation: {
+                mandatory: true
+            }
         }
     };
 
