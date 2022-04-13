@@ -1451,6 +1451,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="notAllowed">Not allowed</key>
     <key alias="openMediaPicker">Open media picker</key>
   </area>
+  <area alias="propertyEditorPicker">
+    <key alias="title">Select Property Editor</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
     <key alias="chooseInternal">choose internal page</key>

@@ -179,6 +179,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
 
                     vm.preValuesLoaded = true;
                     vm.content = data;
+                    vm.content.selectedEditor = null;
 
                     setHeaderNameState(vm.content);
 

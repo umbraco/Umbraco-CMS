@@ -1,25 +1,68 @@
-<umb-box>
+<div ng-controller="Umbraco.Editors.DataType.SettingsController as vm">
 
-    <umb-box-content>
+    <umb-box>
 
-        <umb-property property="model.properties.selectedEditor">
-            <div>
-                <select name="selectedEditor"
-                        ng-model="model.content.selectedEditor"
-                        required
-                        ng-options="e.alias as e.name for e in model.content.availableEditors"></select>
-                <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
-                    <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                </span>
-            </div>
+        <umb-box-content>
 
-        </umb-property>
+            <umb-property property="model.properties.selectedEditor">
+                
+                <!--
+                <div>
+                    <select name="selectedEditor"
+                            ng-model="model.content.selectedEditor"
+                            required
+                            ng-options="e.alias as e.name for e in model.content.availableEditors"></select>
+                    <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
+                        <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                    </span>
+                </div>
+                -->
 
-        <umb-property property="preValue"
-                    ng-repeat="preValue in model.preValues">
-            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
-        </umb-property>
+                <div class="content-type-editor-dialog edit-property-settings">
+                    <div class="editor-wrapper umb-control-group control-group" ng-model="model.content.selectedEditor" val-require-component>
 
-    </umb-box-content>
+                        <button type="button" class="btn-reset editor-placeholder" data-element="property-editor-add" ng-if="!model.content.selectedEditor" ng-click="vm.openPropertyEditorPicker()">
+                            <localize key="defaultdialogs_selectEditor">Select editor</localize>
+                            <div ng-messages="model.content.selectedEditor" show-validation-on-submit>
+                                <span class="umb-validation-label" ng-message="required">
+                                    <localize key="general_required">Required</localize>
+                                </span>
+                            </div>
+                        </button>
 
-</umb-box>
+                        <div class="editor clearfix" ng-if="model.content.selectedEditor">
+
+                            <div class="editor-info">
+                                <div class="editor-icon-wrapper">
+                                    <umb-icon icon="{{vm.selectedEditorModel.icon || 'icon-autofill'}}" class="icon"></umb-icon>
+                                </div>
+
+                                <div class="editor-details">
+                                    <span class="editor-name">{{vm.selectedEditorModel.name}}</span>
+                                    <span class="editor-editor">{{vm.selectedEditorModel.alias}}</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="editor-remove-icon btn-reset pull-right"
+                                    ng-click="vm.openPropertyEditorPicker()"
+                                    localize="title"
+                                    title="@actions_changeDataType">
+                                <umb-icon icon="icon-wrong" class="icon"></umb-icon>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </umb-property>
+
+            <umb-property property="preValue"
+                        ng-repeat="preValue in model.preValues">
+                <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+            </umb-property>
+
+        </umb-box-content>
+
+    </umb-box>
+
+</div>
