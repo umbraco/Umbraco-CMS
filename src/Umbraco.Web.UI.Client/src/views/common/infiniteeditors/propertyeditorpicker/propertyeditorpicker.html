@@ -16,6 +16,7 @@
                 <umb-box-content>
 
                     <umb-search-filter
+                        class="db mb3"
                         input-id="propertyeditor-search"
                         model="vm.searchTerm"
                         label-key="placeholders_search"
@@ -24,19 +25,21 @@
                         auto-focus="true">
                     </umb-search-filter>
 
-                    <ul class="umb-card-grid -six-in-row">
-                        <li ng-repeat="propertyEditor in model.propertyEditors | orderBy:'name' | filter: vm.searchTerm" data-element="propertyeditor-{{propertyeditor.name}}">
-                            <button type="button"
-                                    class="btn-reset umb-card-grid-item"
-                                    title="{{propertyEditor.name}}"
-                                    ng-click="vm.select(propertyEditor)">
-                                <span>
-                                    <umb-icon icon="{{propertyEditor.icon || 'icon-autofill'}}"></umb-icon>
-                                    {{propertyEditor.name}}
-                                </span>
-                            </button>
-                        </li>
-                    </ul>
+                    <div>
+                        <ul class="umb-card-grid -six-in-row">
+                            <li ng-repeat="propertyEditor in model.propertyEditors | orderBy:'name' | filter: vm.searchTerm" data-element="propertyeditor-{{propertyeditor.name}}">
+                                <button type="button"
+                                        class="btn-reset umb-card-grid-item"
+                                        title="{{propertyEditor.name}}"
+                                        ng-click="vm.select(propertyEditor)">
+                                    <span>
+                                        <umb-icon icon="{{propertyEditor.icon || 'icon-autofill'}}"></umb-icon>
+                                        {{propertyEditor.name}}
+                                    </span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
 
                 </umb-box-content>
             </umb-box>
