@@ -17,42 +17,44 @@
                     </span>
                 </div>
                 -->
+                <ng-form name="propertyEditorForm">
 
-                <div class="content-type-editor-dialog edit-property-settings">
-                    <div class="editor-wrapper umb-control-group control-group" ng-model="model.content.selectedEditor" val-require-component>
+                    <div class="content-type-editor-dialog edit-property-settings">
+                        <div class="editor-wrapper umb-control-group control-group" ng-model="model.content.selectedEditor" name="selectedEditor" val-require-component>
 
-                        <button type="button" class="btn-reset editor-placeholder" data-element="property-editor-add" ng-if="!model.content.selectedEditor" ng-click="vm.openPropertyEditorPicker()">
-                            <localize key="defaultdialogs_selectEditor">Select editor</localize>
-                            <div ng-messages="model.content.selectedEditor" show-validation-on-submit>
-                                <span class="umb-validation-label" ng-message="required">
-                                    <localize key="general_required">Required</localize>
-                                </span>
-                            </div>
-                        </button>
-
-                        <div class="editor clearfix" ng-if="model.content.selectedEditor">
-
-                            <div class="editor-info">
-                                <div class="editor-icon-wrapper">
-                                    <umb-icon icon="{{vm.selectedEditorModel.icon || 'icon-autofill'}}" class="icon"></umb-icon>
+                            <button type="button" class="btn-reset editor-placeholder" data-element="property-editor-add" ng-if="!model.content.selectedEditor" ng-click="vm.openPropertyEditorPicker()">
+                                <localize key="defaultdialogs_selectEditor">Select editor</localize>
+                                <div ng-messages="propertyEditorForm.selectedEditor.$error" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="valRequiredComponent">
+                                        <localize key="general_required">Required</localize>
+                                    </span>
                                 </div>
-
-                                <div class="editor-details">
-                                    <span class="editor-name">{{vm.selectedEditorModel.name}}</span>
-                                    <span class="editor-editor">{{vm.selectedEditorModel.alias}}</span>
-                                </div>
-                            </div>
-
-                            <button type="button" class="editor-remove-icon btn-reset pull-right"
-                                    ng-click="vm.openPropertyEditorPicker()"
-                                    localize="title"
-                                    title="@actions_changeDataType">
-                                <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                             </button>
-                        </div>
 
+                            <div class="editor clearfix" ng-if="model.content.selectedEditor">
+
+                                <div class="editor-info">
+                                    <div class="editor-icon-wrapper">
+                                        <umb-icon icon="{{vm.selectedEditorModel.icon || 'icon-autofill'}}" class="icon"></umb-icon>
+                                    </div>
+
+                                    <div class="editor-details">
+                                        <span class="editor-name">{{vm.selectedEditorModel.name}}</span>
+                                        <span class="editor-editor">{{vm.selectedEditorModel.alias}}</span>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="editor-remove-icon btn-reset pull-right"
+                                        ng-click="vm.openPropertyEditorPicker()"
+                                        localize="title"
+                                        title="@actions_changeDataType">
+                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
+                                </button>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
+                </ng-form>
 
             </umb-property>
 
