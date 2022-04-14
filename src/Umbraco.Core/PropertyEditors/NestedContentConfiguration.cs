@@ -23,6 +23,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Show the Element Type icons.")]
         public bool ShowIcons { get; set; } = true;
 
+        [ConfigurationField("expandsOnLoad", "Expands on load", "boolean", Description = "Item is automatically expanded when there is one max item available")]
+        public bool ExpandsOnLoad { get; set; } = true;
+
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Hide the property label and let the item list span the full width of the editor window.")]
         public bool HideLabel { get; set; }
 
