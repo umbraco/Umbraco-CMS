@@ -123,17 +123,8 @@ namespace Umbraco.Cms.Web.Website.ActionResults
             }
 
             HttpContext httpContext = context.HttpContext;
-
-            string destinationUrl;
-            if (IsUrlAbsolute(Url))
-            {
-                destinationUrl = Url;
-            }
-            else
-            {
-                IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
-                destinationUrl = hostingEnvironment.ToAbsolute(Url);
-            }
+            var urlHelper = httpContext.RequestServices.GetRequiredService<IUrlHelper>();
+            string destinationUrl = urlHelper.Content(Url);
 
             if (_queryString.HasValue)
             {
@@ -144,7 +135,5 @@ namespace Umbraco.Cms.Web.Website.ActionResults
 
             return Task.CompletedTask;
         }
-
-        private static bool IsUrlAbsolute(string url) => url.Contains("//");
     }
 }
