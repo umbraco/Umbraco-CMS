@@ -131,8 +131,8 @@ namespace Umbraco.Cms.Web.Website.ActionResults
             }
             else
             {
-                IHostingEnvironment ioHelper = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
-                destinationUrl = ioHelper.ToAbsolute(Url);
+                IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
+                destinationUrl = hostingEnvironment.ToAbsolute(Url);
             }
 
             if (_queryString.HasValue)
