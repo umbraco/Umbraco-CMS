@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -122,8 +123,17 @@ namespace Umbraco.Cms.Web.Website.ActionResults
             }
 
             HttpContext httpContext = context.HttpContext;
-            IIOHelper ioHelper = httpContext.RequestServices.GetRequiredService<IIOHelper>();
-            string destinationUrl = ioHelper.ResolveUrl(Url);
+
+            string destinationUrl;
+            if (IsUrlAbsolute(Url))
+            {
+                destinationUrl = Url;
+            }
+            else
+            {
+                IHostingEnvironment ioHelper = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
+                destinationUrl = ioHelper.ToAbsolute(Url);
+            }
 
             if (_queryString.HasValue)
             {
@@ -135,5 +145,6 @@ namespace Umbraco.Cms.Web.Website.ActionResults
             return Task.CompletedTask;
         }
 
+        private static bool IsUrlAbsolute(string url) => url.Contains("//");
     }
 }
