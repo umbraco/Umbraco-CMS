@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         {
             var lang = new Language(globalSettings, dto.IsoCode)
             {
-                CultureName = new CultureInfo(dto.IsoCode).EnglishName,
+                CultureName = dto.CultureName,
                 Id = dto.Id,
                 IsDefault = dto.IsDefault,
                 IsMandatory = dto.IsMandatory,
@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         {
             var dto = new LanguageDto
             {
+                CultureName = entity.CultureName,
                 IsoCode = entity.IsoCode,
                 IsDefault = entity.IsDefault,
                 IsMandatory = entity.IsMandatory,
