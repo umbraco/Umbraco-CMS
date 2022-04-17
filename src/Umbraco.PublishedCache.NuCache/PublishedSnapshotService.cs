@@ -340,12 +340,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                 try
                 {
-                    // By using ToList() here we are forcing the database query result extraction to complete straight away,
-                    // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
-                    // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
-                    // here results in the calling method to not release the lock.
-                    var kits = _publishedContentService.GetAllContentSources().ToList();
-                    return onStartup ? _contentStore.SetAllFastSortedLocked(kits, true) : _contentStore.SetAllLocked(kits);
+                    var kits = _publishedContentService.GetAllContentSources();
+                    return onStartup ? _contentStore.SetAllFastSortedLocked(kits, _config.KitBatchSize, true) : _contentStore.SetAllLocked(kits, _config.KitBatchSize, true);
                 }
                 catch (ThreadAbortException tae)
                 {
@@ -403,12 +399,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                 try
                 {
-                    // By using ToList() here we are forcing the database query result extraction to complete straight away,
-                    // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
-                    // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
-                    // here results in the calling method to not release the lock.
-                    var kits = _publishedContentService.GetAllMediaSources().ToList();
-                    return onStartup ? _mediaStore.SetAllFastSortedLocked(kits, true) : _mediaStore.SetAllLocked(kits);
+
+                    var kits = _publishedContentService.GetAllMediaSources();
+                    return onStartup ? _mediaStore.SetAllFastSortedLocked(kits, _config.KitBatchSize, true) : _mediaStore.SetAllLocked(kits, _config.KitBatchSize, true);
                 }
                 catch (ThreadAbortException tae)
                 {
@@ -464,7 +457,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 return false;
             }
 
-            return onStartup ? store.SetAllFastSortedLocked(kits, false) : store.SetAllLocked(kits);
+            return onStartup ? store.SetAllFastSortedLocked(kits, _config.KitBatchSize, false) : store.SetAllLocked(kits, _config.KitBatchSize, false);
         }
 
         private void LockAndLoadDomains()

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
@@ -155,7 +156,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             lock (_rlocko)
             {
                 // see SnapDictionary
-                try { }
+                try
+                { }
                 finally
                 {
                     if (_nextGen == false || (forceGen))
@@ -180,7 +182,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     lock (_rlocko)
                     {
                         // see SnapDictionary
-                        try { }
+                        try
+                        { }
                         finally
                         {
                             _nextGen = false;
@@ -215,7 +218,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void RollbackRoot()
         {
-            if (_root.Gen <= _liveGen) return;
+            if (_root.Gen <= _liveGen)
+                return;
 
             if (_root.Next != null)
                 _root = _root.Next;
@@ -227,7 +231,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             foreach (var item in dictionary)
             {
                 var link = item.Value;
-                if (link.Gen <= _liveGen) continue;
+                if (link.Gen <= _liveGen)
+                    continue;
 
                 var key = item.Key;
                 if (link.Next == null)
@@ -282,7 +287,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void RegisterChange(int id, ContentNodeKit kit)
         {
-            if (_wchanges == null) _wchanges = new List<KeyValuePair<int, ContentNodeKit>>();
+            if (_wchanges == null)
+                _wchanges = new List<KeyValuePair<int, ContentNodeKit>>();
             _wchanges.Add(new KeyValuePair<int, ContentNodeKit>(id, kit));
         }
 
@@ -325,7 +331,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public void UpdateContentTypesLocked(IEnumerable<IPublishedContentType> types)
         {
             //nothing to do if this is empty, no need to lock/allocate/iterate/etc...
-            if (!types.Any()) return;
+            if (!types.Any())
+                return;
 
             EnsureLocked();
 
@@ -339,10 +346,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             foreach (var link in _contentNodes.Values)
             {
                 var node = link.Value;
-                if (node == null) continue;
+                if (node == null)
+                    continue;
                 var contentTypeId = node.ContentType.Id;
-                if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
-                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, _publishedModelFactory, contentType));
+                if (index.TryGetValue(contentTypeId, out var contentType) == false)
+                    continue;
+                SetValueLocked(_contentNodes, node.Id, new ContentNode(node, _publishedModelFactory, contentType));
             }
         }
 
@@ -408,10 +417,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             foreach (var link in _contentNodes.Values)
             {
                 var node = link.Value;
-                if (node == null) continue;
+                if (node == null)
+                    continue;
                 var contentTypeId = node.ContentType.Id;
-                if (removedIdsA.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
-                if (refreshedIdsA.Contains(contentTypeId)) refreshedContentTypeNodes.Add(node.Id);
+                if (removedIdsA.Contains(contentTypeId))
+                    removedContentTypeNodes.Add(node.Id);
+                if (refreshedIdsA.Contains(contentTypeId))
+                    refreshedContentTypeNodes.Add(node.Id);
             }
 
             // perform deletion of content with removed content type
@@ -451,7 +463,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 visited.Add(kit.Node.Id);
-                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+                if (_localDb != null)
+                    RegisterChange(kit.Node.Id, kit);
             }
 
             // all content should have been refreshed - but...
@@ -507,9 +520,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     _contentNodes.TryGetValue(id, out var link);
                     if (link?.Value == null)
                         continue;
-                        var node = new ContentNode(link.Value, _publishedModelFactory, contentType);
+                    var node = new ContentNode(link.Value, _publishedModelFactory, contentType);
                     SetValueLocked(_contentNodes, id, node);
-                    if (_localDb != null) RegisterChange(id, node.ToKit());
+                    if (_localDb != null)
+                        RegisterChange(id, node.ToKit());
                 }
             }
         }
@@ -623,16 +637,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // moving?
             var moving = existing != null && existing.ParentContentId != kit.Node.ParentContentId;
 
-                // manage children
-                if (existing != null)
-                {
-                    kit.Node.FirstChildContentId = existing.FirstChildContentId;
-                    kit.Node.LastChildContentId = existing.LastChildContentId;
-                }
+            // manage children
+            if (existing != null)
+            {
+                kit.Node.FirstChildContentId = existing.FirstChildContentId;
+                kit.Node.LastChildContentId = existing.LastChildContentId;
+            }
 
             // set
             SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-            if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+            if (_localDb != null)
+                RegisterChange(kit.Node.Id, kit);
 
             // manage the tree
             if (existing == null)
@@ -672,6 +687,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <param name="kits">
         /// All kits sorted by Level + Parent Id + Sort order
         /// </param>
+        /// <param name="kitGroupSize"></param>
         /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
         /// <returns></returns>
         /// <remarks>
@@ -688,7 +704,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <exception cref="InvalidOperationException">
         /// Thrown if this method is not called within a write lock
         /// </exception>
-        public bool SetAllFastSortedLocked(IEnumerable<ContentNodeKit> kits, bool fromDb)
+        public bool SetAllFastSortedLocked(IEnumerable<ContentNodeKit> kits, int kitGroupSize, bool fromDb)
         {
             EnsureLocked();
 
@@ -706,54 +722,68 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ContentNode previousNode = null;
             ContentNode parent = null;
 
-            foreach (var kit in kits)
+            // By using InGroupsOf() here we are forcing the database query result extraction to retrieve items in batches,
+            // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
+            // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
+            // here results in the calling method to not release the lock.
+
+            // However the larger the batck size, the more content loaded into memory.  So by default, this is set to 1 and can be increased by setting
+            // the configuration setting Umbraco:CMS:NuCache:KitPageSize to a higher value.
+
+            // If we are not loading from the database, then we can ignore this restriction.
+
+            foreach (var kitGroup in kits.InGroupsOf(!fromDb || kitGroupSize < 1 ? 1 : kitGroupSize))
             {
-                if (!BuildKit(kit, out var parentLink))
+                foreach (var kit in kitGroup)
                 {
-                    ok = false;
-                    continue; // skip that one
+                    if (!BuildKit(kit, out var parentLink))
+                    {
+                        ok = false;
+                        continue; // skip that one
+                    }
+
+                    var thisNode = kit.Node;
+
+                    if (parent == null)
+                    {
+                        // first parent
+                        parent = parentLink.Value;
+                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
+                    }
+                    else if (parent.Id != parentLink.Value.Id)
+                    {
+                        // new parent
+                        parent = parentLink.Value;
+                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
+                        previousNode = null; // there is no previous sibling
+                    }
+
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id, thisNode.ParentContentId);
+                    }
+
+                    SetValueLocked(_contentNodes, thisNode.Id, thisNode);
+
+                    // if we are initializing from the database source ensure the local db is updated
+                    if (fromDb && _localDb != null)
+                        RegisterChange(thisNode.Id, kit);
+
+                    // this node is always the last child
+                    parent.LastChildContentId = thisNode.Id;
+
+                    // wire previous node as previous sibling
+                    if (previousNode != null)
+                    {
+                        previousNode.NextSiblingContentId = thisNode.Id;
+                        thisNode.PreviousSiblingContentId = previousNode.Id;
+                    }
+
+                    // this node becomes the previous node
+                    previousNode = thisNode;
+
+                    _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
                 }
-
-                var thisNode = kit.Node;
-
-                if (parent == null)
-                {
-                    // first parent
-                    parent = parentLink.Value;
-                    parent.FirstChildContentId = thisNode.Id; // this node is the first node
-                }
-                else if (parent.Id != parentLink.Value.Id)
-                {
-                    // new parent
-                    parent = parentLink.Value;
-                    parent.FirstChildContentId = thisNode.Id; // this node is the first node
-                    previousNode = null; // there is no previous sibling
-                }
-
-                if (_logger.IsEnabled(LogLevel.Debug))
-                {
-                    _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id, thisNode.ParentContentId);
-                }
-
-                SetValueLocked(_contentNodes, thisNode.Id, thisNode);
-
-                // if we are initializing from the database source ensure the local db is updated
-                if (fromDb && _localDb != null) RegisterChange(thisNode.Id, kit);
-
-                // this node is always the last child
-                parent.LastChildContentId = thisNode.Id;
-
-                // wire previous node as previous sibling
-                if (previousNode != null)
-                {
-                    previousNode.NextSiblingContentId = thisNode.Id;
-                    thisNode.PreviousSiblingContentId = previousNode.Id;
-                }
-
-                // this node becomes the previous node
-                previousNode = thisNode;
-
-                _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
@@ -763,6 +793,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// Set all data for a collection of <see cref="ContentNodeKit"/>
         /// </summary>
         /// <param name="kits"></param>
+        /// <param name="kitGroupSize"></param>
+        /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
         /// <returns></returns>
         /// <remarks>
         /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
@@ -771,7 +803,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <exception cref="InvalidOperationException">
         /// Thrown if this method is not called within a write lock
         /// </exception>
-        public bool SetAllLocked(IEnumerable<ContentNodeKit> kits)
+        public bool SetAllLocked(IEnumerable<ContentNodeKit> kits, int kitGroupSize, bool fromDb)
         {
             EnsureLocked();
 
@@ -784,25 +816,38 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             //ClearLocked(_contentTypesById);
             //ClearLocked(_contentTypesByAlias);
 
-            foreach (var kit in kits)
+            // By using InGroupsOf() here we are forcing the database query result extraction to retrieve items in batches,
+            // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
+            // This in turn reduces the possibility that the NuCache file will remain locked, because an exception
+            // here results in the calling method to not release the lock.
+
+            // However the larger the batck size, the more content loaded into memory.  So by default, this is set to 1 and can be increased by setting
+            // the configuration setting Umbraco:CMS:NuCache:KitPageSize to a higher value.
+
+            // If we are not loading from the database, then we can ignore this restriction.
+            foreach (var kitGroup in kits.InGroupsOf(!fromDb || kitGroupSize < 1 ? 1 : kitGroupSize))
             {
-                if (!BuildKit(kit, out var parent))
+                foreach (var kit in kitGroup)
                 {
-                    ok = false;
-                    continue; // skip that one
+                    if (!BuildKit(kit, out var parent))
+                    {
+                        ok = false;
+                        continue; // skip that one
+                    }
+
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
+                    }
+
+                    SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+
+                    if (_localDb != null)
+                        RegisterChange(kit.Node.Id, kit);
+                    AddTreeNodeLocked(kit.Node, parent);
+
+                    _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
                 }
-
-                if (_logger.IsEnabled(LogLevel.Debug))
-                {
-                    _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
-                }
-
-                SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-
-                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
-                AddTreeNodeLocked(kit.Node, parent);
-
-                _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
@@ -854,7 +899,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     continue; // skip that one
                 }
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+                if (_localDb != null)
+                    RegisterChange(kit.Node.Id, kit);
                 AddTreeNodeLocked(kit.Node, parent);
 
                 _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
@@ -882,7 +928,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // try to find the content
             // if it is not there, nothing to do
             _contentNodes.TryGetValue(id, out var link); // else null
-            if (link?.Value == null) return false;
+            if (link?.Value == null)
+                return false;
 
             var content = link.Value;
 
@@ -912,10 +959,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             // This should never be null, all code that calls this method is null checking but we've seen
             // issues of null ref exceptions in issue reports so we'll double check here
-            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (content == null)
+                throw new ArgumentNullException(nameof(content));
 
             SetValueLocked(_contentNodes, content.Id, null);
-            if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
+            if (_localDb != null)
+                RegisterChange(content.Id, ContentNodeKit.Null);
 
             _contentKeyToIdMap.TryRemove(content.Uid, out _);
 
@@ -987,7 +1036,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private LinkedNode<TValue> GetLinkedNodeGen<TValue>(LinkedNode<TValue> link, long? gen)
             where TValue : class
         {
-            if (!gen.HasValue) return link;
+            if (!gen.HasValue)
+                return link;
 
             //find the correct snapshot, find the first that is <= the requested gen
             while (link != null && link.Gen > gen)
@@ -1704,7 +1754,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             public void Dispose()
             {
-                if (_gen < 0) return;
+                if (_gen < 0)
+                    return;
 #if DEBUG
                 _logger.LogDebug("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
 #endif
