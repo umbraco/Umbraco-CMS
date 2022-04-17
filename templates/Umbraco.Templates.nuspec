@@ -23,6 +23,8 @@
       <file src="UmbracoProject\**" target="UmbracoProject" exclude="bin;obj" />
       <file src="..\src\Umbraco.Web.UI\Program.cs" target="UmbracoProject" />
       <file src="..\src\Umbraco.Web.UI\Startup.cs" target="UmbracoProject" />
-      <file src="..\src\Umbraco.Web.UI\Views\**" target="UmbracoProject\Views" />
+      <file src="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**" target="UmbracoProject\Views\Partials\blocklist" />
+      <file src="..\src\Umbraco.Web.UI\Views\Partials\grid\**" target="UmbracoProject\Views\Partials\grid" />
+      <file src="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml" target="UmbracoProject\Views\_ViewImports.cshtml" />
   </files>
 </package>
