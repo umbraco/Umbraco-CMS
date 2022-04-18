@@ -12,6 +12,10 @@ namespace Umbraco.Cms.Web.Website.Models
     /// </summary>
     public class ProfileModel : PostRedirectModel
     {
+
+        [ReadOnly(true)]
+        public Guid Key { get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]

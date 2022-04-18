@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
@@ -11,6 +15,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
@@ -60,6 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(CacheInstructionDto),
             typeof(ExternalLoginDto),
             typeof(ExternalLoginTokenDto),
+            typeof(TwoFactorLoginDto),
             typeof(RedirectUrlDto),
             typeof(LockDto),
             typeof(UserGroupDto),
@@ -78,7 +84,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(ContentScheduleDto),
             typeof(LogViewerQueryDto),
             typeof(ContentVersionCleanupPolicyDto),
-            typeof(UserGroup2NodeDto)
+            typeof(UserGroup2NodeDto),
+            typeof(CreatedPackageSchemaDto)
         };
 
         private readonly IUmbracoDatabase _database;
@@ -86,15 +93,33 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly ILogger<DatabaseSchemaCreator> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
 
-        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory, IUmbracoVersion umbracoVersion, IEventAggregator eventAggregator)
+        [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
+        public DatabaseSchemaCreator(
+            IUmbracoDatabase database,
+            ILogger<DatabaseSchemaCreator> logger,
+            ILoggerFactory loggerFactory,
+            IUmbracoVersion umbracoVersion,
+            IEventAggregator eventAggregator)
+            : this (database, logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
+        {
+        }
+
+        public DatabaseSchemaCreator(
+            IUmbracoDatabase database,
+            ILogger<DatabaseSchemaCreator> logger,
+            ILoggerFactory loggerFactory,
+            IUmbracoVersion umbracoVersion,
+            IEventAggregator eventAggregator,
+            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _eventAggregator = eventAggregator;
+            _defaultDataCreationSettings = defaultDataCreationSettings;
 
             if (_database?.SqlContext?.SqlSyntax == null)
             {
@@ -151,8 +176,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (creatingNotification.Cancel == false)
             {
-                var dataCreation = new DatabaseDataCreator(_database,
-                    _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion);
+                var dataCreation = new DatabaseDataCreator(
+                    _database,
+                    _loggerFactory.CreateLogger<DatabaseDataCreator>(),
+                    _umbracoVersion,
+                    _defaultDataCreationSettings);
                 foreach (Type table in OrderedTables)
                 {
                     CreateTable(false, table, dataCreation);
@@ -417,9 +445,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             where T : new()
         {
             Type tableType = typeof(T);
-            CreateTable(overwrite, tableType,
-                new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
-                    _umbracoVersion));
+            CreateTable(
+                overwrite,
+                tableType,
+                new DatabaseDataCreator(
+                    _database,
+                    _loggerFactory.CreateLogger<DatabaseDataCreator>(),
+                    _umbracoVersion,
+                    _defaultDataCreationSettings));
         }
 
         /// <summary>

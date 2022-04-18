@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Zarządzanie hostami</key>
+    <key alias="assigndomain">Zarządzanie hostami</key>
     <key alias="auditTrail">Historia zmian</key>
     <key alias="browse">Przeglądaj węzeł</key>
     <key alias="changeDocType">Zmień typ dokumentu</key>
@@ -15,7 +15,7 @@
     <key alias="createGroup">Stwórz grupę</key>
     <key alias="delete">Usuń</key>
     <key alias="disable">Deaktywuj</key>
-    <key alias="emptyRecycleBin">Opróżnij kosz</key>
+    <key alias="emptyrecyclebin">Opróżnij kosz</key>
     <key alias="enable">Aktywuj</key>
     <key alias="exportDocumentType">Eksportuj typ dokumentu</key>
     <key alias="importdocumenttype">Importuj typ dokumentu</key>

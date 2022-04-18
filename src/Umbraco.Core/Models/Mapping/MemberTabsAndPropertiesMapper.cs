@@ -65,94 +65,21 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
-            // if we just had all of the membership provider fields on the member table :(
-            // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
+            // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
             var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
-                isLockedOutProperty.View = "readonlyvalue";
-                isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
-            }
-
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
-                && _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-            {
-                var memberTypeLink = $"#/member/memberTypes/edit/{source.ContentTypeId}";
-
-                // Replace the doctype property
-                var docTypeProperty = resolved.SelectMany(x => x.Properties)
-                    .First(x => x.Alias == $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype");
-                docTypeProperty.Value = new List<object>
-                {
-                    new
-                    {
-                        linkText = source.ContentType.Name,
-                        url = memberTypeLink,
-                        target = "_self",
-                        icon = Constants.Icons.ContentType
-                    }
-                };
-                docTypeProperty.View = "urllist";
+                isLockedOutProperty.Readonly = true;
             }
 
             return resolved;
         }
 
+        [Obsolete("Use MapMembershipProperties. Will be removed in Umbraco 10.")]
         protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
         {
             var member = (IMember)content;
-
-            var genericProperties = new List<ContentPropertyDisplay>
-            {
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
-                    Label = _localizedTextService.Localize("general","id"),
-                    Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
-                    View = "idwithguid"
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
-                    Label = _localizedTextService.Localize("content","membertype"),
-                    Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
-                    View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
-                },
-                GetLoginProperty(member, _localizedTextService),
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
-                    Label = _localizedTextService.Localize("general","email"),
-                    Value = member.Email,
-                    View = "email",
-                    Validation = {Mandatory = true}
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
-                    Label = _localizedTextService.Localize(null,"password"),
-                    Value = new Dictionary<string, object>
-                    {
-                        // TODO: why ignoreCase, what are we doing here?!
-                        {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
-                    },
-                    // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
-                    View = "changepassword",
-                    // initialize the dictionary with the configuration from the default membership provider
-                    Config = GetPasswordConfig(member)
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
-                    Label = _localizedTextService.Localize("content","membergroup"),
-                    Value = GetMemberGroupValue(member.Username),
-                    View = "membergroups",
-                    Config = new Dictionary<string, object> {{"IsRequired", true}}
-                }
-            };
-
-            return genericProperties;
+            return MapMembershipProperties(member, null);
         }
 
         private Dictionary<string, object> GetPasswordConfig(IMember member)
@@ -255,6 +182,47 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             return result;
+        }
+
+        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext context)
+        {
+            var properties = new List<ContentPropertyDisplay>
+            {
+                GetLoginProperty(member, _localizedTextService),
+                new ContentPropertyDisplay
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
+                    Label = _localizedTextService.Localize("general","email"),
+                    Value = member.Email,
+                    View = "email",
+                    Validation = { Mandatory = true }
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
+                    Label = _localizedTextService.Localize(null,"password"),
+                    Value = new Dictionary<string, object>
+                    {
+                        // TODO: why ignoreCase, what are we doing here?!
+                        { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
+                    },
+                    View = "changepassword",
+                    Config = GetPasswordConfig(member) // Initialize the dictionary with the configuration from the default membership provider
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
+                    Label = _localizedTextService.Localize("content","membergroup"),
+                    Value = GetMemberGroupValue(member.Username),
+                    View = "membergroups",
+                    Config = new Dictionary<string, object>
+                    {
+                        { "IsRequired", true }
+                    }
+                }
+            };
+
+            return properties;
         }
     }
 }

@@ -87,7 +87,16 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                  // call startup
                  builder.Configure(app => Configure(app));
-            }).UseEnvironment(Environments.Development);
+            })
+            .UseDefaultServiceProvider(cfg =>
+            {
+                // These default to true *if* WebHostEnvironment.EnvironmentName == Development
+                // When running tests, EnvironmentName used to be null on the mock that we register into services.
+                // Enable opt in for tests so that validation occurs regardless of environment name.
+                // Would be nice to have this on for UmbracoIntegrationTest also but requires a lot more effort to resolve issues.
+                cfg.ValidateOnBuild = true;
+                cfg.ValidateScopes = true;
+            });
 
             return builder;
         }

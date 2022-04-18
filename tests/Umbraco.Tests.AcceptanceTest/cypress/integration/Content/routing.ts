@@ -60,16 +60,16 @@ context('Routing', () => {
         // Ensure cleaned before tests run
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
-        cy.umbracoEnsureLanguageNotExists(danishCulture);
-        cy.umbracoEnsureLanguageNotExists(swedishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(danishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(swedishCulture);
     });
 
     afterEach(() => {
         // Cleanup after tests
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
-        cy.umbracoEnsureLanguageNotExists(danishCulture);
-        cy.umbracoEnsureLanguageNotExists(swedishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(danishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(swedishCulture);
     })
 
     it('Root node published in language A, Child node published in language A', () => {

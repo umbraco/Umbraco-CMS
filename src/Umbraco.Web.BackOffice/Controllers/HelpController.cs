@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -13,15 +20,44 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class HelpController : UmbracoAuthorizedJsonController
     {
         private readonly ILogger<HelpController> _logger;
+        private HelpPageSettings _helpPageSettings;
 
+        [Obsolete("Use constructor that takes IOptions<HelpPageSettings>")]
         public HelpController(ILogger<HelpController> logger)
+            : this(logger, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<HelpPageSettings>>())
+        {
+        }
+
+        [ActivatorUtilitiesConstructor]
+        public HelpController(
+            ILogger<HelpController> logger,
+            IOptionsMonitor<HelpPageSettings> helpPageSettings)
         {
             _logger = logger;
+
+            ResetHelpPageSettings(helpPageSettings.CurrentValue);
+            helpPageSettings.OnChange(ResetHelpPageSettings);
+        }
+
+        private void ResetHelpPageSettings(HelpPageSettings settings)
+        {
+            _helpPageSettings = settings;
         }
 
         private static HttpClient _httpClient;
+
         public async Task<List<HelpPage>> GetContextHelpForPage(string section, string tree, string baseUrl = "https://our.umbraco.com")
         {
+            if (IsAllowedUrl(baseUrl) is false)
+            {
+                _logger.LogError($"The following URL is not listed in the allowlist for HelpPage in HelpPageSettings: {baseUrl}");
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+                // Ideally we'd want to return a BadRequestResult here,
+                // however, since we're not returning ActionResult this is not possible and changing it would be a breaking change.
+                return new List<HelpPage>();
+            }
+
             var url = string.Format(baseUrl + "/Umbraco/Documentation/Lessons/GetContextHelpDocs?sectionAlias={0}&treeAlias={1}", section, tree);
 
             try
@@ -43,6 +79,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return new List<HelpPage>();
+        }
+
+        private bool IsAllowedUrl(string url)
+        {
+            if (_helpPageSettings.HelpPageUrlAllowList is null ||
+                _helpPageSettings.HelpPageUrlAllowList.Contains(url))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 

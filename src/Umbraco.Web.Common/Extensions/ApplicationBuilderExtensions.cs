@@ -1,18 +1,20 @@
 using System;
 using System.IO;
+using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
 {
@@ -94,7 +96,8 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (!app.UmbracoCanBoot()) return app;
+            if (!app.UmbracoCanBoot())
+                return app;
 
             app.UseMiddleware<UmbracoRequestLoggingMiddleware>();
 
@@ -109,25 +112,21 @@ namespace Umbraco.Extensions
         public static IApplicationBuilder UseUmbracoPluginsStaticFiles(this IApplicationBuilder app)
         {
             var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
 
             var pluginFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
-
-            // Ensure the plugin folder exists
-            Directory.CreateDirectory(pluginFolder);
-
-            var fileProvider = new UmbracoPluginPhysicalFileProvider(
-                pluginFolder,
-                umbracoPluginSettings);
-
-            app.UseStaticFiles(new StaticFileOptions
+            if (Directory.Exists(pluginFolder))
             {
-                FileProvider = fileProvider,
-                RequestPath = Constants.SystemDirectories.AppPlugins
-            });
+                var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
+
+                var pluginFileProvider = new UmbracoPluginPhysicalFileProvider(
+                    pluginFolder,
+                    umbracoPluginSettings);
+
+                IWebHostEnvironment webHostEnvironment = app.ApplicationServices.GetService<IWebHostEnvironment>();
+                webHostEnvironment.WebRootFileProvider = webHostEnvironment.WebRootFileProvider.ConcatComposite(new PrependBasePathFileProvider(Constants.SystemDirectories.AppPlugins, pluginFileProvider));
+            }
 
             return app;
         }
     }
-
 }

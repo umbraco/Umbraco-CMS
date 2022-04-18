@@ -1,7 +1,11 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Deploy.Core.Configuration.DebugConfiguration;
+using Umbraco.Deploy.Core.Configuration.DeployConfiguration;
+using Umbraco.Deploy.Core.Configuration.DeployProjectConfiguration;
 using Umbraco.Forms.Core.Configuration;
 using SecuritySettings = Umbraco.Cms.Core.Configuration.Models.SecuritySettings;
 
@@ -82,7 +86,14 @@ namespace JsonSchema
                 public BasicAuthSettings BasicAuth { get; set; }
 
                 public PackageMigrationSettings PackageMigration { get; set; }
+
                 public LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
+
+                public ContentDashboardSettings ContentDashboard { get; set; }
+
+                public HelpPageSettings HelpPage { get; set; }
+
+                public InstallDefaultDataSettings DefaultDataCreation { get; set; }
             }
 
             /// <summary>
@@ -116,6 +127,11 @@ namespace JsonSchema
             /// </summary>
             public class DeployDefinition
             {
+                public DeploySettings Settings { get; set; }
+
+                public DeployProjectConfig Project { get; set; }
+
+                public DebugSettings Debug { get; set; }
             }
         }
     }

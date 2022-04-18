@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Media;
@@ -83,6 +84,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
             builder.EmbedProviders().Append<T>();
             return builder;
         }
+
+        [Obsolete("Use AddEmbedProvider instead. This will be removed in Umbraco 10")]
+        public static IUmbracoBuilder AddOEmbedProvider<T>(this IUmbracoBuilder builder)
+            where T : class, IEmbedProvider => AddEmbedProvider<T>(builder);
 
         /// <summary>
         /// Register a section.

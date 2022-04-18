@@ -60,6 +60,11 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
             _ipResolver = new AspNetCoreIpResolver(_httpContextAccessor);
 
             string contentRoot = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
+
+            // The mock for IWebHostEnvironment has caused a good few issues.
+            // We can UseContentRoot, UseWebRoot etc on the host builder instead.
+            // possibly going down rabbit holes though as would need to cleanup all usages of
+            // GetHostingEnvironment & GetWebHostEnvironment.
             var hostEnvironment = new Mock<IWebHostEnvironment>();
 
             // This must be the assembly name for the WebApplicationFactory to work.
@@ -68,6 +73,7 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
             hostEnvironment.Setup(x => x.ContentRootFileProvider).Returns(() => new PhysicalFileProvider(contentRoot));
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
             hostEnvironment.Setup(x => x.WebRootFileProvider).Returns(() => new PhysicalFileProvider(WorkingDirectory));
+            hostEnvironment.Setup(x => x.EnvironmentName).Returns("Tests");
 
             // We also need to expose it as the obsolete interface since netcore's WebApplicationFactory casts it.
             hostEnvironment.As<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();

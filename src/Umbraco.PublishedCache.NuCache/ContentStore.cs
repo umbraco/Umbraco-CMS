@@ -443,10 +443,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 refreshedIdsA.Contains(x.ContentTypeId) &&
                 BuildKit(x, out _)))
             {
-                // replacing the node: must preserve the parents
+                // replacing the node: must preserve the relations
                 var node = GetHead(_contentNodes, kit.Node.Id)?.Value;
                 if (node != null)
+                {
+                    // Preserve children
                     kit.Node.FirstChildContentId = node.FirstChildContentId;
+                    kit.Node.LastChildContentId = node.LastChildContentId;
+
+                    // Also preserve siblings
+                    kit.Node.NextSiblingContentId = node.NextSiblingContentId;
+                    kit.Node.PreviousSiblingContentId = node.PreviousSiblingContentId;
+                }
 
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
@@ -608,7 +616,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 throw new ArgumentException("Kit content cannot have children.", nameof(kit));
             // ReSharper restore LocalizableElement
 
-            _logger.LogDebug("Set content ID: {KitNodeId}", kit.Node.Id);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Set content ID: {KitNodeId}", kit.Node.Id);
+            }
 
             // get existing
             _contentNodes.TryGetValue(kit.Node.Id, out var link);
@@ -727,7 +738,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     previousNode = null; // there is no previous sibling
                 }
 
-                _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id, thisNode.ParentContentId);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id, thisNode.ParentContentId);
+                }
+
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                 // if we are initializing from the database source ensure the local db is updated
@@ -784,7 +799,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     ok = false;
                     continue; // skip that one
                 }
-                _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
+
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
+                }
+
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
@@ -873,7 +893,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (link?.Value == null) return false;
 
             var content = link.Value;
-            _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
+            }
 
             // clear the entire branch
             ClearBranchLocked(content);

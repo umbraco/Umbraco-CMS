@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Beheer domeinnamen</key>
+    <key alias="assigndomain">Beheer domeinnamen</key>
     <key alias="auditTrail">Documentgeschiedenis</key>
     <key alias="browse">Node bekijken</key>
     <key alias="changeDocType">Documenttype wijzigen</key>
@@ -18,7 +18,7 @@
     <key alias="delete">Verwijderen</key>
     <key alias="disable">Uitschakelen</key>
     <key alias="editSettings">Instellingen wijzigen</key>
-    <key alias="emptyRecycleBin">Prullenbak leegmaken</key>
+    <key alias="emptyrecyclebin">Prullenbak leegmaken</key>
     <key alias="enable">Inschakelen</key>
     <key alias="exportDocumentType">Documenttype exporteren</key>
     <key alias="importdocumenttype">Documenttype importeren</key>
@@ -82,6 +82,7 @@
     <key alias="translate">Toegang toestaan om een node te vertalen</key>
     <key alias="update">Toegang toestaan om een node op te slaan</key>
     <key alias="createblueprint">Toegang toestaan om Inhoudssjabloon aan te maken</key>
+    <key alias="notify">Toegang toestaan om meldingen voor content nodes aan te maken</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Inhoud</key>
@@ -256,6 +257,7 @@
     <key alias="statistics">Statistieken</key>
     <key alias="titleOptional">Titel (optioneel)</key>
     <key alias="altTextOptional">Alternatieve tekst (optioneel)</key>
+    <key alias="captionTextOptional">Bijschrift (optioneel)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Depubliceren</key>
     <key alias="unpublished">Concept</key>
@@ -533,6 +535,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">Er zijn geen woordenboekitems.</key>
+    <key alias="createNew">Woordenboekitem aanmaken</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -693,6 +696,7 @@
     <key alias="clear">Wissen</key>
     <key alias="close">Sluiten</key>
     <key alias="closewindow">Sluit venster</key>
+    <key alias="closepane">Sluit paneel</key>
     <key alias="comment">Comment</key>
     <key alias="confirm">Bevestig</key>
     <key alias="constrain">Beperken</key>
@@ -770,6 +774,7 @@
     <key alias="pleasewait">Een ogenblik geduld aub...</key>
     <key alias="previous">Vorige</key>
     <key alias="properties">Eigenschappen</key>
+    <key alias="readMore">Lees meer</key>
     <key alias="rebuild">Opnieuw opbouwen</key>
     <key alias="reciept">E-mail om formulier resultaten te ontvangen</key>
     <key alias="recycleBin">Prullenbak</key>
@@ -1251,6 +1256,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="rollbackTo">Terugzetten naar</key>
     <key alias="selectVersion">Selecteer versie</key>
     <key alias="view">Bekijk</key>
+    <key alias="pagination"><![CDATA[Toont versie %0% tot %1% van %2% versies]]></key>
+    <key alias="versions">Versies</key>
+    <key alias="currentDraftVersion">Conceptversie</key>
+    <key alias="currentPublishedVersion">Gepubliceerde versie</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Bewerk script-bestand</key>
@@ -1670,6 +1679,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       weggooien?
     </key>
     <key alias="addTab">Tabblad toevoegen</key>
+    <key alias="historyCleanupHeading">Geschiedenis opschonen</key>
+    <key alias="historyCleanupDescription">Overschrijf de standaard geschiedenis opschonen instellingen.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Bewaar alle versies nieuwer dan dagen</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Bewaar de laatste versie per dag voor dagen</key>
+    <key alias="historyCleanupPreventCleanup">Voorkom opschonen</key>
+    <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
@@ -1794,7 +1809,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="memberRoles">Rollen</key>
     <key alias="memberTypes">Ledentypes</key>
     <key alias="documentTypes">Documenttypes</key>
-    <key alias="relationTypes">RelatieTypen</key>
+    <key alias="relationTypes">Relatietypes</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="partialViews">Partial Views</key>
@@ -1832,9 +1847,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="changePassword">Verander je wachtwoord</key>
     <key alias="changePhoto">Wijzig je foto</key>
     <key alias="newPassword">Wijzig je wachtwoord</key>
+    <key alias="newPasswordFormatLengthTip">Nog minimaal %0% teken(s) te gaan!</key>
     <key alias="noLockouts">is niet gedeblokkeerd</key>
     <key alias="noPasswordChange">Het wachtwoord is niet gewijzigd</key>
-    <key alias="confirmNewPassword">Bevestig nieuw password</key>
+    <key alias="confirmNewPassword">Bevestig nieuw wachtwoord</key>
     <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en
       op de knop 'Verander wachtwoord' te klikken
     </key>
@@ -2206,6 +2222,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="noRelations">Geen relaties voor dit relatietype.</key>
     <key alias="tabRelationType">Relatietype</key>
     <key alias="tabRelations">Relaties</key>
+    <key alias="isDependency">Is Afhankelijkheid</key>
+    <key alias="dependency">Ja</key>
+    <key alias="noDependency">Nee</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Aan de slag</key>

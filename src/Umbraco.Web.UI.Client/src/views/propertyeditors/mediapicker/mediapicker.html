@@ -1,14 +1,14 @@
 <div class="umb-property-editor umb-mediapicker" ng-class="{'umb-mediapicker-multi':isMultiPicker, 'umb-mediapicker-single':!isMultiPicker}" ng-controller="Umbraco.PropertyEditors.MediaPickerController as vm">
 
-    <p ng-if="(vm.mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
-    <p ng-if="(vm.mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
+    <p ng-if="(vm.mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</localize></p>
+    <p ng-if="(vm.mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</localize></p>
 
     <div data-element="sortable-thumbnails" class="umb-sortable-thumbnails-container error">
         <ul ui-sortable="sortableOptions" ng-model="vm.mediaItems" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="media in vm.mediaItems track by $index">
 
                 <p class="label label__trashed" ng-if="media.trashed">
-                    <localize key="mediaPicker_trashed"></localize>
+                    <localize key="mediaPicker_trashed">Trashed</localize>
                     <umb-icon icon="icon-trash"></umb-icon>
                 </p>
 

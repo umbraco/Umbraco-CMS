@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {
             Formatting = Formatting.None,
-            NullValueHandling = NullValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         private const string ContentGuid1 = "036ce82586a64dfba2d523a99ed80f58";

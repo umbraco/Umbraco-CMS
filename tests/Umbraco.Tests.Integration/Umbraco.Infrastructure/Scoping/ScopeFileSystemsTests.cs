@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [Test]
         public void MediaFileManager_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
         {
-            string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
+            string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             MediaFileManager mediaFileManager = MediaFileManager;
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [Test]
         public void MediaFileManager_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
         {
-            string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
+            string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             MediaFileManager mediaFileManager = MediaFileManager;
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [Test]
         public void MultiThread()
         {
-            string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
+            string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             MediaFileManager mediaFileManager = MediaFileManager;

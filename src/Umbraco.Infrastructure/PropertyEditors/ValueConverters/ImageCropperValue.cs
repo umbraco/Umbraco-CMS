@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
@@ -20,14 +21,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     /// </summary>
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropperValue>))]
     [TypeConverter(typeof(ImageCropperValueTypeConverter))]
-    [DataContract(Name="imageCropDataSet")]
+    [DataContract(Name = "imageCropDataSet")]
     public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValue>
     {
         /// <summary>
         /// Gets or sets the value source image.
         /// </summary>
-        [DataMember(Name="src")]
-        public string Src { get; set;}
+        [DataMember(Name = "src")]
+        public string Src { get; set; }
 
         /// <summary>
         /// Gets or sets the value focal point.
@@ -43,9 +44,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override string ToString()
-        {
-            return Crops != null ? (Crops.Any() ? JsonConvert.SerializeObject(this) : Src) : string.Empty;
-        }
+            => HasCrops() || HasFocalPoint() ? JsonConvert.SerializeObject(this, Formatting.None) : Src;
 
         /// <inheritdoc />
         public string ToHtmlString() => Src;
@@ -122,13 +121,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// </summary>
         /// <returns></returns>
         public bool HasFocalPoint()
-            => FocalPoint != null && (FocalPoint.Left != 0.5m || FocalPoint.Top != 0.5m);
+            => FocalPoint is ImageCropperFocalPoint focalPoint && (focalPoint.Left != 0.5m || focalPoint.Top != 0.5m);
+
+        /// <summary>
+        /// Determines whether the value has crops.
+        /// </summary>
+        public bool HasCrops()
+            => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any();
 
         /// <summary>
         /// Determines whether the value has a specified crop.
         /// </summary>
         public bool HasCrop(string alias)
-            => Crops != null && Crops.Any(x => x.Alias == alias);
+            => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any(x => x.Alias == alias);
 
         /// <summary>
         /// Determines whether the value has a source image.
@@ -167,6 +172,49 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             };
         }
 
+        /// <summary>
+        /// Removes redundant crop data/default focal point.
+        /// </summary>
+        /// <param name="value">The image cropper value.</param>
+        public static void Prune(JObject value)
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (value.TryGetValue("crops", out var crops))
+            {
+                if (crops.HasValues)
+                {
+                    foreach (var crop in crops.Values<JObject>().ToList())
+                    {
+                        if (crop.TryGetValue("coordinates", out var coordinates) == false || coordinates.HasValues == false)
+                        {
+                            // Remove crop without coordinates
+                            crop.Remove();
+                            continue;
+                        }
+
+                        // Width/height are already stored in the crop configuration
+                        crop.Remove("width");
+                        crop.Remove("height");
+                    }
+                }
+
+                if (crops.HasValues == false)
+                {
+                    // Remove empty crops
+                    value.Remove("crops");
+                }
+            }
+
+            if (value.TryGetValue("focalPoint", out var focalPoint) &&
+                (focalPoint.HasValues == false || (focalPoint.Value<decimal>("top") == 0.5m && focalPoint.Value<decimal>("left") == 0.5m)))
+            {
+                // Remove empty/default focal point
+                value.Remove("focalPoint");
+            }
+        }
+
         #region IEquatable
 
         /// <inheritdoc />
@@ -200,8 +248,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 // properties are, practically, readonly
                 // ReSharper disable NonReadonlyMemberInGetHashCode
                 var hashCode = Src?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ (FocalPoint?.GetHashCode() ?? 0);
-                hashCode = (hashCode*397) ^ (Crops?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (FocalPoint?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Crops?.GetHashCode() ?? 0);
                 return hashCode;
                 // ReSharper restore NonReadonlyMemberInGetHashCode
             }
@@ -246,7 +294,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 {
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
-                    return (Left.GetHashCode()*397) ^ Top.GetHashCode();
+                    return (Left.GetHashCode() * 397) ^ Top.GetHashCode();
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }
             }
@@ -300,9 +348,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
                     var hashCode = Alias?.GetHashCode() ?? 0;
-                    hashCode = (hashCode*397) ^ Width;
-                    hashCode = (hashCode*397) ^ Height;
-                    hashCode = (hashCode*397) ^ (Coordinates?.GetHashCode() ?? 0);
+                    hashCode = (hashCode * 397) ^ Width;
+                    hashCode = (hashCode * 397) ^ Height;
+                    hashCode = (hashCode * 397) ^ (Coordinates?.GetHashCode() ?? 0);
                     return hashCode;
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }
@@ -357,9 +405,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
                     var hashCode = X1.GetHashCode();
-                    hashCode = (hashCode*397) ^ Y1.GetHashCode();
-                    hashCode = (hashCode*397) ^ X2.GetHashCode();
-                    hashCode = (hashCode*397) ^ Y2.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Y1.GetHashCode();
+                    hashCode = (hashCode * 397) ^ X2.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Y2.GetHashCode();
                     return hashCode;
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }

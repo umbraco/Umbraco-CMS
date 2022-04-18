@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -37,7 +38,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
             serviceCollection
                 .AddLogging()
                 .AddAuthentication()
-                .AddCookie(IdentityConstants.ApplicationScheme);
+                .AddCookie(IdentityConstants.ApplicationScheme)
+                .AddCookie(IdentityConstants.ExternalScheme, o =>
+                {
+                    o.Cookie.Name = IdentityConstants.ExternalScheme;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
+                .AddCookie(IdentityConstants.TwoFactorUserIdScheme, o =>
+                {
+                    o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
+                .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
+                {
+                    o.Cookie.Name = IdentityConstants.TwoFactorRememberMeScheme;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                });
             IServiceProvider serviceProvider = serviceProviderFactory.CreateServiceProvider(serviceCollection);
             var httpContextFactory = new DefaultHttpContextFactory(serviceProvider);
             IFeatureCollection features = new DefaultHttpContext().Features;
@@ -55,7 +71,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                     Mock.Of<IOptions<IdentityOptions>>(),
                     _mockLogger.Object,
                     Mock.Of<IAuthenticationSchemeProvider>(),
-                    Mock.Of<IUserConfirmation<MemberIdentityUser>>());
+                    Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
+                    Mock.Of<IMemberExternalLoginProviders>(),
+                    Mock.Of<IEventAggregator>()
+                    );
         }
         private static Mock<MemberManager> MockMemberManager()
             => new Mock<MemberManager>(

@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29209.152
@@ -16,7 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-1
 	ProjectSection(SolutionItems) = preProject
 		.github\BUILD.md = .github\BUILD.md
 		.github\CLEAR.md = .github\CLEAR.md
-		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\CONTRIBUTING_DETAILED.md = .github\CONTRIBUTING_DETAILED.md
 		.github\CONTRIBUTION_GUIDELINES.md = .github\CONTRIBUTION_GUIDELINES.md
@@ -38,7 +36,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_3961"
 		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Client\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3961\"
@@ -61,7 +59,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
 		Debug.AspNetCompiler.PhysicalPath = "tests\Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"

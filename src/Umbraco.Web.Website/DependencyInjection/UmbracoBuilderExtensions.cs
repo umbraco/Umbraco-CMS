@@ -18,7 +18,7 @@ namespace Umbraco.Extensions
     /// <summary>
     /// <see cref="IUmbracoBuilder"/> extensions for umbraco front-end website
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Add services for the umbraco front-end website

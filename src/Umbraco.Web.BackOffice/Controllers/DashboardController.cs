@@ -1,25 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -40,10 +46,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IOptions<ContentDashboardSettings> _dashboardSettings;
+        private readonly ISiteIdentifierService _siteIdentifierService;
+        private readonly ContentDashboardSettings _dashboardSettings;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
+        [ActivatorUtilitiesConstructor]
         public DashboardController(
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             AppCaches appCaches,
@@ -51,7 +60,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentDashboardSettings> dashboardSettings)
+            IOptions<ContentDashboardSettings> dashboardSettings,
+            ISiteIdentifierService siteIdentifierService)
 
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -60,12 +70,36 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;
             _shortStringHelper = shortStringHelper;
-            _dashboardSettings = dashboardSettings;
+            _siteIdentifierService = siteIdentifierService;
+            _dashboardSettings = dashboardSettings.Value;
+        }
+
+
+        [Obsolete("Use the constructor that accepts ISiteIdentifierService")]
+        public DashboardController(
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            AppCaches appCaches,
+            ILogger<DashboardController> logger,
+            IDashboardService dashboardService,
+            IUmbracoVersion umbracoVersion,
+            IShortStringHelper shortStringHelper,
+            IOptions<ContentDashboardSettings> dashboardSettings)
+        : this(
+            backOfficeSecurityAccessor,
+            appCaches,
+            logger,
+            dashboardService,
+            umbracoVersion,
+            shortStringHelper,
+            dashboardSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
+        {
         }
 
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
 
+        // TODO(V10) : change return type to Task<ActionResult<JObject>> and consider removing baseUrl as parameter
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
@@ -75,15 +109,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var language = user.Language;
             var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
             var isAdmin = user.IsAdmin();
+            _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
 
-            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
+            if (!IsAllowedUrl(baseUrl))
+            {
+                _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}");
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+                // Hacking the response - can't set the HttpContext.Response.Body, so instead returning the error as JSON
+                var errorJson = JsonConvert.SerializeObject(new { Error = "Dashboard source not permitted" });
+                return JObject.Parse(errorJson);
+            }
+
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteid={7}",
                 baseUrl,
-                _dashboardSettings.Value.ContentDashboardPath,
+                _dashboardSettings.ContentDashboardPath,
                 section,
                 allowedSections,
                 language,
                 version,
-                isAdmin);
+                isAdmin,
+                siteIdentifier);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = _appCaches.RuntimeCache.GetCacheItem<JObject>(key);
@@ -116,8 +162,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return result;
         }
 
+        // TODO(V10) : consider removing baseUrl as parameter
         public async Task<IActionResult> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
+            if (!IsAllowedUrl(baseUrl))
+            {
+                _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}");
+                return BadRequest("Dashboard source not permitted");
+            }
+
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umbraco-dynamic-dashboard-css-" + section;
 
@@ -152,12 +205,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
 
-            return Content(result,"text/css", Encoding.UTF8);
+            return Content(result, "text/css", Encoding.UTF8);
 
         }
 
         public async Task<IActionResult> GetRemoteXml(string site, string url)
         {
+            if (!IsAllowedUrl(url))
+            {
+                _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {url}");
+                return BadRequest("Dashboard source not permitted");
+            }
+
             // This is used in place of the old feedproxy.config
             // Which was used to grab data from our.umbraco.com, umbraco.com or umbraco.tv
             // for certain dashboards or the help drawer
@@ -214,7 +273,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            return Content(result,"text/xml", Encoding.UTF8);
+            return Content(result, "text/xml", Encoding.UTF8);
 
         }
 
@@ -239,6 +298,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     View = y.View
                 })
             }).ToList();
+        }
+
+        // Checks if the passed URL is part of the configured allowlist of addresses
+        private bool IsAllowedUrl(string url)
+        {
+            // No addresses specified indicates that any URL is allowed
+            if (_dashboardSettings.ContentDashboardUrlAllowlist is null || _dashboardSettings.ContentDashboardUrlAllowlist.Contains(url, StringComparer.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

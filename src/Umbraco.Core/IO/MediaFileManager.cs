@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -22,13 +21,22 @@ namespace Umbraco.Cms.Core.IO
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IServiceProvider _serviceProvider;
         private MediaUrlGeneratorCollection _mediaUrlGenerators;
-        private readonly ContentSettings _contentSettings;
 
-        /// <summary>
-        /// Gets the media filesystem.
-        /// </summary>
-        public IFileSystem FileSystem { get; }
+        public MediaFileManager(
+            IFileSystem fileSystem,
+            IMediaPathScheme mediaPathScheme,
+            ILogger<MediaFileManager> logger,
+            IShortStringHelper shortStringHelper,
+            IServiceProvider serviceProvider)
+        {
+            _mediaPathScheme = mediaPathScheme;
+            _logger = logger;
+            _shortStringHelper = shortStringHelper;
+            _serviceProvider = serviceProvider;
+            FileSystem = fileSystem;
+        }
 
+        [Obsolete("Use the ctr that doesn't include unused parameters.")]
         public MediaFileManager(
             IFileSystem fileSystem,
             IMediaPathScheme mediaPathScheme,
@@ -36,14 +44,13 @@ namespace Umbraco.Cms.Core.IO
             IShortStringHelper shortStringHelper,
             IServiceProvider serviceProvider,
             IOptions<ContentSettings> contentSettings)
-        {
-            _mediaPathScheme = mediaPathScheme;
-            _logger = logger;
-            _shortStringHelper = shortStringHelper;
-            _serviceProvider = serviceProvider;
-            _contentSettings = contentSettings.Value;
-            FileSystem = fileSystem;
-        }
+            : this(fileSystem, mediaPathScheme, logger, shortStringHelper, serviceProvider)
+        { }
+
+        /// <summary>
+        /// Gets the media filesystem.
+        /// </summary>
+        public IFileSystem FileSystem { get; }
 
         /// <summary>
         /// Delete media files.

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
@@ -30,6 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly ILogger<RuntimeState> _logger;
         private readonly PendingPackageMigrations _packageMigrationState;
         private readonly Dictionary<string, object> _startupState = new Dictionary<string, object>();
+        private readonly IConflictingRouteService _conflictingRouteService;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -41,16 +44,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
-        /// </summary>
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
             IOptions<UnattendedSettings> unattendedSettings,
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            PendingPackageMigrations packageMigrationState)
+            PendingPackageMigrations packageMigrationState,
+            IConflictingRouteService conflictingRouteService)
         {
             _globalSettings = globalSettings;
             _unattendedSettings = unattendedSettings;
@@ -58,8 +59,30 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _databaseFactory = databaseFactory;
             _logger = logger;
             _packageMigrationState = packageMigrationState;
+            _conflictingRouteService = conflictingRouteService;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
+        /// </summary>
+        [Obsolete("use ctor with all params")]
+        public RuntimeState(
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoDatabaseFactory databaseFactory,
+            ILogger<RuntimeState> logger,
+            PendingPackageMigrations packageMigrationState)
+            : this(
+                globalSettings,
+                unattendedSettings,
+                umbracoVersion,
+                databaseFactory,
+                logger,
+                packageMigrationState,
+                StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
+        {
+        }
 
         /// <inheritdoc />
         public Version Version => _umbracoVersion.Version;
@@ -98,6 +121,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 _logger.LogDebug("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
+                return;
+            }
+
+            // Check if we have multiple controllers with the same name.
+            if (_conflictingRouteService.HasConflictingRoutes(out string controllerName))
+            {
+                Level = RuntimeLevel.BootFailed;
+                Reason = RuntimeLevelReason.BootFailedOnException;
+                BootFailedException = new BootFailedException($"Conflicting routes, you cannot have multiple controllers with the same name: {controllerName}");
+
                 return;
             }
 

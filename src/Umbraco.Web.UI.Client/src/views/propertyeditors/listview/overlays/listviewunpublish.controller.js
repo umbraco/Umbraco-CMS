@@ -5,6 +5,7 @@
 
         var vm = this;
         vm.loading = true;
+        vm.warningText = null;
 
         vm.changeSelection = changeSelection;
         
@@ -29,7 +30,9 @@
 
         function onInit() {
 
+            vm.selection = $scope.model.selection;
             vm.languages = $scope.model.languages;
+            $scope.model.hideSubmitButton = true;
 
             if (!$scope.model.title) {
                 localizationService.localize("content_unpublish").then(function (value) {
@@ -64,6 +67,26 @@
 
             vm.loading = false;
         }
+
+        vm.checkingReferencesComplete = () => {
+            $scope.model.hideSubmitButton = false;
+        };
+
+        vm.onReferencesWarning = () => {
+            $scope.model.submitButtonStyle = "danger";
+          
+            // check if the unpublishing of items that have references has been disabled
+            if (Umbraco.Sys.ServerVariables.umbracoSettings.disableUnpublishWhenReferenced) {
+                // this will only be disabled if we have a warning, indicating that this item or its descendants have reference
+                $scope.model.disableSubmitButton = true;
+            }
+
+            localizationService.localize("content_unpublish").then(function (action) {
+                localizationService.localize("references_listViewDialogWarning", [action.toLowerCase()]).then((value) => {
+                    vm.warningText = value;
+                });
+            });
+        };
 
         onInit();
 

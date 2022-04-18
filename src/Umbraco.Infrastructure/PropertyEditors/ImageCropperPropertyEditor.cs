@@ -208,10 +208,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         continue;
                     }
+
                     var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(src);
                     var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
                     jo["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
-                    notification.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
+                    notification.Copy.SetValue(property.Alias, jo.ToString(Formatting.None), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
@@ -272,17 +273,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             // it can happen when an image is uploaded via the folder browser, in which case
                             // the property value will be the file source eg '/media/23454/hello.jpg' and we
                             // are fixing that anomaly here - does not make any sense at all but... bah...
-
-                            var dt = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-                            var config = dt?.ConfigurationAs<ImageCropperConfiguration>();
                             src = svalue;
-                            var json = new
-                            {
-                                src = svalue,
-                                crops = config == null ? Array.Empty<ImageCropperConfiguration.Crop>() : config.Crops
-                            };
 
-                            property.SetValue(JsonConvert.SerializeObject(json), pvalue.Culture, pvalue.Segment);
+                            property.SetValue(JsonConvert.SerializeObject(new { src = svalue }, Formatting.None), pvalue.Culture, pvalue.Segment);
                         }
                         else
                         {

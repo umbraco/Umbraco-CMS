@@ -33,7 +33,7 @@
             $rootScope.lastKnownFocusableElements.push(document.activeElement);
 
             // List of elements that can be focusable within the focus lock
-            var focusableElementsSelector = '[role="button"], a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
+            var focusableElementsSelector = '[role="button"], a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide):not([type="hidden"]), select:not([disabled]):not(.ng-hide)';
 
             function getDomNodes(){
                 infiniteEditorsWrapper = document.querySelector('.umb-editors');
@@ -123,7 +123,15 @@
                     lastKnownElement.focus();
                 }
                 else if(defaultFocusedElement === null ){
-                    firstFocusableElement.focus();
+                    // If the first focusable elements are either items from the umb-sub-views-nav menu or the umb-button-ellipsis we most likely want to start the focus on the second item
+                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action') || elm.classList.contains('umb-tab-button'));
+
+                    if(avoidStartElm === 0) {
+                        focusableElements[1].focus();
+                    }
+                    else {
+                        firstFocusableElement.focus();
+                    }
                 }
                 else {
                     defaultFocusedElement.focus();
@@ -175,34 +183,27 @@
             }
 
             function onInit(targetElm) {
-
                 $timeout(() => {
+                        // Fetch the DOM nodes we need
+                        getDomNodes();
 
-                    // Fetch the DOM nodes we need
-                    getDomNodes();
+                        cleanupEventHandlers();
 
-                    cleanupEventHandlers();
+                        getFocusableElements(targetElm);
 
-                    getFocusableElements(targetElm);
+                        if(focusableElements.length > 0) {
 
-                    if(focusableElements.length > 0) {
+                            observeDomChanges();
 
-                        observeDomChanges();
+                            setElementFocus();
 
-                        setElementFocus();
-
-                        //  Handle keydown
-                        target.addEventListener('keydown', handleKeydown);
-                    }
-
-                });
+                            //  Handle keydown
+                            target.addEventListener('keydown', handleKeydown);
+                        }
+                }, 500);
             }
 
-            scope.$on('$includeContentLoaded', () => {
-                angularHelper.safeApply(scope, () => {
-                    onInit();
-                });
-            });
+            onInit();
 
             // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
@@ -243,6 +244,3 @@
     angular.module('umbraco.directives').directive('umbFocusLock', FocusLock);
 
 })();
-
-
-// TODO: Ensure the domObserver is NOT started when there is only one infinite overlay and it's being destroyed!

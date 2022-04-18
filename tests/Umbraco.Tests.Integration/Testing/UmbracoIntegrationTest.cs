@@ -201,6 +201,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
+            // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
+            services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
+
             // Add it!
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
             TypeLoader typeLoader = services.AddTypeLoader(

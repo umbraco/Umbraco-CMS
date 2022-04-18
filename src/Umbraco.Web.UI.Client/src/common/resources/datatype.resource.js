@@ -23,7 +23,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *    });
          * </pre>
          *
-         * @param {String} editorAlias string alias of editor type to retrive prevalues configuration for
+         * @param {String} editorAlias string alias of editor type to retrieve prevalues configuration for
          * @param {Int} id id of datatype to retrieve prevalues for
          * @returns {Promise} resourcePromise object.
          *

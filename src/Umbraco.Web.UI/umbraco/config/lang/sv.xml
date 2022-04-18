@@ -8,7 +8,7 @@
     <key alias="umbContent">Innehåll</key>
   </area>
   <area alias="actions">
-    <key alias="assignDomain">Hantera domännamn</key>
+    <key alias="assigndomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
     <key alias="browse">Surfa på sidan</key>
     <key alias="changeDocType">Ändra dokumenttyp</key>
@@ -20,7 +20,7 @@
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
-    <key alias="emptyRecycleBin">Töm papperskorgen</key>
+    <key alias="emptyrecyclebin">Töm papperskorgen</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
     <key alias="importdocumenttype">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>

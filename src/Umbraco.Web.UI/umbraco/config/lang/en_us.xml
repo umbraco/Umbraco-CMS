@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture and Hostnames</key>
+    <key alias="assigndomain">Culture and Hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
@@ -18,7 +18,7 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Empty recycle bin</key>
+    <key alias="emptyrecyclebin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importdocumenttype">Import Document Type</key>
@@ -82,6 +82,7 @@
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
+    <key alias="notify">Allow access to setup notifications for content nodes</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Content</key>
@@ -260,7 +261,7 @@
     <key alias="captionTextOptional">Caption (optional)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
-    <key alias="unpublished">Draft</key>
+    <key alias="unpublished">Unpublished</key>
     <key alias="notCreated">Not created</key>
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
@@ -334,6 +335,7 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
     <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
@@ -573,8 +575,12 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
+    <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
@@ -805,6 +811,7 @@
     <key alias="new">New</key>
     <key alias="next">Next</key>
     <key alias="no">No</key>
+    <key alias="nodeName">Node Name</key>
     <key alias="of">of</key>
     <key alias="off">Off</key>
     <key alias="ok">OK</key>
@@ -845,6 +852,7 @@
     <key alias="submit">Submit</key>
     <key alias="success">Success</key>
     <key alias="type">Type</key>
+    <key alias="typeName">Type Name</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="under">under</key>
     <key alias="up">Up</key>
@@ -1307,6 +1315,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoResultsDescription">Please try searching for another package or browse through the categories
     </key>
     <key alias="packagesPopular">Popular</key>
+    <key alias="packagesPromoted">Promoted</key>
     <key alias="packagesNew">New releases</key>
     <key alias="packageHas">has</key>
     <key alias="packageKarmaPoints">karma points</key>
@@ -1487,6 +1496,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
     <key alias="umbracoForum">Visit our.umbraco.com</key>
     <key alias="umbracoTv">Visit umbraco.tv</key>
+    <key alias="umbracoLearningBase">Watch our free tutorial videos</key>
+    <key alias="umbracoLearningBaseDescription">on the Umbraco Learning Base</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -1528,6 +1539,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
+    <key alias="folderUploadNotAllowed">This file is being uploaded as part of a folder, but creating a new folder is not allowed here</key>
+    <key alias="folderCreationNotAllowed">Creating a new folder is not allowed here</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
@@ -1545,8 +1558,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="editContentPublishedText">and is visible on the website</key>
     <key alias="editMultiContentPublishedText">%0% documents published and visible on the website</key>
     <key alias="editVariantPublishedText">%0% published and visible on the website</key>
-    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website
-    </key>
+    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website</key>
+    <key alias="editBlueprintSavedHeader">Content Template saved</key>
+    <key alias="editBlueprintSavedText">Changes have been successfully saved</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>
@@ -1626,7 +1640,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
     <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
     <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
-    <key alias="cannotCopyInformation">Could not copy your system information to the clipboard</key>    
+    <key alias="cannotCopyInformation">Could not copy your system information to the clipboard</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
@@ -1903,7 +1917,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled">History cleanup is disabled globally, these settings will not take effect until it is enabled.</key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2369,6 +2383,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
+    <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is set to <strong>%0%</strong>.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultFalse">The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set.</key>
     <key alias="clickJackingCheckHeaderFound">
       <![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
     <key alias="clickJackingCheckHeaderNotFound">
@@ -2460,6 +2476,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="parent">Parent</key>
     <key alias="child">Child</key>
     <key alias="count">Count</key>
+    <key alias="relation">Relation</key>
     <key alias="relations">Relations</key>
     <key alias="created">Created</key>
     <key alias="comment">Comment</key>
@@ -2467,6 +2484,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noRelations">No relations for this Relation Type</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
+    <key alias="isDependency">Is Dependency</key>
+    <key alias="dependency">Yes</key>
+    <key alias="noDependency">No</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Getting Started</key>
@@ -2537,13 +2557,20 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="references">
     <key alias="tabName">References</key>
     <key alias="DataTypeNoReferences">This Data Type has no references.</key>
-    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
-    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
-    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
-    <key alias="usedByProperties">Used by</key>
-    <key alias="labelUsedByDocuments">Used in Documents</key>
-    <key alias="labelUsedByMembers">Used in Members</key>
-    <key alias="labelUsedByMedia">Used in Media</key>
+    <key alias="itemHasNoReferences">This item has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Referenced by the following Document Types</key>
+    <key alias="labelUsedByMediaTypes">Referenced by the following Media Types</key>
+    <key alias="labelUsedByMemberTypes">Referenced by the following Member Types</key>
+    <key alias="usedByProperties">Referenced by</key>
+    <key alias="labelUsedByItems">Referenced by the following items</key>
+    <key alias="labelDependsOnThis">The following items depend on this</key>
+    <key alias="labelUsedItems">The following items are referenced</key>
+    <key alias="labelUsedDescendants">The following descendant items have dependencies</key>
+    <key alias="labelDependentDescendants">The following descending items have dependencies</key>
+    <key alias="deleteWarning">This item or its descendants is being referenced. Deletion can lead to broken links on your website.</key>
+    <key alias="unpublishWarning">This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.</key>
+    <key alias="deleteDisabledWarning">This item or its descendants is being referenced. Therefore, deletion has been disabled.</key>
+    <key alias="listViewDialogWarning">The following items you are trying to %0% are referenced by other content.</key>
   </area>
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Delete Saved Search</key>
@@ -2697,9 +2724,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
             Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
         ]]>
     </key>
-    <key alias="bulletPointThree">
+    <key alias="bulletPointTutorials">
       <![CDATA[
-            Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutorial videos</a> (some are free, some require a subscription)
+            Watch our free <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>
         ]]>
     </key>
     <key alias="bulletPointFour">
@@ -2735,7 +2762,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
-    <key alias="headlineEditorAppearance">Editor apperance</key>
+    <key alias="headlineEditorAppearance">Editor appearance</key>
     <key alias="headlineDataModels">Data models</key>
     <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
     <key alias="labelBackgroundColor">Background color</key>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -59,14 +59,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             var json = editorValue.Value as JArray;
-            if (json == null)
+            if (json == null || json.HasValues == false)
             {
                 return null;
             }
 
             var values = json.Select(item => item.Value<string>()).ToArray();
+            if (values.Length == 0)
+            {
+                return null;
+            }
 
-            return JsonConvert.SerializeObject(values);
+            return JsonConvert.SerializeObject(values, Formatting.None);
         }
     }
 }

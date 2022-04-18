@@ -34,6 +34,12 @@ namespace Umbraco.Cms.Core.Security
                 return result;
             }
 
+            if(Guid.TryParse(userId, out var key))
+            {
+                // Reverse the IntExtensions.ToGuid
+                return BitConverter.ToInt32(key.ToByteArray(), 0);
+            }
+
             throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
         }
 

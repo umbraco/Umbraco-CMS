@@ -1,9 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Extensions
@@ -106,6 +110,52 @@ namespace Umbraco.Extensions
 
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Gets the application URI, will use the one specified in settings if present
+        /// </summary>
+        public static Uri GetApplicationUri(this HttpRequest request, WebRoutingSettings routingSettings)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            if (routingSettings == null)
+            {
+                throw new ArgumentNullException(nameof(routingSettings));
+            }
+
+            if (string.IsNullOrEmpty(routingSettings.UmbracoApplicationUrl))
+            {
+                var requestUri = new Uri(request.GetDisplayUrl());
+
+                // Create a new URI with the relative uri as /, this ensures that only the base path is returned.
+                return new Uri(requestUri, "/");
+            }
+
+            return new Uri(routingSettings.UmbracoApplicationUrl);
+        }
+
+        /// <summary>
+        /// Gets the Umbraco `ufprt` encrypted string from the current request
+        /// </summary>
+        /// <param name="request">The current request</param>
+        /// <returns>The extracted `ufprt` token.</returns>
+        public static string GetUfprt(this HttpRequest request)
+        {
+            if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal) && formVal != StringValues.Empty)
+            {
+                return formVal.ToString();
+            }
+
+            if (request.Query.TryGetValue("ufprt", out StringValues queryVal) && queryVal != StringValues.Empty)
+            {
+                return queryVal.ToString();
+            }
+
+            return null;
         }
     }
 }

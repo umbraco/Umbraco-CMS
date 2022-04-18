@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Runtime
 
                 if (_isMainDom.HasValue == false)
                 {
-                    throw new InvalidOperationException("Register called when MainDom has not been acquired");
+                    throw new InvalidOperationException("Register called before IsMainDom has been established");
                 }
                 else if (_isMainDom == false)
                 {
@@ -154,11 +154,11 @@ namespace Umbraco.Cms.Core.Runtime
             // the handler is not installed so that would be the hosting environment
             if (_signaled)
             {
-                _logger.LogInformation("Cannot acquire (signaled).");
+                _logger.LogInformation("Cannot acquire MainDom (signaled).");
                 return false;
             }
 
-            _logger.LogInformation("Acquiring.");
+            _logger.LogInformation("Acquiring MainDom.");
 
             // Get the lock
             var acquired = false;
@@ -168,12 +168,12 @@ namespace Umbraco.Cms.Core.Runtime
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while acquiring");
+                _logger.LogError(ex, "Error while acquiring MainDom");
             }
 
             if (!acquired)
             {
-                _logger.LogInformation("Cannot acquire (timeout).");
+                _logger.LogInformation("Cannot acquire MainDom (timeout).");
 
                 // In previous versions we'd let a TimeoutException be thrown
                 // and the appdomain would not start. We have the opportunity to allow it to
@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Core.Runtime
                 _logger.LogWarning(ex, ex.Message);
             }
 
-            _logger.LogInformation("Acquired.");
+            _logger.LogInformation("Acquired MainDom.");
             return true;
         }
 
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 if (!_isMainDom.HasValue)
                 {
-                    throw new InvalidOperationException("MainDom has not been acquired yet");
+                    throw new InvalidOperationException("IsMainDom has not been established yet");
                 }
                 return _isMainDom.Value;
             }

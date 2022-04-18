@@ -33,18 +33,13 @@
                </div>
 
                <div class="list-view-layout__action">
-                   <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
+                    <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
 
-                   <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
-                       <button type="button" class="btn-icon" ng-click="vm.showPrompt(layout)" aria-label="Remove">
-                           <umb-icon icon="icon-trash"></umb-icon>
-                       </button>
-                       <umb-confirm-action ng-if="layout.deletePrompt"
-                                           direction="left"
-                                           on-confirm="vm.removeLayout($index, layout)"
-                                           on-cancel="vm.hidePrompt(layout)">
-                       </umb-confirm-action>
-                   </div>
+                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
+                        <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.removeLayout(layout, $index, $event)">
+                           <localize key="general_remove">Remove</localize>
+                        </button>
+                    </div>
                </div>
 
            </div>

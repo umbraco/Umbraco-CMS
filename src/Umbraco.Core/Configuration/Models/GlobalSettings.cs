@@ -29,23 +29,22 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
         internal const string StaticSqlWriteLockTimeOut = "00:00:05";
         internal const bool StaticSanitizeTinyMce = false;
+        internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
         /// <summary>
-        /// Gets or sets a value for the reserved URLs.
-        /// It must end with a comma
+        /// Gets or sets a value for the reserved URLs (must end with a comma).
         /// </summary>
         [DefaultValue(StaticReservedUrls)]
         public string ReservedUrls { get; set; } = StaticReservedUrls;
 
         /// <summary>
-        /// Gets or sets a value for the reserved paths.
-        /// It must end with a comma
+        /// Gets or sets a value for the reserved paths (must end with a comma).
         /// </summary>
         [DefaultValue(StaticReservedPaths)]
         public string ReservedPaths { get; set; } = StaticReservedPaths;
 
         /// <summary>
-        /// Gets or sets a value for the timeout
+        /// Gets or sets a value for the back-office login timeout.
         /// </summary>
         [DefaultValue(StaticTimeOut)]
         public TimeSpan TimeOut { get; set; } = TimeSpan.Parse(StaticTimeOut);
@@ -104,10 +103,18 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string UmbracoScriptsPath { get; set; } = StaticUmbracoScriptsPath;
 
         /// <summary>
-        /// Gets or sets a value for the Umbraco media path.
+        /// Gets or sets a value for the Umbraco media request path.
         /// </summary>
         [DefaultValue(StaticUmbracoMediaPath)]
         public string UmbracoMediaPath { get; set; } = StaticUmbracoMediaPath;
+
+        /// <summary>
+        /// Gets or sets a value for the physical Umbraco media root path (falls back to <see cref="UmbracoMediaPath" /> when empty).
+        /// </summary>
+        /// <remarks>
+        /// If the value is a virtual path, it's resolved relative to the webroot.
+        /// </remarks>
+        public string UmbracoMediaPhysicalRootPath { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.
@@ -130,6 +137,30 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the main dom lock.
         /// </summary>
         public string MainDomLock { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value to discriminate MainDom boundaries.
+        /// <para>
+        /// Generally the default should suffice but useful for advanced scenarios e.g. azure deployment slot based zero downtime deployments.
+        /// </para>
+        /// </summary>
+        public string MainDomKeyDiscriminator { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the duration (in milliseconds) for which the MainDomLock release signal polling task should sleep.
+        /// </summary>
+        /// <remarks>
+        /// Doesn't apply to MainDomSemaphoreLock.
+        /// <para>
+        ///  The default value is 2000ms.
+        /// </para>
+        /// </remarks>
+        [DefaultValue(StaticMainDomReleaseSignalPollingInterval)]
+        public int MainDomReleaseSignalPollingInterval { get; set; } = StaticMainDomReleaseSignalPollingInterval;
+
+        /// <summary>
+        /// Gets or sets the telemetry ID.
+        /// </summary>
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
@@ -163,19 +194,19 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
 
-        /// Gets a value indicating whether TinyMCE scripting sanitization should be applied
+        /// <summary>
+        /// Gets or sets a value indicating whether TinyMCE scripting sanitization should be applied.
         /// </summary>
         [DefaultValue(StaticSanitizeTinyMce)]
-        public bool SanitizeTinyMce => StaticSanitizeTinyMce;
+        public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
         /// <summary>
         /// An int value representing the time in milliseconds to lock the database for a write operation
         /// </summary>
         /// <remarks>
-        /// The default value is 5000 milliseconds
+        /// The default value is 5000 milliseconds.
         /// </remarks>
-        /// <value>The timeout in milliseconds.</value>
         [DefaultValue(StaticSqlWriteLockTimeOut)]
-        public TimeSpan SqlWriteLockTimeOut { get; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
+        public TimeSpan SqlWriteLockTimeOut { get; set; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
     }
 }

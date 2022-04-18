@@ -1,14 +1,20 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
@@ -20,7 +26,29 @@ namespace Umbraco.Cms.Web.Website.Controllers
     public class UmbLoginController : SurfaceController
     {
         private readonly IMemberSignInManager _signInManager;
+        private readonly IMemberManager _memberManager;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
 
+
+        [ActivatorUtilitiesConstructor]
+        public UmbLoginController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMemberSignInManager signInManager,
+            IMemberManager memberManager,
+            ITwoFactorLoginService twoFactorLoginService)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+        {
+            _signInManager = signInManager;
+            _memberManager = memberManager;
+            _twoFactorLoginService = twoFactorLoginService;
+        }
+
+        [Obsolete("Use ctor with all params")]
         public UmbLoginController(
             IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory,
@@ -29,9 +57,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
             IMemberSignInManager signInManager)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+            : this(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider, signInManager,
+                StaticServiceProvider.Instance.GetRequiredService<IMemberManager>(),
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
         {
-            _signInManager = signInManager;
+
         }
 
         [HttpPost]
@@ -74,15 +104,28 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
             if (result.RequiresTwoFactor)
             {
-                throw new NotImplementedException("Two factor support is not supported for Umbraco members yet");
+                MemberIdentityUser attemptedUser = await _memberManager.FindByNameAsync(model.Username);
+                if (attemptedUser == null)
+                {
+                    return new ValidationErrorResult(
+                        $"No local member found for username {model.Username}");
+                }
+
+                var providerNames = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(attemptedUser.Key);
+                ViewData.SetTwoFactorProviderNames(providerNames);
             }
-
-            // TODO: We can check for these and respond differently if we think it's important
-            //  result.IsLockedOut
-            //  result.IsNotAllowed
-
-            // Don't add a field level error, just model level.
-            ModelState.AddModelError("loginModel", "Invalid username or password");
+            else if (result.IsLockedOut)
+            {
+                ModelState.AddModelError("loginModel", "Member is locked out");
+            }
+            else if (result.IsNotAllowed)
+            {
+                ModelState.AddModelError("loginModel", "Member is not allowed");
+            }
+            else
+            {
+                ModelState.AddModelError("loginModel", "Invalid username or password");
+            }
             return CurrentUmbracoPage();
         }
 
@@ -97,5 +140,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 model.RedirectUrl = redirectUrl.ToString();
             }
         }
+
+
     }
 }

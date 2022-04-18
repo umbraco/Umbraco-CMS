@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigSecurity)]
     public class SecuritySettings
     {
+        internal const bool StaticMemberBypassTwoFactorForExternalLogins = true;
+        internal const bool StaticUserBypassTwoFactorForExternalLogins = true;
         internal const bool StaticKeepUserLoggedIn = false;
         internal const bool StaticHideDisabledUsersInBackOffice = false;
         internal const bool StaticAllowPasswordReset = true;
@@ -66,5 +68,17 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the member password settings.
         /// </summary>
         public MemberPasswordConfigurationSettings MemberPassword { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login for members. Thereby rely on the External login and potential 2FA at that provider.
+        /// </summary>
+        [DefaultValue(StaticMemberBypassTwoFactorForExternalLogins)]
+        public bool MemberBypassTwoFactorForExternalLogins { get; set; } = StaticMemberBypassTwoFactorForExternalLogins;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login for users. Thereby rely on the External login and potential 2FA at that provider.
+        /// </summary>
+        [DefaultValue(StaticUserBypassTwoFactorForExternalLogins)]
+        public bool UserBypassTwoFactorForExternalLogins { get; set; } = StaticUserBypassTwoFactorForExternalLogins;
     }
 }

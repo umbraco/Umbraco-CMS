@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Angi domene</key>
+    <key alias="assigndomain">Angi domene</key>
     <key alias="auditTrail">Revisjoner</key>
     <key alias="browse">Bla gjennom</key>
     <key alias="changeDocType">Skift dokumenttype</key>
@@ -14,7 +14,7 @@
     <key alias="createPackage">Opprett pakke</key>
     <key alias="delete">Slett</key>
     <key alias="disable">Deaktiver</key>
-    <key alias="emptyRecycleBin">Tøm papirkurv</key>
+    <key alias="emptyrecyclebin">Tøm papirkurv</key>
     <key alias="exportDocumentType">Eksporter dokumenttype</key>
     <key alias="importdocumenttype">Importer dokumenttype</key>
     <key alias="importPackage">Importer pakke</key>

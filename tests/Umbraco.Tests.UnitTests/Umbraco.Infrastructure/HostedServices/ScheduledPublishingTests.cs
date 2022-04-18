@@ -2,12 +2,15 @@
 // See LICENSE for more details.
 
 using System;
+using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -108,6 +111,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockServerMessenger = new Mock<IServerMessenger>();
 
+            var mockScopeProvider = new Mock<IScopeProvider>();
+            mockScopeProvider
+                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Returns(Mock.Of<IScope>());
+
             return new ScheduledPublishing(
                 mockRunTimeState.Object,
                 mockMainDom.Object,
@@ -115,7 +123,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 _mockContentService.Object,
                 mockUmbracoContextFactory.Object,
                 _mockLogger.Object,
-                mockServerMessenger.Object);
+                mockServerMessenger.Object,
+                mockScopeProvider.Object);
         }
 
         private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

@@ -11,7 +11,7 @@
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-
+        vm.initialState = {};
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
@@ -44,6 +44,21 @@
               assignGroupPermissions(group);
             }
           });
+          vm.initialState = angular.copy(userGroups);
+        }
+
+        function resetData() {
+            vm.selectedUserGroups = [];
+            vm.availableUserGroups = angular.copy(vm.initialState);
+            vm.availableUserGroups.forEach(function (group) {
+                if (group.permissions) {
+                    //if there's explicit permissions assigned than it's selected
+                    group.selected = false;
+                    assignGroupPermissions(group);
+                }
+            });
+            currentForm = angularHelper.getCurrentForm($scope);
+
         }
 
         function setViewSate(state) {
@@ -113,6 +128,7 @@
 
         function cancelManagePermissions() {
             setViewSate("manageGroups");
+            resetData();
         }
 
         function formatSaveModel(permissionsSave, selectedUserGroups, removedUserGroups) {

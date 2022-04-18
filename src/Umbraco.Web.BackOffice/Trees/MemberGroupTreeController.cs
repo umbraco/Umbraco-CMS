@@ -26,8 +26,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMemberGroupService memberGroupService,
-            IEventAggregator eventAggregator)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
+            IEventAggregator eventAggregator,
+            IMemberTypeService memberTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator, memberTypeService)
             => _memberGroupService = memberGroupService;
 
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)

@@ -146,7 +146,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
-            entity.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupAlias, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
             var standardPropertyTypes = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             foreach (var standardPropertyType in standardPropertyTypes)
             {

@@ -24,6 +24,8 @@ namespace Umbraco.Extensions
             services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>());
         }
 
+        // TODO(V11): Remove this function.
+        [Obsolete("This method is functionally equivalent to AddSingleton<TImplementing>() please use that instead.")]
         public static void AddUnique<TImplementing>(this IServiceCollection services)
             where TImplementing : class
             => services.Replace(ServiceDescriptor.Singleton<TImplementing, TImplementing>());

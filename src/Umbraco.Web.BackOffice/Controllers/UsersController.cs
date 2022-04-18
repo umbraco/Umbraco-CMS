@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -42,6 +43,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -75,7 +77,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
         private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
         private readonly ILogger<UsersController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly WebRoutingSettings _webRoutingSettings;
 
+        [ActivatorUtilitiesConstructor]
         public UsersController(
             MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
@@ -96,7 +101,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalLogins,
             UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _mediaFileManager = mediaFileManager;
             _contentSettings = contentSettings.Value;
@@ -119,6 +126,55 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
             _passwordChanger = passwordChanger;
             _logger = _loggerFactory.CreateLogger<UsersController>();
+            _httpContextAccessor = httpContextAccessor;
+            _webRoutingSettings = webRoutingSettings.Value;
+        }
+
+        [Obsolete("Use constructor that also takes IHttpAccessor and IOptions<WebRoutingSettings>, scheduled for removal in V11")]
+        public UsersController(
+            MediaFileManager mediaFileManager,
+            IOptions<ContentSettings> contentSettings,
+            IHostingEnvironment hostingEnvironment,
+            ISqlContext sqlContext,
+            IImageUrlGenerator imageUrlGenerator,
+            IOptions<SecuritySettings> securitySettings,
+            IEmailSender emailSender,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            AppCaches appCaches,
+            IShortStringHelper shortStringHelper,
+            IUserService userService,
+            ILocalizedTextService localizedTextService,
+            IUmbracoMapper umbracoMapper,
+            IOptions<GlobalSettings> globalSettings,
+            IBackOfficeUserManager backOfficeUserManager,
+            ILoggerFactory loggerFactory,
+            LinkGenerator linkGenerator,
+            IBackOfficeExternalLoginProviders externalLogins,
+            UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
+            : this(mediaFileManager,
+                contentSettings,
+                hostingEnvironment,
+                sqlContext,
+                imageUrlGenerator,
+                securitySettings,
+                emailSender,
+                backofficeSecurityAccessor,
+                appCaches,
+                shortStringHelper,
+                userService,
+                localizedTextService,
+                umbracoMapper,
+                globalSettings,
+                backOfficeUserManager,
+                loggerFactory,
+                linkGenerator,
+                externalLogins,
+                userEditorAuthorizationHelper,
+                passwordChanger,
+                StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>())
+        {
         }
 
         /// <summary>
@@ -421,29 +477,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         public async Task<ActionResult<UserDisplay>> PostInviteUser(UserInvite userSave)
         {
-            if (userSave == null) throw new ArgumentNullException("userSave");
+            if (userSave == null)
+            {
+                throw new ArgumentNullException(nameof(userSave));
+            }
 
             if (userSave.Message.IsNullOrWhiteSpace())
+            {
                 ModelState.AddModelError("Message", "Message cannot be empty");
+            }
 
-            IUser user;
             if (_securitySettings.UsernameIsEmail)
             {
-                //ensure it's the same
+                // ensure it's the same
                 userSave.Username = userSave.Email;
             }
             else
             {
-                //first validate the username if we're showing it
-                var userResult = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
-                if (!(userResult.Result is null))
+                // first validate the username if we're showing it
+                ActionResult<IUser> userResult = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                if (userResult.Result is not null)
                 {
                     return userResult.Result;
                 }
-
-                user = userResult.Value;
             }
-            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            IUser user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
 
             if (ModelState.IsValid == false)
             {
@@ -455,7 +514,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem("No Email server is configured");
             }
 
-            //Perform authorization here to see if the current user can actually save this user with the info being requested
+            // Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -464,8 +523,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (user == null)
             {
-                //we want to create the user with the UserManager, this ensures the 'empty' (special) password
-                //format is applied without us having to duplicate that logic
+                // we want to create the user with the UserManager, this ensures the 'empty' (special) password
+                // format is applied without us having to duplicate that logic
                 var identityUser = BackOfficeIdentityUser.CreateNew(_globalSettings, userSave.Username, userSave.Email, _globalSettings.DefaultUILanguage);
                 identityUser.Name = userSave.Name;
 
@@ -475,21 +534,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return ValidationProblem(created.Errors.ToErrorMessage());
                 }
 
-                //now re-look the user back up
+                // now re-look the user back up
                 user = _userService.GetByEmail(userSave.Email);
             }
 
-            //map the save info over onto the user
+            // map the save info over onto the user
             user = _umbracoMapper.Map(userSave, user);
 
-            //ensure the invited date is set
+            // ensure the invited date is set
             user.InvitedDate = DateTime.Now;
 
-            //Save the updated user (which will process the user groups too)
+            // Save the updated user (which will process the user groups too)
             _userService.Save(user);
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
-            //send the email
+            // send the email
             await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
             display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles","resendInviteHeader"), _localizedTextService.Localize("speechBubbles","resendInviteSuccess", new[] { user.Name }));
@@ -544,14 +603,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _hostingEnvironment.ApplicationMainUrl;
+            Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request.GetApplicationUri(_webRoutingSettings);
             var inviteUri = new Uri(applicationUri, action);
 
             var emailSubject = _localizedTextService.Localize("user","inviteEmailCopySubject",
-                //Ensure the culture of the found user is used for the email!
+                // Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings));
             var emailBody = _localizedTextService.Localize("user","inviteEmailCopyFormat",
-                //Ensure the culture of the found user is used for the email!
+                // Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), senderEmail });
 

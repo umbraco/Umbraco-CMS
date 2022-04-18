@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {
-    public interface IPhysicalFileSystem : IFileSystem {}
-    public class PhysicalFileSystem : IPhysicalFileSystem
+    public interface IPhysicalFileSystem : IFileSystem
+    { }
+
+    public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILogger<PhysicalFileSystem> _logger;
@@ -28,7 +31,7 @@ namespace Umbraco.Cms.Core.IO
         // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
-        public PhysicalFileSystem(IIOHelper ioHelper,IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
+        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -270,7 +273,7 @@ namespace Umbraco.Cms.Core.IO
                 return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
 
             // unchanged - what else?
-            return path;
+            return path.TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         /// <summary>
@@ -285,7 +288,7 @@ namespace Umbraco.Cms.Core.IO
         public string GetFullPath(string path)
         {
             // normalize
-            var opath = path;
+            var originalPath = path;
             path = EnsureDirectorySeparatorChar(path);
 
             // FIXME: this part should go!
@@ -318,7 +321,7 @@ namespace Umbraco.Cms.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException($"File original: [{opath}] full: [{path}] is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"File original: [{originalPath}] full: [{path}] is outside this filesystem's root.");
         }
 
         /// <summary>
@@ -449,6 +452,9 @@ namespace Umbraco.Cms.Core.IO
                 Thread.Sleep(pausems);
             }
         }
+
+        /// <inheritdoc />
+        public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
 
         #endregion
     }

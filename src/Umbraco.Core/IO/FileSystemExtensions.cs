@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Extensions
@@ -86,6 +87,25 @@ namespace Umbraco.Extensions
                 fs.AddFile(tempFile, s);
             }
             fs.DeleteFile(tempFile);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="IFileProvider" /> from the file system.
+        /// </summary>
+        /// <param name="fileSystem">The file system.</param>
+        /// <param name="fileProvider">When this method returns, contains an <see cref="IFileProvider"/> created from the file system.</param>
+        /// <returns>
+        /// <c>true</c> if the <see cref="IFileProvider" /> was successfully created; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool TryCreateFileProvider(this IFileSystem fileSystem, out IFileProvider fileProvider)
+        {
+            fileProvider = fileSystem switch
+            {
+                IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
+                _ => null
+            };
+
+            return fileProvider != null;
         }
     }
 }

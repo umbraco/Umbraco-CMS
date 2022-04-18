@@ -1,12 +1,14 @@
 @inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
-@using Umbraco.Cms.Core
-@using Umbraco.Cms.Core.Security
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Web.Common.Security
 @using Umbraco.Cms.Web.Website.Controllers
 @using Umbraco.Cms.Web.Website.Models
 @using Umbraco.Extensions
 @inject MemberModelBuilderFactory memberModelBuilderFactory;
-
+@inject IMemberExternalLoginProviders memberExternalLoginProviders
+@inject IExternalLoginWithKeyService externalLoginWithKeyService
 @{
+
     // Build a profile model to edit
     var profileModel = await memberModelBuilderFactory
         .CreateProfileModel()
@@ -17,6 +19,13 @@
         .BuildForCurrentMemberAsync();
 
     var success = TempData["FormSuccess"] != null;
+
+    var loginProviders = await memberExternalLoginProviders.GetMemberProvidersAsync();
+    var externalSignInError = ViewData.GetExternalSignInProviderErrors();
+
+    var currentExternalLogin = profileModel is null
+        ? new Dictionary<string, string>()
+        : externalLoginWithKeyService.GetExternalLogins(profileModel.Key).ToDictionary(x=>x.LoginProvider, x=>x.ProviderKey);
 }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -70,5 +79,50 @@
         }
 
         <button type="submit" class="btn btn-primary">Update</button>
+
+        if (loginProviders.Any())
+        {
+            <hr/>
+            <h4>Link external accounts</h4>
+
+            if (externalSignInError?.AuthenticationType is null && externalSignInError?.Errors.Any() == true)
+            {
+                @Html.DisplayFor(x => externalSignInError.Errors);
+            }
+
+            @foreach (var login in loginProviders)
+            {
+                if (currentExternalLogin.TryGetValue(login.ExternalLoginProvider.AuthenticationType, out var providerKey))
+                {
+                    @using (Html.BeginUmbracoForm<UmbExternalLoginController>(nameof(UmbExternalLoginController.Disassociate)))
+                    {
+                        <input type="hidden" name="providerKey" value="@providerKey"/>
+                        <button type="submit" name="provider" value="@login.ExternalLoginProvider.AuthenticationType">
+                            Un-Link your @login.AuthenticationScheme.DisplayName account
+                        </button>
+
+                        if (externalSignInError?.AuthenticationType == login.ExternalLoginProvider.AuthenticationType)
+                        {
+                            @Html.DisplayFor(x => externalSignInError.Errors);
+                        }
+                    }
+                }
+                else
+                {
+                    @using (Html.BeginUmbracoForm<UmbExternalLoginController>(nameof(UmbExternalLoginController.LinkLogin)))
+                    {
+                        <button type="submit" name="provider" value="@login.ExternalLoginProvider.AuthenticationType">
+                            Link your @login.AuthenticationScheme.DisplayName account
+                        </button>
+
+                        if (externalSignInError?.AuthenticationType == login.ExternalLoginProvider.AuthenticationType)
+                        {
+                            @Html.DisplayFor(x => externalSignInError.Errors);
+                        }
+                    }
+                }
+
+            }
+        }
     }
 }

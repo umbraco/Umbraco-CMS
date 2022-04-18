@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Serilog.Events;
@@ -42,11 +42,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         bool CanHandleLargeLogs { get; }
 
         bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
-
-        /// <summary>
-        /// Get the Serilog minimum-level and UmbracoFile-level values from the config file.
-        /// </summary>
-        ReadOnlyDictionary<string, LogEventLevel> GetLogLevels();
 
         /// <summary>
         /// Gets the current Serilog minimum log level

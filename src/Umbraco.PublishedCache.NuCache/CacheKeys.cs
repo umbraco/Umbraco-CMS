@@ -13,9 +13,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string LangId(string culture)
-        {
-            return culture != null ? ("-L:" + culture) : string.Empty;
-        }
+            => string.IsNullOrEmpty(culture) ? string.Empty : ("-L:" + culture);
 
         public static string PublishedContentChildren(Guid contentUid, bool previewing)
         {

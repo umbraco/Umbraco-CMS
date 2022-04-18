@@ -1,7 +1,18 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions
@@ -34,14 +45,26 @@ namespace Umbraco.Extensions
 
             services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
                 .AddDefaultTokenProviders()
-                .AddUserStore<MemberUserStore>()
+                .AddUserStore<IUserStore<MemberIdentityUser>, MemberUserStore>(factory => new MemberUserStore(
+                    factory.GetRequiredService<IMemberService>(),
+                    factory.GetRequiredService<IUmbracoMapper>(),
+                    factory.GetRequiredService<IScopeProvider>(),
+                    factory.GetRequiredService<IdentityErrorDescriber>(),
+                    factory.GetRequiredService<IPublishedSnapshotAccessor>(),
+                    factory.GetRequiredService<IExternalLoginWithKeyService>(),
+                    factory.GetRequiredService<ITwoFactorLoginService>()
+                ))
                 .AddRoleStore<MemberRoleStore>()
                 .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
                 .AddMemberManager<IMemberManager, MemberManager>()
                 .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
+                .AddSignInManager<IMemberSignInManagerExternalLogins, MemberSignInManager>()
                 .AddErrorDescriber<MembersErrorDescriber>()
                 .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
 
+
+            builder.AddNotificationHandler<MemberDeletedNotification, DeleteExternalLoginsOnMemberDeletedHandler>();
+            builder.AddNotificationAsyncHandler<MemberDeletedNotification, DeleteTwoFactorLoginsOnMemberDeletedHandler>();
             services.ConfigureOptions<ConfigureMemberIdentityOptions>();
 
             services.AddScoped<IMemberUserStore>(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
@@ -49,6 +72,8 @@ namespace Umbraco.Extensions
 
             services.ConfigureOptions<ConfigureSecurityStampOptions>();
             services.ConfigureOptions<ConfigureMemberCookieOptions>();
+
+            services.AddUnique<IMemberExternalLoginProviders, MemberExternalLoginProviders>();
 
             return builder;
         }

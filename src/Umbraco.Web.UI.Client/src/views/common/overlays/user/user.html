@@ -69,7 +69,7 @@
                 ng-click="unlink($event, login.authType, login.linkedProviderKey)"
                 ng-if="login.linkedProviderKey != undefined"
                 value="{{login.authType}}">
-          <umb-icon icon="fa {{login.properties.SocialIcon}}"></umb-icon>
+          <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
           <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
           key="defaultdialogs_account">account
         </localize>

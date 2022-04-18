@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Gestisci hostnames</key>
+    <key alias="assigndomain">Gestisci hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Sfoglia</key>
     <key alias="changeDocType">Cambia tipo di documento</key>
@@ -18,7 +18,7 @@
     <key alias="delete">Cancella</key>
     <key alias="disable">Disabilita</key>
     <key alias="editSettings">Modifica impostazioni</key>
-    <key alias="emptyRecycleBin">Svuota il cestino</key>
+    <key alias="emptyrecyclebin">Svuota il cestino</key>
     <key alias="enable">Abilita</key>
     <key alias="exportDocumentType">Esporta il tipo di documento</key>
     <key alias="importdocumenttype">Importa il tipo di documento</key>

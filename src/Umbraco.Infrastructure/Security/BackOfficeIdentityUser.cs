@@ -159,5 +159,24 @@ namespace Umbraco.Cms.Core.Security
         }
 
         private static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
+
+        public Guid Key => UserIdToInt(Id).ToGuid();
+
+
+        private static int UserIdToInt(string userId)
+        {
+            if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+            {
+                return result;
+            }
+
+            if(Guid.TryParse(userId, out var key))
+            {
+                // Reverse the IntExtensions.ToGuid
+                return BitConverter.ToInt32(key.ToByteArray(), 0);
+            }
+
+            throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
+        }
     }
 }

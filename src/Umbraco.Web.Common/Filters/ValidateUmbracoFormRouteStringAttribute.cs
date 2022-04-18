@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.Common.Filters
             {
                 if (context == null) throw new ArgumentNullException(nameof(context));
 
-                var ufprt = context.HttpContext.Request.Form["ufprt"];
+                var ufprt = context.HttpContext.Request.GetUfprt();
 
                 if (context.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
                 {

@@ -2,26 +2,45 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<JsonConfigManipulator> _logger;
         private readonly object _locker = new object();
 
-        public JsonConfigManipulator(IConfiguration configuration) => _configuration = configuration;
+        [Obsolete]
+        public JsonConfigManipulator(IConfiguration configuration)
+            : this(configuration, StaticServiceProvider.Instance.GetRequiredService<ILogger<JsonConfigManipulator>>())
+        { }
 
-        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
+        public JsonConfigManipulator(
+            IConfiguration configuration,
+            ILogger<JsonConfigManipulator> logger)
+        {
+            _configuration = configuration;
+            _logger = logger;
+        }
+
+        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionName}";
         public void RemoveConnectionString()
         {
             var provider = GetJsonConfigurationProvider(UmbracoConnectionPath);
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to remove connection string from JSON configuration.");
+                return;
+            }
 
             RemoveJsonKey(json, UmbracoConnectionPath);
 
@@ -33,6 +52,11 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save connection string in JSON configuration.");
+                return;
+            }
 
             var item = GetConnectionItem(connectionString, providerName);
 
@@ -47,6 +71,11 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration.", key);
+                return;
+            }
 
             JToken token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
@@ -73,6 +102,11 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save enabled/disabled state for redirect URL tracking in JSON configuration.");
+                return;
+            }
 
             var item = GetDisableRedirectUrlItem(disable);
 
@@ -86,6 +120,11 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save global identifier in JSON configuration.");
+                return;
+            }
 
             var item = GetGlobalIdItem(id);
 
@@ -170,13 +209,20 @@ namespace Umbraco.Cms.Core.Configuration
                 {
                     var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
 
-                    using (var sw = new StreamWriter(jsonFilePath, false))
-                    using (var jsonTextWriter = new JsonTextWriter(sw)
+                    try
                     {
-                        Formatting = Formatting.Indented,
-                    })
+                        using (var sw = new StreamWriter(jsonFilePath, false))
+                        using (var jsonTextWriter = new JsonTextWriter(sw)
+                        {
+                            Formatting = Formatting.Indented,
+                        })
+                        {
+                            json?.WriteTo(jsonTextWriter);
+                        }
+                    }
+                    catch (IOException exception)
                     {
-                        json?.WriteTo(jsonTextWriter);
+                        _logger.LogWarning(exception, "JSON configuration could not be written: {path}", jsonFilePath);
                     }
                 }
             }
@@ -186,19 +232,25 @@ namespace Umbraco.Cms.Core.Configuration
         {
             lock (_locker)
             {
-                if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+                if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
                 {
-                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
-
-                    var serializer = new JsonSerializer();
-                    using (var sr = new StreamReader(jsonFilePath))
-                    using (var jsonTextReader = new JsonTextReader(sr))
-                    {
-                        return serializer.Deserialize<JObject>(jsonTextReader);
-                    }
+                    return null;
                 }
 
-                return null; 
+                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
+
+                try
+                {
+                    var serializer = new JsonSerializer();
+                    using var sr = new StreamReader(jsonFilePath);
+                    using var jsonTextReader = new JsonTextReader(sr);
+                    return serializer.Deserialize<JObject>(jsonTextReader);
+                }
+                catch (IOException exception)
+                {
+                    _logger.LogWarning(exception, "JSON configuration could not be read: {path}", jsonFilePath);
+                    return null;
+                }
             }
         }
 

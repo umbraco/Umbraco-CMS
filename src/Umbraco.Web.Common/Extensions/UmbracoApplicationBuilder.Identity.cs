@@ -20,5 +20,33 @@ namespace Umbraco.Extensions
             builder.Services.Replace(ServiceDescriptor.Scoped(userManagerType, customType));
             return builder;
         }
+
+        public static IUmbracoBuilder SetBackOfficeUserStore<TUserStore>(this IUmbracoBuilder builder)
+            where TUserStore : BackOfficeUserStore
+        {
+            Type customType = typeof(TUserStore);
+            builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IUserStore<>).MakeGenericType(typeof(BackOfficeIdentityUser)), customType));
+            return builder;
+        }
+
+        public static IUmbracoBuilder SetMemberManager<TUserManager>(this IUmbracoBuilder builder)
+            where TUserManager : UserManager<MemberIdentityUser>, IMemberManager
+        {
+
+            Type customType = typeof(TUserManager);
+            Type userManagerType = typeof(UserManager<MemberIdentityUser>);
+            builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IMemberManager), customType));
+            builder.Services.AddScoped(customType, services => services.GetRequiredService(userManagerType));
+            builder.Services.Replace(ServiceDescriptor.Scoped(userManagerType, customType));
+            return builder;
+        }
+
+        public static IUmbracoBuilder SetMemberUserStore<TUserStore>(this IUmbracoBuilder builder)
+            where TUserStore : MemberUserStore
+        {
+            Type customType = typeof(TUserStore);
+            builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IUserStore<>).MakeGenericType(typeof(MemberIdentityUser)), customType));
+            return builder;
+        }
     }
 }

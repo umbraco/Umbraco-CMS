@@ -10,10 +10,11 @@
   "devDependencies": {
     "cross-env": "^7.0.2",
     "cypress": "8.4.1",
+    "cy-verify-downloads": "0.0.5",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.2.0",
-    "umbraco-cypress-testhelpers": "^1.0.0-beta-62"
+    "umbraco-cypress-testhelpers": "^1.0.0-beta-65"
   },
   "dependencies": {
     "typescript": "^3.9.2"

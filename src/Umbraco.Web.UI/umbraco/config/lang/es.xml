@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Administrar dominios</key>
+    <key alias="assigndomain">Administrar dominios</key>
     <key alias="auditTrail">Historial</key>
     <key alias="browse">Nodo de Exploración</key>
     <key alias="changeDocType">Cambiar tipo de documento</key>
@@ -15,7 +15,7 @@
     <key alias="createGroup">Crear grupo</key>
     <key alias="delete">Borrar</key>
     <key alias="disable">Deshabilitar</key>
-    <key alias="emptyRecycleBin">Vaciar Papelera</key>
+    <key alias="emptyrecyclebin">Vaciar Papelera</key>
     <key alias="enable">Activar</key>
     <key alias="exportDocumentType">Exportar Documento (tipo)</key>
     <key alias="importdocumenttype">Importar Documento (tipo)</key>

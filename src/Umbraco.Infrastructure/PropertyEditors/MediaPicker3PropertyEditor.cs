@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -53,23 +54,55 @@ namespace Umbraco.Cms.Core.PropertyEditors
         internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly IJsonSerializer _jsonSerializer;
+            private readonly IDataTypeService _dataTypeService;
 
             public MediaPicker3PropertyValueEditor(
                 ILocalizedTextService localizedTextService,
                 IShortStringHelper shortStringHelper,
                 IJsonSerializer jsonSerializer,
                 IIOHelper ioHelper,
-                DataEditorAttribute attribute)
+                DataEditorAttribute attribute,
+                IDataTypeService dataTypeService)
                 : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _jsonSerializer = jsonSerializer;
+                _dataTypeService = dataTypeService;
             }
 
             public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var value = property.GetValue(culture, segment);
 
-                return Deserialize(_jsonSerializer, value);
+                var dtos = Deserialize(_jsonSerializer, value).ToList();
+
+                var dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+                if (dataType?.Configuration != null)
+                {
+                    var configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
+
+                    foreach (var dto in dtos)
+                    {
+                        dto.ApplyConfiguration(configuration);
+                    }
+                }
+
+                return dtos;
+            }
+
+            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            {
+                if (editorValue.Value is JArray dtos)
+                {
+                    // Clean up redundant/default data
+                    foreach (var dto in dtos.Values<JObject>())
+                    {
+                        MediaWithCropsDto.Prune(dto);
+                    }
+
+                    return dtos.ToString(Formatting.None);
+                }
+
+                return base.FromEditor(editorValue, currentValue);
             }
 
             ///<remarks>
@@ -124,7 +157,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
             }
 
-
             /// <summary>
             /// Model/DTO that represents the JSON that the MediaPicker3 stores.
             /// </summary>
@@ -142,6 +174,48 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 [DataMember(Name = "focalPoint")]
                 public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
+
+                /// <summary>
+                /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
+                /// </summary>
+                /// <param name="configuration">The configuration.</param>
+                public void ApplyConfiguration(MediaPicker3Configuration configuration)
+                {
+                    var crops = new List<ImageCropperValue.ImageCropperCrop>();
+
+                    var configuredCrops = configuration?.Crops;
+                    if (configuredCrops != null)
+                    {
+                        foreach (var configuredCrop in configuredCrops)
+                        {
+                            var crop = Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+
+                            crops.Add(new ImageCropperValue.ImageCropperCrop
+                            {
+                                Alias = configuredCrop.Alias,
+                                Width = configuredCrop.Width,
+                                Height = configuredCrop.Height,
+                                Coordinates = crop?.Coordinates
+                            });
+                        }
+                    }
+
+                    Crops = crops;
+
+                    if (configuration?.EnableLocalFocalPoint == false)
+                    {
+                        FocalPoint = null;
+                    }
+                }
+
+                /// <summary>
+                /// Removes redundant crop data/default focal point.
+                /// </summary>
+                /// <param name="value">The media with crops DTO.</param>
+                /// <remarks>
+                /// Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the prune method.
+                /// </remarks>
+                public static void Prune(JObject value) => ImageCropperValue.Prune(value);
             }
         }
     }

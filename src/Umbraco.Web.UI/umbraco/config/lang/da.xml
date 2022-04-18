@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Tilføj domæne</key>
+    <key alias="assigndomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisionsspor</key>
     <key alias="browse">Gennemse elementer</key>
     <key alias="changeDocType">Skift Dokument Type</key>
@@ -18,7 +18,7 @@
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Tøm papirkurv</key>
+    <key alias="emptyrecyclebin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="importdocumenttype">Importér dokumenttype</key>
@@ -83,6 +83,7 @@
     <key alias="translate">Tillad adgang til at oversætte en node</key>
     <key alias="update">Tillad adgang til at gemme en node</key>
     <key alias="createblueprint">Tillad adgang til at oprette en indholdsskabelon</key>
+    <key alias="notify">Tillad adgang til at oprette notificeringer for noder</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Indhold</key>
@@ -1322,6 +1323,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editMultiContentPublishedText">%0% dokumenter udgivet og synlige på hjemmesiden</key>
     <key alias="editVariantPublishedText">%0% udgivet og synligt på hjemmesiden</key>
     <key alias="editMultiVariantPublishedText">%0% dokumenter udgivet for sprogene %1% og synlige på hjemmesiden</key>
+    <key alias="editBlueprintSavedHeader">Indholdsskabelon gemt</key>
+    <key alias="editBlueprintSavedText">Rettelser er blevet gemt</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentScheduledSavedText">En planlægning for udgivelse er blevet opdateret</key>

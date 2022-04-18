@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">ドメインの割り当て</key>
+    <key alias="assigndomain">ドメインの割り当て</key>
     <key alias="auditTrail">動作記録</key>
     <key alias="browse">ノードの参照</key>
     <key alias="changeDocType">ドキュメントタイプの変更</key>
@@ -14,7 +14,7 @@
     <key alias="createPackage">パッケージの作成</key>
     <key alias="delete">削除</key>
     <key alias="disable">無効</key>
-    <key alias="emptyRecycleBin">ごみ箱を空にする</key>
+    <key alias="emptyrecyclebin">ごみ箱を空にする</key>
     <key alias="exportDocumentType">ドキュメントタイプの書出</key>
     <key alias="importdocumenttype">ドキュメントタイプの読込</key>
     <key alias="importPackage">パッケージの読み込み</key>

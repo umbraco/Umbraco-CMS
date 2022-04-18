@@ -269,16 +269,10 @@ namespace Umbraco.Extensions
 
             if (!pcr.HasPublishedContent())
             {
-                var logMsg = nameof(DetectCollisionAsync) +
+                const string logMsg = nameof(DetectCollisionAsync) +
                              " did not resolve a content item for original url: {Url}, translated to {TranslatedUrl} and culture: {Culture}";
-                if (pcr.IgnorePublishedContentCollisions)
-                {
-                    logger.LogDebug(logMsg, url, uri, culture);
-                }
-                else
-                {
-                    logger.LogDebug(logMsg, url, uri, culture);
-                }
+
+                logger.LogDebug(logMsg, url, uri, culture);
 
                 var urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
                 return Attempt.Succeed(urlInfo);

@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 var repository = new PartialViewRepository(fileSystems);
 
-                var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
+                IPartialView partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);
                 Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
                 Assert.AreEqual("test-path-1.cshtml", partialView.Path);
@@ -62,10 +62,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 partialView = new PartialView(PartialViewType.PartialView, "path-2/test-path-2.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
-                Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path); // fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
 
-                partialView = (PartialView)repository.Get("path-2/test-path-2.cshtml");
+                partialView = repository.Get("path-2/test-path-2.cshtml");
                 Assert.IsNotNull(partialView);
                 Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
@@ -76,26 +76,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
-                partialView = (PartialView)repository.Get("path-2/test-path-3.cshtml");
+                partialView = repository.Get("path-2/test-path-3.cshtml");
                 Assert.IsNotNull(partialView);
                 Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
-                partialView = (PartialView)repository.Get("path-2\\test-path-3.cshtml");
+                partialView = repository.Get("path-2\\test-path-3.cshtml");
                 Assert.IsNotNull(partialView);
                 Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
-                partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
-                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                partialView = new PartialView(PartialViewType.PartialView, "..\\test-path-4.cshtml") { Content = "// partialView" };
+                Assert.Throws<UnauthorizedAccessException>(() =>
                     repository.Save(partialView));
 
-                partialView = (PartialView)repository.Get("missing.cshtml");
+                partialView = new PartialView(PartialViewType.PartialView, "\\test-path-5.cshtml") { Content = "// partialView" };
+                repository.Save(partialView);
+
+                partialView = repository.Get("\\test-path-5.cshtml");
+                Assert.IsNotNull(partialView);
+                Assert.AreEqual("test-path-5.cshtml", partialView.Path);
+                Assert.AreEqual("/Views/Partials/test-path-5.cshtml", partialView.VirtualPath);
+
+                partialView = repository.Get("missing.cshtml");
                 Assert.IsNull(partialView);
 
-                // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<UnauthorizedAccessException>(() => partialView = (PartialView)repository.Get("\\test-path-4.cshtml"));
-                Assert.Throws<UnauthorizedAccessException>(() => partialView = (PartialView)repository.Get("../../packages.config"));
+                Assert.Throws<UnauthorizedAccessException>(() => partialView = repository.Get("..\\test-path-4.cshtml"));
+                Assert.Throws<UnauthorizedAccessException>(() => partialView = repository.Get("../../packages.config"));
             }
         }
 

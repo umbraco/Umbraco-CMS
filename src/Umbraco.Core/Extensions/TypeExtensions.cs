@@ -430,10 +430,16 @@ namespace Umbraco.Extensions
             where T : Attribute
         {
             if (type == null) return Enumerable.Empty<T>();
-            return type.GetCustomAttributes(typeof (T), inherited).OfType<T>();
+            return type.GetCustomAttributes(typeof(T), inherited).OfType<T>();
         }
 
-          /// <summary>
+        public static bool HasCustomAttribute<T>(this Type type, bool inherit)
+            where T : Attribute
+        {
+            return type.GetCustomAttribute<T>(inherit) != null;
+        }
+
+        /// <summary>
         /// Tries to return a value based on a property name for an object but ignores case sensitivity
         /// </summary>
         /// <param name="type"></param>

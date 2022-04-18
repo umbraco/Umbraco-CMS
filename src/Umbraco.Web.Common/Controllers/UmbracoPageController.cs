@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <param name="model">The model.</param>
         /// <returns>The action result.</returns>
         /// <exception cref="InvalidOperationException">If the template found in the route values doesn't physically exist and exception is thrown</exception>
-        protected IActionResult CurrentTemplate<T>(T model)
+        protected virtual IActionResult CurrentTemplate<T>(T model)
         {
             if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
             {
@@ -90,6 +90,13 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <param name="template">The view name.</param>
         protected bool EnsurePhsyicalViewExists(string template)
         {
+            if (string.IsNullOrWhiteSpace(template))
+            {
+                string docTypeAlias = UmbracoRouteValues.PublishedRequest.PublishedContent.ContentType.Alias;
+                _logger.LogWarning("No physical template file was found for document type with alias {Alias}", docTypeAlias);
+                return false;
+            }
+
             ViewEngineResult result = _compositeViewEngine.FindView(ControllerContext, template, false);
             if (result.View != null)
             {
@@ -99,6 +106,5 @@ namespace Umbraco.Cms.Web.Common.Controllers
             _logger.LogWarning("No physical template file was found for template {Template}", template);
             return false;
         }
-
     }
 }

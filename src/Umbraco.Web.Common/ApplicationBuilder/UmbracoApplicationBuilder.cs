@@ -1,10 +1,16 @@
 using System;
+using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
@@ -22,12 +28,14 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         {
             AppBuilder = appBuilder ?? throw new ArgumentNullException(nameof(appBuilder));
             ApplicationServices = appBuilder.ApplicationServices;
-            RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();            
+            RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();
             _umbracoPipelineStartupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
         }
 
         public IServiceProvider ApplicationServices { get; }
+
         public IRuntimeState RuntimeState { get; }
+
         public IApplicationBuilder AppBuilder { get; }
 
         /// <inheritdoc />
@@ -78,18 +86,30 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         }
 
         /// <summary>
-        /// Registers the default required middleware to run Umbraco
+        /// Registers the default required middleware to run Umbraco.
         /// </summary>
-        /// <param name="umbracoApplicationBuilderContext"></param>
         public void RegisterDefaultRequiredMiddleware()
         {
             UseUmbracoCoreMiddleware();
 
-            AppBuilder.UseStatusCodePages();
-
-            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.            
+            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
             AppBuilder.UseImageSharp();
+
+            // Get media file provider and request path/URL
+            var mediaFileManager = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>();
+            if (mediaFileManager.FileSystem.TryCreateFileProvider(out IFileProvider mediaFileProvider))
+            {
+                GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                IHostingEnvironment hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
+                string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
+
+                // Configure custom file provider for media
+                IWebHostEnvironment webHostEnvironment = AppBuilder.ApplicationServices.GetService<IWebHostEnvironment>();
+                webHostEnvironment.WebRootFileProvider = webHostEnvironment.WebRootFileProvider.ConcatComposite(new PrependBasePathFileProvider(mediaRequestPath, mediaFileProvider));
+            }
+
             AppBuilder.UseStaticFiles();
+
             AppBuilder.UseUmbracoPluginsStaticFiles();
 
             // UseRouting adds endpoint routing middleware, this means that middlewares registered after this one

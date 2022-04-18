@@ -263,5 +263,13 @@ namespace Umbraco.Cms.Core.Security
 
             return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
         }
+
+        /// <inheritdoc/>
+        public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
+        {
+            var results = await base.GetValidTwoFactorProvidersAsync(user);
+
+            return results;
+        }
     }
 }

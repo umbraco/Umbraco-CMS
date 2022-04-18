@@ -134,8 +134,13 @@ namespace Umbraco.Cms.Core.Routing
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal UrlInfo GetUrlFromRoute(string route, IUmbracoContext umbracoContext, int id, Uri current,
-            UrlMode mode, string culture)
+        internal UrlInfo GetUrlFromRoute(
+            string route,
+            IUmbracoContext umbracoContext,
+            int id,
+            Uri current,
+            UrlMode mode,
+            string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -149,12 +154,12 @@ namespace Umbraco.Cms.Core.Routing
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
-            var domainUri = pos == 0
+            DomainAndUri domainUri = pos == 0
                 ? null
                 : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current, culture);
 
             var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
-            if (domainUri is not null || culture == defaultCulture || string.IsNullOrEmpty(culture))
+            if (domainUri is not null || string.IsNullOrEmpty(culture) || culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
             {
                 var url = AssembleUrl(domainUri, path, current, mode).ToString();
                 return UrlInfo.Url(url, culture);
