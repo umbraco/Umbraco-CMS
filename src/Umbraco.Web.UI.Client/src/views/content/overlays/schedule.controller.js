@@ -359,7 +359,8 @@
                 // remove properties only needed for this dialog
                 delete variant.releaseDateFormatted;
                 delete variant.expireDateFormatted;
-                delete variant.datePickerConfig;
+                delete variant.datePickerPublishConfig;
+                delete variant.datePickerUnpublishConfig;
                 delete variant.releaseDatePickerInstance;
                 delete variant.expireDatePickerInstance;
                 delete variant.releaseDatePickerOpen;
