@@ -141,7 +141,7 @@
 
                                     <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;" ng-if="variant.save">
                                         <umb-date-time-picker ng-model="variant.releaseDate"
-                                                       options="variant.datePickerConfig"
+                                                       options="variant.datePickerPublishConfig"
                                                        on-setup="vm.datePickerSetup(variant, 'publish', fpItem)"
                                                        on-change="vm.datePickerChange(variant, dateStr, 'publish')"
                                                        on-open="vm.datePickerShow(variant, 'publish')"
@@ -167,7 +167,7 @@
 
                                     <div class="btn-group flex" style="font-size: 14px;" ng-if="variant.save">
                                         <umb-date-time-picker ng-model="variant.expireDate"
-                                                       options="variant.datePickerConfig"
+                                                       options="variant.datePickerUnpublishConfig"
                                                        on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
                                                        on-change="vm.datePickerChange(variant, dateStr, 'unpublish')"
                                                        on-open="vm.datePickerShow(variant, 'unpublish')"
