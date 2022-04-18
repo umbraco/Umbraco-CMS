@@ -519,20 +519,20 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
           let currentNodePermissions = null;
 
-          //Just ensure we do have an editorState
+          // Just ensure we do have an editorState
           if (editorState.current) {
-            //Fetch current node allowed actions for the current user
-            //This is the current node & not each individual child node in the list
-            var currentUserPermissions = editorState.current.allowedActions;
+            // Fetch current node allowed actions for the current user
+            // This is the current node & not each individual child node in the list
+            const currentUserPermissions = editorState.current.allowedActions || [];
 
-            //Create a nicer model rather than the funky & hard to remember permissions strings
+            // Create a nicer model rather than the funky & hard to remember permissions strings
             currentNodePermissions = {
-              "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-              "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-              "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-              "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
-              "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-              "canUnpublish": _.contains(currentUserPermissions, 'Z') //Magic Char = Z
+              "canCopy": currentUserPermissions.includes('O'), //Magic Char = O
+              "canCreate": currentUserPermissions.includes('C'), //Magic Char = C
+              "canDelete": currentUserPermissions.includes('D'), //Magic Char = D
+              "canMove": currentUserPermissions.includes('M'), //Magic Char = M
+              "canPublish": currentUserPermissions.includes('U'), //Magic Char = U
+              "canUnpublish": currentUserPermissions.includes('Z') //Magic Char = Z
             };
           }
 
