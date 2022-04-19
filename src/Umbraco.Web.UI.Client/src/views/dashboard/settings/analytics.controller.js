@@ -18,25 +18,20 @@
       {
         "start": 1,
         "step": 1,
-        "tooltips": [true],
-        "format": {
-          to: function (value) {
-            return vm.consentLevels[value.toFixed(0) - 1];
-          },
-          from: function (value) {
-            return Number(value);
-          }
-        },
+        "tooltips": [false],
         "range": {
           "min": 1,
           "max": 3
         },
         pips: {
-          mode: 'range',
+          mode: 'values',
           density: 50,
+          values: [1, 2, 3],
           "format": {
             to: function (value) {
-              return vm.consentLevels[value.toFixed(0) - 1];
+              console.log("What the hell is going on", value)
+              console.log("array:", vm.consentLevels[value - 1])
+              return vm.consentLevels[value - 1];
             },
             from: function (value) {
               return Number(value);
@@ -59,7 +54,7 @@
     });
     function setup(slider) {
       sliderRef = slider;
-    };
+    }
 
     function getConsentLevel() {
       return analyticResource.getConsentLevel().then(function (response) {
@@ -76,7 +71,8 @@
     }
 
     function sliderChange(values) {
-      vm.sliderVal = values[0];
+      const result = Number(values[0]);
+      vm.sliderVal = vm.consentLevels[result - 1];
     }
 
     function calculateStartPositionForSlider(){
