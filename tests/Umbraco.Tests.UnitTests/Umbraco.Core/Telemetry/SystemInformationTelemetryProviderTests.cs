@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
@@ -11,7 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers;
+using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
 {
@@ -114,7 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings { Debug = isDebug }),
                 Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings{ UmbracoPath = umbracoPath }),
                 hostEnvironment.Object,
-                databaseMock.Object);
+                new Lazy<IUmbracoDatabase>(databaseMock.Object));
         }
     }
 }

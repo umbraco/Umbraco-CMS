@@ -181,7 +181,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
-            Services.AddUnique<IUsageInformationService, UsageInformationService>();
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our

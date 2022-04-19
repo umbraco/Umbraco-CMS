@@ -12,9 +12,10 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
+namespace Umbraco.Cms.Infrastructure.Telemetry.Providers
 {
     internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, IUserDataService
     {

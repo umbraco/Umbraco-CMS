@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 
 namespace Umbraco.Cms.Core.Services
 {
-    public class UsageInformationService : IUsageInformationService
+    internal class UsageInformationService : IUsageInformationService
     {
         private readonly IMetricsConsentService _metricsConsentService;
         private readonly IEnumerable<IDetailedTelemetryProvider> _providers;

@@ -3,8 +3,9 @@ using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 
-namespace Umbraco.Cms.Infrastructure.Telemetry.Providers.Providers
+namespace Umbraco.Cms.Infrastructure.Telemetry.Providers
 {
     public class LanguagesTelemetryProvider : IDetailedTelemetryProvider
     {

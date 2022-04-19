@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Infrastructure.Telemetry.Interfaces
 {
-    public interface IDetailedTelemetryProvider
+    internal interface IDetailedTelemetryProvider
     {
         public IEnumerable<UsageInformation> GetInformation();
     }
