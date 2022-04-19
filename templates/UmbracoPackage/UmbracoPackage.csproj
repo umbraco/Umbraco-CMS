@@ -12,8 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE"/>
-        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE"/>
+        <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +22,7 @@
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </Content>
         <None Include="build\**\*.*">
-            <Pack>True</Pack>
+            <Pack>true</Pack>
             <PackagePath>buildTransitive</PackagePath>
         </None>
     </ItemGroup>

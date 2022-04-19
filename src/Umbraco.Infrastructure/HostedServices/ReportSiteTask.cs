@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
             ITelemetryService telemetryService)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
             _telemetryService = telemetryService;

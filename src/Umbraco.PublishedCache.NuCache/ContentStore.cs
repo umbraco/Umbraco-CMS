@@ -455,10 +455,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 refreshedIdsA.Contains(x.ContentTypeId) &&
                 BuildKit(x, out _)))
             {
-                // replacing the node: must preserve the parents
+                // replacing the node: must preserve the relations
                 var node = GetHead(_contentNodes, kit.Node.Id)?.Value;
                 if (node != null)
+                {
+                    // Preserve children
                     kit.Node.FirstChildContentId = node.FirstChildContentId;
+                    kit.Node.LastChildContentId = node.LastChildContentId;
+
+                    // Also preserve siblings
+                    kit.Node.NextSiblingContentId = node.NextSiblingContentId;
+                    kit.Node.PreviousSiblingContentId = node.PreviousSiblingContentId;
+                }
 
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 

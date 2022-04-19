@@ -1,19 +1,9 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
         <ContentFilesPath>$(MSBuildThisFileDirectory)..\content\umbraco\**\*.*</ContentFilesPath>
         <ContentWwwrootFilesPath>$(MSBuildThisFileDirectory)..\content\wwwroot\umbraco\**\*.*</ContentWwwrootFilesPath>
         <UmbracoWwwrootName Condition="'$(UmbracoWwwrootName)' == ''">umbraco</UmbracoWwwrootName>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <DefaultItemExcludes>$(DefaultItemExcludes);App_Plugins\**;</DefaultItemExcludes>
-
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\Data\**;</DefaultItemExcludes>
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\Logs\**;</DefaultItemExcludes>
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\mediacache\**;</DefaultItemExcludes>
-
-        <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot\media\**;</DefaultItemExcludes>
     </PropertyGroup>
 
     <Target Name="CopyUmbracoAssets" BeforeTargets="BeforeBuild">

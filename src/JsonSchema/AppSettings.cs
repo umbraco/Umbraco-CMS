@@ -92,6 +92,8 @@ namespace JsonSchema
                 public ContentDashboardSettings ContentDashboard { get; set; }
 
                 public HelpPageSettings HelpPage { get; set; }
+
+                public InstallDefaultDataSettings DefaultDataCreation { get; set; }
             }
 
             /// <summary>

@@ -12,6 +12,7 @@
             scope.publishStatus = [];
             scope.currentVariant = null;
             scope.currentUrls = [];
+            scope.loadingReferences = false;
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
@@ -229,6 +230,10 @@
                     });
 
             }
+
+            function loadReferences(){
+              scope.loadingReferences = true;
+            }
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
                 //check if Redirect URL Management is enabled
@@ -335,6 +340,7 @@
                         loadRedirectUrls();
                         setNodePublishStatus();
                         formatDatesToLocal();
+                        loadReferences();
                     } else {
                         isInfoTab = false;
                     }
@@ -352,6 +358,7 @@
                     loadRedirectUrls();
                     setNodePublishStatus();
                     formatDatesToLocal();
+                    loadReferences();
                 }
                 updateCurrentUrls();
             });

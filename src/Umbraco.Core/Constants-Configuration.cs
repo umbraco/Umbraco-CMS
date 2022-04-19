@@ -56,6 +56,21 @@ namespace Umbraco.Cms.Core
             public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
             public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
             public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
+            public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
+
+            public static class NamedOptions
+            {
+                public static class InstallDefaultData
+                {
+                    public const string Languages = "Languages";
+
+                    public const string DataTypes = "DataTypes";
+
+                    public const string MediaTypes = "MediaTypes";
+
+                    public const string MemberTypes = "MemberTypes";
+                }
+            }
         }
     }
 }
