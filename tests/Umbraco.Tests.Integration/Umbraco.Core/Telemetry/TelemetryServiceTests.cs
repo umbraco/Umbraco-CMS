@@ -5,6 +5,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -22,6 +24,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Telemetry
         }
 
         private ITelemetryService TelemetryService => GetRequiredService<ITelemetryService>();
+        private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
 
         [Test]
         public void Expected_Detailed_Telemetry_Exists()
@@ -52,6 +55,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Telemetry
                 Constants.Telemetry.DatabaseProvider,
             };
 
+            MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
             var success = TelemetryService.TryGetTelemetryReportData(out var telemetryReportData);
             var detailed = telemetryReportData.Detailed.ToArray();
 
