@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -12,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -115,16 +113,9 @@ namespace Umbraco.Extensions
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
 
+            TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
+
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-
-            TypeLoader typeLoader = services.AddTypeLoader(
-                Assembly.GetEntryAssembly(),
-                tempHostingEnvironment,
-                loggerFactory,
-                appCaches,
-                config,
-                profiler);
-
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
         }
 
@@ -425,6 +416,5 @@ namespace Umbraco.Extensions
                 wrappedWebRoutingSettings,
                 webHostEnvironment);
         }
-
     }
 }

@@ -4,14 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Extensions;
-using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.Composing
 {
@@ -21,112 +18,58 @@ namespace Umbraco.Cms.Core.Composing
     /// <remarks>
     /// <para>This class should be used to get all types, the <see cref="ITypeFinder"/> class should never be used directly.</para>
     /// <para>In most cases this class is not used directly but through extension methods that retrieve specific types.</para>
-    /// <para>This class caches the types it knows to avoid excessive assembly scanning and shorten startup times, relying
-    /// on a hash of the DLLs in the ~/bin folder to check for cache expiration.</para>
     /// </remarks>
     public sealed class TypeLoader
     {
-        private readonly IRuntimeHash _runtimeHash;
-        private readonly IAppPolicyCache _runtimeCache;
         private readonly ILogger<TypeLoader> _logger;
-        private readonly IProfilingLogger _profilingLogger;
 
-        private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
-        private readonly object _locko = new object();
-        private readonly object _timerLock = new object();
+        private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new ();
+        private readonly object _locko = new ();
 
-        private Timer? _timer;
-        private bool _timing;
-        private string? _cachedAssembliesHash;
-        private string? _currentAssembliesHash;
-        private IEnumerable<Assembly>? _assemblies;
-        private bool _reportedChange;
-        private readonly DirectoryInfo _localTempPath;
-        private readonly Lazy<string?> _fileBasePath;
-        private readonly Dictionary<(string, string), IEnumerable<string>> _emptyCache = new Dictionary<(string, string), IEnumerable<string>>();
-        private string? _typesListFilePath;
-        private string? _typesHashFilePath;
+        private IEnumerable<Assembly> _assemblies;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
-        /// <param name="typeFinder"></param>
-        /// <param name="runtimeCache">The application runtime cache.</param>
-        /// <param name="localTempPath">Files storage location.</param>
-        /// <param name="logger">A profiling logger.</param>
-        /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IRuntimeHash runtimeHash, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfiler profiler, IEnumerable<Assembly>? assembliesToScan = null)
-            : this(typeFinder, runtimeHash, runtimeCache, localTempPath, logger, profiler, true, assembliesToScan)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypeLoader"/> class.
-        /// </summary>
-        /// <param name="typeFinder"></param>
-        /// <param name="runtimeCache">The application runtime cache.</param>
-        /// <param name="localTempPath">Files storage location.</param>
-        /// <param name="logger">A profiling logger.</param>
-        /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IRuntimeHash runtimeHash, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfiler profiler, bool detectChanges, IEnumerable<Assembly>? assembliesToScan = null)
+        [Obsolete("Please use an alternative constructor.")]
+        public TypeLoader(
+            ITypeFinder typeFinder,
+            IRuntimeHash runtimeHash,
+            IAppPolicyCache runtimeCache,
+            DirectoryInfo localTempPath,
+            ILogger<TypeLoader> logger,
+            IProfiler profiler,
+            IEnumerable<Assembly>? assembliesToScan = null)
+            : this(typeFinder, logger, assembliesToScan)
         {
-            if (profiler is null)
-            {
-                throw new ArgumentNullException(nameof(profiler));
-            }
-
-            var runtimeHashValue = runtimeHash.GetHashValue();
-            CacheKey = runtimeHashValue + "umbraco-types.list";
-
-            TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
-            _runtimeHash = runtimeHash;
-            _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
-            _localTempPath = localTempPath;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _profilingLogger = new ProfilingLogger(logger, profiler);
-            _assemblies = assembliesToScan;
-
-            _fileBasePath = new Lazy<string?>(GetFileBasePath);
-
-            if (detectChanges)
-            {
-                //first check if the cached hash is string.Empty, if it is then we need
-                //do the check if they've changed
-                RequiresRescanning = CachedAssembliesHash != CurrentAssembliesHash || CachedAssembliesHash == string.Empty;
-                //if they have changed, we need to write the new file
-                if (RequiresRescanning)
-                {
-                    _logger.LogDebug("Plugin types are being re-scanned. Cached hash value: {CachedHash}, Current hash value: {CurrentHash}", CachedAssembliesHash, CurrentAssembliesHash);
-
-                    // if the hash has changed, clear out the persisted list no matter what, this will force
-                    // rescanning of all types including lazy ones.
-                    // http://issues.umbraco.org/issue/U4-4789
-                    var typesListFilePath = GetTypesListFilePath();
-                    if (typesListFilePath != null)
-                    {
-                        DeleteFile(typesListFilePath, FileDeleteTimeout);
-                    }
-
-                    WriteCacheTypesHash();
-                }
-            }
-            else
-            {
-                // if the hash has changed, clear out the persisted list no matter what, this will force
-                // rescanning of all types including lazy ones.
-                // http://issues.umbraco.org/issue/U4-4789
-                var typesListFilePath = GetTypesListFilePath();
-                if (typesListFilePath != null)
-                {
-                    DeleteFile(typesListFilePath, FileDeleteTimeout);
-                }
-
-                // always set to true if we're not detecting (generally only for testing)
-                RequiresRescanning = true;
-            }
         }
 
-        internal string CacheKey { get; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TypeLoader"/> class.
+        /// </summary>
+        [Obsolete("Please use an alternative constructor.")]
+        public TypeLoader(
+            ITypeFinder typeFinder,
+            IRuntimeHash runtimeHash,
+            IAppPolicyCache runtimeCache,
+            DirectoryInfo localTempPath,
+            ILogger<TypeLoader> logger,
+            IProfiler profiler,
+            bool detectChanges,
+            IEnumerable<Assembly>? assembliesToScan = null)
+            : this(typeFinder, logger, assembliesToScan)
+        {
+        }
+
+        public TypeLoader(
+            ITypeFinder typeFinder,
+            ILogger<TypeLoader> logger,
+            IEnumerable<Assembly>? assembliesToScan = null)
+        {
+            TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _assemblies = assembliesToScan;
+        }
 
         /// <summary>
         /// Returns the underlying <see cref="ITypeFinder"/>
@@ -144,6 +87,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <para>This is for unit tests.</para>
         /// </remarks>
         // internal for tests
+        [Obsolete("This will be removed in a future version.")]
         public IEnumerable<Assembly> AssembliesToScan => _assemblies ??= TypeFinder.AssembliesToScan;
 
         /// <summary>
@@ -151,6 +95,7 @@ namespace Umbraco.Cms.Core.Composing
         /// </summary>
         /// <remarks>For unit tests.</remarks>
         // internal for tests
+        [Obsolete("This will be removed in a future version.")]
         public IEnumerable<TypeList> TypeLists => _types.Values;
 
         /// <summary>
@@ -158,377 +103,48 @@ namespace Umbraco.Cms.Core.Composing
         /// </summary>
         /// <remarks>For unit tests.</remarks>
         // internal for tests
+        [Obsolete("This will be removed in a future version.")]
         public void AddTypeList(TypeList typeList)
         {
             var tobject = typeof(object); // CompositeTypeTypeKey does not support null values
             _types[new CompositeTypeTypeKey(typeList.BaseType ?? tobject, typeList.AttributeType ?? tobject)] = typeList;
         }
 
-        #region Hashing
-
-        /// <summary>
-        /// Gets a value indicating whether the assemblies in bin, app_code, global.asax, etc... have changed since they were last hashed.
-        /// </summary>
-        private bool RequiresRescanning { get; }
-
-        /// <summary>
-        /// Gets the currently cached hash value of the scanned assemblies.
-        /// </summary>
-        /// <value>The cached hash value, or string.Empty if no cache is found.</value>
-        internal string CachedAssembliesHash
-        {
-            get
-            {
-                if (_cachedAssembliesHash != null)
-                {
-                    return _cachedAssembliesHash;
-                }
-
-                var typesHashFilePath = GetTypesHashFilePath();
-                if (typesHashFilePath == null)
-                {
-                    return string.Empty;
-                }
-
-                if (!File.Exists(typesHashFilePath))
-                {
-                    return string.Empty;
-                }
-
-                var hash = File.ReadAllText(typesHashFilePath, Encoding.UTF8);
-
-                _cachedAssembliesHash = hash;
-                return _cachedAssembliesHash;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current assemblies hash based on creating a hash from the assemblies in various places.
-        /// </summary>
-        /// <value>The current hash.</value>
-        private string CurrentAssembliesHash
-        {
-            get
-            {
-                if (_currentAssembliesHash != null)
-                {
-                    return _currentAssembliesHash;
-                }
-
-                _currentAssembliesHash = _runtimeHash.GetHashValue();
-
-                return _currentAssembliesHash;
-            }
-        }
-
-        /// <summary>
-        /// Writes the assembly hash file.
-        /// </summary>
-        private void WriteCacheTypesHash()
-        {
-            var typesHashFilePath = GetTypesHashFilePath();
-            if (typesHashFilePath != null)
-            {
-                File.WriteAllText(typesHashFilePath, CurrentAssembliesHash, Encoding.UTF8);
-            }
-        }
-
-        #endregion
-
         #region Cache
 
-        private const int ListFileOpenReadTimeout = 4000; // milliseconds
-        private const int ListFileOpenWriteTimeout = 2000; // milliseconds
-        private const int ListFileWriteThrottle = 500; // milliseconds - throttle before writing
-        private const int ListFileCacheDuration = 2 * 60; // seconds - duration we cache the entire list
-        private const int FileDeleteTimeout = 4000; // milliseconds
-
         // internal for tests
-        public Attempt<IEnumerable<string>?> TryGetCached(Type? baseType, Type? attributeType)
+        [Obsolete("This will be removed in a future version.")]
+        public Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
         {
-            var cache =
-                _runtimeCache.GetCacheItem(CacheKey, ReadCacheSafe, TimeSpan.FromSeconds(ListFileCacheDuration))!;
-
-            cache.TryGetValue(
-                (baseType == null ? string.Empty : baseType.FullName ?? string.Empty, attributeType == null ? string.Empty : attributeType.FullName ?? string.Empty),
-                out IEnumerable<string>? types);
-
-            return types == null
-                ? Attempt<IEnumerable<string>?>.Fail()
-                : Attempt.Succeed(types);
-        }
-
-        private Dictionary<(string, string), IEnumerable<string>> ReadCacheSafe()
-        {
-            try
-            {
-                return ReadCache();
-            }
-            catch
-            {
-                try
-                {
-                    var typesListFilePath = GetTypesListFilePath();
-                    if (typesListFilePath != null)
-                    {
-                        DeleteFile(typesListFilePath, FileDeleteTimeout);
-                    }
-                }
-                catch
-                {
-                    // on-purpose, does not matter
-                }
-            }
-
-            return _emptyCache;
+            return Attempt<IEnumerable<string>>.Fail();
         }
 
         // internal for tests
-        public Dictionary<(string, string), IEnumerable<string>> ReadCache()
-        {
-            var typesListFilePath = GetTypesListFilePath();
-            if (typesListFilePath == null || File.Exists(typesListFilePath) == false)
-            {
-                return _emptyCache;
-            }
-
-            var cache = new Dictionary<(string, string), IEnumerable<string>>();
-            using (var stream = GetFileStream(typesListFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
-            using (var reader = new StreamReader(stream))
-            {
-                while (true)
-                {
-                    var baseType = reader.ReadLine();
-                    if (baseType == null)
-                    {
-                        return cache; // exit
-                    }
-
-                    if (baseType.StartsWith("<"))
-                    {
-                        break; // old xml
-                    }
-
-                    var attributeType = reader.ReadLine();
-                    if (attributeType == null)
-                    {
-                        break;
-                    }
-
-                    var types = new List<string>();
-                    while (true)
-                    {
-                        var type = reader.ReadLine();
-                        if (type == null)
-                        {
-                            types = null; // break 2 levels
-                            break;
-                        }
-                        if (type == string.Empty)
-                        {
-                            cache[(baseType, attributeType)] = types;
-                            break;
-                        }
-                        types.Add(type);
-                    }
-
-                    if (types == null)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            cache.Clear();
-            return cache;
-        }
+        [Obsolete("This will be removed in a future version.")]
+        public Dictionary<(string, string), IEnumerable<string>> ReadCache() => null;
 
         // internal for tests
-        public string? GetTypesListFilePath() => _typesListFilePath ??= _fileBasePath.Value == null ? null : _fileBasePath.Value + ".list";
-
-        private string? GetTypesHashFilePath() => _typesHashFilePath ??= _fileBasePath.Value == null ? null : _fileBasePath.Value + ".hash";
-
-        /// <summary>
-        /// Used to produce the Lazy value of _fileBasePath
-        /// </summary>
-        /// <returns></returns>
-        private string? GetFileBasePath()
-        {
-            if (_localTempPath == null)
-            {
-                return null;
-            }
-
-            var fileBasePath = Path.Combine(_localTempPath.FullName, "TypesCache", "umbraco-types." + EnvironmentHelper.FileSafeMachineName);
-
-            // ensure that the folder exists
-            var directory = Path.GetDirectoryName(fileBasePath);
-            if (directory == null)
-            {
-                throw new InvalidOperationException($"Could not determine folder for path \"{fileBasePath}\".");
-            }
-
-            if (Directory.Exists(directory) == false)
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            return fileBasePath;
-        }
+        [Obsolete("This will be removed in a future version.")]
+        public string GetTypesListFilePath() => null;
 
         // internal for tests
+        [Obsolete("This will be removed in a future version.")]
         public void WriteCache()
         {
-            _logger.LogDebug("Writing cache file.");
-            var typesListFilePath = GetTypesListFilePath();
-            if (typesListFilePath == null)
-            {
-                return;
-            }
-
-            using (var stream = GetFileStream(typesListFilePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
-            using (var writer = new StreamWriter(stream))
-            {
-                foreach (var typeList in _types.Values)
-                {
-                    writer.WriteLine(typeList.BaseType == null ? string.Empty : typeList.BaseType.FullName);
-                    writer.WriteLine(typeList.AttributeType == null ? string.Empty : typeList.AttributeType.FullName);
-                    foreach (var type in typeList.Types)
-                    {
-                        writer.WriteLine(type.AssemblyQualifiedName);
-                    }
-
-                    writer.WriteLine();
-                }
-            }
-        }
-
-        // internal for tests
-        internal void UpdateCache()
-        {
-            void TimerRelease(object? o)
-            {
-                lock (_timerLock)
-                {
-                    try
-                    {
-                        WriteCache();
-                    }
-                    catch { /* bah - just don't die */ }
-                    if (!_timing)
-                        _timer = null;
-                }
-            }
-
-            lock (_timerLock)
-            {
-                if (_timer == null)
-                {
-                    _timer = new Timer(TimerRelease, null, ListFileWriteThrottle, Timeout.Infinite);
-                }
-                else
-                {
-                    _timer.Change(ListFileWriteThrottle, Timeout.Infinite);
-                }
-
-                _timing = true;
-            }
         }
 
         /// <summary>
-        /// Removes cache files and internal cache.
+        /// Clears cache.
         /// </summary>
         /// <remarks>Generally only used for resetting cache, for example during the install process.</remarks>
+        [Obsolete("This will be removed in a future version.")]
         public void ClearTypesCache()
         {
-            var typesListFilePath = GetTypesListFilePath();
-            if (typesListFilePath == null)
-            {
-                return;
-            }
-
-            DeleteFile(typesListFilePath, FileDeleteTimeout);
-
-            var typesHashFilePath = GetTypesHashFilePath();
-            if (typesHashFilePath != null)
-            {
-                DeleteFile(typesHashFilePath, FileDeleteTimeout);
-            }
-
-            _runtimeCache.Clear(CacheKey);
-        }
-
-        private Stream GetFileStream(string path, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int timeoutMilliseconds)
-        {
-            const int pauseMilliseconds = 250;
-            var attempts = timeoutMilliseconds / pauseMilliseconds;
-            while (true)
-            {
-                try
-                {
-                    return new FileStream(path, fileMode, fileAccess, fileShare);
-                }
-                catch
-                {
-                    if (--attempts == 0)
-                    {
-                        throw;
-                    }
-
-                    _logger.LogDebug("Attempted to get filestream for file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
-                    Thread.Sleep(pauseMilliseconds);
-                }
-            }
-        }
-
-        private void DeleteFile(string path, int timeoutMilliseconds)
-        {
-            const int pauseMilliseconds = 250;
-            var attempts = timeoutMilliseconds / pauseMilliseconds;
-            while (File.Exists(path))
-            {
-                try
-                {
-                    File.Delete(path);
-                }
-                catch
-                {
-                    if (--attempts == 0)
-                        throw;
-
-                    _logger.LogDebug("Attempted to delete file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
-                    Thread.Sleep(pauseMilliseconds);
-                }
-            }
         }
 
         #endregion
 
         #region Get Assembly Attributes
-
-        ///// <summary>
-        ///// Gets the assembly attributes of the specified type <typeparamref name="T" />.
-        ///// </summary>
-        ///// <typeparam name="T">The attribute type.</typeparam>
-        ///// <returns>
-        ///// The assembly attributes of the specified type <typeparamref name="T" />.
-        ///// </returns>
-        //public IEnumerable<T> GetAssemblyAttributes<T>()
-        //    where T : Attribute
-        //{
-        //    return AssembliesToScan.SelectMany(a => a.GetCustomAttributes<T>()).ToList();
-        //}
-
-        ///// <summary>
-        ///// Gets all the assembly attributes.
-        ///// </summary>
-        ///// <returns>
-        ///// All assembly attributes.
-        ///// </returns>
-        //public IEnumerable<Attribute> GetAssemblyAttributes()
-        //{
-        //    return AssembliesToScan.SelectMany(a => a.GetCustomAttributes()).ToList();
-        //}
 
         /// <summary>
         /// Gets the assembly attributes of the specified <paramref name="attributeTypes" />.
@@ -558,7 +174,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
         /// <returns>All class types inheriting from or implementing the specified type.</returns>
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-        public IEnumerable<Type> GetTypes<T>(bool cache = true, IEnumerable<Assembly>? specificAssemblies = null)
+        public IEnumerable<Type> GetTypes<T>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
         {
             if (_logger == null)
             {
@@ -612,7 +228,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
         /// <returns>All class types inheriting from or implementing the specified type and marked with the specified attribute.</returns>
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-        public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(bool cache = true, IEnumerable<Assembly>? specificAssemblies = null)
+        public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
             if (_logger == null)
@@ -666,7 +282,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
         /// <returns>All class types marked with the specified attribute.</returns>
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-        public IEnumerable<Type> GetAttributedTypes<TAttribute>(bool cache = true, IEnumerable<Assembly>? specificAssemblies = null)
+        public IEnumerable<Type> GetAttributedTypes<TAttribute>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
             if (_logger == null)
@@ -691,7 +307,7 @@ namespace Umbraco.Cms.Core.Composing
 
         private IEnumerable<Type> GetTypesInternal(
             Type baseType,
-            Type? attributeType,
+            Type attributeType,
             Func<IEnumerable<Type>> finder,
             string action,
             bool cache)
@@ -701,21 +317,13 @@ namespace Umbraco.Cms.Core.Composing
             // loader is mostly not going to be used in any kind of massively multi-threaded scenario - so,
             // a plain lock is enough
 
-            var name = GetName(baseType, attributeType);
-
             lock (_locko)
             {
-                using (_profilingLogger.DebugDuration<TypeLoader>(
-                "Getting " + name,
-                "Got " + name)) // cannot contain typesFound.Count as it's evaluated before the find
-                {
-                    // get within a lock & timer
-                    return GetTypesInternalLocked(baseType, attributeType, finder, action, cache);
-                }
+                return GetTypesInternalLocked(baseType, attributeType, finder, action, cache);
             }
         }
 
-        private static string GetName(Type? baseType, Type? attributeType)
+        private static string GetName(Type baseType, Type attributeType)
         {
             var s = attributeType == null ? string.Empty : ("[" + attributeType + "]");
             s += baseType;
@@ -723,17 +331,16 @@ namespace Umbraco.Cms.Core.Composing
         }
 
         private IEnumerable<Type> GetTypesInternalLocked(
-            Type? baseType,
-            Type? attributeType,
+            Type baseType, Type attributeType,
             Func<IEnumerable<Type>> finder,
             string action,
             bool cache)
         {
             // check if the TypeList already exists, if so return it, if not we'll create it
             var tobject = typeof(object); // CompositeTypeTypeKey does not support null values
-
             var listKey = new CompositeTypeTypeKey(baseType ?? tobject, attributeType ?? tobject);
-            TypeList? typeList = null;
+            TypeList typeList = null;
+
             if (cache)
             {
                 _types.TryGetValue(listKey, out typeList); // else null
@@ -750,68 +357,12 @@ namespace Umbraco.Cms.Core.Composing
             // else proceed,
             typeList = new TypeList(baseType, attributeType);
 
-            var typesListFilePath = GetTypesListFilePath();
-            var scan = RequiresRescanning || typesListFilePath == null || File.Exists(typesListFilePath) == false;
+            // either we had to scan, or we could not get the types from the cache file - scan now
+            _logger.LogDebug("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
 
-            if (scan)
+            foreach (var t in finder())
             {
-                // either we have to rescan, or we could not find the cache file:
-                // report (only once) and scan and update the cache file
-                if (_reportedChange == false)
-                {
-                    _logger.LogDebug("Assemblies changes detected, need to rescan everything.");
-                    _reportedChange = true;
-                }
-            }
-
-            if (scan == false)
-            {
-                // if we don't have to scan, try the cache
-                var cacheResult = TryGetCached(baseType, attributeType);
-
-                // here we need to identify if the CachedTypeNotFoundInFile was the exception, if it was then we need to re-scan
-                // in some cases the type will not have been scanned for on application startup, but the assemblies haven't changed
-                // so in this instance there will never be a result.
-                if (cacheResult.Exception is CachedTypeNotFoundInFileException || cacheResult.Success == false)
-                {
-                    _logger.LogDebug("Getting {TypeName}: failed to load from cache file, must scan assemblies.", GetName(baseType, attributeType));
-                    scan = true;
-                }
-                else
-                {
-                    // successfully retrieved types from the file cache: load
-                    foreach (var type in cacheResult.Result!)
-                    {
-                        var resolvedType = TypeFinder.GetTypeByName(type);
-                        if (resolvedType != null)
-                        {
-                            typeList.Add(resolvedType);
-                        }
-                        else
-                        {
-                            // in case of any exception, we have to exit, and revert to scanning
-                            _logger.LogWarning("Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
-                            scan = true;
-                            break;
-                        }
-                    }
-
-                    if (scan == false)
-                    {
-                        _logger.LogDebug("Getting {TypeName}: loaded types from cache file.", GetName(baseType, attributeType));
-                    }
-                }
-            }
-
-            if (scan)
-            {
-                // either we had to scan, or we could not get the types from the cache file - scan now
-                _logger.LogDebug("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
-
-                foreach (var t in finder())
-                {
-                    typeList.Add(t);
-                }
+                typeList.Add(t);
             }
 
             // if we are to cache the results, do so
@@ -821,11 +372,6 @@ namespace Umbraco.Cms.Core.Composing
                 if (added)
                 {
                     _types[listKey] = typeList;
-                    //if we are scanning then update the cache file
-                    if (scan)
-                    {
-                        UpdateCache();
-                    }
                 }
 
                 _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
@@ -850,21 +396,21 @@ namespace Umbraco.Cms.Core.Composing
         {
             private readonly HashSet<Type> _types = new HashSet<Type>();
 
-            public TypeList(Type? baseType, Type? attributeType)
+            public TypeList(Type baseType, Type attributeType)
             {
                 BaseType = baseType;
                 AttributeType = attributeType;
             }
 
-            public Type? BaseType { get; }
-            public Type? AttributeType { get; }
+            public Type BaseType { get; }
+            public Type AttributeType { get; }
 
             /// <summary>
             /// Adds a type.
             /// </summary>
             public void Add(Type type)
             {
-                if (BaseType?.IsAssignableFrom(type) == false)
+                if (BaseType.IsAssignableFrom(type) == false)
                     throw new ArgumentException("Base type " + BaseType + " is not assignable from type " + type + ".", nameof(type));
                 _types.Add(type);
             }
