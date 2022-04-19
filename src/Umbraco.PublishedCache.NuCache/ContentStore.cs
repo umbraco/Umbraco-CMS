@@ -687,6 +687,34 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <param name="kits">
         /// All kits sorted by Level + Parent Id + Sort order
         /// </param>
+        /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <para>
+        /// This requires that the collection is sorted by Level + ParentId + Sort Order.
+        /// This should be used only on a site startup as the first generations.
+        /// This CANNOT be used after startup since it bypasses all checks for Generations.
+        /// </para>
+        /// <para>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        [Obsolete("Use the overload that takes a 'kitGroupSize' parameter instead")]
+        public bool SetAllFastSortedLocked(IEnumerable<ContentNodeKit> kits, bool fromDb)
+        {
+            return SetAllFastSortedLocked(kits, 1, fromDb);
+        }
+
+        /// <summary>
+        /// Builds all kits on startup using a fast forward only cursor
+        /// </summary>
+        /// <param name="kits">
+        /// All kits sorted by Level + Parent Id + Sort order
+        /// </param>
         /// <param name="kitGroupSize"></param>
         /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
         /// <returns></returns>
@@ -787,6 +815,24 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
 
             return ok;
+        }
+
+        /// <summary>
+        /// Set all data for a collection of <see cref="ContentNodeKit"/>
+        /// </summary>
+        /// <param name="kits"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        [Obsolete("Use the overload that takes the 'kitGroupSize' and 'fromDb' parameters instead")]
+        public bool SetAllLocked(IEnumerable<ContentNodeKit> kits)
+        {
+            return SetAllLocked(kits, 1, false);
         }
 
         /// <summary>
