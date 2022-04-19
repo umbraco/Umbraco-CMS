@@ -45,7 +45,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         {
             var version = CreateUmbracoVersion(9, 1, 1, "-rc", "-ad2f4k2d");
 
-            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), Mock.Of<IMetricsConsentService>());
+            var metricsConsentService = new Mock<IMetricsConsentService>();
+            metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
