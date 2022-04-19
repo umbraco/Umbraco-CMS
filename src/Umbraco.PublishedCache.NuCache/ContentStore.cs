@@ -156,8 +156,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             lock (_rlocko)
             {
                 // see SnapDictionary
-                try
-                { }
+                try { }
                 finally
                 {
                     if (_nextGen == false || (forceGen))
@@ -182,8 +181,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     lock (_rlocko)
                     {
                         // see SnapDictionary
-                        try
-                        { }
+                        try { }
                         finally
                         {
                             _nextGen = false;
@@ -218,8 +216,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void RollbackRoot()
         {
-            if (_root.Gen <= _liveGen)
-                return;
+            if (_root.Gen <= _liveGen) return;
 
             if (_root.Next != null)
                 _root = _root.Next;
@@ -231,8 +228,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             foreach (var item in dictionary)
             {
                 var link = item.Value;
-                if (link.Gen <= _liveGen)
-                    continue;
+                if (link.Gen <= _liveGen) continue;
 
                 var key = item.Key;
                 if (link.Next == null)
@@ -287,8 +283,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void RegisterChange(int id, ContentNodeKit kit)
         {
-            if (_wchanges == null)
-                _wchanges = new List<KeyValuePair<int, ContentNodeKit>>();
+            if (_wchanges == null) _wchanges = new List<KeyValuePair<int, ContentNodeKit>>();
             _wchanges.Add(new KeyValuePair<int, ContentNodeKit>(id, kit));
         }
 
@@ -331,8 +326,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public void UpdateContentTypesLocked(IEnumerable<IPublishedContentType> types)
         {
             //nothing to do if this is empty, no need to lock/allocate/iterate/etc...
-            if (!types.Any())
-                return;
+            if (!types.Any()) return;
 
             EnsureLocked();
 
@@ -346,11 +340,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             foreach (var link in _contentNodes.Values)
             {
                 var node = link.Value;
-                if (node == null)
-                    continue;
+                if (node == null) continue;
                 var contentTypeId = node.ContentType.Id;
-                if (index.TryGetValue(contentTypeId, out var contentType) == false)
-                    continue;
+                if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
                 SetValueLocked(_contentNodes, node.Id, new ContentNode(node, _publishedModelFactory, contentType));
             }
         }
@@ -417,13 +409,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             foreach (var link in _contentNodes.Values)
             {
                 var node = link.Value;
-                if (node == null)
-                    continue;
+                if (node == null) continue;
                 var contentTypeId = node.ContentType.Id;
-                if (removedIdsA.Contains(contentTypeId))
-                    removedContentTypeNodes.Add(node.Id);
-                if (refreshedIdsA.Contains(contentTypeId))
-                    refreshedContentTypeNodes.Add(node.Id);
+                if (removedIdsA.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
+                if (refreshedIdsA.Contains(contentTypeId)) refreshedContentTypeNodes.Add(node.Id);
             }
 
             // perform deletion of content with removed content type
@@ -471,8 +460,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 visited.Add(kit.Node.Id);
-                if (_localDb != null)
-                    RegisterChange(kit.Node.Id, kit);
+                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
             }
 
             // all content should have been refreshed - but...
@@ -530,8 +518,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                         continue;
                     var node = new ContentNode(link.Value, _publishedModelFactory, contentType);
                     SetValueLocked(_contentNodes, id, node);
-                    if (_localDb != null)
-                        RegisterChange(id, node.ToKit());
+                    if (_localDb != null) RegisterChange(id, node.ToKit());
                 }
             }
         }
@@ -654,8 +641,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             // set
             SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-            if (_localDb != null)
-                RegisterChange(kit.Node.Id, kit);
+            if (_localDb != null) RegisterChange(kit.Node.Id, kit);
 
             // manage the tree
             if (existing == null)
@@ -802,8 +788,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                     // if we are initializing from the database source ensure the local db is updated
-                    if (fromDb && _localDb != null)
-                        RegisterChange(thisNode.Id, kit);
+                    if (fromDb && _localDb != null) RegisterChange(thisNode.Id, kit);
 
                     // this node is always the last child
                     parent.LastChildContentId = thisNode.Id;
@@ -896,8 +881,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
-                    if (_localDb != null)
-                        RegisterChange(kit.Node.Id, kit);
+                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddTreeNodeLocked(kit.Node, parent);
 
                     _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
@@ -953,8 +937,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     continue; // skip that one
                 }
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                if (_localDb != null)
-                    RegisterChange(kit.Node.Id, kit);
+                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                 AddTreeNodeLocked(kit.Node, parent);
 
                 _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
@@ -982,8 +965,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // try to find the content
             // if it is not there, nothing to do
             _contentNodes.TryGetValue(id, out var link); // else null
-            if (link?.Value == null)
-                return false;
+            if (link?.Value == null) return false;
 
             var content = link.Value;
 
@@ -1013,12 +995,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             // This should never be null, all code that calls this method is null checking but we've seen
             // issues of null ref exceptions in issue reports so we'll double check here
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
+            if (content == null) throw new ArgumentNullException(nameof(content));
 
             SetValueLocked(_contentNodes, content.Id, null);
-            if (_localDb != null)
-                RegisterChange(content.Id, ContentNodeKit.Null);
+            if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
 
             _contentKeyToIdMap.TryRemove(content.Uid, out _);
 
@@ -1090,8 +1070,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private LinkedNode<TValue> GetLinkedNodeGen<TValue>(LinkedNode<TValue> link, long? gen)
             where TValue : class
         {
-            if (!gen.HasValue)
-                return link;
+            if (!gen.HasValue) return link;
 
             //find the correct snapshot, find the first that is <= the requested gen
             while (link != null && link.Gen > gen)
@@ -1808,8 +1787,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             public void Dispose()
             {
-                if (_gen < 0)
-                    return;
+                if (_gen < 0) return;
 #if DEBUG
                 _logger.LogDebug("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
 #endif
