@@ -47,11 +47,21 @@ namespace Umbraco.Cms.Core.Telemetry
             telemetryReportData = new TelemetryReportData
             {
                 Id = telemetryId,
-                Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild(),
+                Version = GetVersion(),
                 Packages = GetPackageTelemetry(),
                 Detailed = _usageInformationService.GetDetailed(),
             };
             return true;
+        }
+
+        private string GetVersion()
+        {
+            if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+            {
+                return null;
+            }
+
+            return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
         }
 
         private IEnumerable<PackageTelemetry> GetPackageTelemetry()
