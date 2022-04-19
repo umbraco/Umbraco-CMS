@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
@@ -65,7 +66,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = noVersionPackageName }
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), Mock.Of<IMetricsConsentService>());
+            var metricsConsentService = new Mock<IMetricsConsentService>();
+            metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
+            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -93,7 +96,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = "TrackingAllowed", AllowPackageTelemetry = true },
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), Mock.Of<IMetricsConsentService>());
+            var metricsConsentService = new Mock<IMetricsConsentService>();
+            metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
+            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
