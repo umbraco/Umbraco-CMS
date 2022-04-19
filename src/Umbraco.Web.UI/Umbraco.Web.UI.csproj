@@ -37,6 +37,10 @@
     <PackageReference Include="Umbraco.Code" Version="1.2.0" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\umbraco\views\common\infiniteeditors\twofactor\enabletwofactor.html" />
+  </ItemGroup>
+
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
