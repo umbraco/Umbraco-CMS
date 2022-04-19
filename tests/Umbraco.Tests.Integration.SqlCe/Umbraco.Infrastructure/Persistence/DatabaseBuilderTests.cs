@@ -2,11 +2,13 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -67,7 +69,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             using (var database = UmbracoDatabaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, Mock.Of<ILogger<DatabaseSchemaCreator>>(), NullLoggerFactory.Instance, new UmbracoVersion(), Mock.Of<IEventAggregator>());
+                schemaHelper = new DatabaseSchemaCreator(database, Mock.Of<ILogger<DatabaseSchemaCreator>>(), NullLoggerFactory.Instance, new UmbracoVersion(), Mock.Of<IEventAggregator>(), Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x => x.CurrentValue == new InstallDefaultDataSettings()));
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }
