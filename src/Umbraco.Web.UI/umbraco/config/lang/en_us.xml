@@ -2851,4 +2851,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="searchResult">item returned</key>
     <key alias="searchResults">items returned</key>
   </area>
+  <area alias="analytics">
+    <key alias="consentForAnalytics">Consent for analytics</key>
+  </area>
 </language>
