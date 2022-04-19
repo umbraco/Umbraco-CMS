@@ -11,6 +11,7 @@
     vm.saveConsentLevel = saveConsentLevel;
     vm.sliderChange = sliderChange;
     vm.setup = setup;
+    vm.loading = true;
     vm.consentLevel = '';
     vm.consentLevels = [];
     vm.val = 1;
@@ -27,10 +28,8 @@
           mode: 'values',
           density: 50,
           values: [1, 2, 3],
-          "format": {
+          format: {
             to: function (value) {
-              console.log("What the hell is going on", value)
-              console.log("array:", vm.consentLevels[value - 1])
               return vm.consentLevels[value - 1];
             },
             from: function (value) {
@@ -44,9 +43,18 @@
       getAllConsentLevels()
     ]).then( () => {
       vm.startPos = calculateStartPositionForSlider();
-      vm.sliderVal = vm.consentLevels[vm.startPos];
+      vm.sliderVal = vm.consentLevels[vm.startPos - 1];
       vm.sliderOptions.start = vm.startPos;
       vm.val = vm.startPos;
+      vm.sliderOptions.pips.format = {
+        to: function (value) {
+          return vm.consentLevels[value - 1];
+        },
+        from: function (value) {
+          return Number(value);
+        }
+      }
+      vm.loading = false;
       if (sliderRef) {
         sliderRef.noUiSlider.set(vm.startPos);
       }

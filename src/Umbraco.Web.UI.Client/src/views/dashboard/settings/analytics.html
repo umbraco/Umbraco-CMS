@@ -8,7 +8,7 @@
           <br>
           <br>We will on a regular basis share some of the overall learnings from these metrics.
           Hopefully, you'll help us collect some valuable data.</p>
-        <div style="padding-left: 12px;padding-top: 50px; padding-bottom: 50px; width: 25%">
+        <div ng-if="!vm.loading" style="padding-left: 12px;padding-top: 50px; padding-bottom: 50px; width: 25%">
           <umb-range-slider
             ng-model="vm.val"
             on-setup="vm.setup(slider)"
