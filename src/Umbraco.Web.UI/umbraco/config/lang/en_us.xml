@@ -2508,6 +2508,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsAnalytics">Analytics</key>
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
@@ -2862,5 +2863,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="treeSearch">
     <key alias="searchResult">item returned</key>
     <key alias="searchResults">items returned</key>
+  </area>
+  <area alias="analytics">
+    <key alias="consentForAnalytics">Consent for analytics</key>
+    <key alias="analyticsLevelSavedSuccess">Analytics level saved!</key>
   </area>
 </language>
