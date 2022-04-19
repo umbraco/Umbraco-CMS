@@ -1,7 +1,7 @@
 ﻿(function () {
   "use strict";
 
-  function AnalyticsController($q, analyticResource) {
+  function AnalyticsController($q, analyticResource, localizationService, notificationsService) {
 
     let sliderRef = null;
 
@@ -76,6 +76,9 @@
     }
     function saveConsentLevel(){
       analyticResource.saveConsentLevel(vm.sliderVal);
+      localizationService.localize("analytics_analyticsLevelSavedSuccess").then(function(value) {
+        notificationsService.success(value);
+      });
     }
 
     function sliderChange(values) {

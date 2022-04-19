@@ -2853,5 +2853,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="analytics">
     <key alias="consentForAnalytics">Consent for analytics</key>
+    <key alias="analyticsLevelSavedSuccess">Analytics level saved!</key>
   </area>
 </language>
