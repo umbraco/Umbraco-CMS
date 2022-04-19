@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function AppHeaderDirective(eventsService, appState, userService, focusService, overlayService, $timeout) {
+    function AppHeaderDirective(eventsService, appState, userService, focusService, $timeout, editorService) {
 
         function link(scope, element) {
 
@@ -72,17 +72,15 @@
             };
 
             scope.avatarClick = function () {
-
-                const dialog = {
-                    view: "user",
-                    position: "right",
-                    name: "overlay-user",
-                    close: function () {
-                        overlayService.close();
-                    }
+                const userEditor = {
+                  size: "small",
+                  view: "views/common/infiniteeditors/user/user.html",
+                  close: function() {
+                    editorService.close();
+                  }
                 };
 
-                overlayService.open(dialog);
+                editorService.open(userEditor);
             };
 
             scope.logoModal = {
