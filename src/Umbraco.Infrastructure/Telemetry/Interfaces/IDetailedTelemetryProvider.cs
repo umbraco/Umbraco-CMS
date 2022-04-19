@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Interfaces
 {
     internal interface IDetailedTelemetryProvider
     {
-        public IEnumerable<UsageInformation> GetInformation();
+        IEnumerable<UsageInformation> GetInformation();
     }
 }
