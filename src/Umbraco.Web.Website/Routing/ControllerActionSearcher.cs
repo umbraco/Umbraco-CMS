@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 [ActionToken] = customActionName, // first try to find the custom action
             };
 
-            if(area != null)
+            if (area != null)
             {
                 routeValues[AreaToken] = area;
             }
