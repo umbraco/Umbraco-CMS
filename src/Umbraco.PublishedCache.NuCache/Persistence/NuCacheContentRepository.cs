@@ -141,26 +141,49 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             if (contentTypeIds == null || contentTypeIds.Count == 0)
             {
                 // must support SQL-CE
-                Database.Execute(
-                    @"DELETE FROM cmsContentNu
+                if (Database.DatabaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType)
+                {
+                    Database.Execute(
+                   @"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
 )",
-                    new { objType = contentObjectType });
+                   new { objType = contentObjectType });
+                }
+                else
+                {
+                    Database.Execute(
+                  @"DELETE FROM cmsContentNu
+  INNER JOIN umbracoNode ON cmsContentNu.nodeId = umbracoNode.id
+  WHERE umbracoNode.nodeObjectType=@objType",
+                  new { objType = contentObjectType });
+                }
             }
             else
             {
                 // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                Database.Execute(
+                if (Database.DatabaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType)
+                {
+                    // must support SQL-CE
+                    Database.Execute(
                     $@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
     JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
                     new { objType = contentObjectType, ctypes = contentTypeIds });
+                }
+                else
+                {
+                    Database.Execute(
+                   $@"DELETE FROM cmsContentNu
+  INNER JOIN umbracoNode ON umbracoNode.id = cmsContentNu.nodeId
+  INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
+  AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
+  WHERE umbracoNode.nodeObjectType=@objType",
+                   new { objType = contentObjectType, ctypes = contentTypeIds });
+                }
             }
 
             // insert back - if anything fails the transaction will rollback
@@ -206,19 +229,32 @@ WHERE cmsContentNu.nodeId IN (
             // remove all - if anything fails the transaction will rollback
             if (contentTypeIds == null || contentTypeIds.Count == 0)
             {
-                // must support SQL-CE
-                Database.Execute(
+                if (Database.DatabaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType)
+                {
+                    // must support SQL-CE
+                    Database.Execute(
                     @"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
 )",
                     new { objType = mediaObjectType });
+                }
+                else
+                {
+                    Database.Execute(
+                 @"DELETE FROM cmsContentNu
+  INNER JOIN umbracoNode ON cmsContentNu.nodeId = umbracoNode.id
+  WHERE umbracoNode.nodeObjectType=@objType",
+                 new { objType = mediaObjectType });
+                }
             }
             else
             {
                 // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                Database.Execute(
+                if (Database.DatabaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType)
+                {
+                    // must support SQL-CE
+                    Database.Execute(
                     $@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
@@ -227,6 +263,17 @@ WHERE cmsContentNu.nodeId IN (
     AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = mediaObjectType, ctypes = contentTypeIds });
+                }
+                else
+                {
+                    Database.Execute(
+                  $@"DELETE FROM cmsContentNu
+  INNER JOIN umbracoNode ON umbracoNode.id = cmsContentNu.nodeId
+  INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
+  AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
+  WHERE umbracoNode.nodeObjectType=@objType",
+                  new { objType = mediaObjectType, ctypes = contentTypeIds });
+                }
             }
 
             // insert back - if anything fails the transaction will rollback
