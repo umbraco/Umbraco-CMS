@@ -11,12 +11,14 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Persistence.Sqlite.Mappers;
 using Umbraco.Cms.Persistence.Sqlite.Services;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
@@ -117,11 +119,14 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
         using NPoco.ITransaction transaction = database.GetTransaction();
 
+        var options = new TestOptionsMonitor<InstallDefaultDataSettings>(new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
+
         var schemaCreator = new DatabaseSchemaCreator(
             database,
             _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory,
             new UmbracoVersion(),
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            options);
 
         schemaCreator.InitializeDatabaseSchema();
         transaction.Complete();

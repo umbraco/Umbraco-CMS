@@ -6,9 +6,11 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
@@ -101,11 +103,15 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
 
             using (NPoco.ITransaction transaction = database.GetTransaction())
             {
+                var options = new TestOptionsMonitor<InstallDefaultDataSettings>(new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
+
                 var schemaCreator = new DatabaseSchemaCreator(
                     database,
                     _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory,
                     new UmbracoVersion(),
-                    Mock.Of<IEventAggregator>());
+                    Mock.Of<IEventAggregator>(),
+                    options);
+
                 schemaCreator.InitializeDatabaseSchema();
 
                 transaction.Complete();
