@@ -84,5 +84,11 @@ namespace Umbraco.Extensions
             });
 
         }
+
+        public static IUser GetByKey(this IUserService userService, Guid key)
+        {
+            int id = BitConverter.ToInt32(key.ToByteArray(), 0);
+            return userService.GetUserById(id);
+        }
     }
 }
