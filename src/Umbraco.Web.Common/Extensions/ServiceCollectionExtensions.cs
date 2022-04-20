@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -16,8 +15,10 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Serilog;
-using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Cms.Infrastructure.Logging.Serilog;
+using Umbraco.Cms.Web.Common.Logging.Enrichers;
+using Umbraco.Cms.Core;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -87,6 +88,7 @@ namespace Umbraco.Extensions
 
             services.AddSingleton(umbracoFileConfiguration);
             services.AddSingleton(loggingConfig);
+            services.AddSingleton<Serilog.Core.ILogEventEnricher, ApplicationIdEnricher>();
 
             LoggerConfiguration bootstrapConfiguration = new LoggerConfiguration()
                 .MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
