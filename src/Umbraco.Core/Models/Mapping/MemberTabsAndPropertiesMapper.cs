@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     },
                 },
 
-                // These properties used to live on the member as property data, defaulting to is sensitive, to we set them to sensitive here too
+                // These properties used to live on the member as property data, defaulting to sensitive, so we set them to sensitive here too
                 new()
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}failedPasswordAttempts",
@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() is false)
             {
-                // Current member doesn't have access to sensitive data so explicitly set the views and remove the value from sensitive data
+                // Current user doesn't have access to sensitive data so explicitly set the views and remove the value from sensitive data
                 foreach (var property in properties)
                 {
                     if (property.IsSensitive)

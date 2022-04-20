@@ -408,10 +408,10 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Appends an INNER JOIN clause using a nested query.
         /// </summary>
-        /// <param name="sql">The SQL statement</param>
-        /// <param name="nestedSelect">The nested sql query</param>
+        /// <param name="sql">The SQL statement.</param>
+        /// <param name="nestedSelect">The nested sql query.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
-        /// <returns>A SqlJoin statement</returns>
+        /// <returns>A SqlJoin statement.</returns>
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string alias = null)
         {
             var join = $"({nestedSelect.SQL})";
@@ -458,10 +458,10 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Appends an LEFT JOIN clause using a nested query.
         /// </summary>
-        /// <param name="sql">The SQL statement</param>
-        /// <param name="nestedSelect">The nested sql query</param>
+        /// <param name="sql">The SQL statement.</param>
+        /// <param name="nestedSelect">The nested sql query.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
-        /// <returns>A SqlJoin statement</returns>
+        /// <returns>A SqlJoin statement.</returns>
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string alias = null)
         {
             var join = $"({nestedSelect.SQL})";
