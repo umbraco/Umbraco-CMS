@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IDomain>? GetAll(bool includeWildcards)
+        public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IDomain>? GetAssignedDomains(int contentId, bool includeWildcards)
+        public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

@@ -162,14 +162,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return GetMany()?.Any(x => x.DomainName.InvariantEquals(domainName)) ?? false;
         }
 
-        public IEnumerable<IDomain>? GetAll(bool includeWildcards)
+        public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            return GetMany()?.Where(x => includeWildcards || x.IsWildcard == false);
+            return GetMany().Where(x => includeWildcards || x.IsWildcard == false);
         }
 
-        public IEnumerable<IDomain>? GetAssignedDomains(int contentId, bool includeWildcards)
+        public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            return GetMany()?
+            return GetMany()
                 .Where(x => x.RootContentId == contentId)
                 .Where(x => includeWildcards || x.IsWildcard == false);
         }

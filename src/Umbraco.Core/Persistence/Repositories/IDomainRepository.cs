@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         IDomain? GetByName(string domainName);
         bool Exists(string domainName);
-        IEnumerable<IDomain>? GetAll(bool includeWildcards);
-        IEnumerable<IDomain>? GetAssignedDomains(int contentId, bool includeWildcards);
+        IEnumerable<IDomain> GetAll(bool includeWildcards);
+        IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards);
     }
 }
