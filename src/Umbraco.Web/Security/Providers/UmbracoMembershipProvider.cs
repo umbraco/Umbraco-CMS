@@ -587,6 +587,13 @@ namespace Umbraco.Web.Security.Providers
                     requiresFullSave = true;
                 }
 
+                // If the last login date is default prior to setting it, it means that this value has never been set
+                // and therefore there's no property data created for it yet, which means that we can't just update that property
+                // and need to do a full save.
+                if (member.LastLoginDate == default)
+                {
+                    requiresFullSave = true;
+                }
                 member.LastLoginDate = DateTime.Now;
 
                 Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt succeeded for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
