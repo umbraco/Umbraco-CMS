@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -31,13 +32,20 @@ namespace Umbraco.Cms.Web.Website.Routing
             _actionSelector = actionSelector;
         }
 
+
         /// <summary>
         /// Determines if a custom controller can hijack the current route
         /// </summary>
         /// <typeparam name="T">The controller type to find</typeparam>
-        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action)
+        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action) => Find<T>(httpContext, controller, action, null);
+
+        /// <summary>
+        /// Determines if a custom controller can hijack the current route
+        /// </summary>
+        /// <typeparam name="T">The controller type to find</typeparam>
+        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action, string area)
         {
-            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates<T>(httpContext, controller, action, DefaultActionName);
+            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates<T>(httpContext, controller, action, DefaultActionName, area);
 
             if (candidates.Count > 0)
             {
@@ -47,6 +55,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             return null;
         }
 
+
         /// <summary>
         /// Return a list of controller candidates that match the custom controller and action names
         /// </summary>
@@ -54,7 +63,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             HttpContext httpContext,
             string customControllerName,
             string customActionName,
-            string defaultActionName)
+            string defaultActionName,
+            string area = null)
         {
             // Use aspnetcore's IActionSelector to do the finding since it uses an optimized cache lookup
             var routeValues = new RouteValueDictionary
@@ -62,6 +72,12 @@ namespace Umbraco.Cms.Web.Website.Routing
                 [ControllerToken] = customControllerName,
                 [ActionToken] = customActionName, // first try to find the custom action
             };
+
+            if (area != null)
+            {
+                routeValues[AreaToken] = area;
+            }
+
             var routeData = new RouteData(routeValues);
             var routeContext = new RouteContext(httpContext)
             {

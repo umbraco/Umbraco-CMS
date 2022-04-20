@@ -42,7 +42,8 @@ namespace Umbraco.Extensions
                     factory.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
                     factory.GetRequiredService<IUmbracoMapper>(),
                     factory.GetRequiredService<BackOfficeErrorDescriber>(),
-                    factory.GetRequiredService<AppCaches>()
+                    factory.GetRequiredService<AppCaches>(),
+                    factory.GetRequiredService<ITwoFactorLoginService>()
                 ))
                 .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
@@ -64,7 +65,7 @@ namespace Umbraco.Extensions
 
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
             services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
-            services.TryAddSingleton<IBackOfficeTwoFactorOptions, NoopBackOfficeTwoFactorOptions>();
+            services.TryAddSingleton<IBackOfficeTwoFactorOptions, DefaultBackOfficeTwoFactorOptions>();
 
             return new BackOfficeIdentityBuilder(services);
         }

@@ -82,6 +82,7 @@
     <key alias="translate">Toegang toestaan om een node te vertalen</key>
     <key alias="update">Toegang toestaan om een node op te slaan</key>
     <key alias="createblueprint">Toegang toestaan om Inhoudssjabloon aan te maken</key>
+    <key alias="notify">Toegang toestaan om meldingen voor content nodes aan te maken</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Inhoud</key>
@@ -256,6 +257,7 @@
     <key alias="statistics">Statistieken</key>
     <key alias="titleOptional">Titel (optioneel)</key>
     <key alias="altTextOptional">Alternatieve tekst (optioneel)</key>
+    <key alias="captionTextOptional">Bijschrift (optioneel)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Depubliceren</key>
     <key alias="unpublished">Concept</key>
@@ -694,6 +696,7 @@
     <key alias="clear">Wissen</key>
     <key alias="close">Sluiten</key>
     <key alias="closewindow">Sluit venster</key>
+    <key alias="closepane">Sluit paneel</key>
     <key alias="comment">Comment</key>
     <key alias="confirm">Bevestig</key>
     <key alias="constrain">Beperken</key>
@@ -2219,6 +2222,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="noRelations">Geen relaties voor dit relatietype.</key>
     <key alias="tabRelationType">Relatietype</key>
     <key alias="tabRelations">Relaties</key>
+    <key alias="isDependency">Is Afhankelijkheid</key>
+    <key alias="dependency">Ja</key>
+    <key alias="noDependency">Nee</key>
   </area>
   <area alias="dashboardTabs">
     <key alias="contentIntro">Aan de slag</key>
