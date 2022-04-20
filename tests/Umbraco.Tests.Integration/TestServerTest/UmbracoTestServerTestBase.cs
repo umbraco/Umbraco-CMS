@@ -26,6 +26,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
@@ -135,7 +136,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         private IHostBuilder CreateHostBuilder()
         {
-            IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+            IHostBuilder hostBuilder = UmbracoHost.CreateDefaultBuilder()
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();

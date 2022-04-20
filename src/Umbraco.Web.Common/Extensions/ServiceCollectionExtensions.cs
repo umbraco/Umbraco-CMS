@@ -8,12 +8,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Serilog;
+using Umbraco.Cms.Infrastructure.Logging.Serilog;
+using Umbraco.Cms.Web.Common.Hosting;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -65,44 +69,32 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Create and configure the logger
+        /// Create and configure the logger.
         /// </summary>
+        /// <remarks>
+        /// Additional Serilog services are registered during <see cref="HostBuilderExtensions.ConfigureUmbracoDefaults"/>.
+        /// </remarks>
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
             IHostEnvironment hostEnvironment,
-            ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
-            // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostEnvironment, loggingConfiguration, configuration, out var umbracoFileConfig);
-            services.AddSingleton(umbracoFileConfig);
+            // TODO: WEBSITE_RUN_FROM_PACKAGE - can't assume this DIR is writable - we have an IConfiguration instance so a later refactor should be easy enough.
+            var loggingDir = hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
+            ILoggingConfiguration loggingConfig = new LoggingConfiguration(loggingDir);
 
-            // This is nessasary to pick up all the loggins to MS ILogger.
-            Log.Logger = logger.SerilogLog;
+            var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
-            // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
-            // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which
-            // is the only other option that these ext methods allow.
-            // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
-            // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
+            services.AddSingleton(umbracoFileConfiguration);
+            services.AddSingleton(loggingConfig);
 
-            services.AddLogging(configure =>
-            {
-                configure.AddSerilog(logger.SerilogLog, false);
-            });
+            LoggerConfiguration bootstrapConfiguration = new LoggerConfiguration()
+                .MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
+                .ReadFrom.Configuration(configuration);
 
-            // This won't (and shouldn't) take ownership of the logger.
-            services.AddSingleton(logger.SerilogLog);
-
-            // Registered to provide two services...
-            var diagnosticContext = new DiagnosticContext(logger.SerilogLog);
-
-            // Consumed by e.g. middleware
-            services.AddSingleton(diagnosticContext);
-
-            // Consumed by user code
-            services.AddSingleton<IDiagnosticContext>(diagnosticContext);
-            services.AddSingleton(loggingConfiguration);
+            // Configure for rebuild later.
+            Log.Logger = bootstrapConfiguration
+                .CreateBootstrapLogger();
 
             return services;
         }

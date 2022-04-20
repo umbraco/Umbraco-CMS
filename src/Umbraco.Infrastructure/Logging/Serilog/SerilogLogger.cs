@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog
             SerilogLog = logConfig.CreateLogger();
         }
 
-        [Obsolete("Use the extension method that takes an IHostEnvironment instance instead.")]
+        [Obsolete]
         public static SerilogLogger CreateWithDefaultConfiguration(
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        [Obsolete("Use the extension method that takes an IHostEnvironment instance instead.")]
+        [Obsolete]
         public static SerilogLogger CreateWithDefaultConfiguration(
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
@@ -47,20 +47,6 @@ namespace Umbraco.Cms.Core.Logging.Serilog
 
             return new SerilogLogger(serilogConfig);
         }
-
-        public static SerilogLogger CreateWithDefaultConfiguration(
-            IHostEnvironment hostEnvironment,
-            ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            out UmbracoFileConfiguration umbracoFileConfig)
-        {
-            var serilogConfig = new LoggerConfiguration()
-                .MinimalConfiguration(hostEnvironment, loggingConfiguration, configuration, out umbracoFileConfig)
-                .ReadFrom.Configuration(configuration);
-
-            return new SerilogLogger(serilogConfig);
-        }
-
 
         /// <summary>
         /// Gets a contextualized logger.

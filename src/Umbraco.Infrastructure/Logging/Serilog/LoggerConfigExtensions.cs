@@ -23,7 +23,7 @@ namespace Umbraco.Extensions
         /// Such as adding ProcessID, Thread, AppDomain etc
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
-        [Obsolete("Use the extension method that takes an IHostEnvironment instance instead.")]
+        [Obsolete("Please use an alternative method.")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -38,7 +38,7 @@ namespace Umbraco.Extensions
         /// Such as adding ProcessID, Thread, AppDomain etc
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
-        [Obsolete("Use the extension method that takes an IHostEnvironment instance instead.")]
+        [Obsolete("Please use an alternative method.")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -91,8 +91,7 @@ namespace Umbraco.Extensions
             this LoggerConfiguration logConfig,
             IHostEnvironment hostEnvironment,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            out UmbracoFileConfiguration umbFileConfiguration)
+            UmbracoFileConfiguration umbracoFileConfiguration)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -110,11 +109,6 @@ namespace Umbraco.Extensions
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
-
-            //This is not optimal, but seems to be the only way if we do not make an Serilog.Sink.UmbracoFile sink all the way.
-            var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
-
-            umbFileConfiguration = umbracoFileConfiguration;
 
             logConfig.WriteTo.UmbracoFile(
                 path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
