@@ -617,9 +617,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 // ensure no duplicate alias, then assign the group properties collection
                 EnsureUniqueAliases(destProperties);
-                if (destGroup is not null && (destGroup.PropertyTypes?.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false))
+
+                if (destGroup is not null)
                 {
-                    destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                    if (destGroup.PropertyTypes?.SupportsPublishing != isPublishing || destGroup.PropertyTypes.SequenceEqual(destProperties) is false)
+                    {
+                        destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
+                    }
+
                     destGroups.Add(destGroup);
                 }
             }
