@@ -108,6 +108,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
             services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
 
+            services.AddLogger(webHostEnvironment, Configuration);
+
             // Add it!
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
             TypeLoader typeLoader = services.AddTypeLoader(

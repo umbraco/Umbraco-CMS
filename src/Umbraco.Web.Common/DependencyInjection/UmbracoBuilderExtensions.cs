@@ -112,20 +112,7 @@ namespace Umbraco.Extensions
 
             IProfiler profiler = GetWebProfiler(config);
 
-            // Called in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
-            services.AddLogger(webHostEnvironment, config, serilogConfig =>
-            {
-                if (Log.Logger is not ReloadableLogger)
-                {
-                    // We only want to blast over the global logger if AddLogger hasn't been called previously.
-                    // And in that case we don't want all the synchronization so avoid CreateBootstrapLogger
-                    Log.Logger = serilogConfig.CreateLogger();
-                    Log.Logger.Warning("ConfigureUmbracoDefaults has not been applied to HostBuilder.");
-
-                    services.TryAddSingleton(Log.Logger);
-                    services.AddLogging(cfg => cfg.AddSerilog());
-                }
-            });
+            services.AddLogger(webHostEnvironment, config);
 
             ILoggerFactory loggerFactory = new SerilogLoggerFactory();
 

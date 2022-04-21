@@ -167,6 +167,11 @@ namespace Umbraco.Extensions
         {
             formatter ??= new CompactJsonFormatter();
 
+            /* Async sink has an event buffer of 10k events (by default) so we're not constantly thrashing the disk.
+             * I noticed that with File buffered + large number of log entries (global minimum Debug)
+             * an ungraceful shutdown would consistently result in output that just stops halfway through an entry.
+             * with buffered false on the inner sink ungraceful shutdowns still don't seem to wreck the file.
+             */
             return configuration.Async(
                 cfg =>
                     cfg.File(
@@ -175,8 +180,8 @@ namespace Umbraco.Extensions
                         restrictedToMinimumLevel,
                         fileSizeLimitBytes,
                         levelSwitch,
-                        buffered:true,
-                        shared:false,
+                        buffered: false, // see notes above.
+                        shared: false,
                         flushToDiskInterval,
                         rollingInterval,
                         rollOnFileSizeLimit,

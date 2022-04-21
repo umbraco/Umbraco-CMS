@@ -199,6 +199,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 Configuration,
                 TestHelper.Profiler);
 
+            services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
+
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
 
             builder

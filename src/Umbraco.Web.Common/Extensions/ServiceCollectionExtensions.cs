@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
+using Serilog.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -78,8 +79,7 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
             IHostEnvironment hostEnvironment,
-            IConfiguration configuration,
-            Action<LoggerConfiguration> configureLogger)
+            IConfiguration configuration)
         {
             // TODO: WEBSITE_RUN_FROM_PACKAGE - can't assume this DIR is writable - we have an IConfiguration instance so a later refactor should be easy enough.
             var loggingDir = hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
@@ -91,11 +91,46 @@ namespace Umbraco.Extensions
             services.TryAddSingleton(loggingConfig);
             services.TryAddSingleton<Serilog.Core.ILogEventEnricher, ApplicationIdEnricher>();
 
+            ///////////////////////////////////////////////
+            // Bootstrap logger setup
+            ///////////////////////////////////////////////
+
             LoggerConfiguration serilogConfig = new LoggerConfiguration()
                 .MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
                 .ReadFrom.Configuration(configuration);
 
-            configureLogger(serilogConfig);
+            Log.Logger = serilogConfig.CreateBootstrapLogger();
+
+            ///////////////////////////////////////////////
+            // Runtime logger setup
+            ///////////////////////////////////////////////
+
+            services.AddSingleton<ReloadableLogger>(sp =>
+            {
+                var logger = (ReloadableLogger)Log.Logger;
+
+                logger.Reload(cfg =>
+                {
+                    cfg.MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
+                        .ReadFrom.Configuration(configuration)
+                        .ReadFrom.Services(sp);
+
+                    return cfg;
+                });
+
+                logger.Freeze();
+
+                return logger;
+            });
+
+            services.AddSingleton<Serilog.ILogger>(sp =>
+                sp.GetRequiredService<ReloadableLogger>().ForContext(new NoopEnricher()));
+
+            services.AddSingleton<ILoggerFactory>(sp =>
+            {
+                ReloadableLogger logger = sp.GetRequiredService<ReloadableLogger>();
+                return new SerilogLoggerFactory(logger, true);
+            });
 
             // Registered to provide two services...
             var diagnosticContext = new DiagnosticContext(Log.Logger);
