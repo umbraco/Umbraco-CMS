@@ -28,9 +28,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 user.Language = dto.UserLanguage;
                 user.SecurityStamp = dto.SecurityStampToken;
                 user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;
-                user.LastLockoutDate = dto.LastLockoutDate ?? DateTime.MinValue;
-                user.LastLoginDate = dto.LastLoginDate ?? DateTime.MinValue;
-                user.LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue;
+                user.LastLockoutDate = dto.LastLockoutDate;
+                user.LastLoginDate = dto.LastLoginDate;
+                user.LastPasswordChangeDate = dto.LastPasswordChangeDate;
                 user.CreateDate = dto.CreateDate;
                 user.UpdateDate = dto.UpdateDate;
                 user.Avatar = dto.Avatar;

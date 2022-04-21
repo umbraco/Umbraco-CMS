@@ -406,6 +406,24 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends an INNER JOIN clause using a nested query.
+        /// </summary>
+        /// <param name="sql">The SQL statement.</param>
+        /// <param name="nestedSelect">The nested sql query.</param>
+        /// <param name="alias">An optional alias for the joined table.</param>
+        /// <returns>A SqlJoin statement.</returns>
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string alias = null)
+        {
+            var join = $"({nestedSelect.SQL})";
+            if (alias is not null)
+            {
+                join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+            }
+
+            return sql.InnerJoin(join);
+        }
+
+        /// <summary>
         /// Appends a LEFT JOIN clause to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -436,6 +454,24 @@ namespace Umbraco.Extensions
             Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
             string alias = null) =>
             sql.SqlContext.SqlSyntax.LeftJoinWithNestedJoin<TDto>(sql, nestedJoin, alias);
+
+        /// <summary>
+        /// Appends an LEFT JOIN clause using a nested query.
+        /// </summary>
+        /// <param name="sql">The SQL statement.</param>
+        /// <param name="nestedSelect">The nested sql query.</param>
+        /// <param name="alias">An optional alias for the joined table.</param>
+        /// <returns>A SqlJoin statement.</returns>
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string alias = null)
+        {
+            var join = $"({nestedSelect.SQL})";
+            if (alias is not null)
+            {
+                join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+            }
+
+            return sql.LeftJoin(join);
+        }
 
         /// <summary>
         /// Appends a RIGHT JOIN clause to the Sql statement.
