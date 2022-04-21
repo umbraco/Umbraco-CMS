@@ -153,7 +153,7 @@ WHERE cmsContentNu.nodeId IN (
                 else
                 {
                     Database.Execute(
-                  @"DELETE FROM cmsContentNu
+                  @"DELETE cmsContentNu FROM cmsContentNu
   INNER JOIN umbracoNode ON cmsContentNu.nodeId = umbracoNode.id
   WHERE umbracoNode.nodeObjectType=@objType",
                   new { objType = contentObjectType });
@@ -177,11 +177,11 @@ WHERE cmsContentNu.nodeId IN (
                 else
                 {
                     Database.Execute(
-                   $@"DELETE FROM cmsContentNu
+                   $@"DELETE cmsContentNu FROM cmsContentNu
   INNER JOIN umbracoNode ON umbracoNode.id = cmsContentNu.nodeId
   INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-  AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-  WHERE umbracoNode.nodeObjectType=@objType",
+  WHERE {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
+  AND umbracoNode.nodeObjectType=@objType",
                    new { objType = contentObjectType, ctypes = contentTypeIds });
                 }
             }
@@ -242,7 +242,7 @@ WHERE cmsContentNu.nodeId IN (
                 else
                 {
                     Database.Execute(
-                 @"DELETE FROM cmsContentNu
+                 @"DELETE cmsContentNu FROM cmsContentNu
   INNER JOIN umbracoNode ON cmsContentNu.nodeId = umbracoNode.id
   WHERE umbracoNode.nodeObjectType=@objType",
                  new { objType = mediaObjectType });
@@ -267,11 +267,11 @@ WHERE cmsContentNu.nodeId IN (
                 else
                 {
                     Database.Execute(
-                  $@"DELETE FROM cmsContentNu
+                  $@"DELETE cmsContentNu FROM cmsContentNu
   INNER JOIN umbracoNode ON umbracoNode.id = cmsContentNu.nodeId
   INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-  AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-  WHERE umbracoNode.nodeObjectType=@objType",
+  WHERE {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
+  AND umbracoNode.nodeObjectType=@objType",
                   new { objType = mediaObjectType, ctypes = contentTypeIds });
                 }
             }
