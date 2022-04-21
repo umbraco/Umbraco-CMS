@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             {
                 x.HeaderName = Constants.Web.AngularHeadername;
                 x.Cookie.Name = Constants.Web.CsrfValidationCookieName;
+                x.Cookie.SecurePolicy = globalSettings.Value.UseHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
             });
             ServiceProvider container = services.BuildServiceProvider();
             _internalAntiForgery = container.GetRequiredService<IAntiforgery>();
