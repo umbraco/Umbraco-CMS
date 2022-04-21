@@ -1,14 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees
@@ -21,14 +24,35 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     {
         private readonly IMemberGroupService _memberGroupService;
 
+        [
+            ActivatorUtilitiesConstructor]
+        public MemberGroupTreeController(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IMemberGroupService memberGroupService,
+            IEventAggregator eventAggregator,
+            IMemberTypeService memberTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator, memberTypeService)
+            => _memberGroupService = memberGroupService;
+
+        [Obsolete("Use ctor with all params")]
         public MemberGroupTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMemberGroupService memberGroupService,
             IEventAggregator eventAggregator)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
-            => _memberGroupService = memberGroupService;
+            : this(localizedTextService,
+                umbracoApiControllerTypeCollection,
+                menuItemCollectionFactory,
+                memberGroupService,
+                eventAggregator,
+                StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
+        {
+
+        }
+
 
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)
             => _memberGroupService.GetAll()

@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -24,6 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     {
         private readonly BackOfficeUserManager _userManager;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
+        private readonly IEventAggregator _eventAggregator;
         private readonly GlobalSettings _globalSettings;
 
         protected override string AuthenticationType => Constants.Security.BackOfficeAuthenticationType;
@@ -43,12 +48,30 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IOptions<GlobalSettings> globalSettings,
             ILogger<SignInManager<BackOfficeIdentityUser>> logger,
             IAuthenticationSchemeProvider schemes,
-            IUserConfirmation<BackOfficeIdentityUser> confirmation)
+            IUserConfirmation<BackOfficeIdentityUser> confirmation,
+            IEventAggregator eventAggregator)
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
             _userManager = userManager;
             _externalLogins = externalLogins;
+            _eventAggregator = eventAggregator;
             _globalSettings = globalSettings.Value;
+        }
+
+        [Obsolete("Use ctor with all params")]
+        public BackOfficeSignInManager(
+            BackOfficeUserManager userManager,
+            IHttpContextAccessor contextAccessor,
+            IBackOfficeExternalLoginProviders externalLogins,
+            IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
+            IOptions<IdentityOptions> optionsAccessor,
+            IOptions<GlobalSettings> globalSettings,
+            ILogger<SignInManager<BackOfficeIdentityUser>> logger,
+            IAuthenticationSchemeProvider schemes,
+            IUserConfirmation<BackOfficeIdentityUser> confirmation)
+            : this(userManager, contextAccessor, externalLogins, claimsFactory, optionsAccessor, globalSettings, logger, schemes, confirmation, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        {
+
         }
 
         /// <summary>
@@ -282,6 +305,31 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 var errors = linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList();
                 return AutoLinkSignInResult.FailedLinkingUser(errors);
             }
+        }
+
+        protected override async Task<SignInResult> SignInOrTwoFactorAsync(BackOfficeIdentityUser user, bool isPersistent,
+            string loginProvider = null, bool bypassTwoFactor = false)
+        {
+            var result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
+
+            if (result.RequiresTwoFactor)
+            {
+                NotifyRequiresTwoFactor(user);
+            }
+
+            return result;
+        }
+
+        protected void NotifyRequiresTwoFactor(BackOfficeIdentityUser user) => Notify(user,
+            (currentUser) => new UserTwoFactorRequestedNotification(currentUser.Key)
+        );
+
+        private T Notify<T>(BackOfficeIdentityUser currentUser, Func<BackOfficeIdentityUser, T> createNotification) where T : INotification
+        {
+
+            var notification = createNotification(currentUser);
+            _eventAggregator.Publish(notification);
+            return notification;
         }
 
         private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, BackOfficeIdentityUser user) =>

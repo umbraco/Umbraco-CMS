@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -122,8 +122,9 @@ namespace Umbraco.Cms.Web.Website.ActionResults
             }
 
             HttpContext httpContext = context.HttpContext;
-            IIOHelper ioHelper = httpContext.RequestServices.GetRequiredService<IIOHelper>();
-            string destinationUrl = ioHelper.ResolveUrl(Url);
+            IUrlHelperFactory urlHelperFactory = httpContext.RequestServices.GetRequiredService<IUrlHelperFactory>();
+            IUrlHelper urlHelper = urlHelperFactory.GetUrlHelper(context);
+            string destinationUrl = urlHelper.Content(Url);
 
             if (_queryString.HasValue)
             {
@@ -134,6 +135,5 @@ namespace Umbraco.Cms.Web.Website.ActionResults
 
             return Task.CompletedTask;
         }
-
     }
 }

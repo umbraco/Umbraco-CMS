@@ -1599,6 +1599,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 syncContent();
             });
 
+            // When the element is removed from the DOM, we need to terminate
+            // any active watchers to ensure scopes are disposed and do not leak.
+            // No need to sync content as that has already happened.
+            args.editor.on('remove', () => stopWatch());
+
             args.editor.on('ObjectResized', function (e) {
                 var srcAttr = $(e.target).attr("src");
                 var path = srcAttr.split("?")[0];

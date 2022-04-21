@@ -597,7 +597,10 @@ namespace Umbraco.Cms.Core.Security
                 || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
                 || (identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
-                changeType = MemberDataChangeType.LoginOnly;
+                // If the LastLoginDate is default on the member we have to do a full save.
+                // This is because the umbraco property data for the member doesn't exist yet in this case
+                // meaning we can't just update that property data, but have to do a full save to create it
+                changeType = member.LastLoginDate == default ? MemberDataChangeType.FullSave : MemberDataChangeType.LoginOnly;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
                 DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
