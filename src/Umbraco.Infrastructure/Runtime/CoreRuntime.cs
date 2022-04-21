@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
 
-            // Just in-case UmbracoHost isn't used (e.g. upgrade from 9 and ignored advice).
+            // Just in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
             if (StaticServiceProvider.Instance == null!)
             {
                 StaticServiceProvider.Instance = _serviceProvider;

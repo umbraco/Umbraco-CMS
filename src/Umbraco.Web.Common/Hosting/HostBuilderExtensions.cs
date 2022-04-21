@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Infrastructure.Logging.Serilog;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Hosting
@@ -12,16 +13,14 @@ namespace Umbraco.Cms.Web.Common.Hosting
     /// <summary>
     /// Umbraco specific extensions for the <see cref="IHostBuilder"/> interface.
     /// </summary>
-    internal static class HostBuilderExtensions
+    public static class HostBuilderExtensions
     {
         /// <summary>
         /// Configures an existing <see cref="IHostBuilder"/> with defaults for an Umbraco application.
         /// </summary>
-        internal static IHostBuilder ConfigureUmbracoDefaults(this IHostBuilder builder, string[] args)
+        public static IHostBuilder ConfigureUmbracoDefaults(this IHostBuilder builder)
         {
-            builder.ConfigureDefaults(args);
 #if DEBUG
-
             builder.ConfigureAppConfiguration(config
                 => config.AddJsonFile(
                     "appsettings.Local.json",
@@ -50,7 +49,11 @@ namespace Umbraco.Cms.Web.Common.Hosting
                     .ReadFrom.Services(services); // Adds ILogEventEnricher found in container.
             });
 
-            return builder;
+            return new UmbracoHostBuilderDecorator(builder, OnHostBuilt);
         }
+
+        // Runs before any IHostedService starts (including generic web host).
+        private static void OnHostBuilt(IHost host) =>
+            StaticServiceProvider.Instance = host.Services;
     }
 }

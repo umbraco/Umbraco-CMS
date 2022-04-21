@@ -112,7 +112,7 @@ namespace Umbraco.Extensions
 
             IProfiler profiler = GetWebProfiler(config);
 
-            // Called in-case UmbracoHost isn't used (e.g. upgrade from 9 and ignored advice).
+            // Called in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
             services.AddLogger(webHostEnvironment, config, serilogConfig =>
             {
                 if (Log.Logger is not ReloadableLogger)

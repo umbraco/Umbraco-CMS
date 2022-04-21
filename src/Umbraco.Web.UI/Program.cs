@@ -12,7 +12,8 @@ namespace Umbraco.Cms.Web.UI
                 .Run();
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            UmbracoHost.CreateDefaultBuilder(args)
+            Host.CreateDefaultBuilder(args)
+                .ConfigureUmbracoDefaults()
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }

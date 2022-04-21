@@ -136,7 +136,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         private IHostBuilder CreateHostBuilder()
         {
-            IHostBuilder hostBuilder = UmbracoHost.CreateDefaultBuilder()
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureUmbracoDefaults()
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
