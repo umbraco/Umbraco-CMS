@@ -490,7 +490,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             IMapDefinition memberMapDefinition = new MemberMapDefinition(
                 commonMapper,
-                new CommonTreeNodeMapper(Mock.Of<LinkGenerator>()),
+                new CommonTreeNodeMapper(Mock.Of<LinkGenerator>(), Mock.Of<IHostingEnvironment>()),
                 new MemberTabsAndPropertiesMapper(
                     mockCultureDictionary.Object,
                     backOfficeSecurityAccessor,

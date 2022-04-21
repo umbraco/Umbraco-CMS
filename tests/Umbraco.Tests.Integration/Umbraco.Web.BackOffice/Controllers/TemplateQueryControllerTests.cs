@@ -22,7 +22,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task GetContentTypes__Ensure_camel_case()
         {
-            string url = PrepareApiControllerUrl<TemplateQueryController>(x => x.GetContentTypes());
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<TemplateQueryController>(x => x.GetContentTypes(), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(url);

@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
@@ -42,19 +43,22 @@ namespace Umbraco.Extensions
         /// Return the Url for a Web Api service
         /// </summary>
         /// <typeparam name="T">The <see cref="UmbracoApiControllerBase"/></typeparam>
-        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, object id = null)
+        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName,
+            string pathBase, object id = null)
             where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(
                 actionName,
-                typeof(T),
+                typeof(T), pathBase,
                 new Dictionary<string, object>()
                 {
                     ["id"] = id
                 });
 
-        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, IDictionary<string, object> values)
-            where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), values);
+        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName,
+            IDictionary<string, object> values, string pathBase)
+            where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), pathBase, values);
 
-        public static string GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
+        public static string GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator,
+            Expression<Func<T, object>> methodSelector, string pathBase)
             where T : UmbracoApiControllerBase
         {
             var method = ExpressionHelper.GetMethodInfo(methodSelector);
@@ -62,13 +66,14 @@ namespace Umbraco.Extensions
             {
                 throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
             }
-            return linkGenerator.GetUmbracoApiService<T>(method.Name).TrimEnd(method.Name);
+            return linkGenerator.GetUmbracoApiService<T>(method.Name, pathBase).TrimEnd(method.Name);
         }
 
         /// <summary>
         /// Return the Url for an Umbraco controller
         /// </summary>
-        public static string GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName, string controllerName, string area, IDictionary<string, object> dict = null)
+        public static string GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName,
+            string controllerName, string area, string pathBase, IDictionary<string, object> dict = null)
         {
             if (actionName == null)
             {
@@ -108,13 +113,14 @@ namespace Umbraco.Extensions
                     return a;
                 });
 
-            return linkGenerator.GetPathByAction(actionName, controllerName, values);
+            return linkGenerator.GetPathByAction(actionName, controllerName, values, new PathString(pathBase));
         }
 
         /// <summary>
         /// Return the Url for an Umbraco controller
         /// </summary>
-        public static string GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName, Type controllerType, IDictionary<string, object> values = null)
+        public static string GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName,
+            Type controllerType, string pathBase, IDictionary<string, object> values = null)
         {
             if (actionName == null)
             {
@@ -145,10 +151,11 @@ namespace Umbraco.Extensions
                 area = metaData.AreaName;
             }
 
-            return linkGenerator.GetUmbracoControllerUrl(actionName, ControllerExtensions.GetControllerName(controllerType), area, values);
+            return linkGenerator.GetUmbracoControllerUrl(actionName, ControllerExtensions.GetControllerName(controllerType), area, pathBase, values);
         }
 
-        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
+        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator,
+            Expression<Func<T, object>> methodSelector, string pathBase)
             where T : UmbracoApiController
         {
             var method = ExpressionHelper.GetMethodInfo(methodSelector);
@@ -161,10 +168,10 @@ namespace Umbraco.Extensions
 
             if (methodParams.Any() == false)
             {
-                return linkGenerator.GetUmbracoApiService<T>(method.Name);
+                return linkGenerator.GetUmbracoApiService<T>(method.Name, methodParams, pathBase);
             }
 
-            return linkGenerator.GetUmbracoApiService<T>(method.Name, methodParams);
+            return linkGenerator.GetUmbracoApiService<T>(method.Name, methodParams, pathBase);
         }
     }
 }

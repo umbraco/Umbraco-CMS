@@ -31,7 +31,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task Save_User()
         {
-            string url = PrepareApiControllerUrl<UsersController>(x => x.PostSaveUser(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostSaveUser(null), pathBase);
 
             IUserService userService = GetRequiredService<IUserService>();
 
@@ -80,8 +81,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task GetPagedUsers_Empty()
         {
+            var pathBase = string.Empty;
             // We get page 2 to force an empty response because there always in the useradmin user
-            string url = PrepareApiControllerUrl<UsersController>(x => x.GetPagedUsers(2, 10, "username", Direction.Ascending, null, null, string.Empty));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.GetPagedUsers(2, 10, "username", Direction.Ascending, null, null, string.Empty), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(url);
@@ -106,7 +108,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         {
             int totalNumberOfUsers = 11;
             int pageSize = totalNumberOfUsers - 1;
-            string url = PrepareApiControllerUrl<UsersController>(x => x.GetPagedUsers(1, pageSize, "username", Direction.Ascending, null, null, string.Empty));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<UsersController>(x => x.GetPagedUsers(1, pageSize, "username", Direction.Ascending, null, null, string.Empty), pathBase);
 
             IUserService userService = GetRequiredService<IUserService>();
 
@@ -144,7 +147,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task PostUnlockUsers_When_UserIds_Not_Supplied_Expect_Ok_Response()
         {
-            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(Array.Empty<int>()));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(Array.Empty<int>()), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -156,7 +160,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         public async Task PostUnlockUsers_When_User_Does_Not_Exist_Expect_Zero_Users_Message()
         {
             int userId = 42; // Must not exist
-            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { userId }));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { userId }), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -184,7 +189,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             userService.Save(user);
-            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { user.Id }));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { user.Id }), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -228,7 +234,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 userService.Save(user);
             }
 
-            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(users.Select(x => x.Id).ToArray()));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(users.Select(x => x.Id).ToArray()), pathBase);
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));

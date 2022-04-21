@@ -40,7 +40,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -98,7 +99,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
 
@@ -167,7 +169,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -232,7 +235,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -293,7 +297,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -357,7 +362,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -435,7 +441,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithAction(ContentSaveAction.PublishNew)
                 .Build();
 
-            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
             {
@@ -527,7 +534,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             };
             domainService.Save(dkDomain);
 
-            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
             {
@@ -587,7 +595,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             };
             domainService.Save(dkDomain);
 
-            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
             {
@@ -671,7 +680,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             domainService.Save(dkDomain);
             domainService.Save(usDomain);
 
-            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var pathBase = string.Empty;
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null), pathBase);
 
             ContentItemSave model = new ContentItemSaveBuilder()
                 .WithContent(grandChild)

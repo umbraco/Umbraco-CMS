@@ -15,7 +15,8 @@ namespace Umbraco.Extensions
         /// Return the Url for a Surface Controller
         /// </summary>
         /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
-        public static string GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
+        public static string GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator,
+            Expression<Func<T, object>> methodSelector, string pathBase)
             where T : SurfaceController
         {
             MethodInfo method = ExpressionHelper.GetMethodInfo(methodSelector);
@@ -29,20 +30,21 @@ namespace Umbraco.Extensions
 
             if (methodParams.Any() == false)
             {
-                return linkGenerator.GetUmbracoSurfaceUrl<T>(method.Name);
+                return linkGenerator.GetUmbracoSurfaceUrl<T>(method.Name, pathBase);
             }
 
-            return linkGenerator.GetUmbracoSurfaceUrl<T>(method.Name, methodParams);
+            return linkGenerator.GetUmbracoSurfaceUrl<T>(method.Name, pathBase, methodParams);
         }
 
         /// <summary>
         /// Return the Url for a Surface Controller
         /// </summary>
         /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
-        public static string GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, string actionName, object id = null)
+        public static string GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, string actionName,
+            string pathBase, object id = null)
             where T : SurfaceController => linkGenerator.GetUmbracoControllerUrl(
                 actionName,
-                typeof(T),
+                typeof(T), pathBase,
                 new Dictionary<string, object>()
                 {
                     ["id"] = id
