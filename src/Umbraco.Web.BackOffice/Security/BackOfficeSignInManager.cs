@@ -308,7 +308,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         }
 
         protected override async Task<SignInResult> SignInOrTwoFactorAsync(BackOfficeIdentityUser user, bool isPersistent,
-            string loginProvider = null, bool bypassTwoFactor = false)
+            string? loginProvider = null, bool bypassTwoFactor = false)
         {
             var result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
 

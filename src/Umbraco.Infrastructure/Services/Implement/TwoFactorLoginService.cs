@@ -77,12 +77,12 @@ namespace Umbraco.Cms.Core.Services
         {
             var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
 
-            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider generator))
+            if (!_twoFactorSetupGenerators.TryGetValue(providerName, out ITwoFactorProvider? generator))
             {
                 throw new InvalidOperationException($"No ITwoFactorSetupGenerator found for provider: {providerName}");
             }
 
-            var isValid = generator.ValidateTwoFactorPIN(secret, code);
+            var isValid = secret is not null && generator.ValidateTwoFactorPIN(secret, code);
 
             if (!isValid)
             {

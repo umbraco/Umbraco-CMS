@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets root-level documents.
         /// </summary>
-        IEnumerable<IContent>? GetRootContent();
+        IEnumerable<IContent> GetRootContent();
 
         /// <summary>
         /// Gets documents having an expiration date before (lower than, or equal to) a specified date.

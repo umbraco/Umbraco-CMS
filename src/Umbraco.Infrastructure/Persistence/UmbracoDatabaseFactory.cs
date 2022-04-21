@@ -256,11 +256,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         }
 
         /// <inheritdoc />
-        public IUmbracoDatabase? CreateDatabase()
+        public IUmbracoDatabase CreateDatabase()
         {
             // must be initialized to create a database
             EnsureInitialized();
-            return (IUmbracoDatabase?) _npocoDatabaseFactory?.GetDatabase();
+            return (IUmbracoDatabase) _npocoDatabaseFactory!.GetDatabase();
         }
 
         // gets initialized poco data builders

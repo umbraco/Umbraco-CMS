@@ -343,8 +343,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             {
                 var node = link.Value;
                 if (node == null) continue;
-                var contentTypeId = node.ContentType?.Id;
-                if (contentTypeId is null || index.TryGetValue(contentTypeId, out var contentType) == false) continue;
+                var contentTypeId = node.ContentType.Id;
+                if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
                 SetValueLocked(_contentNodes, node.Id, new ContentNode(node, _publishedModelFactory, contentType));
             }
         }

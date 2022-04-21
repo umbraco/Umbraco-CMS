@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// Determines if a custom controller can hijack the current route
         /// </summary>
         /// <typeparam name="T">The controller type to find</typeparam>
-        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action) => Find<T>(httpContext, controller, action, null);
+        public ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action) => Find<T>(httpContext, controller, action, null);
 
         /// <summary>
         /// Determines if a custom controller can hijack the current route

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <para>The new database must be disposed after being used.</para>
         /// <para>Creating a database causes the factory to initialize if it is not already initialized.</para>
         /// </remarks>
-        IUmbracoDatabase? CreateDatabase();
+        IUmbracoDatabase CreateDatabase();
 
         /// <summary>
         /// Gets a value indicating whether the database factory is configured, i.e. whether

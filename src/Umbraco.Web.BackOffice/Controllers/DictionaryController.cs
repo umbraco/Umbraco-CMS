@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        public IActionResult PostMove(MoveOrCopy move)
+        public IActionResult? PostMove(MoveOrCopy move)
         {
             var dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
             if (dictionaryItem == null)
@@ -209,21 +209,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 if (move.ParentId == Constants.System.Root)
                     dictionaryItem.ParentId = null;
-                else                   
+                else
                     return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
             }
             else
             {
                 dictionaryItem.ParentId = parent.Key;
-                if (dictionaryItem.Key == parent.ParentId)              
-                    return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));               
+                if (dictionaryItem.Key == parent.ParentId)
+                    return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
             }
-               
+
             _localizationService.Save(dictionaryItem);
 
             var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
-            return Content(model.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+            return Content(model!.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>

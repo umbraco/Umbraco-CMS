@@ -843,13 +843,13 @@ namespace Umbraco.Cms.Core.Services
         ///     Gets a collection of <see cref="IContent" /> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-        public IEnumerable<IContent>? GetRootContent()
+        public IEnumerable<IContent> GetRootContent()
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
-                return _documentRepository.Get(query);
+                IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
+                return _documentRepository.Get(query) ?? Enumerable.Empty<IContent>();
             }
         }
 

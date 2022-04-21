@@ -17,18 +17,18 @@ public class NodeCountRepository : INodeCountRepository
 
     public int GetNodeCount(Guid nodeType)
     {
-        var query = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+        var query = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .SelectCount()
             .From<NodeDto>()
             .Where<NodeDto>(x => x.NodeObjectType == nodeType && x.Trashed == false);
 
-        return _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(query);
+        return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>(query) ?? 0;
 
     }
 
     public int GetMediaCount()
     {
-        var query = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+        var query = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .SelectCount()
             .From<NodeDto>()
             .InnerJoin<ContentDto>()
@@ -39,6 +39,6 @@ public class NodeCountRepository : INodeCountRepository
             .Where<NodeDto>(x => !x.Trashed)
             .Where<ContentTypeDto>(x => x.Alias != Constants.Conventions.MediaTypes.Folder);
 
-        return _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(query);
+        return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>(query) ?? 0;
     }
 }

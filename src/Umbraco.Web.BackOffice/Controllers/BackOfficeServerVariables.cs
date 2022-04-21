@@ -246,7 +246,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "twoFactorLoginApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TwoFactorLoginController>(
-                                controller => controller.SetupInfo(null))
+                                controller => controller.SetupInfo(string.Empty))
                         },
                         {
                             "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
