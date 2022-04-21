@@ -159,6 +159,7 @@ namespace Umbraco.Extensions
             ));
 
             builder.AddCoreInitialServices();
+            builder.AddTelemetryProviders();
 
             // aspnet app lifetime mgmt
             builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();

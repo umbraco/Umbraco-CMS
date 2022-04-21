@@ -1,0 +1,26 @@
+name: pr-first-response
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs: 
+  send-response:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch random comment 🗣️
+        uses: JamesIves/fetch-api-data-action@v2.1.0
+        with:
+          ENDPOINT: https://collaboratorsv2.euwest01.umbraco.io/umbraco/api/comments/PostComment
+          CONFIGURATION: '{ "method": "POST", "headers": {"Authorization": "Bearer ${{ secrets.OUR_BOT_API_TOKEN }}", "Content-Type": "application/json" }, "body": { "repo": "${{ github.repository }}", "number": "${{ github.event.number }}", "actor": "${{ github.actor }}", "commentType": "opened-pr-first-comment"} }'
+      - name: Add PR comment
+        if: "${{ env.fetch-api-data != '' }}"
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${{ env.fetch-api-data }}`
+            })

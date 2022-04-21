@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticHideTopLevelNodeFromPath = true;
         internal const bool StaticUseHttps = false;
         internal const int StaticVersionCheckPeriod = 7;
-        internal const string StaticUmbracoPath = "~/umbraco";
+        internal const string StaticUmbracoPath = Constants.System.DefaultUmbracoPath;
         internal const string StaticIconsPath = "~/umbraco/assets/icons";
         internal const string StaticUmbracoCssPath = "~/css";
         internal const string StaticUmbracoScriptsPath = "~/scripts";

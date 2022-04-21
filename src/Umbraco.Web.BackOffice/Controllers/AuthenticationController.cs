@@ -74,11 +74,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly WebRoutingSettings _webRoutingSettings;
 
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
         [ActivatorUtilitiesConstructor]
-        public AuthenticationController(
+          public AuthenticationController(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IBackOfficeUserManager backOfficeUserManager,
             IBackOfficeSignInManager signInManager,
@@ -97,7 +98,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeExternalLoginProviders externalAuthenticationOptions,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<WebRoutingSettings> webRoutingSettings)
+            IOptions<WebRoutingSettings> webRoutingSettings,
+            ITwoFactorLoginService twoFactorLoginService)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
@@ -118,6 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
             _httpContextAccessor = httpContextAccessor;
             _webRoutingSettings = webRoutingSettings.Value;
+            _twoFactorLoginService = twoFactorLoginService;
         }
 
         /// <summary>
@@ -427,7 +430,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            var userFactors = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key);
+
             return new ObjectResult(userFactors);
         }
 
