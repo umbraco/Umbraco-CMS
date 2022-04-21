@@ -4,7 +4,7 @@ using Constants = Umbraco.Cms.Core.Constants;
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
     /// <summary>
-    /// Clears Csrf tokens.
+    /// Clears CSRF tokens for the current request.
     /// </summary>
     public class ClearCsrfCookies : MigrationBase
     {

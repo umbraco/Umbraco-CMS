@@ -1,3 +1,7 @@
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
+
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
     /// <summary>
@@ -5,16 +9,24 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
     /// </summary>
     public class RebuildPublishedSnapshot : MigrationBase
     {
-        private readonly IPublishedSnapshotRebuilder _rebuilder;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly DistributedCache _distributedCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RebuildPublishedSnapshot"/> class.
         /// </summary>
-        public RebuildPublishedSnapshot(IMigrationContext context, IPublishedSnapshotRebuilder rebuilder)
+        public RebuildPublishedSnapshot(IMigrationContext context, IPublishedSnapshotService publishedSnapshotService, DistributedCache distributedCache)
             : base(context)
-            => _rebuilder = rebuilder;
+        {
+            _publishedSnapshotService = publishedSnapshotService;
+            _distributedCache = distributedCache;
+        }
 
         /// <inheritdoc />
-        protected override void Migrate() => _rebuilder.Rebuild();
+        protected override void Migrate()
+        {
+            _publishedSnapshotService.Rebuild();
+            _distributedCache.RefreshAllPublishedSnapshot();
+        }
     }
 }

@@ -92,36 +92,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<DatabaseSchemaCreator> _logger;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
 
-        [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
         public DatabaseSchemaCreator(
             IUmbracoDatabase database,
             ILogger<DatabaseSchemaCreator> logger,
             ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
-            IEventAggregator eventAggregator)
-            : this (database, logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
-        {
-        }
-
-        public DatabaseSchemaCreator(
-            IUmbracoDatabase database,
-            ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
             IEventAggregator eventAggregator,
             IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _eventAggregator = eventAggregator;
             _defaultDataCreationSettings = defaultDataCreationSettings;
 
-            if (_database?.SqlContext?.SqlSyntax == null)
+            if (_database.SqlContext?.SqlSyntax == null)
             {
                 throw new InvalidOperationException("No SqlContext has been assigned to the database");
             }
@@ -177,8 +163,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (creatingNotification.Cancel == false)
             {
                 var dataCreation = new DatabaseDataCreator(
-                    _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
-                    _umbracoVersion,
+                    _database,
+                    _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                     _defaultDataCreationSettings);
                 foreach (Type table in OrderedTables)
                 {
@@ -450,7 +436,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 new DatabaseDataCreator(
                     _database,
                     _loggerFactory.CreateLogger<DatabaseDataCreator>(),
-                    _umbracoVersion,
                     _defaultDataCreationSettings));
         }
 

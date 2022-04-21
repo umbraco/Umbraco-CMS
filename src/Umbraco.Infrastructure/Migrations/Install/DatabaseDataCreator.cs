@@ -4,11 +4,9 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -21,8 +19,61 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
     {
         private readonly IDatabase _database;
         private readonly ILogger<DatabaseDataCreator> _logger;
-        private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
+
+        internal static readonly IEnumerable<LogViewerQueryDto> DefaultLogQueries = new LogViewerQueryDto[]
+        {
+            new ()
+            {
+                Name = "Find all logs where the Level is NOT Verbose and NOT Debug",
+                Query = "Not(@Level='Verbose') and Not(@Level='Debug')"
+            },
+            new ()
+            {
+                Name = "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
+                Query = "Has(@Exception)"
+            },
+            new ()
+            {
+                Name = "Find all logs that have the property 'Duration'",
+                Query = "Has(Duration)"
+            },
+            new ()
+            {
+                Name = "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+                Query = "Has(Duration) and Duration > 1000"
+            },
+            new ()
+            {
+                Name = "Find all logs that are from the namespace 'Umbraco.Core'",
+                Query = "StartsWith(SourceContext, 'Umbraco.Core')"
+            },
+            new ()
+            {
+                Name = "Find all logs that use a specific log message template",
+                Query = "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
+            },
+            new ()
+            {
+                Name = "Find logs where one of the items in the SortedComponentTypes property array is equal to",
+                Query = "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'"
+            },
+            new ()
+            {
+                Name = "Find logs where one of the items in the SortedComponentTypes property array contains",
+                Query = "Contains(SortedComponentTypes[?], 'DatabaseServer')"
+            },
+            new ()
+            {
+                Name = "Find all logs that the message has localhost in it with SQL like",
+                Query = "@Message like '%localhost%'"
+            },
+            new ()
+            {
+                Name = "Find all logs that the message that starts with 'end' in it with SQL like",
+                Query = "@Message like 'end%'"
+            }
+        };
 
         private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>()
             {
@@ -35,11 +86,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 }
             };
 
-        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion, IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
         {
             _database = database;
             _logger = logger;
-            _umbracoVersion = umbracoVersion;
             _installDefaultDataSettings = installDefaultDataSettings;
         }
 
@@ -996,7 +1046,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private void CreateKeyValueData()
         {
             // On install, initialize the umbraco migration plan with the final state.
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+            var upgrader = new Upgrader(new UmbracoPlan());
             var stateValueKey = upgrader.StateValueKey;
             var finalState = upgrader.Plan.FinalState;
 
@@ -1005,12 +1055,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreateLogViewerQueryData()
         {
-            LogViewerQueryDto[] defaultData = MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries.ToArray();
+            LogViewerQueryDto[] defaultData = DefaultLogQueries.ToArray();
 
             for (int i = 0; i < defaultData.Length; i++)
             {
                 LogViewerQueryDto dto = defaultData[i];
-                dto.Id = i+1;
+                dto.Id = i + 1;
                 _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
             }
         }

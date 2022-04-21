@@ -123,7 +123,8 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
         var schemaCreator = new DatabaseSchemaCreator(
             database,
-            _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory,
+            _loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
+            _loggerFactory,
             new UmbracoVersion(),
             Mock.Of<IEventAggregator>(),
             options);
