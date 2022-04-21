@@ -185,21 +185,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             {
                 if (crops.HasValues)
                 {
-                    foreach (var crop in crops.Values<JObject>().ToList())
+                    foreach (var crop in crops.Values<JObject>().WhereNotNull().ToList())
                     {
-                        if (crop?.TryGetValue("coordinates", out var coordinates) == false)
+                        if (crop.TryGetValue("coordinates", out var coordinates) == false || coordinates.HasValues == false)
                         {
-                            if (coordinates!.HasValues)
-                            {
-                                // Remove crop without coordinates
-                                crop.Remove();
-                                continue;
-                            }
+                            // Remove crop without coordinates
+                            crop.Remove();
+                            continue;
                         }
 
                         // Width/height are already stored in the crop configuration
-                        crop?.Remove("width");
-                        crop?.Remove("height");
+                        crop.Remove("width");
+                        crop.Remove("height");
                     }
                 }
 
