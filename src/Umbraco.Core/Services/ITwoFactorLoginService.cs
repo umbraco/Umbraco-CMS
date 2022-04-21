@@ -58,4 +58,12 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey);
     }
+
+    [Obsolete("This will be merged into ITwoFactorLoginService in Umbraco 11")]
+    public interface ITwoFactorLoginService2 : ITwoFactorLoginService
+    {
+        Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code);
+
+        Task<bool> ValidateAndSaveAsync(string providerName, Guid userKey, string secret, string code);
+    }
 }

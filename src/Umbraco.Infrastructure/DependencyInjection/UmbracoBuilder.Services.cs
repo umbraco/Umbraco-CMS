@@ -16,6 +16,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 
@@ -47,6 +49,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
             builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
+            builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
+            builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
+            builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
 
             return builder;
         }

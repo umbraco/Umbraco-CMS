@@ -46,9 +46,6 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public override bool SupportsUserTwoFactor => true;
-
-        /// <inheritdoc />
         public async Task<bool> IsMemberAuthorizedAsync(IEnumerable<string>? allowTypes = null, IEnumerable<string>? allowGroups = null, IEnumerable<int>? allowMembers = null)
         {
             if (allowTypes == null)

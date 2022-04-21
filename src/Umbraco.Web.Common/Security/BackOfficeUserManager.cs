@@ -74,6 +74,7 @@ namespace Umbraco.Cms.Web.Common.Security
             return await base.VerifyPasswordAsync(store, user, password);
         }
 
+
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
         /// </summary>

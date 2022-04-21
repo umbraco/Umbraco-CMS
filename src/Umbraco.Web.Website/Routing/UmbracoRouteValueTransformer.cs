@@ -240,7 +240,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 [ActionToken] = postedInfo.ActionName
             };
 
-            ControllerActionDescriptor? surfaceControllerDescriptor = _controllerActionSearcher.Find<SurfaceController>(httpContext, postedInfo.ControllerName, postedInfo.ActionName);
+            ControllerActionDescriptor? surfaceControllerDescriptor = _controllerActionSearcher.Find<SurfaceController>(httpContext, postedInfo.ControllerName, postedInfo.ActionName, postedInfo.Area);
 
             if (surfaceControllerDescriptor == null)
             {

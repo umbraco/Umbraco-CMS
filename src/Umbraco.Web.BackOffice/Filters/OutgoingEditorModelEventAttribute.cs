@@ -84,6 +84,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             case IEnumerable<Tab<IDashboardSlim>> dashboards:
                                 _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
                                 break;
+                            case IEnumerable<ContentTypeBasic> allowedChildren:
+                                // Changing the Enumerable will generate a new instance, so we need to update the context result with the new content
+                                var notification = new SendingAllowedChildrenNotification(allowedChildren, umbracoContext);
+                                _eventAggregator.Publish(notification);
+                                context.Result = new ObjectResult(notification.Children);
+                                break;
                         }
                     }
                 }

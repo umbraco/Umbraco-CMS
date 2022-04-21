@@ -32,12 +32,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             UmbracoTreeSearcher treeSearcher,
             IMemberTypeService memberTypeService,
             IEventAggregator eventAggregator)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator, memberTypeService)
         {
             _treeSearcher = treeSearcher;
             _memberTypeService = memberTypeService;
         }
-
 
         protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {

@@ -129,7 +129,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
             if (id != Constants.System.RootString)
+            {
                 menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+            }
+
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 

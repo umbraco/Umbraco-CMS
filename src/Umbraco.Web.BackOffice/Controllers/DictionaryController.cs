@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -189,6 +191,39 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
 
             return _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Changes the structure for dictionary items
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public IActionResult PostMove(MoveOrCopy move)
+        {
+            var dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
+            if (dictionaryItem == null)
+                return ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists"));
+
+            var parent = _localizationService.GetDictionaryItemById(move.ParentId);
+            if (parent == null)
+            {
+                if (move.ParentId == Constants.System.Root)
+                    dictionaryItem.ParentId = null;
+                else                   
+                    return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
+            }
+            else
+            {
+                dictionaryItem.ParentId = parent.Key;
+                if (dictionaryItem.Key == parent.ParentId)              
+                    return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));               
+            }
+               
+            _localizationService.Save(dictionaryItem);
+
+            var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
+
+            return Content(model.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>

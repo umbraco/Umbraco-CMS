@@ -118,7 +118,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<Soundcloud>()
                 .Append<Issuu>()
                 .Append<Hulu>()
-                .Append<Giphy>();
+                .Append<Giphy>()
+                .Append<LottieFiles>();
             builder.SearchableTrees()?.Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
             builder.BackOfficeAssets();
         }

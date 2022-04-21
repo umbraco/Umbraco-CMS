@@ -13,7 +13,7 @@ For extra details about options and events take a look here: https://refreshless
 <pre>
 	<div ng-controller="My.Controller as vm">
 
-        <umb-range-slider 
+        <umb-range-slider
             ng-model="vm.value"
             on-end="vm.slideEnd(values)">
         </umb-range-slider>
@@ -229,11 +229,13 @@ For extra details about options and events take a look here: https://refreshless
             var origins = slider.noUiSlider.getOrigins();
 
             // Move tooltips into the origin element. The default stylesheet handles this.
+          if(tooltips && tooltips.length !== 0){
             tooltips.forEach(function (tooltip, index) {
-                if (tooltip) {
-                    origins[index].appendChild(tooltip);
-                }
+              if (tooltip) {
+                origins[index].appendChild(tooltip);
+              }
             });
+          }
 
             slider.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
 
@@ -283,7 +285,7 @@ For extra details about options and events take a look here: https://refreshless
                             offset = (textIsRtl && !isVertical ? 100 : 0) + (offset / handlesInPool) - lastOffset;
 
                             // Filter to unique values
-                            var tooltipValues = poolValues[poolIndex].filter((v, i, a) => a.indexOf(v) === i); 
+                            var tooltipValues = poolValues[poolIndex].filter((v, i, a) => a.indexOf(v) === i);
 
                             // Center this tooltip over the affected handles
                             tooltips[handleNumber].innerHTML = tooltipValues.join(separator);

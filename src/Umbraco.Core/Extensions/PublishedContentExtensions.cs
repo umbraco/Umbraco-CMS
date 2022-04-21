@@ -1106,7 +1106,7 @@ namespace Umbraco.Extensions
         {
             return content.Parent != null
                 ? content.Parent.Children(variationContextAccessor, culture)
-                : publishedSnapshot?.Content?.GetAtRoot().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content?.GetAtRoot(culture).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1122,7 +1122,7 @@ namespace Umbraco.Extensions
         {
             return content.Parent != null
                 ? content.Parent.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture)
-                : publishedSnapshot?.Content?.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content?.GetAtRoot(culture).OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1139,7 +1139,7 @@ namespace Umbraco.Extensions
         {
             return content.Parent != null
                 ? content.Parent.Children<T>(variationContextAccessor, culture)
-                : publishedSnapshot?.Content?.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                : publishedSnapshot?.Content?.GetAtRoot(culture).OfType<T>().WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
         }
 
         #endregion

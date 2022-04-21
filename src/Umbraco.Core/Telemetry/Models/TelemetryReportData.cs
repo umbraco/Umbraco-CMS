@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Telemetry.Models
 {
@@ -30,5 +31,8 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// </remarks>
         [DataMember(Name = "packages")]
         public IEnumerable<PackageTelemetry>? Packages { get; set; }
+
+        [DataMember(Name = "detailed")]
+        public IEnumerable<UsageInformation>? Detailed { get; set; }
     }
 }

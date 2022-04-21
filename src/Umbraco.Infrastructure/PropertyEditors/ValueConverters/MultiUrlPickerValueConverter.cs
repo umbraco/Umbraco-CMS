@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
-        public override bool? IsValue(object? value, PropertyValueLevel level) => value?.ToString() != "[]";
+        public override bool? IsValue(object? value, PropertyValueLevel level) => value is not null && value.ToString() != "[]";
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString()!;
 
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             {
                 var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber;
 
-                if (inter == null)
+                if (string.IsNullOrWhiteSpace(inter?.ToString()))
                 {
                     return maxNumber == 1 ? null : Enumerable.Empty<Link>();
                 }

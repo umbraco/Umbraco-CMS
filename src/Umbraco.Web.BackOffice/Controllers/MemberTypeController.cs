@@ -252,5 +252,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return display;
         }
+
+        /// <summary>
+        /// Copy the member type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+        public IActionResult PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                i => _memberTypeService.Get(i),
+                (type, i) => _memberTypeService.Copy(type, i));
+        }
     }
 }

@@ -49,10 +49,10 @@ namespace Umbraco.Cms.Core.Security
         public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
 
         /// <summary>
-        /// Developers will need to override this to support custom 2 factor auth
+        /// Both users and members supports 2FA
         /// </summary>
         /// <inheritdoc />
-        public override bool SupportsUserTwoFactor => false;
+        public override bool SupportsUserTwoFactor => true;
 
         /// <inheritdoc />
         public override bool SupportsUserPhoneNumber => false; // We haven't needed to support this yet, though might be necessary for 2FA

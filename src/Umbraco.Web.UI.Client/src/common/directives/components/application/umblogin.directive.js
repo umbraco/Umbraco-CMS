@@ -443,12 +443,16 @@
             vm.twoFactor.submitCallback = function submitCallback() {
                 vm.onLogin();
             }
+            vm.twoFactor.cancelCallback = function cancelCallback() {
+              vm.showLogin();
+            }
             vm.twoFactor.view = viewPath;
             vm.view = "2fa-login";
             SetTitle();
         }
 
         function resetInputValidation() {
+            vm.loginStates.submitButton = "init";
             vm.confirmPassword = "";
             vm.password = "";
             vm.login = "";
