@@ -125,11 +125,23 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
                 | ContentCacheDataSerializerEntityType.Media
                 | ContentCacheDataSerializerEntityType.Member);
 
+            // If contentTypeIds, mediaTypeIds and memberTypeIds are null, truncate table as all records will be deleted (as these 3 are the only types in the table).
+            /* TODO: If large % of records would be deleted it may be faster to
+             * 1. insert the records that won't be deleted into a temp table
+             * 2. truncate cmsContentNu
+             * 3. insert the records from the temp table back into cmsContentNu
+             * 4. Delete the temp table
+            */
+            if ((contentTypeIds == null || !contentTypeIds.Any())
+                && (mediaTypeIds == null || !mediaTypeIds.Any())
+                && (memberTypeIds == null || !memberTypeIds.Any()))
+            {
+                Database.Execute("TRUNCATE TABLE cmsContentNu");
+            }
+
             RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
             RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
             RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
-
-
         }
 
         // assumes content tree lock
