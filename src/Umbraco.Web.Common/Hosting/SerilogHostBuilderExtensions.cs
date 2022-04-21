@@ -136,33 +136,9 @@ namespace Umbraco.Cms.Web.Common.Hosting
 
                     return factory;
                 });
-
-                // Null is passed here because we've already (lazily) registered `ILogger`
-                ConfigureServices(collection, null);
             });
 
             return builder;
-        }
-
-        static void ConfigureServices(IServiceCollection collection, Serilog.ILogger logger)
-        {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
-
-            if (logger != null)
-            {
-                // This won't (and shouldn't) take ownership of the logger.
-                collection.AddSingleton(logger);
-            }
-
-            // Registered to provide two services...
-            var diagnosticContext = new DiagnosticContext(logger);
-
-            // Consumed by e.g. middleware
-            collection.AddSingleton(diagnosticContext);
-
-            // Consumed by user code
-            collection.AddSingleton<IDiagnosticContext>(diagnosticContext);
         }
 
         class RegisteredLogger

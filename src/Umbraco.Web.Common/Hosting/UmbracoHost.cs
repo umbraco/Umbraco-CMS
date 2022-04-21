@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.Common.Hosting
 {
@@ -49,8 +50,12 @@ namespace Umbraco.Cms.Web.Common.Hosting
         /// <returns>The initialized <see cref="IHostBuilder"/>.</returns>
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-            HostBuilder builder = new();
+            IHostBuilder builder = new UmbracoHostBuilderDecorator(new HostBuilder(), OnHostBuilt);
             return builder.ConfigureUmbracoDefaults(args);
         }
+
+        // Runs before any IHostedService starts (including generic web host).
+        private static void OnHostBuilt(IHost host) =>
+            StaticServiceProvider.Instance = host.Services;
     }
 }

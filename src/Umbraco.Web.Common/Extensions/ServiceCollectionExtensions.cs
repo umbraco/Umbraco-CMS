@@ -78,7 +78,8 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
             IHostEnvironment hostEnvironment,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            Action<LoggerConfiguration> configureLogger)
         {
             // TODO: WEBSITE_RUN_FROM_PACKAGE - can't assume this DIR is writable - we have an IConfiguration instance so a later refactor should be easy enough.
             var loggingDir = hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
@@ -86,17 +87,24 @@ namespace Umbraco.Extensions
 
             var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
-            services.AddSingleton(umbracoFileConfiguration);
-            services.AddSingleton(loggingConfig);
-            services.AddSingleton<Serilog.Core.ILogEventEnricher, ApplicationIdEnricher>();
+            services.TryAddSingleton(umbracoFileConfiguration);
+            services.TryAddSingleton(loggingConfig);
+            services.TryAddSingleton<Serilog.Core.ILogEventEnricher, ApplicationIdEnricher>();
 
-            LoggerConfiguration bootstrapConfiguration = new LoggerConfiguration()
+            LoggerConfiguration serilogConfig = new LoggerConfiguration()
                 .MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
                 .ReadFrom.Configuration(configuration);
 
-            // Configure for rebuild later.
-            Log.Logger = bootstrapConfiguration
-                .CreateBootstrapLogger();
+            configureLogger(serilogConfig);
+
+            // Registered to provide two services...
+            var diagnosticContext = new DiagnosticContext(Log.Logger);
+
+            // Consumed by e.g. middleware
+            services.TryAddSingleton(diagnosticContext);
+
+            // Consumed by user code
+            services.TryAddSingleton<IDiagnosticContext>(diagnosticContext);
 
             return services;
         }

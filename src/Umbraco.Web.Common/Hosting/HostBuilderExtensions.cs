@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Web.Common.Hosting
     /// <summary>
     /// Umbraco specific extensions for the <see cref="IHostBuilder"/> interface.
     /// </summary>
-    public static class HostBuilderExtensions
+    internal static class HostBuilderExtensions
     {
         /// <summary>
         /// Configures an existing <see cref="IHostBuilder"/> with defaults for an Umbraco application.
         /// </summary>
-        public static IHostBuilder ConfigureUmbracoDefaults(this IHostBuilder builder, string[] args)
+        internal static IHostBuilder ConfigureUmbracoDefaults(this IHostBuilder builder, string[] args)
         {
             builder.ConfigureDefaults(args);
 #if DEBUG
@@ -33,7 +33,10 @@ namespace Umbraco.Cms.Web.Common.Hosting
 
             builder.ConfigureServices((context, services) =>
             {
-                services.AddLogger(context.HostingEnvironment, context.Configuration);
+                services.AddLogger(context.HostingEnvironment, context.Configuration, bootstrapConfig =>
+                {
+                    Log.Logger = bootstrapConfig.CreateBootstrapLogger();
+                });
             });
 
             builder.UseSerilog((context, services, configuration) =>

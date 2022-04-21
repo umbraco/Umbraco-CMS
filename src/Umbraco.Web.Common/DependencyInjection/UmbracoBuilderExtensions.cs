@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Hosting;
+using Serilog.Extensions.Logging;
 using Smidge;
 using Smidge.Cache;
 using Smidge.FileProcessors;
@@ -42,7 +44,6 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
-using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -90,6 +91,10 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(config));
             }
 
+            // Setup static application logging ASAP (e.g. during configure services).
+            // Will log to SilentLogger until Serilog.Log.Logger is setup.
+            StaticApplicationLogging.Initialize(new SerilogLoggerFactory());
+
             // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
             AppDomain.CurrentDomain.SetData("DataDirectory", webHostEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
@@ -107,7 +112,22 @@ namespace Umbraco.Extensions
 
             IProfiler profiler = GetWebProfiler(config);
 
-            ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+            // Called in-case UmbracoHost isn't used (e.g. upgrade from 9 and ignored advice).
+            services.AddLogger(webHostEnvironment, config, serilogConfig =>
+            {
+                if (Log.Logger is not ReloadableLogger)
+                {
+                    // We only want to blast over the global logger if AddLogger hasn't been called previously.
+                    // And in that case we don't want all the synchronization so avoid CreateBootstrapLogger
+                    Log.Logger = serilogConfig.CreateLogger();
+                    Log.Logger.Warning("ConfigureUmbracoDefaults has not been applied to HostBuilder.");
+
+                    services.TryAddSingleton(Log.Logger);
+                    services.AddLogging(cfg => cfg.AddSerilog());
+                }
+            });
+
+            ILoggerFactory loggerFactory = new SerilogLoggerFactory();
 
             TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
 
