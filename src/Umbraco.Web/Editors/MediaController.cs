@@ -601,9 +601,8 @@ namespace Umbraco.Web.Editors
             var isFolderAllowed = IsFolderCreationAllowedHere(intParentId);
             if (isFolderAllowed == false)
             {
-                var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddErrorNotification(Services.TextService.Localize("speechBubbles", "folderCreationNotAllowed"), "");
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                    Services.TextService.Localize("speechBubbles", "folderCreationNotAllowed")));
             }
 
             var mediaService = Services.MediaService;
@@ -648,13 +647,14 @@ namespace Umbraco.Web.Editors
 
             var tempFiles = new PostedFiles();
             var mediaService = Services.MediaService;
+            var localizedTextService = Services.TextService;
 
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (result.FormData.ContainsKey("path"))
             {
                 if (!IsFolderCreationAllowedHere(parentId))
                 {
-                    AddCancelMessage(tempFiles, Services.TextService.Localize("speechBubbles", "folderUploadNotAllowed"));
+                    AddCancelMessage(tempFiles, message: "speechBubbles/folderUploadNotAllowed");
                     return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
                 }
 
@@ -752,8 +752,8 @@ namespace Umbraco.Web.Editors
                 if (!Current.Configs.Settings().Content.IsFileAllowedForUpload(ext))
                 {
                     tempFiles.Notifications.Add(new Notification(
-                        Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
-                        Services.TextService.Localize("media", "disallowedFileType"),
+                        localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        localizedTextService.Localize("media", "disallowedFileType"),
                         NotificationStyle.Warning));
                     continue;
                 }
@@ -775,7 +775,6 @@ namespace Umbraco.Web.Editors
 
                             var dataTypeKey = fileProperty.DataTypeKey;
                             var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
-
 
                             if (dataType == null || dataType.Configuration is not IFileExtensionsConfig fileExtensionsConfig)
                             {
@@ -807,28 +806,28 @@ namespace Umbraco.Web.Editors
                 if (allowedContentTypes.Any(x => x.Alias == mediaTypeAlias) == false)
                 {
                     tempFiles.Notifications.Add(new Notification(
-                        Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
-                        Services.TextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
+                        localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
                         NotificationStyle.Warning));
                     continue;
                 }
 
                 var mediaItemName = fileName.ToFriendlyName();
 
-                var f = mediaService.CreateMedia(mediaItemName, parentId, mediaTypeAlias, Security.CurrentUser.Id);
+                var createdMediaItem = mediaService.CreateMedia(mediaItemName, parentId, mediaTypeAlias, Security.CurrentUser.Id);
 
                 var fileInfo = new FileInfo(file.LocalFileName);
                 var fs = fileInfo.OpenReadWithRetry();
                 if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                 using (fs)
                 {
-                    f.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, fs);
+                    createdMediaItem.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, fs);
                 }
 
-                var saveResult = mediaService.Save(f, Security.CurrentUser.Id);
+                var saveResult = mediaService.Save(createdMediaItem, Security.CurrentUser.Id);
                 if (saveResult == false)
                 {
-                    AddCancelMessage(tempFiles, Services.TextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
+                    AddCancelMessage(tempFiles, message: "speechBubbles/operationCancelledText" + " -- " + mediaItemName);
                 }
                 else
                 {
