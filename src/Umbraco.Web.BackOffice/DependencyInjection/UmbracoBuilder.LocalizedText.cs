@@ -7,11 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Services.Implement;
-
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Extensions
 {
