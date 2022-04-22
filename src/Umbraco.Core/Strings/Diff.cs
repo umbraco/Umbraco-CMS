@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Core.Strings
                 if (ignoreCase)
                     s = s.ToLower();
 
-                object aCode = h[s];
+                object? aCode = h[s];
                 if (aCode == null)
                 {
                     lastUsedCode++;

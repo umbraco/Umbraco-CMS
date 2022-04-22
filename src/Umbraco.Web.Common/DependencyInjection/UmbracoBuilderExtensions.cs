@@ -221,7 +221,7 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder> mvcBuilding = null)
+        public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder>? mvcBuilding = null)
         {
             // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
             // this will directly affect developers who need to call that themselves.
@@ -345,7 +345,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()?
                 .Add(umbracoApiControllerTypes);
 
             builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();

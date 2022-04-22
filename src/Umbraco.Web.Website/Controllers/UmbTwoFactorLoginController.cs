@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model, string returnUrl = null)
+        public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model, string? returnUrl = null)
         {
             var user = await _memberSignInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _memberSignInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
-                if (result.Succeeded)
+                if (result.Succeeded && returnUrl is not null)
                 {
                     return RedirectToLocal(returnUrl);
                 }
@@ -113,13 +113,13 @@ namespace Umbraco.Cms.Web.Website.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ValidateAndSaveSetup(string providerName, string secret, string code, string returnUrl = null)
+        public async Task<IActionResult> ValidateAndSaveSetup(string providerName, string secret, string code, string? returnUrl = null)
         {
             var member = await _memberManager.GetCurrentMemberAsync();
 
             var isValid = _twoFactorLoginService.ValidateTwoFactorSetup(providerName, secret, code);
 
-            if (isValid == false)
+            if (member is null || isValid == false)
             {
                 ModelState.AddModelError(nameof(code), "Invalid Code");
 
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 Confirmed = true,
                 Secret = secret,
                 UserOrMemberKey = member.Key,
-                ProviderName = providerName
+                ProviderName = providerName,
             };
 
             await _twoFactorLoginService.SaveAsync(twoFactorLogin);
@@ -140,11 +140,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Disable(string providerName, string returnUrl = null)
+        public async Task<IActionResult> Disable(string providerName, string? returnUrl = null)
         {
             var member = await _memberManager.GetCurrentMemberAsync();
 
-            var success = await _twoFactorLoginService.DisableAsync(member.Key, providerName);
+            var success = member is not null && await _twoFactorLoginService.DisableAsync(member.Key, providerName);
 
             if (!success)
             {
@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             return RedirectToLocal(returnUrl);
         }
 
-        private IActionResult RedirectToLocal(string returnUrl) =>
+        private IActionResult RedirectToLocal(string? returnUrl) =>
             Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToCurrentUmbracoPage();
     }
 }

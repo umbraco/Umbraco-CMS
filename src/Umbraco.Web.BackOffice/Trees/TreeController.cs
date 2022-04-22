@@ -27,16 +27,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         }
 
         /// <inheritdoc />
-        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, LocalizedTextService);
+        public override string? RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, LocalizedTextService);
 
         /// <inheritdoc />
-        public override string TreeGroup => _treeAttribute.TreeGroup;
+        public override string? TreeGroup => _treeAttribute.TreeGroup;
 
         /// <inheritdoc />
         public override string TreeAlias => _treeAttribute.TreeAlias;
 
         /// <inheritdoc />
-        public override string TreeTitle => _treeAttribute.TreeTitle;
+        public override string? TreeTitle => _treeAttribute.TreeTitle;
 
         /// <inheritdoc />
         public override TreeUse TreeUse => _treeAttribute.TreeUse;

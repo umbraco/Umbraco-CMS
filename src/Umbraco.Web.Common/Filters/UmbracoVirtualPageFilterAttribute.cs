@@ -26,11 +26,11 @@ namespace Umbraco.Cms.Web.Common.Filters
         /// <inheritdoc/>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            Endpoint endpoint = context.HttpContext.GetEndpoint();
+            Endpoint? endpoint = context.HttpContext.GetEndpoint();
 
             // Check if there is any delegate in the metadata of the route, this
             // will occur when using the ForUmbraco method during routing.
-            CustomRouteContentFinderDelegate contentFinder = endpoint.Metadata.OfType<CustomRouteContentFinderDelegate>().FirstOrDefault();
+            CustomRouteContentFinderDelegate? contentFinder = endpoint?.Metadata.OfType<CustomRouteContentFinderDelegate>().FirstOrDefault();
 
             if (contentFinder != null)
             {

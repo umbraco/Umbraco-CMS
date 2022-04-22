@@ -21,13 +21,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
-        public NodeDto NodeDto { get; set; }
+        public NodeDto NodeDto { get; set; } = null!;
 
         // although a content has many content versions,
         // they can only be loaded one by one (as several content),
         // so this here is a OneToOne reference
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
-        public ContentVersionDto ContentVersionDto { get; set; }
+        public ContentVersionDto ContentVersionDto { get; set; } = null!;
     }
 }

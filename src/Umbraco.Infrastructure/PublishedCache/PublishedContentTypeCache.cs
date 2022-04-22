@@ -19,16 +19,16 @@ namespace Umbraco.Cms.Core.PublishedCache
         private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new Dictionary<string, IPublishedContentType>();
         private readonly Dictionary<int, IPublishedContentType> _typesById = new Dictionary<int, IPublishedContentType>();
         private readonly Dictionary<Guid, int> _keyToIdMap = new Dictionary<Guid, int>();
-        private readonly IContentTypeService _contentTypeService;
-        private readonly IMediaTypeService _mediaTypeService;
-        private readonly IMemberTypeService _memberTypeService;
+        private readonly IContentTypeService? _contentTypeService;
+        private readonly IMediaTypeService? _mediaTypeService;
+        private readonly IMemberTypeService? _memberTypeService;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly ILogger<PublishedContentTypeCache> _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private bool _disposedValue;
 
         // default ctor
-        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
+        public PublishedContentTypeCache(IContentTypeService? contentTypeService, IMediaTypeService? mediaTypeService, IMemberTypeService? memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
@@ -38,7 +38,9 @@ namespace Umbraco.Cms.Core.PublishedCache
         }
 
         // for unit tests ONLY
+#pragma warning disable CS8618
         internal PublishedContentTypeCache(ILogger<PublishedContentTypeCache> logger, IPublishedContentTypeFactory publishedContentTypeFactory)
+#pragma warning restore CS8618
         {
             _logger = logger;
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -119,7 +121,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             {
                 _lock.EnterWriteLock();
 
-                var toRemove = _typesById.Values.Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
+                var toRemove = _typesById.Values.Where(x => x.PropertyTypes?.Any(xx => xx.DataType.Id == id) ?? false).ToArray();
                 foreach (var type in toRemove)
                 {
                     _typesByAlias.Remove(GetAliasKey(type));
@@ -245,11 +247,11 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, Guid key)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
-                PublishedItemType.Content => _contentTypeService.Get(key),
-                PublishedItemType.Media => _mediaTypeService.Get(key),
-                PublishedItemType.Member => _memberTypeService.Get(key),
+                PublishedItemType.Content => _contentTypeService?.Get(key),
+                PublishedItemType.Media => _mediaTypeService?.Get(key),
+                PublishedItemType.Member => _memberTypeService?.Get(key),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
             };
             if (contentType == null)
@@ -260,11 +262,11 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
-                PublishedItemType.Content => _contentTypeService.Get(alias),
-                PublishedItemType.Media => _mediaTypeService.Get(alias),
-                PublishedItemType.Member => _memberTypeService.Get(alias),
+                PublishedItemType.Content => _contentTypeService?.Get(alias),
+                PublishedItemType.Media => _mediaTypeService?.Get(alias),
+                PublishedItemType.Member => _memberTypeService?.Get(alias),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
             };
             if (contentType == null)
@@ -275,11 +277,11 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
-                PublishedItemType.Content => _contentTypeService.Get(id),
-                PublishedItemType.Media => _mediaTypeService.Get(id),
-                PublishedItemType.Member => _memberTypeService.Get(id),
+                PublishedItemType.Content => _contentTypeService?.Get(id),
+                PublishedItemType.Media => _mediaTypeService?.Get(id),
+                PublishedItemType.Member => _memberTypeService?.Get(id),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
             };
             if (contentType == null)

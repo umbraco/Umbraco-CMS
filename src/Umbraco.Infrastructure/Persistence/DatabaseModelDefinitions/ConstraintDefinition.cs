@@ -14,10 +14,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
         public bool IsUniqueConstraint => ConstraintType.Unique == _constraintType;
         public bool IsNonUniqueConstraint => ConstraintType.NonUnique == _constraintType;
 
-        public string SchemaName { get; set; }
-        public string ConstraintName { get; set; }
-        public string TableName { get; set; }
-        public ICollection<string> Columns = new HashSet<string>();
+        public string? SchemaName { get; set; }
+        public string? ConstraintName { get; set; }
+        public string? TableName { get; set; }
+        public ICollection<string?> Columns = new HashSet<string?>();
         public bool IsPrimaryKeyClustered { get; set; }
     }
 }

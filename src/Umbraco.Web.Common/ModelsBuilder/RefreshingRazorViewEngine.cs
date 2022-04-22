@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// <summary>
         /// When the models change, re-construct the razor stack
         /// </summary>
-        private void InMemoryModelFactoryModelsChanged(object sender, EventArgs e)
+        private void InMemoryModelFactoryModelsChanged(object? sender, EventArgs e)
         {
             _locker.EnterWriteLock();
             try
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
         }
 
-        public string GetAbsolutePath(string executingFilePath, string pagePath)
+        public string? GetAbsolutePath(string? executingFilePath, string? pagePath)
         {
             _locker.EnterReadLock();
             try
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
         }
 
-        public ViewEngineResult GetView(string executingFilePath, string viewPath, bool isMainPage)
+        public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage)
         {
             _locker.EnterReadLock();
             try

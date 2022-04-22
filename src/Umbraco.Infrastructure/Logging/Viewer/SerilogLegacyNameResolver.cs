@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Serilog.Expressions;
 
 namespace Umbraco.Cms.Infrastructure.Logging.Viewer
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Logging.Viewer
         /// So we can still support the more verbose built in property names such as
         /// Exception, Level, MessageTemplate etc
         /// </summary>
-        public override bool TryResolveBuiltInPropertyName(string alias, out string target)
+        public override bool TryResolveBuiltInPropertyName(string alias, [MaybeNullWhen(false)] out string target)
         {
             target = alias switch
             {

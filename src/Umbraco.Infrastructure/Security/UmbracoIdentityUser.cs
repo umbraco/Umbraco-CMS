@@ -29,20 +29,20 @@ namespace Umbraco.Cms.Core.Security
     /// </remarks>
     public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     {
-        private string _name;
-        private string _passwordConfig;
-        private string _id;
-        private string _email;
-        private string _userName;
+        private string? _name;
+        private string? _passwordConfig;
+        private string _id = null!;
+        private string _email = null!;
+        private string _userName = null!;
         private DateTime? _lastLoginDateUtc;
         private bool _emailConfirmed;
         private int _accessFailedCount;
-        private string _passwordHash;
+        private string? _passwordHash;
         private DateTime? _lastPasswordChangeDateUtc;
-        private ObservableCollection<IIdentityUserLogin> _logins;
-        private ObservableCollection<IIdentityUserToken> _tokens;
-        private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
-        private Lazy<IEnumerable<IIdentityUserToken>> _getTokens;
+        private ObservableCollection<IIdentityUserLogin>? _logins;
+        private ObservableCollection<IIdentityUserToken>? _tokens;
+        private Lazy<IEnumerable<IIdentityUserLogin>?>? _getLogins;
+        private Lazy<IEnumerable<IIdentityUserToken>?>? _getTokens;
         private ObservableCollection<IdentityUserRole<string>> _roles;
 
         /// <summary>
@@ -54,6 +54,7 @@ namespace Umbraco.Cms.Core.Security
             _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += Roles_CollectionChanged;
             Claims = new List<IdentityUserClaim<string>>();
+            _name = string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Core.Security
         public override string Email
         {
             get => _email;
-            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets the salted/hashed form of the user password
         /// </summary>
-        public override string PasswordHash
+        public override string? PasswordHash
         {
             get => _passwordHash;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, nameof(PasswordHash));
@@ -180,7 +181,7 @@ namespace Umbraco.Cms.Core.Security
                 // if the callback is there and hasn't been created yet then execute it and populate the logins
                 if (_getLogins != null && !_getLogins.IsValueCreated)
                 {
-                    foreach (IIdentityUserLogin l in _getLogins.Value)
+                    foreach (IIdentityUserLogin l in _getLogins.Value!)
                     {
                         _logins.Add(l);
                     }
@@ -210,11 +211,14 @@ namespace Umbraco.Cms.Core.Security
 
                 // if the callback is there and hasn't been created yet then execute it and populate the logins
                // if (_getTokens != null && !_getTokens.IsValueCreated)
-                    if (_getTokens?.IsValueCreated != true)
+                if (_getTokens?.IsValueCreated != true)
                 {
-                    foreach (IIdentityUserToken l in _getTokens.Value)
+                    if (_getTokens is not null && _getTokens.Value is not null)
                     {
-                        _tokens.Add(l);
+                        foreach (IIdentityUserToken l in _getTokens.Value)
+                        {
+                            _tokens.Add(l);
+                        }
                     }
                 }
 
@@ -249,7 +253,7 @@ namespace Umbraco.Cms.Core.Security
         public override string UserName
         {
             get => _userName;
-            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, nameof(UserName));
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _userName!, nameof(UserName));
         }
 
         /// <summary>
@@ -277,7 +281,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets the user's real name
         /// </summary>
-        public string Name
+        public string? Name
         {
             get => _name;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -286,7 +290,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets the password config
         /// </summary>
-        public string PasswordConfig
+        public string? PasswordConfig
         {
             // TODO: Implement this for members: AB#11550
             get => _passwordConfig;
@@ -337,28 +341,31 @@ namespace Umbraco.Cms.Core.Security
         /// <remarks>
         /// Adding a role this way will not reflect on the user's group's collection or it's allowed sections until the user is persisted
         /// </remarks>
-        public void AddRole(string role) => Roles.Add(new IdentityUserRole<string>
+        public void AddRole(string role)
         {
-            UserId = Id,
-            RoleId = role
-        });
+            Roles.Add(new IdentityUserRole<string>
+            {
+                UserId = Id,
+                RoleId = role
+            });
+        }
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's Login list
         /// </summary>
         /// <param name="callback">The lazy value</param>
-        internal void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback) => _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
+        internal void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>?>? callback) => _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's token list
         /// </summary>
         /// <param name="callback">The lazy value</param>
-        internal void SetTokensCallback(Lazy<IEnumerable<IIdentityUserToken>> callback) => _getTokens = callback ?? throw new ArgumentNullException(nameof(callback));
+        internal void SetTokensCallback(Lazy<IEnumerable<IIdentityUserToken>?> ?callback) => _getTokens = callback ?? throw new ArgumentNullException(nameof(callback));
 
-        private void Logins_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Logins));
+        private void Logins_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Logins));
 
-        private void LoginTokens_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(LoginTokens));
+        private void LoginTokens_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(LoginTokens));
 
-        private void Roles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Roles));
+        private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Roles));
     }
 }

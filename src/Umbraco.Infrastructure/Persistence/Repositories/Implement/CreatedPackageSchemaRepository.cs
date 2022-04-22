@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
         private readonly PackageDefinitionXmlParser _xmlParser;
-        private readonly IUmbracoDatabase _umbracoDatabase;
+        private readonly IUmbracoDatabase? _umbracoDatabase;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly FileSystems _fileSystems;
         private readonly IEntityXmlSerializer _serializer;
@@ -59,8 +59,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             MediaFileManager mediaFileManager,
             IMacroService macroService,
             IContentTypeService contentTypeService,
-            string mediaFolderPath = null,
-            string tempFolderPath = null)
+            string? mediaFolderPath = null,
+            string? tempFolderPath = null)
         {
             _umbracoDatabase = umbracoDatabaseFactory.CreateDatabase();
             _hostingEnvironment = hostingEnvironment;
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IEnumerable<PackageDefinition> GetAll()
         {
-            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
                 .Select<CreatedPackageSchemaDto>()
                 .From<CreatedPackageSchemaDto>()
                 .OrderBy<CreatedPackageSchemaDto>(x => x.Id);
@@ -93,18 +93,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             foreach (CreatedPackageSchemaDto packageSchema in xmlSchemas)
             {
                 var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
-                packageDefinition.Id = packageSchema.Id;
-                packageDefinition.Name = packageSchema.Name;
-                packageDefinition.PackageId = packageSchema.PackageId;
-                packageDefinitions.Add(packageDefinition);
+                if (packageDefinition is not null)
+                {
+                    packageDefinition.Id = packageSchema.Id;
+                    packageDefinition.Name = packageSchema.Name;
+                    packageDefinition.PackageId = packageSchema.PackageId;
+                    packageDefinitions.Add(packageDefinition);
+                }
             }
 
             return packageDefinitions;
         }
 
-        public PackageDefinition GetById(int id)
+        public PackageDefinition? GetById(int id)
         {
-            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
                 .Select<CreatedPackageSchemaDto>()
                 .From<CreatedPackageSchemaDto>()
                 .Where<CreatedPackageSchemaDto>(x => x.Id == id);
@@ -117,9 +120,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             var packageSchema = schemaDtos.First();
             var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
-            packageDefinition.Id = packageSchema.Id;
-            packageDefinition.Name = packageSchema.Name;
-            packageDefinition.PackageId = packageSchema.PackageId;
+            if (packageDefinition is not null)
+            {
+                packageDefinition.Id = packageSchema.Id;
+                packageDefinition.Name = packageSchema.Name;
+                packageDefinition.PackageId = packageSchema.PackageId;
+            }
+
             return packageDefinition;
         }
 
@@ -127,12 +134,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             // Delete package snapshot
             var packageDef = GetById(id);
-            if (File.Exists(packageDef.PackagePath))
+            if (File.Exists(packageDef?.PackagePath))
             {
                 File.Delete(packageDef.PackagePath);
             }
 
-            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
                 .Delete<CreatedPackageSchemaDto>()
                 .Where<CreatedPackageSchemaDto>(x => x.Id == id);
 
@@ -167,7 +174,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 };
 
                 // Set the ids, we have to save in database first to get the Id
-                _umbracoDatabase.Insert(dto);
+                _umbracoDatabase!.Insert(dto);
                 definition.Id = dto.Id;
             }
 
@@ -182,7 +189,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 PackageId = definition.PackageId,
                 UpdateDate = DateTime.Now
             };
-            _umbracoDatabase.Update(updatedDto);
+            _umbracoDatabase?.Update(updatedDto);
 
             return true;
         }
@@ -209,8 +216,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 PackageMediaTypes(definition, root);
                 PackageTemplates(definition, root);
                 PackageStylesheets(definition, root);
-                PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem);
-                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem);
+                PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem!);
+                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem!);
                 PackageMacros(definition, root);
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
@@ -318,7 +325,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                IDataType dataType = _dataTypeService.GetDataType(outInt);
+                IDataType? dataType = _dataTypeService.GetDataType(outInt);
                 if (dataType == null)
                 {
                     continue;
@@ -340,7 +347,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                ILanguage lang = _localizationService.GetLanguageById(outInt);
+                ILanguage? lang = _localizationService.GetLanguageById(outInt);
                 if (lang == null)
                 {
                     continue;
@@ -364,7 +371,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                IDictionaryItem di = _localizationService.GetDictionaryItemById(outInt);
+                IDictionaryItem? di = _localizationService.GetDictionaryItemById(outInt);
 
                 if (di == null)
                 {
@@ -441,14 +448,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                XElement macroXml = GetMacroXml(outInt, out IMacro macro);
-                if (macroXml == null)
+                XElement? macroXml = GetMacroXml(outInt, out IMacro? macro);
+                if (macroXml is null)
                 {
                     continue;
                 }
 
                 macros.Add(macroXml);
-                packagedMacros.Add(macro);
+                packagedMacros.Add(macro!);
             }
 
             root.Add(macros);
@@ -458,7 +465,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
                 .Select(x =>
                     x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
-            PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
+            PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem!);
         }
 
         private void PackageStylesheets(PackageDefinition definition, XContainer root)
@@ -471,7 +478,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                XElement xml = GetStylesheetXml(stylesheet, true);
+                XElement? xml = GetStylesheetXml(stylesheet, true);
                 if (xml != null)
                 {
                     stylesheetsXml.Add(xml);
@@ -501,15 +508,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     throw new InvalidOperationException("No file found with path " + file);
                 }
 
-                using (Stream stream = fileSystem.OpenFile(file))
-                using (var reader = new StreamReader(stream))
+                using Stream? stream = fileSystem.OpenFile(file);
+                if (stream is not null)
                 {
-                    var fileContents = reader.ReadToEnd();
-                    scriptsXml.Add(
-                        new XElement(
-                            elementName,
-                            new XAttribute("path", file),
-                            new XCData(fileContents)));
+                    using (var reader = new StreamReader(stream))
+                    {
+                        var fileContents = reader.ReadToEnd();
+                        scriptsXml.Add(
+                            new XElement(
+                                elementName,
+                                new XAttribute("path", file),
+                                new XCData(fileContents)));
+                    }
                 }
             }
 
@@ -526,7 +536,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                ITemplate template = _fileService.GetTemplate(outInt);
+                ITemplate? template = _fileService.GetTemplate(outInt);
                 if (template == null)
                 {
                     continue;
@@ -549,7 +559,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                IContentType contentType = _contentTypeService.Get(outInt);
+                IContentType? contentType = _contentTypeService.Get(outInt);
                 if (contentType == null)
                 {
                     continue;
@@ -577,7 +587,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                IMediaType mediaType = _mediaTypeService.Get(outInt);
+                IMediaType? mediaType = _mediaTypeService.Get(outInt);
                 if (mediaType == null)
                 {
                     continue;
@@ -603,7 +613,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (contentNodeId > 0)
                 {
                     // load content from umbraco.
-                    IContent content = _contentService.GetById(contentNodeId);
+                    IContent? content = _contentService.GetById(contentNodeId);
                     if (content != null)
                     {
                         var contentXml = definition.ContentLoadChildNodes
@@ -634,13 +644,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // get the media file path and store that separately in the XML.
                 // the media file path is different from the URL and is specifically
                 // extracted using the property editor for this media file and the current media file system.
-                Stream mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
+                Stream? mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
                 if (mediaStream != null)
                 {
-                    xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath));
+                    xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath!));
 
                     // add the stream to our outgoing stream
-                    mediaStreams.Add(mediaFilePath, mediaStream);
+                    mediaStreams.Add(mediaFilePath!, mediaStream);
                 }
             }
 
@@ -666,7 +676,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         /// Gets a macros xml node
         /// </summary>
-        private XElement GetMacroXml(int macroId, out IMacro macro)
+        private XElement? GetMacroXml(int macroId, out IMacro? macro)
         {
             macro = _macroService.GetById(macroId);
             if (macro == null)
@@ -683,14 +693,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="path">The path of the stylesheet.</param>
         /// <param name="includeProperties">if set to <c>true</c> [include properties].</param>
-        private XElement GetStylesheetXml(string path, bool includeProperties)
+        private XElement? GetStylesheetXml(string path, bool includeProperties)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
             }
 
-            IStylesheet stylesheet = _fileService.GetStylesheet(path);
+            IStylesheet? stylesheet = _fileService.GetStylesheet(path);
             if (stylesheet == null)
             {
                 return null;
@@ -703,7 +713,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (dt.ParentId > 0)
             {
-                IContentType parent = _contentTypeService.Get(dt.ParentId);
+                IContentType? parent = _contentTypeService.Get(dt.ParentId);
                 if (parent != null)
                 {
                     AddDocumentType(parent, dtl);
@@ -720,7 +730,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (mediaType.ParentId > 0)
             {
-                IMediaType parent = _mediaTypeService.Get(mediaType.ParentId);
+                IMediaType? parent = _mediaTypeService.Get(mediaType.ParentId);
                 if (parent != null)
                 {
                     AddMediaType(parent, mediaTypes);

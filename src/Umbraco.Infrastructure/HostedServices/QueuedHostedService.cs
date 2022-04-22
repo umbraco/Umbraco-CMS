@@ -35,11 +35,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                Func<CancellationToken, Task> workItem = await TaskQueue.DequeueAsync(stoppingToken);
+                Func<CancellationToken, Task>? workItem = await TaskQueue.DequeueAsync(stoppingToken);
 
                 try
                 {
-                    await workItem(stoppingToken);
+                    if (workItem is not null)
+                    {
+                        await workItem(stoppingToken);
+                    }
                 }
                 catch (Exception ex)
                 {

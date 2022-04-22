@@ -10,5 +10,5 @@ public abstract class ScalarMapper<T> : IScalarMapper
     protected abstract T Map(object value);
 
     /// <inheritdoc />
-    object IScalarMapper.Map(object value) => Map(value);
+    object IScalarMapper.Map(object value) => Map(value)!;
 }

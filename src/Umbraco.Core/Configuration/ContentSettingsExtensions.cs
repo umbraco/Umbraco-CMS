@@ -23,7 +23,7 @@ namespace Umbraco.Extensions
         /// <param name="contentSettings"></param>
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <returns>The auto-fill configuration for the specified property alias, or null.</returns>
-        public static ImagingAutoFillUploadField GetConfig(this ContentSettings contentSettings, string propertyTypeAlias)
+        public static ImagingAutoFillUploadField? GetConfig(this ContentSettings contentSettings, string propertyTypeAlias)
         {
             var autoFillConfigs = contentSettings.Imaging.AutoFillImageProperties;
             return autoFillConfigs?.FirstOrDefault(x => x.Alias == propertyTypeAlias);

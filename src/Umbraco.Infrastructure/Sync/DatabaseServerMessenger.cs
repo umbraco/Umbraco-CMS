@@ -123,12 +123,12 @@ namespace Umbraco.Cms.Infrastructure.Sync
         protected override void DeliverRemote(
             ICacheRefresher refresher,
             MessageType messageType,
-            IEnumerable<object> ids = null,
-            string json = null)
+            IEnumerable<object>? ids = null,
+            string? json = null)
         {
             var idsA = ids?.ToArray();
 
-            if (GetArrayType(idsA, out Type idType) == false)
+            if (GetArrayType(idsA, out Type? idType) == false)
             {
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
             }

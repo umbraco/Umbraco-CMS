@@ -7,16 +7,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
     public class ExamineIndexModel
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "healthStatus")]
-        public string HealthStatus { get; set; }
+        public string? HealthStatus { get; set; }
 
         [DataMember(Name = "isHealthy")]
         public bool IsHealthy => HealthStatus == "Healthy";
 
         [DataMember(Name = "providerProperties")]
-        public IReadOnlyDictionary<string, object> ProviderProperties { get; set; }
+        public IReadOnlyDictionary<string, object?>? ProviderProperties { get; set; }
 
         [DataMember(Name = "canRebuild")]
         public bool CanRebuild { get; set; }

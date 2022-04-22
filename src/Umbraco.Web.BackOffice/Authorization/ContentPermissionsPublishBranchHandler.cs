@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsPublishBranchRequirement requirement, IContent resource)
         {
-            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
             var denied = new List<IUmbracoEntity>();
             var page = 0;

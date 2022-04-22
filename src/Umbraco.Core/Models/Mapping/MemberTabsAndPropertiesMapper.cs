@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
@@ -58,10 +59,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var memberType = _memberTypeService.Get(source.ContentTypeId);
 
-            IgnoreProperties = memberType.CompositionPropertyTypes
-                .Where(x => x.HasIdentity == false)
-                .Select(x => x.Alias)
-                .ToArray();
+            if (memberType is not null)
+            {
+
+                IgnoreProperties = memberType.CompositionPropertyTypes
+                    .Where(x => x.HasIdentity == false)
+                    .Select(x => x.Alias)
+                    .ToArray();
+            }
 
             var resolved = base.Map(source, context);
 
@@ -107,9 +112,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var prop in result)
             {
                 // check if this property is flagged as sensitive
-                var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
+                var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
                 // check permissions for viewing sensitive data
-                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false))
+                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false))
                 {
                     // mark this property as sensitive
                     prop.IsSensitive = true;
@@ -150,15 +155,15 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return prop;
         }
 
-        internal IDictionary<string, bool> GetMemberGroupValue(string username)
+        internal IDictionary<string, bool> GetMemberGroupValue(string? username)
         {
-            IEnumerable<string> userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
+            IEnumerable<string>? userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
             var result = _memberGroupService.GetAll()
-                .Select(x => x.Name)
+                .Select(x => x.Name!)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                .Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x, x => false);
 
@@ -169,7 +174,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             // else update the dictionary to "true" for the user roles (except internal roles)
-            foreach (var userRole in userRoles.Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
+            foreach (var userRole in userRoles.Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
             {
                 result[userRole] = true;
             }
@@ -177,7 +182,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return result;
         }
 
-        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext context)
+        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext? context)
         {
             var properties = new List<ContentPropertyDisplay>
             {
@@ -194,7 +199,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize(null,"password"),
-                    Value = new Dictionary<string, object>
+                    Value = new Dictionary<string, object?>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
                         { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
@@ -272,7 +277,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 },
             };
 
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() is false)
+            if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() is false)
             {
                 // Current user doesn't have access to sensitive data so explicitly set the views and remove the value from sensitive data
                 foreach (var property in properties)

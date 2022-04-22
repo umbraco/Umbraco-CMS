@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 .Distinct()
                 .ToArray();
 
-            var isAuth = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null &&
+            var isAuth = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser != null &&
                 apps.Any(app => _backOfficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
                     app, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
 

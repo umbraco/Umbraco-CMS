@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T">The expected type of the configuration object.</typeparam>
         /// <param name="dataType">This datatype.</param>
         /// <exception cref="InvalidCastException">When the datatype configuration is not of the expected type.</exception>
-        public static T ConfigurationAs<T>(this IDataType dataType)
+        public static T? ConfigurationAs<T>(this IDataType dataType)
             where T : class
         {
             if (dataType == null)

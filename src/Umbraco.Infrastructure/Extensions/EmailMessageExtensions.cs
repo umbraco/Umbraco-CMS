@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Extensions
                     builder.TextBody = mailMessage.Body;
                 }
 
-                foreach (EmailMessageAttachment attachment in mailMessage.Attachments)
+                foreach (EmailMessageAttachment attachment in mailMessage.Attachments!)
                 {
                     builder.Attachments.Add(attachment.FileName, attachment.Stream);
                 }
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Extensions
             return messageToSend;
         }
 
-        private static void AddAddresses(MimeMessage message, string[] addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
+        private static void AddAddresses(MimeMessage message, string?[]? addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
         {
             var foundValid = false;
             if (addresses != null)
@@ -77,13 +77,14 @@ namespace Umbraco.Cms.Infrastructure.Extensions
         }
 
         public static NotificationEmailModel ToNotificationEmail(this EmailMessage emailMessage,
-            string configuredFromAddress)
+            string? configuredFromAddress)
         {
             var fromEmail = string.IsNullOrEmpty(emailMessage.From) ? configuredFromAddress : emailMessage.From;
 
-            NotificationEmailAddress from = ToNotificationAddress(fromEmail);
+            NotificationEmailAddress? from = ToNotificationAddress(fromEmail);
 
-            return new NotificationEmailModel(from,
+            return new NotificationEmailModel(
+                from,
                 GetNotificationAddresses(emailMessage.To),
                 GetNotificationAddresses(emailMessage.Cc),
                 GetNotificationAddresses(emailMessage.Bcc),
@@ -94,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.Extensions
                 emailMessage.IsBodyHtml);
         }
 
-        private static NotificationEmailAddress ToNotificationAddress(string address)
+        private static NotificationEmailAddress? ToNotificationAddress(string? address)
         {
             if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
             {
@@ -107,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.Extensions
             return null;
         }
 
-        private static IEnumerable<NotificationEmailAddress> GetNotificationAddresses(IEnumerable<string> addresses)
+        private static IEnumerable<NotificationEmailAddress>? GetNotificationAddresses(IEnumerable<string?>? addresses)
         {
             if (addresses is null)
             {
@@ -118,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Extensions
 
             foreach (var address in addresses)
             {
-                NotificationEmailAddress notificationAddress = ToNotificationAddress(address);
+                NotificationEmailAddress? notificationAddress = ToNotificationAddress(address);
                 if (notificationAddress is not null)
                 {
                     notificationAddresses.Add(notificationAddress);

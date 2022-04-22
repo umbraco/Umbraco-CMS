@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Core.Collections
 
         private HashSet<T> GetThreadSafeClone()
         {
-            HashSet<T> clone = null;
+            HashSet<T>? clone = null;
             try
             {
                 _instanceLocker.EnterReadLock();

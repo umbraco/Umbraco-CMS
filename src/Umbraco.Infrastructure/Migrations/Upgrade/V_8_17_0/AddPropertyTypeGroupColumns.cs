@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_17_0
 
         internal IEnumerable<PropertyTypeGroupDto> PopulateAliases(IEnumerable<PropertyTypeGroupDto> dtos)
         {
-            foreach (var dtosPerAlias in dtos.GroupBy(x => x.Text.ToSafeAlias(_shortStringHelper, true)))
+            foreach (var dtosPerAlias in dtos.GroupBy(x => x.Text?.ToSafeAlias(_shortStringHelper, true)))
             {
                 var dtosPerAliasAndText = dtosPerAlias.GroupBy(x => x.Text);
                 var numberSuffix = 1;
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_17_0
                 {
                     foreach (var dto in dtosPerText)
                     {
-                        dto.Alias = dtosPerAlias.Key;
+                        dto.Alias = dtosPerAlias.Key ?? string.Empty;
 
                         if (numberSuffix > 1)
                         {

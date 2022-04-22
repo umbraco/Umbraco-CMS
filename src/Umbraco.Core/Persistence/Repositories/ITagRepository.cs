@@ -50,45 +50,45 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets a tagged entity.
         /// </summary>
-        TaggedEntity GetTaggedEntityByKey(Guid key);
+        TaggedEntity? GetTaggedEntityByKey(Guid key);
 
         /// <summary>
         /// Gets a tagged entity.
         /// </summary>
-        TaggedEntity GetTaggedEntityById(int id);
+        TaggedEntity? GetTaggedEntityById(int id);
 
         /// Gets all entities of a type, tagged with any tag in the specified group.
-        IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group, string culture = null);
+        IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group, string? culture = null);
 
         /// <summary>
         /// Gets all entities of a type, tagged with the specified tag.
         /// </summary>
-        IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string group = null, string culture = null);
+        IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string? group = null, string? culture = null);
 
         /// <summary>
         /// Gets all tags for an entity type.
         /// </summary>
-        IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null, string culture = null);
+        IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string? group = null, string? culture = null);
 
         /// <summary>
         /// Gets all tags attached to an entity.
         /// </summary>
-        IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null, string culture = null);
+        IEnumerable<ITag> GetTagsForEntity(int contentId, string? group = null, string? culture = null);
 
         /// <summary>
         /// Gets all tags attached to an entity.
         /// </summary>
-        IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null, string culture = null);
+        IEnumerable<ITag> GetTagsForEntity(Guid contentId, string? group = null, string? culture = null);
 
         /// <summary>
         /// Gets all tags attached to an entity via a property.
         /// </summary>
-        IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null);
+        IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null);
 
         /// <summary>
         /// Gets all tags attached to an entity via a property.
         /// </summary>
-        IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string group = null, string culture = null);
+        IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null, string? culture = null);
 
         #endregion
     }

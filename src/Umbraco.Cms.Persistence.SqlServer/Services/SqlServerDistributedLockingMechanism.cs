@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -114,7 +115,12 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         private void ObtainReadLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("Could not find a database");
+            }
 
             if (!db.InTransaction)
             {
@@ -141,7 +147,12 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         private void ObtainWriteLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("Could not find a database");
+            }
 
             if (!db.InTransaction)
             {

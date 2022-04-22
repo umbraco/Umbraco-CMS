@@ -53,21 +53,21 @@ namespace Umbraco.Cms.Core.Models
         public Guid Key { get; }
 
         /// <inheritdoc />
-        public ITemplate DefaultTemplate { get;  }
+        public ITemplate? DefaultTemplate { get;  }
 
         public ContentVariation Variations { get; }
 
-        public string Icon { get; }
+        public string? Icon { get; }
 
         public bool IsContainer { get; }
 
-        public string Name { get; }
+        public string? Name { get; }
 
         public bool AllowedAsRoot { get; }
 
         public bool IsElement { get; }
 
-        public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false)
+        public bool SupportsPropertyVariation(string? culture, string segment, bool wildcards = false)
         {
             // non-exact validation: can accept a 'null' culture if the property type varies
             //  by culture, and likewise for segment
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Models
             return string.Equals(Alias, other.Alias) && Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

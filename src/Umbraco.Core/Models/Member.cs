@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class Member : ContentBase, IMember
     {
-        private IDictionary<string, object> _additionalData;
+        private IDictionary<string, object?>? _additionalData;
         private string _username;
         private string _email;
-        private string _rawPasswordValue;
-        private string _passwordConfig;
+        private string? _rawPasswordValue;
+        private string? _passwordConfig;
         private DateTime? _emailConfirmedDate;
-        private string _securityStamp;
+        private string? _securityStamp;
         private int _failedPasswordAttempts;
         private bool _isApproved;
         private bool _isLockedOut;
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Models
         /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
         /// </param>
         /// <param name="contentType"></param>
-        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
+        public Member(string? name, string email, string username, string? rawPasswordValue, IMemberType? contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
             _email = email;
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Core.Models
         public string Username
         {
             get => _username;
-            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
+            set => SetPropertyValueAndDetectChanges(value, ref _username!, nameof(Username));
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Core.Models
         public string Email
         {
             get => _email;
-            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
+            set => SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
         }
 
         [DataMember]
@@ -220,7 +220,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the raw password value
         /// </summary>
         [IgnoreDataMember]
-        public string RawPasswordValue
+        public string? RawPasswordValue
         {
             get => _rawPasswordValue;
             set
@@ -239,7 +239,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         [IgnoreDataMember]
-        public string PasswordConfiguration
+        public string? PasswordConfiguration
         {
             get => _passwordConfig;
             set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Groups that Member is part of
         /// </summary>
         [DataMember]
-        public IEnumerable<string> Groups { get; set; }
+        public IEnumerable<string>? Groups { get; set; }
 
         // TODO: When get/setting all of these properties we MUST:
         // * Check if we are using the umbraco membership provider, if so then we need to use the configured fields - not the explicit fields below
@@ -263,7 +263,7 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public string Comments
+        public string? Comments
         {
             get
             {
@@ -271,9 +271,9 @@ namespace Umbraco.Cms.Core.Models
                 if (a.Success == false)
                     return a.Result;
 
-                return Properties[Constants.Conventions.Member.Comments].GetValue() == null
+                return Properties[Constants.Conventions.Member.Comments]?.GetValue() == null
                     ? string.Empty
-                    : Properties[Constants.Conventions.Member.Comments].GetValue().ToString();
+                    : Properties[Constants.Conventions.Member.Comments]?.GetValue()?.ToString();
             }
             set
             {
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Core.Models
                     nameof(Comments)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.Comments].SetValue(value);
+                Properties[Constants.Conventions.Member.Comments]?.SetValue(value);
             }
         }
 
@@ -377,7 +377,7 @@ namespace Umbraco.Cms.Core.Models
         /// The security stamp used by ASP.Net identity
         /// </summary>
         [IgnoreDataMember]
-        public string SecurityStamp
+        public string? SecurityStamp
         {
             get => _securityStamp;
             set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
@@ -392,7 +392,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string LongStringPropertyValue { get; set; }
+        public string? LongStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
         /// </summary>
@@ -401,7 +401,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string ShortStringPropertyValue { get; set; }
+        public string? ShortStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
         /// </summary>
@@ -437,7 +437,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string PropertyTypeAlias { get; set; }
+        public string? PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
@@ -491,7 +491,7 @@ namespace Umbraco.Cms.Core.Models
         /// <inheritdoc />
         [DataMember]
         [DoNotClone]
-        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+        public IDictionary<string, object?>? AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object?>());
 
         /// <inheritdoc />
         [IgnoreDataMember]

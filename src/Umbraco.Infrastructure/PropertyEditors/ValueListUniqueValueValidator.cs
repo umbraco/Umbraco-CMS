@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class ValueListUniqueValueValidator : IValueValidator
     {
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             // the value we get should be a JArray
             // [ { "value": <value>, "sortOrder": 1 }, { ... }, ... ]
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             var groupedValues = json.OfType<JObject>()
                 .Where(x => x["value"] != null)
-                .Select((x, index) => new { value = x["value"].ToString(), index })
+                .Select((x, index) => new { value = x["value"]?.ToString(), index })
                 .Where(x => x.value.IsNullOrWhiteSpace() == false)
                 .GroupBy(x => x.value);
 

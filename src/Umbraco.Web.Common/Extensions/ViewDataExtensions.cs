@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -40,13 +41,13 @@ namespace Umbraco.Extensions
         /// The cookie value can either be a simple string value
         /// </para>
         /// </remarks>
-        public static bool FromBase64CookieData<T>(this ViewDataDictionary viewData, HttpContext httpContext, string cookieName, IJsonSerializer serializer)
+        public static bool FromBase64CookieData<T>(this ViewDataDictionary viewData, HttpContext? httpContext, string cookieName, IJsonSerializer serializer)
         {
-            var hasCookie = httpContext.Request.Cookies.ContainsKey(cookieName);
+            var hasCookie = httpContext?.Request.Cookies.ContainsKey(cookieName) ?? false;
             if (!hasCookie) return false;
 
             // get the cookie value
-            if (!httpContext.Request.Cookies.TryGetValue(cookieName, out var cookieVal))
+            if (httpContext is null || !httpContext.Request.Cookies.TryGetValue(cookieName, out var cookieVal))
             {
                 return false;
             }
@@ -59,7 +60,7 @@ namespace Umbraco.Extensions
 
             try
             {
-                var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(System.Net.WebUtility.UrlDecode(cookieVal)));
+                var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(System.Net.WebUtility.UrlDecode(cookieVal)!));
                 // deserialize to T and store in viewdata
                 viewData[cookieName] = serializer.Deserialize<T>(decoded);
                 return true;
@@ -70,9 +71,9 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static string GetUmbracoPath(this ViewDataDictionary viewData)
+        public static string? GetUmbracoPath(this ViewDataDictionary viewData)
         {
-            return (string)viewData[TokenUmbracoPath];
+            return (string?)viewData[TokenUmbracoPath];
         }
 
         public static void SetUmbracoPath(this ViewDataDictionary viewData, string value)
@@ -80,19 +81,19 @@ namespace Umbraco.Extensions
             viewData[TokenUmbracoPath] = value;
         }
 
-        public static string GetInstallApiBaseUrl(this ViewDataDictionary viewData)
+        public static string? GetInstallApiBaseUrl(this ViewDataDictionary viewData)
         {
-            return (string)viewData[TokenInstallApiBaseUrl];
+            return (string?)viewData[TokenInstallApiBaseUrl];
         }
 
-        public static void SetInstallApiBaseUrl(this ViewDataDictionary viewData, string value)
+        public static void SetInstallApiBaseUrl(this ViewDataDictionary viewData, string? value)
         {
             viewData[TokenInstallApiBaseUrl] = value;
         }
 
-        public static string GetUmbracoBaseFolder(this ViewDataDictionary viewData)
+        public static string? GetUmbracoBaseFolder(this ViewDataDictionary viewData)
         {
-            return (string)viewData[TokenUmbracoBaseFolder];
+            return (string?)viewData[TokenUmbracoBaseFolder];
         }
 
         public static void SetUmbracoBaseFolder(this ViewDataDictionary viewData, string value)
@@ -104,9 +105,9 @@ namespace Umbraco.Extensions
             viewData[TokenUmbracoVersion] = version;
         }
 
-        public static SemVersion GetUmbracoVersion(this ViewDataDictionary viewData)
+        public static SemVersion? GetUmbracoVersion(this ViewDataDictionary viewData)
         {
-            return (SemVersion) viewData[TokenUmbracoVersion];
+            return (SemVersion?) viewData[TokenUmbracoVersion];
         }
 
         /// <summary>
@@ -114,9 +115,9 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="viewData"></param>
         /// <returns></returns>
-        public static BackOfficeExternalLoginProviderErrors GetExternalSignInProviderErrors(this ViewDataDictionary viewData)
+        public static BackOfficeExternalLoginProviderErrors? GetExternalSignInProviderErrors(this ViewDataDictionary viewData)
         {
-            return (BackOfficeExternalLoginProviderErrors)viewData[TokenExternalSignInError];
+            return (BackOfficeExternalLoginProviderErrors?)viewData[TokenExternalSignInError];
         }
 
         /// <summary>
@@ -129,9 +130,9 @@ namespace Umbraco.Extensions
             viewData[TokenExternalSignInError] = errors;
         }
 
-        public static string GetPasswordResetCode(this ViewDataDictionary viewData)
+        public static string? GetPasswordResetCode(this ViewDataDictionary viewData)
         {
-            return (string)viewData[TokenPasswordResetCode];
+            return (string?)viewData[TokenPasswordResetCode];
         }
 
         public static void SetPasswordResetCode(this ViewDataDictionary viewData, string value)
@@ -144,7 +145,7 @@ namespace Umbraco.Extensions
             viewData[TokenTwoFactorRequired] = providerNames;
         }
 
-        public static bool TryGetTwoFactorProviderNames(this ViewDataDictionary viewData, out IEnumerable<string> providerNames)
+        public static bool TryGetTwoFactorProviderNames(this ViewDataDictionary viewData, [MaybeNullWhen(false)] out IEnumerable<string> providerNames)
         {
             providerNames = viewData[TokenTwoFactorRequired] as IEnumerable<string>;
             return providerNames is not null;

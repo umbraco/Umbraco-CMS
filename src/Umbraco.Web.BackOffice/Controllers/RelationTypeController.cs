@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
-        public ActionResult<RelationTypeDisplay> GetById(int id)
+        public ActionResult<RelationTypeDisplay?> GetById(int id)
         {
             var relationType = _relationService.GetRelationTypeById(id);
 
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
-        public ActionResult<RelationTypeDisplay> GetById(Guid id)
+        public ActionResult<RelationTypeDisplay?> GetById(Guid id)
         {
             var relationType = _relationService.GetRelationTypeById(id);
             if (relationType == null)
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
-        public ActionResult<RelationTypeDisplay> GetById(Udi id)
+        public ActionResult<RelationTypeDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
 
-        public PagedResult<RelationDisplay> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)
+        public PagedResult<RelationDisplay?> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)
         {
 
             if (pageNumber <= 0 || pageSize <= 0)
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // Ordering do we need to pass through?
             var relations = _relationService.GetPagedByRelationTypeId(id, pageNumber -1, pageSize, out long totalRecords);
 
-            return new PagedResult<RelationDisplay>(totalRecords, pageNumber, pageSize)
+            return new PagedResult<RelationDisplay?>(totalRecords, pageNumber, pageSize)
             {
                 Items = relations.Select(x => _umbracoMapper.Map<RelationDisplay>(x))
             };
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var relationTypePersisted = new RelationType(
                 relationType.Name,
-                relationType.Name.ToSafeAlias(_shortStringHelper, true),
+                relationType.Name?.ToSafeAlias(_shortStringHelper, true),
                 relationType.IsBidirectional,
                 relationType.ParentObjectType,
                 relationType.ChildObjectType,
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="relationType">The relation type to update.</param>
         /// <returns>A display object containing the updated relation type.</returns>
-        public ActionResult<RelationTypeDisplay> PostSave(RelationTypeSave relationType)
+        public ActionResult<RelationTypeDisplay?> PostSave(RelationTypeSave relationType)
         {
             var relationTypePersisted = _relationService.GetRelationTypeById(relationType.Key);
 
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 _relationService.Save(relationTypePersisted);
                 var display = _umbracoMapper.Map<RelationTypeDisplay>(relationTypePersisted);
-                display.AddSuccessNotification("Relation type saved", "");
+                display?.AddSuccessNotification("Relation type saved", "");
 
                 return display;
             }

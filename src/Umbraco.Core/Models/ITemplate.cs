@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the Name of the File including extension
         /// </summary>
-        new string Name { get; set; }
+        new string? Name { get; set; }
 
         /// <summary>
         /// Gets the Alias of the File, which is the name without the extension
@@ -25,12 +25,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// returns the master template alias
         /// </summary>
-        string MasterTemplateAlias { get; }
+        string? MasterTemplateAlias { get; }
 
         /// <summary>
         /// Set the mastertemplate
         /// </summary>
         /// <param name="masterTemplate"></param>
-        void SetMasterTemplate(ITemplate masterTemplate);
+        void SetMasterTemplate(ITemplate? masterTemplate);
     }
 }

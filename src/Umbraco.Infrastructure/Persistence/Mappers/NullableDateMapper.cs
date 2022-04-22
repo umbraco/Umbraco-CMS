@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
     /// </summary>
     public class NullableDateMapper : DefaultMapper
     {
-        public override Func<object, object> GetToDbConverter(Type destType, MemberInfo sourceMemberInfo)
+        public override Func<object, object?>? GetToDbConverter(Type destType, MemberInfo sourceMemberInfo)
         {
             // ensures that NPoco does not try to insert an invalid date
             // from a nullable DateTime property

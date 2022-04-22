@@ -12,11 +12,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     {
         [DataMember(Order = 0)]
         [JsonProperty("nm")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Order = 1)]
         [JsonProperty("us")]
-        public string UrlSegment { get; set; }
+        public string? UrlSegment { get; set; }
 
         [DataMember(Order = 2)]
         [JsonProperty("dt")]

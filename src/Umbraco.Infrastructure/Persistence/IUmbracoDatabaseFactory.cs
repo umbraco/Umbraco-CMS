@@ -34,13 +34,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// Gets the connection string.
         /// </summary>
         /// <remarks>May return <c>null</c> if the database factory is not configured.</remarks>
-        string ConnectionString { get; }
+        string? ConnectionString { get; }
 
         /// <summary>
         /// Gets the provider name.
         /// </summary>
         /// <remarks>May return <c>null</c> if the database factory is not configured.</remarks>
-        string ProviderName { get; }
+        string? ProviderName { get; }
 
         /// <summary>
         /// Gets a value indicating whether the database factory is configured (see <see cref="Configured"/>),
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <remarks>
         /// <para>Getting the <see cref="IBulkSqlInsertProvider"/> causes the factory to initialize if it is not already initialized.</para>
         /// </remarks>
-        IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
+        IBulkSqlInsertProvider? BulkSqlInsertProvider { get; }
 
         /// <summary>
         /// Configures the database factory for upgrades.

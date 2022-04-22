@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Cache
         {
         }
 
-        public ICacheRefresher this[Guid id]
+        public ICacheRefresher? this[Guid id]
             => this.FirstOrDefault(x => x.RefresherUniqueId == id);
     }
 }

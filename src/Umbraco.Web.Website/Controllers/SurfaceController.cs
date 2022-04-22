@@ -32,11 +32,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
         /// <summary>
         /// Gets the current page.
         /// </summary>
-        protected virtual IPublishedContent CurrentPage
+        protected virtual IPublishedContent? CurrentPage
         {
             get
             {
-                UmbracoRouteValues umbracoRouteValues = HttpContext.Features.Get<UmbracoRouteValues>();
+                UmbracoRouteValues? umbracoRouteValues = HttpContext.Features.Get<UmbracoRouteValues>();
                 if (umbracoRouteValues is null)
                 {
                     throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");

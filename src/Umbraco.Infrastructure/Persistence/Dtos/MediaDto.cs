@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
-        public ContentDto ContentDto { get; set; }
+        public ContentDto ContentDto { get; set; } = null!;
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]
-        public MediaVersionDto MediaVersionDto { get; set; }
+        public MediaVersionDto MediaVersionDto { get; set; } = null!;
     }
 }

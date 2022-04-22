@@ -2,7 +2,7 @@
 {
     public interface IAssetFile
     {
-        string FilePath { get; set; }
+        string? FilePath { get; set; }
         AssetType DependencyType { get; }
     }
 }

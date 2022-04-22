@@ -39,14 +39,14 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// </remarks>
         public bool IsDefaultPermissions { get; private set; }
 
-        public bool Equals(EntityPermission other)
+        public bool Equals(EntityPermission? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return EntityId == other.EntityId && UserGroupId == other.UserGroupId;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

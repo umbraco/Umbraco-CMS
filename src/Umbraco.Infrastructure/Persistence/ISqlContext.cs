@@ -48,6 +48,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <summary>
         /// Gets the mappers.
         /// </summary>
-        IMapperCollection Mappers { get; }
+        IMapperCollection? Mappers { get; }
     }
 }

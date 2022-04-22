@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// the content app should be displayed or not, and return either a <see cref="ContentApp"/>
         /// instance, or null.</para>
         /// </remarks>
-        ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups);
+        ContentApp? GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups);
     }
 }

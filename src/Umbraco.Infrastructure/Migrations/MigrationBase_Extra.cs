@@ -17,14 +17,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         protected void AddColumn<T>(string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName);
+            AddColumn(table, table.Name!, columnName);
         }
 
         protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             if (columns.Any(x => x.TableName.InvariantEquals(table.Name) && !x.ColumnName.InvariantEquals(columnName)))
-                AddColumn(table, table.Name, columnName);
+                AddColumn(table, table.Name!, columnName);
         }
 
         protected void AddColumn<T>(string tableName, string columnName)
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName, out sqls);
+            AddColumn(table, table.Name!, columnName, out sqls);
         }
 
         protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
         }
 
-        protected string ColumnType(string tableName, string columnName)
+        protected string? ColumnType(string tableName, string columnName)
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
             var column = columns.FirstOrDefault(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));

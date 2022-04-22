@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Routing
             var templateAlias = path.Substring(pos + 1);
             path = pos == 0 ? "/" : path.Substring(0, pos);
 
-            ITemplate template = _fileService.GetTemplate(templateAlias);
+            ITemplate? template = _fileService.GetTemplate(templateAlias);
 
             if (template == null)
             {
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // look for node corresponding to the rest of the route
             var route = frequest.Domain != null ? (frequest.Domain.ContentId + path) : path;
-            IPublishedContent node = FindContent(frequest, route);
+            IPublishedContent? node = FindContent(frequest, route);
 
             if (node == null)
             {

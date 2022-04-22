@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        public IconModel GetIcon(string iconName)
+        public IconModel? GetIcon(string iconName)
         {
             return _iconService.GetIcon(iconName);
         }
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Gets a list of all svg icons found at at the global icons path.
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyDictionary<string, string> GetIcons() => _iconService.GetIcons();
+        public IReadOnlyDictionary<string, string>? GetIcons() => _iconService.GetIcons();
     }
 
 

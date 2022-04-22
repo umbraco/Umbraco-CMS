@@ -26,11 +26,11 @@ namespace Umbraco.Cms.Core.Templates
             _publishedUrlProvider = publishedUrlProvider;
         }
 
-        public IEnumerable<Udi> FindUdisFromLocalLinks(string text)
+        public IEnumerable<Udi?> FindUdisFromLocalLinks(string text)
         {
-            foreach ((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
+            foreach ((int? intId, GuidUdi? udi, string tagValue) in FindLocalLinkIds(text))
             {
-                if (udi != null)
+                if (udi is not null)
                     yield return udi; // In v8, we only care abuot UDIs
             }
         }
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Templates
                 return EnsureInternalLinks(text);
             }
 
-            using (umbracoContext.ForcedPreview(preview)) // force for URL provider
+            using (umbracoContext!.ForcedPreview(preview)) // force for URL provider
             {
                 return EnsureInternalLinks(text);
             }
@@ -72,14 +72,14 @@ namespace Umbraco.Cms.Core.Templates
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
             }
 
-            foreach((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
+            foreach((int? intId, GuidUdi? udi, string tagValue) in FindLocalLinkIds(text))
             {
-                if (udi != null)
+                if (udi is not null)
                 {
                     var newLink = "#";
-                    if (udi.EntityType == Constants.UdiEntityType.Document)
+                    if (udi?.EntityType == Constants.UdiEntityType.Document)
                         newLink = _publishedUrlProvider.GetUrl(udi.Guid);
-                    else if (udi.EntityType == Constants.UdiEntityType.Media)
+                    else if (udi?.EntityType == Constants.UdiEntityType.Media)
                         newLink = _publishedUrlProvider.GetMediaUrl(udi.Guid);
 
                     if (newLink == null)
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Templates
             return text;
         }
 
-        private IEnumerable<(int? intId, GuidUdi udi, string tagValue)> FindLocalLinkIds(string text)
+        private IEnumerable<(int? intId, GuidUdi? udi, string tagValue)> FindLocalLinkIds(string text)
         {
             // Parse internal links
             var tags = LocalLinkPattern.Matches(text);
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Templates
                     if (UdiParser.TryParse(id, out var udi))
                     {
                         var guidUdi = udi as GuidUdi;
-                        if (guidUdi != null)
+                        if (guidUdi is not null)
                             yield return (null, guidUdi, tag.Value);
                     }
 

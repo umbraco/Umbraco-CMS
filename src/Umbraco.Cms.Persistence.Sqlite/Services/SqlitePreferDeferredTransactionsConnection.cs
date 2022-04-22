@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
@@ -40,6 +41,7 @@ public class SqlitePreferDeferredTransactionsConnection : DbConnection
     protected override DbCommand CreateDbCommand()
         => new CommandWrapper(_inner.CreateCommand());
 
+    [AllowNull]
     public override string ConnectionString
     {
         get => _inner.ConnectionString;
@@ -67,6 +69,7 @@ public class SqlitePreferDeferredTransactionsConnection : DbConnection
         public override void Prepare()
             => _inner.Prepare();
 
+        [AllowNull]
         public override string CommandText
         {
             get => _inner.CommandText;

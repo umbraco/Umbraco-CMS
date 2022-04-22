@@ -14,26 +14,26 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [Required]
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required]
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
 
         [DataMember(Name = "key")]
         public Guid Key { get; set; }
 
         [DataMember(Name = "content")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [DataMember(Name = "path")]
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         [DataMember(Name = "virtualPath")]
-        public string VirtualPath { get; set; }
+        public string? VirtualPath { get; set; }
 
         [DataMember(Name = "masterTemplateAlias")]
-        public string MasterTemplateAlias { get; set; }
+        public string? MasterTemplateAlias { get; set; }
 
         [DataMember(Name = "isMasterTemplate")]
         public bool IsMasterTemplate { get; set; }
@@ -42,6 +42,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
-        public List<BackOfficeNotification> Notifications { get; private set; }
+        public List<BackOfficeNotification>? Notifications { get; private set; }
     }
 }

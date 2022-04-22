@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <param name="pocoDataFactory">The Poco data factory.</param>
         /// <param name="databaseType">The database type.</param>
         /// <param name="mappers">The mappers.</param>
-        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)            
+        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection? mappers = null)
         {
             // for tests
             Mappers = mappers;
@@ -55,6 +55,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public IPocoDataFactory PocoDataFactory { get; }
 
         /// <inheritdoc />
-        public IMapperCollection Mappers { get; }
+        public IMapperCollection? Mappers { get; }
     }
 }

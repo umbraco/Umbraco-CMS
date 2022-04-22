@@ -31,21 +31,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Get, Has
 
-        public override IPublishedContent GetById(bool preview, int contentId)
+        public override IPublishedContent? GetById(bool preview, int contentId)
         {
             // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
             return n?.PublishedModel;
         }
 
-        public override IPublishedContent GetById(bool preview, Guid contentId)
+        public override IPublishedContent? GetById(bool preview, Guid contentId)
         {
             // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
             return n?.PublishedModel;
         }
 
-        public override IPublishedContent GetById(bool preview, Udi contentId)
+        public override IPublishedContent? GetById(bool preview, Udi contentId)
         {
             var guidUdi = contentId as GuidUdi;
             if (guidUdi == null)
@@ -67,14 +67,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         IEnumerable<IPublishedContent> INavigableData.GetAtRoot(bool preview) => GetAtRoot(preview);
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
         {
             // handle context culture for variant
             if (culture == null)
                 culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
 
             var atRoot = _snapshot.GetAtRoot().Select(x => x.PublishedModel);
-            return culture == "*" ? atRoot : atRoot.Where(x => x.IsInvariantOrHasCulture(culture));
+            return culture == "*" ? atRoot.WhereNotNull() : atRoot.Where(x => x?.IsInvariantOrHasCulture(culture) ?? false).WhereNotNull();
         }
 
         public override bool HasContent(bool preview)
@@ -86,21 +86,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region XPath
 
-        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
+        public override IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
         {
             var navigator = CreateNavigator(preview);
             var iterator = navigator.Select(xpath, vars);
             return GetSingleByXPath(iterator);
         }
 
-        public override IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
+        public override IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
         {
             var navigator = CreateNavigator(preview);
             var iterator = navigator.Select(xpath, vars);
             return GetSingleByXPath(iterator);
         }
 
-        private static IPublishedContent GetSingleByXPath(XPathNodeIterator iterator)
+        private static IPublishedContent? GetSingleByXPath(XPathNodeIterator iterator)
         {
             if (iterator.MoveNext() == false) return null;
 
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return navigator;
         }
 
-        public override XPathNavigator CreateNodeNavigator(int id, bool preview)
+        public override XPathNavigator? CreateNodeNavigator(int id, bool preview)
         {
             var source = new Source(this, preview);
             var navigator = new NavigableNavigator(source);
@@ -157,11 +157,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id) => _snapshot.GetContentType(id);
+        public override IPublishedContentType? GetContentType(int id) => _snapshot.GetContentType(id);
 
-        public override IPublishedContentType GetContentType(string alias) => _snapshot.GetContentType(alias);
+        public override IPublishedContentType? GetContentType(string alias) => _snapshot.GetContentType(alias);
 
-        public override IPublishedContentType GetContentType(Guid key) => _snapshot.GetContentType(key);
+        public override IPublishedContentType? GetContentType(Guid key) => _snapshot.GetContentType(key);
 
         #endregion
 

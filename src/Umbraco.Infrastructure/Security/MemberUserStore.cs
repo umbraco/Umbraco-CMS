@@ -104,8 +104,8 @@ namespace Umbraco.Cms.Core.Security
                 IMember memberEntity = _memberService.CreateMember(
                     user.UserName,
                     user.Email,
-                    user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
-                    user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
+                    user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name!,
+                    user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias!);
 
                 UpdateMemberProperties(memberEntity, user);
 
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Security
                 _memberService.Save(memberEntity);
 
                 //We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
-                _memberService.AssignRoles(new[] { memberEntity.Id },  user.Roles.Select(x => x.RoleId).ToArray());
+                _memberService.AssignRoles(new[] { memberEntity.Id },  user.Roles.Select(x => x.RoleId).Where(x => x is not null).ToArray()!);
 
                 if (!memberEntity.HasIdentity)
                 {
@@ -177,7 +177,7 @@ namespace Umbraco.Cms.Core.Security
 
                 using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
 
-                IMember found = _memberService.GetById(asInt);
+                IMember? found = _memberService.GetById(asInt);
                 if (found != null)
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -230,7 +230,7 @@ namespace Umbraco.Cms.Core.Security
                     throw new ArgumentNullException(nameof(user));
                 }
 
-                IMember found = _memberService.GetById(UserIdToInt(user.Id));
+                IMember? found = _memberService.GetById(UserIdToInt(user.Id));
                 if (found != null)
                 {
                     _memberService.Delete(found);
@@ -258,13 +258,13 @@ namespace Umbraco.Cms.Core.Security
             }
 
 
-            IMember user = Guid.TryParse(userId, out var key) ? _memberService.GetByKey(key) : _memberService.GetById(UserIdToInt(userId));
+            IMember? user = Guid.TryParse(userId, out var key) ? _memberService.GetByKey(key) : _memberService.GetById(UserIdToInt(userId));
             if (user == null)
             {
-                return Task.FromResult((MemberIdentityUser)null);
+                return Task.FromResult((MemberIdentityUser)null!);
             }
 
-            return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)));
+            return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)))!;
         }
 
         /// <inheritdoc />
@@ -272,13 +272,13 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            IMember user = _memberService.GetByUsername(userName);
+            IMember? user = _memberService.GetByUsername(userName);
             if (user == null)
             {
-                return Task.FromResult((MemberIdentityUser)null);
+                return Task.FromResult((MemberIdentityUser)null!);
             }
 
-            MemberIdentityUser result = AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user));
+            MemberIdentityUser result = AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user))!;
 
             return Task.FromResult(result);
         }
@@ -288,12 +288,12 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            IMember member = _memberService.GetByEmail(email);
-            MemberIdentityUser result = member == null
+            IMember? member = _memberService.GetByEmail(email);
+            MemberIdentityUser? result = member == null
                 ? null
                 : _mapper.Map<MemberIdentityUser>(member);
 
-            return Task.FromResult(AssignLoginsCallback(result));
+            return Task.FromResult(AssignLoginsCallback(result))!;
         }
 
         /// <inheritdoc />
@@ -322,13 +322,16 @@ namespace Umbraco.Cms.Core.Security
             }
 
             ICollection<IIdentityUserLogin> logins = user.Logins;
-            var instance = new IdentityUserLogin(
-                login.LoginProvider,
-                login.ProviderKey,
-                user.Id.ToString());
+            if (user.Id is not null)
+            {
+                var instance = new IdentityUserLogin(
+                    login.LoginProvider,
+                    login.ProviderKey,
+                    user.Id.ToString());
 
-            IdentityUserLogin userLogin = instance;
-            logins.Add(userLogin);
+                IdentityUserLogin userLogin = instance;
+                logins.Add(userLogin);
+            }
 
             return Task.CompletedTask;
         }
@@ -353,7 +356,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(providerKey));
             }
 
-            IIdentityUserLogin userLogin = user.Logins.SingleOrDefault(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
+            IIdentityUserLogin? userLogin = user.Logins.SingleOrDefault(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
             if (userLogin != null)
             {
                 user.Logins.Remove(userLogin);
@@ -394,24 +397,31 @@ namespace Umbraco.Cms.Core.Security
             MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
             if (user == null)
             {
-                return await Task.FromResult((IdentityUserLogin<string>)null);
+                return await Task.FromResult((IdentityUserLogin<string>)null!);
             }
 
             IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
-            UserLoginInfo found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
+            UserLoginInfo? found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
             if (found == null)
             {
-                return await Task.FromResult((IdentityUserLogin<string>)null);
+                return await Task.FromResult((IdentityUserLogin<string>)null!);
             }
 
-            return new IdentityUserLogin<string>
+            if (user.Id is not null)
             {
-                LoginProvider = found.LoginProvider,
-                ProviderKey = found.ProviderKey,
-                // TODO: We don't store this value so it will be null
-                ProviderDisplayName = found.ProviderDisplayName,
-                UserId = user.Id
-            };
+                return new IdentityUserLogin<string>
+                {
+                    LoginProvider = found.LoginProvider,
+                    ProviderKey = found.ProviderKey,
+                    // TODO: We don't store this value so it will be null
+                    ProviderDisplayName = found.ProviderDisplayName,
+                    UserId = user.Id
+                };
+            }
+            else
+            {
+                return null!;
+            }
         }
 
         /// <inheritdoc />
@@ -430,10 +440,10 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(providerKey));
             }
 
-            var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
-            if (logins.Count == 0)
+            var logins = _externalLoginService.Find(loginProvider, providerKey)?.ToList();
+            if (logins is null || logins.Count == 0)
             {
-                return Task.FromResult((IdentityUserLogin<string>)null);
+                return Task.FromResult((IdentityUserLogin<string>)null!);
             }
 
             IIdentityUserLogin found = logins[0];
@@ -489,7 +499,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Lists all users of a given role.
         /// </summary>
-        public override Task<IList<MemberIdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
+        public override Task<IList<MemberIdentityUser>?> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -499,9 +509,9 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(roleName));
             }
 
-            IEnumerable<IMember> members = _memberService.GetMembersByMemberType(roleName);
+            IEnumerable<IMember>? members = _memberService.GetMembersByMemberType(roleName);
 
-            IList<MemberIdentityUser> membersIdentityUsers = members.Select(x => _mapper.Map<MemberIdentityUser>(x)).ToList();
+            IList<MemberIdentityUser>? membersIdentityUsers = members?.Select(x => _mapper.Map<MemberIdentityUser>(x)!).ToList();
 
             return Task.FromResult(membersIdentityUsers);
         }
@@ -514,10 +524,10 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(roleName));
             }
 
-            IMemberGroup group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == roleName);
+            IMemberGroup? group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == roleName);
             if (group == null)
             {
-                return Task.FromResult((UmbracoIdentityRole)null);
+                return Task.FromResult((UmbracoIdentityRole)null!);
             }
 
             return Task.FromResult(new UmbracoIdentityRole(group.Name)
@@ -533,11 +543,11 @@ namespace Umbraco.Cms.Core.Security
             MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
             if (user == null)
             {
-                return null;
+                return null!;
             }
 
-            IdentityUserRole<string> found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
-            return found;
+            IdentityUserRole<string>? found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
+            return found!;
         }
 
         /// <summary>
@@ -558,7 +568,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
             if (token == null)
             {
                 user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
@@ -571,12 +581,12 @@ namespace Umbraco.Cms.Core.Security
             return Task.CompletedTask;
         }
 
-        private MemberIdentityUser AssignLoginsCallback(MemberIdentityUser user)
+        private MemberIdentityUser? AssignLoginsCallback(MemberIdentityUser? user)
         {
             if (user != null)
             {
-                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(user.Key)));
-                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
+                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
+                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
             }
 
             return user;
@@ -594,7 +604,7 @@ namespace Umbraco.Cms.Core.Security
                 anythingChanged = true;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-                DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
+                DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;
                 member.LastLoginDate = dt;
             }
 
@@ -603,7 +613,7 @@ namespace Umbraco.Cms.Core.Security
                 || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
                 anythingChanged = true;
-                member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
+                member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
@@ -625,7 +635,7 @@ namespace Umbraco.Cms.Core.Security
                 && member.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
-                member.Name = identityUser.Name;
+                member.Name = identityUser.Name ?? string.Empty;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Email))
@@ -701,19 +711,19 @@ namespace Umbraco.Cms.Core.Security
             return anythingChanged;
         }
 
-        public IPublishedContent GetPublishedMember(MemberIdentityUser user)
+        public IPublishedContent? GetPublishedMember(MemberIdentityUser user)
         {
             if (user == null)
             {
                 return null;
             }
-            IMember member = _memberService.GetByKey(user.Key);
+            IMember? member = _memberService.GetByKey(user.Key);
             if (member == null)
             {
                 return null;
             }
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-            return publishedSnapshot.Members.Get(member);
+            return publishedSnapshot.Members?.Get(member);
         }
 
         /// <summary>
@@ -724,7 +734,7 @@ namespace Umbraco.Cms.Core.Security
         /// tracking ORMs like EFCore.
         /// </remarks>
         /// <inheritdoc />
-        public override Task<string> GetTokenAsync(MemberIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        public override Task<string?> GetTokenAsync(MemberIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -733,7 +743,7 @@ namespace Umbraco.Cms.Core.Security
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
 
             return Task.FromResult(token?.Value);
         }

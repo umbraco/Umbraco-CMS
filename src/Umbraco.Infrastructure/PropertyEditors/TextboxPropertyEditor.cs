@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         /// <inheritdoc/>
         protected override IDataValueEditor CreateValueEditor() =>
-            DataValueEditorFactory.Create<TextOnlyValueEditor>(Attribute);
+            DataValueEditorFactory.Create<TextOnlyValueEditor>(Attribute!);
 
         /// <inheritdoc/>
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor(_ioHelper);

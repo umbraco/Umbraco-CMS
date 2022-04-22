@@ -80,8 +80,12 @@ namespace Umbraco.Cms.Core.Services
              */
             using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                IReadOnlyCollection<ContentVersionMeta> allHistoricVersions = _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
+                IReadOnlyCollection<ContentVersionMeta>? allHistoricVersions = _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
+                if (allHistoricVersions is null)
+                {
+                    return Array.Empty<ContentVersionMeta>();
+                }
                 _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
                 versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
@@ -135,7 +139,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ContentVersionMeta> GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string culture = null)
+        public IEnumerable<ContentVersionMeta>? GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string? culture = null)
         {
             if (pageIndex < 0)
             {
@@ -163,7 +167,12 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.ContentTree);
                 _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
 
-                ContentVersionMeta version = _documentVersionRepository.Get(versionId);
+                ContentVersionMeta? version = _documentVersionRepository.Get(versionId);
+
+                if (version is null)
+                {
+                    return;
+                }
 
                 AuditType auditType = preventCleanup
                     ? AuditType.ContentVersionPreventCleanup
@@ -175,7 +184,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
         {
             var entry = new AuditItem(
                 objectId,

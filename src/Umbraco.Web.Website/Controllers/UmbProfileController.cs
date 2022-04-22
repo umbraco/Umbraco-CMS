@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             // If there is a specified path to redirect to then use it.
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
-                return Redirect(model.RedirectUrl);
+                return Redirect(model.RedirectUrl!);
             }
 
             // Redirect to current page by default.
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private async Task<IdentityResult> UpdateMemberAsync(ProfileModel model, MemberIdentityUser currentMember)
         {
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-                
+
             currentMember.Email = model.Email;
             currentMember.Name = model.Name;
             currentMember.UserName = model.UserName;
@@ -121,25 +121,25 @@ namespace Umbraco.Cms.Web.Website.Controllers
             // now we can update the custom properties
             // TODO: Ideally we could do this all through our MemberIdentityUser
 
-            IMember member = _memberService.GetByKey(currentMember.Key);
+            IMember? member = _memberService.GetByKey(currentMember.Key);
             if (member == null)
             {
                 // should never happen
-                throw new InvalidOperationException($"Could not find a member with key: {member.Key}.");
+                throw new InvalidOperationException($"Could not find a member with key: {member?.Key}.");
             }
-            
-            IMemberType memberType = _memberTypeService.Get(member.ContentTypeId);
+
+            IMemberType? memberType = _memberTypeService.Get(member.ContentTypeId);
 
             if (model.MemberProperties != null)
             {
                 foreach (MemberPropertyModel property in model.MemberProperties
                     //ensure the property they are posting exists
-                    .Where(p => memberType.PropertyTypeExists(p.Alias))
+                    .Where(p => memberType?.PropertyTypeExists(p.Alias) ?? false)
                     .Where(property => member.Properties.Contains(property.Alias))
                     //needs to be editable
-                    .Where(p => memberType.MemberCanEditProperty(p.Alias)))
+                    .Where(p => memberType?.MemberCanEditProperty(p.Alias) ?? false))
                 {
-                    member.Properties[property.Alias].SetValue(property.Value);
+                    member.Properties[property.Alias]?.SetValue(property.Value);
                 }
             }
 

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
         }
 
-        public RelationDisplay GetById(int id)
+        public RelationDisplay? GetById(int id)
         {
             return _umbracoMapper.Map<IRelation, RelationDisplay>(_relationService.GetById(id));
         }
@@ -46,10 +46,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 return
                     _umbracoMapper.MapEnumerable<IRelation, RelationDisplay>(
-                        relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)));
+                        relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias))).WhereNotNull();
             }
 
-            return _umbracoMapper.MapEnumerable<IRelation, RelationDisplay>(relations);
+            return _umbracoMapper.MapEnumerable<IRelation, RelationDisplay>(relations).WhereNotNull();
         }
 
     }

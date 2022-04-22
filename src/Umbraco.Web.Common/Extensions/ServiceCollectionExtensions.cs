@@ -81,8 +81,8 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static TypeLoader AddTypeLoader(
             this IServiceCollection services,
-            Assembly entryAssembly,
-            IHostingEnvironment hostingEnvironment,
+            Assembly? entryAssembly,
+            IHostingEnvironment? hostingEnvironment,
             ILoggerFactory loggerFactory,
             AppCaches appCaches,
             IConfiguration configuration,
@@ -115,7 +115,7 @@ namespace Umbraco.Extensions
                 typeFinder,
                 runtimeHash,
                 appCaches.RuntimeCache,
-                new DirectoryInfo(hostingEnvironment.LocalTempPath),
+                new DirectoryInfo(hostingEnvironment?.LocalTempPath ?? string.Empty),
                 loggerFactory.CreateLogger<TypeLoader>(),
                 profiler
             );

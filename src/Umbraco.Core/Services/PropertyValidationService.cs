@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidatePropertyValue(
            IPropertyType propertyType,
-           object postedValue)
+           object? postedValue)
         {
             if (propertyType is null) throw new ArgumentNullException(nameof(propertyType));
             var dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
@@ -47,11 +47,11 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<ValidationResult> ValidatePropertyValue(
             IDataEditor editor,
             IDataType dataType,
-            object postedValue,
+            object? postedValue,
             bool isRequired,
-            string validationRegExp,
-            string isRequiredMessage,
-            string validationRegExpMessage)
+            string? validationRegExp,
+            string? isRequiredMessage,
+            string? validationRegExpMessage)
         {
             // Retrieve default messages used for required and regex validatation.  We'll replace these
             // if set with custom ones if they've been provided for a given property.
@@ -82,13 +82,17 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact impact)
+        public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
         {
             // select invalid properties
             invalidProperties = content.Properties.Where(x =>
             {
                 var propertyTypeVaries = x.PropertyType.VariesByCulture();
 
+                if (impact is null)
+                {
+                    return false;
+                }
                 // impacts invariant = validate invariant property, invariant culture
                 if (impact.ImpactsOnlyInvariantCulture)
                     return !(propertyTypeVaries || IsPropertyValid(x, null));
@@ -115,15 +119,15 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
+        public bool IsPropertyValid(IProperty property, string? culture = "*", string? segment = "*")
         {
             //NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
             // The underlying Property._pvalue and Property._vvalues are not exposed but we can re-create these values ourselves which is what it's doing.
 
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
+            segment = segment?.NullOrWhiteSpaceAsNull();
 
-            IPropertyValue pvalue = null;
+            IPropertyValue? pvalue = null;
 
             // if validating invariant/neutral, and it is supported, validate
             // (including ensuring that the value exists, if mandatory)
@@ -156,8 +160,8 @@ namespace Umbraco.Cms.Core.Services
             var pvalues = property.Values.Where(x =>
                     x != pvalue && // don't revalidate pvalue
                     property.PropertyType.SupportsVariation(x.Culture, x.Segment, true) && // the value variation is ok
-                    (culture == "*" || x.Culture.InvariantEquals(culture)) && // the culture matches
-                    (segment == "*" || x.Segment.InvariantEquals(segment))) // the segment matches
+                    (culture == "*" || (x.Culture?.InvariantEquals(culture) ?? false)) && // the culture matches
+                    (segment == "*" || (x.Segment?.InvariantEquals(segment) ?? false))) // the segment matches
                 .ToList();
 
             return pvalues.Count == 0 || pvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
@@ -169,7 +173,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="property"></param>
         /// <param name="value"></param>
         /// <returns>True is property value is valid, otherwise false</returns>
-        private bool IsValidPropertyValue(IProperty property, object value)
+        private bool IsValidPropertyValue(IProperty property, object? value)
         {
             return IsPropertyValueValid(property.PropertyType, value);
         }
@@ -177,7 +181,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
-        private bool IsPropertyValueValid(IPropertyType propertyType, object value)
+        private bool IsPropertyValueValid(IPropertyType propertyType, object? value)
         {
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
             if (editor == null)
@@ -186,7 +190,7 @@ namespace Umbraco.Cms.Core.Services
                 // the property will be displayed as a label, so flagging it as invalid would be pointless.
                 return true;
             }
-            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
+            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.Configuration;
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
         }

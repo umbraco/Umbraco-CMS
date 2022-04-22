@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _macroService = macroService;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -39,12 +39,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //check if there are any macros
-            root.HasChildren = _macroService.GetAll().Any();
+            if (root is not null)
+            {
+                // Check if there are any macros
+                root.HasChildren = _macroService.GetAll().Any();
+            }
+
             return root;
         }
 
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 

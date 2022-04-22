@@ -54,19 +54,49 @@ angular.module("umbraco").controller("Umbraco.Editors.ConfigureTwoFactorControll
     }
 
     function disable(provider) {
+      if ($scope.model.isCurrentUser) {
+        const disableTwoFactorSettings = {
+          provider,
+          user: vm.user,
+          size: "small",
+          view: "views/common/infiniteeditors/twofactor/disabletwofactor.html",
+          close: function () {
+            editorService.close();
+            onInit();
+          }
+        };
 
-      const disableTwoFactorSettings = {
-        provider,
-        user: vm.user,
-        size: "small",
-        view: "views/common/infiniteeditors/twofactor/disabletwofactor.html",
-        close: function () {
-          editorService.close();
-          onInit();
-        }
-      };
+        editorService.open(disableTwoFactorSettings);
+      } else {
+        localizationService.localize("user_2faDisableForUser").then(function (value) {
+          const removeOverlay = {
+            content: value,
+            submitButtonLabelKey: 'actions_disable',
+            submit: function ({ close }) {
+              twoFactorLoginResource.disable(provider.providerName, $scope.model.user.key)
+                .then(onResponse)
+                .catch(onError);
 
-      editorService.open(disableTwoFactorSettings);
+              close();
+            }
+          };
+
+          overlayService.confirmRemove(removeOverlay);
+        });
+      }
+    }
+
+    function onResponse(response) {
+      if (response) {
+        localizationService.localize("user_2faProviderIsDisabledMsg").then(function (value) {
+          notificationsService.info(value);
+        });
+        onInit();
+      } else {
+        localizationService.localize("user_2faProviderIsNotDisabledMsg").then(function (value) {
+          notificationsService.error(value);
+        });
+      }
     }
 
     function onError(error) {

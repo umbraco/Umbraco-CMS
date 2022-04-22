@@ -39,10 +39,10 @@ namespace Umbraco.Cms.Core
             Guid = guid;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var other = obj as GuidUdi;
-            if (other == null) return false;
+            if (other is null) return false;
             return EntityType == other.EntityType && Guid == other.Guid;
         }
 

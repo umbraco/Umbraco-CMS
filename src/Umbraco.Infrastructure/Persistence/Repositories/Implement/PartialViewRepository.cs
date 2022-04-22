@@ -16,18 +16,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
         }
 
-        protected PartialViewRepository(IFileSystem fileSystem)
+        protected PartialViewRepository(IFileSystem? fileSystem)
             : base(fileSystem)
         {
         }
 
         protected virtual PartialViewType ViewType => PartialViewType.PartialView;
 
-        public override IPartialView Get(string id)
+        public override IPartialView? Get(string? id)
         {
+            if (FileSystem is null)
+            {
+                return null;
+            }
             // get the relative path within the filesystem
             // (though... id should be relative already)
-            var path = FileSystem.GetRelativePath(id);
+            var path = FileSystem.GetRelativePath(id!);
 
             if (FileSystem.FileExists(path) == false)
                 return null;
@@ -67,16 +71,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 partialView.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
-        public override IEnumerable<IPartialView> GetMany(params string[] ids)
+        public override IEnumerable<IPartialView> GetMany(params string[]? ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct().ToArray();
+            ids = ids?.Distinct().ToArray();
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 foreach (var id in ids)
                 {
-                    yield return Get(id);
+                    var partialView = Get(id);
+                    if (partialView is not null)
+                    {
+                        yield return partialView;
+                    }
                 }
             }
             else
@@ -84,18 +92,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 var files = FindAllFiles("", "*.*");
                 foreach (var file in files)
                 {
-                    yield return Get(file);
+                    var partialView = Get(file);
+                    if (partialView is not null)
+                    {
+                        yield return partialView;
+                    }
                 }
             }
         }
 
-        public Stream GetFileContentStream(string filepath)
+        public Stream? GetFileContentStream(string filepath)
         {
-            if (FileSystem.FileExists(filepath) == false) return null;
+            if (FileSystem?.FileExists(filepath) == false) return null;
 
             try
             {
-                return FileSystem.OpenFile(filepath);
+                return FileSystem?.OpenFile(filepath);
             }
             catch
             {
@@ -105,7 +117,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public void SetFileContent(string filepath, Stream content)
         {
-            FileSystem.AddFile(filepath, content, true);
+            FileSystem?.AddFile(filepath, content, true);
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
     public class InitializeWebProfiling : INotificationHandler<UmbracoApplicationStartingNotification>
     {
         private readonly bool _profile;
-        private readonly WebProfiler _profiler;
+        private readonly WebProfiler? _profiler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializeWebProfiling"/> class.
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
             if (_profile && notification.RuntimeLevel == RuntimeLevel.Run)
             {
                 // Stop the profiling of the booting process
-                _profiler.StopBoot();
+                _profiler?.StopBoot();
             }
         }
 

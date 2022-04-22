@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">Alias to retrieve an <see cref="IMacro"/> for</param>
         /// <returns>An <see cref="IMacro"/> object</returns>
-        public IMacro GetByAlias(string alias)
+        public IMacro? GetByAlias(string alias)
         {
             if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
             {
@@ -74,11 +74,11 @@ namespace Umbraco.Cms.Core.Services
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return macroWithAliasRepository.GetAllByAlias(aliases);
+                return macroWithAliasRepository.GetAllByAlias(aliases) ?? Enumerable.Empty<IMacro>();
             }
         }
 
-        public IMacro GetById(int id)
+        public IMacro? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IMacro GetById(Guid id)
+        public IMacro? GetById(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

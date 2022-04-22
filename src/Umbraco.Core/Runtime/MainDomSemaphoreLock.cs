@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Runtime
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
         private readonly ILogger<MainDomSemaphoreLock> _logger;
-        private IDisposable _lockRelease;
+        private IDisposable? _lockRelease;
 
         public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
         {
