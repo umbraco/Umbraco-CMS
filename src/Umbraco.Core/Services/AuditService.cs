@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -164,17 +163,17 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (string.IsNullOrWhiteSpace(eventDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
 
             //we need to truncate the data else we'll get SQL errors
-            affectedDetails = affectedDetails?.Substring(0, Math.Min(affectedDetails.Length, AuditEntryDto.DetailsLength));
-            eventDetails = eventDetails.Substring(0, Math.Min(eventDetails.Length, AuditEntryDto.DetailsLength));
+            affectedDetails = affectedDetails?.Substring(0, Math.Min(affectedDetails.Length, Constants.Audit.DetailsLength));
+            eventDetails = eventDetails.Substring(0, Math.Min(eventDetails.Length, Constants.Audit.DetailsLength));
 
             //validate the eventType - must contain a forward slash, no spaces, no special chars
             var eventTypeParts = eventType.ToCharArray();
             if (eventTypeParts.Contains('/') == false || eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)
                 throw new ArgumentException(nameof(eventType) + " must contain only alphanumeric characters, hyphens and at least one '/' defining a category");
-            if (eventType.Length > AuditEntryDto.EventTypeLength)
-                throw new ArgumentException($"Must be max {AuditEntryDto.EventTypeLength} chars.", nameof(eventType));
-            if (performingIp != null && performingIp.Length > AuditEntryDto.IpLength)
-                throw new ArgumentException($"Must be max {AuditEntryDto.EventTypeLength} chars.", nameof(performingIp));
+            if (eventType.Length > Constants.Audit.EventTypeLength)
+                throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(eventType));
+            if (performingIp != null && performingIp.Length > Constants.Audit.IpLength)
+                throw new ArgumentException($"Must be max {Constants.Audit.EventTypeLength} chars.", nameof(performingIp));
 
             var entry = new AuditEntry
             {
@@ -185,7 +184,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 AffectedUserId = affectedUserId,
                 AffectedDetails = affectedDetails,
                 EventType = eventType,
-                EventDetails = eventDetails
+                EventDetails = eventDetails,
             };
 
             if (_isAvailable.Value == false) return entry;
