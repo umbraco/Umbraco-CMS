@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.BlockGrid.BlockConfigurationController
+ * @name Umbraco.Editors.BlockList.BlockConfigurationController
  * @function
  *
  * @description
@@ -28,16 +28,6 @@
             if (!$scope.model.value) {
                 $scope.model.value = [];
             }
-
-            // Ensure good values:
-            $scope.model.value.forEach(block => {
-                block.columnSpanOptions = block.columnSpanOptions || [{
-                    "columnSpan": 12
-                }];
-            })
-            $scope.model.value.forEach(block => {
-                block.areas = block.areas || [];
-            })
 
             loadElementTypes();
 
@@ -118,7 +108,7 @@
                     filter: function (node) {
                         if (node.metaData.isElement === true) {
                             var key = udiService.getKey(node.udi);
-                            // If a Block with this ElementType as content already exists, we will emit it as a possible option.
+                            // If a Block with this ElementType as content already exists, we will emit it as a posible option.
                             return $scope.model.value.find(function (entry) {
                                 return key === entry.contentElementTypeKey;
                             });
@@ -176,9 +166,6 @@
         vm.addBlockFromElementTypeKey = function(key) {
 
             var blockType = {
-                "columnSpanOptions": [{
-                    "columnSpan": 12
-                }],
                 "contentElementTypeKey": key,
                 "settingsElementTypeKey": null,
                 "labelTemplate": "",
@@ -187,9 +174,7 @@
                 "editorSize": "medium",
                 "iconColor": null,
                 "backgroundColor": null,
-                "thumbnail": null,
-                "areaGridColumns": null,
-                "areas": []
+                "thumbnail": null
             };
 
             $scope.model.value.push(blockType);
@@ -215,8 +200,8 @@
                     var overlayModel = {
                         block: clonedBlockData,
                         title: data,
-                        view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
-                        size: "large",
+                        view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
+                        size: "small",
                         submit: function(overlayModel) {
                             loadElementTypes()// lets load elementType again, to ensure we are up to date.
                             TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
@@ -246,6 +231,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockGrid.BlockConfigurationController", BlockConfigurationController);
+    angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockList.BlockConfigurationController", BlockConfigurationController);
 
 })();

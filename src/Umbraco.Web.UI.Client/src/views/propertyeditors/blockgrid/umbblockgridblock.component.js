@@ -5,7 +5,7 @@
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridBlock
      * @description
-     * The component to render the view for a block in the Block Grid Editor.
+     * The component to render the view for a block.
      * If a stylesheet is used then this uses a ShadowDom to make a scoped element.
      * This way the backoffice styling does not collide with the block style.
      */
@@ -53,22 +53,22 @@
             $scope.parentForm = model.parentForm;
             $scope.valFormManager = model.valFormManager;
 
-            var shadowRoot = $element[0].attachShadow({ mode: 'open' });
-            shadowRoot.innerHTML = 
-            `
-                ${ model.stylesheet ? `
+            if (model.stylesheet) {
+                var shadowRoot = $element[0].attachShadow({ mode: 'open' });
+                shadowRoot.innerHTML = `
                     <style>
                     @import "${model.stylesheet}"
-                    </style>`
-                    : ''
-                }
-                <div class="umb-block-grid__block--view" ng-include="'${model.view}'"></div>
-            `;
-            $compile(shadowRoot)($scope);
-            
+                    </style>
+                    <div class="umb-block-grid__block--view" ng-include="'${model.view}'"></div>
+                `;
+                $compile(shadowRoot)($scope);
+            }
+            else {
+                $element.append($compile('<div class="umb-block-grid__block--view" ng-include="model.view"></div>')($scope));
+            }
         };
 
-        // We need to watch for changes on primitive types and update the $scope values.
+        // We need to watch for changes on primitive types and upate the $scope values.
         model.$onChanges = function (changes) {
             if (changes.index) {
                 var index = changes.index.currentValue;
@@ -79,7 +79,6 @@
                 model.block.updateLabel();
             }
         };
-        
     }
 
 

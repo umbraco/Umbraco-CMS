@@ -1,7 +1,6 @@
 (function () {
     "use strict";
 
-    // TODO: make sure clipboardService handles children.
 
     /**
      * @ngdoc directive
@@ -29,7 +28,7 @@
             }
         });
 
-    function BlockGridController($element, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService) {
+    function BlockGridController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
 
         var unsubscribe = [];
         var modelObject;
@@ -42,8 +41,6 @@
         var liveEditing = true;
 
         var vm = this;
-
-        vm.layoutStylesheet = "assets/css/blockgridlayout.css";
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
@@ -97,12 +94,11 @@
             liveEditing = vm.model.config.useLiveEditing;
 
             vm.validationLimit = vm.model.config.validationLimit;
-            vm.gridColumns = vm.model.config.gridColumns || 12;
 
-            vm.editorWrapperStyles = {};
+            vm.listWrapperStyles = {};
 
             if (vm.model.config.maxPropertyWidth) {
-                vm.editorWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
+                vm.listWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
@@ -144,8 +140,7 @@
 
             // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
-
-            $q.all([modelObject.load(), assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope)]).then(onLoaded);
+            modelObject.load().then(onLoaded);
 
         };
 
@@ -153,7 +148,7 @@
         // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
         function onServerValueChanged(newVal, oldVal) {
 
-            // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
+            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
             if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = newVal = {};
             }
@@ -168,96 +163,40 @@
             }
         }
 
-        function initializeLayout(layoutList) {
-
-            // reference the invalid items of this list, to be removed after the loop.
-            var invalidLayoutItems = [];
-
-            // Append the blockObjects to our layout.
-            layoutList.forEach(layoutEntry => {
-
-                var block = initializeLayoutEntry(layoutEntry);
-                if(!block) {
-                    // then we need to filter this out and also update the underlying model. This could happen if the data is invalid.
-                    invalidLayoutItems.push(layoutEntry);
-                }
-            });
-
-            // remove the ones that are invalid
-            invalidLayoutItems.forEach(entry => {
-                var index = layoutList.findIndex(x => x === entry);
-                if (index >= 0) {
-                    layoutList.splice(index, 1);
-                }
-            });
-        }
-
-        function initializeLayoutEntry(layoutEntry) {
-
-            // $block must have the data property to be a valid BlockObject, if not, its considered as a destroyed blockObject.
-            if (!layoutEntry.$block || layoutEntry.$block.data === undefined) {
-
-                // each layoutEntry should have a child array,
-                layoutEntry.areas = layoutEntry.areas || [];
-                
-                var block = getBlockObject(layoutEntry);
-
-                // If this entry was not supported by our property-editor it would return 'null'.
-                if (block !== null) {
-                    layoutEntry.$block = block;
-                } else {
-                    return null;
-                }
-
-                block.config.areas.forEach(areaConfig => {
-                    const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
-                    if(areaIndex === -1) {
-                        layoutEntry.areas.push({
-                            $config: areaConfig,
-                            key: areaConfig.key,
-                            items: []
-                        })
-                    } else {
-                        // set $config as its not persisted:
-                        layoutEntry.areas[areaIndex].$config = areaConfig;
-                        initializeLayout(layoutEntry.areas[areaIndex].items);
-                    }
-                });
-
-                // TODO: clean this up.
-                let i = layoutEntry.areas.length;
-                while(i--) {
-                    const layoutEntryArea = layoutEntry.areas[i];
-                    const areaConfigIndex = block.config.areas.findIndex(x => x.key === layoutEntryArea.key);
-                    if(areaConfigIndex === -1) {
-                        layoutEntry.areas.splice(i, 1);
-                    }
-                }
-
-                // if no columnSpan, then we set one:
-                if (!layoutEntry.columnSpan) {
-                    layoutEntry.columnSpan = 4;
-                }
-                // if no rowSpan, then we set one:
-                if (!layoutEntry.rowSpan) {
-                    layoutEntry.rowSpan = 1;
-                }
-
-                
-            } else {
-                updateBlockObject(layoutEntry.$block);
-            }
-
-            return layoutEntry.$block;
-        }
-
         function onLoaded() {
 
             // Store a reference to the layout model, because we need to maintain this model.
             vm.layout = modelObject.getLayout([]);
 
+            var invalidLayoutItems = [];
 
-            initializeLayout(vm.layout);
+            // Append the blockObjects to our layout.
+            vm.layout.forEach(entry => {
+                // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
+                if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
+                    var block = getBlockObject(entry);
+
+                    // If this entry was not supported by our property-editor it would return 'null'.
+                    if (block !== null) {
+                        entry.$block = block;
+                    }
+                    else {
+                        // then we need to filter this out and also update the underlying model. This could happen if the data
+                        // is invalid for some reason or the data structure has changed.
+                        invalidLayoutItems.push(entry);
+                    }
+                } else {
+                    updateBlockObject(entry.$block);
+                }
+            });
+
+            // remove the ones that are invalid
+            invalidLayoutItems.forEach(entry => {
+                var index = vm.layout.findIndex(x => x === entry);
+                if (index >= 0) {
+                    vm.layout.splice(index, 1);
+                }
+            });
 
             vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
@@ -266,7 +205,10 @@
 
             vm.loading = false;
 
+            $scope.$evalAsync();
+
         }
+
         function updateAllBlockObjects() {
             // Update the blockObjects in our layout.
             vm.layout.forEach(entry => {
@@ -277,14 +219,14 @@
             });
         }
 
-        function applyDefaultViewForBlock(block) {
+        function getDefaultViewForBlock(block) {
 
             var defaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
 
             if (block.config.unsupported === true)
-                block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+                return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
                 
-            block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
+            return defaultViewFolderPath + "labelblock/labelblock.editor.html";
         }
 
         /**
@@ -315,13 +257,7 @@
 
             if (block === null) return null;
 
-            if (!block.config.view) {
-                applyDefaultViewForBlock(block);
-            } else {
-                block.view = block.config.view;
-            }
-
-            block.stylesheet = block.config.stylesheet;
+            block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
@@ -335,20 +271,6 @@
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
             };
-
-            // TODO: temporary hack to get areas:
-            block.config.areas = [
-                {
-                    key: 'test1',
-                    columnSpan: 6,
-                    rowSpan: 1
-                },
-                {
-                    key: 'test2',
-                    columnSpan: 6,
-                    rowSpan: 2
-                }
-            ]
 
             /** decorator methods, to enable switching out methods without loosing references that would have been made in Block Views codes */
             block.activate = function() {
@@ -396,16 +318,13 @@
             block._copy = copyBlock.bind(null, block);
         }
 
-        function addNewBlock(parentBlock, areaKey, index, contentElementTypeKey) {
+        function addNewBlock(index, contentElementTypeKey) {
 
             // Create layout entry. (not added to property model jet.)
             var layoutEntry = modelObject.create(contentElementTypeKey);
             if (layoutEntry === null) {
                 return false;
             }
-
-            // create array for areas.
-            layoutEntry.areas = [];
 
             // make block model
             var blockObject = getBlockObject(layoutEntry);
@@ -418,27 +337,8 @@
             // Add the Block Object to our layout entry.
             layoutEntry.$block = blockObject;
 
-            // set columnSpan to maximum allowed span for this BlockType:
-            const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
-            layoutEntry.columnSpan = maximumColumnSpan;
-
-            // Development note: Notice this is ran before added to the data model.
-            initializeLayoutEntry(layoutEntry);
-
-            // add layout entry at the decided location in layout.
-            if(parentBlock != null) {
-                var area = parentBlock.layout.areas.find(x => x.key === areaKey);
-                if(!area) {
-                    console.error("Could not find area in block creation");
-                }
-
-                // limit columnSpan by areaConfig columnSpan:
-                layoutEntry.columnSpan = Math.min(layoutEntry.columnSpan, area.$config.columnSpan);
-
-                area.items.splice(index, 0, layoutEntry);
-            } else {
-                vm.layout.splice(index, 0, layoutEntry);
-            }
+            // add layout entry at the decired location in layout.
+            vm.layout.splice(index, 0, layoutEntry);
 
             // lets move focus to this new block.
             vm.setBlockFocus(blockObject);
@@ -446,31 +346,16 @@
             return true;
         }
 
-        function getLayoutEntryByContentID(layoutList, contentUdi) {
-            for(const entry of layoutList) {
-                if(entry.contentUdi === contentUdi) {
-                    return {entry: entry, layoutList: layoutList};
-                }
-                for(const area of entry.areas) {
-                    const result = getLayoutEntryByContentID(area.items, contentUdi);
-                    if(result !== null) {
-                        return result;
-                    }
-                }
-            }
-            return null;
-        }
-
         function deleteBlock(block) {
 
-            const result = getLayoutEntryByContentID(vm.layout, block.layout.contentUdi);
-            if (result === null) {
+            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.layout.contentUdi);
+            if (layoutIndex === -1) {
                 throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
             }
 
             setDirty();
-            const layoutListIndex = result.layoutList.indexOf(result.entry);
-            var removed = result.layoutList.splice(layoutListIndex, 1);
+
+            var removed = vm.layout.splice(layoutIndex, 1);
             removed.forEach(x => {
                 // remove any server validation errors associated
                 var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
@@ -481,7 +366,6 @@
                 })
             });
 
-            // TODO: make sure that children is handled, either by this or by modelObject?..
             modelObject.removeDataAndDestroyModel(block);
         }
 
@@ -500,12 +384,9 @@
             options = options || vm.options;
 
             // this must be set
-            /*
-            TODO: This is not possibility in grid, cause of the polymorphism 
             if (blockIndex === undefined) {
                 throw "blockIndex was not specified on call to editBlock";
             }
-            */
 
             var wasNotActiveBefore = blockObject.active !== true;
 
@@ -578,9 +459,9 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
-        function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent) {
+        function requestShowCreate(createIndex, mouseEvent) {
 
-            if (vm.blockTypePickerIsOpen === true) {
+            if (vm.blockTypePicker) {
                 return;
             }
 
@@ -588,25 +469,25 @@
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
-                wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockType.blockConfigModel.contentElementTypeKey);
+                wasAdded = addNewBlock(createIndex, blockType.blockConfigModel.contentElementTypeKey);
 
                 if(wasAdded && !(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                    userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
+                    userFlowWhenBlockWasCreated(createIndex);
                 }
             } else {
-                showCreateDialog(parentBlock, areaKey, createIndex);
+                showCreateDialog(createIndex);
             }
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(parentBlock, areaKey, createIndex, mouseEvent) {
-            showCreateDialog(parentBlock, areaKey, createIndex, true);
+        function requestShowClipboard(createIndex, mouseEvent) {
+            showCreateDialog(createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
-        function showCreateDialog(parentBlock, areaKey, createIndex, openClipboard) {
+        function showCreateDialog(createIndex, openClipboard) {
 
-            if (vm.blockTypePickerIsOpen === true) {
+            if (vm.blockTypePicker) {
                 return;
             }
 
@@ -629,12 +510,12 @@
                     if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
-                            if (requestPasteFromClipboard(parentBlock, createIndex + indexIncrementor, entry, item.type)) {
+                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(parentBlock, createIndex, item.pasteData, item.type);
+                        requestPasteFromClipboard(createIndex, item.pasteData, item.type);
                     }
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         blockPickerModel.close();
@@ -643,26 +524,23 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var wasAdded = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                        wasAdded = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
                         if (wasAdded) {
-                            userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
+                            userFlowWhenBlockWasCreated(createIndex);
                         }
                     }
                 },
                 close: function() {
-                    // if opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                    // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
-                        // TODO: handle areas:
-                        const blockOfInterest = parentLayoutEntry ? parentLayoutEntry.children[Math.max(createIndex-1, 0)].$block : vm.layout[Math.max(createIndex-1, 0)].$block
-                        vm.setBlockFocus(blockOfInterest);
+                        vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
                     }
 
                     editorService.close();
-                    vm.blockTypePickerIsOpen = false;
                 }
             };
 
@@ -673,24 +551,13 @@
 
             blockPickerModel.clipboardItems = vm.clipboardItems;
 
-            vm.blockTypePickerIsOpen = true;
             // open block picker overlay
             editorService.open(blockPickerModel);
 
         };
-        function userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex) {
+        function userFlowWhenBlockWasCreated(createIndex) {
             if (vm.layout.length > createIndex) {
-                var blockObject;
-                
-                if (parentBlock) {
-                    var area = parentBlock.layout.areas.find(x => x.key === areaKey);
-                    if (!area) {
-                        console.error("Area could not be found...", parentBlock, areaKey)
-                    }
-                    blockObject = area.items[createIndex].$block;
-                } else {
-                    blockObject = vm.layout[createIndex].$block;
-                }
+                var blockObject = vm.layout[createIndex].$block;
                 if (inlineEditing === true) {
                     blockObject.activate();
                 } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
@@ -807,7 +674,7 @@
             clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
 
-        function requestPasteFromClipboard(parentLayoutEntry, index, pasteEntry, pasteType) {
+        function requestPasteFromClipboard(index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
                 return false;
@@ -828,10 +695,6 @@
                 return false;
             }
 
-            layoutEntry.areas = layoutEntry.areas || [];
-
-            // TODO: create areas based on config.
-
             // make block model
             var blockObject = getBlockObject(layoutEntry);
             if (blockObject === null) {
@@ -842,16 +705,8 @@
             // set the BlockObject on our layout entry.
             layoutEntry.$block = blockObject;
 
-            initializeLayoutEntry(layoutEntry);
-
-            // insert layout entry at the decided location in layout.
-            if(parentLayoutEntry != null) {
-                // TODO: find right area
-                console.error("TODO: find area...")
-                parentLayoutEntry.children.splice(index, 0, layoutEntry);
-            } else {
-                vm.layout.splice(index, 0, layoutEntry);
-            }
+            // insert layout entry at the decired location in layout.
+            vm.layout.splice(index, 0, layoutEntry);
 
             vm.currentBlockInFocus = blockObject;
 
@@ -903,10 +758,22 @@
             copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
-            openSettingsForBlock: openSettingsForBlock,
-            requestShowCreate: requestShowCreate,
-            requestShowClipboard: requestShowClipboard,
-            internal: vm
+            openSettingsForBlock: openSettingsForBlock
+        };
+
+        vm.sortableOptions = {
+            axis: "y",
+            containment: "parent",
+            cursor: "grabbing",
+            handle: ".blockelement__draggable-element",
+            cancel: "input,textarea,select,option",
+            classes: ".blockelement--dragging",
+            distance: 5,
+            tolerance: "pointer",
+            scroll: true,
+            update: function (ev, ui) {
+                setDirty();
+            }
         };
 
         function onAmountOfBlocksChanged() {

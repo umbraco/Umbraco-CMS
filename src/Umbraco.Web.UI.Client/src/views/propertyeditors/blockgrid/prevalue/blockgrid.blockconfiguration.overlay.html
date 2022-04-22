@@ -1,6 +1,6 @@
-<div class="umb-block-grid-block-configuration-overlay" ng-controller="Umbraco.PropertyEditors.BlockGrid.BlockConfigurationOverlayController as vm">
+<div class="umb-block-list-block-configuration-overlay" ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationOverlayController as vm">
 
-    <form novalidate name="blockGridBlockConfigurationForm" val-form-manager>
+    <form novalidate name="blockListBlockConfigurationForm" val-form-manager>
 
         <umb-editor-view ng-if="!page.loading">
 
@@ -13,7 +13,7 @@
             </umb-editor-header>
 
             <umb-editor-container>
-                <div class="form-vertical umb-block-grid-block-configuration-layout">
+                <div class="form-vertical">
 
                     <div class="umb-group-panel">
 
@@ -94,38 +94,6 @@
 
                         </div>
 
-                    </div>
-
-                    <div class="umb-group-panel">
-
-                        <div class="umb-group-panel__header">
-                            <localize key="blockEditor_TODO">Layout options</localize>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <!-- Column span options -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Column span</localize></label>
-                                    <div class="controls">
-                                        <input 
-                                            ng-repeat="columnSpanOption in vm.block.columnSpanOptions"
-                                            ng-model="columnSpanOption.columnSpan"
-                                            type="text"
-                                            name="label"
-                                            style="width:48px"/>
-                                        <umb-button
-                                            size="xs"
-                                            button-style="action"
-                                            type="button"
-                                            action="vm.block.columnSpanOptions.push({columnSpan: 12})" 
-                                            label="Add option">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    
                     </div>
 
                     <div class="umb-group-panel">
@@ -237,41 +205,6 @@
 
                         </div>
 
-                    </div>
-
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel --span-two">
-
-                        
-                        <div class="umb-group-panel__header">
-                            <localize key="blockEditor_TODO">Block areas</localize>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <!-- areaGridColumns -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Area layout columns</localize></label>
-                                    <div class="controls">
-                                        <input type="text" name="label" ng-model="vm.block.areaGridColumns" style="width:100%"/>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- areas -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Areas</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
-                                    </umb-property-info-button>
-                                    <div class="controls">
-                                        <umb-block-grid-area-editor model="vm.block.areas" block="vm.block"></umb-block-grid-area-editor>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    
                     </div>
 
                     <div class="umb-group-panel">
