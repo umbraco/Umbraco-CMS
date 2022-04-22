@@ -9,52 +9,20 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class BlockGridConfiguration
     {
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define the available blocks.")]
-        public BlockGridBlockConfiguration[] Blocks { get; set; }  = null!;
+        public BlockConfiguration[] Blocks { get; set; }
 
         [DataContract]
-        public class BlockGridBlockConfiguration
+        public class BlockConfiguration
         {
 
-            [DataMember(Name ="columnSpanOptions")]
-            public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = null!;
-            [DataContract]
-            public class BlockGridColumnSpanOption
-            {
-                [DataMember(Name ="columnSpan")]
-                public int? ColumnSpan { get; set; }
-            }
-
-            [DataMember(Name ="areaGridColumns")]
-            public int? AreaGridColumns { get; set; }
-
-            [DataMember(Name ="areas")]
-            public BlockGridAreaConfiguration[] Areas { get; set; }  = null!;
-
-            [DataContract]
-            public class BlockGridAreaConfiguration
-            {
-                [DataMember(Name ="key")]
-                public Guid? Key { get; set; }
-
-                [DataMember(Name ="alias")]
-                public string? Alias { get; set; }
-                
-                [DataMember(Name ="columnSpan")]
-                public int? ColumnSpan { get; set; }
-
-                [DataMember(Name ="rowSpan")]
-                public int? RowSpan { get; set; }
-
-            }
-
             [DataMember(Name ="backgroundColor")]
-            public string? BackgroundColor { get; set; }
+            public string BackgroundColor { get; set; }
 
             [DataMember(Name ="iconColor")]
-            public string? IconColor { get; set; }
+            public string IconColor { get; set; }
 
             [DataMember(Name ="thumbnail")]
-            public string? Thumbnail { get; set; }
+            public string Thumbnail { get; set; }
 
             [DataMember(Name ="contentElementTypeKey")]
             public Guid ContentElementTypeKey { get; set; }
@@ -63,16 +31,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public Guid? SettingsElementTypeKey { get; set; }
 
             [DataMember(Name ="view")]
-            public string? View { get; set; }
+            public string View { get; set; }
 
             [DataMember(Name ="stylesheet")]
-            public string? Stylesheet { get; set; }
+            public string Stylesheet { get; set; }
 
             [DataMember(Name ="label")]
-            public string? Label { get; set; }
+            public string Label { get; set; }
 
             [DataMember(Name ="editorSize")]
-            public string? EditorSize { get; set; }
+            public string EditorSize { get; set; }
 
             [DataMember(Name ="forceHideContentEditorInOverlay")]
             public bool ForceHideContentEditorInOverlay { get; set; }
@@ -95,9 +63,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public bool UseLiveEditing { get; set; }
 
         [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
-        public string? MaxPropertyWidth { get; set; }
-
-        [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout")]
-        public int? GridColumns { get; set; }
+        public string MaxPropertyWidth { get; set; }
     }
 }
