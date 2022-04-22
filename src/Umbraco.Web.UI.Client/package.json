@@ -54,7 +54,7 @@
     "wicg-inert": "^3.0.2"
   },
   "devDependencies": {
-    "@babel/core": "7.17.5",
+    "@babel/core": "7.17.9",
     "@babel/preset-env": "7.16.11",
     "autoprefixer": "10.4.4",
     "caniuse-lite": "^1.0.30001312",
