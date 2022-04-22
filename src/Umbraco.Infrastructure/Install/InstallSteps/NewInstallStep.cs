@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -134,7 +135,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     minCharLength = _passwordConfiguration.RequiredLength,
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
                     quickInstallSettings,
-                    customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
+                    customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured),
+                    constentLevels = Enum.GetValues(typeof(TelemetryLevel)),
                 };
             }
         }
