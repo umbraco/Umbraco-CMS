@@ -345,6 +345,9 @@ context('Content', () => {
 
         cy.get('.-selectable.cursor-pointer:first').click();
 
+        // Wait to ensure the next button is clickable
+        cy.wait(200);
+
         cy.get('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn-success').click();
 
         refreshContentTree();
