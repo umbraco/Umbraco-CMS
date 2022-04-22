@@ -2305,6 +2305,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
     <key alias="2faProviderIsEnabled">This two-factor provider is enabled</key>
     <key alias="2faProviderIsDisabledMsg">This two-factor provider is now disabled</key>
+    <key alias="2faProviderIsNotDisabledMsg">Something went wrong with trying to disable this two-factor provider</key>
+    <key alias="2faDisableForUser">Do you want to disable this two-factor provider for this user?</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
