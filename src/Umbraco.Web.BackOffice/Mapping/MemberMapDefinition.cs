@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Mapping
@@ -64,6 +65,8 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             //Membership
             target.Username = source.Username;
             target.Email = source.Email;
+            target.IsLockedOut = source.IsLockedOut;
+            target.IsApproved = source.IsApproved;
             target.MembershipProperties = _tabsAndPropertiesMapper.MapMembershipProperties(source, context);
         }
 
@@ -81,7 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties).WhereNotNull();
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
@@ -113,7 +116,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
         }
     }
 }

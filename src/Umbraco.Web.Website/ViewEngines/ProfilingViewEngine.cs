@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Web.Website.ViewEngines
             return profiledResult;
         }
 
-        public ViewEngineResult GetView(string executingFilePath, string viewPath, bool isMainPage)
+        public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage)
         {
             using (_profiler.Step(string.Format("{0}.GetView, {1}, {2}, {3}", _name, executingFilePath, viewPath, isMainPage)))
             {

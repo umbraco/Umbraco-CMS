@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Web.Website.Models
     /// </summary>
     public class RegisterModelBuilder : MemberModelBuilderBase
     {
-        private string _memberTypeAlias;
+        private string? _memberTypeAlias;
         private bool _lookupProperties;
         private bool _usernameIsEmail;
-        private string _redirectUrl;
+        private string? _redirectUrl;
 
         public RegisterModelBuilder(IMemberTypeService memberTypeService, IShortStringHelper shortStringHelper)
             : base(memberTypeService, shortStringHelper)
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.Website.Models
         public RegisterModel Build()
         {
             var providedOrDefaultMemberTypeAlias = _memberTypeAlias ?? Core.Constants.Conventions.MemberTypes.DefaultAlias;
-            IMemberType memberType = MemberTypeService.Get(providedOrDefaultMemberTypeAlias);
+            IMemberType? memberType = MemberTypeService.Get(providedOrDefaultMemberTypeAlias);
             if (memberType == null)
             {
                 throw new InvalidOperationException($"Could not find a member type with alias: {providedOrDefaultMemberTypeAlias}.");

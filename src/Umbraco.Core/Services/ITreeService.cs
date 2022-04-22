@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a tree.
         /// </summary>
         /// <param name="treeAlias">The tree alias.</param>
-        Tree GetByAlias(string treeAlias);
+        Tree? GetByAlias(string treeAlias);
 
         /// <summary>
         /// Gets all trees.

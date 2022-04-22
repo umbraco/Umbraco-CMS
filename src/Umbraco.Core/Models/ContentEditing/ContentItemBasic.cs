@@ -31,16 +31,16 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public bool Edited { get; set; }
 
         [DataMember(Name = "owner")]
-        public UserProfile Owner { get; set; }
+        public UserProfile? Owner { get; set; }
 
         [DataMember(Name = "updater")]
-        public UserProfile Updater { get; set; }
+        public UserProfile? Updater { get; set; }
 
         public int ContentTypeId { get; set; }
 
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string ContentTypeAlias { get; set; }
+        public string ContentTypeAlias { get; set; } = null!;
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -72,7 +72,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            if (Id is not null)
+            {
+                return Id.GetHashCode();
+            }
+
+            return base.GetHashCode();
         }
     }
 

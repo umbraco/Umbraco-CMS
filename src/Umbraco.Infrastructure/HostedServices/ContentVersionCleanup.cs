@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         }
 
         /// <inheritdoc />
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             // Globally disabled by feature flag
             if (!_settingsMonitor.CurrentValue.ContentVersionCleanupPolicy.EnableCleanup)

@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Core.Models
     {
         public MacroProperty()
         {
+            _editorAlias = string.Empty;
+            _alias = string.Empty;
             _key = Guid.NewGuid();
         }
 
@@ -23,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="name"></param>
         /// <param name="sortOrder"></param>
         /// <param name="editorAlias"></param>
-        public MacroProperty(string @alias, string name, int sortOrder, string editorAlias)
+        public MacroProperty(string @alias, string? name, int sortOrder, string editorAlias)
         {
             _alias = alias;
             _name = name;
@@ -41,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="name"></param>
         /// <param name="sortOrder"></param>
         /// <param name="editorAlias"></param>
-        public MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
+        public MacroProperty(int id, Guid key, string @alias, string? name, int sortOrder, string editorAlias)
         {
             _id = id;
             _alias = alias;
@@ -53,7 +55,7 @@ namespace Umbraco.Cms.Core.Models
 
         private Guid _key;
         private string _alias;
-        private string _name;
+        private string? _name;
         private int _sortOrder;
         private int _id;
         private string _editorAlias;
@@ -85,14 +87,14 @@ namespace Umbraco.Cms.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value, ref _alias!, nameof(Alias));
         }
 
         /// <summary>
         /// Gets or sets the Name of the Property
         /// </summary>
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -119,7 +121,7 @@ namespace Umbraco.Cms.Core.Models
         public string EditorAlias
         {
             get => _editorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _editorAlias, nameof(EditorAlias));
+            set => SetPropertyValueAndDetectChanges(value, ref _editorAlias!, nameof(EditorAlias));
         }
 
         public object DeepClone()
@@ -138,7 +140,7 @@ namespace Umbraco.Cms.Core.Models
             return string.Equals(_alias, other._alias) && _id == other._id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

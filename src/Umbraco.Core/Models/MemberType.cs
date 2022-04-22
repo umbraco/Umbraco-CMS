@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models
         public const bool SupportsPublishingConst = false;
 
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
-        private string _alias;
+        private string _alias = string.Empty;
 
         public MemberType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
         {
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
             _memberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent) : this(shortStringHelper, parent, null)
+        public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent) : this(shortStringHelper, parent, string.Empty)
         {
         }
 
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Models
                         ? value
                         : (value == null ? string.Empty : value.ToSafeAlias(_shortStringHelper));
 
-                SetPropertyValueAndDetectChanges(newVal, ref _alias, nameof(Alias));
+                SetPropertyValueAndDetectChanges(newVal, ref _alias!, nameof(Alias));
             }
         }
 
@@ -88,9 +88,9 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="propertyTypeAlias">PropertyType Alias of the Property to check</param>
         /// <returns></returns>
-        public bool MemberCanEditProperty(string propertyTypeAlias)
+        public bool MemberCanEditProperty(string? propertyTypeAlias)
         {
-            return _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
+            return propertyTypeAlias is not null && _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
         }
 
         /// <summary>

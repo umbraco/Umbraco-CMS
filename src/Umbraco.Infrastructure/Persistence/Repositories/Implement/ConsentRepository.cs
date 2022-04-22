@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<IConsent> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IConsent> PerformGetAll(params int[]? ids)
         {
             throw new NotSupportedException();
         }

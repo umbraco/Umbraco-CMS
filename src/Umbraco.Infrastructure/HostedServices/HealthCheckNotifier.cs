@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             });
         }
 
-        public override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object? state)
         {
             if (_healthChecksSettings.Notification.Enabled == false)
             {

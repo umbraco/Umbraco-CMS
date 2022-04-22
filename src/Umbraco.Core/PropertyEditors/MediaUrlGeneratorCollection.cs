@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             : base(items)
         { }
 
-        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
         {
             // We can't get a media path from a null value
             // The value will be null when uploading a brand new image, since we try to get the "old path" which doesn't exist yet

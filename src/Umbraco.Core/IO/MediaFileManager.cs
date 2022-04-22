@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.IO
         private readonly ILogger<MediaFileManager> _logger;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IServiceProvider _serviceProvider;
-        private MediaUrlGeneratorCollection _mediaUrlGenerators;
+        private MediaUrlGeneratorCollection? _mediaUrlGenerators;
 
         public MediaFileManager(
             IFileSystem fileSystem,
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.IO
                     var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
                     if (!directory.IsNullOrWhiteSpace())
                     {
-                        FileSystem.DeleteDirectory(directory, true);
+                        FileSystem.DeleteDirectory(directory!, true);
                     }
                 }
                 catch (Exception e)
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="puid">The unique identifier of the property type owning the file.</param>
         /// <returns>The filesystem-relative path to the media file.</returns>
         /// <remarks>With the old media path scheme, this CREATES a new media path each time it is invoked.</remarks>
-        public string GetMediaPath(string filename, Guid cuid, Guid puid)
+        public string GetMediaPath(string? filename, Guid cuid, Guid puid)
         {
             filename = Path.GetFileName(filename);
             if (filename == null)
@@ -127,12 +127,12 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="propertyTypeAlias"></param>
         /// <param name="variationContextAccessor"></param>
         /// <returns></returns>
-        public Stream GetFile(
+        public Stream? GetFile(
             IContentBase content,
-            out string mediaFilePath,
+            out string? mediaFilePath,
             string propertyTypeAlias = Constants.Conventions.Media.File,
-            string culture = null,
-            string segment = null)
+            string? culture = null,
+            string? segment = null)
         {
             // TODO: If collections were lazy we could just inject them
             if (_mediaUrlGenerators == null)
@@ -140,12 +140,12 @@ namespace Umbraco.Cms.Core.IO
                 _mediaUrlGenerators = _serviceProvider.GetRequiredService<MediaUrlGeneratorCollection>();
             }
 
-            if (!content.TryGetMediaPath(propertyTypeAlias, _mediaUrlGenerators, out mediaFilePath, culture, segment))
+            if (!content.TryGetMediaPath(propertyTypeAlias, _mediaUrlGenerators!, out mediaFilePath, culture, segment))
             {
                 return null;
             }
 
-            Stream stream = FileSystem.OpenFile(mediaFilePath);
+            Stream? stream = FileSystem.OpenFile(mediaFilePath!);
             if (stream != null)
             {
                 return stream;
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.IO
         /// <para>If an <paramref name="oldpath"/> is provided then that file (and associated thumbnails if any) is deleted
         /// before the new file is saved, and depending on the media path scheme, the folder may be reused for the new file.</para>
         /// </remarks>
-        public string StoreFile(IContentBase content, IPropertyType propertyType, string filename, Stream filestream, string oldpath)
+        public string StoreFile(IContentBase content, IPropertyType? propertyType, string filename, Stream filestream, string? oldpath)
         {
             if (content == null)
             {
@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Core.IO
             // clear the old file, if any
             if (string.IsNullOrWhiteSpace(oldpath) == false)
             {
-                FileSystem.DeleteFile(oldpath);
+                FileSystem.DeleteFile(oldpath!);
             }
 
             // get the filepath, store the data
@@ -215,7 +215,7 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="propertyType">The property type owning the copy of the media file.</param>
         /// <param name="sourcepath">The filesystem-relative path to the source media file.</param>
         /// <returns>The filesystem-relative path to the copy of the media file.</returns>
-        public string CopyFile(IContentBase content, IPropertyType propertyType, string sourcepath)
+        public string? CopyFile(IContentBase content, IPropertyType propertyType, string sourcepath)
         {
             if (content == null)
             {

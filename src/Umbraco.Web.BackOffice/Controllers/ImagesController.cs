@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
-        public string GetProcessedImageUrl(string imagePath,
+        public string? GetProcessedImageUrl(string imagePath,
             int? width = null,
             int? height = null,
             decimal? focalPointLeft = null,

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -19,6 +19,11 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
+<!--    <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />-->
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
@@ -37,7 +42,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -72,6 +77,8 @@
     <Message Text="Skip JsonSchema generation because $(JsonSchemaPath) exists." Importance="High" Condition="Exists('$(JsonSchemaPath)')" />
     <Message Text="Generate the appsettings json schema." Importance="High" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
+
+
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>

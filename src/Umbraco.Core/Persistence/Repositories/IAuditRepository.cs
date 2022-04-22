@@ -30,8 +30,8 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
             IQuery<IAuditItem> query,
             long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection,
-            AuditType[] auditTypeFilter,
-            IQuery<IAuditItem> customFilter);
+            AuditType[]? auditTypeFilter,
+            IQuery<IAuditItem>? customFilter);
 
         IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query);
     }

@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns>Returns null if no entry is found</returns>
-        public PublicAccessEntry GetEntryForContent(IContent content)
+        public PublicAccessEntry? GetEntryForContent(IContent content)
         {
             return GetEntryForContent(content.Path.EnsureEndsWith("," + content.Id));
         }
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// NOTE: This method get's called *very* often! This will return the results from cache
         /// </remarks>
-        public PublicAccessEntry GetEntryForContent(string contentPath)
+        public PublicAccessEntry? GetEntryForContent(string contentPath)
         {
             //Get all ids in the path for the content item and ensure they all
             // parse to ints that are not -1.
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public Attempt<PublicAccessEntry> IsProtected(IContent content)
+        public Attempt<PublicAccessEntry?> IsProtected(IContent content)
         {
             var result = GetEntryForContent(content);
             return Attempt.If(result != null, result);
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="contentPath"></param>
         /// <returns></returns>
-        public Attempt<PublicAccessEntry> IsProtected(string contentPath)
+        public Attempt<PublicAccessEntry?> IsProtected(string contentPath)
         {
             var result = GetEntryForContent(contentPath);
             return Attempt.If(result != null, result);
@@ -108,10 +108,10 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
         /// <returns></returns>
-        public Attempt<OperationResult<OperationResultType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue)
+        public Attempt<OperationResult<OperationResultType, PublicAccessEntry>?> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            PublicAccessEntry entry;
+            PublicAccessEntry? entry;
             using (var scope = ScopeProvider.CreateScope())
             {
                 entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
@@ -152,17 +152,17 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="content"></param>
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
-        public Attempt<OperationResult> RemoveRule(IContent content, string ruleType, string ruleValue)
+        public Attempt<OperationResult?> RemoveRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            PublicAccessEntry entry;
+            PublicAccessEntry? entry;
             using (var scope = ScopeProvider.CreateScope())
             {
                 entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-                if (entry == null) return Attempt<OperationResult>.Fail(); // causes rollback // causes rollback
+                if (entry == null) return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-                if (existingRule == null) return Attempt<OperationResult>.Fail(); // causes rollback // causes rollback
+                if (existingRule == null) return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
 
                 entry.RemoveRule(existingRule);
 
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Core.Services
         /// Saves the entry
         /// </summary>
         /// <param name="entry"></param>
-        public Attempt<OperationResult> Save(PublicAccessEntry entry)
+        public Attempt<OperationResult?> Save(PublicAccessEntry entry)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Core.Services
         /// Deletes the entry and all associated rules
         /// </summary>
         /// <param name="entry"></param>
-        public Attempt<OperationResult> Delete(PublicAccessEntry entry)
+        public Attempt<OperationResult?> Delete(PublicAccessEntry entry)
         {
             var evtMsgs = EventMessagesFactory.Get();
 

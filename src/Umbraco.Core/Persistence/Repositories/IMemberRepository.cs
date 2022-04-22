@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         int[] GetMemberIds(string[] names);
 
-        IMember GetByUsername(string username);
+        IMember? GetByUsername(string? username);
 
         /// <summary>
         /// Finds members in a given role
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        int GetCountByQuery(IQuery<IMember> query);
+        int GetCountByQuery(IQuery<IMember>? query);
 
         /// <summary>
         /// Sets a members last login date based on their username
@@ -51,6 +51,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// updating their login date. This operation must be fast and cannot use database locks which is fine if we are only executing a single query
         /// for this data since there won't be any other data contention issues.
         /// </remarks>
+        [Obsolete("This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
         void SetLastLogin(string username, DateTime date);
     }
 }

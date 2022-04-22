@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                 var httpContext = _httpContextAccessor.HttpContext;
                 if (httpContext == null)
                     throw new InvalidOperationException($"Cannot get a {nameof(SmidgeHelper)} instance since there is no current http request");
-                return httpContext.RequestServices.GetService<SmidgeHelper>();
+                return httpContext.RequestServices.GetService<SmidgeHelper>()!;
             }
         }
     }

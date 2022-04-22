@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IUmbracoDatabase _db;
+        private readonly IUmbracoDatabase? _db;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
@@ -73,14 +73,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             var tempId = Guid.NewGuid().ToString();
 
-            IUmbracoDatabase db = null;
+            IUmbracoDatabase? db = null;
 
             try
             {
                 db = _dbFactory.CreateDatabase();
 
 
-                _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
+                _hasTable = db!.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
                 {
                     _logger.LogDebug("The DB does not contain the required table so we must be in an install state. We have no choice but to assume we can acquire.");
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     return true;
                 }
 
-                db.BeginTransaction(IsolationLevel.Serializable);
+                db!.BeginTransaction(IsolationLevel.Serializable);
 
                 var result = InsertLockRecord(tempId, db); //we change the row to a random Id to signal other MainDom to shutdown
                 if (result == RecordPersistenceType.Insert)
@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         _logger.LogDebug("Task canceled, exiting loop");
                         return;
                     }
-                    IUmbracoDatabase db = null;
+                    IUmbracoDatabase? db = null;
 
                     try
                     {
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         {
                             // re-check if its still false, we don't want to re-query once we know its there since this
                             // loop needs to use minimal resources
-                            _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
+                            _hasTable = db!.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                             if (!_hasTable)
                             {
                                 // the Db does not contain the required table, we just keep looping since we can't query the db
@@ -196,10 +196,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         if (_acquireWhenTablesNotAvailable)
                         {
                             _acquireWhenTablesNotAvailable = false;
-                            InsertLockRecord(_lockId, db);
+                            InsertLockRecord(_lockId, db!);
                         }
 
-                        db.BeginTransaction(IsolationLevel.Serializable);
+                        db!.BeginTransaction(IsolationLevel.Serializable);
 
                         if (!IsMainDomValue(_lockId, db))
                         {
@@ -257,13 +257,13 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                             // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
                             Thread.Sleep(1000);
 
-                            var acquired = TryAcquire(db, tempId, updatedTempId);
+                            var acquired = TryAcquire(db!, tempId, updatedTempId);
                             if (acquired.HasValue)
                                 return acquired.Value;
 
                             if (watch.ElapsedMilliseconds >= millisecondsTimeout)
                             {
-                                return AcquireWhenMaxWaitTimeElapsed(db);
+                                return AcquireWhenMaxWaitTimeElapsed(db!);
                             }
                         }
                     }
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Creates a separate transaction to the DB instance so we aren't allocating tons of new DB instances for each transaction
             // since this is executed in a tight loop
 
-            ITransaction transaction = null;
+            ITransaction? transaction = null;
 
             try
             {
@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     _logger.LogDebug("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
-                else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
+                else if (mainDomRows.Count == 1 && (!mainDomRows[0].Value?.StartsWith(tempId) ?? false))
                 {
                     // in this case, the prefixed ID is different which  means
                     // another new AppDomain has come online and is wanting to take over. In that case, we will not
@@ -344,7 +344,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             _logger.LogDebug("Timeout elapsed, assuming orphan row, acquiring MainDom.");
 
-            ITransaction transaction = null;
+            ITransaction? transaction = null;
 
             try
             {
@@ -414,11 +414,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                         if (_dbFactory.Configured && _hasTable)
                         {
-                            IUmbracoDatabase db = null;
+                            IUmbracoDatabase? db = null;
                             try
                             {
                                 db = _dbFactory.CreateDatabase();
-                                db.BeginTransaction(IsolationLevel.Serializable);
+                                db!.BeginTransaction(IsolationLevel.Serializable);
 
                                 // When we are disposed, it means we have released the MainDom lock
                                 // and called all MainDom release callbacks, in this case

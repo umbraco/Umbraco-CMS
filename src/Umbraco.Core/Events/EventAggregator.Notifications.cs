@@ -29,7 +29,14 @@ namespace Umbraco.Cms.Core.Events
             Type notificationType = notification.GetType();
             NotificationAsyncHandlerWrapper asyncHandler = s_notificationAsyncHandlers.GetOrAdd(
                 notificationType,
-                t => (NotificationAsyncHandlerWrapper)Activator.CreateInstance(typeof(NotificationAsyncHandlerWrapperImpl<>).MakeGenericType(notificationType)));
+                t =>
+                {
+                    var value = Activator.CreateInstance(
+                        typeof(NotificationAsyncHandlerWrapperImpl<>).MakeGenericType(notificationType));
+                    return value is not null
+                        ? (NotificationAsyncHandlerWrapper)value
+                        : throw new InvalidCastException("Activator could not create instance of NotificationHandler");
+                });
 
             return asyncHandler.HandleAsync(notification, cancellationToken, _serviceFactory, PublishCoreAsync);
         }
@@ -37,11 +44,16 @@ namespace Umbraco.Cms.Core.Events
         private void PublishNotification(INotification notification)
         {
             Type notificationType = notification.GetType();
-            NotificationHandlerWrapper asyncHandler = s_notificationHandlers.GetOrAdd(
+            NotificationHandlerWrapper? asyncHandler = s_notificationHandlers.GetOrAdd(
                 notificationType,
-                t => (NotificationHandlerWrapper)Activator.CreateInstance(typeof(NotificationHandlerWrapperImpl<>).MakeGenericType(notificationType)));
+                t =>
+                {
+                    var value = Activator.CreateInstance(
+                        typeof(NotificationHandlerWrapperImpl<>).MakeGenericType(notificationType));
+                    return value is not null ? (NotificationHandlerWrapper)value : throw new InvalidCastException("Activator could not create instance of NotificationHandler");
+                });
 
-            asyncHandler.Handle(notification, _serviceFactory, PublishCore);
+            asyncHandler?.Handle(notification, _serviceFactory, PublishCore);
         }
 
         private async Task PublishCoreAsync(

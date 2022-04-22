@@ -62,8 +62,11 @@ namespace Umbraco.Extensions
                         var headers = context.Response.GetTypedHeaders();
 
                         var cacheControl = headers.CacheControl;
-                        cacheControl.MustRevalidate = false;
-                        cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+                        if (cacheControl is not null)
+                        {
+                            cacheControl.MustRevalidate = false;
+                            cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+                        }
 
                         headers.CacheControl = cacheControl;
                     }
@@ -71,7 +74,7 @@ namespace Umbraco.Extensions
                     return Task.CompletedTask;
                 };
             })
-                .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
+                .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment?.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
                 .AddProcessor<CropWebProcessor>();
 
             // Configure middleware to use the registered/shared ImageSharp configuration

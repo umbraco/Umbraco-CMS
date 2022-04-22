@@ -7,6 +7,7 @@
         <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
         <Title>Umbraco CMS Back Office</Title>
         <Description>Contains the Back Office assembly needed to run the back office of Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -24,7 +25,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+      <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
       <PackageReference Include="Umbraco.Code" Version="2.0.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>

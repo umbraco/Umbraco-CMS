@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
                 return;
             }
 
-            Database.InsertBulk(logQueriesInFile);
+            Database.InsertBulk(logQueriesInFile!);
 
             Context.AddPostMigration<DeleteLogViewerQueryFile>();
         }

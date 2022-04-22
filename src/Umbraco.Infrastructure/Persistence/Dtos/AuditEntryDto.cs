@@ -28,12 +28,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("performingDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(DetailsLength)]
-        public string PerformingDetails { get; set; }
+        public string? PerformingDetails { get; set; }
 
         [Column("performingIp")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(IpLength)]
-        public string PerformingIp { get; set; }
+        public string? PerformingIp { get; set; }
 
         [Column("eventDateUtc")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -45,15 +45,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("affectedDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(DetailsLength)]
-        public string AffectedDetails { get; set; }
+        public string? AffectedDetails { get; set; }
 
         [Column("eventType")]
         [Length(EventTypeLength)]
-        public string EventType { get; set; }
+        public string? EventType { get; set; }
 
         [Column("eventDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(DetailsLength)]
-        public string EventDetails { get; set; }
+        public string? EventDetails { get; set; }
     }
 }

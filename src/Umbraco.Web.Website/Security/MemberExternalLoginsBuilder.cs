@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.Website.Security
         /// <returns></returns>
         public MemberExternalLoginsBuilder AddMemberLogin(
             Action<MemberAuthenticationBuilder> build,
-            Action<MemberExternalLoginProviderOptions> loginProviderOptions = null)
+            Action<MemberExternalLoginProviderOptions>? loginProviderOptions = null)
         {
             build(new MemberAuthenticationBuilder(_services, loginProviderOptions));
             return this;

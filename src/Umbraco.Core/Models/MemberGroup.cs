@@ -12,21 +12,21 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class MemberGroup : EntityBase, IMemberGroup
     {
-        private IDictionary<string, object> _additionalData;
-        private string _name;
+        private IDictionary<string, object?>? _additionalData;
+        private string? _name;
         private int _creatorId;
 
         /// <inheritdoc />
         [DataMember]
         [DoNotClone]
-        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+        public IDictionary<string, object?> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object?>());
 
         /// <inheritdoc />
         [IgnoreDataMember]
         public bool HasAdditionalData => _additionalData != null;
 
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set

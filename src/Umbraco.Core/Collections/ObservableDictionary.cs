@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Core.Collections
     /// <typeparam name="TValue">The type of elements contained in the BindableCollection</typeparam>
     /// <typeparam name="TKey">The type of the indexing key</typeparam>
     public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, IReadOnlyDictionary<TKey, TValue>, IDictionary<TKey, TValue>, INotifyCollectionChanged
+        where TKey : notnull
     {
         protected Dictionary<TKey, int> Indecies { get; }
         protected Func<TValue, TKey> KeySelector { get; }
@@ -26,7 +27,7 @@ namespace Umbraco.Cms.Core.Collections
         /// </summary>
         /// <param name="keySelector">Selector function to create key from value</param>
         /// <param name="equalityComparer">The equality comparer to use when comparing keys, or null to use the default comparer.</param>
-        public ObservableDictionary(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer = null)
+        public ObservableDictionary(Func<TValue, TKey> keySelector, IEqualityComparer<TKey>? equalityComparer = null)
         {
             KeySelector = keySelector ?? throw new ArgumentException(nameof(keySelector));
             Indecies = new Dictionary<TKey, int>(equalityComparer);
@@ -79,8 +80,8 @@ namespace Umbraco.Cms.Core.Collections
         // c# events are weird, they do not behave the same way as other c# things that are 'virtual',
         // a good article is here: https://medium.com/@unicorn_dev/virtual-events-in-c-something-went-wrong-c6f6f5fbe252
         // and https://stackoverflow.com/questions/2268065/c-sharp-language-design-explicit-interface-implementation-of-an-event
-        private NotifyCollectionChangedEventHandler _changed;
-        event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
+        private NotifyCollectionChangedEventHandler? _changed;
+        event NotifyCollectionChangedEventHandler? INotifyCollectionChanged.CollectionChanged
         {
             add { _changed += value; }
             remove { _changed -= value; }
@@ -108,7 +109,7 @@ namespace Umbraco.Cms.Core.Collections
             set
             {
                 //confirm key matches
-                if (!KeySelector(value).Equals(key))
+                if (!KeySelector(value)!.Equals(key))
                     throw new InvalidOperationException("Key of new value does not match.");
 
                 if (!Indecies.ContainsKey(key))
@@ -135,7 +136,7 @@ namespace Umbraco.Cms.Core.Collections
             if (!Indecies.ContainsKey(key)) return false;
 
             //confirm key matches
-            if (!KeySelector(value).Equals(key))
+            if (!KeySelector(value)!.Equals(key))
                 throw new InvalidOperationException("Key of new value does not match.");
 
             this[Indecies[key]] = value;
@@ -196,7 +197,7 @@ namespace Umbraco.Cms.Core.Collections
                 val = this[index];
                 return true;
             }
-            val = default;
+            val = default!;
             return false;
         }
 

@@ -24,13 +24,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             DateFormatString = "o"
         };
         private readonly JsonNameTable _propertyNameTable = new DefaultJsonNameTable();
-        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published)
+        public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData, bool published)
         {
             if (stringData == null && byteData != null)
                 throw new NotSupportedException($"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
 
             JsonSerializer serializer = JsonSerializer.Create(_jsonSerializerSettings);
-            using (JsonTextReader reader = new JsonTextReader(new StringReader(stringData)))
+            using (JsonTextReader reader = new JsonTextReader(new StringReader(stringData!)))
             {
                 // reader will get buffer from array pool
                 reader.ArrayPool = JsonArrayPool.Instance;
@@ -58,12 +58,16 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             return ArrayPool<char>.Shared.Rent(minimumLength);
         }
 
-        public void Return(char[] array)
+        public void Return(char[]? array)
         {
             // return char array to System.Buffers shared pool
-            ArrayPool<char>.Shared.Return(array);
+            if (array is not null)
+            {
+                ArrayPool<char>.Shared.Return(array);
+            }
         }
     }
+
     public class AutomaticJsonNameTable : DefaultJsonNameTable
     {
         int nAutoAdded = 0;
@@ -74,7 +78,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             this.maxToAutoAdd = maxToAdd;
         }
 
-        public override string Get(char[] key, int start, int length)
+        public override string? Get(char[] key, int start, int length)
         {
             var s = base.Get(key, start, length);
 

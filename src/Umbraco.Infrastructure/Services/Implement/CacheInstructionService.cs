@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 // Deserialize remote instructions & skip if it fails.
-                if (!TryDeserializeInstructions(instruction, out JArray jsonInstructions))
+                if (!TryDeserializeInstructions(instruction, out JArray? jsonInstructions))
                 {
                     lastId = instruction.Id; // skip
                     continue;
@@ -245,7 +245,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Attempts to deserialize the instructions to a JArray.
         /// </summary>
-        private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray jsonInstructions)
+        private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray? jsonInstructions)
         {
             if (instruction.Instructions is null)
             {
@@ -272,17 +272,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Parses out the individual instructions to be processed.
         /// </summary>
-        private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken> jsonInstructions)
+        private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
         {
             var result = new List<RefreshInstruction>();
-            foreach (JToken jsonItem in jsonInstructions)
+            if (jsonInstructions is not null)
+            {
+                return result;
+            }
+
+            foreach (JToken jsonItem in jsonInstructions!)
             {
                 // Could be a JObject in which case we can convert to a RefreshInstruction.
                 // Otherwise it could be another JArray - in which case we'll iterate that.
                 if (jsonItem is JObject jsonObj)
                 {
-                    RefreshInstruction instruction = jsonObj.ToObject<RefreshInstruction>();
-                    result.Add(instruction);
+                    RefreshInstruction? instruction = jsonObj.ToObject<RefreshInstruction>();
+                    if (instruction is not null)
+                    {
+                        result.Add(instruction);
+                    }
                 }
                 else
                 {
@@ -409,19 +417,32 @@ namespace Umbraco.Cms.Core.Services.Implement
             refresher.Refresh(id);
         }
 
-        private void RefreshByIds(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string jsonIds)
+        private void RefreshByIds(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonIds)
         {
             ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
-            foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
+            if (jsonIds is null)
             {
-                refresher.Refresh(id);
+                return;
+            }
+
+            var ids = JsonConvert.DeserializeObject<int[]>(jsonIds);
+            if (ids is not null)
+            {
+                foreach (var id in ids)
+                {
+                    refresher.Refresh(id);
+                }
             }
         }
 
-        private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string jsonPayload)
+        private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonPayload)
         {
             IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
-            refresher.Refresh(jsonPayload);
+            if (jsonPayload is not null)
+            {
+                refresher.Refresh(jsonPayload);
+            }
+
         }
 
         private void RemoveById(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, int id)
@@ -432,7 +453,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private ICacheRefresher GetRefresher(CacheRefresherCollection cacheRefreshers, Guid id)
         {
-            ICacheRefresher refresher = cacheRefreshers[id];
+            ICacheRefresher? refresher = cacheRefreshers[id];
             if (refresher == null)
             {
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");

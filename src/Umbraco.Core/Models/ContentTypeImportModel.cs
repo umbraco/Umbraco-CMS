@@ -8,15 +8,15 @@ namespace Umbraco.Cms.Core.Models
     public class ContentTypeImportModel : INotificationModel
     {
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "notifications")]
         public List<BackOfficeNotification> Notifications { get; } = new List<BackOfficeNotification>();
 
         [DataMember(Name = "tempFileName")]
-        public string TempFileName { get; set; }
+        public string? TempFileName { get; set; }
     }
 }

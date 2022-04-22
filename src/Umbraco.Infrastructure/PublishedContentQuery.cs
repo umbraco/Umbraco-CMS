@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure
             }
         }
 
-        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        private static bool ConvertIdObjectToUdi(object id, out Udi? guidId)
         {
             switch (id)
             {
@@ -96,16 +96,23 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Content
 
-        public IPublishedContent Content(int id)
+        public IPublishedContent? Content(int id)
             => ItemById(id, _publishedSnapshot.Content);
 
-        public IPublishedContent Content(Guid id)
+        public IPublishedContent? Content(Guid id)
             => ItemById(id, _publishedSnapshot.Content);
 
-        public IPublishedContent Content(Udi id)
-            => id is GuidUdi udi ? ItemById(udi.Guid, _publishedSnapshot.Content) : null;
+        public IPublishedContent? Content(Udi? id)
+        {
+            if (!(id is GuidUdi udi))
+            {
+                return null;
+            }
 
-        public IPublishedContent Content(object id)
+            return ItemById(udi.Guid, _publishedSnapshot.Content);
+        }
+
+        public IPublishedContent? Content(object id)
         {
             if (ConvertIdObjectToInt(id, out var intId))
             {
@@ -125,7 +132,7 @@ namespace Umbraco.Cms.Infrastructure
             return null;
         }
 
-        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
             => ItemByXPath(xpath, vars, _publishedSnapshot.Content);
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
@@ -150,16 +157,23 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Media
 
-        public IPublishedContent Media(int id)
+        public IPublishedContent? Media(int id)
             => ItemById(id, _publishedSnapshot.Media);
 
-        public IPublishedContent Media(Guid id)
+        public IPublishedContent? Media(Guid id)
             => ItemById(id, _publishedSnapshot.Media);
 
-        public IPublishedContent Media(Udi id)
-            => id is GuidUdi udi ? ItemById(udi.Guid, _publishedSnapshot.Media) : null;
+        public IPublishedContent? Media(Udi? id)
+        {
+            if (!(id is GuidUdi udi))
+            {
+                return null;
+            }
 
-        public IPublishedContent Media(object id)
+            return ItemById(udi.Guid, _publishedSnapshot.Media);
+        }
+
+        public IPublishedContent? Media(object id)
         {
             if (ConvertIdObjectToInt(id, out var intId))
             {
@@ -195,29 +209,29 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Used by Content/Media
 
-        private static IPublishedContent ItemById(int id, IPublishedCache cache)
-            => cache.GetById(id);
+        private static IPublishedContent? ItemById(int id, IPublishedCache? cache)
+            => cache?.GetById(id);
 
-        private static IPublishedContent ItemById(Guid id, IPublishedCache cache)
-            => cache.GetById(id);
+        private static IPublishedContent? ItemById(Guid id, IPublishedCache? cache)
+            => cache?.GetById(id);
 
-        private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
-            => cache.GetSingleByXPath(xpath, vars);
+        private static IPublishedContent? ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache? cache)
+            => cache?.GetSingleByXPath(xpath, vars);
 
-        private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<int> ids)
+        private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<int> ids)
             => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-        private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<Guid> ids)
+        private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
             => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
-            => cache.GetByXPath(xpath, vars);
+        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache? cache)
+            => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
 
-        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
-            => cache.GetByXPath(xpath, vars);
+        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache? cache)
+            => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
 
-        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache cache)
-            => cache.GetAtRoot();
+        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
+            => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
 
         #endregion
 
@@ -228,7 +242,7 @@ namespace Umbraco.Cms.Infrastructure
             => Search(term, 0, 0, out _, culture, indexName);
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string>? loadedFields = null)
         {
             if (skip < 0)
             {
@@ -353,11 +367,14 @@ namespace Umbraco.Cms.Infrastructure
             /// </summary>
             private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
             {
-                private readonly VariationContext _originalContext;
+                private readonly VariationContext? _originalContext;
                 private readonly IVariationContextAccessor _variationContextAccessor;
                 private readonly IEnumerator<PublishedSearchResult> _wrapped;
 
-                public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
+                public CultureContextualSearchResultsEnumerator(
+                    IEnumerator<PublishedSearchResult> wrapped,
+                    IVariationContextAccessor variationContextAccessor,
+                    VariationContext? originalContext)
                 {
                     _wrapped = wrapped;
                     _variationContextAccessor = variationContextAccessor;

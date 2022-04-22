@@ -22,14 +22,14 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
     /// </summary>
     internal class MemberSaveModelValidator : ContentModelValidator<IMember, MemberSave, IContentProperties<ContentPropertyBasic>>
     {
-        private readonly IBackOfficeSecurity _backofficeSecurity;
+        private readonly IBackOfficeSecurity? _backofficeSecurity;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
         private readonly IShortStringHelper _shortStringHelper;
 
         public MemberSaveModelValidator(
             ILogger<MemberSaveModelValidator> logger,
-            IBackOfficeSecurity backofficeSecurity,
+            IBackOfficeSecurity? backofficeSecurity,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IShortStringHelper shortStringHelper,
@@ -42,9 +42,14 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-        public override bool ValidatePropertiesData(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentPropertyCollectionDto dto,
+        public override bool ValidatePropertiesData(MemberSave? model, IContentProperties<ContentPropertyBasic>? modelWithProperties, ContentPropertyCollectionDto? dto,
             ModelStateDictionary modelState)
         {
+            if (model is null)
+            {
+                return false;
+            }
+
             if (model.Username.IsNullOrWhiteSpace())
             {
                 modelState.AddPropertyError(
@@ -87,42 +92,45 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         /// <param name="modelWithProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        public override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ActionExecutingContext actionContext)
+        public override bool ValidateProperties(MemberSave? model, IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
         {
-            var propertiesToValidate = model.Properties.ToList();
+            var propertiesToValidate = model?.Properties.ToList();
             var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             foreach (var remove in exclude)
             {
-                propertiesToValidate.RemoveAll(property => property.Alias == remove);
+                propertiesToValidate?.RemoveAll(property => property.Alias == remove);
             }
 
             //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
             //if a sensitive value is being submitted.
-            if (_backofficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
+            if (_backofficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false)
             {
-                var contentType = _memberTypeService.Get(model.PersistedContent.ContentTypeId);
-                var sensitiveProperties = contentType
+                var contentType = _memberTypeService.Get(model?.PersistedContent?.ContentTypeId ?? default);
+                var sensitiveProperties = contentType?
                     .PropertyTypes.Where(x => contentType.IsSensitiveProperty(x.Alias))
                     .ToList();
 
-                foreach (var sensitiveProperty in sensitiveProperties)
+                if (sensitiveProperties is not null)
                 {
-                    var prop = propertiesToValidate.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
-
-                    if (prop != null)
+                    foreach (var sensitiveProperty in sensitiveProperties)
                     {
-                        //this should not happen, this means that there was data posted for a sensitive property that
-                        //the user doesn't have access to, which means that someone is trying to hack the values.
+                        var prop = propertiesToValidate?.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
 
-                        var message = $"property with alias: {prop.Alias} cannot be posted";
-                        actionContext.Result = new NotFoundObjectResult(new InvalidOperationException(message));
-                        return false;
+                        if (prop != null)
+                        {
+                            //this should not happen, this means that there was data posted for a sensitive property that
+                            //the user doesn't have access to, which means that someone is trying to hack the values.
+
+                            var message = $"property with alias: {prop.Alias} cannot be posted";
+                            actionContext.Result = new NotFoundObjectResult(new InvalidOperationException(message));
+                            return false;
+                        }
                     }
                 }
             }
 
-            return ValidateProperties(propertiesToValidate, model.PersistedContent.Properties.ToList(), actionContext);
+            return ValidateProperties(propertiesToValidate, model?.PersistedContent?.Properties.ToList(), actionContext);
         }
 
         internal bool ValidateUniqueLogin(MemberSave model)
@@ -135,7 +143,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 case ContentSaveAction.Save:
 
                     //ok, we're updating the member, we need to check if they are changing their login and if so, does it exist already ?
-                    if (model.PersistedContent.Username.InvariantEquals(model.Username.Trim()) == false)
+                    if (model.PersistedContent?.Username.InvariantEquals(model.Username.Trim()) == false)
                     {
                         //they are changing their login name
                         if (existingByName != null && existingByName.Username == model.Username.Trim())
@@ -170,7 +178,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             {
                 case ContentSaveAction.Save:
                     //ok, we're updating the member, we need to check if they are changing their email and if so, does it exist already ?
-                    if (model.PersistedContent.Email.InvariantEquals(model.Email.Trim()) == false)
+                    if (model.PersistedContent?.Email.InvariantEquals(model.Email.Trim()) == false)
                     {
                         //they are changing their email
                         if (existingByEmail != null && existingByEmail.Email.InvariantEquals(model.Email.Trim()))

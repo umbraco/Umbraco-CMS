@@ -32,10 +32,10 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> GetIcons() => GetIconDictionary();
+        public IReadOnlyDictionary<string, string>? GetIcons() => GetIconDictionary();
 
         /// <inheritdoc />
-        public IconModel GetIcon(string iconName)
+        public IconModel? GetIcon(string iconName)
         {
             if (iconName.IsNullOrWhiteSpace())
             {
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
             }
 
             var allIconModels = GetIconDictionary();
-            if (allIconModels.ContainsKey(iconName))
+            if (allIconModels?.ContainsKey(iconName) ?? false)
             {
                 return new IconModel
                 {
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         /// </summary>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
-        private IconModel GetIcon(FileInfo fileInfo)
+        private IconModel? GetIcon(FileInfo fileInfo)
         {
             return fileInfo == null || string.IsNullOrWhiteSpace(fileInfo.Name)
                 ? null
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         /// <param name="iconName"></param>
         /// <param name="iconPath"></param>
         /// <returns></returns>
-        private IconModel CreateIconModel(string iconName, string iconPath)
+        private IconModel? CreateIconModel(string iconName, string iconPath)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 // iterate sub directories of app plugins
                 foreach (var dir in appPlugins.EnumerateDirectories())
                 {
-                    // AppPluginIcons path was previoulsy the wrong case, so we first check for the prefered directory 
+                    // AppPluginIcons path was previoulsy the wrong case, so we first check for the prefered directory
                     // and then check the legacy directory.
                     var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.PluginIcons}");
                     var iconPathExists = Directory.Exists(iconPath);
@@ -136,16 +136,16 @@ namespace Umbraco.Cms.Web.BackOffice.Services
 
         private class CaseInsensitiveFileInfoComparer : IEqualityComparer<FileInfo>
         {
-            public bool Equals(FileInfo one, FileInfo two) => StringComparer.InvariantCultureIgnoreCase.Equals(one.Name, two.Name);
+            public bool Equals(FileInfo? one, FileInfo? two) => StringComparer.InvariantCultureIgnoreCase.Equals(one?.Name, two?.Name);
 
             public int GetHashCode(FileInfo item) => StringComparer.InvariantCultureIgnoreCase.GetHashCode(item.Name);
         }
 
-        private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
+        private IReadOnlyDictionary<string, string>? GetIconDictionary() => _cache.GetCacheItem(
             $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
             () => GetAllIconsFiles()
                 .Select(GetIcon)
-                .Where(i => i != null)
+                .WhereNotNull()
                 .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
         );

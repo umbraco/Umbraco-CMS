@@ -21,8 +21,8 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private string _applicationId;
-        private string _localTempPath;
+        private string? _applicationId;
+        private string? _localTempPath;
         private UrlMode _urlProviderMode;
 
         public AspNetCoreHostingEnvironment(
@@ -59,10 +59,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         public bool IsHosted { get; } = true;
 
         /// <inheritdoc/>
-        public Uri ApplicationMainUrl { get; private set; }
+        public Uri ApplicationMainUrl { get; private set; } = null!;
 
         /// <inheritdoc/>
-        public string SiteName { get; private set; }
+        public string SiteName { get; private set; } = null!;
 
         /// <inheritdoc/>
         public string ApplicationId
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// <inheritdoc/>
         public bool IsDebugMode => _hostingSettings.CurrentValue.Debug;
 
-        public Version IISVersion { get; }
+        public Version? IISVersion { get; }
 
         public string LocalTempPath
         {
@@ -177,7 +177,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             return fullPath;
         }
 
-        public void EnsureApplicationMainUrl(Uri currentApplicationUrl)
+        public void EnsureApplicationMainUrl(Uri? currentApplicationUrl)
         {
             // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             }
         }
 
-        private void SetSiteName(string siteName) =>
+        private void SetSiteName(string? siteName) =>
             SiteName = string.IsNullOrWhiteSpace(siteName)
                 ? _webHostEnvironment.ApplicationName
                 : siteName;

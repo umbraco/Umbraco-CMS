@@ -48,13 +48,13 @@ namespace Umbraco.Cms.Core.Routing
             {
                 return false;
             }
-            IPublishedContent node = null;
+            IPublishedContent? node = null;
 
             // no alias if "/"
             if (frequest.Uri.AbsolutePath != "/")
             {
                 node = FindContentByAlias(
-                    umbracoContext.Content,
+                    umbracoContext!.Content,
                     frequest.Domain != null ? frequest.Domain.ContentId : 0,
                     frequest.Culture,
                     frequest.AbsolutePathDecoded);
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Routing
             return node != null;
         }
 
-        private IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture, string alias)
         {
             if (alias == null)
             {
@@ -101,10 +101,10 @@ namespace Umbraco.Cms.Core.Routing
                     return false;
                 }
 
-                IPublishedProperty p = c.GetProperty(propertyAlias);
-                var varies = p.PropertyType.VariesByCulture();
-                string v;
-                if (varies)
+                IPublishedProperty? p = c.GetProperty(propertyAlias);
+                var varies = p!.PropertyType?.VariesByCulture();
+                string? v;
+                if (varies ?? false)
                 {
                     if (!c.HasCulture(culture))
                     {
@@ -131,16 +131,19 @@ namespace Umbraco.Cms.Core.Routing
             // but the only solution is to entirely refactor URL providers to stop being dynamic
             if (rootNodeId > 0)
             {
-                IPublishedContent rootNode = cache.GetById(rootNodeId);
+                IPublishedContent? rootNode = cache?.GetById(rootNodeId);
                 return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
             }
 
-            foreach (IPublishedContent rootContent in cache.GetAtRoot())
+            if (cache is not null)
             {
-                IPublishedContent c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
-                if (c != null)
+                foreach (IPublishedContent rootContent in cache.GetAtRoot())
                 {
-                    return c;
+                    IPublishedContent? c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+                    if (c != null)
+                    {
+                        return c;
+                    }
                 }
             }
 

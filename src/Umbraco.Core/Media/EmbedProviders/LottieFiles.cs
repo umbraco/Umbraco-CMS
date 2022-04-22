@@ -24,14 +24,19 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
         };
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
 
-        public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+        public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
         {
             var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-            OEmbedResponse oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
-            var html = oembed.GetHtml();
+            OEmbedResponse? oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
+            var html = oembed?.GetHtml();
             //LottieFiles doesn't seem to support maxwidth and maxheight via oembed
             // this is therefore a hack... with regexes.. is that ok? HtmlAgility etc etc
             // otherwise it always defaults to 300...
+            if (html is null)
+            {
+                return null;
+            }
+
             if (maxWidth > 0 && maxHeight > 0)
             {
 

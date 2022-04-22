@@ -23,10 +23,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly ILogger _logger;
+        private readonly ILogger? _logger;
         private TimeSpan _period;
         private readonly TimeSpan _delay;
-        private Timer _timer;
+        private Timer? _timer;
         private bool _disposedValue;
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="logger">Logger.</param>
         /// <param name="period">Timespan representing how often the task should recur.</param>
         /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(ILogger logger, TimeSpan period, TimeSpan delay)
+        protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
         {
             _logger = logger;
             _period = period;
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// Executes the task.
         /// </summary>
         /// <param name="state">The task state.</param>
-        public async void ExecuteAsync(object state)
+        public async void ExecuteAsync(object? state)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
         }
 
-        public abstract Task PerformExecuteAsync(object state);
+        public abstract Task PerformExecuteAsync(object? state);
 
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)

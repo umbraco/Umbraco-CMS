@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     public class SnapDictionary<TKey, TValue>
         where TValue : class
+        where TKey : notnull
     {
         // read
         // http://www.codeproject.com/Articles/548406/Dictionary-plus-Locking-versus-ConcurrentDictionar
@@ -29,12 +30,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
         private readonly ConcurrentQueue<GenObj> _genObjs;
-        private GenObj _genObj;
+        private GenObj? _genObj;
         private readonly object _wlocko = new object();
         private readonly object _rlocko = new object();
         private long _liveGen, _floorGen;
         private bool _nextGen, _collectAuto;
-        private Task _collectTask;
+        private Task? _collectTask;
 
         // minGenDelta to be adjusted
         // we may want to throttle collects even if delta is reached
@@ -107,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // the dict is write-locked until the write-lock is released
         //  which happens when it is disposed (non-scoped)
         //  or when the scope context exits (scoped)
-        public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
+        public IDisposable? GetScopedWriteLock(IScopeProvider scopeProvider)
         {
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
@@ -191,13 +192,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public int Count => _items.Count;
 
-        private LinkedNode<TValue> GetHead(TKey key)
+        private LinkedNode<TValue>? GetHead(TKey key)
         {
             _items.TryGetValue(key, out var link); // else null
             return link;
         }
 
-        public void SetLocked(TKey key, TValue value)
+        public void SetLocked(TKey key, TValue? value)
         {
             EnsureLocked();
 
@@ -253,7 +254,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
-        public TValue Get(TKey key, long gen)
+        public TValue? Get(TKey key, long gen)
         {
             // look ma, no lock!
             var link = GetHead(key);
@@ -396,7 +397,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             while (_genObjs.TryPeek(out var genObj) && (genObj.Count == 0 || genObj.WeakGenRef.IsAlive == false))
             {
                 _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
-                _floorGen = genObj.Gen;
+                _floorGen = genObj!.Gen;
             }
 
             Collect(_items);
@@ -476,7 +477,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Unit testing
 
-        private TestHelper _unitTesting;
+        private TestHelper? _unitTesting;
 
         // note: nothing here is thread-safe
         internal class TestHelper
@@ -499,7 +500,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 set => _dict._collectAuto = value;
             }
 
-            public GenObj GenObj => _dict._genObj;
+            public GenObj? GenObj => _dict._genObj;
 
             public ConcurrentQueue<GenObj> GenObjs => _dict._genObjs;
 
@@ -523,14 +524,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             public class GenVal
             {
-                public GenVal(long gen, TValue value)
+                public GenVal(long gen, TValue? value)
                 {
                     Gen = gen;
                     Value = value;
                 }
 
                 public long Gen { get; }
-                public TValue Value { get; }
+                public TValue? Value { get; }
             }
         }
 
@@ -543,7 +544,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public class Snapshot : IDisposable
         {
             private readonly SnapDictionary<TKey, TValue> _store;
-            private readonly GenRef _genRef;
+            private readonly GenRef? _genRef;
             private readonly long _gen; // copied for perfs
             private int _disposed;
 
@@ -571,7 +572,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
             }
 
-            public TValue Get(TKey key)
+            public TValue? Get(TKey key)
             {
                 EnsureNotDisposed();
                 return _store.Get(key, _gen);

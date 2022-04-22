@@ -13,7 +13,7 @@
         /// <summary>
         /// The entity being rolledback
         /// </summary>
-        public TEntity Entity
+        public TEntity? Entity
         {
             get { return EventObject; }
         }

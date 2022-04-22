@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return false;
 
             var config = publishedProperty.DataType.ConfigurationAs<NestedContentConfiguration>();
-            return config.MinItems == 1 && config.MaxItems == 1;
+            return config?.MinItems == 1 && config.MaxItems == 1;
         }
 
         public static bool IsNestedMany(IPublishedPropertyType publishedProperty)
@@ -41,21 +41,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return IsNested(publishedProperty) && !IsNestedSingle(publishedProperty);
         }
 
-        protected IPublishedElement ConvertToElement(JObject sourceObject, PropertyCacheLevel referenceCacheLevel, bool preview)
+        protected IPublishedElement? ConvertToElement(JObject sourceObject, PropertyCacheLevel referenceCacheLevel, bool preview)
         {
             var elementTypeAlias = sourceObject[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
             if (string.IsNullOrEmpty(elementTypeAlias))
                 return null;
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-            var publishedContentType = publishedSnapshot.Content.GetContentType(elementTypeAlias);
+            var publishedContentType = publishedSnapshot.Content?.GetContentType(elementTypeAlias);
             if (publishedContentType == null || publishedContentType.IsElement == false)
                 return null;
 
-            var propertyValues = sourceObject.ToObject<Dictionary<string, object>>();
+            var propertyValues = sourceObject.ToObject<Dictionary<string, object?>>();
 
-            if (!propertyValues.TryGetValue("key", out var keyo)
-                || !Guid.TryParse(keyo.ToString(), out var key))
+            if (propertyValues is null || !propertyValues.TryGetValue("key", out var keyo)
+                || !Guid.TryParse(keyo!.ToString(), out var key))
                 key = Guid.Empty;
 
             IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);

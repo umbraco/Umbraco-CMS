@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the value of a property.
         /// </summary>
-        public static TValue ValueFor<TModel, TValue>(this TModel model, IPublishedValueFallback publishedValueFallback, Expression<Func<TModel, TValue>> property, string culture = null, string segment = null, Fallback fallback = default, TValue defaultValue = default)
+        public static TValue? ValueFor<TModel, TValue>(this TModel model, IPublishedValueFallback publishedValueFallback, Expression<Func<TModel, TValue>> property, string? culture = null, string? segment = null, Fallback fallback = default, TValue? defaultValue = default)
             where TModel : IPublishedElement
         {
             var alias = GetAlias(model, property);
@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
                 throw new ArgumentException("Not a proper lambda expression (body).", nameof(property));
 
             var memberExpression = (MemberExpression) lambdaBody;
-            if (memberExpression.Expression.NodeType != ExpressionType.Parameter)
+            if (memberExpression.Expression?.NodeType != ExpressionType.Parameter)
                 throw new ArgumentException("Not a proper lambda expression (member).", nameof(property));
 
             var member = memberExpression.Member;

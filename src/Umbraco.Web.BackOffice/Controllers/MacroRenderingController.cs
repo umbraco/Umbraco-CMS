@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            return new ActionResult<IEnumerable<MacroParameter>>(_umbracoMapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder));
+            return new ActionResult<IEnumerable<MacroParameter>>(_umbracoMapper.Map<IEnumerable<MacroParameter>>(macro)!.OrderBy(x => x.SortOrder));
         }
 
         /// <summary>
@@ -107,19 +107,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public class MacroParameterModel
         {
-            public string MacroAlias { get; set; }
+            public string? MacroAlias { get; set; }
             public int PageId { get; set; }
-            public IDictionary<string, object> MacroParams { get; set; }
+            public IDictionary<string, object>? MacroParams { get; set; }
         }
 
-        private async Task<IActionResult> GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
+        private async Task<IActionResult> GetMacroResultAsHtml(string? macroAlias, int pageId, IDictionary<string, object>? macroParams)
         {
-            var m = _macroService.GetByAlias(macroAlias);
+            var m = macroAlias is null ? null : _macroService.GetByAlias(macroAlias);
             if (m == null)
                 return NotFound();
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var publishedContent = umbracoContext.Content.GetById(true, pageId);
+            var publishedContent = umbracoContext.Content?.GetById(true, pageId);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             //currently we cannot render a macro if the page doesn't yet exist
@@ -151,7 +151,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 //need to create a specific content result formatted as HTML since this controller has been configured
                 //with only json formatters.
-                return Content((await _componentRenderer.RenderMacroForContent(publishedContent, m.Alias, macroParams)).ToString(), "text/html",
+                return Content((await _componentRenderer.RenderMacroForContent(publishedContent, m.Alias, macroParams)).ToString() ?? string.Empty, "text/html",
                     Encoding.UTF8);
             }
         }
@@ -178,8 +178,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public class CreatePartialViewMacroWithFileModel
         {
-            public string Filename { get; set; }
-            public string VirtualPath { get; set; }
+            public string? Filename { get; set; }
+            public string? VirtualPath { get; set; }
         }
     }
 }

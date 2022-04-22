@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <remarks>
         /// If the value is a virtual path, it's resolved relative to the webroot.
         /// </remarks>
-        public string UmbracoMediaPhysicalRootPath { get; set; }
+        public string UmbracoMediaPhysicalRootPath { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the SMTP settings.
         /// </summary>
-        public SmtpSettings Smtp { get; set; }
+        public SmtpSettings? Smtp { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether SMTP is configured.

@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             settings.OnChange(x => _settings = x);
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             switch (_serverRegistrar.CurrentServerRole)
             {

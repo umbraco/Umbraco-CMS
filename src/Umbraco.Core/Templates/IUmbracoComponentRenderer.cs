@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Templates
         /// <param name="contentId">The content id</param>
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
-        Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object> parameters);
+        Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object>? parameters);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Templates
         /// Currently only used when the node is unpublished and unable to get the contentId item from the
         /// content cache as its unpublished. This deals with taking in a preview/draft version of the content node
         /// </remarks>
-        Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters);
+        Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object>? parameters);
 
     }
 }

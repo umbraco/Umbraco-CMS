@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Web.Common.Filters
             /// </summary>
             private class GuidNoHyphenConverter : JsonConverter
             {
-                public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+                public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
                 {
                     switch (reader.TokenType)
                     {
@@ -65,9 +65,9 @@ namespace Umbraco.Cms.Web.Common.Filters
                     }
                 }
 
-                public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+                public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
                 {
-                    writer.WriteValue(Guid.Empty.Equals(value) ? Guid.Empty.ToString("N") : ((Guid)value).ToString("N"));
+                    writer.WriteValue(Guid.Empty.Equals(value) ? Guid.Empty.ToString("N") : ((Guid?)value)?.ToString("N"));
                 }
 
                 public override bool CanConvert(Type objectType)

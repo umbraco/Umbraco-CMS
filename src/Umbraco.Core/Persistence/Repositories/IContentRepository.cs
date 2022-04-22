@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets a version.
         /// </summary>
-        TEntity GetVersion(int versionId);
+        TEntity? GetVersion(int versionId);
 
         /// <summary>
         /// Deletes a version.
@@ -54,29 +54,29 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets the recycle bin content.
         /// </summary>
-        IEnumerable<TEntity> GetRecycleBin();
+        IEnumerable<TEntity>? GetRecycleBin();
 
         /// <summary>
         /// Gets the count of content items of a given content type.
         /// </summary>
-        int Count(string contentTypeAlias = null);
+        int Count(string? contentTypeAlias = null);
 
         /// <summary>
         /// Gets the count of child content items of a given parent content, of a given content type.
         /// </summary>
-        int CountChildren(int parentId, string contentTypeAlias = null);
+        int CountChildren(int parentId, string? contentTypeAlias = null);
 
         /// <summary>
         /// Gets the count of descendant content items of a given parent content, of a given content type.
         /// </summary>
-        int CountDescendants(int parentId, string contentTypeAlias = null);
+        int CountDescendants(int parentId, string? contentTypeAlias = null);
 
         /// <summary>
         /// Gets paged content items.
         /// </summary>
         /// <remarks>Here, <paramref name="filter"/> can be null but <paramref name="ordering"/> cannot.</remarks>
-        IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<TEntity> filter, Ordering ordering);
+        IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<TEntity>? filter, Ordering? ordering);
 
         ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
     }

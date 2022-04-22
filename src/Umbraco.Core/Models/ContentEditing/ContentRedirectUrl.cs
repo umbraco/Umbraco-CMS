@@ -10,10 +10,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public Guid RedirectId { get; set; }
 
         [DataMember(Name = "originalUrl")]
-        public string OriginalUrl { get; set; }
+        public string? OriginalUrl { get; set; }
 
         [DataMember(Name = "destinationUrl")]
-        public string DestinationUrl { get; set; }
+        public string? DestinationUrl { get; set; }
 
         [DataMember(Name = "createDateUtc")]
         public DateTime CreateDateUtc { get; set; }
@@ -22,6 +22,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int ContentId { get; set; }
 
         [DataMember(Name = "culture")]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
     }
 }

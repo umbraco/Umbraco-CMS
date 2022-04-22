@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
 
-                IQuery<IMember> query;
+                IQuery<IMember>? query;
 
                 switch (countType)
                 {
@@ -67,10 +67,10 @@ namespace Umbraco.Cms.Core.Services
                         query = Query<IMember>();
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>()?.Where(x => x.IsLockedOut == true);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsApproved && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>()?.Where(x => x.IsApproved == true);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(countType));
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
         /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
         /// <returns><see cref="System.int"/> with number of Members</returns>
-        public int Count(string memberTypeAlias = null)
+        public int Count(string? memberTypeAlias = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -294,7 +294,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id"><see cref="System.int"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember GetById(int id)
+        public IMember? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -310,13 +310,13 @@ namespace Umbraco.Cms.Core.Services
         /// and the user id in the membership provider.</remarks>
         /// <param name="id"><see cref="Guid"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember GetByKey(Guid id)
+        public IMember? GetByKey(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => x.Key == id);
-                return _memberRepository.Get(query).FirstOrDefault();
+                return _memberRepository.Get(query)?.FirstOrDefault();
             }
         }
 
@@ -337,19 +337,19 @@ namespace Umbraco.Cms.Core.Services
         }
 
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+            string orderBy, Direction orderDirection, string? memberTypeAlias = null, string filter = "")
         {
             return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
         }
 
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter)
+            string orderBy, Direction orderDirection, bool orderBySystemField, string? memberTypeAlias, string filter)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                var query1 = memberTypeAlias == null ? null : Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter) || x.Email.Contains(filter));
+                var query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
+                var query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter));
                 return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
             }
         }
@@ -359,7 +359,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember GetByProviderKey(object id)
+        public IMember? GetByProviderKey(object id)
         {
             var asGuid = id.TryConvertTo<Guid>();
             if (asGuid.Success)
@@ -377,13 +377,13 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember GetByEmail(string email)
+        public IMember? GetByEmail(string email)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => x.Email.Equals(email));
-                return _memberRepository.Get(query).FirstOrDefault();
+                return _memberRepository.Get(query)?.FirstOrDefault();
             }
         }
 
@@ -392,7 +392,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username to use for retrieval</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember GetByUsername(string username)
+        public IMember? GetByUsername(string? username)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -406,7 +406,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeAlias">Alias of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
+        public IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -421,7 +421,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
+        public IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -479,19 +479,19 @@ namespace Umbraco.Cms.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Name.Equals(displayNameToMatch));
+                        query?.Where(member => string.Equals(member.Name, displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Name.Contains(displayNameToMatch));
+                        query?.Where(member => member.Name != null && member.Name.Contains(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Name.StartsWith(displayNameToMatch));
+                        query?.Where(member => member.Name != null && member.Name.StartsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Name.EndsWith(displayNameToMatch));
+                        query?.Where(member => member.Name != null && member.Name.EndsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        query?.Where(member => member.Name != null && member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
@@ -520,19 +520,19 @@ namespace Umbraco.Cms.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Email.Equals(emailStringToMatch));
+                        query?.Where(member => member.Email.Equals(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Email.Contains(emailStringToMatch));
+                        query?.Where(member => member.Email.Contains(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Email.StartsWith(emailStringToMatch));
+                        query?.Where(member => member.Email.StartsWith(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Email.EndsWith(emailStringToMatch));
+                        query?.Where(member => member.Email.EndsWith(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
+                        query?.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -561,19 +561,19 @@ namespace Umbraco.Cms.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Username.Equals(login));
+                        query?.Where(member => member.Username.Equals(login));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Username.Contains(login));
+                        query?.Where(member => member.Username.Contains(login));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Username.StartsWith(login));
+                        query?.Where(member => member.Username.StartsWith(login));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Username.EndsWith(login));
+                        query?.Where(member => member.Username.EndsWith(login));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Username.SqlWildcard(login, TextColumnType.NVarchar));
+                        query?.Where(member => member.Username.SqlWildcard(login, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -590,7 +590,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.string"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
+        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -600,16 +600,16 @@ namespace Umbraco.Cms.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlEquals(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlEquals(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEquals(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEquals(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlContains(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlContains(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlContains(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlContains(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.StartsWith:
                         query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlEndsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlEndsWith(value, TextColumnType.NVarchar)));
+                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEndsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEndsWith(value, TextColumnType.NVarchar)));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -626,7 +626,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.int"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -664,7 +664,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
         /// <param name="value"><see cref="System.bool"/> Value to match</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
+        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -682,7 +682,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -748,13 +748,9 @@ namespace Umbraco.Cms.Core.Services
         #region Save
 
         /// <inheritdoc />
+        [Obsolete("This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
         public void SetLastLogin(string username, DateTime date)
         {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _memberRepository.SetLastLogin(username, date);
-                scope.Complete();
-            }
         }
 
         /// <inheritdoc />
@@ -856,7 +852,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void DeleteLocked(IScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object> notificationState = null)
+        private void DeleteLocked(IScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object>? notificationState = null)
         {
             // a member has no descendants
             _memberRepository.Delete(member);
@@ -898,7 +894,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberId"></param>
         /// <returns>A list of member roles</returns>
-        public IEnumerable<string> GetAllRoles(int memberId)
+        public IEnumerable<string?>? GetAllRoles(int memberId)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -908,13 +904,13 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<string> GetAllRoles(string username)
+        public IEnumerable<string> GetAllRoles(string? username)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
-                return result.Select(x => x.Name).Distinct();
+                return result.Where(x => x.Name != null).Select(x => x.Name).Distinct()!;
             }
         }
 
@@ -982,15 +978,18 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 IQuery<IMemberGroup> query = Query<IMemberGroup>().Where(g => g.Name == roleName);
-                IMemberGroup[] found = _memberGroupRepository.Get(query).ToArray();
+                IMemberGroup[]? found = _memberGroupRepository.Get(query)?.ToArray();
 
-                foreach (IMemberGroup memberGroup in found)
+                if (found is not null)
                 {
-                    _memberGroupService.Delete(memberGroup);
+                    foreach (IMemberGroup memberGroup in found)
+                    {
+                        _memberGroupService.Delete(memberGroup);
+                    }
                 }
 
                 scope.Complete();
-                return found.Length > 0;
+                return found?.Length > 0;
             }
         }
 
@@ -1075,7 +1074,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
+        private void Audit(AuditType type, int userId, int objectId, string? message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
 
         #endregion
 
@@ -1089,12 +1088,12 @@ namespace Umbraco.Cms.Core.Services
         /// This is internal for now and is used to export a member in the member editor,
         /// it will raise an event so that auditing logs can be created.
         /// </remarks>
-        public MemberExportModel ExportMember(Guid key)
+        public MemberExportModel? ExportMember(Guid key)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                IQuery<IMember> query = Query<IMember>().Where(x => x.Key == key);
-                IMember member = _memberRepository.Get(query).FirstOrDefault();
+                IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
+                IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
 
                 if (member == null)
                 {
@@ -1108,7 +1107,7 @@ namespace Umbraco.Cms.Core.Services
                     Name = member.Name,
                     Username = member.Username,
                     Email = member.Email,
-                    Groups = GetAllRoles(member.Id).ToList(),
+                    Groups = GetAllRoles(member.Id)?.ToList(),
                     ContentTypeAlias = member.ContentTypeAlias,
                     CreateDate = member.CreateDate,
                     UpdateDate = member.UpdateDate,
@@ -1165,9 +1164,14 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MemberTree);
 
                 // TODO: What about content that has the contenttype as part of its composition?
-                IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+                IQuery<IMember>? query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 
-                IMember[] members = _memberRepository.Get(query).ToArray();
+                IMember[]? members = _memberRepository.Get(query)?.ToArray();
+
+                if (members is null)
+                {
+                    return;
+                }
 
                 if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
                 {
@@ -1200,7 +1204,7 @@ namespace Umbraco.Cms.Core.Services
 
             scope.ReadLock(Constants.Locks.MemberTypes);
 
-            IMemberType memberType = _memberTypeRepository.Get(memberTypeAlias);
+            IMemberType? memberType = _memberTypeRepository.Get(memberTypeAlias);
 
             if (memberType == null)
             {

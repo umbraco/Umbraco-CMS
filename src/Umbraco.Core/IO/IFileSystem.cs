@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.IO
         /// <returns>
         /// <see cref="Stream"/>.
         /// </returns>
-        Stream OpenFile(string path);
+        Stream? OpenFile(string path);
 
         /// <summary>
         /// Deletes the specified file.
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.IO
         /// <returns>
         /// <see cref="string"/> representing the relative URL.
         /// </returns>
-        string GetUrl(string path);
+        string GetUrl(string? path);
 
         /// <summary>
         /// Gets the last modified date/time of the file, expressed as a UTC value.

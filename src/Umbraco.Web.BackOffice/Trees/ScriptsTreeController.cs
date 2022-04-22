@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Scripts, TreeTitle = "Scripts", SortOrder = 10, TreeGroup = Constants.Trees.Groups.Templating)]
     public class ScriptsTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem { get; }
+        protected override IFileSystem? FileSystem { get; }
 
         private static readonly string[] ExtensionsStatic = { "js" };
 

@@ -18,12 +18,12 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
 
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
 
-        public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+        public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
         {
             var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
             var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
-            return oembed.GetHtml();
+            return oembed?.GetHtml();
         }
 
         public GettyImages(IJsonSerializer jsonSerializer) : base(jsonSerializer)

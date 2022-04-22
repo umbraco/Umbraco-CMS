@@ -39,26 +39,46 @@ namespace Umbraco.Cms.Core.Notifications
         {
             get
             {
-                State.TryGetValue(s_templateForContentTypeKey, out var result);
-
-                if (result is not bool createTemplate)
+                if (State?.TryGetValue(s_templateForContentTypeKey, out var result) ?? false)
                 {
-                    return false;
+                    if (result is not bool createTemplate)
+                    {
+                        return false;
+                    }
+
+                    return createTemplate;
                 }
 
-                return createTemplate;
+                return false;
             }
-            set => State[s_templateForContentTypeKey] = value;
+            set
+            {
+                if (!value is bool && State is not null)
+                {
+                    State[s_templateForContentTypeKey] = value;
+                }
+            }
         }
 
-        public string ContentTypeAlias
+        public string? ContentTypeAlias
         {
             get
             {
-                State.TryGetValue(s_contentTypeAliasKey, out var result);
-                return result as string;
+                if (State?.TryGetValue(s_contentTypeAliasKey, out var result) ?? false)
+                {
+                    return result as string;
+                }
+
+                return null;
             }
-            set => State[s_contentTypeAliasKey] = value;
+
+            set
+            {
+                if (value is not null && State is not null)
+                {
+                    State[s_contentTypeAliasKey] = value;
+                }
+            }
         }
     }
 }

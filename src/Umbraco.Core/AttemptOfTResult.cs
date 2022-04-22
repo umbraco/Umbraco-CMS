@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core
     public struct Attempt<TResult>
     {
         // private - use Succeed() or Fail() methods to create attempts
-        private Attempt(bool success, TResult result, Exception exception)
+        private Attempt(bool success, TResult? result, Exception? exception)
         {
             Success = success;
             Result = result;
@@ -25,17 +25,25 @@ namespace Umbraco.Cms.Core
         /// <summary>
         /// Gets the exception associated with an unsuccessful attempt.
         /// </summary>
-        public Exception Exception { get; }
+        public Exception? Exception { get; }
 
         /// <summary>
         /// Gets the attempt result.
         /// </summary>
-        public TResult Result { get; }
+        public TResult? Result { get; }
 
         /// <summary>
         /// Gets the attempt result, if successful, else a default value.
         /// </summary>
-        public TResult ResultOr(TResult value) => Success ? Result : value;
+        public TResult ResultOr(TResult value)
+        {
+            if (Success && Result is not null)
+            {
+                return Result;
+            }
+
+            return value;
+        }
 
         // optimize, use a singleton failed attempt
         private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);
@@ -54,7 +62,7 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<TResult> Succeed(TResult result)
+        public static Attempt<TResult> Succeed(TResult? result)
         {
             return new Attempt<TResult>(true, result, null);
         }
@@ -73,7 +81,7 @@ namespace Umbraco.Cms.Core
         /// </summary>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult> Fail(Exception exception)
+        public static Attempt<TResult> Fail(Exception? exception)
         {
             return new Attempt<TResult>(false, default(TResult), exception);
         }
@@ -94,9 +102,9 @@ namespace Umbraco.Cms.Core
         /// <param name="result">The result of the attempt.</param>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult> Fail(TResult result, Exception exception)
+        public static Attempt<TResult?> Fail(TResult result, Exception exception)
         {
-            return new Attempt<TResult>(false, result, exception);
+            return new Attempt<TResult?>(false, result, exception);
         }
 
         /// <summary>
@@ -115,7 +123,7 @@ namespace Umbraco.Cms.Core
         /// <param name="condition">A value indicating whether the attempt is successful.</param>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The attempt.</returns>
-        public static Attempt<TResult> If(bool condition, TResult result)
+        public static Attempt<TResult> If(bool condition, TResult? result)
         {
             return new Attempt<TResult>(condition, result, null);
         }

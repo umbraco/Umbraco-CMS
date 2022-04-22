@@ -10,6 +10,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class MemberListDisplay : ContentItemDisplayBase<ContentPropertyDisplay>
     {
         [DataMember(Name = "apps")]
-        public IEnumerable<ContentApp> ContentApps { get; set; }
+        public IEnumerable<ContentApp>? ContentApps { get; set; }
     }
 }

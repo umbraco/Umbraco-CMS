@@ -27,17 +27,17 @@ namespace Umbraco.Cms.Core.IO
             _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
         }
 
-        public bool ViewExists(ITemplate t) => _viewFileSystem.FileExists(ViewPath(t.Alias));
-    
+        public bool ViewExists(ITemplate t) => t.Alias is not null && _viewFileSystem.FileExists(ViewPath(t.Alias));
+
 
         public string GetFileContents(ITemplate t)
         {
             var viewContent = "";
-            var path = ViewPath(t.Alias);
+            var path = ViewPath(t.Alias ?? string.Empty);
 
             if (_viewFileSystem.FileExists(path))
             {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)!))
                 {
                     viewContent = tr.ReadToEnd();
                     tr.Close();
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.IO
             }
             else
             {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)!))
                 {
                     viewContent = tr.ReadToEnd();
                     tr.Close();
@@ -69,8 +69,8 @@ namespace Umbraco.Cms.Core.IO
         }
 
         [Obsolete("Inject IDefaultViewContentProvider instead")]
-        public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null,
-            string modelNamespace = null, string modelNamespaceAlias = null)
+        public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null,
+            string? modelNamespace = null, string? modelNamespaceAlias = null)
         {
             var viewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
             return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace,
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.IO
 
         private string SaveTemplateToFile(ITemplate template)
         {
-            var design = template.Content.IsNullOrWhiteSpace() ? EnsureInheritedLayout(template) : template.Content;
+            var design = template.Content.IsNullOrWhiteSpace() ? EnsureInheritedLayout(template) : template.Content!;
             var path = ViewPath(template.Alias);
 
             var data = Encoding.UTF8.GetBytes(design);
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.IO
             return design;
         }
 
-        public string UpdateViewFile(ITemplate t, string currentAlias = null)
+        public string? UpdateViewFile(ITemplate t, string? currentAlias = null)
         {
             var path = ViewPath(t.Alias);
 
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.IO
                     _viewFileSystem.DeleteFile(oldFile);
             }
 
-            var data = Encoding.UTF8.GetBytes(t.Content);
+            var data = Encoding.UTF8.GetBytes(t.Content ?? string.Empty);
             var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
 
             using (var ms = new MemoryStream(withBom))

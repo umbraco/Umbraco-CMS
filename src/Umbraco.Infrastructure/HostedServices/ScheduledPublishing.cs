@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _scopeProvider = scopeProvider;
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
             {

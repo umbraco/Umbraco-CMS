@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,7 +24,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
             return Convert(value);
         }
 
-        public bool TryDeserialize(string json, out BlockEditorData blockEditorData)
+        public bool TryDeserialize(string json, [MaybeNullWhen(false)] out BlockEditorData blockEditorData)
         {
             try
             {
@@ -44,16 +45,16 @@ namespace Umbraco.Cms.Core.Models.Blocks
             return Convert(value);
         }
 
-        private BlockEditorData Convert(BlockValue value)
+        private BlockEditorData Convert(BlockValue? value)
         {
-            if (value.Layout == null)
+            if (value?.Layout == null)
                 return BlockEditorData.Empty;
 
             var references = value.Layout.TryGetValue(_propertyEditorAlias, out var layout)
                 ? GetBlockReferences(layout)
                 : Enumerable.Empty<ContentAndSettingsReference>();
 
-            return new BlockEditorData(_propertyEditorAlias, references, value);
+            return new BlockEditorData(_propertyEditorAlias, references!, value);
         }
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// </summary>
         /// <param name="jsonLayout"></param>
         /// <returns></returns>
-        protected abstract IEnumerable<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout);
+        protected abstract IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout);
 
     }
 }

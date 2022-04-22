@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
         private SyncBootState _syncBootState;
         private bool _syncBootStateReady;
-        private object _syncBootStateLock;
+        private object? _syncBootStateLock;
 
         public SyncBootStateAccessor(
             ILogger<SyncBootStateAccessor> logger,

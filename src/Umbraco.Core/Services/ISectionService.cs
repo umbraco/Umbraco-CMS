@@ -22,6 +22,6 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="appAlias">The application alias.</param>
         /// <returns></returns>
-        ISection GetByAlias(string appAlias);
+        ISection? GetByAlias(string appAlias);
     }
 }

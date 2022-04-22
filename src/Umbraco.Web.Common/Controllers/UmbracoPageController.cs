@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
     /// </summary>
     public abstract class UmbracoPageController : UmbracoController
     {
-        private UmbracoRouteValues _umbracoRouteValues;
+        private UmbracoRouteValues? _umbracoRouteValues;
         private readonly ICompositeViewEngine _compositeViewEngine;
         private readonly ILogger<UmbracoPageController> _logger;
 
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <summary>
         /// Gets the current content item.
         /// </summary>
-        protected virtual IPublishedContent CurrentPage
+        protected virtual IPublishedContent? CurrentPage
         {
             get
             {
@@ -88,11 +88,11 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// Ensures that a physical view file exists on disk.
         /// </summary>
         /// <param name="template">The view name.</param>
-        protected bool EnsurePhsyicalViewExists(string template)
+        protected bool EnsurePhsyicalViewExists(string? template)
         {
             if (string.IsNullOrWhiteSpace(template))
             {
-                string docTypeAlias = UmbracoRouteValues.PublishedRequest.PublishedContent.ContentType.Alias;
+                string? docTypeAlias = UmbracoRouteValues.PublishedRequest.PublishedContent?.ContentType.Alias;
                 _logger.LogWarning("No physical template file was found for document type with alias {Alias}", docTypeAlias);
                 return false;
             }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -112,7 +113,12 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("no database was found");
+            }
 
             if (!db.InTransaction)
             {
@@ -124,7 +130,12 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         // lock occurs for entire database as opposed to row/table.
         private void ObtainWriteLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("no database was found");
+            }
 
             if (!db.InTransaction)
             {

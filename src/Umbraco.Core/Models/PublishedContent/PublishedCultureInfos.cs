@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedCultureInfo"/> class.
         /// </summary>
-        public PublishedCultureInfo(string culture, string name, string urlSegment, DateTime date)
+        public PublishedCultureInfo(string culture, string? name, string? urlSegment, DateTime date)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets the URL segment of the item.
         /// </summary>
-        public string UrlSegment { get; }
+        public string? UrlSegment { get; }
 
         /// <summary>
         /// Gets the date associated with the culture.

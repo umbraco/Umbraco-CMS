@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Core.Web
 {
     /// <summary>
@@ -7,7 +9,7 @@ namespace Umbraco.Cms.Core.Web
     /// </summary>
     public interface IUmbracoContextAccessor
     {
-        bool TryGetUmbracoContext(out IUmbracoContext umbracoContext);
+        bool TryGetUmbracoContext([MaybeNullWhen(false)] out IUmbracoContext umbracoContext);
         void Clear();
         void Set(IUmbracoContext umbracoContext);
     }

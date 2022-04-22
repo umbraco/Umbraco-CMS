@@ -183,10 +183,11 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             return new InstallProgressResultModel(true, "", "");
         }
 
-        private static object GetInstruction(InstallInstructions installModel, InstallTrackingItem item,
+        private static object? GetInstruction(InstallInstructions installModel, InstallTrackingItem item,
             InstallSetupStep step)
         {
-            installModel.Instructions.TryGetValue(item.Name, out var instruction); // else null
+            object? instruction = null;
+            installModel.Instructions?.TryGetValue(item.Name, out instruction); // else null
 
             if (instruction is JObject jObject)
             {
@@ -242,7 +243,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         }
 
         // determines whether the step requires execution
-        internal bool StepRequiresExecution(InstallSetupStep step, object instruction)
+        internal bool StepRequiresExecution(InstallSetupStep step, object? instruction)
         {
             if (step == null) throw new ArgumentNullException(nameof(step));
 
@@ -260,7 +261,8 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             try
             {
                 var method = typedStepType.GetMethods().Single(x => x.Name == "RequiresExecution");
-                return (bool) method.Invoke(step, new[] { model });
+                var result =  (bool?) method.Invoke(step, new[] { model });
+                return result ?? false;
             }
             catch (Exception ex)
             {
@@ -271,7 +273,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         }
 
         // executes the step
-        internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object instruction)
+        internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object? instruction)
         {
             using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.",
                 "Step completed"))
@@ -290,8 +292,8 @@ namespace Umbraco.Cms.Web.BackOffice.Install
                 try
                 {
                     var method = typedStepType.GetMethods().Single(x => x.Name == "ExecuteAsync");
-                    var task = (Task<InstallSetupResult>) method.Invoke(step, new[] { model });
-                    return await task;
+                    var task = (Task<InstallSetupResult>?) method.Invoke(step, new[] { model });
+                    return await task!;
                 }
                 catch (Exception ex)
                 {

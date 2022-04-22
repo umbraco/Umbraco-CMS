@@ -2,8 +2,8 @@
 {
     public class SortExpression
     {
-        public PropertyModel Property { get; set; }
+        public PropertyModel? Property { get; set; }
 
-        public string Direction { get; set; }
+        public string? Direction { get; set; }
     }
 }
