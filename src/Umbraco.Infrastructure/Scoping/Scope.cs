@@ -535,7 +535,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             {
                 while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
                 {
-                    _acquiredLocks.Dequeue().Dispose();
+                    _acquiredLocks?.Dequeue().Dispose();
                 }
 
                 // We're the parent scope, make sure that locks of all scopes has been cleared
@@ -603,7 +603,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         ///     Used for testing. Ensures and gets any queued read locks.
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<Guid, Dictionary<int, int>> GetReadLocks()
+        internal Dictionary<Guid, Dictionary<int, int>>? GetReadLocks()
         {
             EnsureDbLocks();
             // always delegate to root/parent scope.
@@ -619,7 +619,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         ///     Used for testing. Ensures and gets and queued write locks.
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<Guid, Dictionary<int, int>> GetWriteLocks()
+        internal Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks()
         {
             EnsureDbLocks();
             // always delegate to root/parent scope.
@@ -763,8 +763,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             var builder = new StringBuilder();
             builder.AppendLine(
                 $"Lock counters aren't empty, suggesting a scope hasn't been properly disposed, parent id: {InstanceId}");
-            WriteLockDictionaryToString(_readLocksDictionary, builder, "read locks");
-            WriteLockDictionaryToString(_writeLocksDictionary, builder, "write locks");
+            WriteLockDictionaryToString(_readLocksDictionary!, builder, "read locks");
+            WriteLockDictionaryToString(_writeLocksDictionary!, builder, "write locks");
             return builder.ToString();
         }
 
@@ -857,10 +857,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 {
                     if (completed)
                     {
-                        _fscope.Complete();
+                        _fscope?.Complete();
                     }
 
-                    _fscope.Dispose();
+                    _fscope?.Dispose();
                     _fscope = null;
                 }
             }
@@ -881,7 +881,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 {
                     try
                     {
-                        _scopeProvider.AmbientContext.ScopeExit(completed);
+                        _scopeProvider.AmbientContext?.ScopeExit(completed);
                     }
                     finally
                     {
@@ -952,17 +952,17 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock ID to increment.</param>
         /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
         /// <param name="locks">Reference to the dictionary to increment on</param>
-        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks)
+        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
         {
             // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
             // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
             locks ??= new Dictionary<Guid, Dictionary<int, int>>();
 
             // Try and get the dict associated with the scope id.
-            var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int> locksDict);
+            var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
             if (locksDictFound)
             {
-                locksDict.TryGetValue(lockId, out var value);
+                locksDict!.TryGetValue(lockId, out var value);
                 locksDict[lockId] = value + 1;
             }
             else
@@ -1112,8 +1112,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                         // We are the outermost scope, handle the lock request.
                         LockInner(
                             instanceId,
-                            ref _readLocksDictionary,
-                            ref _readLocks,
+                            ref _readLocksDictionary!,
+                            ref _readLocks!,
                             ObtainReadLock,
                             timeout,
                             lockId);
@@ -1146,8 +1146,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                         // We are the outermost scope, handle the lock request.
                         LockInner(
                             instanceId,
-                            ref _writeLocksDictionary,
-                            ref _writeLocks,
+                            ref _writeLocksDictionary!,
+                            ref _writeLocks!,
                             ObtainWriteLock,
                             timeout,
                             lockId);
@@ -1204,7 +1204,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainReadLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
 
         /// <summary>
         ///     Obtains a write lock with a custom timeout.
@@ -1212,6 +1212,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainWriteLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
     }
 }

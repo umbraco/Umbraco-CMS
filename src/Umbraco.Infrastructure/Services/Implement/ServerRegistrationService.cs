@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
         /// </summary>
         public ServerRegistrationService(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IServerRegistrationRepository serverRegistrationRepository,
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public void TouchServer(string serverAddress, TimeSpan staleTimeout)
         {
             var serverIdentity = GetCurrentServerIdentity();
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.Servers);
 
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             // because the repository caches "all" and has queries disabled...
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.Servers);
 
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void DeactiveStaleServers(TimeSpan staleTimeout)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.Servers);
                 _serverRegistrationRepository.DeactiveStaleServers(staleTimeout);
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// from the database.</remarks>
         public IEnumerable<IServerRegistration> GetServers(bool refresh = false)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.Servers);
                 if (refresh)

@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>, IUserSessionStore<BackOfficeIdentityUser>
     {
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginWithKeyService _externalLoginService;
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         [ActivatorUtilitiesConstructor]
         public BackOfficeUserStore(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IUserService userService,
             IEntityService entityService,
             IExternalLoginWithKeyService externalLoginService,
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Security
 
         [Obsolete("Use non obsolete ctor")]
         public BackOfficeUserStore(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IUserService userService,
             IEntityService entityService,
             IExternalLoginWithKeyService externalLoginService,
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Security
 
         [Obsolete("Use non obsolete ctor")]
         public BackOfficeUserStore(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
@@ -205,7 +205,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            using (IScope scope = _scopeProvider.CreateScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 IUser? found = _userService.GetUserById(asInt);
                 if (found != null)
