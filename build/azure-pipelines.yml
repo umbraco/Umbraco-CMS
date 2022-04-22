@@ -285,8 +285,7 @@ stages:
                   name: PrepareTask
                   displayName: npm ci (AcceptanceTest)
                   inputs:
-                      command: custom
-                      customCommand: ci --ignore-scripts
+                      command: ci
                       workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
                 - task: PowerShell@2
                   displayName: Run Cypress (Desktop)
@@ -389,8 +388,7 @@ stages:
                   name: PrepareTask
                   displayName: npm ci (AcceptanceTest)
                   inputs:
-                      command: custom
-                      customCommand: ci --ignore-scripts
+                      command: ci
                       workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
                 - task: Bash@3
                   displayName: Run Cypress (Desktop)
@@ -485,8 +483,7 @@ stages:
                   name: PrepareTask
                   displayName: npm ci (AcceptanceTest)
                   inputs:
-                      command: custom
-                      customCommand: ci --ignore-scripts
+                      command: ci
                       workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
                 - task: Bash@3
                   displayName: Run Cypress (Desktop)
