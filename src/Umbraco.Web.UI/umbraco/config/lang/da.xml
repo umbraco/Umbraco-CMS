@@ -1927,6 +1927,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="2faDisableText">Hvis du ønsker at slå denne autentificeringsmetode fra, så skal du nu indtaste koden fra dit device:</key>
     <key alias="2faProviderIsEnabled">Denne autentificeringsmetode er slået til</key>
     <key alias="2faProviderIsDisabledMsg">Den valgte autentificeringsmetode er nu slået fra</key>
+    <key alias="2faProviderIsNotDisabledMsg">Der skete en ukendt fejl da denne autentificeringsmetode skulles slåes fra</key>
+    <key alias="2faDisableForUser">Er du sikker på, at du vil fjerne denne autentificeringsmetode for denne bruger?</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validering</key>
