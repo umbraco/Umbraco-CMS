@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.Website.Models
         /// <summary>
         /// The username of the model, if UsernameIsEmail is true then this is ignored.
         /// </summary>
-        public string Username { get; set; } = null!;
+        public string? Username { get; set; }
 
         /// <summary>
         /// Flag to determine if the username should be the email address, if true then the Username property is ignored
