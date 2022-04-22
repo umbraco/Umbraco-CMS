@@ -12,19 +12,16 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
         private static readonly string[] s_default_plugins = new[]
         {
-            "paste",
             "anchor",
             "charmap",
             "table",
             "lists",
             "advlist",
-            "hr",
             "autolink",
             "directionality",
-            "tabfocus",
             "searchreplace"
         };
-        private static readonly RichTextEditorCommand[] s_default_commands = new []
+        private static readonly RichTextEditorCommand[] s_default_commands = new[]
         {
             new RichTextEditorCommand(){Alias = "ace" , Name = "Source code editor" , Mode = RichTextEditorCommandMode.Insert},
             new RichTextEditorCommand(){Alias = "removeformat" , Name = "Remove format" , Mode = RichTextEditorCommandMode.Selection},
