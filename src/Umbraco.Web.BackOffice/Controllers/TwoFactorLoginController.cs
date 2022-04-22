@@ -72,7 +72,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var enabledProviderNameHashSet = new HashSet<string>(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key));
 
-            var providerNames = await _backOfficeUserManager.GetValidTwoFactorProvidersAsync(user);
+            IEnumerable<string> providerNames = await _backOfficeUserManager.GetValidTwoFactorProvidersAsync(user);
+
+            // Filter out any providers that does not have a view attached to it, since it's unusable then.
+            providerNames = providerNames.Where(providerName =>
+            {
+                TwoFactorLoginViewOptions options = _twoFactorLoginViewOptions.Get(providerName);
+                return options is not null && !string.IsNullOrWhiteSpace(options.SetupViewPath);
+            });
 
             return providerNames.Select(providerName =>
                 new UserTwoFactorProviderModel(providerName, enabledProviderNameHashSet.Contains(providerName))).ToArray();
