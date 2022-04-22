@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 .Config = new Dictionary<string, object> { { "idType", "udi" } };
         }
 
-        public override IDictionary<string, object> ToValueEditor(object configuration)
+        public override IDictionary<string, object> ToValueEditor(object? configuration)
         {
             // get the configuration fields
             var d = base.ToValueEditor(configuration);

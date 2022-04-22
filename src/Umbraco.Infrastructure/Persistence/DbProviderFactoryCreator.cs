@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _providerSpecificMapperFactories = providerSpecificMapperFactories.ToDictionary(x => x.ProviderName);
         }
 
-        public DbProviderFactory CreateFactory(string providerName)
+        public DbProviderFactory? CreateFactory(string? providerName)
         {
             if (string.IsNullOrEmpty(providerName))
                 return null;

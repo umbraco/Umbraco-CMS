@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,Relation>
 
-        protected override IRelation PerformGet(int id)
+        protected override IRelation? PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { id });
@@ -54,10 +54,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return DtoToEntity(dto, relationType);
         }
 
-        protected override IEnumerable<IRelation> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IRelation> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false);
-            if (ids.Length > 0)
+            if (ids?.Length > 0)
                 sql.WhereIn<RelationDto>(x => x.Id, ids);
             sql.OrderBy<RelationDto>(x => x.RelationType);
             var dtos = Database.Fetch<RelationDto>(sql);
@@ -78,11 +78,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             //NOTE: This is N+1, BUT ALL relation types are cached so shouldn't matter
 
-            return dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).ToList();
+            return dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).WhereNotNull().ToList();
         }
 
-        private static IRelation DtoToEntity(RelationDto dto, IRelationType relationType)
+        private static IRelation? DtoToEntity(RelationDto dto, IRelationType? relationType)
         {
+            if (relationType is null)
+            {
+                return null;
+            }
             var entity = RelationFactory.BuildEntity(dto, relationType);
 
             // reset dirty initial properties (U4-1946)
@@ -300,7 +304,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering ordering)
+        public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering)
         {
             var sql = GetBaseQuery(false);
 
@@ -318,15 +322,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var dtos = page.Items;
             totalRecords = page.TotalItems;
 
-            var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())
+            var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())?
                 .ToDictionary(x => x.Id, x => x);
 
             var result = dtos.Select(r =>
             {
-                if (!relTypes.TryGetValue(r.RelationType, out var relType))
+                if (relTypes is null || !relTypes.TryGetValue(r.RelationType, out var relType))
                     throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", r.RelationType));
                 return DtoToEntity(r, relType);
-            }).ToList();
+            }).WhereNotNull().ToList();
 
             return result;
         }
@@ -434,25 +438,25 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public Guid ChildNodeKey { get; set; }
 
         [Column(Name = "nodeName")]
-        public string ChildNodeName { get; set; }
+        public string? ChildNodeName { get; set; }
 
         [Column(Name = "nodeObjectType")]
         public Guid ChildNodeObjectType { get; set; }
 
         [Column(Name = "contentTypeIcon")]
-        public string ChildContentTypeIcon { get; set; }
+        public string? ChildContentTypeIcon { get; set; }
 
         [Column(Name = "contentTypeAlias")]
-        public string ChildContentTypeAlias { get; set; }
+        public string? ChildContentTypeAlias { get; set; }
 
         [Column(Name = "contentTypeName")]
-        public string ChildContentTypeName { get; set; }
+        public string? ChildContentTypeName { get; set; }
 
         [Column(Name = "relationTypeName")]
-        public string RelationTypeName { get; set; }
+        public string? RelationTypeName { get; set; }
 
         [Column(Name = "relationTypeAlias")]
-        public string RelationTypeAlias { get; set; }
+        public string? RelationTypeAlias { get; set; }
 
         [Column(Name = "relationTypeIsDependency")]
         public bool RelationTypeIsDependency { get; set; }

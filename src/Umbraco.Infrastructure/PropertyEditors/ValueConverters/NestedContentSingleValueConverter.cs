@@ -36,10 +36,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
-            var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>().ContentTypes;
-            return contentTypes.Length > 1
+            var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>()!.ContentTypes;
+            return contentTypes?.Length > 1
                 ? typeof(IPublishedElement)
-                : ModelType.For(contentTypes[0].Alias);
+                : ModelType.For(contentTypes?[0].Alias);
         }
 
         /// <inheritdoc />
@@ -47,20 +47,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => PropertyCacheLevel.Element;
 
         /// <inheritdoc />
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             return source?.ToString();
         }
 
         /// <inheritdoc />
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             using (_proflog.DebugDuration<NestedContentSingleValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
-                var value = (string)inter;
+                var value = (string?)inter;
                 if (string.IsNullOrWhiteSpace(value)) return null;
 
-                var objects = JsonConvert.DeserializeObject<List<JObject>>(value);
+                var objects = JsonConvert.DeserializeObject<List<JObject>>(value)!;
                 if (objects.Count == 0)
                     return null;
                 if (objects.Count > 1)

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
@@ -100,7 +101,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// <returns>
         ///     <c>true</c> when the state contains a version; otherwise, <c>false</c>.D
         /// </returns>
-        private static bool TryGetInitStateVersion(string state, out string version)
+        private static bool TryGetInitStateVersion(string state, [MaybeNullWhen(false)] out string version)
         {
             if (state.StartsWith(InitPrefix) && state.EndsWith(InitSuffix))
             {

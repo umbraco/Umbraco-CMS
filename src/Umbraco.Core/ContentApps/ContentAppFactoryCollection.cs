@@ -31,21 +31,25 @@ namespace Umbraco.Cms.Core.ContentApps
 
         }
 
-        public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups=null)
+        public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup>? userGroups = null)
         {
             var roles = GetCurrentUserGroups();
 
             var apps = this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
 
             var aliases = new HashSet<string>();
-            List<string> dups = null;
+            List<string>? dups = null;
 
             foreach (var app in apps)
             {
-                if (aliases.Contains(app.Alias))
-                    (dups ?? (dups = new List<string>())).Add(app.Alias);
-                else
-                    aliases.Add(app.Alias);
+                if (app.Alias is not null)
+                {
+
+                    if (aliases.Contains(app.Alias))
+                        (dups ?? (dups = new List<string>())).Add(app.Alias);
+                    else
+                        aliases.Add(app.Alias);
+                }
             }
 
             if (dups != null)

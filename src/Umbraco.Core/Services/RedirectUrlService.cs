@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Services
             _redirectUrlRepository = redirectUrlRepository;
         }
 
-        public void Register(string url, Guid contentKey, string culture = null)
+        public void Register(string url, Guid contentKey, string? culture = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IRedirectUrl GetMostRecentRedirectUrl(string url)
+        public IRedirectUrl? GetMostRecentRedirectUrl(string url)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IRedirectUrl GetMostRecentRedirectUrl(string url, string culture)
+        public IRedirectUrl? GetMostRecentRedirectUrl(string url, string? culture)
         {
             if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentRedirectUrl(url);
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

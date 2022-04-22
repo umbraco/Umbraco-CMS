@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Web.Common.Security
     /// </summary>
     public class MemberExternalSignInAutoLinkOptions
     {
-        private readonly string _defaultCulture;
+        private readonly string? _defaultCulture;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MemberExternalSignInAutoLinkOptions" /> class.
@@ -22,8 +22,8 @@ namespace Umbraco.Cms.Web.Common.Security
             bool autoLinkExternalAccount = false,
             bool defaultIsApproved = true,
             string defaultMemberTypeAlias = Core.Constants.Conventions.MemberTypes.DefaultAlias,
-            string defaultCulture = null,
-            IEnumerable<string> defaultMemberGroups = null)
+            string? defaultCulture = null,
+            IEnumerable<string>? defaultMemberGroups = null)
         {
             AutoLinkExternalAccount = autoLinkExternalAccount;
             DefaultIsApproved = defaultIsApproved;
@@ -36,14 +36,14 @@ namespace Umbraco.Cms.Web.Common.Security
         ///     A callback executed during account auto-linking and before the user is persisted
         /// </summary>
         [IgnoreDataMember]
-        public Action<MemberIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
+        public Action<MemberIdentityUser, ExternalLoginInfo>? OnAutoLinking { get; set; }
 
         /// <summary>
         ///     A callback executed during every time a user authenticates using an external login.
         ///     returns a boolean indicating if sign in should continue or not.
         /// </summary>
         [IgnoreDataMember]
-        public Func<MemberIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
+        public Func<MemberIdentityUser, ExternalLoginInfo, bool>? OnExternalLogin { get; set; }
 
         /// <summary>
         ///     Gets a value indicating whether flag indicating if logging in with the external provider should auto-link/create a

@@ -19,14 +19,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             base.Map(property, dest, context);
 
-            dest.IsRequired = property.PropertyType.Mandatory;
-            dest.IsRequiredMessage = property.PropertyType.MandatoryMessage;
-            dest.ValidationRegExp = property.PropertyType.ValidationRegExp;
-            dest.ValidationRegExpMessage = property.PropertyType.ValidationRegExpMessage;
-            dest.Description = property.PropertyType.Description;
-            dest.Label = property.PropertyType.Name;
-            dest.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
-            dest.LabelOnTop = property.PropertyType.LabelOnTop;
+            dest.IsRequired = property.PropertyType?.Mandatory;
+            dest.IsRequiredMessage = property.PropertyType?.MandatoryMessage;
+            dest.ValidationRegExp = property.PropertyType?.ValidationRegExp;
+            dest.ValidationRegExpMessage = property.PropertyType?.ValidationRegExpMessage;
+            dest.Description = property.PropertyType?.Description;
+            dest.Label = property.PropertyType?.Name;
+            dest.DataType = property.PropertyType is null ? null : DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            dest.LabelOnTop = property.PropertyType?.LabelOnTop;
         }
     }
 }

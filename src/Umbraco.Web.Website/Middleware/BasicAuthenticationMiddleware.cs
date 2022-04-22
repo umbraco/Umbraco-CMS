@@ -36,8 +36,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return;
             }
 
-            IPAddress clientIPAddress = context.Connection.RemoteIpAddress;
-            if (_basicAuthService.IsIpAllowListed(clientIPAddress))
+            IPAddress? clientIPAddress = context.Connection.RemoteIpAddress;
+            if (clientIPAddress is not null && _basicAuthService.IsIpAllowListed(clientIPAddress))
             {
                 await next(context);
                 return;
@@ -52,10 +52,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             if (context.TryGetBasicAuthCredentials(out var username, out var password))
             {
-                IBackOfficeSignInManager backOfficeSignInManager =
+                IBackOfficeSignInManager? backOfficeSignInManager =
                     context.RequestServices.GetService<IBackOfficeSignInManager>();
 
-                if (backOfficeSignInManager is not null)
+                if (backOfficeSignInManager is not null && username is not null && password is not null)
                 {
                     SignInResult signInResult =
                         await backOfficeSignInManager.PasswordSignInAsync(username, password, false, true);

@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
         {
             var result = new OEmbedResult();
             var foundMatch = false;
-            IEmbedProvider matchedProvider = null;
+            IEmbedProvider? matchedProvider = null;
 
             foreach (var provider in _embedCollection)
             {
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
             try
             {
                 result.SupportsDimensions = true;
-                result.Markup = matchedProvider.GetMarkup(url, width, height);
+                result.Markup = matchedProvider?.GetMarkup(url, width, height);
                 result.OEmbedStatus = OEmbedStatus.Success;
             }
             catch(Exception ex)

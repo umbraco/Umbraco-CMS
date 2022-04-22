@@ -44,22 +44,32 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// This does not save the item, that needs to be done explicitly
         /// </remarks>
-        public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value)
+        public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             if (language == null) throw new ArgumentNullException(nameof(language));
 
-            var existing = item.Translations.FirstOrDefault(x => x.Language.Id == language.Id);
+            var existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
             if (existing != null)
             {
                 existing.Value = value;
             }
             else
             {
-                item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                if (item.Translations is not null)
                 {
-                    new DictionaryTranslation(language, value)
-                };
+                    item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                    {
+                        new DictionaryTranslation(language, value)
+                    };
+                }
+                else
+                {
+                    item.Translations = new List<IDictionaryTranslation>
+                    {
+                        new DictionaryTranslation(language, value)
+                    };
+                }
             }
         }
 
@@ -70,7 +80,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="parentId"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null)
+        public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -88,7 +98,7 @@ namespace Umbraco.Cms.Core.Services
                 if (defaultValue.IsNullOrWhiteSpace() == false)
                 {
                     var langs = GetAllLanguages();
-                    var translations = langs.Select(language => new DictionaryTranslation(language, defaultValue))
+                    var translations = langs.Select(language => new DictionaryTranslation(language, defaultValue!))
                         .Cast<IDictionaryTranslation>()
                         .ToList();
 
@@ -121,7 +131,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        public IDictionaryItem GetDictionaryItemById(int id)
+        public IDictionaryItem? GetDictionaryItemById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -137,7 +147,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="DictionaryItem"/></returns>
-        public IDictionaryItem GetDictionaryItemById(Guid id)
+        public IDictionaryItem? GetDictionaryItemById(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -153,7 +163,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="key">Key of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        public IDictionaryItem GetDictionaryItemByKey(string key)
+        public IDictionaryItem? GetDictionaryItemByKey(string key)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -169,15 +179,19 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="parentId">Id of the parent</param>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
+        public IEnumerable<IDictionaryItem>? GetDictionaryItemChildren(Guid parentId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
+                var items = _dictionaryRepository.Get(query)?.ToArray();
+                if (items is not null)
+                {
+                    //ensure the lazy Language callback is assigned
+                    foreach (var item in items)
+                        EnsureDictionaryItemLanguageCallback(item);
+                }
+
                 return items;
             }
         }
@@ -203,15 +217,18 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the root/top <see cref="IDictionaryItem"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+        public IEnumerable<IDictionaryItem>? GetRootDictionaryItems()
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
+                var items = _dictionaryRepository.Get(query)?.ToArray();
+                if (items is not null)
+                {
+                    //ensure the lazy Language callback is assigned
+                    foreach (var item in items)
+                        EnsureDictionaryItemLanguageCallback(item);
+                }
                 return items;
             }
         }
@@ -292,7 +309,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="Language"/></param>
         /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageById(int id)
+        public ILanguage? GetLanguageById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -305,8 +322,12 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
         /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageByIsoCode(string isoCode)
+        public ILanguage? GetLanguageByIsoCode(string? isoCode)
         {
+            if (isoCode is null)
+            {
+                return null;
+            }
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.GetByIsoCode(isoCode);
@@ -323,7 +344,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public string GetLanguageIsoCodeById(int id)
+        public string? GetLanguageIsoCodeById(int id)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -444,7 +465,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void Audit(AuditType type, string message, int userId, int objectId, string entityType)
+        private void Audit(AuditType type, string message, int userId, int objectId, string? entityType)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
         }
@@ -455,14 +476,18 @@ namespace Umbraco.Cms.Core.Services
         /// if developers have a lot of dictionary items and translations, the caching and cloning size gets much larger because of
         /// the large object graphs. So now we don't cache or clone the attached ILanguage
         /// </summary>
-        private void EnsureDictionaryItemLanguageCallback(IDictionaryItem d)
+        private void EnsureDictionaryItemLanguageCallback(IDictionaryItem? d)
         {
             var item = d as DictionaryItem;
             if (item == null) return;
 
             item.GetLanguage = GetLanguageById;
-            foreach (var trans in item.Translations.OfType<DictionaryTranslation>())
-                trans.GetLanguage = GetLanguageById;
+            var translations = item.Translations?.OfType<DictionaryTranslation>();
+            if (translations is not null)
+            {
+                foreach (var trans in translations)
+                    trans.GetLanguage = GetLanguageById;
+            }
         }
 
         public Dictionary<string, Guid> GetDictionaryItemKeyMap()

@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services
 
             using(_scopeProvider.CreateScope(autoComplete: true))
             {
-                var policyOverrides = _documentVersionRepository.GetCleanupPolicies()
+                var policyOverrides = _documentVersionRepository.GetCleanupPolicies()?
                     .ToDictionary(x => x.ContentTypeId);
 
                 foreach (var version in items)
@@ -83,10 +83,15 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private ContentVersionCleanupPolicySettings GetOverridePolicy(
+        private ContentVersionCleanupPolicySettings? GetOverridePolicy(
             ContentVersionMeta version,
-            IDictionary<int, ContentVersionCleanupPolicySettings> overrides)
+            IDictionary<int, ContentVersionCleanupPolicySettings>? overrides)
         {
+            if (overrides is null)
+            {
+                return null;
+            }
+
             _ = overrides.TryGetValue(version.ContentTypeId, out var value);
 
             return value;

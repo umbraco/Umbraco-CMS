@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     // implements published snapshot
     public class PublishedSnapshot : IPublishedSnapshot, IDisposable
     {
-        private readonly PublishedSnapshotService _service;
+        private readonly PublishedSnapshotService? _service;
         private bool _defaultPreview;
-        private PublishedSnapshotElements _elements;
+        private PublishedSnapshotElements? _elements;
 
         #region Constructors
 
@@ -23,19 +23,19 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public class PublishedSnapshotElements : IDisposable
         {
 #pragma warning disable IDE1006 // Naming Styles
-            public ContentCache ContentCache;
-            public MediaCache MediaCache;
-            public MemberCache MemberCache;
-            public DomainCache DomainCache;
-            public IAppCache SnapshotCache;
-            public IAppCache ElementsCache;
+            public ContentCache? ContentCache;
+            public MediaCache? MediaCache;
+            public MemberCache? MemberCache;
+            public DomainCache? DomainCache;
+            public IAppCache? SnapshotCache;
+            public IAppCache? ElementsCache;
 #pragma warning restore IDE1006 // Naming Styles
 
             public void Dispose()
             {
-                ContentCache.Dispose();
-                MediaCache.Dispose();
-                MemberCache.Dispose();
+                ContentCache?.Dispose();
+                MediaCache?.Dispose();
+                MemberCache?.Dispose();
             }
         }
 
@@ -62,23 +62,23 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Caches
 
-        public IAppCache SnapshotCache => Elements.SnapshotCache;
+        public IAppCache? SnapshotCache => Elements.SnapshotCache;
 
-        public IAppCache ElementsCache => Elements.ElementsCache;
+        public IAppCache? ElementsCache => Elements.ElementsCache;
 
         #endregion
 
         #region IPublishedSnapshot
 
-        public IPublishedContentCache Content => Elements.ContentCache;
+        public IPublishedContentCache? Content => Elements.ContentCache;
 
-        public IPublishedMediaCache Media => Elements.MediaCache;
+        public IPublishedMediaCache? Media => Elements.MediaCache;
 
-        public IPublishedMemberCache Members => Elements.MemberCache;
+        public IPublishedMemberCache? Members => Elements.MemberCache;
 
-        public IDomainCache Domains => Elements.DomainCache;
+        public IDomainCache? Domains => Elements.DomainCache;
 
-        public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
+        public IDisposable ForcedPreview(bool preview, Action<bool>? callback = null)
         {
             return new ForcedPreviewObject(this, preview, callback);
         }
@@ -87,9 +87,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             private readonly PublishedSnapshot _publishedSnapshot;
             private readonly bool _origPreview;
-            private readonly Action<bool> _callback;
+            private readonly Action<bool>? _callback;
 
-            public ForcedPreviewObject(PublishedSnapshot publishedShapshot, bool preview, Action<bool> callback)
+            public ForcedPreviewObject(PublishedSnapshot publishedShapshot, bool preview, Action<bool>? callback)
             {
                 _publishedSnapshot = publishedShapshot;
                 _callback = callback;

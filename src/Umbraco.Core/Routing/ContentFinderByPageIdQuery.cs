@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Routing
             }
             if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"),  NumberStyles.Integer, CultureInfo.InvariantCulture, out int pageId))
             {
-                IPublishedContent doc = umbracoContext.Content.GetById(pageId);
+                IPublishedContent? doc = umbracoContext.Content?.GetById(pageId);
 
                 if (doc != null)
                 {

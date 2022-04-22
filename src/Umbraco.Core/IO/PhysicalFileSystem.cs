@@ -330,9 +330,9 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="path">The filesystem-relative path.</param>
         /// <returns>The URL.</returns>
         /// <remarks>All separators are forward-slashes.</remarks>
-        public string GetUrl(string path)
+        public string GetUrl(string? path)
         {
-            path = EnsureUrlSeparatorChar(path).Trim(Constants.CharArrays.ForwardSlash);
+            path = EnsureUrlSeparatorChar(path ?? string.Empty).Trim(Constants.CharArrays.ForwardSlash);
             return _rootUrl + "/" + path;
         }
 

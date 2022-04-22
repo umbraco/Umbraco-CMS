@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Cms.Core.Models
 {
     public interface IPropertyCollection : IEnumerable<IProperty>, IDeepCloneable, INotifyCollectionChanged
     {
-        bool TryGetValue(string propertyTypeAlias, out IProperty property);
+        bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property);
         bool Contains(string key);
 
         /// <summary>
@@ -21,12 +22,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the property with the specified alias.
         /// </summary>
-        IProperty this[string name] { get; }
+        IProperty? this[string name] { get; }
 
         /// <summary>
         /// Gets the property at the specified index.
         /// </summary>
-        IProperty this[int index] { get; }
+        IProperty? this[int index] { get; }
 
         /// <summary>
         /// Adds or updates a property.

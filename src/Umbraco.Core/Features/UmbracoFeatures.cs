@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Features
         /// <summary>
         /// Determines whether a controller is enabled.
         /// </summary>
-        public bool IsControllerEnabled(Type feature)
+        public bool IsControllerEnabled(Type? feature)
         {
             if (typeof(IUmbracoFeature).IsAssignableFrom(feature))
                 return Disabled.Controllers.Contains(feature) == false;

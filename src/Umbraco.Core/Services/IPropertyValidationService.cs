@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Validates the content item's properties pass validation rules
         /// </summary>
-        bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact impact);
+        bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact);
 
         /// <summary>
         /// Gets a value indicating whether the property has valid values.
@@ -23,17 +23,17 @@ namespace Umbraco.Cms.Core.Services
         IEnumerable<ValidationResult> ValidatePropertyValue(
             IDataEditor editor,
             IDataType dataType,
-            object postedValue,
+            object? postedValue,
             bool isRequired,
-            string validationRegExp,
-            string isRequiredMessage,
-            string validationRegExpMessage);
+            string? validationRegExp,
+            string? isRequiredMessage,
+            string? validationRegExpMessage);
 
         /// <summary>
         /// Validates a property value.
         /// </summary>
         IEnumerable<ValidationResult> ValidatePropertyValue(
             IPropertyType propertyType,
-            object postedValue);
+            object? postedValue);
     }
 }

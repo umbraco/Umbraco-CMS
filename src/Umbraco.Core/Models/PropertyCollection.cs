@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
@@ -123,7 +124,7 @@ namespace Umbraco.Cms.Core.Models
         {
             for (var i = 0; i < Count; i++)
             {
-                if (this[i].Alias.InvariantEquals(key))
+                if (this[i].Alias?.InvariantEquals(key) ?? false)
                     return i;
             }
             return -1;
@@ -131,13 +132,13 @@ namespace Umbraco.Cms.Core.Models
 
         protected override string GetKeyForItem(IProperty item)
         {
-            return item.Alias;
+            return item.Alias!;
         }
 
         /// <summary>
         /// Gets the property with the specified PropertyType.
         /// </summary>
-        internal IProperty this[IPropertyType propertyType]
+        internal IProperty? this[IPropertyType propertyType]
         {
             get
             {
@@ -145,7 +146,7 @@ namespace Umbraco.Cms.Core.Models
             }
         }
 
-        public bool TryGetValue(string propertyTypeAlias, out IProperty property)
+        public bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property)
         {
             property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             return property != null;
@@ -154,7 +155,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Occurs when the collection changes.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
@@ -187,7 +188,14 @@ namespace Umbraco.Cms.Core.Models
             var typeAliases = propertyTypesA.Select(x => x.Alias);
             var remove = thisAliases.Except(typeAliases).ToArray();
             foreach (var alias in remove)
-                Remove(alias);
+            {
+                if (alias is not null)
+                {
+                    Remove(alias);
+                }
+
+            }
+
 
             foreach (var propertyType in propertyTypesA)
                 Add(new Property(propertyType));

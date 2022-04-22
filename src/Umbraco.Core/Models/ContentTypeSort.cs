@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the Id of the ContentType
         /// </summary>
-        public Lazy<int> Id { get; set; }
+        public Lazy<int> Id { get; set; } = new Lazy<int>(() => 0);
 
         /// <summary>
         /// Gets or sets the Sort Order of the ContentType
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the Alias of the ContentType
         /// </summary>
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
 
 
         public object DeepClone()
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Models
             return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the editor view.
         /// </summary>
-        string View { get; }
+        string? View { get; }
 
         /// <summary>
         /// Gets the type of the value.
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="value">The property value.</param>
         /// <param name="required">A value indicating whether the property value is required.</param>
         /// <param name="format">A specific format (regex) that the property value must respect.</param>
-        IEnumerable<ValidationResult> Validate(object value, bool required, string format);
+        IEnumerable<ValidationResult> Validate(object? value, bool required, string? format);
 
         /// <summary>
         /// Gets the validators to use to validate the edited value.
@@ -54,12 +54,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Converts a value posted by the editor to a property value.
         /// </summary>
-        object FromEditor(ContentPropertyData editorValue, object currentValue);
+        object? FromEditor(ContentPropertyData editorValue, object? currentValue);
 
         /// <summary>
         /// Converts a property value to a value for the editor.
         /// </summary>
-        object ToEditor(IProperty property, string culture = null, string segment = null);
+        object? ToEditor(IProperty property, string? culture = null, string? segment = null);
 
         // TODO: / deal with this when unplugging the xml cache
         // why property vs propertyType? services should be injected! etc...
@@ -80,6 +80,6 @@ namespace Umbraco.Cms.Core.Models
         /// <returns></returns>
         XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
-        string ConvertDbToString(IPropertyType propertyType, object value);
+        string ConvertDbToString(IPropertyType propertyType, object? value);
     }
 }

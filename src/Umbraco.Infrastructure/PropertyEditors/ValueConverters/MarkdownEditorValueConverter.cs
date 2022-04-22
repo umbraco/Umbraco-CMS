@@ -31,10 +31,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
-            var sourceString = source.ToString();
+            var sourceString = source.ToString()!;
 
             // ensures string is parsed for {localLink} and URLs are resolved correctly
             sourceString = _localLinkParser.EnsureInternalLinks(sourceString, preview);
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return sourceString;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // convert markup to HTML for frontend rendering.
             // source should come from ConvertSource and be a string (or null) already
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
             return inter?.ToString() ?? string.Empty;

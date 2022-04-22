@@ -8,6 +8,6 @@
         /// <summary>
         /// Gets or sets the current <see cref="VariationContext"/>.
         /// </summary>
-        VariationContext VariationContext { get; set; }
+        VariationContext? VariationContext { get; set; }
     }
 }

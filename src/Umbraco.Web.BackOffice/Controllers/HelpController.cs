@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class HelpController : UmbracoAuthorizedJsonController
     {
         private readonly ILogger<HelpController> _logger;
-        private HelpPageSettings _helpPageSettings;
+        private HelpPageSettings? _helpPageSettings;
 
         [Obsolete("Use constructor that takes IOptions<HelpPageSettings>")]
         public HelpController(ILogger<HelpController> logger)
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _helpPageSettings = settings;
         }
 
-        private static HttpClient _httpClient;
+        private static HttpClient? _httpClient;
 
         public async Task<List<HelpPage>> GetContextHelpForPage(string section, string tree, string baseUrl = "https://our.umbraco.com")
         {
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private bool IsAllowedUrl(string url)
         {
-            if (_helpPageSettings.HelpPageUrlAllowList is null ||
+            if (_helpPageSettings?.HelpPageUrlAllowList is null ||
                 _helpPageSettings.HelpPageUrlAllowList.Contains(url))
             {
                 return true;
@@ -97,16 +97,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class HelpPage
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataMember(Name = "url")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         [DataMember(Name = "type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
     }
 }

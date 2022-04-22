@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return new ContentPickerConfigurationEditor(_ioHelper);
         }
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute!);
 
         internal class ContentPickerPropertyValueEditor  : DataValueEditor, IDataValueReference
         {
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var asString = value is string str ? str : value?.ToString();
 

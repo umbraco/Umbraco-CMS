@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.Common.Security
         private readonly IMemberUserStore _store;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private MemberIdentityUser _currentMember;
+        private MemberIdentityUser? _currentMember;
 
         public MemberManager(
             IIpResolver ipResolver,
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public async Task<bool> IsMemberAuthorizedAsync(IEnumerable<string> allowTypes = null, IEnumerable<string> allowGroups = null, IEnumerable<int> allowMembers = null)
+        public async Task<bool> IsMemberAuthorizedAsync(IEnumerable<string>? allowTypes = null, IEnumerable<string>? allowGroups = null, IEnumerable<int>? allowMembers = null)
         {
             if (allowTypes == null)
             {
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Web.Common.Security
             }
             else
             {
-                MemberIdentityUser currentMember = await GetCurrentMemberAsync();
+                MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
 
                 // If a member could not be resolved from the provider, we are clearly not authorized and can break right here
                 if (currentMember == null)
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 if (allowTypesList.Any(allowType => allowType != string.Empty))
                 {
                     // Allow only if member's type is in list
-                    allowAction = allowTypesList.Select(x => x.ToLowerInvariant()).Contains(currentMember.MemberTypeAlias.ToLowerInvariant());
+                    allowAction = allowTypesList.Select(x => x.ToLowerInvariant()).Contains(currentMember.MemberTypeAlias?.ToLowerInvariant());
                 }
 
                 // If specific members defined, check member is of one of those
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <inheritdoc />
         public bool IsLoggedIn()
         {
-            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            HttpContext? httpContext = _httpContextAccessor.HttpContext;
             return httpContext?.User.Identity?.IsAuthenticated ?? false;
         }
 
@@ -160,13 +160,13 @@ namespace Umbraco.Cms.Web.Common.Security
             foreach (var path in paths)
             {
                 //this is a cached call
-                result[path] = _publicAccessService.IsProtected(path);
+                result[path] = _publicAccessService.IsProtected(path).Success;
             }
             return Task.FromResult((IReadOnlyDictionary<string, bool>)result);
         }
 
         /// <inheritdoc />
-        public async Task<MemberIdentityUser> GetCurrentMemberAsync()
+        public async Task<MemberIdentityUser?> GetCurrentMemberAsync()
         {
             if (_currentMember == null)
             {
@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 {
                     return null;
                 }
-                _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext.User);
+                _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User);
             }
             return _currentMember;
         }
@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <returns></returns>
         private async Task<bool> HasAccessAsync(string path)
         {
-            MemberIdentityUser currentMember = await GetCurrentMemberAsync();
+            MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
             if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
             {
                 return false;
@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Web.Common.Security
         private async Task<IReadOnlyDictionary<string, bool>> HasAccessAsync(IEnumerable<string> paths)
         {
             var result = new Dictionary<string, bool>();
-            MemberIdentityUser currentMember = await GetCurrentMemberAsync();
+            MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
 
             if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
             {
@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Web.Common.Security
             }
 
             // ensure we only lookup user roles once
-            IList<string> userRoles = null;
+            IList<string>? userRoles = null;
             async Task<IList<string>> getUserRolesAsync()
             {
                 if (userRoles != null)
@@ -232,6 +232,6 @@ namespace Umbraco.Cms.Web.Common.Security
             return result;
         }
 
-        public IPublishedContent AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
+        public IPublishedContent? AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
     }
 }

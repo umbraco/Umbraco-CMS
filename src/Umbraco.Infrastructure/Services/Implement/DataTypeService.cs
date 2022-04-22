@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Containers
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public EntityContainer GetContainer(int containerId)
+        public EntityContainer? GetContainer(int containerId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public EntityContainer GetContainer(Guid containerId)
+        public EntityContainer? GetContainer(Guid containerId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -120,13 +120,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
+        public IEnumerable<EntityContainer>? GetContainers(IDataType dataType)
         {
             var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
-                    return asInt ? asInt.Result : int.MinValue;
+                    return asInt.Success ? asInt.Result : int.MinValue;
                 })
                 .Where(x => x != int.MinValue && x != dataType.Id)
                 .ToArray();
@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return GetContainers(ancestorIds);
         }
 
-        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
+        public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -177,7 +177,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // 'container' here does not know about its children, so we need
                 // to get it again from the entity repository, as a light entity
                 var entity = _entityRepository.Get(container.Id);
-                if (entity.HasChildren)
+                if (entity?.HasChildren ?? false)
                 {
                     scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -254,11 +254,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(string name)
+        public IDataType? GetDataType(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name)).FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
                 return dataType;
             }
@@ -269,7 +269,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(int id)
+        public IDataType? GetDataType(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -284,12 +284,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataType(Guid id)
+        public IDataType? GetDataType(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.Key == id);
-                var dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(query)?.FirstOrDefault();
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
                 return dataType;
             }
@@ -300,12 +300,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
-        public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
+        public IEnumerable<IDataType>? GetByEditorAlias(string propertyEditorAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
                 var dataType = _dataTypeRepository.Get(query);
+                if (dataType is null)
+                {
+                    return null;
+                }
                 ConvertMissingEditorsOfDataTypesToLabels(dataType);
                 return dataType;
             }
@@ -316,17 +320,22 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        public IEnumerable<IDataType> GetAll(params int[] ids)
+        public IEnumerable<IDataType>? GetAll(params int[] ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var dataTypes = _dataTypeRepository.GetMany(ids);
+                if (dataTypes is null)
+                {
+                    return null;
+                }
+
                 ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
                 return dataTypes;
             }
         }
 
-        private void ConvertMissingEditorOfDataTypeToLabel(IDataType dataType)
+        private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
         {
             if (dataType == null)
             {
@@ -348,7 +357,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
+        public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moveInfo = new List<MoveEventInfo<IDataType>>();
@@ -366,7 +375,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 try
                 {
-                    EntityContainer container = null;
+                    EntityContainer? container = null;
                     if (parentId > 0)
                     {
                         container = _dataTypeContainerRepository.Get(parentId);
@@ -492,10 +501,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     foreach (var propertyGroup in contentType.PropertyGroups)
                     {
-                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeId == dataType.Id).ToList();
-                        foreach (var propertyType in types)
+                        var types = propertyGroup.PropertyTypes?.Where(x => x.DataTypeId == dataType.Id).ToList();
+                        if (types is not null)
                         {
-                            propertyGroup.PropertyTypes.Remove(propertyType);
+                            foreach (var propertyType in types)
+                            {
+                                propertyGroup.PropertyTypes?.Remove(propertyType);
+                            }
                         }
                     }
 

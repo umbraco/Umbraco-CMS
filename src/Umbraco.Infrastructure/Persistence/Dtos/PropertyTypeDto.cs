@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     [ExplicitColumns]
     internal class PropertyTypeDto
     {
-        private string _alias;
+        private string? _alias;
 
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 100)]
@@ -31,11 +31,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeAlias")]
         [Column("Alias")]
-        public string Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
+        public string? Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
 
         [Column("Name")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("sortOrder")]
         [Constraint(Default = "0")]
@@ -48,21 +48,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("mandatoryMessage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
-        public string MandatoryMessage { get; set; }
+        public string? MandatoryMessage { get; set; }
 
         [Column("validationRegExp")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string ValidationRegExp { get; set; }
+        public string? ValidationRegExp { get; set; }
 
         [Column("validationRegExpMessage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
-        public string ValidationRegExpMessage { get; set; }
+        public string? ValidationRegExpMessage { get; set; }
 
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(2000)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("labelOnTop")]
         [Constraint(Default = "0")]
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
-        public DataTypeDto DataTypeDto { get; set; }
+        public DataTypeDto DataTypeDto { get; set; } = null!;
 
         [Column("UniqueID")]
         [NullSetting(NullSetting = NullSettings.NotNull)]

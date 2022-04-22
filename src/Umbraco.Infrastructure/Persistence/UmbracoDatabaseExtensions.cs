@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// Gets a dictionary of key/values directly from the database, no scope, nothing.
         /// </summary>
         /// <remarks>Used by <see cref="CoreRuntimeBootstrapper"/> to determine the runtime state.</remarks>
-        public static IReadOnlyDictionary<string, string> GetFromKeyValueTable(this IUmbracoDatabase database, string keyPrefix)
+        public static IReadOnlyDictionary<string, string?>? GetFromKeyValueTable(this IUmbracoDatabase database, string keyPrefix)
         {
             if (database is null) return null;
 
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 .Where(whereParam, keyPrefix + sqlSyntax.GetWildcardPlaceholder());
 
             return database.Fetch<KeyValueDto>(sql)
-                .ToDictionary(x => x.Key, x => x.Value);
+                .ToDictionary(x => x.Key!, x => x.Value);
         }
 
 

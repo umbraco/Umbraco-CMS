@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             int nodeId;
             if (requirement.NodeId.HasValue == false)
             {
-                if (!HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out StringValues routeVal))
+                if (HttpContextAccessor.HttpContext is null || requirement.QueryStringName is null || !HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out StringValues routeVal))
                 {
                     // Must succeed this requirement since we cannot process it
                     return Task.FromResult(true);
@@ -61,11 +61,11 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
 
             ContentPermissions.ContentAccess permissionResult = _contentPermissions.CheckPermissions(
                 nodeId,
-                BackOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                out IContent contentItem,
+                BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+                out IContent? contentItem,
                 new[] { requirement.PermissionToCheck });
 
-            if (contentItem != null)
+            if (HttpContextAccessor.HttpContext is not null && contentItem is not null)
             {
                 // Store the content item in request cache so it can be resolved in the controller without re-looking it up.
                 HttpContextAccessor.HttpContext.Items[typeof(IContent).ToString()] = contentItem;

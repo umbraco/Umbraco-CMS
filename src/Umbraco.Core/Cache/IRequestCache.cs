@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public interface IRequestCache : IAppCache, IEnumerable<KeyValuePair<string, object>>
+    public interface IRequestCache : IAppCache, IEnumerable<KeyValuePair<string, object?>>
     {
-        bool Set(string key, object value);
+        bool Set(string key, object? value);
         bool Remove(string key);
 
         /// <summary>

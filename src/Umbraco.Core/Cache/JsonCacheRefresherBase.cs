@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         /// <param name="json">The json payload.</param>
         /// <returns>The deserialized object payload.</returns>
-        public TJsonPayload[] Deserialize(string json)
+        public TJsonPayload[]? Deserialize(string json)
         {
             return JsonSerializer.Deserialize<TJsonPayload[]>(json);
         }

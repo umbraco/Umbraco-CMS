@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// </summary>
         /// <param name="authenticationType"></param>
         /// <returns></returns>
-        Task<BackOfficeExternaLoginProviderScheme> GetAsync(string authenticationType);
+        Task<BackOfficeExternaLoginProviderScheme?> GetAsync(string authenticationType);
 
         /// <summary>
         /// Get all registered <see cref="BackOfficeExternalLoginProvider"/>
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// </summary>
         /// <param name="manager"></param>
         /// <returns></returns>
-        string GetAutoLoginProvider();
+        string? GetAutoLoginProvider();
 
         /// <summary>
         /// Returns true if there is any external provider that has the Deny Local Login option configured

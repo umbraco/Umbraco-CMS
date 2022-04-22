@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Cms.Core
 {
@@ -34,7 +35,7 @@ namespace Umbraco.Cms.Core
         public static Udi Parse(string s)
         {
             ParseInternal(s, false, false, out var udi);
-            return udi;
+            return udi!;
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace Umbraco.Cms.Core
         public static Udi Parse(string s, bool knownTypes)
         {
             ParseInternal(s, false, knownTypes, out var udi);
-            return udi;
+            return udi!;
         }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Umbraco.Cms.Core
         /// <param name="s">The string to convert.</param>
         /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
         /// <returns>A boolean value indicating whether the string could be parsed.</returns>
-        public static bool TryParse(string s, out Udi udi)
+        public static bool TryParse(string s, [MaybeNullWhen(returnValue: false)] out Udi udi)
         {
             return ParseInternal(s, true, false, out udi);
         }
@@ -73,8 +74,8 @@ namespace Umbraco.Cms.Core
         /// <param name="s">The string to convert.</param>
         /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
         /// <returns>A boolean value indicating whether the string could be parsed.</returns>
-        public static bool TryParse<T>(string s, out T udi)
-            where T : Udi
+        public static bool TryParse<T>(string? s, [MaybeNullWhen(returnValue: false)] out T udi)
+            where T : Udi?
         {
             var result = ParseInternal(s, true, false, out var parsed);
             if (result && parsed is T)
@@ -101,18 +102,16 @@ namespace Umbraco.Cms.Core
         /// <para>If <paramref name="knownTypes"/> is <c>true</c>, assemblies are not scanned for types,
         /// and therefore only builtin types may be known. Unless scanning already took place.</para>
         /// </remarks>
-        public static bool TryParse(string s, bool knownTypes, out Udi udi)
+        public static bool TryParse(string? s, bool knownTypes, [MaybeNullWhen(returnValue: false)] out Udi udi)
         {
             return ParseInternal(s, true, knownTypes, out udi);
         }
 
-        private static bool ParseInternal(string s, bool tryParse, bool knownTypes, out Udi udi)
+        private static bool ParseInternal(string? s, bool tryParse, bool knownTypes,[MaybeNullWhen(returnValue: false)] out Udi udi)
         {
             udi = null;
-            Uri uri;
-
             if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
-                || Uri.TryCreate(s, UriKind.Absolute, out uri) == false)
+                || Uri.TryCreate(s, UriKind.Absolute, out var uri) == false)
             {
                 if (tryParse) return false;
                 throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));

@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// dictionary of key/values. For advanced editors which inherit from <see cref="ConfigurationEditor{TConfiguration}"/>,
         /// this will be an actual configuration object (ie an instance of <c>TConfiguration</c>.</para>
         /// </remarks>
-        object DefaultConfigurationObject { get; }
+        object? DefaultConfigurationObject { get; }
 
         /// <summary>
         /// Determines whether a configuration object is of the type expected by the configuration editor.
@@ -52,25 +52,25 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <remarks>Converting the configuration object to the serialized database value is
         /// achieved by simply serializing the configuration. See <see cref="ConfigurationEditor.ToDatabase"/>.</remarks>
-        object FromDatabase(string configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
+        object FromDatabase(string? configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
         /// <summary>
         /// Converts the values posted by the configuration editor into the actual configuration object.
         /// </summary>
         /// <param name="editorValues">The values posted by the configuration editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        object FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration);
+        object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration);
 
         /// <summary>
         /// Converts the configuration object to values for the configuration editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        IDictionary<string, object> ToConfigurationEditor(object configuration);
+        IDictionary<string, object> ToConfigurationEditor(object? configuration);
 
         /// <summary>
         /// Converts the configuration object to values for the value editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        IDictionary<string, object> ToValueEditor(object configuration);
+        IDictionary<string, object>? ToValueEditor(object? configuration);
     }
 }

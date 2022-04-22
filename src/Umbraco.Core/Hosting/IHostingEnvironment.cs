@@ -85,6 +85,6 @@ namespace Umbraco.Cms.Core.Hosting
         /// <summary>
         /// Ensures that the application know its main Url.
         /// </summary>
-        void EnsureApplicationMainUrl(Uri currentApplicationUrl);
+        void EnsureApplicationMainUrl(Uri? currentApplicationUrl);
     }
 }

@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Composing
             return sortedComposerTypes;
         }
 
-        internal Dictionary<Type, List<Type>> GetRequirements(bool throwOnMissing = true)
+        internal Dictionary<Type, List<Type>?> GetRequirements(bool throwOnMissing = true)
         {
             // create a list, remove those that cannot be enabled due to runtime level
             var composerTypeList = _composerTypes.ToList();
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Composing
             }
 
             // sort the composers according to their dependencies
-            var requirements = new Dictionary<Type, List<Type>>();
+            var requirements = new Dictionary<Type, List<Type>?>();
             foreach (var type in composerTypeList)
                 requirements[type] = null;
             foreach (var type in composerTypeList)
@@ -143,10 +143,10 @@ namespace Umbraco.Cms.Core.Composing
             return requirements;
         }
 
-        internal IEnumerable<Type> SortComposers(Dictionary<Type, List<Type>> requirements)
+        internal IEnumerable<Type> SortComposers(Dictionary<Type, List<Type>?> requirements)
         {
             // sort composers
-            var graph = new TopoGraph<Type, KeyValuePair<Type, List<Type>>>(kvp => kvp.Key, kvp => kvp.Value);
+            var graph = new TopoGraph<Type, KeyValuePair<Type, List<Type>?>>(kvp => kvp.Key, kvp => kvp.Value);
             graph.AddItems(requirements);
             List<Type> sortedComposerTypes;
             try
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Core.Composing
             return sortedComposerTypes;
         }
 
-        internal static string GetComposersReport(Dictionary<Type, List<Type>> requirements)
+        internal static string GetComposersReport(Dictionary<Type, List<Type>?> requirements)
         {
             var text = new StringBuilder();
             text.AppendLine("Composers & Dependencies:");
@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Core.Composing
                 types.Remove(kvp.Key);
         }
 
-        private static void GatherRequirementsFromAfterAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>> requirements, bool throwOnMissing = true)
+        private static void GatherRequirementsFromAfterAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>?> requirements, bool throwOnMissing = true)
         {
             // get 'require' attributes
             // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Core.Composing
                     if (implems.Count > 0)
                     {
                         if (requirements[type] == null) requirements[type] = new List<Type>();
-                        requirements[type].AddRange(implems);
+                        requirements[type]!.AddRange(implems);
                     }
                     else if (attr.Weak == false && throwOnMissing) // if explicitly set to !weak, is strong, else is weak
                         throw new Exception($"Broken composer dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
@@ -291,7 +291,7 @@ namespace Umbraco.Cms.Core.Composing
                     if (types.Contains(attr.RequiredType))
                     {
                         if (requirements[type] == null) requirements[type] = new List<Type>();
-                        requirements[type].Add(attr.RequiredType);
+                        requirements[type]!.Add(attr.RequiredType);
                     }
                     else if (attr.Weak != true && throwOnMissing) // if not explicitly set to weak, is strong
                         throw new Exception($"Broken composer dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
@@ -299,7 +299,7 @@ namespace Umbraco.Cms.Core.Composing
             }
         }
 
-        private static void GatherRequirementsFromBeforeAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>> requirements)
+        private static void GatherRequirementsFromBeforeAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>?> requirements)
         {
             // get 'required' attributes
             // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
@@ -318,7 +318,7 @@ namespace Umbraco.Cms.Core.Composing
                     foreach (var implem in implems)
                     {
                         if (requirements[implem] == null) requirements[implem] = new List<Type>();
-                        requirements[implem].Add(type);
+                        requirements[implem]!.Add(type);
                     }
                 }
                 // required by a class
@@ -327,7 +327,7 @@ namespace Umbraco.Cms.Core.Composing
                     if (types.Contains(attr.RequiringType))
                     {
                         if (requirements[attr.RequiringType] == null) requirements[attr.RequiringType] = new List<Type>();
-                        requirements[attr.RequiringType].Add(type);
+                        requirements[attr.RequiringType]!.Add(type);
                     }
                 }
             }
@@ -337,7 +337,7 @@ namespace Umbraco.Cms.Core.Composing
         {
             foreach (Type type in types)
             {
-                ConstructorInfo ctor = type.GetConstructor(Array.Empty<Type>());
+                ConstructorInfo? ctor = type.GetConstructor(Array.Empty<Type>());
 
                 if (ctor == null)
                 {

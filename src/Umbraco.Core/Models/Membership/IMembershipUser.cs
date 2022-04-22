@@ -15,14 +15,14 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <summary>
         /// Gets or sets the raw password value
         /// </summary>
-        string RawPasswordValue { get; set; }
+        string? RawPasswordValue { get; set; }
 
         /// <summary>
         /// The user's specific password config (i.e. algorithm type, etc...)
         /// </summary>
-        string PasswordConfiguration { get; set; }
+        string? PasswordConfiguration { get; set; }
 
-        string Comments { get; set; }
+        string? Comments { get; set; }
         bool IsApproved { get; set; }
         bool IsLockedOut { get; set; }
         DateTime? LastLoginDate { get; set; }
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <summary>
         /// Gets or sets the security stamp used by ASP.NET Identity
         /// </summary>
-        string SecurityStamp { get; set; }
+        string? SecurityStamp { get; set; }
 
         //object ProfileId { get; set; }
         //IEnumerable<object> Groups { get; set; }

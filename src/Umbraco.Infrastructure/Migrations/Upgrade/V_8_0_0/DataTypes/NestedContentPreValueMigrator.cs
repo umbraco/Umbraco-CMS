@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         }
         */
 
-        protected override object GetPreValueValue(PreValueDto preValue)
+        protected override object? GetPreValueValue(PreValueDto preValue)
         {
             if (preValue.Alias == "confirmDeletes" ||
                 preValue.Alias == "showIcons" ||
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
                 preValue.Alias == "maxItems")
                 return int.TryParse(preValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? (int?)i : null;
 
-            return preValue.Value.DetectIsJson() ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
+            return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
         }
     }
 }

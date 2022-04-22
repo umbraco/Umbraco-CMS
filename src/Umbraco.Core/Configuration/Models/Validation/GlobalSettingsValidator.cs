@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
             return ValidateOptionsResult.Success;
         }
 
-        private bool ValidateSmtpSetting(SmtpSettings value, out string message) =>
+        private bool ValidateSmtpSetting(SmtpSettings? value, out string message) =>
             ValidateOptionalEntry($"{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.Smtp)}", value, "A valid From email address is required", out message);
 
         private bool ValidateSqlWriteLockTimeOutSetting(TimeSpan configuredTimeOut, out string message) {

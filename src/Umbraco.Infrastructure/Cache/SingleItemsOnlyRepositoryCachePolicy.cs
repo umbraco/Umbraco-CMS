@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Cache
             : base(cache, scopeAccessor, options)
         { }
 
-        protected override void InsertEntities(TId[] ids, TEntity[] entities)
+        protected override void InsertEntities(TId[]? ids, TEntity[]? entities)
         {
             // nop
         }

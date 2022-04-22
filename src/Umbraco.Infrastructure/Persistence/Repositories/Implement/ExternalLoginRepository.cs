@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ForUpdate();
 
             // deduplicate the logins
-            logins = logins.LegacyDistinctBy(x => x.ProviderKey + x.LoginProvider).ToList();
+            logins = logins.LegacyDistinctBy(x => x!.ProviderKey + x.LoginProvider).ToList();
 
             var toUpdate = new Dictionary<int, IExternalLogin>();
             var toDelete = new List<int>();
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userOrMemberKey, i)));
         }
 
-        protected override IIdentityUserLogin PerformGet(int id)
+        protected override IIdentityUserLogin? PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { id = id });
@@ -105,9 +105,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return entity;
         }
 
-        protected override IEnumerable<IIdentityUserLogin> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IIdentityUserLogin> PerformGetAll(params int[]? ids)
         {
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 return PerformGetAllOnIds(ids);
             }
@@ -123,7 +123,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (ids.Any() == false) yield break;
             foreach (var id in ids)
             {
-                yield return Get(id);
+                IIdentityUserLogin? identityUserLogin = Get(id);
+                if (identityUserLogin is not null)
+                {
+                    yield return identityUserLogin;
+                }
             }
         }
 
@@ -202,7 +206,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken> query)
+        public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken>? query)
         {
             Sql<ISqlContext> sqlClause = GetBaseTokenQuery(false);
 
@@ -237,7 +241,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ToDictionary(x => x.LoginProvider, x => x.Id);
 
             // deduplicate the tokens
-            tokens = tokens.LegacyDistinctBy(x => x.LoginProvider + x.Name).ToList();
+            tokens = tokens.LegacyDistinctBy(x => x!.LoginProvider + x.Name).ToList();
 
             var providers = tokens.Select(x => x.LoginProvider).Distinct().ToList();
 
@@ -253,7 +257,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (ExternalLoginTokenDto existing in existingTokens)
             {
-                IExternalLoginToken found = tokens.FirstOrDefault(x =>
+                IExternalLoginToken? found = tokens.FirstOrDefault(x =>
                         x.LoginProvider.InvariantEquals(existing.ExternalLoginDto.LoginProvider)
                         && x.Name.InvariantEquals(existing.Name));
 

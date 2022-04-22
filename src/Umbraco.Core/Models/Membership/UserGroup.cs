@@ -18,9 +18,9 @@ namespace Umbraco.Cms.Core.Models.Membership
         private int? _startContentId;
         private int? _startMediaId;
         private string _alias;
-        private string _icon;
+        private string? _icon;
         private string _name;
-        private IEnumerable<string> _permissions;
+        private IEnumerable<string>? _permissions;
         private List<string> _sectionCollection;
 
         //Custom comparer for enumerable
@@ -34,6 +34,8 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// </summary>
         public UserGroup(IShortStringHelper shortStringHelper)
         {
+            _alias = string.Empty;
+            _name = string.Empty;
             _shortStringHelper = shortStringHelper;
             _sectionCollection = new List<string>();
         }
@@ -46,12 +48,12 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <param name="name"></param>
         /// <param name="permissions"></param>
         /// <param name="icon"></param>
-        public UserGroup(IShortStringHelper shortStringHelper, int userCount, string alias, string name, IEnumerable<string> permissions, string icon)
+        public UserGroup(IShortStringHelper shortStringHelper, int userCount, string? alias, string? name, IEnumerable<string> permissions, string? icon)
             : this(shortStringHelper)
         {
             UserCount = userCount;
-            _alias = alias;
-            _name = name;
+            _alias = alias ?? string.Empty;
+            _name = name ?? string.Empty;
             _permissions = permissions;
             _icon = icon;
         }
@@ -71,7 +73,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         [DataMember]
-        public string Icon
+        public string? Icon
         {
             get => _icon;
             set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
@@ -81,14 +83,14 @@ namespace Umbraco.Cms.Core.Models.Membership
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!, nameof(Alias));
         }
 
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
         /// </remarks>
         [DataMember]
-        public IEnumerable<string> Permissions
+        public IEnumerable<string>? Permissions
         {
             get => _permissions;
             set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);

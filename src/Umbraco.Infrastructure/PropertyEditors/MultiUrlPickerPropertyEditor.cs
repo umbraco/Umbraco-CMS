@@ -37,6 +37,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiUrlPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiUrlPickerValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiUrlPickerValueEditor>(Attribute!);
     }
 }

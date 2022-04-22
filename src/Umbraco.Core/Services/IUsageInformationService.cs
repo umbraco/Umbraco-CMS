@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Core.Services
 {
     public interface IUsageInformationService
     {
-        IEnumerable<UsageInformation> GetDetailed();
+        IEnumerable<UsageInformation>? GetDetailed();
     }
 }

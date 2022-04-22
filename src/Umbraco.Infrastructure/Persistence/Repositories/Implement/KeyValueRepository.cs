@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix)
-            => Get(Query<IKeyValue>().Where(entity => entity.Identifier.StartsWith(keyPrefix)))
-                .ToDictionary(x => x.Identifier, x => x.Value);
+        public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
+            => Get(Query<IKeyValue>().Where(entity => entity.Identifier!.StartsWith(keyPrefix)))?
+                .ToDictionary(x => x.Identifier!, x => x.Value);
 
         #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
 
@@ -57,18 +57,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 
-        protected override IKeyValue PerformGet(string id)
+        protected override IKeyValue? PerformGet(string? id)
         {
             var sql = GetBaseQuery(false).Where<KeyValueDto>(x => x.Key == id);
             var dto = Database.Fetch<KeyValueDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
 
-        protected override IEnumerable<IKeyValue> PerformGetAll(params string[] ids)
+        protected override IEnumerable<IKeyValue>? PerformGetAll(params string[]? ids)
         {
             var sql = GetBaseQuery(false).WhereIn<KeyValueDto>(x => x.Key, ids);
             var dtos = Database.Fetch<KeyValueDto>(sql);
-            return dtos.WhereNotNull().Select(Map);
+            return dtos?.WhereNotNull().Select(Map)!;
         }
 
         protected override IEnumerable<IKeyValue> PerformGetByQuery(IQuery<IKeyValue> query)
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IKeyValue>(sqlClause, query);
             var sql = translator.Translate();
-            return Database.Fetch<KeyValueDto>(sql).Select(Map);
+            return Database.Fetch<KeyValueDto>(sql).Select(Map).WhereNotNull();
         }
 
         protected override void PersistNewItem(IKeyValue entity)
@@ -88,10 +88,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IKeyValue entity)
         {
             var dto = Map(entity);
-            Database.Update(dto);
+            if (dto is not null)
+            {
+                Database.Update(dto);
+            }
         }
 
-        private static KeyValueDto Map(IKeyValue keyValue)
+        private static KeyValueDto? Map(IKeyValue keyValue)
         {
             if (keyValue == null) return null;
 
@@ -103,7 +106,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             };
         }
 
-        private static IKeyValue Map(KeyValueDto dto)
+        private static IKeyValue? Map(KeyValueDto dto)
         {
             if (dto == null) return null;
 

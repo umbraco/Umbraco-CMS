@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Core.Cache
     /// </summary>
     /// <typeparam name="TKey">The type of the dictionary key.</typeparam>
     public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
+        where TKey : notnull
     {
         private readonly ConcurrentDictionary<TKey, IAppPolicyCache> _caches = new ConcurrentDictionary<TKey, IAppPolicyCache>();
 
@@ -36,8 +37,8 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Tries to get a cache.
         /// </summary>
-        protected Attempt<IAppPolicyCache> Get(TKey key)
-            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache>();
+        protected Attempt<IAppPolicyCache?> Get(TKey key)
+            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache?>();
 
         /// <summary>
         /// Removes a cache.

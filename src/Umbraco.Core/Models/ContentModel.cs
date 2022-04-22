@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentModel"/> class with a content.
         /// </summary>
-        public ContentModel(IPublishedContent content) => Content = content ?? throw new ArgumentNullException(nameof(content));
+        public ContentModel(IPublishedContent? content) => Content = content ?? throw new ArgumentNullException(nameof(content));
 
         /// <summary>
         /// Gets the content.

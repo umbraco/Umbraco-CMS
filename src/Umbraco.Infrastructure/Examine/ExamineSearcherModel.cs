@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
     }
 

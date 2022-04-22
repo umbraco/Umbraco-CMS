@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Core.Models
     public class AuditEntry : EntityBase, IAuditEntry
     {
         private int _performingUserId;
-        private string _performingDetails;
-        private string _performingIp;
+        private string? _performingDetails;
+        private string? _performingIp;
         private int _affectedUserId;
-        private string _affectedDetails;
-        private string _eventType;
-        private string _eventDetails;
+        private string? _affectedDetails;
+        private string? _eventType;
+        private string? _eventDetails;
 
         /// <inheritdoc />
         public int PerformingUserId
@@ -27,14 +27,14 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string PerformingDetails
+        public string? PerformingDetails
         {
             get => _performingDetails;
             set => SetPropertyValueAndDetectChanges(value, ref _performingDetails, nameof(PerformingDetails));
         }
 
         /// <inheritdoc />
-        public string PerformingIp
+        public string? PerformingIp
         {
             get => _performingIp;
             set => SetPropertyValueAndDetectChanges(value, ref _performingIp, nameof(PerformingIp));
@@ -55,21 +55,21 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string AffectedDetails
+        public string? AffectedDetails
         {
             get => _affectedDetails;
             set => SetPropertyValueAndDetectChanges(value, ref _affectedDetails, nameof(AffectedDetails));
         }
 
         /// <inheritdoc />
-        public string EventType
+        public string? EventType
         {
             get => _eventType;
             set => SetPropertyValueAndDetectChanges(value, ref _eventType, nameof(EventType));
         }
 
         /// <inheritdoc />
-        public string EventDetails
+        public string? EventDetails
         {
             get => _eventDetails;
             set => SetPropertyValueAndDetectChanges(value, ref _eventDetails, nameof(EventDetails));

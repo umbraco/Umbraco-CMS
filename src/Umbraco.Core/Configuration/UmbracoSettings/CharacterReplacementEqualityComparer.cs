@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
 {
     public class CharacterReplacementEqualityComparer : IEqualityComparer<IChar>
     {
-        public bool Equals(IChar x, IChar y)
+        public bool Equals(IChar? x, IChar? y)
         {
             if (ReferenceEquals(x, y))
             {

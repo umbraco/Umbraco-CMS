@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, TreeTitle = "Stylesheets", SortOrder = 9, TreeGroup = Constants.Trees.Groups.Templating)]
     public class StylesheetsTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem { get; }
+        protected override IFileSystem? FileSystem { get; }
 
         private static readonly string[] ExtensionsStatic = { "css" };
 

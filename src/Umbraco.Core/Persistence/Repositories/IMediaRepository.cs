@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IMediaRepository : IContentRepository<int, IMedia>, IReadRepository<Guid, IMedia>
     {
-        IMedia GetMediaByPath(string mediaPath);
+        IMedia? GetMediaByPath(string mediaPath);
         bool RecycleBinSmells();
     }
 }

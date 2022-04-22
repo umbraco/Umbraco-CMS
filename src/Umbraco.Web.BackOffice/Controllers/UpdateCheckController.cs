@@ -41,11 +41,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [UpdateCheckResponseFilter]
-        public async Task<UpgradeCheckResponse> GetCheck()
+        public async Task<UpgradeCheckResponse?> GetCheck()
         {
             var updChkCookie = _cookieManager.GetCookieValue("UMB_UPDCHK");
             var updateCheckCookie = updChkCookie ?? string.Empty;
-            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin())
+            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false))
             {
                 try
                 {

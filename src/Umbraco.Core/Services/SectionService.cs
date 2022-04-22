@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public ISection GetByAlias(string appAlias)
+        public ISection? GetByAlias(string appAlias)
             => GetSections().FirstOrDefault(t => t.Alias.Equals(appAlias, StringComparison.OrdinalIgnoreCase));
     }
 }

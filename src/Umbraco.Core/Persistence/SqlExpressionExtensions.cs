@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Persistence
 
         public static bool SqlEquals(this string str, string txt, TextColumnType columnType) => str.InvariantEquals(txt);
 
-        public static bool SqlStartsWith(this string str, string txt, TextColumnType columnType) => str.InvariantStartsWith(txt);
+        public static bool SqlStartsWith(this string? str, string txt, TextColumnType columnType) => str?.InvariantStartsWith(txt) ?? false;
 
         public static bool SqlEndsWith(this string str, string txt, TextColumnType columnType) => str.InvariantEndsWith(txt);
 #pragma warning restore IDE0060 // Remove unused parameter

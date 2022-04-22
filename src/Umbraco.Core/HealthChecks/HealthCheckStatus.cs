@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.HealthChecks
         /// The status description if one is necessary
         /// </summary>
         [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// This is optional but would allow a developer to specify a path to an angular HTML view
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.HealthChecks
         /// to configure how an action is executed
         /// </summary>
         [DataMember(Name = "view")]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         /// <summary>
         /// The status type
@@ -53,6 +53,6 @@ namespace Umbraco.Cms.Core.HealthChecks
         /// This is optional but would allow a developer to specify a link that is shown as a "read more" button.
         /// </summary>
         [DataMember(Name = "readMoreLink")]
-        public string ReadMoreLink { get; set; }
+        public string? ReadMoreLink { get; set; }
     }
 }

@@ -680,7 +680,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreateDataTypeData()
         {
-            void InsertDataTypeDto(int id, string editorAlias, string dbType, string configuration = null)
+            void InsertDataTypeDto(int id, string editorAlias, string dbType, string? configuration = null)
             {
                 var dataTypeDto = new DataTypeDto
                 {
@@ -1036,17 +1036,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 alwaysInsert = true;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.None)
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.None)
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }

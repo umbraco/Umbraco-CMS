@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "name", IsRequired = true)]
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
 
-        int IComparable.CompareTo(object obj)
+        int IComparable.CompareTo(object? obj)
         {
-            return String.Compare(Name, ((UserProfile)obj).Name, StringComparison.Ordinal);
+            return String.Compare(Name, ((UserProfile?)obj)?.Name, StringComparison.Ordinal);
         }
     }
 }

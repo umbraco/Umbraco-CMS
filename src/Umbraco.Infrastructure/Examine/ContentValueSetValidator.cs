@@ -14,8 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValidator
     {
-        private readonly IPublicAccessService _publicAccessService;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly IPublicAccessService? _publicAccessService;
+        private readonly IScopeProvider? _scopeProvider;
         private const string PathKey = "path";
         private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Content, IndexTypes.Media };
         protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 // explicit scope since we may be in a background thread
                 using (_scopeProvider.CreateScope(autoComplete: true))
                 {
-                    if (_publicAccessService.IsProtected(path))
+                    if (_publicAccessService.IsProtected(path).Success)
                     {
                         return false;
                     }
@@ -76,16 +76,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         // used for tests
         public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null,
-            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
             : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
         {
         }
 
         public ContentValueSetValidator(bool publishedValuesOnly, bool supportProtectedContent,
-            IPublicAccessService publicAccessService,
-            IScopeProvider scopeProvider,
+            IPublicAccessService? publicAccessService,
+            IScopeProvider? scopeProvider,
             int? parentId = null,
-            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
             : base(includeItemTypes, excludeItemTypes, null, null)
         {
             PublishedValuesOnly = publishedValuesOnly;
@@ -147,9 +147,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
             // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
             // We cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
             // because we need to remove anything that doesn't pass by protected content in the cases that umbraco data is moved to an illegal parent.
-            if (!ValidatePath(path, valueSet.Category)
-                || !ValidateRecycleBin(path, valueSet.Category)
-                || !ValidateProtectedContent(path, valueSet.Category))
+            if (!ValidatePath(path!, valueSet.Category)
+                || !ValidateRecycleBin(path!, valueSet.Category)
+                || !ValidateProtectedContent(path!, valueSet.Category))
                 return ValueSetValidationResult.Filtered;
 
             return isFiltered ? ValueSetValidationResult.Filtered : ValueSetValidationResult.Valid;

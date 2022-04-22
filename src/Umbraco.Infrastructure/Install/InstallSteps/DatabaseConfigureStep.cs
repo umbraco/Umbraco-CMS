@@ -35,14 +35,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _databaseProviderMetadata = databaseProviderMetadata;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel databaseSettings)
+        public override Task<InstallSetupResult?> ExecuteAsync(DatabaseModel databaseSettings)
         {
             if (!_databaseBuilder.ConfigureDatabaseConnection(databaseSettings, isTrialRun: false))
             {
                 throw new InstallException("Could not connect to the database");
             }
 
-            return Task.FromResult<InstallSetupResult>(null);
+            return Task.FromResult<InstallSetupResult?>(null);
         }
 
         public override object ViewModel

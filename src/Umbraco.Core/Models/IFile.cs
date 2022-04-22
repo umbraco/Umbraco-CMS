@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the Name of the File including extension
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Gets the Alias of the File, which is the name without the extension
@@ -36,12 +36,12 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
-        string Content { get; set; }
+        string? Content { get; set; }
 
         /// <summary>
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
-        string VirtualPath { get; set; }
+        string? VirtualPath { get; set; }
 
     }
 }

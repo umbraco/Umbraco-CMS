@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out var propertyEditor))
                     return false;
 
-                return _compressionOptions.IsCompressed(content, propertyType, propertyEditor, published);
+                return _compressionOptions.IsCompressed(content, propertyType, propertyEditor!, published);
             });
 
             return compressedStorage;
