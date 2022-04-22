@@ -67,10 +67,10 @@ namespace Umbraco.Cms.Core.Services
                         query = Query<IMember>();
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>().Where(x => x.IsLockedOut == true);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsApproved && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>().Where(x => x.IsApproved == true);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(countType));
@@ -748,13 +748,9 @@ namespace Umbraco.Cms.Core.Services
         #region Save
 
         /// <inheritdoc />
+        [Obsolete("This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
         public void SetLastLogin(string username, DateTime date)
         {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _memberRepository.SetLastLogin(username, date);
-                scope.Complete();
-            }
         }
 
         /// <inheritdoc />
