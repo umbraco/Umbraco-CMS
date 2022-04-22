@@ -109,13 +109,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public bool IsLockedOut => Member.IsLockedOut;
 
-        public DateTime LastLockoutDate => Member.LastLockoutDate;
+        public DateTime? LastLockoutDate => Member.LastLockoutDate;
 
         public DateTime CreationDate => Member.CreateDate;
 
-        public DateTime LastLoginDate => Member.LastLoginDate;
+        public DateTime? LastLoginDate => Member.LastLoginDate;
 
-        public DateTime LastPasswordChangedDate => Member.LastPasswordChangeDate;
+        public DateTime? LastPasswordChangedDate => Member.LastPasswordChangeDate;
 
         #endregion
     }

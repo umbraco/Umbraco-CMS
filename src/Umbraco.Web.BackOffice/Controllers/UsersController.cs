@@ -862,7 +862,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Check user hasn't logged in.  If they have they may have made content changes which will mean
             // the Id is associated with audit trails, versions etc. and can't be removed.
-            if (user.LastLoginDate != default(DateTime))
+            if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
             {
                 return BadRequest();
             }

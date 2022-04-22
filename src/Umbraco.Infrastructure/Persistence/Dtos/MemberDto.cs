@@ -49,7 +49,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? EmailConfirmedDate { get; set; }
 
-        // TODO: It would be SOOOOO much better to store all core member data here instead of hiding it in Umbraco properties
+        [Column("failedPasswordAttempts")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? FailedPasswordAttempts { get; set; }
+
+        [Column("isLockedOut")]
+        [Constraint(Default = 0)]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public bool IsLockedOut { get; set; }
+
+        [Column("isApproved")]
+        [Constraint(Default = 1)]
+        public bool IsApproved { get; set; }
+
+        [Column("lastLoginDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastLoginDate { get; set; }
+
+        [Column("lastLockoutDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastLockoutDate { get; set; }
+
+        [Column("lastPasswordChangeDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastPasswordChangeDate { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]

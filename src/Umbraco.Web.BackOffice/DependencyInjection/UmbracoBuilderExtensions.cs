@@ -56,7 +56,8 @@ namespace Umbraco.Extensions
                 .AddLogViewer()
                 .AddExamine()
                 .AddExamineIndexes()
-                .AddControllersWithAmbiguousConstructors();
+                .AddControllersWithAmbiguousConstructors()
+                .AddSupplemenataryLocalizedTextFileSources();
 
         public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {

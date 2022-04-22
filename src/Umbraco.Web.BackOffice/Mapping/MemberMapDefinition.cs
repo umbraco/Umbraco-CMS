@@ -65,6 +65,8 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             //Membership
             target.Username = source.Username;
             target.Email = source.Email;
+            target.IsLockedOut = source.IsLockedOut;
+            target.IsApproved = source.IsApproved;
             target.MembershipProperties = _tabsAndPropertiesMapper.MapMembershipProperties(source, context);
         }
 
