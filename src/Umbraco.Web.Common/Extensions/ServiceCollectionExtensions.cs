@@ -20,7 +20,9 @@ using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using Umbraco.Cms.Web.Common.Logging.Enrichers;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Web.Common.Logging;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using ILogger = Serilog.ILogger;
 
 namespace Umbraco.Extensions
 {
@@ -105,9 +107,9 @@ namespace Umbraco.Extensions
             // Runtime logger setup
             ///////////////////////////////////////////////
 
-            services.AddSingleton<ReloadableLogger>(sp =>
+            services.AddSingleton(sp =>
             {
-                var logger = (ReloadableLogger)Log.Logger;
+                var logger = new RegisteredReloadableLogger(Log.Logger as ReloadableLogger);
 
                 logger.Reload(cfg =>
                 {
@@ -118,18 +120,19 @@ namespace Umbraco.Extensions
                     return cfg;
                 });
 
-                logger.Freeze();
-
                 return logger;
             });
 
             services.AddSingleton<Serilog.ILogger>(sp =>
-                sp.GetRequiredService<ReloadableLogger>().ForContext(new NoopEnricher()));
+            {
+                ILogger logger = sp.GetRequiredService<RegisteredReloadableLogger>().Logger;
+                return logger.ForContext(new NoopEnricher());
+            });
 
             services.AddSingleton<ILoggerFactory>(sp =>
             {
-                ReloadableLogger logger = sp.GetRequiredService<ReloadableLogger>();
-                return new SerilogLoggerFactory(logger, true);
+                ILogger logger = sp.GetRequiredService<RegisteredReloadableLogger>().Logger;
+                return new SerilogLoggerFactory(logger, false);
             });
 
             // Registered to provide two services...
