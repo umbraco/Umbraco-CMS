@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
@@ -147,7 +148,9 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, query);
 
             // imagine there is an existing writer, whilst elapsed time is < command timeout sqlite will busy loop
-            command.CommandTimeout = _timeout.Seconds;
+            // Important to note that if this value == 0 then Command.DefaultTimeout (30s) is used.
+            // Math.Ceiling such that (0 < totalseconds < 1) is rounded up to 1.
+            command.CommandTimeout = (int)Math.Ceiling(_timeout.TotalSeconds);
 
             try
             {
