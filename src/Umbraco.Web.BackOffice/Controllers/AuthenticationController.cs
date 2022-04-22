@@ -74,11 +74,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly WebRoutingSettings _webRoutingSettings;
 
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
         [ActivatorUtilitiesConstructor]
-        public AuthenticationController(
+          public AuthenticationController(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IBackOfficeUserManager backOfficeUserManager,
             IBackOfficeSignInManager signInManager,
@@ -97,7 +98,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeExternalLoginProviders externalAuthenticationOptions,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<WebRoutingSettings> webRoutingSettings)
+            IOptions<WebRoutingSettings> webRoutingSettings,
+            ITwoFactorLoginService twoFactorLoginService)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
@@ -118,9 +120,56 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
             _httpContextAccessor = httpContextAccessor;
             _webRoutingSettings = webRoutingSettings.Value;
+            _twoFactorLoginService = twoFactorLoginService;
         }
 
-        [Obsolete("Use constructor that also takes IHttpAccessor and IOptions<WebRoutingSettings>, scheduled for removal in V11")]
+        [Obsolete("Use constructor that takes all params, scheduled for removal in V11")]
+        public AuthenticationController(
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeUserManager backOfficeUserManager,
+            IBackOfficeSignInManager signInManager,
+            IUserService userService,
+            ILocalizedTextService textService,
+            IUmbracoMapper umbracoMapper,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<SecuritySettings> securitySettings,
+            ILogger<AuthenticationController> logger,
+            IIpResolver ipResolver,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IEmailSender emailSender,
+            ISmsSender smsSender,
+            IHostingEnvironment hostingEnvironment,
+            LinkGenerator linkGenerator,
+            IBackOfficeExternalLoginProviders externalAuthenticationOptions,
+            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<WebRoutingSettings> webRoutingSettings)
+            : this(
+                backofficeSecurityAccessor,
+                backOfficeUserManager,
+                signInManager,
+                userService,
+                textService,
+                umbracoMapper,
+                globalSettings,
+                securitySettings,
+                logger,
+                ipResolver,
+                passwordConfiguration,
+                emailSender,
+                smsSender,
+                hostingEnvironment,
+                linkGenerator,
+                externalAuthenticationOptions,
+                backOfficeTwoFactorOptions,
+                StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+        {
+
+        }
+
+        [Obsolete("Use constructor that takes all params, scheduled for removal in V11")]
         public AuthenticationController(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IBackOfficeUserManager backOfficeUserManager,
@@ -469,7 +518,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            var userFactors = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key);
+
             return new ObjectResult(userFactors);
         }
 

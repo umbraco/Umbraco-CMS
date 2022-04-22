@@ -181,6 +181,7 @@ namespace Umbraco.Cms.Core.Security
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                     var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
+                    var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
                     MemberDataChangeType memberChangeType = UpdateMemberProperties(found, user);
                     if (memberChangeType == MemberDataChangeType.FullSave)
@@ -202,6 +203,16 @@ namespace Umbraco.Cms.Core.Security
                                 x.LoginProvider,
                                 x.ProviderKey,
                                 x.UserData)));
+                    }
+
+                    if (isTokensPropertyDirty)
+                    {
+                        _externalLoginService.Save(
+                            found.Key,
+                            user.LoginTokens.Select(x => new ExternalLoginToken(
+                                x.LoginProvider,
+                                x.Name,
+                                x.Value)));
                     }
                 }
 
@@ -535,6 +546,37 @@ namespace Umbraco.Cms.Core.Security
             return found;
         }
 
+        /// <summary>
+        /// Overridden to support Umbraco's own data storage requirements
+        /// </summary>
+        /// <remarks>
+        /// The base class's implementation of this calls into FindTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+        /// tracking ORMs like EFCore.
+        /// </remarks>
+        /// <inheritdoc />
+        public override Task SetTokenAsync(MemberIdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            if (token == null)
+            {
+                user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
+            }
+            else
+            {
+                token.Value = value;
+            }
+
+            return Task.CompletedTask;
+        }
+
         private MemberIdentityUser AssignLoginsCallback(MemberIdentityUser user)
         {
             if (user != null)
@@ -555,7 +597,10 @@ namespace Umbraco.Cms.Core.Security
                 || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
                 || (identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
-                changeType = MemberDataChangeType.LoginOnly;
+                // If the LastLoginDate is default on the member we have to do a full save.
+                // This is because the umbraco property data for the member doesn't exist yet in this case
+                // meaning we can't just update that property data, but have to do a full save to create it
+                changeType = member.LastLoginDate == default ? MemberDataChangeType.FullSave : MemberDataChangeType.LoginOnly;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
                 DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();

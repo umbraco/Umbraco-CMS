@@ -46,7 +46,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
                 .Append<ContentTypeTemplatesContentAppFactory>()
-                .Append<MemberEditorContentAppFactory>();
+                .Append<MemberEditorContentAppFactory>()
+                .Append<DictionaryContentAppFactory>();
 
             // all built-in finders in the correct order,
             // devs can then modify this list on application startup
@@ -117,7 +118,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<Soundcloud>()
                 .Append<Issuu>()
                 .Append<Hulu>()
-                .Append<Giphy>();
+                .Append<Giphy>()
+                .Append<LottieFiles>();
             builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
             builder.BackOfficeAssets();
         }

@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Core.Composing
             IEnumerable<Assembly> assemblies = null,
             bool onlyConcreteClasses = true)
         {
-            var assemblyList = (assemblies ?? AssembliesToScan).ToList();
+            var assemblyList = assemblies ?? AssembliesToScan;
 
             return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses,
                 //the additional filter will ensure that any found types also have the attribute applied.
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns></returns>
         public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies = null, bool onlyConcreteClasses = true)
         {
-            var assemblyList = (assemblies ?? AssembliesToScan).ToList();
+            var assemblyList = assemblies ?? AssembliesToScan;
 
             return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses);
         }
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Core.Composing
             IEnumerable<Assembly> assemblies = null,
             bool onlyConcreteClasses = true)
         {
-            var assemblyList = (assemblies ?? AssembliesToScan).ToList();
+            var assemblyList = assemblies ?? AssembliesToScan;
 
             return GetClassesWithAttribute(attributeType, assemblyList, onlyConcreteClasses);
         }

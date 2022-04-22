@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
             ITelemetryService telemetryService)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
             _telemetryService = telemetryService;
@@ -58,9 +58,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 {
                     // Send data to LIVE telemetry
                     s_httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
-
-                    // Set a low timeout - no need to use a larger default timeout for this POST request
-                    s_httpClient.Timeout = new TimeSpan(0, 0, 1);
 
 #if DEBUG
                     // Send data to DEBUG telemetry service

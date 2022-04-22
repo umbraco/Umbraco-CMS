@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Runtime
 
                 if (_isMainDom.HasValue == false)
                 {
-                    throw new InvalidOperationException("Register called when MainDom has not been acquired");
+                    throw new InvalidOperationException("Register called before IsMainDom has been established");
                 }
                 else if (_isMainDom == false)
                 {
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 if (!_isMainDom.HasValue)
                 {
-                    throw new InvalidOperationException("MainDom has not been acquired yet");
+                    throw new InvalidOperationException("IsMainDom has not been established yet");
                 }
                 return _isMainDom.Value;
             }

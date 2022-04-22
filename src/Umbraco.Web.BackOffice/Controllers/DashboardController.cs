@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -19,10 +20,12 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -43,10 +46,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly ISiteIdentifierService _siteIdentifierService;
         private readonly ContentDashboardSettings _dashboardSettings;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
+        [ActivatorUtilitiesConstructor]
         public DashboardController(
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             AppCaches appCaches,
@@ -54,7 +60,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentDashboardSettings> dashboardSettings)
+            IOptions<ContentDashboardSettings> dashboardSettings,
+            ISiteIdentifierService siteIdentifierService)
 
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -63,7 +70,30 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;
             _shortStringHelper = shortStringHelper;
+            _siteIdentifierService = siteIdentifierService;
             _dashboardSettings = dashboardSettings.Value;
+        }
+
+
+        [Obsolete("Use the constructor that accepts ISiteIdentifierService")]
+        public DashboardController(
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            AppCaches appCaches,
+            ILogger<DashboardController> logger,
+            IDashboardService dashboardService,
+            IUmbracoVersion umbracoVersion,
+            IShortStringHelper shortStringHelper,
+            IOptions<ContentDashboardSettings> dashboardSettings)
+        : this(
+            backOfficeSecurityAccessor,
+            appCaches,
+            logger,
+            dashboardService,
+            umbracoVersion,
+            shortStringHelper,
+            dashboardSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
+        {
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -79,6 +109,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var language = user.Language;
             var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
             var isAdmin = user.IsAdmin();
+            _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
 
             if (!IsAllowedUrl(baseUrl))
             {
@@ -90,14 +121,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return JObject.Parse(errorJson);
             }
 
-            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteid={7}",
                 baseUrl,
                 _dashboardSettings.ContentDashboardPath,
                 section,
                 allowedSections,
                 language,
                 version,
-                isAdmin);
+                isAdmin,
+                siteIdentifier);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = _appCaches.RuntimeCache.GetCacheItem<JObject>(key);

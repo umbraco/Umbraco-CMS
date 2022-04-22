@@ -49,7 +49,14 @@
                     </div>
                 </ng-form>
             </div>
-            <br />
         </div>
+    </div>
+
+    <div style="margin-top: 15px;">
+        <umb-tracked-references id="vm.id" on-loading-complete="vm.checkingReferencesComplete()" hide-no-result="true" compact="true" show-descendants="true" hide-none-dependencies="true" on-warning="vm.onReferencesWarning()"></umb-tracked-references>
+    </div>
+
+    <div class="abstract umb-alert umb-alert--warning" ng-if="vm.warningText">
+        {{vm.warningText}}
     </div>
 </div>

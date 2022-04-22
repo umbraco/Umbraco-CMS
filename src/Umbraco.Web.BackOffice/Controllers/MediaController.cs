@@ -33,12 +33,9 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Authorization;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -676,10 +673,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 return new ActionResult<MediaItemDisplay>(parentIdResult.Result);
             }
+
             var parentId = parentIdResult.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
+            }
+
+            var isFolderAllowed = IsFolderCreationAllowedHere(parentId.Value);
+            if (isFolderAllowed == false)
+            {
+                return ValidationProblem(_localizedTextService.Localize("speechBubbles", "folderCreationNotAllowed"));
             }
 
             var f = _mediaService.CreateMedia(folder.Name, parentId.Value, Constants.Conventions.MediaTypes.Folder);
@@ -722,10 +726,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var tempFiles = new PostedFiles();
 
-
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (!string.IsNullOrEmpty(path))
             {
+                if (!IsFolderCreationAllowedHere(parentId.Value))
+                {
+                    AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
+                    return Ok(tempFiles);
+                }
 
                 var folders = path.Split(Constants.CharArrays.ForwardSlash);
 
@@ -735,7 +743,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     IMedia folderMediaItem;
 
                     //if uploading directly to media root and not a subfolder
-                    if (parentId == -1)
+                    if (parentId == Constants.System.Root)
                     {
                         //look for matching folder
                         folderMediaItem =
@@ -768,9 +776,48 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             _mediaService.Save(folderMediaItem);
                         }
                     }
+
                     //set the media root to the folder id so uploaded files will end there.
                     parentId = folderMediaItem.Id;
                 }
+            }
+
+            var mediaTypeAlias = string.Empty;
+            var allMediaTypes = _mediaTypeService.GetAll().ToList();
+            var allowedContentTypes = new HashSet<IMediaType>();
+
+            if (parentId != Constants.System.Root)
+            {
+                var mediaFolderItem = _mediaService.GetById(parentId.Value);
+                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
+
+                if (mediaFolderType != null)
+                {
+                    IMediaType mediaTypeItem = null;
+
+                    foreach (ContentTypeSort allowedContentType in mediaFolderType.AllowedContentTypes)
+                    {
+                        IMediaType checkMediaTypeItem = allMediaTypes.FirstOrDefault(x => x.Id == allowedContentType.Id.Value);
+                        allowedContentTypes.Add(checkMediaTypeItem);
+
+                        var fileProperty = checkMediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                        if (fileProperty != null)
+                        {
+                            mediaTypeItem = checkMediaTypeItem;
+                        }
+                    }
+
+                    //Only set the permission-based mediaType if we only allow 1 specific file under this parent.
+                    if (allowedContentTypes.Count == 1 && mediaTypeItem != null)
+                    {
+                        mediaTypeAlias = mediaTypeItem.Alias;
+                    }
+                }
+            }
+            else
+            {
+                var typesAllowedAtRoot = allMediaTypes.Where(x => x.AllowedAsRoot).ToList();
+                allowedContentTypes.UnionWith(typesAllowedAtRoot);
             }
 
             //get the files
@@ -780,71 +827,82 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (_contentSettings.IsFileAllowedForUpload(ext))
-                {
-                    var mediaType = Constants.Conventions.MediaTypes.File;
-
-                    if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
-                    {
-                        var mediaTypes = _mediaTypeService.GetAll();
-                        // Look up MediaTypes
-                        foreach (var mediaTypeItem in mediaTypes)
-                        {
-                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
-                            if (fileProperty != null)
-                            {
-                                var dataTypeKey = fileProperty.DataTypeKey;
-                                var dataType = _dataTypeService.GetDataType(dataTypeKey);
-
-                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig)
-                                {
-                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
-                                    if (fileExtensions != null)
-                                    {
-                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
-                                        {
-                                            mediaType = mediaTypeItem.Alias;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // If media type is still File then let's check if it's an image.
-                        if (mediaType == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
-                        {
-                            mediaType = Constants.Conventions.MediaTypes.Image;
-                        }
-                    }
-                    else
-                    {
-                        mediaType = contentTypeAlias;
-                    }
-
-                    var mediaItemName = fileName.ToFriendlyName();
-
-                    var f = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
-
-
-                    await using (var stream = formFile.OpenReadStream())
-                    {
-                        f.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
-                    }
-
-
-                    var saveResult = _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
-                    if (saveResult == false)
-                    {
-                        AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
-                    }
-                }
-                else
+                if (!_contentSettings.IsFileAllowedForUpload(ext))
                 {
                     tempFiles.Notifications.Add(new BackOfficeNotification(
                         _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
                         _localizedTextService.Localize("media", "disallowedFileType"),
                         NotificationStyle.Warning));
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(mediaTypeAlias))
+                {
+                    mediaTypeAlias = Constants.Conventions.MediaTypes.File;
+
+                    if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
+                    {
+                        // Look up MediaTypes
+                        foreach (var mediaTypeItem in allMediaTypes)
+                        {
+                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                            if (fileProperty == null)
+                            {
+                                continue;
+                            }
+
+                            var dataTypeKey = fileProperty.DataTypeKey;
+                            var dataType = _dataTypeService.GetDataType(dataTypeKey);
+
+                            if (dataType == null || dataType.Configuration is not IFileExtensionsConfig fileExtensionsConfig)
+                            {
+                                continue;
+                            }
+
+                            var fileExtensions = fileExtensionsConfig.FileExtensions;
+                            if (fileExtensions == null || fileExtensions.All(x => x.Value != ext))
+                            {
+                                continue;
+                            }
+
+                            mediaTypeAlias = mediaTypeItem.Alias;
+                            break;
+                        }
+
+                        // If media type is still File then let's check if it's an image.
+                        if (mediaTypeAlias == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
+                        {
+                            mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
+                        }
+                    }
+                    else
+                    {
+                        mediaTypeAlias = contentTypeAlias;
+                    }
+                }
+
+                if (allowedContentTypes.Any(x => x.Alias == mediaTypeAlias) == false)
+                {
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
+                        NotificationStyle.Warning));
+                    continue;
+                }
+
+                var mediaItemName = fileName.ToFriendlyName();
+
+                var createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+
+                await using (var stream = formFile.OpenReadStream())
+                {
+                    createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
+                }
+
+                var saveResult = _mediaService.Save(createdMediaItem, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                if (saveResult == false)
+                {
+                    AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
                 }
             }
 
@@ -859,6 +917,29 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return Ok(tempFiles);
+        }
+
+        private bool IsFolderCreationAllowedHere(int parentId)
+        {
+            var allMediaTypes = _mediaTypeService.GetAll().ToList();
+            var isFolderAllowed = false;
+            if (parentId == Constants.System.Root)
+            {
+                var typesAllowedAtRoot = allMediaTypes.Where(ct => ct.AllowedAsRoot).ToList();
+                isFolderAllowed = typesAllowedAtRoot.Any(x => x.Alias == Constants.Conventions.MediaTypes.Folder);
+            }
+            else
+            {
+                var parentMediaType = _mediaService.GetById(parentId);
+                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == parentMediaType.ContentType.Alias);
+                if (mediaFolderType != null)
+                {
+                    isFolderAllowed =
+                        mediaFolderType.AllowedContentTypes.Any(x => x.Alias == Constants.Conventions.MediaTypes.Folder);
+                }
+            }
+
+            return isFolderAllowed;
         }
 
         private IMedia FindInChildren(int mediaId, string nameToFind, string contentTypeAlias)
@@ -1001,7 +1082,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return new ActionResult<IMedia>(toMove);
         }
 
-
+        [Obsolete("Please use TrackedReferencesController.GetPagedRelationsForItem() instead. Scheduled for removal in V11.")]
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)

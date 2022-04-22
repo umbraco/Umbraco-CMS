@@ -1,0 +1,44 @@
+﻿<div ng-controller="Umbraco.Login2faController as cvm" class="umb-login-container">
+  <div id="twoFactorlogin" ng-cloak="">
+    <form name="cvm.authForm" method="POST" name="twoFactorCodeForm" ng-submit="cvm.validate()">
+      <header class="h4">
+        <localize key="login_2fatitle">One last step</localize>
+      </header>
+
+      <p>
+        <localize key="login_2faText">You have enabled 2-factor authentication and must verify your identity.</localize>
+      </p>
+
+      <br>
+
+      <!-- if there's only one provider active, it will skip this step! -->
+      <umb-control-group ng-if="cvm.providers.length > 1" label="@login_2faMultipleText" label-for="provider"
+        alias="2faprovider">
+        <select id="2faprovider" name="provider" ng-model="cvm.provider">
+          <option ng-repeat="provider in cvm.providers" ng-value="provider">{{provider}}</option>
+        </select>
+      </umb-control-group>
+
+      <umb-control-group label-for="token" alias="2facode" label="@login_2faCodeInput"
+        description="@user_2faDisableText" required="true">
+
+        <input umb-auto-focus id="2facode" class="-full-width-input input-xlarge" type="text" name="token"
+          inputmode="numeric" autocomplete="one-time-code" ng-model="cvm.code" localize="placeholder"
+          placeholder="@login_2faCodeInputHelp" aria-required="true" required no-dirty-check />
+
+        <div ng-messages="cvm.authForm.token.$error" role="alert">
+          <span class="umb-validation-label" ng-message="token">
+            <localize key="login_2faInvalidCode">Invalid code entered</localize>
+          </span>
+        </div>
+      </umb-control-group>
+
+      <div class="flex justify-between items-center">
+        <umb-button button-style="success" size="m" label-key="general_validate" state="cvm.stateValidateButton"
+          type="submit" disabled="cvm.code.length === 0"></umb-button>
+        <umb-button size="m" label-key="general_back" type="button" action="cvm.goBack()">
+        </umb-button>
+      </div>
+    </form>
+  </div>
+</div>
