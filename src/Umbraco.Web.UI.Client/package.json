@@ -51,7 +51,7 @@
     "tinymce": "4.9.11",
     "typeahead.js": "0.11.1",
     "underscore": "1.13.2",
-    "wicg-inert": "^3.0.2"
+    "wicg-inert": "3.1.1"
   },
   "devDependencies": {
     "@babel/core": "7.17.9",
