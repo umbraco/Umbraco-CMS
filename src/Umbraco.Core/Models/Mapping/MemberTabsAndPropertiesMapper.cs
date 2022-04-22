@@ -277,7 +277,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 },
             };
 
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() is false)
+            if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() is false)
             {
                 // Current user doesn't have access to sensitive data so explicitly set the views and remove the value from sensitive data
                 foreach (var property in properties)

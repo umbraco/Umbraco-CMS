@@ -412,7 +412,7 @@ namespace Umbraco.Extensions
         /// <param name="nestedSelect">The nested sql query.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string alias = null)
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string? alias = null)
         {
             var join = $"({nestedSelect.SQL})";
             if (alias is not null)
@@ -462,7 +462,7 @@ namespace Umbraco.Extensions
         /// <param name="nestedSelect">The nested sql query.</param>
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
-        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string alias = null)
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect, string? alias = null)
         {
             var join = $"({nestedSelect.SQL})";
             if (alias is not null)
