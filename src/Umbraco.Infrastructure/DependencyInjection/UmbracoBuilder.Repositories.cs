@@ -66,6 +66,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IUpgradeCheckRepository, UpgradeCheckRepository>();
             builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
             builder.Services.AddUnique<INodeCountRepository, NodeCountRepository>();
+            builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
 
             return builder;
         }
