@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
         /// <returns>All class types inheriting from or implementing the specified type.</returns>
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-        public IEnumerable<Type> GetTypes<T>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
+        public IEnumerable<Type> GetTypes<T>(bool cache = true, IEnumerable<Assembly>? specificAssemblies = null)
         {
             if (_logger == null)
             {
@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
         /// <returns>All class types inheriting from or implementing the specified type and marked with the specified attribute.</returns>
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-        public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
+        public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(bool cache = true, IEnumerable<Assembly>? specificAssemblies = null)
             where TAttribute : Attribute
         {
             if (_logger == null)
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
         /// <returns>All class types marked with the specified attribute.</returns>
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-        public IEnumerable<Type> GetAttributedTypes<TAttribute>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
+        public IEnumerable<Type> GetAttributedTypes<TAttribute>(bool cache = true, IEnumerable<Assembly>? specificAssemblies = null)
             where TAttribute : Attribute
         {
             if (_logger == null)
@@ -307,7 +307,7 @@ namespace Umbraco.Cms.Core.Composing
 
         private IEnumerable<Type> GetTypesInternal(
             Type baseType,
-            Type attributeType,
+            Type? attributeType,
             Func<IEnumerable<Type>> finder,
             string action,
             bool cache)
@@ -323,7 +323,7 @@ namespace Umbraco.Cms.Core.Composing
             }
         }
 
-        private static string GetName(Type baseType, Type attributeType)
+        private static string GetName(Type? baseType, Type? attributeType)
         {
             var s = attributeType == null ? string.Empty : ("[" + attributeType + "]");
             s += baseType;
@@ -331,7 +331,8 @@ namespace Umbraco.Cms.Core.Composing
         }
 
         private IEnumerable<Type> GetTypesInternalLocked(
-            Type baseType, Type attributeType,
+            Type? baseType,
+            Type? attributeType,
             Func<IEnumerable<Type>> finder,
             string action,
             bool cache)
@@ -396,14 +397,14 @@ namespace Umbraco.Cms.Core.Composing
         {
             private readonly HashSet<Type> _types = new HashSet<Type>();
 
-            public TypeList(Type baseType, Type attributeType)
+            public TypeList(Type? baseType, Type? attributeType)
             {
                 BaseType = baseType;
                 AttributeType = attributeType;
             }
 
-            public Type BaseType { get; }
-            public Type AttributeType { get; }
+            public Type? BaseType { get; }
+            public Type? AttributeType { get; }
 
             /// <summary>
             /// Adds a type.
