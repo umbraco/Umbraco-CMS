@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using CSharpTest.Net.Serialization;
+using Microsoft.Toolkit.HighPerformance.Buffers;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
@@ -34,13 +35,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                     {
                         chars[i] = (char)VariantNumberSerializer.Int32.ReadFrom(stream);
                     }
-
-                    var str = chars.AsSpan().Slice(0, sz).ToString();
-                    if (intern && str != null)
+                    Span<char> str = chars.AsSpan().Slice(0, sz);
+                    if (str != null && intern)
                     {
-                        return string.Intern(str);
+                        return StringPool.Shared.GetOrAdd(str);
                     }
-                    return str;
+                    return str.ToString();
                 }
                 finally
                 {
