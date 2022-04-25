@@ -8,48 +8,37 @@
 
                 <ng-form name="propertyEditorForm">
 
-                    <div class="content-type-editor-dialog edit-property-settings">
-                        <div class="editor-wrapper" ng-model="model.content.selectedEditor" name="selectedEditor" val-require-component>
+                    <div ng-model="model.content.selectedEditor" name="selectedEditor" val-require-component>
 
-                            <button type="button" class="btn-reset editor-placeholder" data-element="property-editor-add" ng-if="!model.content.selectedEditor" ng-click="vm.openPropertyEditorPicker()">
-                                <localize key="defaultdialogs_selectEditor">Select editor</localize>
-                                <div ng-messages="propertyEditorForm.selectedEditor.$error" show-validation-on-submit>
-                                    <span class="umb-validation-label" ng-message="valRequiredComponent">
-                                        <localize key="general_required">Required</localize>
-                                    </span>
-                                </div>
-                            </button>
+                        <umb-button
+                            ng-if="!model.content.selectedEditor"
+                            data-element="property-editor-add"
+                            type="button"
+                            button-style="[placeholder, block]"
+                            label-key="propertyEditorPicker_openPropertyEditorPicker"
+                            ng-click="vm.openPropertyEditorPicker()">
+                        </umb-button>
 
-                            <div class="editor clearfix" ng-if="model.content.selectedEditor">
-
-                                <div class="editor-info">
-                                    <div class="editor-icon-wrapper">
-                                        <umb-icon icon="{{vm.selectedEditorModel.icon || 'icon-autofill'}}" class="icon"></umb-icon>
-                                    </div>
-
-                                    <div class="editor-details">
-                                        <span class="editor-name">{{vm.selectedEditorModel.name}}</span>
-                                        <span class="editor-editor">{{vm.selectedEditorModel.alias}}</span>
-                                    </div>
-                                </div>
-
-                                <button ng-if="vm.canChangePropertyEditor === 'on' || vm.canChangePropertyEditor === 'disabled'"
-                                        type="button"
-                                        ng-disabled="vm.canChangePropertyEditor === 'disabled'"
-                                        class="editor-remove-icon btn-reset pull-right"
-                                        ng-click="vm.openPropertyEditorPicker()"
-                                        localize="title"
-                                        title="@actions_changeDataType">
-                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
-                                </button>
-
-                            </div>
-
+                        <div ng-messages="propertyEditorForm.selectedEditor.$error" show-validation-on-submit>
+                            <span ng-message="valRequiredComponent">
+                                <localize key="general_required">Required</localize>
+                            </span>
                         </div>
-                    </div>
 
-                    <div ng-if="vm.canChangePropertyEditor === 'disabled'" class="umb-alert umb-alert--compact umb-alert--info">
-                        Temp help message
+                        <div ng-if="model.content.selectedEditor">
+                            <umb-node-preview
+                                single
+                                icon="vm.selectedEditorModel.icon || 'icon-autofill'"
+                                name="vm.selectedEditorModel.name"
+                                description="vm.selectedEditorModel.alias"
+                                allow-change="vm.canChangePropertyEditor === 'on'"
+                                on-change="vm.openPropertyEditorPicker()">
+                            </umb-node-preview>
+
+                            <div ng-if="vm.canChangePropertyEditor === 'disabled'" class="mt2 umb-alert umb-alert--compact umb-alert--info">
+                                Temp help message
+                            </div>
+                        </div>
                     </div>
                 </ng-form>
 

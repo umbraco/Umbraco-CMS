@@ -1453,6 +1453,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="propertyEditorPicker">
     <key alias="title">Select Property Editor</key>
+    <key alias="openPropertyEditorPicker">Select Property Editor</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
