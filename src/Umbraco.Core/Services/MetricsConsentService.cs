@@ -13,26 +13,26 @@ namespace Umbraco.Cms.Core.Services
 
         private readonly IKeyValueService _keyValueService;
         private readonly ILogger<MetricsConsentService> _logger;
-        private readonly IBackOfficeSecurity _backOfficeSecurity;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        // Scheduled for removal in V11
+        // Scheduled for removal in V12
         [Obsolete("Please use the constructor that takes and ILogger and IBackOfficeSecurity instead")]
         public MetricsConsentService(IKeyValueService keyValueService)
         : this(
             keyValueService,
             StaticServiceProvider.Instance.GetRequiredService<ILogger<MetricsConsentService>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurity>())
+            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
         {
         }
 
         public MetricsConsentService(
             IKeyValueService keyValueService,
             ILogger<MetricsConsentService> logger,
-            IBackOfficeSecurity backOfficeSecurity)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _keyValueService = keyValueService;
             _logger = logger;
-            _backOfficeSecurity = backOfficeSecurity;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
 
         public TelemetryLevel GetConsentLevel()
@@ -49,8 +49,8 @@ namespace Umbraco.Cms.Core.Services
 
         public void SetConsentLevel(TelemetryLevel telemetryLevel)
         {
-            var currentUser = _backOfficeSecurity.CurrentUser;
-            _logger.LogInformation($"Telemetry level changed by {currentUser.Email}");
+            var currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity.CurrentUser;
+            _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
             _keyValueService.SetValue(Key, telemetryLevel.ToString());
         }
     }
