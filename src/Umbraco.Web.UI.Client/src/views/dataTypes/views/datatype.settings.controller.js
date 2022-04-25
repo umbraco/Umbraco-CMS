@@ -11,6 +11,11 @@
   var vm = this;
 
   vm.selectedEditorModel = null;
+  // TODO - get setting value from data type and config
+  // 'on': allow the user to change the property editor
+  // 'off': don't allow the user to change the property editor
+  // 'disabled': don't allow the user to change the property editor, but show a help text where to change the setting
+  vm.canChangePropertyEditor = 'disabled';
 
   vm.openPropertyEditorPicker = openPropertyEditorPicker;
 

@@ -5,11 +5,11 @@
         <umb-box-content>
 
             <umb-property property="model.properties.selectedEditor">
-                
+
                 <ng-form name="propertyEditorForm">
 
                     <div class="content-type-editor-dialog edit-property-settings">
-                        <div class="editor-wrapper umb-control-group control-group" ng-model="model.content.selectedEditor" name="selectedEditor" val-require-component>
+                        <div class="editor-wrapper" ng-model="model.content.selectedEditor" name="selectedEditor" val-require-component>
 
                             <button type="button" class="btn-reset editor-placeholder" data-element="property-editor-add" ng-if="!model.content.selectedEditor" ng-click="vm.openPropertyEditorPicker()">
                                 <localize key="defaultdialogs_selectEditor">Select editor</localize>
@@ -33,15 +33,23 @@
                                     </div>
                                 </div>
 
-                                <button type="button" class="editor-remove-icon btn-reset pull-right"
+                                <button ng-if="vm.canChangePropertyEditor === 'on' || vm.canChangePropertyEditor === 'disabled'"
+                                        type="button"
+                                        ng-disabled="vm.canChangePropertyEditor === 'disabled'"
+                                        class="editor-remove-icon btn-reset pull-right"
                                         ng-click="vm.openPropertyEditorPicker()"
                                         localize="title"
                                         title="@actions_changeDataType">
                                     <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                                 </button>
+
                             </div>
 
                         </div>
+                    </div>
+
+                    <div ng-if="vm.canChangePropertyEditor === 'disabled'" class="umb-alert umb-alert--compact umb-alert--info">
+                        Temp help message
                     </div>
                 </ng-form>
 

@@ -907,8 +907,20 @@ input.umb-group-builder__group-sort-value {
         color: @ui-action-discreet-type;
 
         &:hover {
-            color: @ui-action-discreet-type-hover;
-            background-color: @ui-action-discreet-hover;
+          color: @ui-action-discreet-type-hover;
+          background-color: @ui-action-discreet-hover;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          background: @sand-5;
+          opacity: 0.6;
+          color: @black;
+
+          &:hover {
+            background: @sand-5;
+            color: @black;
+          }
         }
     }
 
