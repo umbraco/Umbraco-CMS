@@ -153,6 +153,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                         ConfigureServices(services);
                         ConfigureTestServices(services);
+                        services.AddUnique(CreateLoggerFactory());
 
                         if (!TestOptions.Boot)
                         {
@@ -184,7 +185,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected void ConfigureServices(IServiceCollection services)
         {
-            services.AddUnique(CreateLoggerFactory());
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
