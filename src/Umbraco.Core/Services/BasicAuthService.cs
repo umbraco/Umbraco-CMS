@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -6,10 +7,21 @@ namespace Umbraco.Cms.Core.Services.Implement
 {
     public class BasicAuthService : IBasicAuthService
     {
+        private readonly IIpAddressUtilities _ipAddressUtilities;
         private BasicAuthSettings _basicAuthSettings;
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use the contructor that takes an IIpadressUtilities instead")]
         public BasicAuthService(IOptionsMonitor<BasicAuthSettings> optionsMonitor)
         {
+            _basicAuthSettings = optionsMonitor.CurrentValue;
+
+            optionsMonitor.OnChange(basicAuthSettings => _basicAuthSettings = basicAuthSettings);
+        }
+
+        public BasicAuthService(IOptionsMonitor<BasicAuthSettings> optionsMonitor, IIpAddressUtilities ipAddressUtilities)
+        {
+            _ipAddressUtilities = ipAddressUtilities;
             _basicAuthSettings = optionsMonitor.CurrentValue;
 
             optionsMonitor.OnChange(basicAuthSettings => _basicAuthSettings = basicAuthSettings);
@@ -21,7 +33,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             foreach (var allowedIpString in _basicAuthSettings.AllowedIPs)
             {
-                if (IPNetwork.TryParse(allowedIpString, out IPNetwork allowedIp) && allowedIp.Contains(clientIpAddress))
+                if (_ipAddressUtilities.IsAllowListed(clientIpAddress, allowedIpString))
                 {
                     return true;
                 }

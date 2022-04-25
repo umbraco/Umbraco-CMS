@@ -164,6 +164,7 @@ namespace Umbraco.Extensions
             // aspnet app lifetime mgmt
             builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
             builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
+            builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
 
             return builder;
         }
