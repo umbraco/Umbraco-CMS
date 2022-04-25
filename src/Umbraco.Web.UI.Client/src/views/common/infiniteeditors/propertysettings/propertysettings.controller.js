@@ -37,6 +37,12 @@
         vm.toggleIsSensitiveData = toggleIsSensitiveData;
         vm.toggleLabelOnTop = toggleLabelOnTop;
 
+        // TODO - get setting value from data type and config
+        // 'on': allow the user to change the data type
+        // 'off': don't allow the user to change the data type
+        // 'disabled': don't allow the user to change the data type but show a help text where to change the setting
+        vm.canChangeDataType = 'on';
+
         function onInit() {
 
             userService.getCurrentUser().then(function(user) {

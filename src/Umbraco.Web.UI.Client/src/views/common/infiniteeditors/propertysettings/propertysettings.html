@@ -51,41 +51,43 @@
                                     umb-auto-resize>
                         </textarea>
                         </div>
+                        
+                        <ng-form name="dataTypeForm">
+                            <div class="umb-control-group control-group" ng-model="model.property.editor" name="selectedEditor" val-require-component ng-if="!model.property.locked">
+                                <umb-button
+                                    ng-if="!model.property.editor"
+                                    data-element="editor-add"
+                                    type="button"
+                                    button-style="[placeholder, block]"
+                                    label-key="defaultdialogs_selectEditor"
+                                    ng-click="vm.openDataTypePicker(model.property)"
+                                    shortcut="alt+shift+e">
+                                </umb-button>
 
-                        <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
-
-                            <button type="button" class="btn-reset editor-placeholder" data-element="editor-add" ng-if="!model.property.editor" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
-                                <localize key="defaultdialogs_selectEditor">Select editor</localize>
-                                <div ng-messages="model.property.editor" show-validation-on-submit>
-                                    <span class="umb-validation-label" ng-message="required">
+                                <div ng-messages="dataTypeForm.selectedEditor.$error" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="valRequiredComponent">
                                         <localize key="general_required">Required</localize>
                                     </span>
                                 </div>
-                            </button>
 
-                            <div class="editor clearfix" ng-if="model.property.editor">
-
-                                <button type="button" class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
-                                    <div class="editor-icon-wrapper">
-                                        <umb-icon icon="{{model.property.dataTypeIcon || 'icon-autofill'}}" class="icon"></umb-icon>
+                                <div ng-if="model.property.editor">
+                                    <umb-node-preview
+                                        single
+                                        icon="model.property.dataTypeIcon || 'icon-autofill'"
+                                        name="model.property.dataTypeName"
+                                        description="model.property.editor"
+                                        allow-edit="true"
+                                        on-edit="vm.openDataTypeSettings(model.property)"
+                                        allow-change="vm.canChangeDataType === 'on'"
+                                        on-change="vm.openDataTypePicker(model.property)">
+                                    </umb-node-preview>
+                                    
+                                    <div ng-if="vm.canChangeDataType === 'disabled'" class="mt2 umb-alert umb-alert--compact umb-alert--info">
+                                        Temp help message
                                     </div>
-
-                                    <div class="editor-details">
-                                        <span class="editor-name">{{model.property.dataTypeName}}</span>
-                                        <span class="editor-editor">{{model.property.editor}}</span>
-                                    </div>
-                                </button>
-
-                                <button type="button" class="editor-remove-icon btn-reset pull-right"
-                                        ng-click="vm.openDataTypePicker(model.property)"
-                                        hotkey="alt+shift+d"
-                                        localize="title"
-                                        title="@actions_changeDataType">
-                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
-                                </button>
+                                </div>
                             </div>
-
-                        </div>
+                        </ng-form>
 
                         <div class="umb-control-group clearfix" ng-if="!model.property.locked">
 
