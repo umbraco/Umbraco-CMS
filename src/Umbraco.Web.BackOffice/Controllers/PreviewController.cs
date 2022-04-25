@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
 
-            return null;
+            return new EmptyResult();
         }
 
         public ActionResult End(string redir = null)
