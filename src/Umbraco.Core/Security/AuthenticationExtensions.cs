@@ -22,11 +22,11 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static CultureInfo GetCulture(this IIdentity identity)
+        public static CultureInfo? GetCulture(this IIdentity identity)
         {
-            if (identity is ClaimsIdentity umbIdentity && umbIdentity.VerifyBackOfficeIdentity(out _) && umbIdentity.IsAuthenticated)
+            if (identity is ClaimsIdentity umbIdentity && umbIdentity.VerifyBackOfficeIdentity(out _) && umbIdentity.IsAuthenticated && umbIdentity.GetCultureString() is not null)
             {
-                return CultureInfo.GetCultureInfo(umbIdentity.GetCultureString());
+                return CultureInfo.GetCultureInfo(umbIdentity.GetCultureString()!);
             }
 
             return null;

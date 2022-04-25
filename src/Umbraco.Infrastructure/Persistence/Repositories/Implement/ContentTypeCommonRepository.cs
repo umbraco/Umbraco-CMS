@@ -43,45 +43,49 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _shortStringHelper = shortStringHelper;
         }
 
-        private IDatabaseScope AmbientScope => _scopeAccessor.AmbientScope;
-        private IUmbracoDatabase Database => AmbientScope.Database;
+        private IDatabaseScope? AmbientScope => _scopeAccessor.AmbientScope;
+        private IUmbracoDatabase? Database => AmbientScope?.Database;
 
-        private ISqlContext SqlContext => AmbientScope.SqlContext;
+        private ISqlContext? SqlContext => AmbientScope?.SqlContext;
         //private Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
         //private ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
         //private IQuery<T> Query<T>() => SqlContext.Query<T>();
 
         /// <inheritdoc />
-        public IEnumerable<IContentTypeComposition> GetAllTypes() =>
+        public IEnumerable<IContentTypeComposition>? GetAllTypes() =>
             // use a 5 minutes sliding cache - same as FullDataSet cache policy
             _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, TimeSpan.FromMinutes(5), true);
 
         /// <inheritdoc />
         public void ClearCache() => _appCaches.RuntimeCache.Clear(CacheKey);
 
-        private Sql<ISqlContext> Sql() => SqlContext.Sql();
+        private Sql<ISqlContext>? Sql() => SqlContext?.Sql();
 
         private IEnumerable<IContentTypeComposition> GetAllTypesInternal()
         {
             var contentTypes = new Dictionary<int, IContentTypeComposition>();
 
             // get content types
-            Sql<ISqlContext> sql1 = Sql()
+            Sql<ISqlContext>? sql1 = Sql()?
                 .Select<ContentTypeDto>(r => r.Select(x => x.NodeDto))
                 .From<ContentTypeDto>()
                 .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
                 .OrderBy<ContentTypeDto>(x => x.NodeId);
 
-            List<ContentTypeDto> contentTypeDtos = Database.Fetch<ContentTypeDto>(sql1);
+            List<ContentTypeDto>? contentTypeDtos = Database?.Fetch<ContentTypeDto>(sql1);
 
             // get allowed content types
-            Sql<ISqlContext> sql2 = Sql()
+            Sql<ISqlContext>? sql2 = Sql()?
                 .Select<ContentTypeAllowedContentTypeDto>()
                 .From<ContentTypeAllowedContentTypeDto>()
                 .OrderBy<ContentTypeAllowedContentTypeDto>(x => x.Id);
 
-            List<ContentTypeAllowedContentTypeDto> allowedDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(sql2);
+            List<ContentTypeAllowedContentTypeDto>? allowedDtos = Database?.Fetch<ContentTypeAllowedContentTypeDto>(sql2);
 
+            if (contentTypeDtos is null)
+            {
+                return contentTypes.Values;
+            }
             // prepare
             // note: same alias could be used for media, content... but always different ids = ok
             var aliases = Enumerable.ToDictionary(contentTypeDtos, x => x.NodeId, x => x.Alias);
@@ -114,7 +118,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 // map allowed content types
                 var allowedContentTypes = new List<ContentTypeSort>();
-                while (allowedDtoIx < allowedDtos.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
+                while (allowedDtoIx < allowedDtos?.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
                 {
                     ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIx];
                     if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
@@ -123,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
 
                     allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
-                        allowedDto.SortOrder, alias));
+                        allowedDto.SortOrder, alias!));
                     allowedDtoIx++;
                 }
 
@@ -147,15 +151,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private void MapHistoryCleanup(Dictionary<int, IContentTypeComposition> contentTypes)
         {
             // get templates
-            Sql<ISqlContext> sql1 = Sql()
+            Sql<ISqlContext>? sql1 = Sql()?
                 .Select<ContentVersionCleanupPolicyDto>()
                 .From<ContentVersionCleanupPolicyDto>()
                 .OrderBy<ContentVersionCleanupPolicyDto>(x => x.ContentTypeId);
 
-            var contentVersionCleanupPolicyDtos = Database.Fetch<ContentVersionCleanupPolicyDto>(sql1);
+            var contentVersionCleanupPolicyDtos = Database?.Fetch<ContentVersionCleanupPolicyDto>(sql1);
 
             var contentVersionCleanupPolicyDictionary =
-                contentVersionCleanupPolicyDtos.ToDictionary(x => x.ContentTypeId);
+                contentVersionCleanupPolicyDtos?.ToDictionary(x => x.ContentTypeId);
             foreach (IContentTypeComposition c in contentTypes.Values)
             {
                 if (!(c is ContentType contentType))
@@ -165,7 +169,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 var historyCleanup = new HistoryCleanup();
 
-                if (contentVersionCleanupPolicyDictionary.TryGetValue(contentType.Id, out var versionCleanup))
+                if (contentVersionCleanupPolicyDictionary is not null && contentVersionCleanupPolicyDictionary.TryGetValue(contentType.Id, out var versionCleanup))
                 {
                     historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
                     historyCleanup.KeepAllVersionsNewerThanDays = versionCleanup.KeepAllVersionsNewerThanDays;
@@ -179,14 +183,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private void MapTemplates(Dictionary<int, IContentTypeComposition> contentTypes)
         {
             // get templates
-            Sql<ISqlContext> sql1 = Sql()
+            Sql<ISqlContext>? sql1 = Sql()?
                 .Select<ContentTypeTemplateDto>()
                 .From<ContentTypeTemplateDto>()
                 .OrderBy<ContentTypeTemplateDto>(x => x.ContentTypeNodeId);
 
-            List<ContentTypeTemplateDto> templateDtos = Database.Fetch<ContentTypeTemplateDto>(sql1);
+            List<ContentTypeTemplateDto>? templateDtos = Database?.Fetch<ContentTypeTemplateDto>(sql1);
             //var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
-            var templates = Enumerable.ToDictionary(_templateRepository.GetMany(), x => x.Id, x => x);
+            var allTemplates = _templateRepository.GetMany();
+            if (allTemplates is null)
+            {
+                return;
+            }
+            var templates = Enumerable.ToDictionary(allTemplates, x => x.Id, x => x);
             var templateDtoIx = 0;
 
             foreach (IContentTypeComposition c in contentTypes.Values)
@@ -199,12 +208,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // map allowed templates
                 var allowedTemplates = new List<ITemplate>();
                 var defaultTemplateId = 0;
-                while (templateDtoIx < templateDtos.Count &&
+                while (templateDtoIx < templateDtos?.Count &&
                        templateDtos[templateDtoIx].ContentTypeNodeId == contentType.Id)
                 {
                     ContentTypeTemplateDto allowedDto = templateDtos[templateDtoIx];
                     templateDtoIx++;
-                    if (!templates.TryGetValue(allowedDto.TemplateNodeId, out ITemplate template))
+                    if (!templates.TryGetValue(allowedDto.TemplateNodeId, out ITemplate? template))
                     {
                         continue;
                     }
@@ -225,24 +234,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private void MapComposition(IDictionary<int, IContentTypeComposition> contentTypes)
         {
             // get parent/child
-            Sql<ISqlContext> sql1 = Sql()
+            Sql<ISqlContext>? sql1 = Sql()?
                 .Select<ContentType2ContentTypeDto>()
                 .From<ContentType2ContentTypeDto>()
                 .OrderBy<ContentType2ContentTypeDto>(x => x.ChildId);
 
-            List<ContentType2ContentTypeDto> compositionDtos = Database.Fetch<ContentType2ContentTypeDto>(sql1);
+            List<ContentType2ContentTypeDto>? compositionDtos = Database?.Fetch<ContentType2ContentTypeDto>(sql1);
 
             // map
             var compositionIx = 0;
             foreach (IContentTypeComposition contentType in contentTypes.Values)
             {
-                while (compositionIx < compositionDtos.Count &&
+                while (compositionIx < compositionDtos?.Count &&
                        compositionDtos[compositionIx].ChildId == contentType.Id)
                 {
                     ContentType2ContentTypeDto parentDto = compositionDtos[compositionIx];
                     compositionIx++;
 
-                    if (!contentTypes.TryGetValue(parentDto.ParentId, out IContentTypeComposition parentContentType))
+                    if (!contentTypes.TryGetValue(parentDto.ParentId, out IContentTypeComposition? parentContentType))
                     {
                         continue;
                     }
@@ -254,7 +263,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private void MapGroupsAndProperties(IDictionary<int, IContentTypeComposition> contentTypes)
         {
-            Sql<ISqlContext> sql1 = Sql()
+            Sql<ISqlContext>? sql1 = Sql()?
                 .Select<PropertyTypeGroupDto>()
                 .From<PropertyTypeGroupDto>()
                 .InnerJoin<ContentTypeDto>()
@@ -262,9 +271,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderBy<ContentTypeDto>(x => x.NodeId)
                 .AndBy<PropertyTypeGroupDto>(x => x.SortOrder, x => x.Id);
 
-            List<PropertyTypeGroupDto> groupDtos = Database.Fetch<PropertyTypeGroupDto>(sql1);
+            List<PropertyTypeGroupDto>? groupDtos = Database?.Fetch<PropertyTypeGroupDto>(sql1);
 
-            Sql<ISqlContext> sql2 = Sql()
+            Sql<ISqlContext>? sql2 = Sql()?
                 .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto, r1 => r1.Select(x => x.NodeDto)))
                 .AndSelect<MemberPropertyTypeDto>()
                 .From<PropertyTypeDto>()
@@ -282,7 +291,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     x => x.Id) // NULLs will come first or last, never mind, we deal with it below
                 .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
 
-            List<PropertyTypeCommonDto> propertyDtos = Database.Fetch<PropertyTypeCommonDto>(sql2);
+            List<PropertyTypeCommonDto>? propertyDtos = Database?.Fetch<PropertyTypeCommonDto>(sql2);
             Dictionary<string, PropertyType> builtinProperties =
                 ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
 
@@ -295,7 +304,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 // get group-less properties (in case NULL is ordered first)
                 var noGroupPropertyTypes = new PropertyTypeCollection(isPublishing);
-                while (propertyIx < propertyDtos.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
+                while (propertyIx < propertyDtos?.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                        propertyDtos[propertyIx].PropertyTypeGroupId == null)
                 {
                     noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
@@ -304,17 +313,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 // get groups and their properties
                 var groupCollection = new PropertyGroupCollection();
-                while (groupIx < groupDtos.Count && groupDtos[groupIx].ContentTypeNodeId == contentType.Id)
+                while (groupIx < groupDtos?.Count && groupDtos[groupIx].ContentTypeNodeId == contentType.Id)
                 {
                     PropertyGroup group = MapPropertyGroup(groupDtos[groupIx], isPublishing);
                     groupCollection.Add(group);
                     groupIx++;
 
-                    while (propertyIx < propertyDtos.Count &&
+                    while (propertyIx < propertyDtos?.Count &&
                            propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                            propertyDtos[propertyIx].PropertyTypeGroupId == group.Id)
                     {
-                        group.PropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx],
+                        group.PropertyTypes?.Add(MapPropertyType(contentType, propertyDtos[propertyIx],
                             builtinProperties));
                         propertyIx++;
                     }
@@ -323,7 +332,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 contentType.PropertyGroups = groupCollection;
 
                 // get group-less properties (in case NULL is ordered last)
-                while (propertyIx < propertyDtos.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
+                while (propertyIx < propertyDtos?.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                        propertyDtos[propertyIx].PropertyTypeGroupId == null)
                 {
                     noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
@@ -370,12 +379,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var groupId = dto.PropertyTypeGroupId;
 
-            var readonlyStorageType = builtinProperties.TryGetValue(dto.Alias, out PropertyType propertyType);
+            var readonlyStorageType = builtinProperties.TryGetValue(dto.Alias!, out PropertyType? propertyType);
             ValueStorageType storageType = readonlyStorageType
-                ? propertyType.ValueStorageType
+                ? propertyType!.ValueStorageType
                 : Enum<ValueStorageType>.Parse(dto.DataTypeDto.DbType);
 
-            if (contentType is IMemberType memberType)
+            if (contentType is IMemberType memberType && dto.Alias is not null)
             {
                 memberType.SetIsSensitiveProperty(dto.Alias, dto.IsSensitive);
                 memberType.SetMemberCanEditProperty(dto.Alias, dto.CanEdit);
@@ -393,7 +402,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     Key = dto.UniqueId,
                     Mandatory = dto.Mandatory,
                     MandatoryMessage = dto.MandatoryMessage,
-                    Name = dto.Name,
+                    Name = dto.Name ?? string.Empty,
                     PropertyGroupId = groupId.HasValue ? new Lazy<int>(() => groupId.Value) : null,
                     SortOrder = dto.SortOrder,
                     ValidationRegExp = dto.ValidationRegExp,

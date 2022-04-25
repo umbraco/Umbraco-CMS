@@ -19,13 +19,13 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the culture name of the language.
         /// </summary>
         [DataMember]
-        string CultureName { get; set; }
+        string? CultureName { get; set; }
 
         /// <summary>
         /// Gets the <see cref="CultureInfo"/> object for the language.
         /// </summary>
         [IgnoreDataMember]
-        CultureInfo CultureInfo { get; }
+        CultureInfo? CultureInfo { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the language is the default language.

@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Cache
 
         protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
 
-        protected string GetEntityCacheKey(TId id)
+        protected string GetEntityCacheKey(TId? id)
         {
             if (EqualityComparer<TId>.Default.Equals(id, default))
             {
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Cache
             }
             else
             {
-                return EntityTypeCacheKey + id.ToString().ToUpperInvariant();
+                return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
             }
         }
 
@@ -58,9 +58,9 @@ namespace Umbraco.Cms.Core.Cache
         protected virtual void InsertEntity(string cacheKey, TEntity entity)
             => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
 
-        protected virtual void InsertEntities(TId[] ids, TEntity[] entities)
+        protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
         {
-            if (ids.Length == 0 && entities.Length == 0 && _options.GetAllCacheAllowZeroCount)
+            if (ids?.Length == 0 && entities?.Length == 0 && _options.GetAllCacheAllowZeroCount)
             {
                 // getting all of them, and finding nothing.
                 // if we can cache a zero count, cache an empty array,
@@ -69,11 +69,14 @@ namespace Umbraco.Cms.Core.Cache
             }
             else
             {
-                // individually cache each item
-                foreach (var entity in entities)
+                if (entities is not null)
                 {
-                    var capture = entity;
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                    // individually cache each item
+                    foreach (var entity in entities)
+                    {
+                        var capture = entity;
+                        Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                    }
                 }
             }
         }
@@ -162,7 +165,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
             var cacheKey = GetEntityCacheKey(id);
             var fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -184,14 +187,14 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity GetCached(TId id)
+        public override TEntity? GetCached(TId id)
         {
             var cacheKey = GetEntityCacheKey(id);
             return Cache.GetCacheItem<TEntity>(cacheKey);
         }
 
         /// <inheritdoc />
-        public override bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             // if found in cache the return else check
             var cacheKey = GetEntityCacheKey(id);
@@ -200,9 +203,9 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public override TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
-            if (ids.Length > 0)
+            if (ids?.Length > 0)
             {
                 // try to get each entity from the cache
                 // if we can find all of them, return
@@ -213,23 +216,26 @@ namespace Umbraco.Cms.Core.Cache
             else
             {
                 // get everything we have
-                var entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)
+                var entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)?
                     .ToArray(); // no need for null checks, we are not caching nulls
 
-                if (entities.Length > 0)
+                if (entities?.Length > 0)
                 {
                     // if some of them were in the cache...
                     if (_options.GetAllCacheValidateCount)
                     {
                         // need to validate the count, get the actual count and return if ok
-                        var totalCount = _options.PerformCount();
-                        if (entities.Length == totalCount)
-                            return entities;
+                        if (_options.PerformCount is not null)
+                        {
+                            var totalCount = _options.PerformCount();
+                            if (entities.Length == totalCount)
+                                return entities.WhereNotNull().ToArray();
+                        }
                     }
                     else
                     {
                         // no need to validate, just return what we have and assume it's all there is
-                        return entities;
+                        return entities.WhereNotNull().ToArray();
                     }
                 }
                 else if (_options.GetAllCacheAllowZeroCount)
@@ -242,7 +248,7 @@ namespace Umbraco.Cms.Core.Cache
             }
 
             // cache failed, get from repo and cache
-            var repoEntities = performGetAll(ids)
+            var repoEntities = performGetAll(ids)?
                 .WhereNotNull() // exclude nulls!
                 .Where(x => x.HasIdentity) // be safe, though would be weird...
                 .ToArray();
@@ -250,7 +256,7 @@ namespace Umbraco.Cms.Core.Cache
             // note: if empty & allow zero count, will cache a special (empty) entry
             InsertEntities(ids, repoEntities);
 
-            return repoEntities;
+            return repoEntities ?? Array.Empty<TEntity>();
         }
 
         /// <inheritdoc />

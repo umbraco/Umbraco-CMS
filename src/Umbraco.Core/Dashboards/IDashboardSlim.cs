@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Core.Dashboards
         /// Gets the alias of the dashboard.
         /// </summary>
         [DataMember(Name = "alias")]
-        string Alias { get; }
+        string? Alias { get; }
 
         /// <summary>
         /// Gets the view used to render the dashboard.
         /// </summary>
         [DataMember(Name = "view")]
-        string View { get; }
+        string? View { get; }
     }
 }

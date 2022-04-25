@@ -20,6 +20,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <summary>
         /// Dequeue the first item on the queue.
         /// </summary>
-        Task<Func<CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken);
+        Task<Func<CancellationToken, Task>?> DequeueAsync(CancellationToken cancellationToken);
     }
 }

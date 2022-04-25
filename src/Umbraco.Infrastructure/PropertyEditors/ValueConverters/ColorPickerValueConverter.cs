@@ -21,20 +21,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             var useLabel = UseLabel(propertyType);
 
             if (source == null) return useLabel ? null : string.Empty;
 
-            var ssource = source.ToString();
+            var ssource = source.ToString()!;
             if (ssource.DetectIsJson())
             {
                 try
                 {
                     var jo = JsonConvert.DeserializeObject<JObject>(ssource);
-                    if (useLabel) return new PickedColor(jo["value"].ToString(), jo["label"].ToString());
-                    return jo["value"].ToString();
+                    if (useLabel) return new PickedColor(jo!["value"]!.ToString(), jo["label"]!.ToString());
+                    return jo!["value"]!.ToString();
                 }
                 catch { /* not json finally */ }
             }
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         private bool UseLabel(IPublishedPropertyType propertyType)
         {
-            return ConfigurationEditor.ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Configuration).UseLabel;
+            return ConfigurationEditor.ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Configuration)?.UseLabel ?? false;
         }
 
         public class PickedColor

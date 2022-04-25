@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data
         /// <inheritdoc />
         public IExecutableBuilder IsNull(string columnName)
         {
-            Expression.Rows.Add(new DeletionDataDefinition { new KeyValuePair<string, object>(columnName, null) });
+            Expression.Rows.Add(new DeletionDataDefinition { new KeyValuePair<string, object?>(columnName, null) });
             return this;
         }
 
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data
 
             var data = new DeletionDataDefinition();
             foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+                data.Add(new KeyValuePair<string, object?>(property.Name, property.GetValue(dataAsAnonymousType)));
             return data;
         }
     }

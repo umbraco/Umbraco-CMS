@@ -27,13 +27,13 @@ namespace Umbraco.Cms.Core.Manifest
     [DataContract(Name = "appdef", Namespace = "")]
     public class ManifestContentAppDefinition
     {
-        private string _view;
+        private string? _view;
 
         /// <summary>
         /// Gets or sets the name of the content app.
         /// </summary>
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the unique alias of the content app.
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// <para>Must be a valid javascript identifier, ie no spaces etc.</para>
         /// </remarks>
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         /// <summary>
         /// Gets or sets the weight of the content app.
@@ -57,13 +57,13 @@ namespace Umbraco.Cms.Core.Manifest
         /// <para>Must be a valid helveticons class name (see http://hlvticons.ch/).</para>
         /// </remarks>
         [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets the view for rendering the content app.
         /// </summary>
         [DataMember(Name = "view")]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         /// <summary>
         /// Gets or sets the list of 'show' conditions for the content app.

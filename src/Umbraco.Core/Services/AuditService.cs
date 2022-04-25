@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _isAvailable = new Lazy<bool>(DetermineIsAvailable);
         }
 
-        public void Add(AuditType type, int userId, int objectId, string entityType, string comment, string parameters = null)
+        public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<IAuditItem> GetLogs(int objectId)
+        public IEnumerable<IAuditItem>? GetLogs(int objectId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -97,8 +97,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
-            AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null)
+            AuditType[]? auditTypeFilter = null,
+            IQuery<IAuditItem>? customFilter = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -135,7 +135,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Optional filter to be applied
         /// </param>
         /// <returns></returns>
-        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, AuditType[] auditTypeFilter = null, IQuery<IAuditItem> customFilter = null)
+        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, AuditType[]? auditTypeFilter = null, IQuery<IAuditItem>? customFilter = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
+        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
         {
             if (performingUserId < 0 && performingUserId != Cms.Core.Constants.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
             if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-        internal IEnumerable<IAuditEntry> GetAll()
+        internal IEnumerable<IAuditEntry>? GetAll()
         {
             if (_isAvailable.Value == false) return Enumerable.Empty<IAuditEntry>();
 

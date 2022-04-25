@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the name of the Macro
         /// </summary>
         [DataMember]
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets a boolean indicating whether the Macro can be used in an Editor

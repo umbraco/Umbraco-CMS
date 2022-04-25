@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (_tourSettings.EnableTours == false)
                 return result;
 
-            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             if (user == null)
                 return result;
 
@@ -134,6 +135,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var resourceStream = GetType().Assembly.GetManifestResourceStream(fileName);
 
+            if (resourceStream is null)
+            {
+                return string.Empty;
+            }
             using var reader = new StreamReader(resourceStream, Encoding.UTF8);
             return await reader.ReadToEndAsync();
         }
@@ -176,7 +181,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             List<BackOfficeTourFilter> filters,
             List<BackOfficeTourFilter> aliasOnlyFilters,
             Func<string, Task<string>> fileNameToFileContent,
-            string pluginName = null)
+            string? pluginName = null)
         {
             var fileName = Path.GetFileNameWithoutExtension(tourFile);
             if (fileName == null) return;
@@ -198,20 +203,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var contents = await fileNameToFileContent(tourFile);
                 var tours = JsonConvert.DeserializeObject<BackOfficeTour[]>(contents);
 
-                var backOfficeTours = tours.Where(x =>
-                    aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false);
+                var backOfficeTours = tours?.Where(x =>
+                    aliasFilters.Count == 0 || aliasFilters.WhereNotNull().All(filter => filter.IsMatch(x.Alias)) == false);
 
-                var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
-                var localizedTours = backOfficeTours.Where(x =>
-                    string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user.Language,
+                var localizedTours = backOfficeTours?.Where(x =>
+                    string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user?.Language,
                         StringComparison.InvariantCultureIgnoreCase)).ToList();
 
                 var tour = new BackOfficeTourFile
                 {
                     FileName = Path.GetFileNameWithoutExtension(tourFile),
                     PluginName = pluginName,
-                    Tours = localizedTours
+                    Tours = localizedTours ?? new List<BackOfficeTour>(),
                 };
 
                 //don't add if all of the tours are filtered

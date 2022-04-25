@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private readonly IHttpContextAccessor _httpContextAccessor;
         private WebRoutingSettings _webRoutingSettings;
         private readonly ISet<string> _applicationUrls = new HashSet<string>();
-        private Uri _currentApplicationUrl;
+        private Uri? _currentApplicationUrl;
         private object _initLocker = new object();
         private bool _hasAppUrl = false;
         private bool _isInit = false;
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// <inheritdoc/>
         public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
-        private string GetFormValue(string name)
+        private string? GetFormValue(string name)
         {
             var request = _httpContextAccessor.GetRequiredHttpContext().Request;
             if (!request.HasFormContentType)
@@ -50,10 +50,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         public string GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
 
         /// <inheritdoc/>
-        public Uri GetRequestUrl() => _httpContextAccessor.HttpContext != null ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()) : null;
+        public Uri? GetRequestUrl() => _httpContextAccessor.HttpContext != null ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()) : null;
 
         /// <inheritdoc/>
-        public Uri GetApplicationUrl()
+        public Uri? GetApplicationUrl()
         {
             // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
@@ -76,8 +76,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             }
 
             var url = UriHelper.BuildAbsolute(request.Scheme, request.Host);
-            var change = url != null && !_applicationUrls.Contains(url);
-            if (change)
+            if (url != null && !_applicationUrls.Contains(url))
             {
                 _applicationUrls.Add(url);
 

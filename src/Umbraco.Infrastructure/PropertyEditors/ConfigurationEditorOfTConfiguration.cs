@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // if the field has its own type, instantiate it
                 try
                 {
-                    field = (ConfigurationField) Activator.CreateInstance(attribute.Type);
+                    field = (ConfigurationField) Activator.CreateInstance(attribute.Type)!;
                 }
                 catch (Exception ex)
                 {
@@ -111,12 +111,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
             => obj is TConfiguration;
 
         /// <inheritdoc />
-        public override object FromDatabase(string configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        public override object FromDatabase(string? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(configuration)) return new TConfiguration();
-                return configurationEditorJsonSerializer.Deserialize<TConfiguration>(configuration);
+                return configurationEditorJsonSerializer.Deserialize<TConfiguration>(configuration)!;
             }
             catch (Exception e)
             {
@@ -125,9 +125,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override object FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
+        public sealed override object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration)
         {
-            return FromConfigurationEditor(editorValues, (TConfiguration) configuration);
+            return FromConfigurationEditor(editorValues, (TConfiguration?) configuration);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValues">The configuration object posted by the editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        public virtual TConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, TConfiguration configuration)
+        public virtual TConfiguration? FromConfigurationEditor(IDictionary<string, object?>? editorValues, TConfiguration? configuration)
         {
             // note - editorValue contains a mix of CLR types (string, int...) and JToken
             // turning everything back into a JToken... might not be fastest but is simplest
@@ -148,24 +148,24 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // field only, JsonPropertyAttribute is ignored here
                 // only keep fields that have a non-null/empty value
                 // rest will fall back to default during ToObject()
-                if (editorValues.TryGetValue(field.Key, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
+                if (editorValues is not null && editorValues.TryGetValue(field.Key!, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
                 {
                     if (value is JToken jtoken)
                     {
                         //if it's a jtoken then set it
-                        o[field.PropertyName] = jtoken;
+                        o[field.PropertyName!] = jtoken;
                     }
                     else if (field.PropertyType == typeof(bool) && value is string sBool)
                     {
                         //if it's a boolean property type but a string is found, try to do a conversion
                         var converted = sBool.TryConvertTo<bool>();
-                        if (converted)
-                            o[field.PropertyName] = converted.Result;
+                        if (converted.Success)
+                            o[field.PropertyName!] = converted.Result;
                     }
                     else
                     {
                         //default behavior
-                        o[field.PropertyName] = JToken.FromObject(value);
+                        o[field.PropertyName!] = JToken.FromObject(value);
                     }
                 }
             }
@@ -174,22 +174,25 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override IDictionary<string, object> ToConfigurationEditor(object configuration)
+        public sealed override IDictionary<string, object> ToConfigurationEditor(object? configuration)
         {
-            return ToConfigurationEditor((TConfiguration) configuration);
+            return ToConfigurationEditor((TConfiguration?) configuration);
         }
 
         /// <summary>
         /// Converts configuration values to values for the editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration configuration)
+        public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration? configuration)
         {
             string FieldNamer(PropertyInfo property)
             {
                 // try the field
                 var field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
-                if (field != null) return field.Key;
+                if (field is not null && field.Key is not null)
+                {
+                    return field.Key;
+                }
 
                 // but the property may not be a field just an extra thing
                 var json = property.GetCustomAttribute<JsonPropertyAttribute>();

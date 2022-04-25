@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class PublicAccessServiceExtensions
     {
-        public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string oldRolename, string newRolename)
+        public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string? oldRolename, string? newRolename)
         {
             var hasChange = false;
             if (oldRolename == newRolename) return false;
@@ -33,7 +33,7 @@ namespace Umbraco.Extensions
                 foreach (var roleRule in roleRules)
                 {
                     //a rule is being updated so flag this entry to be saved
-                    roleRule.RuleValue = newRolename;
+                    roleRule.RuleValue = newRolename ?? String.Empty;
                     save = true;
                 }
                 if (save)

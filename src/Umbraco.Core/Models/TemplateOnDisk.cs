@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>Setting the content means it is not "on disk" anymore, and the
         /// template becomes (and behaves like) a normal template.</para>
         /// </remarks>
-        public override string Content
+        public override string? Content
         {
             get
             {

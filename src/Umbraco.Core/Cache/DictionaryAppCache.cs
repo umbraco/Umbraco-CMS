@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
-        private readonly ConcurrentDictionary<string, object> _items = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, object?> _items = new ConcurrentDictionary<string, object?>();
 
         public int Count => _items.Count;
 
@@ -23,25 +23,25 @@ namespace Umbraco.Cms.Core.Cache
         public bool IsAvailable => true;
 
         /// <inheritdoc />
-        public virtual object Get(string key)
+        public virtual object? Get(string key)
         {
             return _items.TryGetValue(key, out var value) ? value : null;
         }
 
         /// <inheritdoc />
-        public virtual object Get(string key, Func<object> factory)
+        public virtual object? Get(string key, Func<object?> factory)
         {
             return _items.GetOrAdd(key, _ => factory());
         }
 
-        public bool Set(string key, object value) => _items.TryAdd(key, value);
+        public bool Set(string key, object? value) => _items.TryAdd(key, value);
 
         public bool Remove(string key) => _items.TryRemove(key, out _);
 
         /// <inheritdoc />
-        public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
+        public virtual IEnumerable<object?> SearchByKey(string keyStartsWith)
         {
-            var items = new List<object>();
+            var items = new List<object?>();
             foreach (var (key, value) in _items)
                 if (key.InvariantStartsWith(keyStartsWith))
                     items.Add(value);
@@ -49,10 +49,10 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public IEnumerable<object> SearchByRegex(string regex)
+        public IEnumerable<object?> SearchByRegex(string regex)
         {
             var compiled = new Regex(regex, RegexOptions.Compiled);
-            var items = new List<object>();
+            var items = new List<object?>();
             foreach (var (key, value) in _items)
                 if (compiled.IsMatch(key))
                     items.Add(value);
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Cache
             _items.RemoveAll(kvp => compiled.IsMatch(kvp.Key));
         }
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _items.GetEnumerator();
+        public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => _items.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

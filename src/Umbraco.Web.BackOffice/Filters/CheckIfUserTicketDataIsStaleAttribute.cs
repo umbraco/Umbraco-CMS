@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 var tokenFilter = new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery);
                 await tokenFilter.OnActionExecutionAsync(
                     actionContext,
-                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
+                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), new { })));
 
                 // add the header
                 AppendUserModifiedHeaderAttribute.AppendHeader(actionContext);
@@ -118,7 +118,13 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    IUser user = _userService.GetUserById(identity.GetId());
+                    var id = identity.GetId();
+                    if (id is null)
+                    {
+                        return;
+                    }
+
+                    IUser? user = _userService.GetUserById(id.Value);
                     if (user == null)
                     {
                         return;
@@ -159,8 +165,11 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             /// </summary>
             private async Task ReSync(IUser user, ActionExecutingContext actionContext)
             {
-                BackOfficeIdentityUser backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
-                await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                BackOfficeIdentityUser? backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
+                if (backOfficeIdentityUser is not null)
+                {
+                    await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                }
 
                 // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);

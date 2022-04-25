@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null);
+        string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        string GetUrl(int id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null);
+        string GetUrl(int id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -45,9 +45,9 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null);
+        string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null);
 
-        string GetUrlFromRoute(int id, string route, string culture);
+        string GetUrlFromRoute(int id, string? route, string? culture);
 
         /// <summary>
         /// Gets the other urls of a published content.
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="propertyAlias"></param>
         /// <param name="current"></param>
         /// <returns></returns>
-        string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null);
+        string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
 
         /// <summary>
         /// Gets the url of a media item.
@@ -99,6 +99,6 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null);
+        string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
     }
 }

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public Attempt<OperationResult> Delete(IDomain domain)
+        public Attempt<OperationResult?> Delete(IDomain domain)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(eventMessages);
         }
 
-        public IDomain GetByName(string name)
+        public IDomain? GetByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IDomain GetById(int id)
+        public IDomain? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public Attempt<OperationResult> Save(IDomain domainEntity)
+        public Attempt<OperationResult?> Save(IDomain domainEntity)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 

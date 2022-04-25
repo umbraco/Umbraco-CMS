@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _migrationPlanExecutor = migrationPlanExecutor;
             _keyValueService = keyValueService;
             _eventAggregator = eventAggregator;
-            _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);            
+            _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         /// <returns></returns>
         public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
         {
-            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
             IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
             IEnumerable<string> packagePlans = _packageMigrationPlans.Values
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             {
                 foreach (var migrationName in plansToRun)
                 {
-                    if (!_packageMigrationPlans.TryGetValue(migrationName, out PackageMigrationPlan plan))
+                    if (!_packageMigrationPlans.TryGetValue(migrationName, out PackageMigrationPlan? plan))
                     {
                         throw new InvalidOperationException("Cannot find package migration plan " + migrationName);
                     }

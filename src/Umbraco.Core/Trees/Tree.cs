@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Trees
     [DebuggerDisplay("Tree - {SectionAlias}/{TreeAlias}")]
     public class Tree : ITree
     {
-        public Tree(int sortOrder, string applicationAlias, string group, string alias, string title, TreeUse use, Type treeControllerType, bool isSingleNodeTree)
+        public Tree(int sortOrder, string applicationAlias, string? group, string alias, string? title, TreeUse use, Type treeControllerType, bool isSingleNodeTree)
         {
             SortOrder = sortOrder;
             SectionAlias = applicationAlias ?? throw new ArgumentNullException(nameof(applicationAlias));
@@ -30,13 +30,13 @@ namespace Umbraco.Cms.Core.Trees
         public string SectionAlias { get; set; }
 
         /// <inheritdoc />
-        public string TreeGroup { get; }
+        public string? TreeGroup { get; }
 
         /// <inheritdoc />
         public string TreeAlias { get; }
 
         /// <inheritdoc />
-        public string TreeTitle { get; set; }
+        public string? TreeTitle { get; set; }
 
         /// <inheritdoc />
         public TreeUse TreeUse { get; set; }
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Trees
         /// </summary>
         public Type TreeControllerType { get; }
 
-        public static string GetRootNodeDisplayName(ITree tree, ILocalizedTextService textService)
+        public static string? GetRootNodeDisplayName(ITree tree, ILocalizedTextService textService)
         {
             var label = $"[{tree.TreeAlias}]";
 

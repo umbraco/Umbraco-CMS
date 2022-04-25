@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Tree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(x => x.TreeAlias == treeAlias);
+        public Tree? GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(x => x.TreeAlias == treeAlias);
 
         /// <inheritdoc />
         public IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main)

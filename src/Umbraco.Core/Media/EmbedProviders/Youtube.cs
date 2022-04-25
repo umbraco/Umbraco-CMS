@@ -20,12 +20,12 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
             {"format", "json"}
         };
 
-        public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+        public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
         {
             var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
             var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
-            return oembed.GetHtml();
+            return oembed?.GetHtml();
         }
 
         public YouTube(IJsonSerializer jsonSerializer) : base(jsonSerializer)

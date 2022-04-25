@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private static HttpClient s_httpClient;
+        private static HttpClient? s_httpClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExcessiveHeadersCheck"/> class.
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         {
             string message;
             var success = false;
-            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);
+            var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
             // Access the site home page and check for the headers
             var request = new HttpRequestMessage(HttpMethod.Head, url);
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 var headersToCheckFor = new List<string> {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version" };
 
                 // Ignore if server header is present and it's set to cloudflare
-                if (allHeaders.InvariantContains("Server") && response.Headers.TryGetValues("Server", out var serverHeaders) && serverHeaders.FirstOrDefault().InvariantEquals("cloudflare"))
+                if (allHeaders.InvariantContains("Server") && response.Headers.TryGetValues("Server", out var serverHeaders) && (serverHeaders.FirstOrDefault()?.InvariantEquals("cloudflare") ?? false))
                 {
                     headersToCheckFor.Remove("Server");
                 }
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url?.ToString(), ex.Message });
             }
 
             return

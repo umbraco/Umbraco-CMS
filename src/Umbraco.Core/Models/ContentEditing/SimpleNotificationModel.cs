@@ -26,6 +26,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         ///  A default message
         /// </summary>
         [DataMember(Name = "message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
     }
 }

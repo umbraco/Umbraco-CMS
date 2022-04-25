@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-        public MediaType(IShortStringHelper shortStringHelper,IMediaType parent) : this(shortStringHelper, parent, null)
+        public MediaType(IShortStringHelper shortStringHelper,IMediaType parent) : this(shortStringHelper, parent, string.Empty)
         {
         }
 

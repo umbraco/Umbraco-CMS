@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             [NullSetting(NullSetting = NullSettings.NotNull)]
             [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userOrMemberKey",
                 Name = "IX_" + TableName + "_LoginProvider")]
-            public string LoginProvider { get; set; }
+            public string LoginProvider { get; set; } = null!;
 
             /// <summary>
             ///     Stores the key the provider uses to lookup the login
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             [NullSetting(NullSetting = NullSettings.NotNull)]
             [Index(IndexTypes.NonClustered, ForColumns = "loginProvider,providerKey",
                 Name = "IX_" + TableName + "_ProviderKey")]
-            public string ProviderKey { get; set; }
+            public string ProviderKey { get; set; } = null!;
 
             [Column("createDate")]
             [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             [Column("userData")]
             [NullSetting(NullSetting = NullSettings.Null)]
             [SpecialDbType(SpecialDbTypes.NTEXT)]
-            public string UserData { get; set; }
+            public string? UserData { get; set; }
         }
     }
 }

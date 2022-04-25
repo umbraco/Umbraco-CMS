@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets or sets the name of the entity.
         /// </summary>
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the user who created this entity.
@@ -27,7 +27,7 @@
         /// been persistent and does not yet have an identity. The parent identifier will be retrieved
         /// from the parent entity when needed. If the parent entity still does not have an entity by that
         /// time, an exception will be thrown by <see cref="ParentId"/> getter.</remarks>
-        void SetParent(ITreeEntity parent);
+        void SetParent(ITreeEntity? parent);
 
         /// <summary>
         /// Gets or sets the level of the entity.

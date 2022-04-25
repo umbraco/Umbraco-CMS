@@ -16,9 +16,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public HttpContextVariationContextAccessor(IRequestCache requestCache) => _requestCache = requestCache;
 
         /// <inheritdoc />
-        public VariationContext VariationContext
+        public VariationContext? VariationContext
         {
-            get => (VariationContext) _requestCache.Get(ContextKey);
+            get => (VariationContext?) _requestCache.Get(ContextKey);
             set => _requestCache.Set(ContextKey, value);
         }
     }

@@ -76,7 +76,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         }
 
         // for unit tests only
+#pragma warning disable CS8618
         protected Builder()
+#pragma warning restore CS8618
         { }
 
         protected ModelsBuilderSettings Config { get; }
@@ -191,7 +193,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             return true;
         }
 
-        public string ModelsNamespaceForTests { get; set; }
+        public string? ModelsNamespaceForTests { get; set; }
 
         public string GetModelsNamespace()
         {

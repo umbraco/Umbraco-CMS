@@ -33,19 +33,19 @@ namespace Umbraco.Extensions
             this IContentBase content,
             string propertyTypeAlias,
             MediaUrlGeneratorCollection mediaUrlGenerators,
-            out string mediaFilePath,
-            string culture = null,
-            string segment = null)
+            out string? mediaFilePath,
+            string? culture = null,
+            string? segment = null)
         {
-            if (!content.Properties.TryGetValue(propertyTypeAlias, out IProperty property))
+            if (!content.Properties.TryGetValue(propertyTypeAlias, out IProperty? property))
             {
                 mediaFilePath = null;
                 return false;
             }
 
             if (!mediaUrlGenerators.TryGetMediaPath(
-                property.PropertyType.PropertyEditorAlias,
-                property.GetValue(culture, segment),
+                property?.PropertyType?.PropertyEditorAlias,
+                property?.GetValue(culture, segment),
                 out mediaFilePath))
             {
                 return false;
@@ -90,7 +90,7 @@ namespace Umbraco.Extensions
         /// <param name="entity"></param>
         public static void SanitizeEntityPropertiesForXmlStorage(this IContentBase entity)
         {
-            entity.Name = entity.Name.ToValidXmlString();
+            entity.Name = entity.Name?.ToValidXmlString();
             foreach (var property in entity.Properties)
             {
                 foreach (var propertyValue in property.Values)
@@ -112,15 +112,15 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This is a bit of a hack because we need to type check!
         /// </remarks>
-        internal static bool HasChildren(IContentBase content, ServiceContext services)
+        internal static bool? HasChildren(IContentBase content, ServiceContext services)
         {
             if (content is IContent)
             {
-                return services.ContentService.HasChildren(content.Id);
+                return services.ContentService?.HasChildren(content.Id);
             }
             if (content is IMedia)
             {
-                return services.MediaService.HasChildren(content.Id);
+                return services.MediaService?.HasChildren(content.Id);
             }
             return false;
         }
@@ -133,7 +133,7 @@ namespace Umbraco.Extensions
         /// <param name="editorAlias"></param>
         /// <returns></returns>
         public static IEnumerable<IProperty> GetPropertiesByEditor(this IContentBase content, string editorAlias)
-            => content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == editorAlias);
+            => content.Properties.Where(x => x.PropertyType?.PropertyEditorAlias == editorAlias);
 
 
         #region IContent
@@ -141,7 +141,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the current status of the Content
         /// </summary>
-        public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string culture = null)
+        public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string? culture = null)
         {
             if (content.Trashed)
                 return ContentStatus.Trashed;
@@ -151,11 +151,11 @@ namespace Umbraco.Extensions
             else if (culture.IsNullOrWhiteSpace())
                 throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
 
-            var expires = contentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
+            var expires = contentSchedule.GetSchedule(culture!, ContentScheduleAction.Expire);
             if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
                 return ContentStatus.Expired;
 
-            var release = contentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
+            var release = contentSchedule.GetSchedule(culture!, ContentScheduleAction.Release);
             if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
                 return ContentStatus.AwaitingRelease;
 
@@ -170,8 +170,8 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of integer ids</returns>
-        public static IEnumerable<int> GetAncestorIds(this IContent content) =>
-            content.Path.Split(Constants.CharArrays.Comma)
+        public static IEnumerable<int>? GetAncestorIds(this IContent content) =>
+            content.Path?.Split(Constants.CharArrays.Comma)
                 .Where(x => x != Constants.System.RootString && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(s =>
                     int.Parse(s, CultureInfo.InvariantCulture));
 
@@ -181,14 +181,14 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this content item.
         /// </summary>
-        public static IProfile GetCreatorProfile(this IContentBase content, IUserService userService)
+        public static IProfile? GetCreatorProfile(this IContentBase content, IUserService userService)
         {
             return userService.GetProfileById(content.CreatorId);
         }
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
-        public static IProfile GetWriterProfile(this IContent content, IUserService userService)
+        public static IProfile? GetWriterProfile(this IContent content, IUserService userService)
         {
             return userService.GetProfileById(content.WriterId);
         }
@@ -196,7 +196,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
-        public static IProfile GetWriterProfile(this IMedia content, IUserService userService)
+        public static IProfile? GetWriterProfile(this IMedia content, IUserService userService)
         {
             return userService.GetProfileById(content.WriterId);
         }
@@ -207,7 +207,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
-        public static IProfile GetCreatorProfile(this IMedia media, IUserService userService)
+        public static IProfile? GetCreatorProfile(this IMedia media, IUserService userService)
         {
             return userService.GetProfileById(media.CreatorId);
         }
@@ -224,8 +224,8 @@ namespace Umbraco.Extensions
         public static IEnumerable<IProperty> GetNonGroupedProperties(this IContentBase content)
         {
             return content.Properties
-                .Where(x => x.PropertyType.PropertyGroupId == null)
-                .OrderBy(x => x.PropertyType.SortOrder);
+                .Where(x => x.PropertyType?.PropertyGroupId == null)
+                .OrderBy(x => x.PropertyType?.SortOrder);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Umbraco.Extensions
         {
             //get the properties for the current tab
             return content.Properties
-                .Where(property => propertyGroup.PropertyTypes
+                .Where(property => propertyGroup.PropertyTypes is not null && propertyGroup.PropertyTypes
                     .Select(propertyType => propertyType.Id)
                     .Contains(property.PropertyTypeId));
         }
@@ -258,8 +258,8 @@ namespace Umbraco.Extensions
             string propertyTypeAlias,
             string filename,
             Stream filestream,
-            string culture = null,
-            string segment = null)
+            string? culture = null,
+            string? segment = null)
         {
             if (filename == null || filestream == null)
                 return;
@@ -280,18 +280,18 @@ namespace Umbraco.Extensions
             string propertyTypeAlias,
             string filename,
             Stream filestream,
-            string culture = null,
-            string segment = null)
+            string? culture = null,
+            string? segment = null)
         {
             var property = GetProperty(content, contentTypeBaseServiceProvider, propertyTypeAlias);
 
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
-            string oldpath = null;
+            string? oldpath = null;
 
-            if (content.TryGetMediaPath(property.Alias, mediaUrlGenerators, out string mediaFilePath, culture, segment))
+            if (content.TryGetMediaPath(property.Alias, mediaUrlGenerators, out string? mediaFilePath, culture, segment))
             {
-                oldpath = mediaFileManager.FileSystem.GetRelativePath(mediaFilePath);
+                oldpath = mediaFileManager.FileSystem.GetRelativePath(mediaFilePath!);
             }
 
             var filepath = mediaFileManager.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
@@ -310,8 +310,8 @@ namespace Umbraco.Extensions
                 return property;
 
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
-            var propertyType = contentType.CompositionPropertyTypes
-                .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            var propertyType = contentType?.CompositionPropertyTypes
+                .FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             if (propertyType == null)
                 throw new Exception("No property type exists with alias " + propertyTypeAlias + ".");
 
@@ -339,8 +339,8 @@ namespace Umbraco.Extensions
         public static string StoreFile(this IContentBase content, MediaFileManager mediaFileManager, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
-            var propertyType = contentType
-                .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            var propertyType = contentType?
+                .CompositionPropertyTypes.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
             if (propertyType == null)
                 throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
             return mediaFileManager.StoreFile(content, propertyType, filename, filestream, filepath);

@@ -15,24 +15,28 @@ namespace Umbraco.Cms.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
-        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This field is for internal use only (to allow changing item keys).")]
-        internal PropertyGroupCollection Collection;
+        [SuppressMessage("Style", "IDE1006:Naming Styles",
+            Justification = "This field is for internal use only (to allow changing item keys).")]
+        internal PropertyGroupCollection? Collection;
+
         private PropertyGroupType _type;
-        private string _name;
+        private string? _name;
         private string _alias;
         private int _sortOrder;
-        private PropertyTypeCollection _propertyTypes;
+        private PropertyTypeCollection? _propertyTypes;
 
         public PropertyGroup(bool isPublishing)
             : this(new PropertyTypeCollection(isPublishing))
-        { }
+        {
+        }
 
         public PropertyGroup(PropertyTypeCollection propertyTypeCollection)
         {
             PropertyTypes = propertyTypeCollection;
+            _alias = string.Empty;
         }
 
-        private void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(PropertyTypes));
         }
@@ -57,7 +61,7 @@ namespace Umbraco.Cms.Core.Models
         /// The name.
         /// </value>
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -78,7 +82,7 @@ namespace Umbraco.Cms.Core.Models
                 // If added to a collection, ensure the key is changed before setting it (this ensures the internal lookup dictionary is updated)
                 Collection?.ChangeKey(this, value);
 
-                SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+                SetPropertyValueAndDetectChanges(value, ref _alias!, nameof(Alias));
             }
         }
 
@@ -106,7 +110,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [DataMember]
         [DoNotClone]
-        public PropertyTypeCollection PropertyTypes
+        public PropertyTypeCollection? PropertyTypes
         {
             get => _propertyTypes;
             set
@@ -118,17 +122,21 @@ namespace Umbraco.Cms.Core.Models
 
                 _propertyTypes = value;
 
-                // since we're adding this collection to this group,
-                // we need to ensure that all the lazy values are set.
-                foreach (var propertyType in _propertyTypes)
-                    propertyType.PropertyGroupId = new Lazy<int>(() => Id);
+                if (_propertyTypes is not null)
+                {
+                    // since we're adding this collection to this group,
+                    // we need to ensure that all the lazy values are set.
+                    foreach (var propertyType in _propertyTypes)
+                        propertyType.PropertyGroupId = new Lazy<int>(() => Id);
 
-                OnPropertyChanged(nameof(PropertyTypes));
-                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                    OnPropertyChanged(nameof(PropertyTypes));
+                    _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                }
             }
         }
 
-        public bool Equals(PropertyGroup other) => base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias);
+        public bool Equals(PropertyGroup? other) =>
+            base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias);
 
         public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
@@ -142,8 +150,9 @@ namespace Umbraco.Cms.Core.Models
             if (clonedEntity._propertyTypes != null)
             {
                 clonedEntity._propertyTypes.ClearCollectionChangedEvents(); //clear this event handler if any
-                clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
-                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged; //re-assign correct event handler
+                clonedEntity._propertyTypes = (PropertyTypeCollection)_propertyTypes!.DeepClone(); //manually deep clone
+                clonedEntity._propertyTypes.CollectionChanged +=
+                    clonedEntity.PropertyTypesChanged; //re-assign correct event handler
             }
         }
     }

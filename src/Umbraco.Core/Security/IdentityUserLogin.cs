@@ -41,6 +41,6 @@ namespace Umbraco.Cms.Core.Security
         public string UserId { get; set; }
 
         /// <inheritdoc />
-        public string UserData { get; set; }
+        public string? UserData { get; set; }
     }
 }

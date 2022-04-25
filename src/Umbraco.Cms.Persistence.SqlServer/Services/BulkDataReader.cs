@@ -38,12 +38,12 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
         /// The <see cref="DataTable"/> containing the input row set's schema information <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>
         /// requires to function correctly.
         /// </summary>
-        private DataTable _schemaTable = new DataTable();
+        private DataTable? _schemaTable = new DataTable();
 
         /// <summary>
         /// The mapping from the row set input to the target table's columns.
         /// </summary>
-        private List<SqlBulkCopyColumnMapping> _columnMappings = new List<SqlBulkCopyColumnMapping>();
+        private List<SqlBulkCopyColumnMapping>? _columnMappings = new List<SqlBulkCopyColumnMapping>();
 
         #endregion
 
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
         {
             get
             {
-                if (this._columnMappings.Count == 0)
+                if (this._columnMappings?.Count == 0)
                 {
                     // Need to add the column definitions and mappings.
                     AddSchemaTableRows();
@@ -69,10 +69,10 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                         throw new InvalidOperationException("AddSchemaTableRows did not add rows.");
                     }
 
-                    Debug.Assert(this._schemaTable.Rows.Count == FieldCount);
+                    Debug.Assert(this._schemaTable?.Rows.Count == FieldCount);
                 }
 
-                return new ReadOnlyCollection<SqlBulkCopyColumnMapping>(_columnMappings);
+                return new ReadOnlyCollection<SqlBulkCopyColumnMapping>(_columnMappings!);
             }
         }
 
@@ -211,11 +211,11 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                                          bool isKey,
                                          bool allowDbNull,
                                          SqlDbType providerType,
-                                         string udtSchema,
-                                         string udtType,
-                                         string xmlSchemaCollectionDatabase,
-                                         string xmlSchemaCollectionOwningSchema,
-                                         string xmlSchemaCollectionName)
+                                         string? udtSchema,
+                                         string? udtType,
+                                         string? xmlSchemaCollectionDatabase,
+                                         string? xmlSchemaCollectionOwningSchema,
+                                         string? xmlSchemaCollectionName)
         {
             if (string.IsNullOrEmpty(columnName))
             {
@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                 throw new ArgumentOutOfRangeException("columnSize");
             }
 
-            List<string> allowedOptionalColumnList;
+            List<string>? allowedOptionalColumnList;
 
             if (BulkDataReader.AllowedOptionalColumnCombinations.TryGetValue(providerType, out allowedOptionalColumnList))
             {
@@ -627,7 +627,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
 
             }
 
-            this._schemaTable.Rows.Add(columnName,
+            this._schemaTable?.Rows.Add(columnName,
                                       _schemaTable.Rows.Count,
                                       columnSize,
                                       numericPrecision,
@@ -656,7 +656,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                                       xmlSchemaCollectionOwningSchema,
                                       xmlSchemaCollectionName);
 
-            this._columnMappings.Add(new SqlBulkCopyColumnMapping(columnName, columnName));
+            this._columnMappings?.Add(new SqlBulkCopyColumnMapping(columnName, columnName));
         }
 
         #endregion
@@ -875,7 +875,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
         /// <seealso cref="IDataRecord.GetBytes(Int32,Int64,Byte[],Int32,Int32)"/>
         public long GetBytes(int i,
                              long fieldOffset,
-                             byte[] buffer,
+                             byte[]? buffer,
                              int bufferoffset,
                              int length)
         {
@@ -908,8 +908,8 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
 
             object data = GetValue(i);
             char? dataAsChar = data as char?;
-            char[] dataAsCharArray = data as char[];
-            string dataAsString = data as string;
+            char[]? dataAsCharArray = data as char[];
+            string? dataAsString = data as string;
 
             if (dataAsChar.HasValue)
             {
@@ -964,14 +964,14 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
         /// <seealso cref="IDataRecord.GetChars(Int32,Int64,Char[],Int32,Int32)"/>
         public long GetChars(int i,
                              long fieldoffset,
-                             char[] buffer,
+                             char[]? buffer,
                              int bufferoffset,
                              int length)
         {
             object data = GetValue(i);
 
-            string dataAsString = data as string;
-            char[] dataAsCharArray = data as char[];
+            string? dataAsString = data as string;
+            char[]? dataAsCharArray = data as char[];
 
             if (dataAsString != null)
             {
@@ -1013,7 +1013,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                 throw new ArgumentOutOfRangeException("i");
             }
 
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -1304,7 +1304,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                 throw new InvalidOperationException("The IDataReader is closed.");
             }
 
-            if (_schemaTable.Rows.Count == 0)
+            if (_schemaTable?.Rows.Count == 0)
             {
                 // Need to add the column definitions and mappings
                 _schemaTable.TableName = TableName;
@@ -1314,7 +1314,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                 Debug.Assert(_schemaTable.Rows.Count == FieldCount);
             }
 
-            return _schemaTable;
+            return _schemaTable!;
         }
 
         /// <summary>

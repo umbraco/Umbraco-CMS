@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             if (!_propertyEditors.TryGet(source.EditorAlias, out var editor))
                 return;
 
-            target.Alias = editor.Alias;
+            target.Alias = editor!.Alias;
             target.Group = editor.Group;
             target.Icon = editor.Icon;
         }
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             if (!_propertyEditors.TryGet(source.EditorAlias, out var editor))
                 return;
 
-            target.Alias = editor.Alias;
+            target.Alias = editor!.Alias;
             target.Group = editor.Group;
             target.Icon = editor.Icon;
         }
@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var properties = _propertyEditors
                 .Where(x => !x.IsDeprecated || _contentSettings.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name);
-            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties);
+            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties).WhereNotNull();
         }
 
         private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, MapperContext context)
@@ -146,8 +146,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             if (string.IsNullOrWhiteSpace(dataType.EditorAlias) || !_propertyEditors.TryGet(dataType.EditorAlias, out var editor))
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
-            var configurationEditor = editor.GetConfigurationEditor();
-            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
+            var configurationEditor = editor!.GetConfigurationEditor();
+            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields).WhereNotNull().ToList();
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
             MapConfigurationFields(dataType, fields, configurationDictionary);
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return fields;
         }
 
-        private void MapConfigurationFields(IDataType dataType, List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object> configuration)
+        private void MapConfigurationFields(IDataType? dataType, List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object>? configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -164,13 +164,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var field in fields.ToList())
             {
                 //filter out the not-supported pre-values for built-in data types
-                if (dataType != null && dataType.IsBuildInDataType() && field.Key.InvariantEquals(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes))
+                if (dataType != null && dataType.IsBuildInDataType() && (field.Key?.InvariantEquals(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes) ?? false))
                 {
                     fields.Remove(field);
                     continue;
                 }
 
-                if (configuration.TryGetValue(field.Key, out var value))
+                if (field.Key is not null && configuration.TryGetValue(field.Key, out var value))
                 {
                     field.Value = value;
                 }
@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 throw new InvalidOperationException($"Could not find property editor \"{source.EditorAlias}\".");
 
             // TODO: what about source.PropertyEditor? can we get the configuration here? 'cos it may change the storage type?!
-            var valueType = editor.GetValueEditor().ValueType;
+            var valueType = editor!.GetValueEditor().ValueType;
             return ValueTypes.ToStorageType(valueType);
         }
 
@@ -201,7 +201,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var configurationEditor = source.GetConfigurationEditor();
 
-            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
+            var fields =
+                context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields).WhereNotNull().ToList();
 
             var defaultConfiguration = configurationEditor.DefaultConfiguration;
             if (defaultConfiguration != null)

@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// </summary>
         /// <param name="alias">The model type alias.</param>
         /// <returns>A List{T} of the strongly-typed model, exposed as an IList.</returns>
-        IList CreateModelList(string alias);
+        IList? CreateModelList(string? alias);
 
         /// <summary>
         /// Maps a CLR type that may contain model types, to an actual CLR type.

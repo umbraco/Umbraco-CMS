@@ -11,18 +11,18 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class KeyValue : EntityBase, IKeyValue, IEntity
     {
-        private string _identifier;
-        private string _value;
+        private string _identifier = null!;
+        private string? _value;
 
         /// <inheritdoc />
         public string Identifier
         {
             get => _identifier;
-            set => SetPropertyValueAndDetectChanges(value, ref _identifier, nameof(Identifier));
+            set => SetPropertyValueAndDetectChanges(value, ref _identifier!, nameof(Identifier));
         }
 
         /// <inheritdoc />
-        public string Value
+        public string? Value
         {
             get => _value;
             set => SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value));

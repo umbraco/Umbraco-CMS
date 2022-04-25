@@ -17,14 +17,14 @@ namespace Umbraco.Cms.Core.Cache
         #region IAppCache
 
         /// <inheritdoc />
-        public virtual object Get(string key)
+        public virtual object? Get(string key)
         {
             key = GetCacheKey(key);
-            Lazy<object> result;
+            Lazy<object?>? result;
             try
             {
                 EnterReadLock();
-                result = GetEntry(key) as Lazy<object>; // null if key not found
+                result = GetEntry(key) as Lazy<object?>; // null if key not found
             }
             finally
             {
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public abstract object Get(string key, Func<object> factory);
+        public abstract object? Get(string key, Func<object?> factory);
 
         /// <inheritdoc />
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
@@ -54,12 +54,12 @@ namespace Umbraco.Cms.Core.Cache
             }
 
             return entries
-                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
-                .Where(x => x != null); // backward compat, don't store null values in the cache
+                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value)) // return exceptions as null
+                .Where(x => x != null)!; // backward compat, don't store null values in the cache
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<object> SearchByRegex(string regex)
+        public virtual IEnumerable<object?> SearchByRegex(string regex)
         {
             const string prefix = CacheItemPrefix + "-";
             var compiled = new Regex(regex, RegexOptions.Compiled);
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Cache
                 ExitReadLock();
             }
             return entries
-                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => SafeLazy.GetSafeLazyValue( (Lazy<object?>)x.Value)) // return exceptions as null
                 .Where(x => x != null); // backward compatible, don't store null values in the cache
         }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Core.Cache
                         // entry.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>) x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object?>) x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Core.Cache
                         // remove null values as well, does not hurt
                         // compare on exact type, don't use "is"
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>) x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object?>) x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Core.Cache
                         // remove null values as well, does not hurt
                         // compare on exact type, don't use "is"
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>) x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object?>) x.Value, true);
                         if (value == null) return true;
 
                         // if T is an interface remove anything that implements that interface
@@ -261,7 +261,7 @@ namespace Umbraco.Cms.Core.Cache
         // and use the full prefixed cache keys
         protected abstract IEnumerable<KeyValuePair<object, object>> GetDictionaryEntries();
         protected abstract void RemoveEntry(string key);
-        protected abstract object GetEntry(string key);
+        protected abstract object? GetEntry(string key);
 
         // read-write lock the underlying cache
         //protected abstract IDisposable ReadLock { get; }

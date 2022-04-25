@@ -23,21 +23,21 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// The message template describing the log event.
         /// </summary>
-        public string MessageTemplateText { get; set; }
+        public string? MessageTemplateText { get; set; }
 
         /// <summary>
         /// The message template filled with the log event properties.
         /// </summary>
-        public string RenderedMessage { get; set; }
+        public string? RenderedMessage { get; set; }
 
         /// <summary>
         /// Properties associated with the log event, including those presented in Serilog.Events.LogEvent.MessageTemplate.
         /// </summary>
-        public IReadOnlyDictionary<string, LogEventPropertyValue> Properties { get; set; }
+        public IReadOnlyDictionary<string, LogEventPropertyValue>? Properties { get; set; }
 
         /// <summary>
         /// An exception associated with the log event, or null.
         /// </summary>
-        public string Exception { get; set; }
+        public string? Exception { get; set; }
     }
 }

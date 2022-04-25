@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models
         private int _parentId;
         private int _childId;
         private IRelationType _relationType;
-        private string _comment;
+        private string? _comment;
 
         /// <summary>
         /// Constructor for constructing the entity to be created
@@ -81,14 +81,14 @@ namespace Umbraco.Cms.Core.Models
         public IRelationType RelationType
         {
             get => _relationType;
-            set => SetPropertyValueAndDetectChanges(value, ref _relationType, nameof(RelationType));
+            set => SetPropertyValueAndDetectChanges(value, ref _relationType!, nameof(RelationType));
         }
 
         /// <summary>
         /// Gets or sets a comment for the Relation
         /// </summary>
         [DataMember]
-        public string Comment
+        public string? Comment
         {
             get => _comment;
             set => SetPropertyValueAndDetectChanges(value, ref _comment, nameof(Comment));

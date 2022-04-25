@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Deploy
     public abstract class ArtifactBase<TUdi> : IArtifact
         where TUdi : Udi
     {
-        protected ArtifactBase(TUdi udi, IEnumerable<ArtifactDependency> dependencies = null)
+        protected ArtifactBase(TUdi udi, IEnumerable<ArtifactDependency>? dependencies = null)
         {
             Udi = udi ?? throw new ArgumentNullException("udi");
             Name = Udi.ToString();
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Deploy
 
         private readonly Lazy<string> _checksum;
 
-        private IEnumerable<ArtifactDependency> _dependencies;
+        private IEnumerable<ArtifactDependency>? _dependencies;
 
         protected abstract string GetChecksum();
 
@@ -43,16 +43,16 @@ namespace Umbraco.Cms.Core.Deploy
         /// </remarks>
         public bool ShouldSerializeChecksum() => false;
 
-        public IEnumerable<ArtifactDependency> Dependencies
+        public IEnumerable<ArtifactDependency>? Dependencies
         {
             get => _dependencies;
-            set => _dependencies = value.OrderBy(x => x.Udi);
+            set => _dependencies = value?.OrderBy(x => x.Udi);
         }
 
         #endregion
 
         public string Name { get; set; }
 
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
     }
 }

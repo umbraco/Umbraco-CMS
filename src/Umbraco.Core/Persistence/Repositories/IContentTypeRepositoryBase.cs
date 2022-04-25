@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<int, TItem>, IReadRepository<Guid, TItem>
         where TItem : IContentTypeComposition
     {
-        TItem Get(string alias);
+        TItem? Get(string alias);
         IEnumerable<MoveEventInfo<TItem>> Move(TItem moving, EntityContainer container);
 
         /// <summary>

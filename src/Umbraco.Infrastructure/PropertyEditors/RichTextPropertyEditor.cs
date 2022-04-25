@@ -82,9 +82,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() =>
+            DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute!);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() =>
+            new RichTextConfigurationEditor(_ioHelper);
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 
@@ -145,7 +147,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             /// <inheritdoc />
-            public override object Configuration
+            public override object? Configuration
             {
                 get => base.Configuration;
                 set
@@ -153,7 +155,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     if (value == null)
                         throw new ArgumentNullException(nameof(value));
                     if (!(value is RichTextConfiguration configuration))
-                        throw new ArgumentException($"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
+                        throw new ArgumentException(
+                            $"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.",
+                            nameof(value));
                     base.Configuration = value;
 
                     HideLabel = configuration.HideLabel;
@@ -167,14 +171,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="dataTypeService"></param>
             /// <param name="culture"></param>
             /// <param name="segment"></param>
-            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 if (val == null)
                     return null;
 
-                var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(val.ToString());
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved, new Dictionary<string, string>());
+                var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(val.ToString()!);
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved,
+                    new Dictionary<string, string>());
                 return parsed;
             }
 
@@ -184,20 +189,28 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value == null)
                 {
                     return null;
                 }
 
-                var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+                var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ??
+                             Constants.Security.SuperUserId;
 
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _imageUrlGenerator);
+                if (string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+                {
+                    return null;
+                }
+
+                var parseAndSavedTempImages =
+                    _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString()!, mediaParentId, userId,
+                        _imageUrlGenerator);
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
                 var sanitized = _htmlSanitizer.Sanitize(parsed);
@@ -210,15 +223,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
-                var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+                var asString = value == null ? string.Empty : value is string str ? str : value.ToString()!;
 
                 foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
+                {
                     yield return new UmbracoEntityReference(udi);
+                }
 
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
-                    yield return new UmbracoEntityReference(udi);
+                {
+                    if (udi is not null)
+                    {
+                        yield return new UmbracoEntityReference(udi);
+                    }
+                }
 
                 //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
                 //UPDATE: We are getting the Macros in 'FindUmbracoEntityReferencesFromEmbeddedMacros' - perhaps we just return the macro Udis here too or do they need their own relationAlias?
@@ -230,19 +250,20 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
         {
-            public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published)
+            public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property,
+                string? culture, string? segment, bool published)
             {
                 var val = property.GetValue(culture, segment, published);
 
                 if (!(val is string strVal)) yield break;
 
                 //index the stripped HTML values
-                yield return new KeyValuePair<string, IEnumerable<object>>(property.Alias, new object[] { strVal.StripHtml() });
+                yield return new KeyValuePair<string, IEnumerable<object?>>(property.Alias,
+                    new object[] {strVal.StripHtml()});
                 //store the raw value
-                yield return new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
+                yield return new KeyValuePair<string, IEnumerable<object?>>(
+                    $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] {strVal});
             }
         }
     }
-
-
 }

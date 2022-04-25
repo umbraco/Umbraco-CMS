@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             => false;
 
         /// <inheritdoc />
-        public virtual bool? IsValue(object value, PropertyValueLevel level)
+        public virtual bool? IsValue(object? value, PropertyValueLevel level)
         {
             switch (level)
             {
@@ -47,15 +47,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
             => PropertyCacheLevel.Snapshot;
 
         /// <inheritdoc />
-        public virtual object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public virtual object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
             => source;
 
         /// <inheritdoc />
-        public virtual object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public virtual object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => inter;
 
         /// <inheritdoc />
-        public virtual object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public virtual object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => inter?.ToString() ?? string.Empty;
     }
 }

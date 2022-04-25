@@ -33,10 +33,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "udi")]
         [ReadOnly(true)]
-        public Udi Udi { get; set; }
+        public Udi? Udi { get; set; }
 
         [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [DataMember(Name = "trashed")]
         [ReadOnly(true)]
@@ -46,17 +46,17 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// This is the unique Id stored in the database - but could also be the unique id for a custom membership provider
         /// </summary>
         [DataMember(Name = "key")]
-        public Guid Key { get; set; }
+        public Guid? Key { get; set; }
 
         [DataMember(Name = "parentId", IsRequired = true)]
         [Required]
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         /// <summary>
         /// The path of the entity
         /// </summary>
         [DataMember(Name = "path")]
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         /// <summary>
         /// A collection of content variants
@@ -65,19 +65,19 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// If a content item is invariant, this collection will only contain one item, else it will contain all culture variants
         /// </remarks>
         [DataMember(Name = "variants")]
-        public IEnumerable<TVariant> Variants { get; set; }
+        public IEnumerable<TVariant>? Variants { get; set; }
 
         [DataMember(Name = "owner")]
-        public UserProfile Owner { get; set; }
+        public UserProfile? Owner { get; set; }
 
         [DataMember(Name = "updater")]
-        public UserProfile Updater { get; set; }
+        public UserProfile? Updater { get; set; }
 
         /// <summary>
         /// The name of the content type
         /// </summary>
         [DataMember(Name = "contentTypeName")]
-        public string ContentTypeName { get; set; }
+        public string? ContentTypeName { get; set; }
 
         /// <summary>
         /// Indicates if the content is configured as a list view container
@@ -105,17 +105,17 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// so the app will need to go fetch the individual tree node in order to be able to load it's action list (menu)
         /// </remarks>
         [DataMember(Name = "treeNodeUrl")]
-        public string TreeNodeUrl { get; set; }
+        public string? TreeNodeUrl { get; set; }
 
         [DataMember(Name = "contentTypeId")]
-        public int ContentTypeId { get; set; }
+        public int? ContentTypeId { get; set; }
 
         [DataMember(Name = "contentTypeKey")]
         public Guid ContentTypeKey { get; set; }
 
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string ContentTypeAlias { get; set; }
+        public string ContentTypeAlias { get; set; } = null!;
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
@@ -130,19 +130,19 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public DateTime UpdateDate { get; set; }
 
         [DataMember(Name = "template")]
-        public string TemplateAlias { get; set; }
+        public string? TemplateAlias { get; set; }
 
         [DataMember(Name = "templateId")]
         public int TemplateId { get; set; }
 
         [DataMember(Name = "allowedTemplates")]
-        public IDictionary<string, string> AllowedTemplates { get; set; }
+        public IDictionary<string, string?>? AllowedTemplates { get; set; }
 
         [DataMember(Name = "documentType")]
-        public ContentTypeBasic DocumentType { get; set; }
+        public ContentTypeBasic? DocumentType { get; set; }
 
         [DataMember(Name = "urls")]
-        public UrlInfo[] Urls { get; set; }
+        public UrlInfo[]? Urls { get; set; }
 
         /// <summary>
         /// Determines whether previewing is allowed for this node
@@ -160,7 +160,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Each char represents a button which we can then map on the front-end to the correct actions
         /// </remarks>
         [DataMember(Name = "allowedActions")]
-        public IEnumerable<string> AllowedActions { get; set; }
+        public IEnumerable<string>? AllowedActions { get; set; }
 
         [DataMember(Name = "isBlueprint")]
         public bool IsBlueprint { get; set; }
@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        public IContent PersistedContent { get; set; }
+        public IContent? PersistedContent { get; set; }
 
         /// <summary>
         /// The DTO object used to gather all required content data including data type information etc... for use with validation - used during inbound model binding
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        public ContentPropertyCollectionDto ContentDto { get; set; }
+        public ContentPropertyCollectionDto? ContentDto { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
@@ -214,6 +214,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "metaData")]
         [ReadOnly(true)]
-        public IDictionary<string, object> AdditionalData { get; private set; }
+        public IDictionary<string, object>? AdditionalData { get; private set; }
     }
 }

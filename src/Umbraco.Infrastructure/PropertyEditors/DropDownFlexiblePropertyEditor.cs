@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor()
         {
-            return DataValueEditorFactory.Create<MultipleValueEditor>(Attribute);
+            return DataValueEditorFactory.Create<MultipleValueEditor>(Attribute!);
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new DropDownFlexibleConfigurationEditor(_textService, _ioHelper);

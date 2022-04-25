@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Models
     public class Consent : EntityBase, IConsent
     {
         private bool _current;
-        private string _source;
-        private string _context;
-        private string _action;
+        private string? _source;
+        private string? _context;
+        private string? _action;
         private ConsentState _state;
-        private string _comment;
+        private string? _comment;
 
         /// <inheritdoc />
         public bool Current
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string Source
+        public string? Source
         {
             get => _source;
             set
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string Context
+        public string? Context
         {
             get => _context;
             set
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string Action
+        public string? Action
         {
             get => _action;
             set
@@ -69,18 +69,18 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public string Comment
+        public string? Comment
         {
             get => _comment;
             set => SetPropertyValueAndDetectChanges(value, ref _comment, nameof(Comment));
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent> History => HistoryInternal;
+        public IEnumerable<IConsent>? History => HistoryInternal;
 
         /// <summary>
         /// Gets the previous states of this consent.
         /// </summary>
-        public List<IConsent> HistoryInternal { get; set; }
+        public List<IConsent>? HistoryInternal { get; set; }
     }
 }

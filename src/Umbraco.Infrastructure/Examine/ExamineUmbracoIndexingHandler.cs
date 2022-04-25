@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                             .Field("nodeType", id.ToInvariantString())
                             .Execute(QueryOptions.SkipTake(page * pageSize, pageSize));
                         total = results.TotalItemCount;
-                        
+
                         foreach (ISearchResult item in results)
                         {
                             if (int.TryParse(item.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int contentId))
@@ -214,9 +214,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             private readonly List<DeferedAction> _actions = new List<DeferedAction>();
 
-            public static DeferedActions Get(IScopeProvider scopeProvider)
+            public static DeferedActions? Get(IScopeProvider scopeProvider)
             {
-                IScopeContext scopeContext = scopeProvider.Context;
+                IScopeContext? scopeContext = scopeProvider.Context;
 
                 return scopeContext?.Enlist("examineEvents",
                     () => new DeferedActions(), // creator
@@ -224,7 +224,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     {
                         if (completed)
                         {
-                            actions.Execute();
+                            actions?.Execute();
                         }
                     }, EnlistPriority);
             }
@@ -384,7 +384,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly int _id;
-            private readonly IReadOnlyCollection<int> _ids;
+            private readonly IReadOnlyCollection<int>? _ids;
             private readonly bool _keepIfUnpublished;
 
             public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)

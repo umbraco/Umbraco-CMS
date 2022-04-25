@@ -38,6 +38,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "AccessId")]
-        public List<AccessRuleDto> Rules { get; set; }
+        public List<AccessRuleDto> Rules { get; set; } = null!;
     }
 }

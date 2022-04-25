@@ -7,13 +7,13 @@ namespace Umbraco.Cms.Web.Common.Models
     {
         [Required]
         [Display(Name = "User name")]
-        public string Username { get; set; }
+        public string Username { get; set; } = null!;
 
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         [StringLength(maximumLength: 256)]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }

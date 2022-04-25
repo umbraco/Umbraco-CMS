@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         protected override IDataValueEditor CreateValueEditor() =>
-            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute);
+            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService);
 
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             { }
 
             /// <inheritdoc />
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 var value = editorValue?.Value?.ToString();
 
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     return null;
                 }
 
-                if (editorValue.Value is JArray json)
+                if (editorValue?.Value is JArray json)
                 {
                     return json.HasValues ? json.Select(x => x.Value<string>()) : null;
                 }
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private class RequiredJsonValueValidator : IValueRequiredValidator
             {
                 /// <inheritdoc />
-                public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
+                public IEnumerable<ValidationResult> ValidateRequired(object? value, string valueType)
                 {
                     if (value == null)
                     {
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         yield break;
                     }
 
-                    if (value.ToString().DetectIsEmptyJson())
+                    if (value.ToString()!.DetectIsEmptyJson())
                         yield return new ValidationResult("Value cannot be empty", new[] { "value" });
                 }
             }

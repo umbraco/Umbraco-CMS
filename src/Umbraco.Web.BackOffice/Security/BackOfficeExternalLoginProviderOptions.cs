@@ -8,10 +8,10 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public BackOfficeExternalLoginProviderOptions(
             string buttonStyle,
             string icon,
-            ExternalSignInAutoLinkOptions autoLinkOptions = null,
+            ExternalSignInAutoLinkOptions? autoLinkOptions = null,
             bool denyLocalLogin = false,
             bool autoRedirectLoginToExternalProvider = false,
-            string customBackOfficeView = null)
+            string? customBackOfficeView = null)
         {
             ButtonStyle = buttonStyle;
             Icon = icon;
@@ -55,6 +55,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// If this view is specified it is 100% up to the user to render the html responsible for rendering the link/un-link buttons along with showing any errors
         /// that occur. This overrides what Umbraco normally does by default.
         /// </remarks>
-        public string CustomBackOfficeView { get; set; }
+        public string? CustomBackOfficeView { get; set; }
     }
 }

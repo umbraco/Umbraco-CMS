@@ -34,18 +34,18 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
 
         public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
-        public override string GetQuotedTableName(string tableName)
+        public override string GetQuotedTableName(string? tableName)
         {
-            if (tableName.Contains(".") == false)
+            if (tableName?.Contains(".") == false)
                 return $"[{tableName}]";
 
-            var tableNameParts = tableName.Split(Cms.Core.Constants.CharArrays.Period, 2);
-            return $"[{tableNameParts[0]}].[{tableNameParts[1]}]";
+            var tableNameParts = tableName?.Split(Cms.Core.Constants.CharArrays.Period, 2);
+            return $"[{tableNameParts?[0]}].[{tableNameParts?[1]}]";
         }
 
-        public override string GetQuotedColumnName(string columnName) => $"[{columnName}]";
+        public override string GetQuotedColumnName(string? columnName) => $"[{columnName}]";
 
-        public override string GetQuotedName(string name) => $"[{name}]";
+        public override string GetQuotedName(string? name) => $"[{name}]";
 
         public override string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType)
         {

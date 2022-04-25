@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Install
         /// <value>
         /// The view.
         /// </value>
-        public string View { get; private set; }
+        public string? View { get; private set; }
 
         /// <summary>
         /// Gets the view model.
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Install
         /// <remarks>
         /// This object is not included when serializing.
         /// </remarks>
-        public object ViewModel { get; private set; }
+        public object? ViewModel { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstallException" /> class.
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Install
         /// <param name="message">The message.</param>
         /// <param name="view">The view.</param>
         /// <param name="viewModel">The view model.</param>
-        public InstallException(string message, string view, object viewModel)
+        public InstallException(string message, string view, object? viewModel)
             : base(message)
         {
             View = view;

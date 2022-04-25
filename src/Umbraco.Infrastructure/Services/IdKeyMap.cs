@@ -173,11 +173,11 @@ namespace Umbraco.Cms.Core.Services
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
                     }
                     else
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
                             new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Cms.Core.Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
@@ -215,12 +215,12 @@ namespace Umbraco.Cms.Core.Services
             return GetIdForKey(guidUdi.Guid, umbracoType);
         }
 
-        public Attempt<Udi> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
+        public Attempt<Udi?> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
             var keyAttempt = GetKeyForId(id, umbracoObjectType);
-            return keyAttempt
-                ? Attempt.Succeed<Udi>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
-                : Attempt<Udi>.Fail();
+            return keyAttempt.Success
+                ? Attempt.Succeed<Udi?>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
+                : Attempt<Udi?>.Fail();
         }
 
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
@@ -261,11 +261,11 @@ namespace Umbraco.Cms.Core.Services
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
                     }
                     else
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
                             new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Cms.Core.Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();

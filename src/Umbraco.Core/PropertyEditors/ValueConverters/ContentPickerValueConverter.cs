@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Elements;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
 
@@ -54,27 +54,27 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (inter == null)
                 return null;
 
             if ((propertyType.Alias != null && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
-                IPublishedContent content;
+                IPublishedContent? content;
                 var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 if (inter is int id)
                 {
-                    content = publishedSnapshot.Content.GetById(id);
+                    content = publishedSnapshot.Content?.GetById(id);
                     if (content != null)
                         return content;
                 }
                 else
                 {
                     var udi = inter as GuidUdi;
-                    if (udi == null)
+                    if (udi is null)
                         return null;
-                    content = publishedSnapshot.Content.GetById(udi.Guid);
+                    content = publishedSnapshot.Content?.GetById(udi.Guid);
                     if (content != null && content.ContentType.ItemType == PublishedItemType.Content)
                         return content;
                 }
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return inter;
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (inter == null) return null;
             return inter.ToString();

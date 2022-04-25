@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute!);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <remarks>
             /// We will also check the pre-values here, if there are more items than what is allowed we'll just trim the end
             /// </remarks>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 var asArray = editorValue.Value as JArray;
                 if (asArray == null || asArray.HasValues == false)
@@ -84,13 +84,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
 
                 if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
-                    throw new PanicException($"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
+                    throw new PanicException($"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
                 var max = config.Maximum;
 
                 //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
                 var array = asArray.OfType<JObject>()
                                    .Where(x => x["value"] != null)
-                                   .Select(x => x["value"].Value<string>());
+                                   .Select(x => x["value"]!.Value<string>());
 
                 //only allow the max if over 0
                 if (max > 0)
@@ -113,10 +113,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
             {
                 var val = property.GetValue(culture, segment);
-                return val?.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+                return val?.ToString()?.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
                            .Select(x => JObject.FromObject(new {value = x})) ?? new JObject[] { };
             }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _localizedTextService = localizedTextService;
             }
 
-            public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format)
+            public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
             {
                 var asArray = value as JArray;
                 if (asArray == null)
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 var textStrings = asArray.OfType<JObject>()
                     .Where(x => x["value"] != null)
-                    .Select(x => x["value"].Value<string>());
+                    .Select(x => x["value"]!.Value<string>());
                 var textStringValidator = new RegexValidator(_localizedTextService);
                 foreach (var textString in textStrings)
                 {

@@ -51,13 +51,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 ? typeof(IPublishedContent)
                 : typeof(IEnumerable<IPublishedContent>);
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
 
             if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
             {
-                var nodeIds = source.ToString()
+                var nodeIds = source.ToString()?
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(UdiParser.Parse)
                     .ToArray();
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
         {
             if (source == null)
             {
@@ -90,26 +90,26 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         foreach (var udi in udis)
                         {
                             var guidUdi = udi as GuidUdi;
-                            if (guidUdi == null) continue;
+                            if (guidUdi is null) continue;
 
-                            IPublishedContent multiNodeTreePickerItem = null;
+                            IPublishedContent? multiNodeTreePickerItem = null;
                             switch (udi.EntityType)
                             {
                                 case Constants.UdiEntityType.Document:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot.Content.GetById(guidUdi.Guid));
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot.Content?.GetById(guidUdi.Guid));
                                     break;
                                 case Constants.UdiEntityType.Media:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot.Media.GetById(guidUdi.Guid));
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot.Media?.GetById(guidUdi.Guid));
                                     break;
                                 case Constants.UdiEntityType.Member:
                                     multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id =>
                                     {
-                                        IMember m = _memberService.GetByKey(guidUdi.Guid);
+                                        IMember? m = _memberService.GetByKey(guidUdi.Guid);
                                         if (m == null)
                                         {
                                             return null;
                                         }
-                                        IPublishedContent member = publishedSnapshot.Members.Get(m);
+                                        IPublishedContent? member = publishedSnapshot?.Members?.Get(m);
                                         return member;
                                     });
                                     break;
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <param name="expectedType">The type of content expected/supported by <paramref name="contentFetcher"/></param>
         /// <param name="contentFetcher">A function to fetch content of type <paramref name="expectedType"/></param>
         /// <returns>The requested content, or null if either it does not exist or <paramref name="actualType"/> does not match <paramref name="expectedType"/></returns>
-        private IPublishedContent GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent> contentFetcher)
+        private IPublishedContent? GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent?> contentFetcher)
         {
             // is the actual type supported by the content fetcher?
             if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)
@@ -166,6 +166,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return content;
         }
 
-        private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) => propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().MaxNumber == 1;
+        private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) => propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
     }
 }

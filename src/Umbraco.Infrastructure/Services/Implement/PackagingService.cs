@@ -47,9 +47,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Installation
 
-        public CompiledPackage GetCompiledPackageInfo(XDocument xml) => _packageInstallation.ReadPackage(xml);
+        public CompiledPackage GetCompiledPackageInfo(XDocument? xml) => _packageInstallation.ReadPackage(xml);
 
-        public InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId)
+        public InstallationSummary InstallCompiledPackageData(XDocument? packageXml, int userId = Constants.Security.SuperUserId)
         {
             CompiledPackage compiledPackage = GetCompiledPackageInfo(packageXml);
 
@@ -98,27 +98,27 @@ namespace Umbraco.Cms.Core.Services.Implement
             _createdPackages.Delete(id);
         }
 
-        public IEnumerable<PackageDefinition> GetAllCreatedPackages() => _createdPackages.GetAll();
+        public IEnumerable<PackageDefinition?> GetAllCreatedPackages() => _createdPackages.GetAll();
 
-        public PackageDefinition GetCreatedPackageById(int id) => _createdPackages.GetById(id);
+        public PackageDefinition? GetCreatedPackageById(int id) => _createdPackages.GetById(id);
 
         public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
 
         public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
-        public InstalledPackage GetInstalledPackageByName(string packageName)
-            => GetAllInstalledPackages().Where(x => x.PackageName.InvariantEquals(packageName)).FirstOrDefault();
+        public InstalledPackage? GetInstalledPackageByName(string packageName)
+            => GetAllInstalledPackages().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
 
         public IEnumerable<InstalledPackage> GetAllInstalledPackages()
         {
-            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
             var installedPackages = new Dictionary<string, InstalledPackage>();
 
             // Collect the package from the package migration plans
             foreach(PackageMigrationPlan plan in _packageMigrationPlans)
             {
-                if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage installedPackage))
+                if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
                 {
                     installedPackage = new InstalledPackage
                     {
@@ -128,7 +128,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-                keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var currentState);
+                if (keyValues is null || keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
+                        out var currentState))
+                {
+                    currentState = null;
+                }
+
                 currentPlans.Add(new InstalledPackageMigrationPlans
                 {
                     CurrentMigrationId = currentState,
@@ -141,7 +146,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             // Collect and merge the packages from the manifests
             foreach(PackageManifest package in _manifestParser.GetManifests())
             {
-                if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage installedPackage))
+                if (package.PackageName is null)
+                {
+                    continue;
+                }
+
+                if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
                 {
                     installedPackage = new InstalledPackage
                     {

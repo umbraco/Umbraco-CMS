@@ -257,6 +257,8 @@ context('Routing', () => {
         cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
+        // Close success notifications
+        cy.get('.alert-success > .close').click({multiple : true});
         // Publish Grandchild
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();

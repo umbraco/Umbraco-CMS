@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core
 {
     public static class StaticApplicationLogging
     {
-        private static ILoggerFactory s_loggerFactory;
+        private static ILoggerFactory? s_loggerFactory;
 
         public static void Initialize(ILoggerFactory loggerFactory) => s_loggerFactory = loggerFactory;
 

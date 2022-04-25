@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishResult"/> class.
         /// </summary>
-        public PublishResult(PublishResultType resultType, EventMessages eventMessages, IContent content)
+        public PublishResult(PublishResultType resultType, EventMessages? eventMessages, IContent? content)
             : base(resultType, eventMessages, content)
         { }
 
@@ -27,11 +27,11 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the document.
         /// </summary>
-        public IContent Content => Entity;
+        public IContent? Content => Entity;
 
         /// <summary>
         /// Gets or sets the invalid properties, if the status failed due to validation.
         /// </summary>
-        public IEnumerable<IProperty> InvalidProperties { get; set; }
+        public IEnumerable<IProperty>? InvalidProperties { get; set; }
     }
 }

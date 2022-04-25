@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Services
 
 
         /// <inheritdoc />
-        public IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser currentUser)
+        public IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser? currentUser)
         {
             var tabs = new List<Tab<IDashboard>>();
             var tabId = 0;
@@ -36,10 +36,10 @@ namespace Umbraco.Cms.Core.Services
             foreach (var dashboard in _dashboardCollection.Where(x => x.Sections.InvariantContains(section)))
             {
                 // validate access
-                if (!CheckUserAccessByRules(currentUser, _sectionService, dashboard.AccessRules))
+                if (currentUser is null || !CheckUserAccessByRules(currentUser, _sectionService, dashboard.AccessRules))
                     continue;
 
-                if (dashboard.View.InvariantEndsWith(".ascx"))
+                if (dashboard.View?.InvariantEndsWith(".ascx") ?? false)
                     throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
 
                 var dashboards = new List<IDashboard> { dashboard };
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser currentUser)
+        public IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser? currentUser)
         {
             return _sectionService.GetSections().ToDictionary(x => x.Alias, x => GetDashboards(x.Alias, currentUser));
         }
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Services
             var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);
 
             var hasAccess = true;
-            string[] assignedUserGroups = null;
+            string[]? assignedUserGroups = null;
 
             // if there are no grant rules, then access is granted by default, unless denied
             // otherwise, grant rules determine if access can be granted at all
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Services
                 if (grantBySectionRules.Length > 0)
                 {
                     var allowedSections = sectionService.GetAllowedSections(user.Id).Select(x => x.Alias).ToArray();
-                    var wantedSections = grantBySectionRules.SelectMany(g => g.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+                    var wantedSections = grantBySectionRules.SelectMany(g => g.Value?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>()).ToArray();
 
                     if (wantedSections.Intersect(allowedSections).Any())
                         hasAccess = true;
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.Services
                 if (hasAccess == false && grantRules.Any())
                 {
                     assignedUserGroups = user.Groups.Select(x => x.Alias).ToArray();
-                    var wantedUserGroups = grantRules.SelectMany(g => g.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+                    var wantedUserGroups = grantRules.SelectMany(g => g.Value?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>()).ToArray();
 
                     if (wantedUserGroups.Intersect(assignedUserGroups).Any())
                         hasAccess = true;
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Core.Services
             // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
             // be denied to see it no matter what
             assignedUserGroups = assignedUserGroups ?? user.Groups.Select(x => x.Alias).ToArray();
-            var deniedUserGroups = denyRules.SelectMany(g => g.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+            var deniedUserGroups = denyRules.SelectMany(g => g.Value?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>()).ToArray();
 
             if (deniedUserGroups.Intersect(assignedUserGroups).Any())
                 hasAccess = false;
@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Core.Services
 
         private static (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
         {
-            IAccessRule[] denyRules = null, grantRules = null, grantBySectionRules = null;
+            IAccessRule[]? denyRules = null, grantRules = null, grantBySectionRules = null;
 
             var groupedRules = rules.GroupBy(x => x.Type);
             foreach (var group in groupedRules)

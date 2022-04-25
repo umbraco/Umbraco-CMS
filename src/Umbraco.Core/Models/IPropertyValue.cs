@@ -7,24 +7,24 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <remarks>The culture is either null (invariant) or a non-empty string. If the property is
         /// set with an empty or whitespace value, its value is converted to null.</remarks>
-        string Culture { get; set; }
+        string? Culture { get; set; }
 
         /// <summary>
         /// Gets or sets the segment of the property.
         /// </summary>
         /// <remarks>The segment is either null (neutral) or a non-empty string. If the property is
         /// set with an empty or whitespace value, its value is converted to null.</remarks>
-        string Segment { get; set; }
+        string? Segment { get; set; }
 
         /// <summary>
         /// Gets or sets the edited value of the property.
         /// </summary>
-        object EditedValue { get; set; }
+        object? EditedValue { get; set; }
 
         /// <summary>
         /// Gets or sets the published value of the property.
         /// </summary>
-        object PublishedValue { get; set; }
+        object? PublishedValue { get; set; }
 
         /// <summary>
         /// Clones the property value.

@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Core.Models
     public class Script : File, IScript
     {
         public Script(string path)
-            : this(path, (Func<File, string>) null)
+            : this(path, (Func<File, string>?) null)
         { }
 
-        public Script(string path, Func<File, string> getFileContent)
+        public Script(string path, Func<File, string?>? getFileContent)
             : base(path, getFileContent)
         { }
 

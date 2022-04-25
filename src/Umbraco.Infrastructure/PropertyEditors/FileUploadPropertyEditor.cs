@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -61,12 +62,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute);
+            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
             editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
             return editor;
         }
 
-        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)]out string mediaPath)
         {
             if (propertyEditorAlias == Alias &&
                 value?.ToString() is var mediaPathValue &&

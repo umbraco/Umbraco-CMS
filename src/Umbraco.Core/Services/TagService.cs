@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityById(int id)
+        public TaggedEntity? GetTaggedEntityById(int id)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityByKey(Guid key)
+        public TaggedEntity? GetTaggedEntityByKey(Guid key)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string group, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string group, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string group = null, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string group, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string group, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string group = null, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string group, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string group, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string group = null, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetAllTags(string group = null, string culture = null)
+        public IEnumerable<ITag> GetAllTags(string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetAllContentTags(string group = null, string culture = null)
+        public IEnumerable<ITag> GetAllContentTags(string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetAllMediaTags(string group = null, string culture = null)
+        public IEnumerable<ITag> GetAllMediaTags(string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetAllMemberTags(string group = null, string culture = null)
+        public IEnumerable<ITag> GetAllMemberTags(string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(int contentId, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string? group = null, string? culture = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {

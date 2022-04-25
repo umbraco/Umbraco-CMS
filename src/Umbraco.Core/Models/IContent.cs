@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets the name of the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the name can change, but this will not until the content is published.</remarks>
-        string PublishName { get; set; }
+        string? PublishName { get; set; }
 
         /// <summary>
         /// Gets the identifier of the user who published the content.
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>When <paramref name="culture"/> is <c>null</c>, gets the invariant
         /// language, which is the value of the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        string GetPublishName(string culture);
+        string? GetPublishName(string? culture);
 
         /// <summary>
         /// Gets the published culture infos of the content.
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        ContentCultureInfosCollection PublishCultureInfos { get; set; }
+        ContentCultureInfosCollection? PublishCultureInfos { get; set; }
 
         /// <summary>
         /// Gets the published cultures.
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the edited cultures.
         /// </summary>
-        IEnumerable<string> EditedCultures { get; set; }
+        IEnumerable<string>? EditedCultures { get; set; }
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset

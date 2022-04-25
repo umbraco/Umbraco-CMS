@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors
             DefaultConfiguration.Add("multiPicker", "1");
         }
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleMediaPickerPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleMediaPickerPropertyValueEditor>(Attribute!);
 
         internal class MultipleMediaPickerPropertyValueEditor : MultiplePickerParamateterValueEditorBase
         {

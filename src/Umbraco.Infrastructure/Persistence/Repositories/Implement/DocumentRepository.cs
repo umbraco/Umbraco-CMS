@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly IJsonSerializer _serializer;
         private readonly AppCaches _appCaches;
         private readonly ILoggerFactory _loggerFactory;
-        private PermissionRepository<IContent> _permissionRepository;
+        private PermissionRepository<IContent>? _permissionRepository;
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
 
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Document;
 
-        protected override IContent PerformGet(int id)
+        protected override IContent? PerformGet(int id)
         {
             var sql = GetBaseQuery(QueryType.Single)
                 .Where<NodeDto>(x => x.NodeId == id)
@@ -110,11 +110,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 : MapDtoToContent(dto);
         }
 
-        protected override IEnumerable<IContent> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IContent> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(QueryType.Many);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
                            r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
                         .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
+                           r1.Select(documentVersionDto => documentVersionDto!.ContentVersionDto, "pcv")))
 
                        // select the variant name, coalesce to the invariant name, as "variantName"
                        .AndSelect(VariantNameSqlExpression + " AS variantName");
@@ -301,7 +301,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 false, false, true);
         }
 
-        public override IContent GetVersion(int versionId)
+        public override IContent? GetVersion(int versionId)
         {
             var sql = GetBaseQuery(QueryType.Single, false)
                 .Where<ContentVersionDto>(x => x.Id == versionId);
@@ -456,7 +456,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // persist the property data
-            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, entity.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out HashSet<string> editedCultures);
+            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, entity.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out HashSet<string>? editedCultures);
             foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
                 Database.Insert(propertyDataDto);
@@ -486,7 +486,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 // names also impact 'edited'
                 // ReSharper disable once UseDeconstruction
-                foreach (ContentCultureInfos cultureInfo in entity.CultureInfos)
+                foreach (ContentCultureInfos cultureInfo in entity.CultureInfos!)
                 {
                     if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                     {
@@ -495,7 +495,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
 
                 // refresh content
-                entity.SetCultureEdited(editedCultures);
+                entity.SetCultureEdited(editedCultures!);
 
                 // bump dates to align cultures to version
                 entity.AdjustDates(contentVersionDto.VersionDate, publishing);
@@ -504,7 +504,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
             }
 
             // trigger here, before we reset Published etc
@@ -657,7 +657,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
 
                 // insert property data
-                ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out HashSet<string> editedCultures);
+                ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out HashSet<string>? editedCultures);
 
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
@@ -683,7 +683,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     // names also impact 'edited'
                     // ReSharper disable once UseDeconstruction
-                    foreach (var cultureInfo in entity.CultureInfos)
+                    foreach (var cultureInfo in entity.CultureInfos!)
                     {
                         if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                         {
@@ -699,7 +699,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
 
                     // refresh content
-                    entity.SetCultureEdited(editedCultures);
+                    entity.SetCultureEdited(editedCultures!);
 
                     // bump dates to align cultures to version
                     entity.AdjustDates(contentVersionDto.VersionDate, publishing);
@@ -723,7 +723,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                     // insert document variations
-                    Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
+                    Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
                 }
 
                 // update the document dto
@@ -857,7 +857,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Content Repository
 
-        public int CountPublished(string contentTypeAlias = null)
+        public int CountPublished(string? contentTypeAlias = null)
         {
             var sql = SqlContext.Sql();
             if (contentTypeAlias.IsNullOrWhiteSpace())
@@ -918,11 +918,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        public override IEnumerable<IContent> GetPage(IQuery<IContent> query,
+        public override IEnumerable<IContent> GetPage(IQuery<IContent>? query,
             long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering)
+            IQuery<IContent>? filter, Ordering? ordering)
         {
-            Sql<ISqlContext> filterSql = null;
+            Sql<ISqlContext>? filterSql = null;
 
             // if we have a filter, map its clauses to an Sql statement
             if (filter != null)
@@ -954,17 +954,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 ordering);
         }
 
-        public bool IsPathPublished(IContent content)
+        public bool IsPathPublished(IContent? content)
         {
             // fail fast
-            if (content.Path.StartsWith("-1,-20,"))
+            if (content?.Path.StartsWith("-1,-20,") ?? false)
                 return false;
 
             // succeed fast
-            if (content.ParentId == -1)
+            if (content?.ParentId == -1)
                 return content.Published;
 
-            var ids = content.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(s => int.Parse(s, CultureInfo.InvariantCulture));
+            var ids = content?.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(s => int.Parse(s, CultureInfo.InvariantCulture));
 
             var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)
@@ -973,7 +973,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .WhereIn<NodeDto>(x => x.NodeId, ids);
 
             var count = Database.ExecuteScalar<int>(sql);
-            return count == content.Level;
+            return count == content?.Level;
         }
 
         #endregion
@@ -995,12 +995,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Read Repository implementation for Guid keys
 
-        public IContent Get(Guid id)
+        public IContent? Get(Guid id)
         {
             return _contentByGuidReadRepository.Get(id);
         }
 
-        IEnumerable<IContent> IReadRepository<Guid, IContent>.GetMany(params Guid[] ids)
+        IEnumerable<IContent> IReadRepository<Guid, IContent>.GetMany(params Guid[]? ids)
         {
             return _contentByGuidReadRepository.GetMany(ids);
         }
@@ -1023,7 +1023,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 _outerRepo = outerRepo;
             }
 
-            protected override IContent PerformGet(Guid id)
+            protected override IContent? PerformGet(Guid id)
             {
                 var sql = _outerRepo.GetBaseQuery(QueryType.Single)
                     .Where<NodeDto>(x => x.UniqueId == id);
@@ -1038,10 +1038,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return content;
             }
 
-            protected override IEnumerable<IContent> PerformGetAll(params Guid[] ids)
+            protected override IEnumerable<IContent> PerformGetAll(params Guid[]? ids)
             {
                 var sql = _outerRepo.GetBaseQuery(QueryType.Many);
-                if (ids.Length > 0)
+                if (ids?.Length > 0)
                     sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
 
                 return _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
@@ -1219,7 +1219,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool loadVariants = true)
         {
             var temps = new List<TempContent<Content>>();
-            var contentTypes = new Dictionary<int, IContentType>();
+            var contentTypes = new Dictionary<int, IContentType?>();
             var templateIds = new List<int>();
 
             var content = new Content[dtos.Count];
@@ -1275,15 +1275,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 temps.Add(temp);
             }
 
-            Dictionary<int, ITemplate> templates = null;
+            Dictionary<int, ITemplate>? templates = null;
             if (loadTemplates)
             {
                 // load all required templates in 1 query, and index
-                templates = _templateRepository.GetMany(templateIds.ToArray())
+                templates = _templateRepository.GetMany(templateIds.ToArray())?
                     .ToDictionary(x => x.Id, x => x);
             }
 
-            IDictionary<int, PropertyCollection> properties = null;
+            IDictionary<int, PropertyCollection>? properties = null;
             if (loadProperties)
             {
                 // load all properties for all documents from database in 1 query - indexed by version id
@@ -1296,18 +1296,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (loadTemplates)
                 {
                     // set the template ID if it matches an existing template
-                    if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
-                        temp.Content.TemplateId = temp.Template1Id;
-                    if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
-                        temp.Content.PublishTemplateId = temp.Template2Id;
+                    if (temp.Template1Id.HasValue && (templates?.ContainsKey(temp.Template1Id.Value) ?? false))
+                        temp.Content!.TemplateId = temp.Template1Id;
+                    if (temp.Template2Id.HasValue && (templates?.ContainsKey(temp.Template2Id.Value) ?? false))
+                        temp.Content!.PublishTemplateId = temp.Template2Id;
                 }
 
 
                 // set properties
                 if (loadProperties)
                 {
-                    if (properties.ContainsKey(temp.VersionId))
-                        temp.Content.Properties = properties[temp.VersionId];
+                    if (properties?.ContainsKey(temp.VersionId) ?? false)
+                        temp.Content!.Properties = properties[temp.VersionId];
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
                 }
@@ -1316,7 +1316,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (loadVariants)
             {
                 // set variations, if varying
-                temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
+                temps = temps.Where(x => x.ContentType?.VariesByCulture() ?? false).ToList();
                 if (temps.Count > 0)
                 {
                     // load all variations for all documents from database, in one query
@@ -1361,7 +1361,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 content.Properties = properties[dto.DocumentVersionDto.Id];
 
                 // set variations, if varying
-                if (contentType.VariesByCulture())
+                if (contentType?.VariesByCulture() ?? false)
                 {
                     var contentVariations = GetContentVariations(ltemp);
                     var documentVariations = GetDocumentVariations(ltemp);
@@ -1401,8 +1401,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return result;
         }
 
-        private void SetVariations(Content content, IDictionary<int, List<ContentVariation>> contentVariations, IDictionary<int, List<DocumentVariation>> documentVariations)
+        private void SetVariations(Content? content, IDictionary<int, List<ContentVariation>> contentVariations, IDictionary<int, List<DocumentVariation>> documentVariations)
         {
+            if (content is null)
+            {
+                return;
+            }
             if (contentVariations.TryGetValue(content.VersionId, out var contentVariation))
                 foreach (var v in contentVariation)
                     content.SetCultureInfo(v.Culture, v.Name, v.Date);
@@ -1484,34 +1488,40 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
         {
-            // create dtos for the 'current' (non-published) version, all cultures
-            // ReSharper disable once UseDeconstruction
-            foreach (var cultureInfo in content.CultureInfos)
-                yield return new ContentVersionCultureVariationDto
-                {
-                    VersionId = content.VersionId,
-                    LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
-                    Culture = cultureInfo.Culture,
-                    Name = cultureInfo.Name,
-                    UpdateDate = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
-                };
+            if (content.CultureInfos is not null)
+            {
+                // create dtos for the 'current' (non-published) version, all cultures
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in content.CultureInfos)
+                    yield return new ContentVersionCultureVariationDto
+                    {
+                        VersionId = content.VersionId,
+                        LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
+                        Culture = cultureInfo.Culture,
+                        Name = cultureInfo.Name,
+                        UpdateDate = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
+                    };
+            }
 
             // if not publishing, we're just updating the 'current' (non-published) version,
             // so there are no DTOs to create for the 'published' version which remains unchanged
             if (!publishing)
                 yield break;
 
-            // create dtos for the 'published' version, for published cultures (those having a name)
-            // ReSharper disable once UseDeconstruction
-            foreach (var cultureInfo in content.PublishCultureInfos)
-                yield return new ContentVersionCultureVariationDto
-                {
-                    VersionId = content.PublishedVersionId,
-                    LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
-                    Culture = cultureInfo.Culture,
-                    Name = cultureInfo.Name,
-                    UpdateDate = content.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
-                };
+            if (content.PublishCultureInfos is not null)
+            {
+                // create dtos for the 'published' version, for published cultures (those having a name)
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in content.PublishCultureInfos)
+                    yield return new ContentVersionCultureVariationDto
+                    {
+                        VersionId = content.PublishedVersionId,
+                        LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
+                        Culture = cultureInfo.Culture,
+                        Name = cultureInfo.Name,
+                        UpdateDate = content.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
+                    };
+            }
         }
 
         private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, HashSet<string> editedCultures)
@@ -1540,14 +1550,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private class ContentVariation
         {
-            public string Culture { get; set; }
-            public string Name { get; set; }
+            public string? Culture { get; set; }
+            public string? Name { get; set; }
             public DateTime Date { get; set; }
         }
 
         private class DocumentVariation
         {
-            public string Culture { get; set; }
+            public string? Culture { get; set; }
             public bool Edited { get; set; }
         }
 
@@ -1579,15 +1589,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 // content varies by culture
                 // then it must have at least a variant name, else it makes no sense
-                if (content.CultureInfos.Count == 0)
+                if (content.CultureInfos?.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
                 // and then, we need to set the invariant name implicitly,
                 // using the default culture if it has a name, otherwise anything we can
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)
-                    ? cultureName.Name
-                    : content.CultureInfos[0].Name;
+                content.Name = defaultCulture != null && (content.CultureInfos?.TryGetValue(defaultCulture, out var cultureName) ?? false)
+                    ? cultureName.Name!
+                    : content.CultureInfos![0].Name!;
             }
             else
             {
@@ -1602,7 +1612,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
         }
 
-        protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
         {
             return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
         }
@@ -1620,7 +1630,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private void EnsureVariantNamesAreUnique(IContent content, bool publishing)
         {
-            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0)
+            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos?.Count == 0)
                 return;
 
             // get names per culture, at same level (ie all siblings)
@@ -1636,6 +1646,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // of whether the name has changed (ie the culture has been updated) - some saving culture
             // fr-FR could cause culture en-UK name to change - not sure that is clean
 
+            if (content.CultureInfos is null)
+            {
+                return;
+            }
             foreach (var cultureInfo in content.CultureInfos)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
@@ -1653,7 +1667,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, cultureInfo.Culture);
-                if (publishing && content.PublishCultureInfos.ContainsKey(cultureInfo.Culture))
+                if (publishing && (content.PublishCultureInfos?.ContainsKey(cultureInfo.Culture) ?? false))
                     content.SetPublishInfo(cultureInfo.Culture, uniqueName, DateTime.Now); //TODO: This is weird, this call will have already been made in the SetCultureName
             }
         }
@@ -1662,7 +1676,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private class CultureNodeName
         {
             public int Id { get; set; }
-            public string Name { get; set; }
+            public string? Name { get; set; }
             public int LanguageId { get; set; }
         }
 

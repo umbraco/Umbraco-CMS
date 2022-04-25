@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// <param name="children"></param>
         /// <param name="isSingleNodeTree"></param>
         /// <returns></returns>
-        public static TreeRootNode CreateSingleTreeRoot(string nodeId, string getChildNodesUrl, string menuUrl, string title, TreeNodeCollection children, bool isSingleNodeTree = false)
+        public static TreeRootNode CreateSingleTreeRoot(string nodeId, string? getChildNodesUrl, string? menuUrl, string? title, TreeNodeCollection? children, bool isSingleNodeTree = false)
         {
             return new TreeRootNode(nodeId, getChildNodesUrl, menuUrl)
             {
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// <param name="nodeId"></param>
         /// <param name="getChildNodesUrl"></param>
         /// <param name="menuUrl"></param>
-        private TreeRootNode(string nodeId, string getChildNodesUrl, string menuUrl)
+        private TreeRootNode(string nodeId, string? getChildNodesUrl, string? menuUrl)
             : base(nodeId, null, getChildNodesUrl, menuUrl)
         {
             //default to false
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// The node's children collection
         /// </summary>
         [DataMember(Name = "children")]
-        public TreeNodeCollection Children { get; private set; }
+        public TreeNodeCollection? Children { get; private set; }
 
         /// <summary>
         /// Returns true if there are any children
@@ -152,6 +152,6 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// This is used in the UI to configure a full screen section/app
         /// </remarks>
         [DataMember(Name = "containsTrees")]
-        public bool ContainsTrees => Children.Count > 0 || !_isSingleNodeTree;
+        public bool ContainsTrees => Children?.Count > 0 || !_isSingleNodeTree;
     }
 }

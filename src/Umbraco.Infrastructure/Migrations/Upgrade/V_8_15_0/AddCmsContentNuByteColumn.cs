@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0
             [Column("data")]
             [SpecialDbType(SpecialDbTypes.NTEXT)]
             [NullSetting(NullSetting = NullSettings.Null)]
-            public string Data { get; set; }
+            public string? Data { get; set; }
 
             [Column("rv")]
             public long Rv { get; set; }

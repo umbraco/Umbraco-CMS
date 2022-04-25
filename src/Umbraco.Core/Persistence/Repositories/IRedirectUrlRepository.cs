@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <param name="contentKey">The content unique key.</param>
         /// <param name="culture">The culture.</param>
         /// <returns></returns>
-        IRedirectUrl Get(string url, Guid contentKey, string culture);
+        IRedirectUrl? Get(string url, Guid contentKey, string? culture);
 
         /// <summary>
         /// Deletes a redirect URL.
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="url">The Umbraco redirect URL route.</param>
         /// <returns>The most recent redirect URL corresponding to the route.</returns>
-        IRedirectUrl GetMostRecentUrl(string url);
+        IRedirectUrl? GetMostRecentUrl(string url);
 
         /// <summary>
         /// Gets the most recent redirect URL corresponding to an Umbraco redirect URL route.
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <param name="url">The Umbraco redirect URL route.</param>
         /// <param name="culture">The culture the domain is associated with</param>
         /// <returns>The most recent redirect URL corresponding to the route.</returns>
-        IRedirectUrl GetMostRecentUrl(string url, string culture);
+        IRedirectUrl? GetMostRecentUrl(string url, string culture);
 
         /// <summary>
         /// Gets all redirect URLs for a content item.

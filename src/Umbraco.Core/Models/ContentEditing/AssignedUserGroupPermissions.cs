@@ -17,21 +17,25 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The assigned permissions for the user group organized by permission group name
         /// </summary>
         [DataMember(Name = "permissions")]
-        public IDictionary<string, IEnumerable<Permission>> AssignedPermissions { get; set; }
+        public IDictionary<string, IEnumerable<Permission>>? AssignedPermissions { get; set; }
 
         /// <summary>
         /// The default permissions for the user group organized by permission group name
         /// </summary>
         [DataMember(Name = "defaultPermissions")]
-        public IDictionary<string, IEnumerable<Permission>> DefaultPermissions { get; set; }
+        public IDictionary<string, IEnumerable<Permission>>? DefaultPermissions { get; set; }
 
-        public static IDictionary<string, IEnumerable<Permission>> ClonePermissions(IDictionary<string, IEnumerable<Permission>> permissions)
+        public static IDictionary<string, IEnumerable<Permission>> ClonePermissions(IDictionary<string, IEnumerable<Permission>>? permissions)
         {
             var result = new Dictionary<string, IEnumerable<Permission>>();
-            foreach (var permission in permissions)
+            if (permissions is not null)
             {
-                result[permission.Key] = new List<Permission>(permission.Value.Select(x => (Permission)x.Clone()));
+                foreach (var permission in permissions)
+                {
+                    result[permission.Key] = new List<Permission>(permission.Value.Select(x => (Permission)x.Clone()));
+                }
             }
+
             return result;
         }
     }

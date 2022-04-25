@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         public virtual bool CanMigrate(string editorAlias)
             => true;
 
-        public virtual string GetNewAlias(string editorAlias)
+        public virtual string? GetNewAlias(string editorAlias)
             => editorAlias;
 
         public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
@@ -35,9 +35,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         protected virtual IEnumerable<PreValueDto> GetPreValues(IEnumerable<PreValueDto> preValues)
             => preValues;
 
-        protected virtual object GetPreValueValue(PreValueDto preValue)
+        protected virtual object? GetPreValueValue(PreValueDto preValue)
         {
-            return preValue.Value.DetectIsJson() ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
+            return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
         }
     }
 }

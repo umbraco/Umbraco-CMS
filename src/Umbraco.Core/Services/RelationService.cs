@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IRelation GetById(int id)
+        public IRelation? GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IRelationType GetRelationTypeById(int id)
+        public IRelationType? GetRelationTypeById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IRelationType GetRelationTypeById(Guid id)
+        public IRelationType? GetRelationTypeById(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IRelationType GetRelationTypeByAlias(string alias) => GetRelationType(alias);
+        public IRelationType? GetRelationTypeByAlias(string alias) => GetRelationType(alias);
 
         /// <inheritdoc />
         public IEnumerable<IRelation> GetAllRelations(params int[] ids)
@@ -70,13 +70,13 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetAllRelationsByRelationType(IRelationType relationType)
+        public IEnumerable<IRelation>? GetAllRelationsByRelationType(IRelationType relationType)
         {
             return GetAllRelationsByRelationType(relationType.Id);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
+        public IEnumerable<IRelation>? GetAllRelationsByRelationType(int relationTypeId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -95,30 +95,30 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetByParentId(int id) => GetByParentId(id, null);
+        public IEnumerable<IRelation>? GetByParentId(int id) => GetByParentId(id, null);
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetByParentId(int id, string relationTypeAlias)
+        public IEnumerable<IRelation> GetByParentId(int id, string? relationTypeAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 if (relationTypeAlias.IsNullOrWhiteSpace())
                 {
                     var qry1 = Query<IRelation>().Where(x => x.ParentId == id);
-                    return _relationRepository.Get(qry1);
+                    return _relationRepository.Get(qry1) ?? Enumerable.Empty<IRelation>();
                 }
 
-                var relationType = GetRelationType(relationTypeAlias);
+                var relationType = GetRelationType(relationTypeAlias!);
                 if (relationType == null)
                     return Enumerable.Empty<IRelation>();
 
                 var qry2 = Query<IRelation>().Where(x => x.ParentId == id && x.RelationTypeId == relationType.Id);
-                return _relationRepository.Get(qry2);
+                return _relationRepository.Get(qry2) ?? Enumerable.Empty<IRelation>();
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent) => GetByParentId(parent.Id);
+        public IEnumerable<IRelation>? GetByParent(IUmbracoEntity parent) => GetByParentId(parent.Id);
 
         /// <inheritdoc />
         public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent, string relationTypeAlias) => GetByParentId(parent.Id, relationTypeAlias);
@@ -127,22 +127,22 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IRelation> GetByChildId(int id) => GetByChildId(id, null);
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetByChildId(int id, string relationTypeAlias)
+        public IEnumerable<IRelation> GetByChildId(int id, string? relationTypeAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 if (relationTypeAlias.IsNullOrWhiteSpace())
                 {
                     var qry1 = Query<IRelation>().Where(x => x.ChildId == id);
-                    return _relationRepository.Get(qry1);
+                    return _relationRepository.Get(qry1) ?? Enumerable.Empty<IRelation>();
                 }
 
-                var relationType = GetRelationType(relationTypeAlias);
+                var relationType = GetRelationType(relationTypeAlias!);
                 if (relationType == null)
                     return Enumerable.Empty<IRelation>();
 
                 var qry2 = Query<IRelation>().Where(x => x.ChildId == id && x.RelationTypeId == relationType.Id);
-                return _relationRepository.Get(qry2);
+                return _relationRepository.Get(qry2) ?? Enumerable.Empty<IRelation>();
             }
         }
 
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IRelation> GetByChild(IUmbracoEntity child, string relationTypeAlias) => GetByChildId(child.Id, relationTypeAlias);
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetByParentOrChildId(int id)
+        public IEnumerable<IRelation>? GetByParentOrChildId(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
+        public IEnumerable<IRelation>? GetByParentOrChildId(int id, string relationTypeAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -176,30 +176,30 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
+        public IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IRelation>().Where(x => x.ParentId == parentId &&
-                                                          x.ChildId == childId &&
-                                                          x.RelationTypeId == relationType.Id);
-                return _relationRepository.Get(query).FirstOrDefault();
+                                                           x.ChildId == childId &&
+                                                           x.RelationTypeId == relationType.Id);
+                return _relationRepository.Get(query)?.FirstOrDefault();
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
         {
-            List<int> relationTypeIds;
+            List<int>? relationTypeIds;
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 //This is a silly query - but i guess it's needed in case someone has more than one relation with the same Name (not alias), odd.
                 var query = Query<IRelationType>().Where(x => x.Name == relationTypeName);
                 var relationTypes = _relationTypeRepository.Get(query);
-                relationTypeIds = relationTypes.Select(x => x.Id).ToList();
+                relationTypeIds = relationTypes?.Select(x => x.Id).ToList();
             }
 
-            return relationTypeIds.Count == 0
+            return relationTypeIds is null || relationTypeIds.Count == 0
                 ? Enumerable.Empty<IRelation>()
                 : GetRelationsByListOfTypeIds(relationTypeIds);
         }
@@ -215,7 +215,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
+        public IEnumerable<IRelation>? GetByRelationTypeId(int relationTypeId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -225,37 +225,42 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering ordering = null)
+        public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+                var query = Query<IRelation>()?.Where(x => x.RelationTypeId == relationTypeId);
                 return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
             }
         }
 
         /// <inheritdoc />
-        public IUmbracoEntity GetChildEntityFromRelation(IRelation relation)
+        public IUmbracoEntity? GetChildEntityFromRelation(IRelation relation)
         {
             var objectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
             return _entityService.Get(relation.ChildId, objectType);
         }
 
         /// <inheritdoc />
-        public IUmbracoEntity GetParentEntityFromRelation(IRelation relation)
+        public IUmbracoEntity? GetParentEntityFromRelation(IRelation relation)
         {
             var objectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
             return _entityService.Get(relation.ParentId, objectType);
         }
 
         /// <inheritdoc />
-        public Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation)
+        public Tuple<IUmbracoEntity, IUmbracoEntity>? GetEntitiesFromRelation(IRelation relation)
         {
             var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
             var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
 
             var child = _entityService.Get(relation.ChildId, childObjectType);
             var parent = _entityService.Get(relation.ParentId, parentObjectType);
+
+            if (parent is null || child is null)
+            {
+                return null;
+            }
 
             return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
         }
@@ -321,7 +326,10 @@ namespace Umbraco.Cms.Core.Services
                 var child = _entityService.Get(relation.ChildId, childObjectType);
                 var parent = _entityService.Get(relation.ParentId, parentObjectType);
 
-                yield return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
+                if (parent is not null && child is not null)
+                {
+                    yield return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
+                }
             }
         }
 
@@ -387,7 +395,7 @@ namespace Umbraco.Cms.Core.Services
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-                return _relationRepository.Get(query).Any();
+                return _relationRepository.Get(query)?.Any() ?? false;
             }
         }
 
@@ -397,7 +405,7 @@ namespace Umbraco.Cms.Core.Services
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
-                return _relationRepository.Get(query).Any();
+                return _relationRepository.Get(query)?.Any() ?? false;
             }
         }
 
@@ -407,7 +415,7 @@ namespace Umbraco.Cms.Core.Services
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
-                return _relationRepository.Get(query).Any();
+                return _relationRepository.Get(query)?.Any() ?? false;
             }
         }
 
@@ -428,7 +436,7 @@ namespace Umbraco.Cms.Core.Services
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
-                return _relationRepository.Get(query).Any();
+                return _relationRepository.Get(query)?.Any() ?? false;
             }
         }
 
@@ -548,8 +556,12 @@ namespace Umbraco.Cms.Core.Services
             var relations = new List<IRelation>();
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-                relations.AddRange(_relationRepository.Get(query).ToList());
+                IQuery<IRelation>? query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+                var allRelations = _relationRepository.Get(query)?.ToList();
+                if (allRelations is not null)
+                {
+                    relations.AddRange(allRelations);
+                }
 
                 //TODO: N+1, we should be able to do this in a single call
 
@@ -566,12 +578,12 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private IRelationType GetRelationType(string relationTypeAlias)
+        private IRelationType? GetRelationType(string relationTypeAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
-                return _relationTypeRepository.Get(query).FirstOrDefault();
+                return _relationTypeRepository.Get(query)?.FirstOrDefault();
             }
         }
 
@@ -584,13 +596,17 @@ namespace Umbraco.Cms.Core.Services
                 {
                     var id = relationTypeId;
                     var query = Query<IRelation>().Where(x => x.RelationTypeId == id);
-                    relations.AddRange(_relationRepository.Get(query));
+                    var relation = _relationRepository.Get(query);
+                    if (relation is not null)
+                    {
+                        relations.AddRange(relation);
+                    }
                 }
             }
             return relations;
         }
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.RelationType), message));
         }

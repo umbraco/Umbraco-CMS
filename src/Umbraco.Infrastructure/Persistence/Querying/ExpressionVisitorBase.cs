@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         /// <param name="expression">The expression</param>
         /// <returns>The SQL statement corresponding to the expression.</returns>
         /// <remarks>Also populates the SQL parameters.</remarks>
-        public virtual string Visit(Expression expression)
+        public virtual string Visit(Expression? expression)
         {
             if (expression == null) return string.Empty;
 
@@ -145,11 +145,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return cachedExpression.VisitResult;
         }
 
-        protected abstract string VisitMemberAccess(MemberExpression m);
+        protected abstract string VisitMemberAccess(MemberExpression? m);
 
-        protected virtual string VisitLambda(LambdaExpression lambda)
+        protected virtual string VisitLambda(LambdaExpression? lambda)
         {
-            if (lambda.Body.NodeType == ExpressionType.MemberAccess &&
+            if (lambda?.Body.NodeType == ExpressionType.MemberAccess &&
                 lambda.Body is MemberExpression memberExpression && memberExpression.Expression != null)
                 {
                     //This deals with members that are boolean (i.e. x => IsTrashed )
@@ -160,11 +160,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                     return Visited ? string.Empty : $"{result} = @{SqlParameters.Count - 1}";
                 }
 
-            return Visit(lambda.Body);
+            return Visit(lambda?.Body);
         }
 
-        protected virtual string VisitBinary(BinaryExpression b)
+        protected virtual string VisitBinary(BinaryExpression? b)
         {
+            if (b is null)
+            {
+                return string.Empty;
+            }
             var left = string.Empty;
             var right = string.Empty;
 
@@ -202,24 +206,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             {
                 // deal with (x == true|false) - most common
                 if (b.Right is ConstantExpression constRight && constRight.Type == typeof(bool))
-                    return (bool) constRight.Value ? VisitNotNot(b.Left) : VisitNot(b.Left);
+                    return (bool) constRight.Value! ? VisitNotNot(b.Left) : VisitNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false == x) - why not
                 if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof(bool))
-                    return (bool) constLeft.Value ? VisitNotNot(b.Right) : VisitNot(b.Right);
+                    return (bool) constLeft.Value! ? VisitNotNot(b.Right) : VisitNot(b.Right);
                 left = Visit(b.Left);
             }
             else if (operand == "<>")
             {
                 // deal with (x != true|false) - most common
                 if (b.Right is ConstantExpression constRight && constRight.Type == typeof (bool))
-                    return (bool) constRight.Value ? VisitNot(b.Left) : VisitNotNot(b.Left);
+                    return (bool) constRight.Value! ? VisitNot(b.Left) : VisitNotNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false != x) - why not
                 if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof (bool))
-                    return (bool) constLeft.Value ? VisitNot(b.Right) : VisitNotNot(b.Right);
+                    return (bool) constLeft.Value! ? VisitNot(b.Right) : VisitNotNot(b.Right);
                 left = Visit(b.Left);
             }
             else
@@ -251,9 +255,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             }
         }
 
-        protected virtual List<object> VisitExpressionList(ReadOnlyCollection<Expression> original)
+        protected virtual List<object> VisitExpressionList(ReadOnlyCollection<Expression>? original)
         {
             var list = new List<object>();
+            if (original is null)
+            {
+                return list;
+            }
             for (int i = 0, n = original.Count; i < n; i++)
             {
                 if (original[i].NodeType == ExpressionType.NewArrayInit ||
@@ -269,8 +277,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return list;
         }
 
-        protected virtual string VisitNew(NewExpression newExpression)
+        protected virtual string VisitNew(NewExpression? newExpression)
         {
+            if (newExpression is null)
+            {
+                return string.Empty;
+            }
             // TODO: check !
             var member = Expression.Convert(newExpression, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);
@@ -293,14 +305,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             }
         }
 
-        protected virtual string VisitParameter(ParameterExpression p)
+        protected virtual string VisitParameter(ParameterExpression? p)
         {
-            return p.Name;
+            return p?.Name ?? string.Empty;
         }
 
-        protected virtual string VisitConstant(ConstantExpression c)
+        protected virtual string VisitConstant(ConstantExpression? c)
         {
-            if (c.Value == null)
+            if (c?.Value == null)
                 return "null";
 
             SqlParameters.Add(c.Value);
@@ -308,14 +320,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
         }
 
-        protected virtual string VisitUnary(UnaryExpression u)
+        protected virtual string VisitUnary(UnaryExpression? u)
         {
-            switch (u.NodeType)
+            switch (u?.NodeType)
             {
                 case ExpressionType.Not:
                     return VisitNot(u.Operand);
                 default:
-                    return Visit(u.Operand);
+                    return Visit(u?.Operand);
             }
         }
 
@@ -357,14 +369,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             }
         }
 
-        protected virtual string VisitNewArray(NewArrayExpression na)
+        protected virtual string VisitNewArray(NewArrayExpression? na)
         {
+            if (na is null)
+            {
+                return string.Empty;
+            }
             var exprs = VisitExpressionList(na.Expressions);
             return Visited ? string.Empty : string.Join(",", exprs);
         }
 
-        protected virtual List<object> VisitNewArrayFromExpressionList(NewArrayExpression na)
-            => VisitExpressionList(na.Expressions);
+        protected virtual List<object> VisitNewArrayFromExpressionList(NewArrayExpression? na)
+            => VisitExpressionList(na?.Expressions);
 
         protected virtual string BindOperant(ExpressionType e)
         {
@@ -403,8 +419,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             }
         }
 
-        protected virtual string VisitMethodCall(MethodCallExpression m)
+        protected virtual string VisitMethodCall(MethodCallExpression? m)
         {
+            if (m is null)
+            {
+                return string.Empty;
+            }
             // m.Object is the expression that represent the instance for instance method class, or null for static method calls
             // m.Arguments is the collection of expressions that represent arguments of the called method
             // m.MethodInfo is the method info for the method to be called
@@ -482,7 +502,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var member = Expression.Convert(methodArgs[0], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
-                        compareValue = getter().ToString();
+                        compareValue = getter().ToString()!;
                     }
                     else
                     {
@@ -499,7 +519,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var colTypeArg = methodArgs.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
                         if (colTypeArg != null)
                         {
-                            colType = (TextColumnType)((ConstantExpression)colTypeArg).Value;
+                            colType = (TextColumnType)((ConstantExpression)colTypeArg).Value!;
                         }
                     }
 
@@ -515,7 +535,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var member = Expression.Convert(methodArgs[0], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
-                        searchValue = getter().ToString();
+                        searchValue = getter().ToString()!;
                     }
                     else
                     {
@@ -536,7 +556,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         var member = Expression.Convert(methodArgs[1], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
-                        replaceValue = getter().ToString();
+                        replaceValue = getter().ToString()!;
                     }
                     else
                     {
@@ -548,8 +568,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                         throw new NotSupportedException("An array Contains method is not supported");
                     }
 
-                    SqlParameters.Add(RemoveQuote(searchValue));
-                    SqlParameters.Add(RemoveQuote(replaceValue));
+                    SqlParameters.Add(RemoveQuote(searchValue)!);
+                    SqlParameters.Add(RemoveQuote(replaceValue)!);
 
                     //don't execute if compiled
                     return Visited ? string.Empty : $"replace({visitedMethodObject}, @{SqlParameters.Count - 2}, @{SqlParameters.Count - 1})";
@@ -703,13 +723,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             switch (verb)
             {
                 case nameof(SqlExpressionExtensions.SqlWildcard):
-                    SqlParameters.Add(RemoveQuote(val));
+                    SqlParameters.Add(RemoveQuote(val)!);
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
 
                 case "Equals":
                 case nameof(StringExtensions.InvariantEquals):
                 case nameof(SqlExpressionExtensions.SqlEquals):
-                    SqlParameters.Add(RemoveQuote(val));
+                    SqlParameters.Add(RemoveQuote(val)!);
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnEqualComparison(col, SqlParameters.Count - 1, columnType);
 
                 case "StartsWith":
@@ -740,14 +760,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         {
             return paramValue == null
                 ? string.Empty
-                : sqlSyntax.EscapeString(paramValue.ToString());
+                : sqlSyntax.EscapeString(paramValue.ToString()!);
         }
 
-        protected virtual string RemoveQuote(string exp)
+        protected virtual string? RemoveQuote(string? exp)
         {
             if (exp.IsNullOrWhiteSpace()) return exp;
 
-            var c = exp[0];
+            var c = exp![0];
             return (c == '"' || c == '`' || c == '\'') && exp[exp.Length - 1] == c
                 ? exp.Length == 1
                     ? string.Empty

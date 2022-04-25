@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.Common.ModelBinders
             // only IPublishedContent will ever exist in the request so when this model binder is used as an IModelBinder
             // in the aspnet pipeline it will really only support converting from IPublishedContent which is contained
             // in the UmbracoRouteValues --> IContentModel
-            UmbracoRouteValues umbracoRouteValues = bindingContext.HttpContext.Features.Get<UmbracoRouteValues>();
+            UmbracoRouteValues? umbracoRouteValues = bindingContext.HttpContext.Features.Get<UmbracoRouteValues>();
             if (umbracoRouteValues is null)
             {
                 return Task.CompletedTask;
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.Common.ModelBinders
         /// <summary>
         /// Attempts to bind the model
         /// </summary>
-        public void BindModel(ModelBindingContext bindingContext, object source, Type modelType)
+        public void BindModel(ModelBindingContext bindingContext, object? source, Type modelType)
         {
             // Null model, return
             if (source == null)
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Web.Common.ModelBinders
             }
 
             // Last chance : try to convert
-            Attempt<object> attempt2 = source.TryConvertTo(modelType);
+            Attempt<object?> attempt2 = source.TryConvertTo(modelType);
             if (attempt2.Success)
             {
                 bindingContext.Result = ModelBindingResult.Success(attempt2.Result);

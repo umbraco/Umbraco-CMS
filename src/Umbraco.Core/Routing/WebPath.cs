@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Routing
     {
         public const char PathSeparator = '/';
 
-        public static string Combine(params string[] paths)
+        public static string Combine(params string[]? paths)
         {
             if (paths == null)
             {

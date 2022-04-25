@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MediaPickerPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MediaPickerPropertyValueEditor>(Attribute!);
 
         public class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var asString = value is string str ? str : value?.ToString();
 

@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Core.Logging.Viewer
     //Log Expression Filters (pass in filter exp string)
     internal class ExpressionFilter : ILogFilter
     {
-        private readonly Func<LogEvent, bool> _filter;
+        private readonly Func<LogEvent, bool>? _filter;
         private const string s_expressionOperators = "()+=*<>%-";
 
-        public ExpressionFilter(string filterExpression)
+        public ExpressionFilter(string? filterExpression)
         {
-            Func<LogEvent, bool> filter;
+            Func<LogEvent, bool>? filter;
 
             // Our custom Serilog Functions to extend Serilog.Expressions
             // In this case we are plugging the gap for the missing Has()
@@ -36,11 +36,11 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             else // check if it's a valid expression
             {
                 // If the expression evaluates then make it into a filter
-                if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression compiled, out var error))
+                if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression? compiled, out var error))
                 {
                     filter = evt =>
                     {
-                        LogEventPropertyValue result = compiled(evt);
+                        LogEventPropertyValue? result = compiled(evt);
                         return ExpressionResult.IsTrue(result);
                     };
                 }
@@ -60,15 +60,15 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             return _filter == null || _filter(e);
         }
 
-        private Func<LogEvent, bool> PerformMessageLikeFilter(string filterExpression)
+        private Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression)
         {
             var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%'";
-            if (SerilogExpression.TryCompile(filterSearch, out CompiledExpression compiled, out var error))
+            if (SerilogExpression.TryCompile(filterSearch, out CompiledExpression? compiled, out var error))
             {
                 // `compiled` is a function that can be executed against `LogEvent`s:
                 return evt =>
                 {
-                    LogEventPropertyValue result = compiled(evt);
+                    LogEventPropertyValue? result = compiled(evt);
                     return ExpressionResult.IsTrue(result);
                 };
             }
