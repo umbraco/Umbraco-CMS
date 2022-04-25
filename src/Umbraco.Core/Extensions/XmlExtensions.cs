@@ -35,7 +35,7 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNodeList SelectNodes(this XmlNode source, string expression, IEnumerable<XPathVariable> variables)
+        public static XmlNodeList? SelectNodes(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
         {
             var av = variables == null ? null : variables.ToArray();
             return SelectNodes(source, expression, av);
@@ -53,7 +53,7 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable> variables)
+        public static XmlNodeList? SelectNodes(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
         {
             var av = variables == null ? null : variables.ToArray();
             return SelectNodes(source, expression, av);
@@ -71,12 +71,12 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNodeList SelectNodes(this XmlNode source, string expression, params XPathVariable[] variables)
+        public static XmlNodeList? SelectNodes(this XmlNode source, string? expression, params XPathVariable[]? variables)
         {
             if (variables == null || variables.Length == 0 || variables[0] == null)
-                return source.SelectNodes(expression);
+                return source.SelectNodes(expression ?? "");
 
-            var iterator = source.CreateNavigator().Select(expression, variables);
+            var iterator = source.CreateNavigator()?.Select(expression ?? "", variables);
             return XmlNodeListFactory.CreateNodeList(iterator);
         }
 
@@ -92,12 +92,12 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression, params XPathVariable[] variables)
+        public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
         {
             if (variables == null || variables.Length == 0 || variables[0] == null)
                 return source.SelectNodes(expression);
 
-            var iterator = source.CreateNavigator().Select(expression, variables);
+            var iterator = source.CreateNavigator()?.Select(expression, variables);
             return XmlNodeListFactory.CreateNodeList(iterator);
         }
 
@@ -113,7 +113,7 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNode SelectSingleNode(this XmlNode source, string expression, IEnumerable<XPathVariable> variables)
+        public static XmlNode? SelectSingleNode(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
         {
             var av = variables == null ? null : variables.ToArray();
             return SelectSingleNode(source, expression, av);
@@ -131,7 +131,7 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNode SelectSingleNode(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable> variables)
+        public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
         {
             var av = variables == null ? null : variables.ToArray();
             return SelectSingleNode(source, expression, av);
@@ -149,12 +149,12 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNode SelectSingleNode(this XmlNode source, string expression, params XPathVariable[] variables)
+        public static XmlNode? SelectSingleNode(this XmlNode source, string expression, params XPathVariable[]? variables)
         {
             if (variables == null || variables.Length == 0 || variables[0] == null)
                 return source.SelectSingleNode(expression);
 
-            return SelectNodes(source, expression, variables).Cast<XmlNode>().FirstOrDefault();
+            return SelectNodes(source, expression, variables)?.Cast<XmlNode>().FirstOrDefault();
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Umbraco.Extensions
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public static XmlNode SelectSingleNode(this XmlNode source, XPathExpression expression, params XPathVariable[] variables)
+        public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
         {
             if (variables == null || variables.Length == 0 || variables[0] == null)
                 return source.SelectSingleNode(expression);
@@ -211,7 +211,7 @@ namespace Umbraco.Extensions
         ///// </summary>
         ///// <param name="xElement"></param>
         ///// <returns></returns>
-        public static XmlNode ToXmlElement(this XContainer xElement)
+        public static XmlNode? ToXmlElement(this XContainer xElement)
         {
             var xmlDocument = new XmlDocument();
             using (var xmlReader = xElement.CreateReader())
@@ -235,7 +235,7 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static T RequiredAttributeValue<T>(this XElement xml, string attributeName)
+        public static T? RequiredAttributeValue<T>(this XElement xml, string attributeName)
         {
             if (xml == null)
             {
@@ -247,7 +247,7 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException($"{attributeName} not found in xml");
             }
 
-            XAttribute attribute = xml.Attribute(attributeName);
+            XAttribute? attribute = xml.Attribute(attributeName);
             if (attribute is null)
             {
                 throw new InvalidOperationException($"{attributeName} not found in xml");
@@ -262,7 +262,7 @@ namespace Umbraco.Extensions
             throw new InvalidOperationException($"{attribute.Value} attribute value cannot be converted to {typeof(T)}");
         }
 
-        public static T AttributeValue<T>(this XElement xml, string attributeName)
+        public static T? AttributeValue<T>(this XElement xml, string attributeName)
         {
             if (xml == null) throw new ArgumentNullException("xml");
             if (xml.HasAttributes == false) return default(T);
@@ -270,7 +270,7 @@ namespace Umbraco.Extensions
             if (xml.Attribute(attributeName) == null)
                 return default(T);
 
-            var val = xml.Attribute(attributeName).Value;
+            var val = xml.Attribute(attributeName)?.Value;
             var result = val.TryConvertTo<T>();
             if (result.Success)
                 return result.Result;
@@ -278,7 +278,7 @@ namespace Umbraco.Extensions
             return default(T);
         }
 
-        public static T AttributeValue<T>(this XmlNode xml, string attributeName)
+        public static T? AttributeValue<T>(this XmlNode xml, string attributeName)
         {
             if (xml == null) throw new ArgumentNullException("xml");
             if (xml.Attributes == null) return default(T);
@@ -286,7 +286,7 @@ namespace Umbraco.Extensions
             if (xml.Attributes[attributeName] == null)
                 return default(T);
 
-            var val = xml.Attributes[attributeName].Value;
+            var val = xml.Attributes[attributeName]?.Value;
             var result = val.TryConvertTo<T>();
             if (result.Success)
                 return result.Result;
@@ -294,7 +294,7 @@ namespace Umbraco.Extensions
             return default(T);
         }
 
-        public static XElement GetXElement(this XmlNode node)
+        public static XElement? GetXElement(this XmlNode node)
         {
             XDocument xDoc = new XDocument();
             using (XmlWriter xmlWriter = xDoc.CreateWriter())
@@ -302,7 +302,7 @@ namespace Umbraco.Extensions
             return xDoc.Root;
         }
 
-        public static XmlNode GetXmlNode(this XContainer element)
+        public static XmlNode? GetXmlNode(this XContainer element)
         {
             using (var xmlReader = element.CreateReader())
             {
@@ -312,9 +312,15 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static XmlNode GetXmlNode(this XContainer element, XmlDocument xmlDoc)
+        public static XmlNode? GetXmlNode(this XContainer element, XmlDocument xmlDoc)
         {
-            return xmlDoc.ImportNode(element.GetXmlNode(), true);
+            var node = element.GetXmlNode();
+            if (node is not null)
+            {
+                return xmlDoc.ImportNode(node, true);
+            }
+
+            return null;
         }
 
         // this exists because

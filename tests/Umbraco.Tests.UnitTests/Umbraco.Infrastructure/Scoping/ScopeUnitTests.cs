@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -18,6 +19,9 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 {
@@ -29,7 +33,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         /// </summary>
         /// <param name="syntaxProviderMock">The mock of the ISqlSyntaxProvider2, used to count method calls.</param>
         /// <returns></returns>
-        private ScopeProvider GetScopeProvider(out Mock<ISqlSyntaxProvider> syntaxProviderMock)
+        private ScopeProvider GetScopeProvider(out Mock<IDistributedLockingMechanism> lockingMechanism)
         {
             var loggerFactory = NullLoggerFactory.Instance;
             var fileSystems = new FileSystems(loggerFactory,
@@ -44,7 +48,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();
-            syntaxProviderMock = new Mock<ISqlSyntaxProvider>();
+
+            lockingMechanism = new Mock<IDistributedLockingMechanism>();
+            lockingMechanism.Setup(x => x.ReadLock(It.IsAny<int>(), It.IsAny<TimeSpan?>()))
+                .Returns(Mock.Of<IDistributedLock>());
+            lockingMechanism.Setup(x => x.WriteLock(It.IsAny<int>(), It.IsAny<TimeSpan?>()))
+                .Returns(Mock.Of<IDistributedLock>());
+
+            var lockingMechanismFactory = new Mock<IDistributedLockingMechanismFactory>();
+            lockingMechanismFactory.Setup(x => x.DistributedLockingMechanism)
+                .Returns(lockingMechanism.Object);
 
             // Setup mock of database factory to return mock of database.
             databaseFactory.Setup(x => x.CreateDatabase()).Returns(database.Object);
@@ -53,15 +66,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             // Setup mock of database to return mock of sql SqlContext
             database.Setup(x => x.SqlContext).Returns(sqlContext.Object);
 
+            var syntaxProviderMock = new Mock<ISqlSyntaxProvider>();
             // Setup mock of ISqlContext to return syntaxProviderMock
             sqlContext.Setup(x => x.SqlSyntax).Returns(syntaxProviderMock.Object);
 
             return new ScopeProvider(
+                lockingMechanismFactory.Object,
                 databaseFactory.Object,
                 fileSystems,
-                Options.Create(new CoreDebugSettings()),
-                mediaFileManager,
-                loggerFactory.CreateLogger<ScopeProvider>(),
+                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
                 loggerFactory,
                 Mock.Of<IRequestCache>(),
                 Mock.Of<IEventAggregator>());
@@ -126,8 +139,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Domains), Times.Once);
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
         }
 
         [Test]
@@ -150,8 +163,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.ContentTree, It.IsAny<TimeSpan?>()), Times.Once);
         }
 
         [Test]
@@ -182,8 +195,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), timeout, Constants.Locks.Domains), Times.Once);
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), timeout, Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
         }
 
         [Test]
@@ -215,8 +228,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.Domains), Times.Once);
-            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
         }
 
         [Test]
@@ -249,8 +262,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), timeOut, Constants.Locks.Domains), Times.Once);
-            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), timeOut, Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
         }
 
         [Test]
@@ -273,8 +286,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
-            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.ContentTree, It.IsAny<TimeSpan?>()), Times.Once);
         }
 
         [Test]
@@ -468,7 +481,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         public void WriteLock_Doesnt_Increment_On_Error()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
-            syntaxProviderMock.Setup(x => x.WriteLock(It.IsAny<IDatabase>(), It.IsAny<int[]>())).Throws(new Exception("Boom"));
+            syntaxProviderMock.Setup(x => x.WriteLock(It.IsAny<int>(), It.IsAny<TimeSpan?>())).Throws(new Exception("Boom"));
 
             using (var scope = (Scope)scopeProvider.CreateScope())
             {
@@ -482,7 +495,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         public void ReadLock_Doesnt_Increment_On_Error()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
-            syntaxProviderMock.Setup(x => x.ReadLock(It.IsAny<IDatabase>(), It.IsAny<int[]>())).Throws(new Exception("Boom"));
+            syntaxProviderMock.Setup(x => x.ReadLock(It.IsAny<int>(), It.IsAny<TimeSpan?>())).Throws(new Exception("Boom"));
 
             using (var scope = (Scope)scopeProvider.CreateScope())
             {

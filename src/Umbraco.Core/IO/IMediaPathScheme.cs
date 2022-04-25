@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="itemGuid">The (content, media) item unique identifier.</param>
         /// <param name="propertyGuid">The property type unique identifier.</param>
         /// <param name="filename">The file name.</param>
-        /// 
+        ///
         /// <returns>The filesystem-relative complete file path.</returns>
         string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename);
 
@@ -28,6 +28,6 @@ namespace Umbraco.Cms.Core.IO
         /// <para>The directory, and anything below it, will be deleted.</para>
         /// <para>Can return null (or empty) when no directory should be deleted.</para>
         /// </remarks>
-        string GetDeleteDirectory(MediaFileManager fileSystem, string filepath);
+        string? GetDeleteDirectory(MediaFileManager fileSystem, string filepath);
     }
 }

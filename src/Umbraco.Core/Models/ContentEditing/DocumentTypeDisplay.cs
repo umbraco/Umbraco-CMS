@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public IEnumerable<EntityBasic> AllowedTemplates { get; set; }
 
         [DataMember(Name = "defaultTemplate")]
-        public EntityBasic DefaultTemplate { get; set; }
+        public EntityBasic? DefaultTemplate { get; set; }
 
         [DataMember(Name = "allowCultureVariant")]
         public bool AllowCultureVariant { get; set; }
@@ -26,9 +26,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public bool AllowSegmentVariant { get; set; }
 
         [DataMember(Name = "apps")]
-        public IEnumerable<ContentApp> ContentApps { get; set; }
+        public IEnumerable<ContentApp>? ContentApps { get; set; }
 
         [DataMember(Name = "historyCleanup")]
-        public HistoryCleanupViewModel HistoryCleanup { get; set; }
+        public HistoryCleanupViewModel? HistoryCleanup { get; set; }
     }
 }

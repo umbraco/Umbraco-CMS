@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -107,7 +108,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             return new KeepAlive(
                 mockHostingEnvironment.Object,
                 mockMainDom.Object,
-                Options.Create(settings),
+
+                new TestOptionsMonitor<KeepAliveSettings>(settings),
                 mockLogger.Object,
                 mockProfilingLogger.Object,
                 mockServerRegistrar.Object,

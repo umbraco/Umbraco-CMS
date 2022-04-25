@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <remarks>
         /// This check is required since the base examine lib will try to rebuild on startup
         /// </remarks>
-        protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs> onComplete)
+        protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs>? onComplete)
         {
             if (CanInitialize())
             {
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        public Attempt<string> IsHealthy() => _diagnostics.IsHealthy();
-        public virtual IReadOnlyDictionary<string, object> Metadata => _diagnostics.Metadata;
+        public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();
+        public virtual IReadOnlyDictionary<string, object?> Metadata => _diagnostics.Metadata;
     }
 }

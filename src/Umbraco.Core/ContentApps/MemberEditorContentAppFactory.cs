@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Core.ContentApps
         // see note on ContentApp
         internal const int Weight = +50;
 
-        private ContentApp _memberApp;
+        private ContentApp? _memberApp;
 
-        public ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
+        public ContentApp? GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             switch (source)
             {

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         /// Overrides default naming of indexes:
         /// IX_tableName
         /// </remarks>
-        public string Name { get; set; }//Overrides default naming of indexes: IX_tableName
+        public string? Name { get; set; }//Overrides default naming of indexes: IX_tableName
 
         /// <summary>
         /// Gets or sets the type of index to create
@@ -30,11 +30,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         /// <summary>
         /// Gets or sets the column name(s) for the current index
         /// </summary>
-        public string ForColumns { get; set; }
+        public string? ForColumns { get; set; }
 
         /// <summary>
         /// Gets or sets the column name(s) for the columns to include in the index
         /// </summary>
-        public string IncludeColumns { get; set; }
+        public string? IncludeColumns { get; set; }
     }
 }

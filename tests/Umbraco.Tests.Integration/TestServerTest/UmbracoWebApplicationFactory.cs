@@ -18,11 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </summary>
         /// <param name="createHostBuilder">Method to create the IHostBuilder</param>
         /// <param name="beforeStart">Method to perform an action before IHost starts</param>
-        public UmbracoWebApplicationFactory(Func<IHostBuilder> createHostBuilder, Action<IHost> beforeStart = null)
-        {
-            _createHostBuilder = createHostBuilder;
-            _beforeStart = beforeStart;
-        }
+        public UmbracoWebApplicationFactory(Func<IHostBuilder> createHostBuilder) => _createHostBuilder = createHostBuilder;
 
         protected override IHostBuilder CreateHostBuilder() => _createHostBuilder();
 

@@ -2,15 +2,17 @@
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
+    // TODO: These should move to Persistence.SqlServer
+
     /// <summary>
     /// Provides a factory class for instantiating application-specific retry policies.
     /// </summary>
     public static class RetryPolicyFactory
     {
-        public static RetryPolicy GetDefaultSqlConnectionRetryPolicyByConnectionString(string connectionString)
+        public static RetryPolicy GetDefaultSqlConnectionRetryPolicyByConnectionString(string? connectionString)
         {
             //Is this really the best way to determine if the database is an Azure database?
-            return connectionString.Contains("database.windows.net")
+            return connectionString?.Contains("database.windows.net") ?? false
                        ? GetDefaultSqlAzureConnectionRetryPolicy()
                        : GetDefaultSqlConnectionRetryPolicy();
         }
@@ -30,10 +32,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
             return retryPolicy;
         }
 
-        public static RetryPolicy GetDefaultSqlCommandRetryPolicyByConnectionString(string connectionString)
+        public static RetryPolicy GetDefaultSqlCommandRetryPolicyByConnectionString(string? connectionString)
         {
             //Is this really the best way to determine if the database is an Azure database?
-            return connectionString.Contains("database.windows.net")
+            return connectionString?.Contains("database.windows.net") ?? false
                        ? GetDefaultSqlAzureCommandRetryPolicy()
                        : GetDefaultSqlCommandRetryPolicy();
         }

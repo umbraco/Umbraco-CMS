@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Core.Models
     /// </summary>
     public class ImageUrlGenerationOptions
     {
-        public ImageUrlGenerationOptions(string imageUrl) => ImageUrl = imageUrl;
+        public ImageUrlGenerationOptions(string? imageUrl) => ImageUrl = imageUrl;
 
-        public string ImageUrl { get; }
+        public string? ImageUrl { get; }
 
         public int? Width { get; set; }
 
@@ -19,13 +19,13 @@ namespace Umbraco.Cms.Core.Models
 
         public ImageCropAnchor? ImageCropAnchor { get; set; }
 
-        public FocalPointPosition FocalPoint { get; set; }
+        public FocalPointPosition? FocalPoint { get; set; }
 
-        public CropCoordinates Crop { get; set; }
+        public CropCoordinates? Crop { get; set; }
 
-        public string CacheBusterValue { get; set; }
+        public string? CacheBusterValue { get; set; }
 
-        public string FurtherOptions { get; set; }
+        public string? FurtherOptions { get; set; }
 
         /// <summary>
         /// The focal point position, in whatever units the registered IImageUrlGenerator uses, typically a percentage of the total image from 0.0 to 1.0.

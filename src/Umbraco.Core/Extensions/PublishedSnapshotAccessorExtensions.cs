@@ -9,8 +9,9 @@ namespace Umbraco.Extensions
         {
             if (publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
             {
-                return publishedSnapshot;
+                return publishedSnapshot!;
             }
+
             throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
         }
     }

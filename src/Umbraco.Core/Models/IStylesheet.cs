@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models
         ///
         /// /** umb_name: MyPropertyName */ p { font-size: 1em; }
         /// </remarks>
-        IEnumerable<IStylesheetProperty> Properties { get; }
+        IEnumerable<IStylesheetProperty>? Properties { get; }
 
         /// <summary>
         /// Adds an Umbraco stylesheet property for use in the back office

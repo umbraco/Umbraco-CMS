@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions
             Column = new ColumnDefinition { ModificationType = ModificationType.Alter };
         }
 
-        public virtual string SchemaName { get; set; }
-        public virtual string TableName { get; set; }
+        public virtual string? SchemaName { get; set; }
+        public virtual string? TableName { get; set; }
         public virtual ColumnDefinition Column { get; set; }
 
         protected override string GetSql()

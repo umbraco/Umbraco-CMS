@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IMediaTypeService mediaTypeService,
             IMediaService mediaService,
             IEntityService entityService,
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="parentId"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public ActionResult<MediaItemDisplay> GetEmpty(string contentTypeAlias, int parentId)
+        public ActionResult<MediaItemDisplay?> GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _mediaTypeService.Get(contentTypeAlias);
             if (contentType == null)
@@ -132,11 +132,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            var emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
             var mapped = _umbracoMapper.Map<MediaItemDisplay>(emptyContent);
 
-            //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+            if (mapped is not null)
+            {
+                //remove the listview app if it exists
+                mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+            }
 
             return mapped;
         }
@@ -173,7 +176,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
-        public MediaItemDisplay GetById(int id)
+        public MediaItemDisplay? GetById(int id)
         {
             var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
 
@@ -193,7 +196,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
-        public MediaItemDisplay GetById(Guid id)
+        public MediaItemDisplay? GetById(Guid id)
         {
             var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
 
@@ -213,7 +216,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
-        public ActionResult<MediaItemDisplay> GetById(Udi id)
+        public ActionResult<MediaItemDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -230,7 +233,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
-        public IEnumerable<MediaItemDisplay> GetByIds([FromQuery] int[] ids)
+        public IEnumerable<MediaItemDisplay?> GetByIds([FromQuery] int[] ids)
         {
             var foundMedia = _mediaService.GetByIds(ids);
             return foundMedia.Select(media => _umbracoMapper.Map<MediaItemDisplay>(media));
@@ -266,7 +269,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(total, pageNumber, pageSize)
             {
-                Items = children.Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>)
+                Items = children.Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
             };
         }
 
@@ -278,13 +281,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             // TODO: Add permissions check!
 
-            return _mediaService.GetRootMedia()
-                           .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>);
+            return _mediaService.GetRootMedia()?
+                           .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull() ?? Enumerable.Empty<ContentItemBasic<ContentPropertyBasic>>();
         }
 
         #region GetChildren
 
-        private int[] _userStartNodes;
+        private int[]? _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly MediaFileManager _mediaFileManager;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
@@ -293,7 +296,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)); }
+            get { return _userStartNodes ??= _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateMediaStartNodeIds(_entityService, _appCaches) ?? Array.Empty<int>(); }
         }
 
         /// <summary>
@@ -321,7 +324,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     pageSize = nodes.Length; // bah
                 var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(nodes.Length, pageNumber, pageSize)
                 {
-                    Items = nodes.Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>)
+                    Items = nodes.Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
                 };
                 return pr;
             }
@@ -332,12 +335,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             List<IMedia> children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                IQuery<IMedia> queryFilter = null;
+                IQuery<IMedia>? queryFilter = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
                     //add the default text filter
                     queryFilter = _sqlContext.Query<IMedia>()
-                        .Where(x => x.Name.Contains(filter));
+                        .Where(x => x.Name != null)
+                        .Where(x => x.Name!.Contains(filter));
                 }
 
                 children = _mediaService
@@ -361,7 +365,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children
-                .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>);
+                .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull();
 
             return pagedResult;
         }
@@ -449,7 +453,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //if the current item is in the recycle bin
             if (foundMedia.Trashed == false)
             {
-                var moveResult = _mediaService.MoveToRecycleBin(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+                var moveResult = _mediaService.MoveToRecycleBin(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
                 if (moveResult == false)
                 {
                     return ValidationProblem();
@@ -457,7 +461,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var deleteResult = _mediaService.Delete(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+                var deleteResult = _mediaService.Delete(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
                 if (deleteResult == false)
                 {
                     return ValidationProblem();
@@ -490,9 +494,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var destinationParentID = move.ParentId;
-            var sourceParentID = toMove.ParentId;
+            var sourceParentID = toMove?.ParentId;
 
-            var moveResult = _mediaService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            var moveResult = toMove is null ? false : _mediaService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             if (sourceParentID == destinationParentID)
             {
@@ -504,7 +508,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+                return Content(toMove!.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
         }
 
@@ -515,7 +519,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [MediaItemSaveValidation]
         [OutgoingEditorModelEvent]
-        public ActionResult<MediaItemDisplay> PostSave(
+        public ActionResult<MediaItemDisplay?>? PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
         {
@@ -538,7 +542,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // * Permissions are valid
 
             //Don't update the name if it is empty
-            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            if (contentItem.Name.IsNullOrWhiteSpace() == false && contentItem.PersistedContent is not null)
             {
                 contentItem.PersistedContent.Name = contentItem.Name;
             }
@@ -546,8 +550,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             MapPropertyValuesForPersistence<IMedia, MediaItemSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
-                (save, property) => property.GetValue(), //get prop val
-                (save, property, v) => property.SetValue(v), //set prop val
+                (save, property) => property?.GetValue(), //get prop val
+                (save, property, v) => property?.SetValue(v), //set prop val
                 null); // media are all invariant
 
             //we will continue to save if model state is invalid, however we cannot save if critical data is missing.
@@ -559,13 +563,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw validation response
-                    MediaItemDisplay forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
+                    MediaItemDisplay? forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                     return ValidationProblem(forDisplay, ModelState);
                 }
             }
 
+            if (contentItem.PersistedContent is null)
+            {
+                return null;
+            }
+
             //save the item
-            var saveStatus = _mediaService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            var saveStatus = _mediaService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             //return the updated model
             var display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
@@ -583,7 +592,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case ContentSaveAction.SaveNew:
                     if (saveStatus.Success)
                     {
-                        display.AddSuccessNotification(
+                        display?.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles", "editMediaSaved"),
                             _localizedTextService.Localize("speechBubbles", "editMediaSavedText"));
                     }
@@ -594,7 +603,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         //If the item is new and the operation was cancelled, we need to return a different
                         // status code so the UI can handle it since it won't be able to redirect since there
                         // is no Id to redirect to!
-                        if (saveStatus.Result.Result == OperationResultType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
+                        if (saveStatus.Result?.Result == OperationResultType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
                         {
                             return ValidationProblem(display);
                         }
@@ -614,7 +623,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult EmptyRecycleBin()
         {
-            _mediaService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            _mediaService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             return Ok(_localizedTextService.Localize("defaultdialogs", "recycleBinIsEmpty"));
         }
@@ -632,7 +641,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //if there's nothing to sort just return ok
-            if (sorted.IdSortOrder.Length == 0)
+            if (sorted.IdSortOrder?.Length == 0)
             {
                 return Ok();
             }
@@ -649,7 +658,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var sortedMedia = new List<IMedia>();
             try
             {
-                sortedMedia.AddRange(sorted.IdSortOrder.Select(_mediaService.GetById));
+                sortedMedia.AddRange(sorted.IdSortOrder?.Select(_mediaService.GetById).WhereNotNull() ?? Enumerable.Empty<IMedia>());
 
                 // Save Media with new sort order and update content xml in db accordingly
                 if (_mediaService.Sort(sortedMedia) == false)
@@ -666,15 +675,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        public async Task<ActionResult<MediaItemDisplay>> PostAddFolder(PostedFolder folder)
+        public async Task<ActionResult<MediaItemDisplay?>> PostAddFolder(PostedFolder folder)
         {
             var parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions: true);
-            if (!(parentIdResult.Result is null))
+            if (!(parentIdResult?.Result is null))
             {
-                return new ActionResult<MediaItemDisplay>(parentIdResult.Result);
+                return new ActionResult<MediaItemDisplay?>(parentIdResult.Result);
             }
 
-            var parentId = parentIdResult.Value;
+            var parentId = parentIdResult?.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
@@ -687,7 +696,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var f = _mediaService.CreateMedia(folder.Name, parentId.Value, Constants.Conventions.MediaTypes.Folder);
-            _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             return _umbracoMapper.Map<MediaItemDisplay>(f);
         }
@@ -713,12 +722,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             //get the string json from the request
             var parentIdResult = await GetParentIdAsIntAsync(currentFolder, validatePermissions: true);
-            if (!(parentIdResult.Result is null))
+            if (!(parentIdResult?.Result is null))
             {
                 return parentIdResult.Result;
             }
 
-            var parentId = parentIdResult.Value;
+            var parentId = parentIdResult?.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
@@ -740,14 +749,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
                     var folderName = folders[i];
-                    IMedia folderMediaItem;
+                    IMedia? folderMediaItem;
 
                     //if uploading directly to media root and not a subfolder
                     if (parentId == Constants.System.Root)
                     {
                         //look for matching folder
                         folderMediaItem =
-                            _mediaService.GetRootMedia().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                            _mediaService.GetRootMedia()?.FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
                         if (folderMediaItem == null)
                         {
                             //if null, create a folder
@@ -789,21 +798,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (parentId != Constants.System.Root)
             {
                 var mediaFolderItem = _mediaService.GetById(parentId.Value);
-                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
+                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem?.ContentType.Alias);
 
                 if (mediaFolderType != null)
                 {
-                    IMediaType mediaTypeItem = null;
+                    IMediaType? mediaTypeItem = null;
 
-                    foreach (ContentTypeSort allowedContentType in mediaFolderType.AllowedContentTypes)
+                    if (mediaFolderType.AllowedContentTypes is not null)
                     {
-                        IMediaType checkMediaTypeItem = allMediaTypes.FirstOrDefault(x => x.Id == allowedContentType.Id.Value);
-                        allowedContentTypes.Add(checkMediaTypeItem);
-
-                        var fileProperty = checkMediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
-                        if (fileProperty != null)
+                        foreach (ContentTypeSort allowedContentType in mediaFolderType.AllowedContentTypes)
                         {
-                            mediaTypeItem = checkMediaTypeItem;
+                            IMediaType? checkMediaTypeItem = allMediaTypes.FirstOrDefault(x => x.Id == allowedContentType.Id.Value);
+                            if (checkMediaTypeItem is not null)
+                            {
+                                allowedContentTypes.Add(checkMediaTypeItem);
+                            }
+
+                            var fileProperty = checkMediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File);
+                            if (fileProperty != null)
+                            {
+                                mediaTypeItem = checkMediaTypeItem;
+                            }
                         }
                     }
 
@@ -892,14 +907,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 var mediaItemName = fileName.ToFriendlyName();
 
-                var createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                var createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
                 await using (var stream = formFile.OpenReadStream())
                 {
                     createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
                 }
 
-                var saveResult = _mediaService.Save(createdMediaItem, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                var saveResult = _mediaService.Save(createdMediaItem, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
                 if (saveResult == false)
                 {
                     AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
@@ -931,18 +946,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else
             {
                 var parentMediaType = _mediaService.GetById(parentId);
-                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == parentMediaType.ContentType.Alias);
+                var mediaFolderType = allMediaTypes.FirstOrDefault(x => x.Alias == parentMediaType?.ContentType.Alias);
                 if (mediaFolderType != null)
                 {
                     isFolderAllowed =
-                        mediaFolderType.AllowedContentTypes.Any(x => x.Alias == Constants.Conventions.MediaTypes.Folder);
+                        mediaFolderType.AllowedContentTypes?.Any(x => x.Alias == Constants.Conventions.MediaTypes.Folder) ?? false;
                 }
             }
 
             return isFolderAllowed;
         }
 
-        private IMedia FindInChildren(int mediaId, string nameToFind, string contentTypeAlias)
+        private IMedia? FindInChildren(int mediaId, string nameToFind, string contentTypeAlias)
         {
             const int pageSize = 500;
             var page = 0;
@@ -969,14 +984,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// and if that check fails an unauthorized exception will occur
         /// </param>
         /// <returns></returns>
-        private async Task<ActionResult<int?>> GetParentIdAsIntAsync(string parentId, bool validatePermissions)
+        private async Task<ActionResult<int?>?> GetParentIdAsIntAsync(string? parentId, bool validatePermissions)
         {
             int intParentId;
 
             // test for udi
-            if (UdiParser.TryParse(parentId, out GuidUdi parentUdi))
+            if (UdiParser.TryParse(parentId, out GuidUdi? parentUdi))
             {
-                parentId = parentUdi.Guid.ToString();
+                parentId = parentUdi?.Guid.ToString();
             }
 
             //if it's not an INT then we'll check for GUID
@@ -1062,7 +1077,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 //check if the item is allowed under this one
                 var parentContentType = _mediaTypeService.Get(parent.ContentTypeId);
-                if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                if (parentContentType?.AllowedContentTypes?.Select(x => x.Id).ToArray()
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     var notificationModel = new SimpleNotificationModel();
@@ -1082,7 +1097,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return new ActionResult<IMedia>(toMove);
         }
 
-        [Obsolete("Please use TrackedReferencesController.GetPagedReferences() instead. Scheduled for removal in V11.")]
+        [Obsolete("Please use TrackedReferencesController.GetPagedRelationsForItem() instead. Scheduled for removal in V11.")]
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)

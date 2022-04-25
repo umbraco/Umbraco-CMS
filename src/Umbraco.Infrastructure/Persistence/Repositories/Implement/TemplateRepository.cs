@@ -12,11 +12,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     {
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IFileSystem _viewsFileSystem;
+        private readonly IFileSystem? _viewsFileSystem;
         private readonly IViewHelper _viewHelper;
 
         public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, FileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper, IViewHelper viewHelper)
@@ -45,15 +45,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,ITemplate>
 
-        protected override ITemplate PerformGet(int id) =>
+        protected override ITemplate? PerformGet(int id) =>
             //use the underlying GetAll which will force cache all templates
-            base.GetMany().FirstOrDefault(x => x.Id == id);
+            base.GetMany()?.FirstOrDefault(x => x.Id == id);
 
-        protected override IEnumerable<ITemplate> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
         {
             Sql<ISqlContext> sql = GetBaseQuery(false);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.Where("umbracoNode.id in (@ids)", new { ids });
             }
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            IUmbracoEntity[] childIds = (ids.Any()
+            IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
                 : dtos.Select(x => new EntitySlim
                 {
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             int o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
-            ITemplate parent = Get(template.MasterTemplateId.Value);
+            ITemplate? parent = Get(template.MasterTemplateId!.Value);
             if (parent != null)
             {
                 nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -195,19 +195,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             EnsureValidAlias(entity);
 
             //store the changed alias if there is one for use with updating files later
-            string originalAlias = entity.Alias;
+            string? originalAlias = entity.Alias;
             if (entity.IsPropertyDirty("Alias"))
             {
                 //we need to check what it currently is before saving and remove that file
-                ITemplate current = Get(entity.Id);
-                originalAlias = current.Alias;
+                ITemplate? current = Get(entity.Id);
+                originalAlias = current?.Alias;
             }
 
             var template = (Template)entity;
 
             if (entity.IsPropertyDirty("MasterTemplateId"))
             {
-                ITemplate parent = Get(template.MasterTemplateId.Value);
+                ITemplate? parent = Get(template.MasterTemplateId!.Value);
                 if (parent != null)
                 {
                     entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -245,9 +245,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        private void SaveFile(Template template, string originalAlias = null)
+        private void SaveFile(Template template, string? originalAlias = null)
         {
-            string content;
+            string? content;
 
             if (template is TemplateOnDisk templateOnDisk && templateOnDisk.IsOnDisk)
             {
@@ -292,7 +292,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             string viewName = string.Concat(entity.Alias, ".cshtml");
-            _viewsFileSystem.DeleteFile(viewName);
+            _viewsFileSystem?.DeleteFile(viewName);
 
             entity.DeleteDate = DateTime.Now;
         }
@@ -338,7 +338,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (dto.NodeDto.ParentId > 0)
             {
-                IUmbracoEntity masterTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
+                IUmbracoEntity? masterTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
                 if (masterTemplate != null)
                 {
                     template.MasterTemplateAlias = masterTemplate.Name;
@@ -363,13 +363,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 // we need to discover the path
                 path = string.Concat(template.Alias, ".cshtml");
-                if (_viewsFileSystem.FileExists(path))
+                if (_viewsFileSystem?.FileExists(path) ?? false)
                 {
                     template.VirtualPath = _viewsFileSystem.GetUrl(path);
                     return;
                 }
                 path = string.Concat(template.Alias, ".vbhtml");
-                if (_viewsFileSystem.FileExists(path))
+                if (_viewsFileSystem?.FileExists(path) ?? false)
                 {
                     template.VirtualPath = _viewsFileSystem.GetUrl(path);
                     return;
@@ -378,26 +378,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             else
             {
                 // we know the path already
-                template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                template.VirtualPath = _viewsFileSystem?.GetUrl(path);
             }
 
             template.VirtualPath = string.Empty; // file not found...
         }
 
-        private string GetFileContent(ITemplate template, bool init)
+        private string? GetFileContent(ITemplate template, bool init)
         {
             string path = template.OriginalPath;
             if (string.IsNullOrWhiteSpace(path))
             {
                 // we need to discover the path
                 path = string.Concat(template.Alias, ".cshtml");
-                if (_viewsFileSystem.FileExists(path))
+                if (_viewsFileSystem?.FileExists(path) ?? false)
                 {
                     return GetFileContent(template, _viewsFileSystem, path, init);
                 }
 
                 path = string.Concat(template.Alias, ".vbhtml");
-                if (_viewsFileSystem.FileExists(path))
+                if (_viewsFileSystem?.FileExists(path) ?? false)
                 {
                     return GetFileContent(template, _viewsFileSystem, path, init);
                 }
@@ -413,11 +413,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return string.Empty;
         }
 
-        private string GetFileContent(ITemplate template, IFileSystem fs, string filename, bool init)
+        private string? GetFileContent(ITemplate template, IFileSystem? fs, string filename, bool init)
         {
             // do not update .UpdateDate as that would make it dirty (side-effect)
             // unless initializing, because we have to do it once
-            if (init)
+            if (init && fs is not null)
             {
                 template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
             }
@@ -429,31 +429,39 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
             // xtemplate.EnableChangeTracking();
 
-            template.VirtualPath = fs.GetUrl(filename);
+            template.VirtualPath = fs?.GetUrl(filename);
 
             return init ? null : GetFileContent(fs, filename);
         }
 
-        private string GetFileContent(IFileSystem fs, string filename)
+        private string? GetFileContent(IFileSystem? fs, string filename)
         {
-            using (Stream stream = fs.OpenFile(filename))
-            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+            if (fs is null)
             {
+                return null;
+            }
+
+            using Stream? stream = fs.OpenFile(filename);
+            if (stream is not null)
+            {
+                using var reader = new StreamReader(stream, Encoding.UTF8, true);
                 return reader.ReadToEnd();
             }
+
+            return null;
         }
 
-        public Stream GetFileContentStream(string filepath)
+        public Stream? GetFileContentStream(string filepath)
         {
-            IFileSystem fileSystem = GetFileSystem(filepath);
-            if (fileSystem.FileExists(filepath) == false)
+            IFileSystem? fileSystem = GetFileSystem(filepath);
+            if (fileSystem?.FileExists(filepath) == false)
             {
                 return null;
             }
 
             try
             {
-                return fileSystem.OpenFile(filepath);
+                return fileSystem!.OpenFile(filepath);
             }
             catch
             {
@@ -461,19 +469,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        public void SetFileContent(string filepath, Stream content) => GetFileSystem(filepath).AddFile(filepath, content, true);
+        public void SetFileContent(string filepath, Stream content) => GetFileSystem(filepath)?.AddFile(filepath, content, true);
 
         public long GetFileSize(string filename)
         {
-            IFileSystem fileSystem = GetFileSystem(filename);
-            if (fileSystem.FileExists(filename) == false)
+            IFileSystem? fileSystem = GetFileSystem(filename);
+            if (fileSystem?.FileExists(filename) == false)
             {
                 return -1;
             }
 
             try
             {
-                return fileSystem.GetSize(filename);
+                return fileSystem!.GetSize(filename);
             }
             catch
             {
@@ -481,10 +489,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        private IFileSystem GetFileSystem(string filepath)
+        private IFileSystem? GetFileSystem(string filepath)
         {
             string ext = Path.GetExtension(filepath);
-            IFileSystem fs;
+            IFileSystem? fs;
             switch (ext)
             {
                 case ".cshtml":
@@ -499,9 +507,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Implementation of ITemplateRepository
 
-        public ITemplate Get(string alias) => GetAll(alias).FirstOrDefault();
+        public ITemplate? Get(string? alias) => GetAll(alias)?.FirstOrDefault();
 
-        public IEnumerable<ITemplate> GetAll(params string[] aliases)
+        public IEnumerable<ITemplate>? GetAll(params string?[] aliases)
         {
             //We must call the base (normal) GetAll method
             // which is cached. This is a specialized method and unfortunately with the params[] it
@@ -512,37 +520,37 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             //return from base.GetAll, this is all cached
-            return base.GetMany().Where(x => aliases.InvariantContains(x.Alias));
+            return base.GetMany()?.Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
         }
 
-        public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
+        public IEnumerable<ITemplate>? GetChildren(int masterTemplateId)
         {
             //return from base.GetAll, this is all cached
-            ITemplate[] all = base.GetMany().ToArray();
+            ITemplate[]? all = base.GetMany()?.ToArray();
 
             if (masterTemplateId <= 0)
             {
-                return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+                return all?.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
             }
 
-            ITemplate parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+            ITemplate? parent = all?.FirstOrDefault(x => x.Id == masterTemplateId);
             if (parent == null)
             {
                 return Enumerable.Empty<ITemplate>();
             }
 
-            IEnumerable<ITemplate> children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
+            IEnumerable<ITemplate>? children = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
             return children;
         }
 
         public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
         {
             //return from base.GetAll, this is all cached
-            ITemplate[] all = base.GetMany().ToArray();
+            ITemplate[]? all = base.GetMany()?.ToArray();
             var descendants = new List<ITemplate>();
             if (masterTemplateId > 0)
             {
-                ITemplate parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+                ITemplate? parent = all?.FirstOrDefault(x => x.Id == masterTemplateId);
                 if (parent == null)
                 {
                     return Enumerable.Empty<ITemplate>();
@@ -553,11 +561,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
             else
             {
-                descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
-                foreach (ITemplate parent in descendants)
+                if (all is not null)
                 {
-                    //recursively add all children with a level
-                    AddChildren(all, descendants, parent.Alias);
+                    descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
+                    foreach (ITemplate parent in descendants)
+                    {
+                        //recursively add all children with a level
+                        AddChildren(all, descendants, parent.Alias);
+                    }
                 }
             }
 
@@ -565,14 +576,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return descendants;
         }
 
-        private void AddChildren(ITemplate[] all, List<ITemplate> descendants, string masterAlias)
+        private void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
         {
-            ITemplate[] c = all.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
-            descendants.AddRange(c);
-            if (c.Any() == false)
+            ITemplate[]? c = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
+            if (c is null || c.Any() == false)
             {
                 return;
             }
+            descendants.AddRange(c);
 
             //recurse through all children
             foreach (ITemplate child in c)

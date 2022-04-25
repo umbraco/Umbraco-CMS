@@ -6,6 +6,6 @@
     public interface IProfile
     {
         int Id { get; }
-        string Name { get; }
+        string? Name { get; }
     }
 }

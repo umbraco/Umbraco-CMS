@@ -52,9 +52,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache
 
-                var regs = _serverRegistrationRepository.GetMany().ToArray();
-                var hasSchedulingPublisher = regs.Any(x => ((ServerRegistration) x).IsSchedulingPublisher);
-                var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                var regs = _serverRegistrationRepository.GetMany()?.ToArray();
+                var hasSchedulingPublisher = regs?.Any(x => ((ServerRegistration) x).IsSchedulingPublisher);
+                var server = regs?.FirstOrDefault(x => x.ServerIdentity?.InvariantEquals(serverIdentity) ?? false);
 
                 if (server == null)
                 {
@@ -75,11 +75,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // reload - cheap, cached
 
-                regs = _serverRegistrationRepository.GetMany().ToArray();
+                regs = _serverRegistrationRepository.GetMany()?.ToArray();
 
                 // default role is single server, but if registrations contain more
                 // than one active server, then role is scheduling publisher or subscriber
-                _currentServerRole = regs.Count(x => x.IsActive) > 1
+                _currentServerRole = regs?.Count(x => x.IsActive) > 1
                     ? (server.IsSchedulingPublisher ? ServerRole.SchedulingPublisher : ServerRole.Subscriber)
                     : ServerRole.Single;
 
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
 
-                var server = _serverRegistrationRepository.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                var server = _serverRegistrationRepository.GetMany()?.FirstOrDefault(x => x.ServerIdentity?.InvariantEquals(serverIdentity) ?? false);
                 if (server == null) return;
                 server.IsActive = server.IsSchedulingPublisher = false;
                 _serverRegistrationRepository.Save(server); // will trigger a cache reload // will trigger a cache reload
@@ -133,13 +133,28 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// time the current server is touched, and the period depends on the configuration. Use the
         /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
         /// from the database.</remarks>
-        public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false)
+        public IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false) => GetServers(refresh).Where(x => x.IsActive);
+
+        /// <summary>
+        /// Return all servers (active and inactive).
+        /// </summary>
+        /// <param name="refresh">A value indicating whether to force-refresh the cache.</param>
+        /// <returns>All servers.</returns>
+        /// <remarks>By default this method will rely on the repository's cache, which is updated each
+        /// time the current server is touched, and the period depends on the configuration. Use the
+        /// <paramref name="refresh"/> parameter to force a cache refresh and reload all servers
+        /// from the database.</remarks>
+        public IEnumerable<IServerRegistration> GetServers(bool refresh = false)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.Servers);
-                if (refresh) ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache();
-                return _serverRegistrationRepository.GetMany().Where(x => x.IsActive).ToArray(); // fast, cached // fast, cached
+                if (refresh)
+                {
+                    ((ServerRegistrationRepository)_serverRegistrationRepository).ClearCache();
+                }
+
+                return _serverRegistrationRepository.GetMany().ToArray(); // fast, cached // fast, cached
             }
         }
 

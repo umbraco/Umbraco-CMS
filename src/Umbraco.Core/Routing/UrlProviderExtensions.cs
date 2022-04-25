@@ -123,7 +123,7 @@ namespace Umbraco.Extensions
 
                 if (urlGroup.Key)
                 {
-                    result.AddRange(urlGroup.DistinctBy(x => x.Text.ToUpperInvariant())
+                    result.AddRange(urlGroup.LegacyDistinctBy(x => x!.Text.ToUpperInvariant())
                         .OrderBy(x => x.Text).ThenBy(x => x.Culture));
                 }
                 else
@@ -202,9 +202,9 @@ namespace Umbraco.Extensions
                     // got a URL, deal with collisions, add URL
                     default:
                         // detect collisions, etc
-                        Attempt<UrlInfo> hasCollision = await DetectCollisionAsync(logger, content, url, culture,
+                        Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture,
                             umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
-                        if (hasCollision)
+                        if (hasCollision.Success && hasCollision.Result is not null)
                         {
                             result.Add(hasCollision.Result);
                         }
@@ -225,7 +225,7 @@ namespace Umbraco.Extensions
         {
             // document has a published version yet its URL is "#" => a parent must be
             // unpublished, walk up the tree until we find it, and report.
-            IContent parent = content;
+            IContent? parent = content;
             do
             {
                 parent = parent.ParentId > 0 ? contentService.GetParent(parent) : null;
@@ -250,7 +250,7 @@ namespace Umbraco.Extensions
                 culture);
         }
 
-        private static async Task<Attempt<UrlInfo>> DetectCollisionAsync(ILogger logger, IContent content, string url,
+        private static async Task<Attempt<UrlInfo?>> DetectCollisionAsync(ILogger logger, IContent content, string url,
             string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter,
             ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility)
@@ -280,28 +280,28 @@ namespace Umbraco.Extensions
 
             if (pcr.IgnorePublishedContentCollisions)
             {
-                return Attempt<UrlInfo>.Fail();
+                return Attempt<UrlInfo?>.Fail();
             }
 
-            if (pcr.PublishedContent.Id != content.Id)
+            if (pcr.PublishedContent?.Id != content.Id)
             {
-                IPublishedContent o = pcr.PublishedContent;
+                IPublishedContent? o = pcr.PublishedContent;
                 var l = new List<string>();
                 while (o != null)
                 {
-                    l.Add(o.Name(variationContextAccessor));
+                    l.Add(o.Name(variationContextAccessor)!);
                     o = o.Parent;
                 }
 
                 l.Reverse();
-                var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
+                var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent?.Id + ")";
 
                 var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
                 return Attempt.Succeed(urlInfo);
             }
 
             // no collision
-            return Attempt<UrlInfo>.Fail();
+            return Attempt<UrlInfo?>.Fail();
         }
     }
 }

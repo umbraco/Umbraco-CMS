@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Tests.Common.Builders.Extensions
             return builder;
         }
 
-        public static T WithPropertyValues<T>(this T builder, object propertyValues, string culture = null, string segment = null)
+        public static T WithPropertyValues<T>(this T builder, object propertyValues, string? culture = null, string? segment = null)
             where T : IWithPropertyValues
         {
             builder.PropertyValues = propertyValues;

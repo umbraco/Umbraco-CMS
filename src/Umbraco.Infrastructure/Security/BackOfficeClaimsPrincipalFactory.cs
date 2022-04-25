@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Security
             // since it's setting an authentication type which is not what we want.
             // so we override this method to change it.
 
-            // get the base 
+            // get the base
             ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(user);
 
             // now create a new one with the correct authentication type
@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Core.Security
 
             // ensure our required claims are there
             id.AddRequiredClaims(
-                user.Id,
+                user.Id!,
                 user.UserName,
-                user.Name,
+                user.Name!,
                 user.CalculatedContentStartNodeIds,
                 user.CalculatedMediaStartNodeIds,
                 user.Culture,

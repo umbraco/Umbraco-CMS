@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// </summary>
         public bool EnabledCompositeFiles { get; }
 
-        public override bool Equals(object obj) => obj is BundlingOptions options && Equals(options);
+        public override bool Equals(object? obj) => obj is BundlingOptions options && Equals(options);
         public bool Equals(BundlingOptions other) => OptimizeOutput == other.OptimizeOutput && EnabledCompositeFiles == other.EnabledCompositeFiles;
 
         public override int GetHashCode()

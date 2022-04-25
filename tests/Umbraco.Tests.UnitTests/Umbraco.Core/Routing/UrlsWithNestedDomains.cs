@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -42,7 +43,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
             var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
+                Mock.Of<IOptionsMonitor<RequestHandlerSettings>>(x=>x.CurrentValue == requestHandlerSettings),
                 Mock.Of<ILogger<DefaultUrlProvider>>(),
                 new SiteDomainMapper(),
                 umbracoContextAccessor,

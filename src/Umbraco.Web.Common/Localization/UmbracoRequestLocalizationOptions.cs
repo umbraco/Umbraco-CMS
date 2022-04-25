@@ -11,18 +11,21 @@ namespace Umbraco.Cms.Web.Common.Localization
     /// </summary>
     public class UmbracoRequestLocalizationOptions : IConfigureOptions<RequestLocalizationOptions>
     {
-        private readonly IOptions<GlobalSettings> _globalSettings;
+        private GlobalSettings _globalSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestLocalizationOptions"/> class.
         /// </summary>
-        public UmbracoRequestLocalizationOptions(IOptions<GlobalSettings> globalSettings) => _globalSettings = globalSettings;
+        public UmbracoRequestLocalizationOptions(IOptions<GlobalSettings> globalSettings)
+        {
+            _globalSettings = globalSettings.Value;
+        }
 
         /// <inheritdoc/>
         public void Configure(RequestLocalizationOptions options)
         {
             // set the default culture to what is in config
-            options.DefaultRequestCulture = new RequestCulture(_globalSettings.Value.DefaultUILanguage);
+            options.DefaultRequestCulture = new RequestCulture(_globalSettings.DefaultUILanguage);
 
             // add a custom provider
             if (options.RequestCultureProviders == null)

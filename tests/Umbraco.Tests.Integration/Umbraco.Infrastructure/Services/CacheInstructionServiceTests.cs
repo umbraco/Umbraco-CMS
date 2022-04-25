@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 .From<CacheInstructionDto>();
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                cacheInstructions = scope.Database.Fetch<CacheInstructionDto>(sql);
+                cacheInstructions = ScopeAccessor.AmbientScope.Database.Fetch<CacheInstructionDto>(sql);
                 scope.Complete();
             }
 

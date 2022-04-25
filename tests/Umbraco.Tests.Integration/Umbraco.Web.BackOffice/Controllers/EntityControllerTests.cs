@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -21,6 +22,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
     [TestFixture]
     public class EntityControllerTests : UmbracoTestServerTestBase
     {
+        private IScopeProvider ScopeProvider => GetRequiredService<IScopeProvider>();
+
         [Test]
         public async Task GetUrlsByIds_MediaWithIntegerIds_ReturnsValidMap()
         {

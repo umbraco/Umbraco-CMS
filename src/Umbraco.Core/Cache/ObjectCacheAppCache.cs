@@ -33,13 +33,13 @@ namespace Umbraco.Cms.Core.Cache
         public ObjectCache MemoryCache { get; private set; }
 
         /// <inheritdoc />
-        public object Get(string key)
+        public object? Get(string key)
         {
-            Lazy<object> result;
+            Lazy<object?>? result;
             try
             {
                 _locker.EnterReadLock();
-                result = MemoryCache.Get(key) as Lazy<object>; // null if key not found
+                result = MemoryCache.Get(key) as Lazy<object?>; // null if key not found
             }
             finally
             {
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory)
+        public object? Get(string key, Func<object?> factory)
         {
             return Get(key, factory, null);
         }
@@ -72,9 +72,9 @@ namespace Umbraco.Cms.Core.Cache
                     _locker.ExitReadLock();
             }
             return entries
-                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value)) // return exceptions as null
                 .Where(x => x != null) // backward compat, don't store null values in the cache
-                .ToList();
+                .ToList()!;
         }
 
         /// <inheritdoc />
@@ -96,23 +96,23 @@ namespace Umbraco.Cms.Core.Cache
                     _locker.ExitReadLock();
             }
             return entries
-                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value)) // return exceptions as null
                 .Where(x => x != null) // backward compat, don't store null values in the cache
-                .ToList();
+                .ToList()!;
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, string[] dependentFiles = null)
+        public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
         {
             // see notes in HttpRuntimeAppCache
 
-            Lazy<object> result;
+            Lazy<object?>? result;
 
             try
             {
                 _locker.EnterUpgradeableReadLock();
 
-                result = MemoryCache.Get(key) as Lazy<object>;
+                result = MemoryCache.Get(key) as Lazy<object?>;
                 if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = SafeLazy.GetSafeLazy(factory);
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
+        public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
@@ -205,7 +205,7 @@ namespace Umbraco.Cms.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -268,7 +268,7 @@ namespace Umbraco.Cms.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = SafeLazy.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value, true);
                         if (value == null) return true;
 
                         // if T is an interface remove anything that implements that interface
@@ -327,7 +327,7 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
+        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
         {
             var absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration : (timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? ObjectCache.NoSlidingExpiration : (timeout ?? ObjectCache.NoSlidingExpiration);

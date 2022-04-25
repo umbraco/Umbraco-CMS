@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [DataContract]
     public class DataEditor : IDataEditor
     {
-        private IDictionary<string, object> _defaultConfiguration;
+        private IDictionary<string, object>? _defaultConfiguration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
@@ -36,7 +36,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // assign properties based on the attribute, if it is found
             Attribute = GetType().GetCustomAttribute<DataEditorAttribute>(false);
-            if (Attribute == null) return;
+            if (Attribute == null)
+            {
+                Alias = string.Empty;
+                Name = string.Empty;
+                return;
+            }
 
             Alias = Attribute.Alias;
             Type = Attribute.Type;
@@ -49,7 +54,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets the editor attribute.
         /// </summary>
-        protected DataEditorAttribute Attribute { get; }
+        protected DataEditorAttribute? Attribute { get; }
 
         /// <inheritdoc />
         [DataMember(Name = "alias", IsRequired = true)]
@@ -103,7 +108,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <para>Technically, it could be cached by datatype but let's keep things
         /// simple enough for now.</para>
         /// </remarks>
-        public virtual IDataValueEditor GetValueEditor(object configuration)
+        public virtual IDataValueEditor GetValueEditor(object? configuration)
         {
             // if an explicit value editor has been set (by the manifest parser)
             // then return it, and ignore the configuration, which is going to be
@@ -112,7 +117,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return ExplicitValueEditor;
 
             var editor = CreateValueEditor();
-            ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
+            if (configuration is not null)
+            {
+                ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
+            }
+
             return editor;
         }
 
@@ -121,7 +130,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <remarks>Used for manifest data editors.</remarks>
         [DataMember(Name = "editor")]
-        public IDataValueEditor ExplicitValueEditor { get; set; }
+        public IDataValueEditor? ExplicitValueEditor { get; set; }
 
         /// <inheritdoc />
         /// <remarks>
@@ -139,7 +148,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <remarks>Used for manifest data editors.</remarks>
         [DataMember(Name = "config")]
-        public IConfigurationEditor ExplicitConfigurationEditor { get; set; }
+        public IConfigurationEditor? ExplicitConfigurationEditor { get; set; }
 
         /// <inheritdoc />
         [DataMember(Name = "defaultConfig")]
@@ -174,7 +183,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             var editor = new ConfigurationEditor();
             // pass the default configuration if this is not a property value editor
-            if ((Type & EditorType.PropertyValue) == 0)
+            if ((Type & EditorType.PropertyValue) == 0 && _defaultConfiguration is not null)
             {
                 editor.DefaultConfiguration = _defaultConfiguration;
             }

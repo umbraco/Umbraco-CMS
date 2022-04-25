@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             => _repository.GetMediaSource(id);
 
         /// <inheritdoc/>
-        public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int> ids)
+        public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int>? ids)
             => _repository.GetTypeContentSources(ids);
 
         /// <inheritdoc/>
@@ -115,9 +115,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 
         /// <inheritdoc/>
         public void Rebuild(
-            IReadOnlyCollection<int> contentTypeIds = null,
-            IReadOnlyCollection<int> mediaTypeIds = null,
-            IReadOnlyCollection<int> memberTypeIds = null)
+            IReadOnlyCollection<int>? contentTypeIds = null,
+            IReadOnlyCollection<int>? mediaTypeIds = null,
+            IReadOnlyCollection<int>? memberTypeIds = null)
         {
             using (IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {

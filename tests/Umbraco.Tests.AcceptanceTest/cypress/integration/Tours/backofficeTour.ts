@@ -93,7 +93,7 @@ function runBackOfficeIntroTour(percentageComplete, buttonText, timeout) {
     cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('9/13');
     cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
     cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('10/13');
-    cy.get('.umb-overlay-drawer__align-right .umb-button').should('be.visible').click();
+    cy.get('[data-element~="overlay-user"] [data-element="button-overlayClose"]').should('be.visible').click();
     cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('11/13');
     cy.umbracoGlobalHelp().click()
 

@@ -142,17 +142,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     currParentId = desc1.Key;
                 }
 
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                 IDictionaryItem[] items = LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId).ToArray();
 
-                Debug.WriteLine("SQL CALLS: " + scope.Database.AsUmbracoDatabase().SqlCount);
+                Debug.WriteLine("SQL CALLS: " + ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().SqlCount);
 
                 Assert.AreEqual(51, items.Length);
 
                 // There's a call or two to get languages, so apart from that there should only be one call per level.
-                Assert.Less(scope.Database.AsUmbracoDatabase().SqlCount, 30);
+                Assert.Less(ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().SqlCount, 30);
             }
         }
 

@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -180,7 +181,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 CreateAndCommitMultipleUserGroups(repository);
 
                 // Act
-                IQuery<IUserGroup> query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testGroup1");
+                IQuery<IUserGroup> query = provider.CreateQuery<IUserGroup>().Where(x => x.Alias == "testGroup1");
                 IEnumerable<IUserGroup> result = repository.Get(query);
 
                 // Assert
@@ -261,7 +262,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IUserGroup[] userGroups = CreateAndCommitMultipleUserGroups(repository);
 
                 // Act
-                IQuery<IUserGroup> query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testGroup1" || x.Alias == "testGroup2");
+                IQuery<IUserGroup> query = provider.CreateQuery<IUserGroup>().Where(x => x.Alias == "testGroup1" || x.Alias == "testGroup2");
                 int result = repository.Count(query);
 
                 // Assert

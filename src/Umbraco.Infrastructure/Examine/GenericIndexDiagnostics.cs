@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         public int FieldCount => -1; //unknown
 
-        public Attempt<string> IsHealthy()
+        public Attempt<string?> IsHealthy()
         {
             if (!_index.IndexExists())
                 return Attempt.Fail("Does not exist");
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             try
             {
                 var result = _index.Searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet).Execute(new QueryOptions(0, 1));
-                return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
+                return Attempt<string?>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)
             {
@@ -46,11 +46,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         public IEnumerable<string> GetFieldNames() => Enumerable.Empty<string>();
 
-        public IReadOnlyDictionary<string, object> Metadata
+        public IReadOnlyDictionary<string, object?> Metadata
         {
             get
             {
-                var result = new Dictionary<string, object>();
+                var result = new Dictionary<string, object?>();
 
                 var props = TypeHelper.CachedDiscoverableProperties(_index.GetType(), mustWrite: false)
                     .Where(x => s_ignoreProperties.InvariantContains(x.Name) == false)

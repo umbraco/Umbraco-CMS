@@ -95,8 +95,8 @@ namespace Umbraco.Cms.Web.Common.Controllers
 
                     // set the redirect result and do not call next to short circuit
                     context.Result = pcr.IsRedirectPermanent()
-                        ? RedirectPermanent(pcr.RedirectUrl)
-                        : Redirect(pcr.RedirectUrl);
+                        ? RedirectPermanent(pcr.RedirectUrl!)
+                        : Redirect(pcr.RedirectUrl!);
                     break;
                 case UmbracoRouteResult.NotFound:
                     // set the redirect result and do not call next to short circuit
@@ -109,10 +109,10 @@ namespace Umbraco.Cms.Web.Common.Controllers
                     // If there it is means that we are proxying/executing this controller
                     // from another controller and we need to merge it's ViewData with this one
                     // since this one will be empty.
-                    ProxyViewDataFeature saveViewData = HttpContext.Features.Get<ProxyViewDataFeature>();
+                    ProxyViewDataFeature? saveViewData = HttpContext.Features.Get<ProxyViewDataFeature>();
                     if (saveViewData != null)
                     {
-                        foreach (KeyValuePair<string, object> kv in saveViewData.ViewData)
+                        foreach (KeyValuePair<string, object?> kv in saveViewData.ViewData)
                         {
                             ViewData[kv.Key] = kv.Value;
                         }

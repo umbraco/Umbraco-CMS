@@ -116,14 +116,18 @@ namespace Umbraco.Extensions
             var pluginFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(pluginFolder))
             {
-                var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
+                var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptionsMonitor<UmbracoPluginSettings>>();
 
                 var pluginFileProvider = new UmbracoPluginPhysicalFileProvider(
                     pluginFolder,
                     umbracoPluginSettings);
 
-                IWebHostEnvironment webHostEnvironment = app.ApplicationServices.GetService<IWebHostEnvironment>();
-                webHostEnvironment.WebRootFileProvider = webHostEnvironment.WebRootFileProvider.ConcatComposite(new PrependBasePathFileProvider(Constants.SystemDirectories.AppPlugins, pluginFileProvider));
+                IWebHostEnvironment? webHostEnvironment = app.ApplicationServices.GetService<IWebHostEnvironment>();
+
+                if (webHostEnvironment is not null)
+                {
+                    webHostEnvironment.WebRootFileProvider = webHostEnvironment.WebRootFileProvider.ConcatComposite(new PrependBasePathFileProvider(Constants.SystemDirectories.AppPlugins, pluginFileProvider));
+                }
             }
 
             return app;

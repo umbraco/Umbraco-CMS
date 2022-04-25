@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetUserAgent()
+        public string? GetUserAgent()
         {
-            return _httpContextAccessor.HttpContext.Request.Headers["User-Agent"].ToString();
+            return _httpContextAccessor.HttpContext?.Request.Headers["User-Agent"].ToString();
         }
     }
 }

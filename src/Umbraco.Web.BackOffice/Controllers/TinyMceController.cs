@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public TinyMceController(
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator)
         {

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Trees
         /// Sets the default menu item alias to be shown when the menu is launched - this is optional and if not set then the menu will just be shown normally.
         /// </summary>
         [DataMember(Name = "defaultAlias")]
-        public string DefaultMenuAlias { get; set; }
+        public string? DefaultMenuAlias { get; set; }
 
         /// <summary>
         /// The list of menu items

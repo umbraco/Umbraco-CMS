@@ -22,12 +22,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
     /// </summary>
     internal class FilterAllowedOutgoingMediaAttribute : TypeFilterAttribute
     {
-        public FilterAllowedOutgoingMediaAttribute(Type outgoingType, string propertyName = null)
+        public FilterAllowedOutgoingMediaAttribute(Type outgoingType, string? propertyName = null)
             : base(typeof(FilterAllowedOutgoingMediaFilter))
         {
             Arguments = new object[]
             {
-                outgoingType, propertyName
+                outgoingType, propertyName ?? string.Empty
             };
         }
     }
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             _outgoingType = outgoingType;
         }
 
-        protected virtual int[] GetUserStartNodes(IUser user)
+        protected virtual int[]? GetUserStartNodes(IUser user)
         {
             return user.CalculateMediaStartNodeIds(_entityService, _appCaches);
         }
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         {
             if (context.Result == null) return;
 
-            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             if (user == null) return;
 
             var objectContent = context.Result as ObjectResult;
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = (item != null && ContentPermissions.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
+                var hasPathAccess = (item != null && ContentPermissions.HasPathAccess(item?.Path, GetUserStartNodes(user), RecycleBinId));
                 if (hasPathAccess == false)
                 {
                     toRemove.Add(item);
@@ -110,14 +110,14 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
         private void SetValueForResponse(ObjectResult objectContent, dynamic newVal)
         {
-            if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value.GetType()))
+            if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value?.GetType()))
             {
                 objectContent.Value = newVal;
             }
             else if (_propertyName.IsNullOrWhiteSpace() == false)
             {
                 //try to get the enumerable collection from a property on the result object using reflection
-                var property = objectContent.Value.GetType().GetProperty(_propertyName);
+                var property = objectContent.Value?.GetType().GetProperty(_propertyName);
                 if (property != null)
                 {
                     property.SetValue(objectContent.Value, newVal);
@@ -126,9 +126,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
         }
 
-        internal dynamic GetValueFromResponse(ObjectResult objectContent)
+        internal dynamic? GetValueFromResponse(ObjectResult objectContent)
         {
-            if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value.GetType()))
+            if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value?.GetType()))
             {
                 return objectContent.Value;
             }
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             if (_propertyName.IsNullOrWhiteSpace() == false)
             {
                 //try to get the enumerable collection from a property on the result object using reflection
-                var property = objectContent.Value.GetType().GetProperty(_propertyName);
+                var property = objectContent.Value?.GetType().GetProperty(_propertyName);
                 if (property != null)
                 {
                     var result = property.GetValue(objectContent.Value);

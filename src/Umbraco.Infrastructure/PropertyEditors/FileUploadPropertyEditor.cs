@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         INotificationHandler<MemberDeletedNotification>
     {
         private readonly MediaFileManager _mediaFileManager;
-        private readonly ContentSettings _contentSettings;
+        private readonly IOptionsMonitor<ContentSettings> _contentSettings;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IContentService _contentService;
@@ -37,7 +38,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public FileUploadPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             ILocalizedTextService localizedTextService,
             UploadAutoFillProperties uploadAutoFillProperties,
             IContentService contentService,
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings;
             _localizedTextService = localizedTextService;
             _uploadAutoFillProperties = uploadAutoFillProperties;
             _contentService = contentService;
@@ -61,12 +62,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute);
-            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, Options.Create(_contentSettings)));
+            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
+            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
             return editor;
         }
 
-        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)]out string mediaPath)
         {
             if (propertyEditorAlias == Alias &&
                 value?.ToString() is var mediaPathValue &&
@@ -182,7 +183,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             foreach (var property in properties)
             {
-                var autoFillConfig = _contentSettings.GetConfig(property.Alias);
+                var autoFillConfig = _contentSettings.CurrentValue.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 foreach (var pvalue in property.Values)

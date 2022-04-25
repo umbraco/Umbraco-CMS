@@ -77,9 +77,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // SQL CE is fun!
-                var contentVersions = scope.Database.Single<int>(@"select count(1) from umbracoContentVersion");
-                var documentVersions = scope.Database.Single<int>(@"select count(1) from umbracoDocumentVersion");
-                var propertyData = scope.Database.Single<int>(@"select count(1) from umbracoPropertyData");
+                var contentVersions = ScopeAccessor.AmbientScope.Database.Single<int>(@"select count(1) from umbracoContentVersion");
+                var documentVersions = ScopeAccessor.AmbientScope.Database.Single<int>(@"select count(1) from umbracoDocumentVersion");
+                var propertyData = ScopeAccessor.AmbientScope.Database.Single<int>(@"select count(1) from umbracoPropertyData");
 
                 return new Report
                 {
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     Updated = DateTime.Today
                 };
 
-                scope.Database.Insert(entity);
+                ScopeAccessor.AmbientScope.Database.Insert(entity);
             }
         }
 

@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
@@ -150,7 +151,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                IQuery<ILanguage> query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
+                IQuery<ILanguage> query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode == "da-DK");
                 IEnumerable<ILanguage> result = repository.Get(query);
 
                 // Assert
@@ -170,7 +171,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                IQuery<ILanguage> query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
+                IQuery<ILanguage> query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert

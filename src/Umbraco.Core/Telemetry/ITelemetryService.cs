@@ -10,6 +10,6 @@ namespace Umbraco.Cms.Core.Telemetry
         /// <summary>
         /// Try and get the <see cref="TelemetryReportData"/>
         /// </summary>
-        bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData);
+        bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData);
     }
 }

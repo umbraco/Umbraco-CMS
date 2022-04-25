@@ -83,18 +83,135 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
             {
                 LastLoginDate = now,
-                UpdateDate = now
+                UpdateDate = now,
             };
             MemberService.Save(member);
 
             DateTime newDate = now.AddDays(10);
-            MemberService.SetLastLogin(member.Username, newDate);
+            member.LastLoginDate = newDate;
+            member.UpdateDate = newDate;
+            MemberService.Save(member);
 
             // re-get
             member = MemberService.GetById(member.Id);
 
             Assert.That(member.LastLoginDate, Is.EqualTo(newDate).Within(1).Seconds);
             Assert.That(member.UpdateDate, Is.EqualTo(newDate).Within(1).Seconds);
+        }
+
+        // These might seem like some somewhat pointless tests, but there's some funky things going on in MemberRepository when saving.
+        [Test]
+        public void Can_Set_Failed_Password_Attempts()
+        {
+            IMemberType memberType = MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                FailedPasswordAttempts = 1,
+            };
+            MemberService.Save(member);
+
+            member.FailedPasswordAttempts = 2;
+            MemberService.Save(member);
+
+            member = MemberService.GetById(member.Id);
+
+            Assert.AreEqual(2, member.FailedPasswordAttempts);
+        }
+
+        [Test]
+        public void Can_Set_Is_Approved()
+        {
+            IMemberType memberType = MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
+            MemberService.Save(member);
+
+            member.IsApproved = false;
+            MemberService.Save(member);
+
+            member = MemberService.GetById(member.Id);
+
+            Assert.IsFalse(member.IsApproved);
+        }
+
+        [Test]
+        public void Can_Set_Is_Locked_Out()
+        {
+            IMemberType memberType = MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                IsLockedOut = false,
+            };
+            MemberService.Save(member);
+
+            member.IsLockedOut = true;
+            MemberService.Save(member);
+
+            member = MemberService.GetById(member.Id);
+
+            Assert.IsTrue(member.IsLockedOut);
+        }
+
+        [Test]
+        public void Can_Set_Last_Lockout_Date()
+        {
+            DateTime now = DateTime.Now;
+            IMemberType memberType = MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                LastLockoutDate = now,
+            };
+            MemberService.Save(member);
+
+            DateTime newDate = now.AddDays(10);
+            member.LastLockoutDate = newDate;
+            MemberService.Save(member);
+
+            // re-get
+            member = MemberService.GetById(member.Id);
+
+            Assert.That(member.LastLockoutDate, Is.EqualTo(newDate).Within(1).Seconds);
+        }
+
+        [Test]
+        public void Can_set_Last_Login_Date()
+        {
+            DateTime now = DateTime.Now;
+            IMemberType memberType = MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                LastLoginDate = now,
+            };
+            MemberService.Save(member);
+
+            DateTime newDate = now.AddDays(10);
+            member.LastLoginDate = newDate;
+            MemberService.Save(member);
+
+            // re-get
+            member = MemberService.GetById(member.Id);
+
+            Assert.That(member.LastLoginDate, Is.EqualTo(newDate).Within(1).Seconds);
+        }
+
+        [Test]
+        public void Can_Set_Last_Password_Change_Date()
+        {
+            DateTime now = DateTime.Now;
+            IMemberType memberType = MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                LastPasswordChangeDate = now,
+            };
+            MemberService.Save(member);
+
+            DateTime newDate = now.AddDays(10);
+            member.LastPasswordChangeDate = newDate;
+            MemberService.Save(member);
+
+            // re-get
+            member = MemberService.GetById(member.Id);
+
+            Assert.That(member.LastPasswordChangeDate, Is.EqualTo(newDate).Within(1).Seconds);
         }
 
         [Test]
@@ -116,17 +233,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // contains the umbracoMember... properties created when installing, on the member type
             // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
-            //
-            // TODO: see TODO in PublishedContentType, this list contains duplicates
             string[] aliases = new[]
             {
                 Constants.Conventions.Member.Comments,
-                Constants.Conventions.Member.FailedPasswordAttempts,
-                Constants.Conventions.Member.IsApproved,
-                Constants.Conventions.Member.IsLockedOut,
-                Constants.Conventions.Member.LastLockoutDate,
-                Constants.Conventions.Member.LastLoginDate,
-                Constants.Conventions.Member.LastPasswordChangeDate,
                 nameof(IMember.Email),
                 nameof(IMember.Username),
                 nameof(IMember.Comments),
@@ -333,7 +442,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int roleId;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                roleId = scope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
+                roleId = ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
                 scope.Complete();
             }
 
@@ -346,8 +455,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
-                scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
+                ScopeAccessor.AmbientScope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
+                ScopeAccessor.AmbientScope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
                 scope.Complete();
             }
 
@@ -589,14 +698,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // just a c# property of the Member object
             resolved.Email = "changed@test.com";
 
+            // NOTE: This will not trigger a property isDirty for the same reason above, but this is a new change, so leave this to make sure.
+            resolved.FailedPasswordAttempts = 1234;
+
             // NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
             // the underlying 'Property'
-            resolved.FailedPasswordAttempts = 1234;
+            resolved.Comments = "This will make it dirty";
 
             var dirtyMember = (ICanBeDirty)resolved;
             var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
             Assert.IsTrue(dirtyMember.IsDirty());
             Assert.AreEqual(1, dirtyProperties.Count);
+
+            // Assert that email and failed password attempts is still set as dirty on the member it self
+            Assert.IsTrue(dirtyMember.IsPropertyDirty(nameof(resolved.Email)));
+            Assert.IsTrue(dirtyMember.IsPropertyDirty(nameof(resolved.FailedPasswordAttempts)));
+
+            // Comment will also be marked as dirty on the member object because content base merges dirty properties.
+            Assert.IsTrue(dirtyMember.IsPropertyDirty(Constants.Conventions.Member.Comments));
+            Assert.AreEqual(3, dirtyMember.GetDirtyProperties().Count());
         }
 
         [Test]
@@ -1205,7 +1325,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(members);
 
             Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            customMember.SetValue(Constants.Conventions.Member.IsLockedOut, true);
+            customMember.IsLockedOut = true;
             MemberService.Save(customMember);
 
             int found = MemberService.GetCount(MemberCountType.LockedOut);
@@ -1222,7 +1342,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(members);
 
             Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            customMember.SetValue(Constants.Conventions.Member.IsApproved, false);
+            customMember.IsApproved = false;
             MemberService.Save(customMember);
 
             int found = MemberService.GetCount(MemberCountType.Approved);
@@ -1248,48 +1368,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IMember found = MemberService.GetById(customMember.Id);
 
             Assert.IsTrue(found.Comments.IsNullOrWhiteSpace());
-        }
-
-        /// <summary>
-        /// Because we are forcing some of the built-ins to be Labels which have an underlying db type as nvarchar but we need
-        /// to ensure that the dates/int get saved to the correct column anyways.
-        /// </summary>
-        [Test]
-        public void Setting_DateTime_Property_On_Built_In_Member_Property_Saves_To_Correct_Column()
-        {
-            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeService.Save(memberType);
-            Member member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "test", "test");
-            DateTime date = DateTime.Now;
-            member.LastLoginDate = DateTime.Now;
-            MemberService.Save(member);
-
-            IMember result = MemberService.GetById(member.Id);
-            Assert.AreEqual(
-                date.TruncateTo(DateTimeExtensions.DateTruncate.Second),
-                result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
-
-            // now ensure the col is correct
-            ISqlContext sqlContext = GetRequiredService<ISqlContext>();
-            Sql<ISqlContext> sql = sqlContext.Sql().Select<PropertyDataDto>()
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
-                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
-                .Where<ContentVersionDto>(dto => dto.NodeId == member.Id)
-                .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
-
-            List<PropertyDataDto> colResult;
-            using (IScope scope = ScopeProvider.CreateScope())
-            {
-                colResult = scope.Database.Fetch<PropertyDataDto>(sql);
-                scope.Complete();
-            }
-
-            Assert.AreEqual(1, colResult.Count);
-            Assert.IsTrue(colResult.First().DateValue.HasValue);
-            Assert.IsFalse(colResult.First().IntegerValue.HasValue);
-            Assert.IsNull(colResult.First().TextValue);
-            Assert.IsNull(colResult.First().VarcharValue);
         }
 
         [Test]

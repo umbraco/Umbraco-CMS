@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditItem"/> class.
         /// </summary>
-        public AuditItem(int objectId, AuditType type, int userId, string entityType, string comment = null, string parameters = null)
+        public AuditItem(int objectId, AuditType type, int userId, string? entityType, string? comment = null, string? parameters = null)
         {
             DisableChangeTracking();
 
@@ -25,15 +25,15 @@ namespace Umbraco.Cms.Core.Models
         public AuditType AuditType { get; }
 
         /// <inheritdoc/>
-        public string EntityType { get; }
+        public string? EntityType { get; }
 
         /// <inheritdoc/>
         public int UserId { get; }
 
         /// <inheritdoc/>
-        public string Comment { get; }
+        public string? Comment { get; }
 
         /// <inheritdoc/>
-        public string Parameters { get; }
+        public string? Parameters { get; }
     }
 }

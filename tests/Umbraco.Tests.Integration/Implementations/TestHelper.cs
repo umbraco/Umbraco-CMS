@@ -32,6 +32,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
@@ -102,9 +103,6 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
         public IHttpContextAccessor GetHttpContextAccessor() => _httpContextAccessor;
 
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
-
-        public override IDbProviderFactoryCreator DbProviderFactoryCreator =>
-            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory, Options.Create(new GlobalSettings()));
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 

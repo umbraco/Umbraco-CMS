@@ -13,9 +13,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IVariationContextAccessor? _variationContextAccessor;
 
-        protected PublishedContentBase(IVariationContextAccessor variationContextAccessor)
+        protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor)
         {
             _variationContextAccessor = variationContextAccessor;
         }
@@ -39,10 +39,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public virtual string Name => this.Name(_variationContextAccessor);
+        public virtual string? Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        public virtual string UrlSegment => this.UrlSegment(_variationContextAccessor);
+        public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
@@ -75,20 +75,20 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
-        public abstract bool IsDraft(string culture = null);
+        public abstract bool IsDraft(string? culture = null);
 
         /// <inheritdoc />
-        public abstract bool IsPublished(string culture = null);
+        public abstract bool IsPublished(string? culture = null);
 
         #endregion
 
         #region Tree
 
         /// <inheritdoc />
-        public abstract IPublishedContent Parent { get; }
+        public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
+        public virtual IEnumerable<IPublishedContent>? Children => this.Children(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
-        public abstract IPublishedProperty GetProperty(string alias);
+        public abstract IPublishedProperty? GetProperty(string alias);
 
         #endregion
     }

@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Routing
                 route = frequest.AbsolutePathDecoded;
             }
 
-            IPublishedContent node = FindContent(frequest, route);
+            IPublishedContent? node = FindContent(frequest, route);
             return node != null;
         }
 
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
         /// </summary>
         /// <returns>The document node, or null.</returns>
-        protected IPublishedContent FindContent(IPublishedRequestBuilder docreq, string route)
+        protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route)
         {
             if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.Routing
 
             LogTestRoute(route);
 
-            IPublishedContent node = umbracoContext.Content.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
+            IPublishedContent? node = umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
             if (node != null)
             {
                 docreq.SetPublishedContent(node);

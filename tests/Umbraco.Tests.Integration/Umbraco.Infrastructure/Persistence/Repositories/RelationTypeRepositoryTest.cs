@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -184,7 +185,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                IQuery<IRelationType> query = scope.SqlContext.Query<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
+                IQuery<IRelationType> query = provider.CreateQuery<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -203,7 +204,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 System.Guid childObjType = Constants.ObjectTypes.DocumentType;
-                IQuery<IRelationType> query = scope.SqlContext.Query<IRelationType>().Where(x => x.ChildObjectType == childObjType);
+                IQuery<IRelationType> query = provider.CreateQuery<IRelationType>().Where(x => x.ChildObjectType == childObjType);
                 IEnumerable<IRelationType> result = repository.Get(query);
 
                 // Assert

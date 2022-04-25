@@ -24,7 +24,7 @@ namespace Umbraco.Extensions
                 if (convention.Metadata.OfType<ISuppressMatchingMetadata>().FirstOrDefault()?.SuppressMatching != true)
                 {
                     // Get the controller action descriptor
-                    ControllerActionDescriptor actionDescriptor = convention.Metadata.OfType<ControllerActionDescriptor>().FirstOrDefault();
+                    ControllerActionDescriptor? actionDescriptor = convention.Metadata.OfType<ControllerActionDescriptor>().FirstOrDefault();
                     if (actionDescriptor != null)
                     {
                         // This is more or less like the IApplicationModelProvider, it allows us to add filters, etc... to the ControllerActionDescriptor

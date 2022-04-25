@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             // If there is a specified path to redirect to then use it.
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
-                return Redirect(model.RedirectUrl);
+                return Redirect(model.RedirectUrl!);
             }
 
             // Redirect to current page by default.

@@ -22,15 +22,15 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public void Clear() => _content.Clear();
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null) => throw new NotImplementedException();
+        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null) => throw new NotImplementedException();
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
 
-        public string GetRouteById(bool preview, int contentId, string culture = null) => throw new NotImplementedException();
+        public string GetRouteById(bool preview, int contentId, string? culture = null) => throw new NotImplementedException();
 
-        public string GetRouteById(int contentId, string culture = null) => throw new NotImplementedException();
+        public string GetRouteById(int contentId, string? culture = null) => throw new NotImplementedException();
 
-        public override IPublishedContent GetById(bool preview, int contentId) => _content.ContainsKey(contentId) ? _content[contentId] : null;
+        public override IPublishedContent? GetById(bool preview, int contentId) => _content.ContainsKey(contentId) ? _content[contentId] : null;
 
         public override IPublishedContent GetById(bool preview, Guid contentId) => throw new NotImplementedException();
 
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public override bool HasById(bool preview, int contentId) => _content.ContainsKey(contentId);
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null) => _content.Values.Where(x => x.Parent == null);
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null) => _content.Values.Where(x => x.Parent == null);
 
         public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars) => throw new NotImplementedException();
 

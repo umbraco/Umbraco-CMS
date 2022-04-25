@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Core.HealthChecks
         }
 
         public string Name { get; private set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string Group { get; set; }
+        public string? Group { get; set; }
 
         public Guid Id { get; private set; }
 

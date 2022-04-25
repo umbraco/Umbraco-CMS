@@ -18,6 +18,8 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
@@ -26,8 +28,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     public class PostMigrationTests
     {
         private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
-        private IMigrationPlanExecutor GetMigrationPlanExecutor(IScopeProvider scopeProvider, IMigrationBuilder builder)
-            => new MigrationPlanExecutor(scopeProvider, s_loggerFactory, builder);
+        private IMigrationPlanExecutor GetMigrationPlanExecutor(IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,IMigrationBuilder builder)
+            => new MigrationPlanExecutor(scopeProvider, scopeAccessor, s_loggerFactory, builder);
 
         [Test]
         public void ExecutesPlanPostMigration()
@@ -49,7 +51,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 });
 
             var database = new TestDatabase();
-            IScope scope = Mock.Of<IScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
+            IDatabaseScope scope = Mock.Of<IDatabaseScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
             Mock.Get(scope)
                 .Setup(x => x.Database)
                 .Returns(database);
@@ -67,7 +69,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             TestPostMigration.MigrateCount = 0;
 
             var upgrader = new Upgrader(plan);
-            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);
+            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, scopeProvider, builder);
             upgrader.Execute(
                 executor,
                 scopeProvider,
@@ -98,7 +100,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 });
 
             var database = new TestDatabase();
-            IScope scope = Mock.Of<IScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
+            IDatabaseScope scope = Mock.Of<IDatabaseScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
             Mock.Get(scope)
                 .Setup(x => x.Database)
                 .Returns(database);
@@ -118,7 +120,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             new MigrationContext(plan, database, s_loggerFactory.CreateLogger<MigrationContext>());
 
             var upgrader = new Upgrader(plan);
-            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);
+            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, scopeProvider, builder);
             upgrader.Execute(
                 executor,
                 scopeProvider,

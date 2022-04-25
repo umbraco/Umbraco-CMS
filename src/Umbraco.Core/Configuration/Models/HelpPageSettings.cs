@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets the allowed addresses to retrieve data for the content dashboard.
         /// </summary>
-        public string[] HelpPageUrlAllowList { get; set; }
+        public string[]? HelpPageUrlAllowList { get; set; }
     }
 }

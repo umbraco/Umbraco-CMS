@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -62,7 +63,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
                 PublicAccessRule[] rules = new[]
@@ -102,7 +103,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
                 PublicAccessRule[] rules = new[]

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 {
     public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     {
-        protected NotificationMethodBase(IOptions<HealthChecksSettings> healthCheckSettings)
+        protected NotificationMethodBase(IOptionsMonitor<HealthChecksSettings> healthCheckSettings)
         {
             var type = GetType();
             var attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
                 return;
             }
 
-            var notificationMethods = healthCheckSettings.Value.Notification.NotificationMethods;
+            var notificationMethods = healthCheckSettings.CurrentValue.Notification.NotificationMethods;
             if (!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
             {
                 Enabled = false;
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 
         public HealthCheckNotificationVerbosity Verbosity { get; protected set; }
 
-        public IDictionary<string, string> Settings { get; }
+        public IDictionary<string, string>? Settings { get; }
 
         protected bool ShouldSend(HealthCheckResults results)
         {

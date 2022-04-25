@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IMainDom _mainDom;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IAuditService _auditService;
-        private readonly LoggingSettings _settings;
+        private LoggingSettings _settings;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IMainDom mainDom,
             IServerRoleAccessor serverRegistrar,
             IAuditService auditService,
-            IOptions<LoggingSettings> settings,
+            IOptionsMonitor<LoggingSettings> settings,
             IScopeProvider scopeProvider,
             ILogger<LogScrubber> logger,
             IProfilingLogger profilingLogger)
@@ -53,13 +53,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
             _auditService = auditService;
-            _settings = settings.Value;
+            _settings = settings.CurrentValue;
             _scopeProvider = scopeProvider;
             _logger = logger;
             _profilingLogger = profilingLogger;
+            settings.OnChange(x => _settings = x);
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             switch (_serverRegistrar.CurrentServerRole)
             {

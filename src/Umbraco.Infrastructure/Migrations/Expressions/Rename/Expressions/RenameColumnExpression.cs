@@ -6,9 +6,9 @@
             : base(context)
         { }
 
-        public virtual string TableName { get; set; }
-        public virtual string OldName { get; set; }
-        public virtual string NewName { get; set; }
+        public virtual string? TableName { get; set; }
+        public virtual string? OldName { get; set; }
+        public virtual string? NewName { get; set; }
 
         /// <inheritdoc />
         protected override string GetSql()

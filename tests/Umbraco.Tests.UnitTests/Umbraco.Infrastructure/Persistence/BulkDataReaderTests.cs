@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence
 {

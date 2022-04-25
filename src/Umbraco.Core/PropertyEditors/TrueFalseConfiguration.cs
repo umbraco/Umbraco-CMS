@@ -12,9 +12,9 @@
         public bool ShowLabels { get; set; }
 
         [ConfigurationField("labelOn", "Label On", "textstring", Description = "Label text when enabled.")]
-        public string LabelOn { get; set; }
+        public string? LabelOn { get; set; }
 
         [ConfigurationField("labelOff", "Label Off", "textstring", Description = "Label text when disabled.")]
-        public string LabelOff { get; set; }
+        public string? LabelOff { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
             }
 
             // process the independent bundles
-            if (manifestParser.CombinedManifest.Scripts.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets> independentManifestAssetsList))
+            if (manifestParser.CombinedManifest.Scripts.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets>? independentManifestAssetsList))
             {
                 foreach (ManifestAssets manifestAssets in independentManifestAssetsList)
                 {
@@ -79,7 +79,7 @@ namespace Umbraco.Extensions
             }
 
             // process the independent bundles
-            if (manifestParser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets> independentManifestAssetsList))
+            if (manifestParser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets>? independentManifestAssetsList))
             {
                 foreach (ManifestAssets manifestAssets in independentManifestAssetsList)
                 {

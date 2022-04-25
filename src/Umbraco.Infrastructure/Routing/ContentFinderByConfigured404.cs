@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Routing
     {
         private readonly ILogger<ContentFinderByConfigured404> _logger;
         private readonly IEntityService _entityService;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -34,17 +34,19 @@ namespace Umbraco.Cms.Core.Routing
         public ContentFinderByConfigured404(
             ILogger<ContentFinderByConfigured404> logger,
             IEntityService entityService,
-            IOptions<ContentSettings> contentConfigSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IExamineManager examineManager,
             IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
             _logger = logger;
             _entityService = entityService;
-            _contentSettings = contentConfigSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
             _examineManager = examineManager;
             _variationContextAccessor = variationContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>
@@ -58,12 +60,13 @@ namespace Umbraco.Cms.Core.Routing
             {
                 return false;
             }
+
             _logger.LogDebug("Looking for a page to handle 404.");
 
             int? domainContentId = null;
 
             // try to find a culture as best as we can
-            string errorCulture = CultureInfo.CurrentUICulture.Name;
+            string? errorCulture = CultureInfo.CurrentUICulture.Name;
             if (frequest.Domain != null)
             {
                 errorCulture = frequest.Domain.Culture;
@@ -73,11 +76,11 @@ namespace Umbraco.Cms.Core.Routing
             {
                 var route = frequest.AbsolutePathDecoded;
                 var pos = route.LastIndexOf('/');
-                IPublishedContent node = null;
+                IPublishedContent? node = null;
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = umbracoContext.Content.GetByRoute(route, culture: frequest?.Culture);
+                    node = umbracoContext.Content?.GetByRoute(route, culture: frequest?.Culture);
                     if (node != null)
                     {
                         break;
@@ -88,7 +91,7 @@ namespace Umbraco.Cms.Core.Routing
 
                 if (node != null)
                 {
-                    Domain d = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains.GetAll(true), node.Path, null);
+                    Domain? d = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), node.Path, null);
                     if (d != null)
                     {
                         errorCulture = d.Culture;
@@ -103,13 +106,13 @@ namespace Umbraco.Cms.Core.Routing
                 errorCulture,
                 domainContentId);
 
-            IPublishedContent content = null;
+            IPublishedContent? content = null;
 
             if (error404.HasValue)
             {
                 LogErrorNodeFound(error404.Value);
 
-                content = umbracoContext.Content.GetById(error404.Value);
+                content = umbracoContext.Content?.GetById(error404.Value);
 
                 _logger.LogDebug(content == null
                     ? "Could not find content with that id."
@@ -120,7 +123,7 @@ namespace Umbraco.Cms.Core.Routing
                 _logger.LogDebug("Got nothing.");
             }
 
-            frequest
+            frequest?
                 .SetPublishedContent(content)
                 .SetIs404();
 

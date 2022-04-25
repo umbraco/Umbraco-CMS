@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         #region Value Editor
 
         protected override IDataValueEditor CreateValueEditor()
-            => DataValueEditorFactory.Create<NestedContentPropertyValueEditor>(Attribute);
+            => DataValueEditorFactory.Create<NestedContentPropertyValueEditor>(Attribute!);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             /// <inheritdoc />
-            public override object Configuration
+            public override object? Configuration
             {
                 get => base.Configuration;
                 set
@@ -100,13 +100,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue)
+            public override string ConvertDbToString(IPropertyType propertyType, object? propertyValue)
             {
                 var rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
                 if (rows.Count == 0)
                 {
-                    return null;
+                    return string.Empty;
                 }
 
                 foreach (var row in rows.ToList())
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                             if (propEditor == null) continue;
 
-                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
                             var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
 
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
-            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 var valEditors = new Dictionary<int, IDataValueEditor>();
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             var dataTypeId = prop.Value.PropertyType.DataTypeId;
                             if (!valEditors.TryGetValue(dataTypeId, out var valEditor))
                             {
-                                var tempConfig = _dataTypeService.GetDataType(dataTypeId).Configuration;
+                                var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
                                 valEditor = propEditor.GetValueEditor(tempConfig);
 
                                 valEditors.Add(dataTypeId, valEditor);
@@ -223,7 +223,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     foreach(var prop in row.PropertyValues.ToList())
                     {
                         // Fetch the property types prevalue
-                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                         // Lookup the property editor
                         var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
             #endregion
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
@@ -301,7 +301,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _nestedContentValues = nestedContentValues;
                 _contentTypeService = contentTypeService;
             }
-            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value)
             {
                 var rows = _nestedContentValues.GetPropertyValues(value);
                 if (rows.Count == 0) yield break;
@@ -357,7 +357,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _contentTypes = new Lazy<Dictionary<string, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Alias));
             }
 
-            private IContentType GetElementType(NestedContentRowValue item)
+            private IContentType? GetElementType(NestedContentRowValue item)
             {
                 _contentTypes.Value.TryGetValue(item.ContentTypeAlias, out var contentType);
                 return contentType;
@@ -368,15 +368,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// </summary>
             /// <param name="propertyValue"></param>
             /// <returns></returns>
-            public IReadOnlyList<NestedContentRowValue> GetPropertyValues(object propertyValue)
+            public IReadOnlyList<NestedContentRowValue> GetPropertyValues(object? propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return new List<NestedContentRowValue>();
 
-                 if (!propertyValue.ToString().DetectIsJson())
+                 if (!propertyValue.ToString()!.DetectIsJson())
                     return new List<NestedContentRowValue>();
 
-                var rowValues = JsonConvert.DeserializeObject<List<NestedContentRowValue>>(propertyValue.ToString());
+                var rowValues = JsonConvert.DeserializeObject<List<NestedContentRowValue>>(propertyValue.ToString()!);
 
                 // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
                 // The original note was: "Issue #38 - Keep recursive property lookups working"
@@ -432,8 +432,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// </summary>
             internal class NestedContentPropertyValue
             {
-                public object Value { get; set; }
-                public IPropertyType PropertyType { get; set; }
+                public object? Value { get; set; }
+
+                public IPropertyType PropertyType { get; set; } = null!;
             }
 
             /// <summary>
@@ -445,11 +446,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 public Guid Id{ get; set; }
 
                 [JsonProperty("name")]
-                public string Name { get; set; }
+                public string? Name { get; set; }
 
                 [JsonProperty("ncContentTypeAlias")]
-                public string ContentTypeAlias { get; set; }
-                public IPropertyType PropType { get; }
+                public string ContentTypeAlias { get; set; } = null!;
+                public IPropertyType? PropType { get; }
 
                 /// <summary>
                 /// The remaining properties will be serialized to a dictionary
@@ -461,7 +462,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 ///   "stringValue":"Some String","numericValue":125,"otherNumeric":null
                 /// </remarks>
                 [JsonExtensionData]
-                public IDictionary<string, object> RawPropertyValues { get; set; }
+                public IDictionary<string, object?> RawPropertyValues { get; set; } = null!;
 
                 /// <summary>
                 /// Used during deserialization to convert the raw property data into data with a property type context

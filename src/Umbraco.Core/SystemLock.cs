@@ -22,16 +22,16 @@ namespace Umbraco.Cms.Core
     //
     public class SystemLock
     {
-        private readonly SemaphoreSlim _semaphore;
-        private readonly Semaphore _semaphore2;
-        private readonly IDisposable _releaser;
-        private readonly Task<IDisposable> _releaserTask;
+        private readonly SemaphoreSlim? _semaphore;
+        private readonly Semaphore? _semaphore2;
+        private readonly IDisposable? _releaser;
+        private readonly Task<IDisposable>? _releaserTask;
 
         public SystemLock()
             : this(null)
         { }
 
-        public SystemLock(string name)
+        public SystemLock(string? name)
         {
             // WaitOne() waits until count > 0 then decrements count
             // Release() increments count
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core
             }
         }
 
-        private IDisposable CreateReleaser()
+        private IDisposable? CreateReleaser()
         {
             // for anonymous semaphore, use the unique releaser, else create a new one
             return _semaphore != null
@@ -66,20 +66,20 @@ namespace Umbraco.Cms.Core
                 : new NamedSemaphoreReleaser(_semaphore2);
         }
 
-        public IDisposable Lock()
+        public IDisposable? Lock()
         {
             if (_semaphore != null)
                 _semaphore.Wait();
             else
-                _semaphore2.WaitOne();
+                _semaphore2?.WaitOne();
             return _releaser ?? CreateReleaser(); // anonymous vs named
         }
 
-        public IDisposable Lock(int millisecondsTimeout)
+        public IDisposable? Lock(int millisecondsTimeout)
         {
             var entered = _semaphore != null
                 ? _semaphore.Wait(millisecondsTimeout)
-                : _semaphore2.WaitOne(millisecondsTimeout);
+                : _semaphore2?.WaitOne(millisecondsTimeout);
             if (entered == false)
                 throw new TimeoutException("Failed to enter the lock within timeout.");
             return _releaser ?? CreateReleaser(); // anonymous vs named
@@ -90,9 +90,9 @@ namespace Umbraco.Cms.Core
 
         private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
         {
-            private readonly Semaphore _semaphore;
+            private readonly Semaphore? _semaphore;
 
-            internal NamedSemaphoreReleaser(Semaphore semaphore)
+            internal NamedSemaphoreReleaser(Semaphore? semaphore)
             {
                 _semaphore = semaphore;
             }
@@ -115,13 +115,13 @@ namespace Umbraco.Cms.Core
                 {
                     try
                     {
-                        _semaphore.Release();
+                        _semaphore?.Release();
                     }
                     finally
                     {
                         try
                         {
-                            _semaphore.Dispose();
+                            _semaphore?.Dispose();
                         }
                         catch { }
                     }

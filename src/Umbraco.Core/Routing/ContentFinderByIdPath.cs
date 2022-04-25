@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly ILogger<ContentFinderByIdPath> _logger;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
 
         private static readonly Action<ILogger, int,Exception> s_logNodeId
             = LoggerMessage.Define<int>(MicrosoftLogLevel.Debug, new EventId(10), "Id={NodeId}");
@@ -32,15 +32,17 @@ namespace Umbraco.Cms.Core.Routing
         /// Initializes a new instance of the <see cref="ContentFinderByIdPath"/> class.
         /// </summary>
         public ContentFinderByIdPath(
-            IOptions<WebRoutingSettings> webRoutingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             ILogger<ContentFinderByIdPath> logger,
             IRequestAccessor requestAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _webRoutingSettings = webRoutingSettings.Value ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.CurrentValue ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             _requestAccessor = requestAccessor ?? throw new System.ArgumentNullException(nameof(requestAccessor));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         /// <summary>
@@ -59,7 +61,7 @@ namespace Umbraco.Cms.Core.Routing
                 return false;
             }
 
-            IPublishedContent node = null;
+            IPublishedContent? node = null;
             var path = frequest.AbsolutePathDecoded;
 
             var nodeId = -1;
@@ -77,7 +79,7 @@ namespace Umbraco.Cms.Core.Routing
                 if (nodeId > 0)
                 {
                     LogNodeId(nodeId);
-                    node = umbracoContext.Content.GetById(nodeId);
+                    node = umbracoContext?.Content?.GetById(nodeId);
 
                     if (node != null)
                     {

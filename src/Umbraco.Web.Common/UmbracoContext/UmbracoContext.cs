@@ -20,12 +20,12 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         private readonly ICookieManager _cookieManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
-        private string _previewToken;
+        private string? _previewToken;
         private bool? _previewing;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
-        private Uri _requestUrl;
-        private Uri _originalRequestUrl;
-        private Uri _cleanedUmbracoUrl;
+        private Uri? _requestUrl;
+        private Uri? _originalRequestUrl;
+        private Uri? _cleanedUmbracoUrl;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         internal Guid UmbracoRequestId { get; }
 
         // lazily get/create a Uri for the current request
-        private Uri RequestUrl => _requestUrl ??= _httpContextAccessor.HttpContext is null
+        private Uri? RequestUrl => _requestUrl ??= _httpContextAccessor.HttpContext is null
             ? null
             : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl());
 
@@ -88,22 +88,22 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
         /// <inheritdoc/>
-        public IPublishedContentCache Content => PublishedSnapshot.Content;
+        public IPublishedContentCache? Content => PublishedSnapshot.Content;
 
         /// <inheritdoc/>
-        public IPublishedMediaCache Media => PublishedSnapshot.Media;
+        public IPublishedMediaCache? Media => PublishedSnapshot.Media;
 
         /// <inheritdoc/>
-        public IDomainCache Domains => PublishedSnapshot.Domains;
+        public IDomainCache? Domains => PublishedSnapshot.Domains;
 
         /// <inheritdoc/>
-        public IPublishedRequest PublishedRequest { get; set; }
+        public IPublishedRequest? PublishedRequest { get; set; }
 
         /// <inheritdoc/>
         public bool IsDebug => // NOTE: the request can be null during app startup!
                 _hostingEnvironment.IsDebugMode
-                       && (string.IsNullOrEmpty(_httpContextAccessor.HttpContext.GetRequestValue("umbdebugshowtrace")) == false
-                           || string.IsNullOrEmpty(_httpContextAccessor.HttpContext.GetRequestValue("umbdebug")) == false
+                       && (string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebugshowtrace")) == false
+                           || string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebug")) == false
                            || string.IsNullOrEmpty(_cookieManager.GetCookieValue("UMB-DEBUG")) == false);
 
         /// <inheritdoc/>
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             private set => _previewing = value;
         }
 
-        internal string PreviewToken
+        internal string? PreviewToken
         {
             get
             {

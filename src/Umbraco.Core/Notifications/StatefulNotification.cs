@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Notifications
 {
     public abstract class StatefulNotification : IStatefulNotification
     {
-        private IDictionary<string, object> _state;
+        private IDictionary<string, object>? _state;
 
         /// <summary>
         /// This can be used by event subscribers to store state in the notification so they easily deal with custom state data between

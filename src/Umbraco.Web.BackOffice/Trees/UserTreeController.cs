@@ -33,24 +33,27 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
             {
-                return rootResult;
+                return rootResult.Result;
             }
             var root = rootResult.Value;
 
-            //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Users}/{Constants.Trees.Users}/users";
-            root.Icon = Constants.Icons.UserGroup;
+            if (root is not null)
+            {
+                // this will load in a custom UI instead of the dashboard for the root node
+                root.RoutePath = $"{Constants.Applications.Users}/{Constants.Trees.Users}/users";
+                root.Icon = Constants.Icons.UserGroup;
+                root.HasChildren = false;
+            }
 
-            root.HasChildren = false;
             return root;
         }
 
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
         {
             //full screen app without tree nodes
             return TreeNodeCollection.Empty;

@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.Common.Filters
         {
             public Task RenderAsync(ViewContext context) => Task.CompletedTask;
 
-            public string Path { get; }
+            public string Path { get; } = null!;
         }
     }
 }

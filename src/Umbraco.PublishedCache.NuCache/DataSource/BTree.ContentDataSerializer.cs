@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     public class ContentDataSerializer : ISerializer<ContentData>
     {
-        public ContentDataSerializer(IDictionaryOfPropertyDataSerializer dictionaryOfPropertyDataSerializer = null)
+        public ContentDataSerializer(IDictionaryOfPropertyDataSerializer? dictionaryOfPropertyDataSerializer = null)
         {
             _dictionaryOfPropertyDataSerializer = dictionaryOfPropertyDataSerializer;
             if(_dictionaryOfPropertyDataSerializer == null)
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         }
         private static readonly DictionaryOfPropertyDataSerializer s_defaultPropertiesSerializer = new DictionaryOfPropertyDataSerializer();
         private static readonly DictionaryOfCultureVariationSerializer s_defaultCultureVariationsSerializer = new DictionaryOfCultureVariationSerializer();
-        private readonly IDictionaryOfPropertyDataSerializer _dictionaryOfPropertyDataSerializer;
+        private readonly IDictionaryOfPropertyDataSerializer? _dictionaryOfPropertyDataSerializer;
 
         public ContentData ReadFrom(Stream stream)
         {
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             var versionDate = PrimitiveSerializer.DateTime.ReadFrom(stream);
             var writerId = PrimitiveSerializer.Int32.ReadFrom(stream);
             var templateId = PrimitiveSerializer.Int32.ReadFrom(stream);
-            var properties = _dictionaryOfPropertyDataSerializer.ReadFrom(stream); // TODO: We don't want to allocate empty arrays
+            var properties = _dictionaryOfPropertyDataSerializer?.ReadFrom(stream); // TODO: We don't want to allocate empty arrays
             var cultureInfos = s_defaultCultureVariationsSerializer.ReadFrom(stream); // TODO: We don't want to allocate empty arrays
             return new ContentData(name, urlSegment, versionId, versionDate, writerId, templateId, published, properties, cultureInfos);
         }
@@ -42,11 +42,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             PrimitiveSerializer.Int32.WriteTo(value.VersionId, stream);
             PrimitiveSerializer.DateTime.WriteTo(value.VersionDate, stream);
             PrimitiveSerializer.Int32.WriteTo(value.WriterId, stream);
-            if (value.TemplateId.HasValue)
-            {
-                PrimitiveSerializer.Int32.WriteTo(value.TemplateId.Value, stream);
-            }
-            _dictionaryOfPropertyDataSerializer.WriteTo(value.Properties, stream);
+            PrimitiveSerializer.Int32.WriteTo(value.TemplateId ?? 0, stream);
+            _dictionaryOfPropertyDataSerializer?.WriteTo(value.Properties, stream);
             s_defaultCultureVariationsSerializer.WriteTo(value.CultureInfos, stream);
         }
     }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -22,10 +23,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly ILogger _logger;
+        private readonly ILogger? _logger;
         private TimeSpan _period;
         private readonly TimeSpan _delay;
-        private Timer _timer;
+        private Timer? _timer;
         private bool _disposedValue;
 
         /// <summary>
@@ -34,12 +35,24 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="logger">Logger.</param>
         /// <param name="period">Timespan representing how often the task should recur.</param>
         /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(ILogger logger, TimeSpan period, TimeSpan delay)
+        protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
         {
             _logger = logger;
             _period = period;
             _delay = delay;
         }
+
+        // Scheduled for removal in V11
+        [Obsolete("Please use constructor that takes an ILogger instead")]
+        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
+            : this(null, period, delay)
+        { }
+
+        /// <summary>
+        /// Change the period between operations.
+        /// </summary>
+        /// <param name="newPeriod">The new period between tasks</param>
+        protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
 
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
@@ -56,7 +69,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// Executes the task.
         /// </summary>
         /// <param name="state">The task state.</param>
-        public async void ExecuteAsync(object state)
+        public async void ExecuteAsync(object? state)
         {
             try
             {
@@ -71,7 +84,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception in recurring hosted service {serviceName}.", GetType().Name);
+                ILogger logger = _logger ?? StaticApplicationLogging.CreateLogger(GetType());
+                logger.LogError(ex, "Unhandled exception in recurring hosted service.");
             }
             finally
             {
@@ -81,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
         }
 
-        public abstract Task PerformExecuteAsync(object state);
+        public abstract Task PerformExecuteAsync(object? state);
 
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)
@@ -97,7 +111,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             {
                 if (disposing)
                 {
-                     _timer?.Dispose();
+                    _timer?.Dispose();
                 }
 
                 _disposedValue = true;

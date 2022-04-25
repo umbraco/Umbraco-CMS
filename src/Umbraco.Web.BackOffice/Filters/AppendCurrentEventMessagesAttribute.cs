@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             throw new ArgumentOutOfRangeException();
                     }
 
-                    notifications.Notifications.Add(new BackOfficeNotification
+                    notifications.Notifications?.Add(new BackOfficeNotification
                     {
                         Message = eventMessage.Message,
                         Header = eventMessage.Category,

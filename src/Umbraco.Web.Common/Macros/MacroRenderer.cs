@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             IProfilingLogger profilingLogger,
             ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
@@ -74,6 +74,8 @@ namespace Umbraco.Cms.Web.Common.Macros
             _requestAccessor = requestAccessor;
             _partialViewMacroEngine = partialViewMacroEngine;
             _httpContextAccessor = httpContextAccessor;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         #region MacroContent cache
@@ -113,14 +115,14 @@ namespace Umbraco.Cms.Web.Common.Macros
             }
 
             foreach (var value in model.Properties.Select(x => x.Value))
-                id.AppendFormat("{0}-", value.Length <= 255 ? value : value.Substring(0, 255));
+                id.AppendFormat("{0}-", value?.Length <= 255 ? value : value?.Substring(0, 255));
 
             return id.ToString();
         }
 
         // gets this macro content from the cache
         // ensuring that it is appropriate to use the cache
-        private MacroContent GetMacroContentFromCache(MacroModel model)
+        private MacroContent? GetMacroContentFromCache(MacroModel model)
         {
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
@@ -183,8 +185,8 @@ namespace Umbraco.Cms.Web.Common.Macros
             // do not cache if it should cache by member and there's not member
             if (model.CacheByMember)
             {
-                var memberManager = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
-                var member = await memberManager.GetCurrentMemberAsync();
+                var memberManager = _httpContextAccessor.HttpContext?.RequestServices.GetRequiredService<IMemberManager>();
+                MemberIdentityUser? member = await memberManager?.GetCurrentMemberAsync()!;
                 if (member is null)
                 {
                     return;
@@ -214,16 +216,16 @@ namespace Umbraco.Cms.Web.Common.Macros
 
         // gets the macro source file name
         // null if the macro is not file-based, or not supported
-        internal static string GetMacroFileName(MacroModel model)
+        internal static string? GetMacroFileName(MacroModel model)
         {
-            string filename = model.MacroSource; // partial views are saved with their full virtual path
+            string? filename = model.MacroSource; // partial views are saved with their full virtual path
 
             return string.IsNullOrEmpty(filename) ? null : filename;
         }
 
         // gets the macro source file
         // null if macro is not file-based
-        private FileInfo GetMacroFile(MacroModel model)
+        private FileInfo? GetMacroFile(MacroModel model)
         {
             var filename = GetMacroFileName(model);
             if (filename == null)
@@ -238,7 +240,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         }
 
         // updates the model properties values according to the attributes
-        private static void UpdateMacroModelProperties(MacroModel model, IDictionary<string, object> macroParams)
+        private static void UpdateMacroModelProperties(MacroModel model, IDictionary<string, object?>? macroParams)
         {
             foreach (var prop in model.Properties)
             {
@@ -252,7 +254,7 @@ namespace Umbraco.Cms.Web.Common.Macros
 
         #region Render/Execute
 
-        public async Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
+        public async Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent? content, IDictionary<string, object?>? macroParams)
         {
             var m = _appCaches.RuntimeCache.GetCacheItem(CacheKeys.MacroFromAliasCacheKey + macroAlias, () => _macroService.GetByAlias(macroAlias));
 
@@ -265,7 +267,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             return await RenderAsync(macro, content);
         }
 
-        private async Task<MacroContent> RenderAsync(MacroModel macro, IPublishedContent content)
+        private async Task<MacroContent> RenderAsync(MacroModel macro, IPublishedContent? content)
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
@@ -315,7 +317,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         /// <summary>
         /// Executes a macro of a given type.
         /// </summary>
-        private Attempt<MacroContent> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut, Func<MacroContent> getMacroContent, Func<string> msgErr)
+        private Attempt<MacroContent?> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut, Func<MacroContent> getMacroContent, Func<string> msgErr)
         {
             using (_profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
             {
@@ -326,7 +328,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         /// <summary>
         /// Executes a macro of a given type.
         /// </summary>
-        private Attempt<MacroContent> ExecuteProfileMacroWithErrorWrapper(MacroModel macro, string msgIn, Func<MacroContent> getMacroContent, Func<string> msgErr)
+        private Attempt<MacroContent?> ExecuteProfileMacroWithErrorWrapper(MacroModel macro, string msgIn, Func<MacroContent> getMacroContent, Func<string> msgErr)
         {
             try
             {
@@ -371,7 +373,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         /// <remarks>Returns an attempt that is successful if the macro ran successfully. If the macro failed
         /// to run properly, the attempt fails, though it may contain a content. But for instance that content
         /// should not be cached. In that case the attempt may also contain an exception.</remarks>
-        private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
+        private Attempt<MacroContent?> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
             if (model == null)
             {
@@ -401,8 +403,12 @@ namespace Umbraco.Cms.Web.Common.Macros
 
         // parses attribute value looking for [@requestKey], [%sessionKey]
         // supports fallbacks eg "[@requestKey],[%sessionKey],1234"
-        private string ParseAttribute(string attributeValue)
+        private string? ParseAttribute(string? attributeValue)
         {
+            if (attributeValue is null)
+            {
+                return attributeValue;
+            }
             // check for potential querystring/cookie variables
             attributeValue = attributeValue.Trim();
             if (attributeValue.StartsWith("[") == false)

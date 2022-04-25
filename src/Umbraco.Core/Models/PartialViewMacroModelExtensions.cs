@@ -14,14 +14,14 @@ namespace Umbraco.Extensions
         /// <param name="parameterAlias"></param>
         /// <param name="defaultValue"></param>
         /// <returns>Parameter value if available, the default value that was passed otherwise.</returns>
-        public static T GetParameterValue<T>(this PartialViewMacroModel partialViewMacroModel, string parameterAlias, T defaultValue)
+        public static T? GetParameterValue<T>(this PartialViewMacroModel partialViewMacroModel, string parameterAlias, T defaultValue)
         {
-            if (partialViewMacroModel.MacroParameters.ContainsKey(parameterAlias) == false || string.IsNullOrEmpty(partialViewMacroModel.MacroParameters[parameterAlias].ToString()))
+            if (partialViewMacroModel.MacroParameters.ContainsKey(parameterAlias) == false || string.IsNullOrEmpty(partialViewMacroModel.MacroParameters[parameterAlias]?.ToString()))
                 return defaultValue;
 
             var attempt = partialViewMacroModel.MacroParameters[parameterAlias].TryConvertTo(typeof(T));
 
-            return attempt.Success ? (T) attempt.Result : defaultValue;
+            return attempt.Success ? (T?) attempt.Result : defaultValue;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Umbraco.Extensions
         /// <param name="partialViewMacroModel"></param>
         /// <param name="parameterAlias"></param>
         /// <returns>Parameter value if available, the default value for the type otherwise.</returns>
-        public static T GetParameterValue<T>(this PartialViewMacroModel partialViewMacroModel, string parameterAlias)
+        public static T? GetParameterValue<T>(this PartialViewMacroModel partialViewMacroModel, string parameterAlias)
         {
             return partialViewMacroModel.GetParameterValue(parameterAlias, default(T));
         }

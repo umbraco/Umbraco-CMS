@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -809,8 +809,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
                 _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
-                _subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
-                ContentService.Save(_subpage, 0);
+                var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+                ContentService.Save(_subpage, 0, contentSchedule);
 
                 // Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
                 _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);

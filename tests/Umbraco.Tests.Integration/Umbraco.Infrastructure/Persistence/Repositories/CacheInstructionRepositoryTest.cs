@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -98,7 +99,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var repo = new CacheInstructionRepository((IScopeAccessor)sp);
                 repo.Add(new CacheInstruction(0, date, Instructions, OriginIdentiy, InstructionCount));
 
-                List<CacheInstructionDto> dtos = scope.Database.Fetch<CacheInstructionDto>("WHERE id > -1");
+                List<CacheInstructionDto> dtos = ScopeAccessor.AmbientScope.Database.Fetch<CacheInstructionDto>("WHERE id > -1");
 
                 Assert.That(dtos.Any(), Is.True);
 

@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
@@ -85,6 +86,8 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public void CloseSharedConnection()
         {
         }
+
+        (List<T1>, List<T2>, List<T3>, List<T4>) IDatabaseQuery.FetchMultiple<T1, T2, T3, T4>(Sql sql) => throw new NotImplementedException();
 
         public int OneTimeCommandTimeout { get; set; }
 
@@ -182,14 +185,17 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public Task<int> ExecuteAsync(string sql, params object[] args) => throw new NotImplementedException();
 
         public Task<int> ExecuteAsync(Sql sql) => throw new NotImplementedException();
+        public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco) => throw new NotImplementedException();
 
         public object Insert<T>(string tableName, string primaryKeyName, bool autoIncrement, T poco) => throw new NotImplementedException();
 
         public object Insert<T>(string tableName, string primaryKeyName, T poco) => throw new NotImplementedException();
 
         public object Insert<T>(T poco) => throw new NotImplementedException();
+        public void InsertBulk<T>(IEnumerable<T> pocos, InsertBulkOptions? options = null) => throw new NotImplementedException();
 
         public Task<object> InsertAsync<T>(T poco) => throw new NotImplementedException();
+        public Task InsertBulkAsync<T>(IEnumerable<T> pocos, InsertBulkOptions options = null) => throw new NotImplementedException();
 
         public Task<int> InsertBatchAsync<T>(IEnumerable<T> pocos, BatchOptions options = null) => throw new NotImplementedException();
 
@@ -206,6 +212,9 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public IAsyncUpdateQueryProvider<T> UpdateManyAsync<T>() => throw new NotImplementedException();
 
         public IAsyncDeleteQueryProvider<T> DeleteManyAsync<T>() => throw new NotImplementedException();
+        public Task<bool> IsNewAsync<T>(T poco) => throw new NotImplementedException();
+
+        public Task SaveAsync<T>(T poco) => throw new NotImplementedException();
 
         public void InsertBulk<T>(IEnumerable<T> pocos) => throw new NotImplementedException();
 
@@ -350,6 +359,15 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public TRet FetchMultiple<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, Sql sql) => throw new NotImplementedException();
 
         public TRet FetchMultiple<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, Sql sql) => throw new NotImplementedException();
+        (List<T1>, List<T2>) IDatabaseQuery.FetchMultiple<T1, T2>(string sql, params object[] args) => throw new NotImplementedException();
+
+        (List<T1>, List<T2>, List<T3>) IDatabaseQuery.FetchMultiple<T1, T2, T3>(string sql, params object[] args) => throw new NotImplementedException();
+
+        (List<T1>, List<T2>, List<T3>, List<T4>) IDatabaseQuery.FetchMultiple<T1, T2, T3, T4>(string sql, params object[] args) => throw new NotImplementedException();
+
+        (List<T1>, List<T2>) IDatabaseQuery.FetchMultiple<T1, T2>(Sql sql) => throw new NotImplementedException();
+
+        (List<T1>, List<T2>, List<T3>) IDatabaseQuery.FetchMultiple<T1, T2, T3>(Sql sql) => throw new NotImplementedException();
 
         public Tuple<List<T1>, List<T2>> FetchMultiple<T1, T2>(string sql, params object[] args) => throw new NotImplementedException();
 
@@ -382,6 +400,9 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public Task<T> FirstOrDefaultAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
 
         public Task<T> FirstOrDefaultAsync<T>(Sql sql) => throw new NotImplementedException();
+        IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+
+        IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(Sql sql) => throw new NotImplementedException();
 
         public Task<IEnumerable<T>> QueryAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
 
@@ -406,6 +427,29 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, params object[] args) => throw new NotImplementedException();
 
         public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql) => throw new NotImplementedException();
+        public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
+
+        public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
+
+        public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
+
+        public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, Sql sql) => throw new NotImplementedException();
+
+        public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, Sql sql) => throw new NotImplementedException();
+
+        public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, Sql sql) => throw new NotImplementedException();
+
+        public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(string sql, params object[] args) => throw new NotImplementedException();
+
+        public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(string sql, params object[] args) => throw new NotImplementedException();
+
+        public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(string sql, params object[] args) => throw new NotImplementedException();
+
+        public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(Sql sql) => throw new NotImplementedException();
+
+        public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(Sql sql) => throw new NotImplementedException();
+
+        public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(Sql sql) => throw new NotImplementedException();
 
         public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage) => throw new NotImplementedException();
     }

@@ -33,33 +33,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
-        /// </summary>
-        // Note: Ignoring the two version notice rule as this class should probably be internal.
-        // We don't expect anyone downstream to be instantiating a HostedService
-        [Obsolete("This constructor will be removed in version 10, please use an alternative constructor.")]
-        public ScheduledPublishing(
-            IRuntimeState runtimeState,
-            IMainDom mainDom,
-            IServerRoleAccessor serverRegistrar,
-            IContentService contentService,
-            IUmbracoContextFactory umbracoContextFactory,
-            ILogger<ScheduledPublishing> logger,
-            IServerMessenger serverMessenger)
-            : this(
-                runtimeState,
-                mainDom,
-                serverRegistrar,
-                contentService,
-                umbracoContextFactory,
-                logger,
-                serverMessenger,
-                StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>())
-        {
-        }
-
-        /// <summary>
+ /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
         /// </summary>
         public ScheduledPublishing(
@@ -83,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _scopeProvider = scopeProvider;
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
             {

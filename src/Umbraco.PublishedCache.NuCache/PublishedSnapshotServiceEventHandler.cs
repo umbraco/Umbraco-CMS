@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Extensions;
@@ -17,7 +14,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     /// Subscribes to Umbraco events to ensure nucache remains consistent with the source data
     /// </summary>
     public class PublishedSnapshotServiceEventHandler :
-        IDisposable,
         INotificationHandler<LanguageSavedNotification>,
         INotificationHandler<MemberDeletingNotification>,
         INotificationHandler<ContentRefreshNotification>,
@@ -28,47 +24,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         INotificationHandler<MemberTypeRefreshedNotification>,
         INotificationHandler<ScopedEntityRemoveNotification>
     {
-        private readonly IRuntimeState _runtime;
-        private bool _disposedValue;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly INuCacheContentService _publishedContentService;
-        private readonly IContentService _contentService;
-        private readonly IMediaService _mediaService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedSnapshotServiceEventHandler"/> class.
         /// </summary>
         public PublishedSnapshotServiceEventHandler(
-            IRuntimeState runtime,
             IPublishedSnapshotService publishedSnapshotService,
-            INuCacheContentService publishedContentService,
-            IContentService contentService,
-            IMediaService mediaService)
+            INuCacheContentService publishedContentService)
         {
-            _runtime = runtime;
             _publishedSnapshotService = publishedSnapshotService;
             _publishedContentService = publishedContentService;
-            _contentService = contentService;
-            _mediaService = mediaService;
-        }
-
-        /// <summary>
-        /// Binds to the Umbraco events
-        /// </summary>
-        /// <returns>Returns true if binding occurred</returns>
-        public bool Initialize()
-        {
-            // however, the cache is NOT available until we are configured, because loading
-            // content (and content types) from database cannot be consistent (see notes in "Handle
-            // Notifications" region), so
-            // - notifications will be ignored
-            // - trying to obtain a published snapshot from the service will throw
-            if (_runtime.Level != RuntimeLevel.Run)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         // note: if the service is not ready, ie _isReady is false, then we still handle repository events,
@@ -135,21 +102,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 // Rebuild all content for all content types
                 _publishedSnapshotService.Rebuild(contentTypeIds: Array.Empty<int>());
             }
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

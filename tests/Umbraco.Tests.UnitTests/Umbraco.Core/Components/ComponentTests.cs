@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -27,6 +28,8 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
@@ -43,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         {
             // FIXME: use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
             var mock = new Mock<IServiceProvider>();
-            NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
+            ILoggerFactory loggerFactory = NullLoggerFactory.Instance;
             ILogger logger = loggerFactory.CreateLogger("GenericLogger");
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
@@ -52,10 +55,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 Options.Create(globalSettings),
-                Mock.Of<IOptionsMonitor<ConnectionStrings>>(x => x.CurrentValue == connectionStrings),
+                Mock.Of<IOptionsMonitor<ConnectionStrings>>(x => x.Get(It.IsAny<string>()) == connectionStrings),
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
-                TestHelper.DbProviderFactoryCreator,
-                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()),
+                Mock.Of<IDbProviderFactoryCreator>(),
+                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>(), Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>()),
                 mapperCollection);
 
             var fs = new FileSystems(loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
@@ -68,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 Mock.Of<IServiceProvider>(),
                 Options.Create(new ContentSettings()));
             IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
-            var scopeProvider = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileManager, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
+            var scopeProvider = new ScopeProvider(Mock.Of<IDistributedLockingMechanismFactory>(),f , fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), loggerFactory, NoAppCache.Instance, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);

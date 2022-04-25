@@ -45,7 +45,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
             var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var webRoutingSettings = new WebRoutingSettings();
-            var lookup = new ContentFinderByIdPath(Options.Create(webRoutingSettings), Mock.Of<ILogger<ContentFinderByIdPath>>(), Mock.Of<IRequestAccessor>(), umbracoContextAccessor);
+            var lookup = new ContentFinderByIdPath(
+                Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x=>x.CurrentValue ==  webRoutingSettings),
+                Mock.Of<ILogger<ContentFinderByIdPath>>(), Mock.Of<IRequestAccessor>(), umbracoContextAccessor);
 
 
             var result = lookup.TryFindContent(frequest);

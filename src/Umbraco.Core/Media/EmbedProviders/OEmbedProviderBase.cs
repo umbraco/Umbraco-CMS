@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
             _jsonSerializer = jsonSerializer;
         }
 
-        private static HttpClient _httpClient;
+        private static HttpClient? _httpClient;
 
         public abstract string ApiEndpoint { get; }
 
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
 
         public abstract Dictionary<string, string> RequestParams { get; }
 
-        public abstract string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+        public abstract string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
         public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
         {
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
             }
         }
 
-        public virtual T GetJsonResponse<T>(string url) where T : class
+        public virtual T? GetJsonResponse<T>(string url) where T : class
         {
             var response = DownloadResponse(url);
             return _jsonSerializer.Deserialize<T>(response);

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Templates
 {
     public sealed partial class HtmlUrlParser
     {
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly ILogger<HtmlUrlParser> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IProfilingLogger _profilingLogger;
@@ -22,12 +22,14 @@ namespace Umbraco.Cms.Core.Templates
         private static readonly Action<ILogger, long,int, Exception> s_logUrlRegexResult
             = LoggerMessage.Define<long, int>(MicrosoftLogLevel.Debug, new EventId(46), "After regex: {Duration} matched: {TagsCount}");
 
-        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptionsMonitor<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
         {
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
             _logger = logger;
             _ioHelper = ioHelper;
             _profilingLogger = profilingLogger;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>
@@ -48,7 +50,7 @@ namespace Umbraco.Cms.Core.Templates
             {
                 // find all relative URLs (ie. URLs that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                LogUrlRegexResult(timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                LogUrlRegexResult(timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

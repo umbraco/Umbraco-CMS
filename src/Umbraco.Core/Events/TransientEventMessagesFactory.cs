@@ -10,7 +10,7 @@
             return new EventMessages();
         }
 
-        public EventMessages GetOrDefault()
+        public EventMessages? GetOrDefault()
         {
             return null;
         }

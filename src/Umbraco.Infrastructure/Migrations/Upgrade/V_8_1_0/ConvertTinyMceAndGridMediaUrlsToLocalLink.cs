@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
                 RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             var sqlPropertyData = Sql()
-                .Select<PropertyDataDto80>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
+                .Select<PropertyDataDto80>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x!.DataTypeDto)))
                 .From<PropertyDataDto80>()
                     .InnerJoin<PropertyTypeDto80>().On<PropertyDataDto80, PropertyTypeDto80>((left, right) => left.PropertyTypeId == right.Id)
                     .InnerJoin<DataTypeDto>().On<PropertyTypeDto80, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
@@ -46,20 +46,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
 
 
                 bool propertyChanged = false;
-                if (property.PropertyTypeDto.DataTypeDto.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Grid)
+                if (property.PropertyTypeDto?.DataTypeDto?.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Grid)
                 {
                     try
                     {
                         var obj = JsonConvert.DeserializeObject<JObject>(value);
-                        var allControls = obj.SelectTokens("$.sections..rows..areas..controls");
+                        var allControls = obj?.SelectTokens("$.sections..rows..areas..controls");
 
-                        foreach (var control in allControls.SelectMany(c => c).OfType<JObject>())
+                        if (allControls is not null)
                         {
-                            var controlValue = control["value"];
-                            if (controlValue?.Type == JTokenType.String)
+                            foreach (var control in allControls.SelectMany(c => c).OfType<JObject>())
                             {
-                                control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>(), out var controlChanged);
-                                propertyChanged |= controlChanged;
+                                var controlValue = control["value"];
+                                if (controlValue?.Type == JTokenType.String)
+                                {
+                                    control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>()!, out var controlChanged);
+                                    propertyChanged |= controlChanged;
+                                }
                             }
                         }
 

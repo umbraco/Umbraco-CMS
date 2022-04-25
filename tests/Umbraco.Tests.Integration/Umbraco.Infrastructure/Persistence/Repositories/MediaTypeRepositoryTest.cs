@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -294,7 +295,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IEnumerable<IMediaType> mediaTypes = repository.GetMany();
                 int count =
-                    scope.Database.ExecuteScalar<int>(
+                    ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
@@ -319,7 +320,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IEnumerable<IMediaType> mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetMany(allGuidIds);
 
                 int count =
-                    scope.Database.ExecuteScalar<int>(
+                    ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = Constants.ObjectTypes.MediaType });
 

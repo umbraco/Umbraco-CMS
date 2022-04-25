@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private readonly IUserService _userService;
             private readonly IEntityService _entityService;
             private readonly ILocalizedTextService _localizedTextService;
-            private readonly IOptions<GlobalSettings> _globalSettings;
+            private GlobalSettings _globalSettings;
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
             private readonly IScopeProvider _scopeProvider;
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 IUserService userService,
                 IEntityService entityService,
                 ILocalizedTextService localizedTextService,
-                IOptions<GlobalSettings> globalSettings,
+                IOptionsSnapshot<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery,
                 IScopeProvider scopeProvider,
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _userService = userService;
                 _entityService = entityService;
                 _localizedTextService = localizedTextService;
-                _globalSettings = globalSettings;
+                _globalSettings = globalSettings.Value;
                 _backOfficeSignInManager = backOfficeSignInManager;
                 _backOfficeAntiforgery = backOfficeAntiforgery;
                 _scopeProvider = scopeProvider;
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 var tokenFilter = new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery);
                 await tokenFilter.OnActionExecutionAsync(
                     actionContext,
-                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
+                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), new { })));
 
                 // add the header
                 AppendUserModifiedHeaderAttribute.AppendHeader(actionContext);
@@ -118,7 +118,13 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    IUser user = _userService.GetUserById(identity.GetId());
+                    var id = identity.GetId();
+                    if (id is null)
+                    {
+                        return;
+                    }
+
+                    IUser? user = _userService.GetUserById(id.Value);
                     if (user == null)
                     {
                         return;
@@ -130,7 +136,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         () => user.Username != identity.GetUsername(),
                         () =>
                         {
-                            CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
+                            CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings);
                             return culture != null && culture.ToString() != identity.GetCultureString();
                         },
                         () => user.AllowedSections.UnsortedSequenceEqual(identity.GetAllowedApplications()) == false,
@@ -159,8 +165,11 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             /// </summary>
             private async Task ReSync(IUser user, ActionExecutingContext actionContext)
             {
-                BackOfficeIdentityUser backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
-                await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                BackOfficeIdentityUser? backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
+                if (backOfficeIdentityUser is not null)
+                {
+                    await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                }
 
                 // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);

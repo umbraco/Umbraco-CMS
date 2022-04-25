@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Core.Logging
         private readonly LogLevel _level;
         private readonly Type _loggerType;
         private readonly int _thresholdMilliseconds;
-        private readonly IDisposable _profilerStep;
+        private readonly IDisposable? _profilerStep;
         private readonly string _endMessage;
-        private string _failMessage;
-        private readonly object[] _endMessageArgs;
-        private readonly object[] _failMessageArgs;
-        private Exception _failException;
+        private string? _failMessage;
+        private readonly object[]? _endMessageArgs;
+        private readonly object[]? _failMessageArgs;
+        private Exception? _failException;
         private bool _failed;
         private readonly string _timingId;
         private static readonly Action<ILogger, string, string, Exception> s_logInformationStartTimer
@@ -41,10 +41,10 @@ namespace Umbraco.Cms.Core.Logging
             Type loggerType,
             string startMessage,
             string endMessage,
-            string failMessage = null,
-            object[] startMessageArgs = null,
-            object[] endMessageArgs = null,
-            object[] failMessageArgs = null,
+            string? failMessage = null,
+            object[]? startMessageArgs = null,
+            object[]? endMessageArgs = null,
+            object[]? failMessageArgs = null,
             int thresholdMilliseconds = 0)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Logging
         /// <param name="failMessage">The fail message.</param>
         /// <param name="exception">The exception.</param>
         /// <remarks>Completion of the timer will be reported as an error, with the specified message and exception.</remarks>
-        public void Fail(string failMessage = null, Exception exception = null)
+        public void Fail(string? failMessage = null, Exception? exception = null)
         {
             _failed = true;
             _failMessage = failMessage ?? _failMessage ?? "Failed.";

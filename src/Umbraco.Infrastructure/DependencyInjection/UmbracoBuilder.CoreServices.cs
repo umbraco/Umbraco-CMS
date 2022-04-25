@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
@@ -36,6 +37,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -50,8 +52,10 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -67,11 +71,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddMainDom()
                 .AddLogging();
 
+            builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-            builder.NPocoMappers().Add<NullableDateMapper>();
-            builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+            builder.NPocoMappers()?.Add<NullableDateMapper>();
+            builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
 
             builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
             builder.Services.AddSingleton<IRuntime, CoreRuntime>();
@@ -90,12 +94,14 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
-            builder.Mappers().AddCoreMappers();
+            builder.Mappers()?.AddCoreMappers();
 
             // register the scope provider
-            builder.Services.AddSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
             builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+
+
             builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
             builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
@@ -112,14 +118,14 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register the manifest filter collection builder (collection is empty by default)
             builder.ManifestFilters();
 
-            builder.MediaUrlGenerators()
+            builder.MediaUrlGenerators()?
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 
             builder.Services.AddSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             builder.Services.AddSingleton<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptionsMonitor<RequestHandlerSettings>>().CurrentValue)));
 
             builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
             builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
@@ -142,7 +148,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We will remove the basic one defined
             // in core so that the more enhanced version is active.
-            builder.PropertyValueConverters()
+            builder.PropertyValueConverters()?
                 .Remove<SimpleTinyMceValueConverter>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
@@ -156,7 +162,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IEmailSender, EmailSender>(
                 services => new EmailSender(
                     services.GetRequiredService<ILogger<EmailSender>>(),
-                    services.GetRequiredService<IOptions<GlobalSettings>>(),
+                    services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                     services.GetRequiredService<IEventAggregator>(),
                     services.GetService<INotificationHandler<SendEmailNotification>>(),
                     services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
@@ -196,6 +202,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddSingleton<PackageDataInstallation>();
 
+            builder.Services.AddTransient<INodeCountService, NodeCountService>();
             builder.AddInstaller();
 
             // Services required to run background jobs (with out the handler)
@@ -227,26 +234,29 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
                 var databaseSchemaCreatorFactory = factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
                 var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
 
-                if (globalSettings.Value.MainDomLock == "FileSystemMainDomLock")
+                switch (globalSettings.Value.MainDomLock)
                 {
-                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
-                }
-
-                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(
+                    case "SqlMainDomLock":
+                        return new SqlMainDomLock(
                             loggerFactory,
                             globalSettings,
                             connectionStrings,
                             dbCreator,
                             mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
-                            npocoMappers)
-                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+                            npocoMappers);
+
+                    case "MainDomSemaphoreLock":
+                        return new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+
+                    case "FileSystemMainDomLock":
+                    default:
+                        return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
+                }
             });
 
             return builder;
@@ -255,7 +265,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
         {
-            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
+            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()?
                 .Append<RenamingPreValueMigrator>()
                 .Append<RichTextPreValueMigrator>()
                 .Append<UmbracoSliderPreValueMigrator>()

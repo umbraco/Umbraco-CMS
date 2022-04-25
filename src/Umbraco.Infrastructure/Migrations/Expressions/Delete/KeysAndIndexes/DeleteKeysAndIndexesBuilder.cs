@@ -6,6 +6,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexes
 {
+    /// <remarks>
+    /// <para>
+    /// Assuming we stick with the current migrations setup this will need to be altered to
+    /// delegate to SQL syntax provider (we can drop indexes but not PK/FK).
+    /// </para>
+    /// <para>
+    /// 1. For SQLite, rename table.<br/>
+    /// 2. Create new table with expected keys.<br/>
+    /// 3. Insert into new from renamed<br/>
+    /// 4. Drop renamed.<br/>
+    /// </para>
+    /// <para>
+    /// Read more <a href="https://www.sqlite.org/omitted.html">SQL Features That SQLite Does Not Implement</a>
+    /// </para>
+    /// </remarks>
     public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
     {
         private readonly IMigrationContext _context;
@@ -17,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexe
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
 
         public bool DeleteLocal { get; set; }
 
@@ -29,10 +44,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexe
             _context.BuildingExpression = false;
 
             //get a list of all constraints - this will include all PK, FK and unique constraints
-            var tableConstraints = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToList();
+            var tableConstraints = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).LegacyDistinctBy(x => x!.Item2).ToList();
 
             //get a list of defined indexes - this will include all indexes, unique indexes and unique constraint indexes
-            var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToList();
+            var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).LegacyDistinctBy(x => x!.IndexName).ToList();
 
             var uniqueConstraintNames = tableConstraints.Where(x => !x.Item2.InvariantStartsWith("PK_") && !x.Item2.InvariantStartsWith("FK_")).Select(x => x.Item2);
             var indexNames = indexes.Select(x => x.IndexName).ToList();

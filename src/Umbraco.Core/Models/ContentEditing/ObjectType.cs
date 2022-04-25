@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class ObjectType
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "id")]
         public Guid Id { get; set; }

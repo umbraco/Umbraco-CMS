@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = new GlobalSettingsValidator();
             var options = new GlobalSettings
             {
-                SqlWriteLockTimeOut = TimeSpan.Parse("00:00:00.099")
+                DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:00.099")
             };
 
             ValidateOptionsResult result = validator.Validate("settings", options);
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = new GlobalSettingsValidator();
             var options = new GlobalSettings
             {
-                SqlWriteLockTimeOut = TimeSpan.Parse("00:00:21")
+                DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:21")
             };
 
             ValidateOptionsResult result = validator.Validate("settings", options);
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = new GlobalSettingsValidator();
             var options = new GlobalSettings
             {
-                SqlWriteLockTimeOut = TimeSpan.Parse("00:00:20")
+                DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:20")
             };
 
             ValidateOptionsResult result = validator.Validate("settings", options);

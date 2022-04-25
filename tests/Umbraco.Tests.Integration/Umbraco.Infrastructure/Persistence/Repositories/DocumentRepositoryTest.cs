@@ -24,6 +24,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -152,11 +154,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 new IsolatedCaches(t => new ObjectCacheAppCache()));
 
             IScopeProvider provider = ScopeProvider;
+            IScopeAccessor scopeAccessor = ScopeAccessor;
+
             using (IScope scope = provider.CreateScope())
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out ContentTypeRepository contentTypeRepository, appCaches: realCache);
 
-                IUmbracoDatabase udb = scope.Database;
+                IUmbracoDatabase udb = scopeAccessor.AmbientScope.Database;
 
                 udb.EnableSqlCount = false;
 
@@ -230,7 +234,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -246,7 +250,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // unpublish = no impact on versions
                 ((Content)content1).PublishedState = PublishedState.Unpublishing;
@@ -261,7 +265,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(false, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -276,7 +280,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(false, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
                 content1.PublishCulture(CultureImpact.Invariant);
@@ -292,7 +296,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -310,7 +314,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = new version
                 content1.Name = "name-4";
@@ -328,7 +332,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // all versions
                 IContent[] allVersions = repository.GetAllVersions(content1.Id).ToArray();
@@ -700,7 +704,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
                 IEnumerable<IContent> result = repository.Get(query);
 
                 Assert.GreaterOrEqual(2, result.Count());
@@ -838,10 +842,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.ParentId == root.Id);
+                    IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.ParentId == root.Id);
                     IEnumerable<IContent> result = repository.GetPage(query, 0, 20, out long totalRecords, null, Ordering.By("UpdateDate"));
 
                     Assert.AreEqual(25, totalRecords);
@@ -864,8 +868,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -878,12 +882,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Text"));
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("Text"));
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     IEnumerable<IContent> result = repository.GetPage(query, 0, 2, out long totalRecords, null, Ordering.By("title", isCustomField: true));
 
@@ -896,8 +900,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -910,12 +914,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     IEnumerable<IContent> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("Name"));
 
@@ -925,8 +929,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -939,7 +943,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
                 IEnumerable<IContent> result = repository.GetPage(query, 1, 1, out long totalRecords, null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -956,7 +960,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
                 IEnumerable<IContent> result = repository.GetPage(query, 0, 2, out long totalRecords, null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -973,7 +977,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
                 IEnumerable<IContent> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("Name", Direction.Descending));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -990,9 +994,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
-                IQuery<IContent> filterQuery = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
+                IQuery<IContent> filterQuery = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("Page 2"));
                 IEnumerable<IContent> result = repository.GetPage(query, 0, 1, out long totalRecords, filterQuery, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -1009,9 +1013,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
-                IQuery<IContent> filterQuery = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("text"));
+                IQuery<IContent> filterQuery = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("text"));
                 IEnumerable<IContent> result = repository.GetPage(query, 0, 1, out long totalRecords, filterQuery, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.EqualTo(2));
@@ -1084,7 +1088,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
                 int result = repository.Count(query);
 
                 Assert.That(result, Is.GreaterThanOrEqualTo(2));
@@ -1099,7 +1103,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 DocumentRepository repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                IQuery<IContent> query = scope.SqlContext.Query<IContent>().Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+                IQuery<IContent> query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
                 IContent content = repository.Get(query).SingleOrDefault();
 
                 Assert.IsNotNull(content);

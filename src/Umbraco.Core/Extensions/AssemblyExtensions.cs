@@ -23,8 +23,7 @@ namespace Umbraco.Extensions
             {
                 return _rootDir;
             }
-
-            var codeBase = executingAssembly.CodeBase;
+            var codeBase = executingAssembly.Location;
             var uri = new Uri(codeBase);
             var path = uri.LocalPath;
             var baseDirectory = Path.GetDirectoryName(path);
@@ -45,7 +44,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static FileInfo GetAssemblyFile(this Assembly assembly)
         {
-            var codeBase = assembly.CodeBase;
+            var codeBase = assembly.Location;
             var uri = new Uri(codeBase);
             var path = uri.LocalPath;
             return new FileInfo(path);
@@ -58,7 +57,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static bool IsAppCodeAssembly(this Assembly assembly)
         {
-            if (assembly.FullName.StartsWith("App_Code"))
+            if (assembly.FullName!.StartsWith("App_Code"))
             {
                 try
                 {
@@ -82,7 +81,7 @@ namespace Umbraco.Extensions
         public static bool IsGlobalAsaxAssembly(this Assembly assembly)
         {
             //only way I can figure out how to test is by the name
-            return assembly.FullName.StartsWith("App_global.asax");
+            return assembly.FullName!.StartsWith("App_global.asax");
         }
 
         /// <summary>
@@ -90,12 +89,17 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="assemblyName"></param>
         /// <returns></returns>
-        public static FileInfo GetAssemblyFile(this AssemblyName assemblyName)
+        public static FileInfo? GetAssemblyFile(this AssemblyName assemblyName)
         {
             var codeBase = assemblyName.CodeBase;
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            return new FileInfo(path);
+            if (!string.IsNullOrEmpty(codeBase))
+            {
+                var uri = new Uri(codeBase);
+                var path = uri.LocalPath;
+                return new FileInfo(path);
+            }
+
+            return null;
         }
 
     }

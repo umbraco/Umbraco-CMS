@@ -68,8 +68,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var entities = _relationService.GetEntitiesFromRelation(source);
 
-            target.ParentName = entities.Item1.Name;
-            target.ChildName = entities.Item2.Name;
+            if (entities is not null)
+            {
+                target.ParentName = entities.Item1.Name;
+                target.ChildName = entities.Item2.Name;
+            }
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate

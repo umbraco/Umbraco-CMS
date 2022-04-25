@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMainDom _mainDom;
-        private readonly KeepAliveSettings _keepAliveSettings;
+        private KeepAliveSettings _keepAliveSettings;
         private readonly ILogger<KeepAlive> _logger;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRoleAccessor _serverRegistrar;
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public KeepAlive(
             IHostingEnvironment hostingEnvironment,
             IMainDom mainDom,
-            IOptions<KeepAliveSettings> keepAliveSettings,
+            IOptionsMonitor<KeepAliveSettings> keepAliveSettings,
             ILogger<KeepAlive> logger,
             IProfilingLogger profilingLogger,
             IServerRoleAccessor serverRegistrar,
@@ -53,14 +53,16 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             _hostingEnvironment = hostingEnvironment;
             _mainDom = mainDom;
-            _keepAliveSettings = keepAliveSettings.Value;
+            _keepAliveSettings = keepAliveSettings.CurrentValue;
             _logger = logger;
             _profilingLogger = profilingLogger;
             _serverRegistrar = serverRegistrar;
             _httpClientFactory = httpClientFactory;
+
+            keepAliveSettings.OnChange(x => _keepAliveSettings = x);
         }
 
-        public override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object? state)
         {
             if (_keepAliveSettings.DisableKeepAliveTask)
             {
@@ -95,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 }
 
                 // If the config is an absolute path, just use it
-                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
+                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl!, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
 
                 try
                 {

@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
 
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly PropertyEditorCollection _propertyEditorCollection;
@@ -38,15 +38,17 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             IManifestParser parser,
             PropertyEditorCollection propertyEditorCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             CustomBackOfficeAssetsCollection customBackOfficeAssetsCollection)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
             _propertyEditorCollection = propertyEditorCollection;
             _hostingEnvironment = hostingEnvironment;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
             _customBackOfficeAssetsCollection = customBackOfficeAssetsCollection;
+
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         public void CreateBundles()
@@ -96,8 +98,8 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             // custom back office assets, and any scripts found in package manifests
             // that have the default bundle options.
 
-            IEnumerable<string> jsAssets = (customAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string> customScripts) ? customScripts : Enumerable.Empty<string>())
-                .Union(propertyEditorAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string> scripts) ? scripts : Enumerable.Empty<string>());
+            IEnumerable<string?> jsAssets = (customAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string?>? customScripts) ? customScripts : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string>? scripts) ? scripts : Enumerable.Empty<string>());
 
             _runtimeMinifier.CreateJsBundle(
                 UmbracoExtensionsJsBundleName,
@@ -106,17 +108,17 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                     GetScriptsForBackOfficeExtensions(jsAssets)));
 
             // Create a bundle per package manifest that is declaring an Independent bundle type
-            RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Scripts, AssetType.Javascript);
+            RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest?.Scripts, AssetType.Javascript);
 
             // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
-            RegisterPackageBundlesForNoneOption(_parser.CombinedManifest.Scripts, UmbracoNonOptimizedPackageJsBundleName);
+            RegisterPackageBundlesForNoneOption(_parser.CombinedManifest?.Scripts, UmbracoNonOptimizedPackageJsBundleName);
 
             // This bundle includes all CSS from property editor assets,
             // custom back office assets, and any CSS found in package manifests
             // that have the default bundle options.
 
-            IEnumerable<string> cssAssets = (customAssets.TryGetValue(AssetType.Css, out IEnumerable<string> customStyles) ? customStyles : Enumerable.Empty<string>())
-                .Union(propertyEditorAssets.TryGetValue(AssetType.Css, out IEnumerable<string> styles) ? styles : Enumerable.Empty<string>());
+            IEnumerable<string?> cssAssets = (customAssets.TryGetValue(AssetType.Css, out IEnumerable<string?>? customStyles) ? customStyles : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Css, out IEnumerable<string>? styles) ? styles : Enumerable.Empty<string>());
 
             _runtimeMinifier.CreateCssBundle(
                 UmbracoCssBundleName,
@@ -125,23 +127,23 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                     GetStylesheetsForBackOffice(cssAssets)));
 
             // Create a bundle per package manifest that is declaring an Independent bundle type
-            RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Stylesheets, AssetType.Css);
+            RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest?.Stylesheets, AssetType.Css);
 
             // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
-            RegisterPackageBundlesForNoneOption(_parser.CombinedManifest.Stylesheets, UmbracoNonOptimizedPackageCssBundleName);
+            RegisterPackageBundlesForNoneOption(_parser.CombinedManifest?.Stylesheets, UmbracoNonOptimizedPackageCssBundleName);
         }
 
         public static string GetIndependentPackageBundleName(ManifestAssets manifestAssets, AssetType assetType)
             => $"{manifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
 
         private void RegisterPackageBundlesForNoneOption(
-            IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> combinedPackageManifestAssets,
+            IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>>? combinedPackageManifestAssets,
             string bundleName)
         {
             var assets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             // Create a bundle per package manifest that is declaring the matching BundleOptions
-            if (combinedPackageManifestAssets.TryGetValue(BundleOptions.None, out IReadOnlyList<ManifestAssets> manifestAssetList))
+            if (combinedPackageManifestAssets?.TryGetValue(BundleOptions.None, out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
             {
                 foreach(var asset in manifestAssetList.SelectMany(x => x.Assets))
                 {
@@ -157,20 +159,20 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         }
 
         private void RegisterPackageBundlesForIndependentOptions(
-            IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> combinedPackageManifestAssets,
+            IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>>? combinedPackageManifestAssets,
             AssetType assetType)
         {
             // Create a bundle per package manifest that is declaring the matching BundleOptions
-            if (combinedPackageManifestAssets.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets> manifestAssetList))
+            if (combinedPackageManifestAssets?.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
             {
                 foreach (ManifestAssets manifestAssets in manifestAssetList)
                 {
                     string bundleName = GetIndependentPackageBundleName(manifestAssets, assetType);
-                    string[] filePaths = FormatPaths(manifestAssets.Assets.ToArray());
+                    string[]? filePaths = FormatPaths(manifestAssets.Assets.ToArray());
 
                     switch (assetType)
                     {
-                        case AssetType.Javascript:                           
+                        case AssetType.Javascript:
                             _runtimeMinifier.CreateJsBundle(bundleName, BundlingOptions.OptimizedAndComposite, filePaths);
                             break;
                         case AssetType.Css:
@@ -178,7 +180,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                             break;
                         default:
                             throw new IndexOutOfRangeException();
-                    }                    
+                    }
                 }
             }
         }
@@ -187,12 +189,12 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// Returns scripts used to load the back office
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string> propertyEditorScripts)
+        private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string?> propertyEditorScripts)
         {
             var scripts = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             // only include scripts with the default bundle options here
-            if (_parser.CombinedManifest.Scripts.TryGetValue(BundleOptions.Default, out IReadOnlyList<ManifestAssets> manifestAssets))
+            if (_parser.CombinedManifest?.Scripts.TryGetValue(BundleOptions.Default, out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
             {
                 foreach (string script in manifestAssets.SelectMany(x => x.Assets))
                 {
@@ -200,9 +202,12 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                 }
             }
 
-            foreach (string script in propertyEditorScripts)
+            foreach (string? script in propertyEditorScripts)
             {
-                scripts.Add(script);
+                if (script is not null)
+                {
+                    scripts.Add(script);
+                }
             }
 
             return scripts.ToArray();
@@ -212,22 +217,22 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// Returns the list of scripts for back office initialization
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForBackOfficeCore()
+        private string[]? GetScriptsForBackOfficeCore()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
+            return resources?.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>
         /// Returns stylesheets used to load the back office
         /// </summary>
         /// <returns></returns>
-        private string[] GetStylesheetsForBackOffice(IEnumerable<string> propertyEditorStyles)
+        private string[] GetStylesheetsForBackOffice(IEnumerable<string?> propertyEditorStyles)
         {
             var stylesheets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             // only include css with the default bundle options here
-            if (_parser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.Default, out IReadOnlyList<ManifestAssets> manifestAssets))
+            if (_parser.CombinedManifest?.Stylesheets.TryGetValue(BundleOptions.Default, out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
             {
                 foreach (string script in manifestAssets.SelectMany(x => x.Assets))
                 {
@@ -235,9 +240,12 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                 }
             }
 
-            foreach (string stylesheet in propertyEditorStyles)
+            foreach (string? stylesheet in propertyEditorStyles)
             {
-                stylesheets.Add(stylesheet);
+                if (stylesheet is not null)
+                {
+                    stylesheets.Add(stylesheet);
+                }
             }
 
             return stylesheets.ToArray();
@@ -247,20 +255,20 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// Returns the scripts used for tinymce
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForTinyMce()
+        private string[]? GetScriptsForTinyMce()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.TinyMceInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
+            return resources?.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>
         /// Returns the scripts used for preview
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForPreview()
+        private string[]? GetScriptsForPreview()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.PreviewInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
+            return resources?.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>
@@ -268,11 +276,11 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// </summary>
         /// <param name="assets"></param>
         /// <returns></returns>
-        private string[] FormatPaths(params string[] assets)
+        private string[]? FormatPaths(params string[]? assets)
         {
             var umbracoPath = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
 
-            return assets
+            return assets?
                 .Where(x => x.IsNullOrWhiteSpace() == false)
                 .Select(x => !x.StartsWith("/") && Uri.IsWellFormedUriString(x, UriKind.Relative)
                     // most declarations with be made relative to the /umbraco folder, so things

@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger) =>
             _eventMessagesFactory = eventMessagesFactory;
 
-        protected override IMemberGroup PerformGet(int id)
+        protected override IMemberGroup? PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { id = id });
@@ -35,14 +35,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
         }
 
-        protected override IEnumerable<IMemberGroup> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMemberGroup> PerformGetAll(params int[]? ids)
         {
             var sql = Sql()
                 .SelectAll()
                 .From<NodeDto>()
                 .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
             return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
-        public IMemberGroup Get(Guid uniqueId)
+        public IMemberGroup? Get(Guid uniqueId)
         {
             var sql = GetBaseQuery(false);
             sql.Where<NodeDto>(x => x.UniqueId == uniqueId);
@@ -131,15 +131,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
         }
 
-        public IMemberGroup GetByName(string name)
+        public IMemberGroup? GetByName(string? name)
         {
             return IsolatedCache.GetCacheItem<IMemberGroup>(
                 typeof(IMemberGroup).FullName + "." + name,
                 () =>
                 {
-                    var qry = Query<IMemberGroup>().Where(group => group.Name.Equals(name));
+                    var qry = Query<IMemberGroup>().Where(group => group.Name!.Equals(name));
                     var result = Get(qry);
-                    return result.FirstOrDefault();
+                    return result?.FirstOrDefault();
                 },
                 //cache for 5 mins since that is the default in the Runtime app cache
                 TimeSpan.FromMinutes(5),
@@ -147,12 +147,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 true);
         }
 
-        public IMemberGroup CreateIfNotExists(string roleName)
+        public IMemberGroup? CreateIfNotExists(string roleName)
         {
-            var qry = Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var qry = Query<IMemberGroup>().Where(group => group.Name!.Equals(roleName));
             var result = Get(qry);
 
-            if (result.Any())
+            if (result?.Any() ?? false)
                 return null;
 
             var grp = new MemberGroup
@@ -183,11 +183,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<Member2MemberGroupDto>(x => x.Member == memberId);
 
             return Database.Fetch<NodeDto>(sql)
-                .DistinctBy(dto => dto.NodeId)
+                .LegacyDistinctBy(dto => dto!.NodeId)
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 
-        public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string username)
+        public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string? username)
         {
             var sql = Sql()
                 .Select("un.*")
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where("cmsMember.LoginName=@loginName", new { loginName = username });
 
             return Database.Fetch<NodeDto>(sql)
-                .DistinctBy(dto => dto.NodeId)
+                .LegacyDistinctBy(dto => dto!.NodeId)
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 
@@ -222,8 +222,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                .From<NodeDto>()
                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
                .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
-            IEnumerable<string> existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
-            IEnumerable<string> missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
+            IEnumerable<string?> existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
+            IEnumerable<string?> missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
             MemberGroup[] missingGroups = missingRoles.Select(x => new MemberGroup { Name = x }).ToArray();
 
             var evtMsgs = _eventMessagesFactory.Get();
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             //now go get all the dto's for roles with these role names
             var rolesForNames = Database.Fetch<NodeDto>(existingSql)
-                .ToDictionary(x => x.Text, StringComparer.InvariantCultureIgnoreCase);
+                .ToDictionary(x => x.Text!, StringComparer.InvariantCultureIgnoreCase);
 
             AssignedRolesDto[] currentlyAssigned;
             if (replace)
@@ -274,14 +274,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 //exist in the roleNames list, then determine which ones are not currently assigned.
                 var mId = memberId;
                 AssignedRolesDto[] found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
-                IEnumerable<string> assignedRoles = found.Where(x => roleNames.Contains(x.RoleName, StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
-                IEnumerable<string> nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
+                IEnumerable<string?> assignedRoles = found.Where(x => roleNames.Contains(x.RoleName, StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
+                IEnumerable<string?> nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
 
                 IEnumerable<Member2MemberGroupDto> dtos = nonAssignedRoles
                     .Select(x => new Member2MemberGroupDto
                     {
                         Member = mId,
-                        MemberGroup = rolesForNames[x].NodeId
+                        MemberGroup = rolesForNames[x!].NodeId
                     });
 
                 Database.InsertBulk(dtos);
@@ -309,7 +309,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private class AssignedRolesDto
         {
             [Column("text")]
-            public string RoleName { get; set; }
+            public string? RoleName { get; set; }
 
             [Column("Member")]
             public int MemberId { get; set; }

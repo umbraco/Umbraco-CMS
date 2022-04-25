@@ -18,7 +18,7 @@ namespace Umbraco.Extensions
         /// <param name="expression">An expression to visit.</param>
         /// <param name="alias">An optional table alias.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitDto<TDto>(this ISqlContext sqlContext, Expression<Func<TDto, object>> expression, string alias = null)
+        public static (string Sql, object[] Args) VisitDto<TDto>(this ISqlContext sqlContext, Expression<Func<TDto, object>> expression, string? alias = null)
         {
             var visitor = new PocoToSqlExpressionVisitor<TDto>(sqlContext, alias);
             var visited = visitor.Visit(expression);
@@ -34,7 +34,7 @@ namespace Umbraco.Extensions
         /// <param name="expression">An expression to visit.</param>
         /// <param name="alias">An optional table alias.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitDto<TDto, TOut>(this ISqlContext sqlContext, Expression<Func<TDto, TOut>> expression, string alias = null)
+        public static (string Sql, object[] Args) VisitDto<TDto, TOut>(this ISqlContext sqlContext, Expression<Func<TDto, TOut>> expression, string? alias = null)
         {
             var visitor = new PocoToSqlExpressionVisitor<TDto>(sqlContext, alias);
             var visited = visitor.Visit(expression);
@@ -51,7 +51,7 @@ namespace Umbraco.Extensions
         /// <param name="alias1">An optional table alias for the first DTO.</param>
         /// <param name="alias2">An optional table alias for the second DTO.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitDto<TDto1, TDto2>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, object>> expression, string alias1 = null, string alias2 = null)
+        public static (string Sql, object[] Args) VisitDto<TDto1, TDto2>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, object?>> expression, string? alias1 = null, string? alias2 = null)
         {
             var visitor = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlContext, alias1, alias2);
             var visited = visitor.Visit(expression);
@@ -69,7 +69,7 @@ namespace Umbraco.Extensions
         /// <param name="alias1">An optional table alias for the first DTO.</param>
         /// <param name="alias2">An optional table alias for the second DTO.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitDto<TDto1, TDto2, TOut>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, TOut>> expression, string alias1 = null, string alias2 = null)
+        public static (string Sql, object[] Args) VisitDto<TDto1, TDto2, TOut>(this ISqlContext sqlContext, Expression<Func<TDto1, TDto2, TOut>> expression, string? alias1 = null, string? alias2 = null)
         {
             var visitor = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlContext, alias1, alias2);
             var visited = visitor.Visit(expression);
@@ -83,7 +83,7 @@ namespace Umbraco.Extensions
         /// <param name="sqlContext">An <see cref="ISqlContext"/>.</param>
         /// <param name="expression">An expression to visit.</param>
         /// <returns>A SQL statement, and arguments, corresponding to the expression.</returns>
-        public static (string Sql, object[] Args) VisitModel<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object>> expression)
+        public static (string Sql, object[] Args) VisitModel<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object?>> expression)
         {
             var visitor = new ModelToSqlExpressionVisitor<TModel>(sqlContext.SqlSyntax, sqlContext.Mappers);
             var visited = visitor.Visit(expression);
@@ -97,7 +97,7 @@ namespace Umbraco.Extensions
         /// <param name="sqlContext">An <see cref="ISqlContext"/>.</param>
         /// <param name="field">An expression to visit, representing a field.</param>
         /// <returns>The name of the field.</returns>
-        public static string VisitModelField<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object>> field)
+        public static string VisitModelField<TModel>(this ISqlContext sqlContext, Expression<Func<TModel, object?>> field)
         {
             var (sql, _) = sqlContext.VisitModel(field);
 

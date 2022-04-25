@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets or sets the view.
         /// </summary>
         [DataMember(Name = "view")]
-        public string View { get; set; }
+        public string View { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the parameters.

@@ -19,6 +19,8 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
@@ -34,7 +36,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
 
             var database = new TestDatabase();
-            IScope scope = Mock.Of<IScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
+            IDatabaseScope scope = Mock.Of<IDatabaseScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
             Mock.Get(scope)
                 .Setup(x => x.Database)
                 .Returns(database);
@@ -58,7 +60,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                     }
                 });
 
-            var executor = new MigrationPlanExecutor(scopeProvider, loggerFactory, migrationBuilder);
+            var executor = new MigrationPlanExecutor(scopeProvider, scopeProvider, loggerFactory, migrationBuilder);
 
             MigrationPlan plan = new MigrationPlan("default")
                 .From(string.Empty)

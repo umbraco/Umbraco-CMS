@@ -65,9 +65,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override bool RecycleBinSmells => _mediaService.RecycleBinSmells();
 
-        private int[] _userStartNodes;
+        private int[]? _userStartNodes;
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateMediaStartNodeIds(_entityService, _appCaches)) ?? Array.Empty<int>();
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings)
+        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings)
         {
             var node = CreateTreeNode(
                 entity,
@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService, _appCaches))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasMediaPathAccess(item, _entityService, _appCaches) ?? false)
             {
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
         {
             return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// </summary>
         private bool IsSessionsAvailable => !(_httpContextAccessor.HttpContext?.Features.Get<ISessionFeature>() is null);
 
-        public string SessionId
+        public string? SessionId
         {
             get
             {
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             }
         }
 
-        public string GetSessionValue(string sessionName)
+        public string? GetSessionValue(string sessionName)
         {
             if(!IsSessionsAvailable) return null;
             return _httpContextAccessor.HttpContext?.Session.GetString(sessionName);

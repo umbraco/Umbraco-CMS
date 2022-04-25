@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("comment")]
         [Length(1000)]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         [ResultColumn]
         [Column("parentObjectType")]

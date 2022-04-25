@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(IPublishedContent);
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null)
                 return null;
@@ -48,23 +48,23 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
         {
             if (source == null)
             {
                 return null;
             }
 
-            IPublishedContent member;
+            IPublishedContent? member;
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             if (source is int id)
             {
-                IMember m = _memberService.GetById(id);
+                IMember? m = _memberService.GetById(id);
                 if (m == null)
                 {
                     return null;
                 }
-                member = publishedSnapshot.Members.Get(m);
+                member = publishedSnapshot?.Members?.Get(m);
                 if (member != null)
                 {
                     return member;
@@ -73,16 +73,16 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             else
             {
                 var sourceUdi = source as GuidUdi;
-                if (sourceUdi == null)
+                if (sourceUdi is null)
                     return null;
 
-                IMember m = _memberService.GetByKey(sourceUdi.Guid);
+                IMember? m = _memberService.GetByKey(sourceUdi.Guid);
                 if (m == null)
                 {
                     return null;
                 }
 
-                member = publishedSnapshot.Members.Get(m);
+                member = publishedSnapshot?.Members?.Get(m);
 
                 if (member != null)
                 {
