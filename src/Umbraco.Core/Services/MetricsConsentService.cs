@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void SetConsentLevel(TelemetryLevel telemetryLevel)
         {
-            var currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
             _keyValueService.SetValue(Key, telemetryLevel.ToString());
         }
