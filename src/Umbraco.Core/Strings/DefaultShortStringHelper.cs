@@ -345,11 +345,14 @@ namespace Umbraco.Cms.Core.Strings
                 var isUpper = char.IsUpper(c); // false for digits, symbols...
                 //var isLower = char.IsLower(c); // false for digits, symbols...
 
-                // what should I do with surrogates?
-                // no idea, really, so they are not supported at the moment
+                // what should I do with surrogates? - E.g emojis like 🎈
+                // no idea, really, so they are not supported at the moment and we just continue
                 var isPair = char.IsSurrogate(c);
                 if (isPair)
-                    throw new NotSupportedException("Surrogate pairs are not supported.");
+                {
+                    continue;
+                }
+
 
                 switch (state)
                 {
