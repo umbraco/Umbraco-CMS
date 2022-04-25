@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -50,7 +49,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.Servers);
 
-                ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache
+                _serverRegistrationRepository.ClearCache(); // ensure we have up-to-date cache
 
                 var regs = _serverRegistrationRepository.GetMany().ToArray();
                 var hasSchedulingPublisher = regs.Any(x => ((ServerRegistration) x).IsSchedulingPublisher);
@@ -99,7 +98,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.Servers);
 
-                ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
+                _serverRegistrationRepository.ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
 
                 var server = _serverRegistrationRepository.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 if (server == null) return;
@@ -151,7 +150,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.ReadLock(Cms.Core.Constants.Locks.Servers);
                 if (refresh)
                 {
-                    ((ServerRegistrationRepository)_serverRegistrationRepository).ClearCache();
+                    _serverRegistrationRepository.ClearCache();
                 }
 
                 return _serverRegistrationRepository.GetMany().ToArray(); // fast, cached // fast, cached
