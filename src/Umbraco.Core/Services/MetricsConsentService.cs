@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Services
 {
@@ -13,9 +15,14 @@ namespace Umbraco.Cms.Core.Services
         private readonly ILogger<MetricsConsentService> _logger;
         private readonly IBackOfficeSecurity _backOfficeSecurity;
 
+        // Scheduled for removal in V11
+        [Obsolete("Please use the constructor that takes and ILogger and IBackOfficeSecurity instead")]
         public MetricsConsentService(IKeyValueService keyValueService)
+        : this(
+            keyValueService,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<MetricsConsentService>>(),
+            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurity>())
         {
-            _keyValueService = keyValueService;
         }
 
         public MetricsConsentService(
@@ -43,7 +50,7 @@ namespace Umbraco.Cms.Core.Services
         public void SetConsentLevel(TelemetryLevel telemetryLevel)
         {
             var currentUser = _backOfficeSecurity.CurrentUser;
-            _logger.LogInformation($"Telemetry level changed by {currentUser.Name}");
+            _logger.LogInformation($"Telemetry level changed by {currentUser.Email}");
             _keyValueService.SetValue(Key, telemetryLevel.ToString());
         }
     }
