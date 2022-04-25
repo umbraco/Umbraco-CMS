@@ -374,7 +374,7 @@
         }
 
         function enableUser() {
-            vm.enableUserButtonState = "busfy";
+            vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
                 vm.user.userState = "Active";
                 setUserDisplayState();

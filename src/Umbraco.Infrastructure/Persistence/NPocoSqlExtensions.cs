@@ -650,6 +650,12 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        public static Sql<ISqlContext> SelectDistinct(this Sql<ISqlContext> sql, params object[] columns)
+        {
+            sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
+            return sql;
+        }
+
         //this.Append("SELECT " + string.Join(", ", columns), new object[0]);
 
         /// <summary>
