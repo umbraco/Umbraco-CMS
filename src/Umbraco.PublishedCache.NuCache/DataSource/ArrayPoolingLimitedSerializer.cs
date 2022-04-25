@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     internal class ArrayPoolingLimitedSerializer
     {
+        private StringPool _s_internPool = new StringPool();
         public string ReadString(Stream stream, bool intern = false)
         {
             unchecked
@@ -36,11 +37,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                         chars[i] = (char)VariantNumberSerializer.Int32.ReadFrom(stream);
                     }
                     Span<char> str = chars.AsSpan().Slice(0, sz);
-                    if (str != null && intern)
+
+                    if (intern)
                     {
-                        return StringPool.Shared.GetOrAdd(str);
+                        return _s_internPool.GetOrAdd(str);
                     }
-                    return str.ToString();
+                    return StringPool.Shared.GetOrAdd(str);
                 }
                 finally
                 {
