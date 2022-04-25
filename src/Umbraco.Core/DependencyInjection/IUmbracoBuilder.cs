@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <remarks>
         /// This may be null.
         /// </remarks>
+        [Obsolete("This property will be removed in a future version, please find an alternative approach.")]
         IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         IProfiler Profiler { get; }
