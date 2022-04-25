@@ -8,30 +8,33 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Infrastructure.Persistence;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 using Umbraco.Extensions;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
 using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Core.Scoping;
 
 #if DEBUG_SCOPES
 using System.Linq;
 using System.Text;
 #endif
 
-namespace Umbraco.Cms.Core.Scoping
+namespace Umbraco.Cms.Infrastructure.Scoping
 {
     /// <summary>
     /// Implements <see cref="IScopeProvider"/>.
     /// </summary>
-    internal class ScopeProvider : IScopeProvider, IScopeAccessor
+    internal class ScopeProvider :
+        ICoreScopeProvider,
+        IScopeProvider,
+        Core.Scoping.IScopeProvider,
+        IScopeAccessor
     {
         private readonly ILogger<ScopeProvider> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IRequestCache _requestCache;
         private readonly FileSystems _fileSystems;
         private CoreDebugSettings _coreDebugSettings;
+        private readonly MediaFileManager _mediaFileManager;
         private static readonly AsyncLocal<ConcurrentStack<IScope>> s_scopeStack = new AsyncLocal<ConcurrentStack<IScope>>();
         private static readonly AsyncLocal<ConcurrentStack<IScopeContext>> s_scopeContextStack = new AsyncLocal<ConcurrentStack<IScopeContext>>();
         private static readonly string s_scopeItemKey = typeof(Scope).FullName!;
@@ -43,6 +46,7 @@ namespace Umbraco.Cms.Core.Scoping
             IUmbracoDatabaseFactory databaseFactory,
             FileSystems fileSystems,
             IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
+            MediaFileManager mediaFileManager,
             ILoggerFactory loggerFactory,
             IRequestCache requestCache,
             IEventAggregator eventAggregator)
@@ -51,6 +55,7 @@ namespace Umbraco.Cms.Core.Scoping
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _coreDebugSettings = coreDebugSettings.CurrentValue;
+            _mediaFileManager = mediaFileManager;
             _logger = loggerFactory.CreateLogger<ScopeProvider>();
             _loggerFactory = loggerFactory;
             _requestCache = requestCache;
@@ -66,8 +71,6 @@ namespace Umbraco.Cms.Core.Scoping
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
         public ISqlContext SqlContext => DatabaseFactory.SqlContext;
-
-        public IQuery<T> CreateQuery<T>() => SqlContext.Query<T>();
 
         #region Context
 
@@ -292,7 +295,7 @@ namespace Umbraco.Cms.Core.Scoping
 
         #region Ambient Scope
 
-        IDatabaseScope? IScopeAccessor.AmbientScope => AmbientScope;
+        IScope? IScopeAccessor.AmbientScope => AmbientScope;
 
         /// <summary>
         /// Gets or set the Ambient (Current) <see cref="Scope"/> for the current execution context.
@@ -394,9 +397,10 @@ namespace Umbraco.Cms.Core.Scoping
         public IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            IEventDispatcher? eventDispatcher = null,
             IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null)
-            => new Scope(this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, scopedNotificationPublisher, scopeFileSystems);
+            => new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopedNotificationPublisher, scopeFileSystems);
 
         /// <inheritdoc />
         public void AttachScope(IScope other, bool callContext = false)
@@ -465,6 +469,7 @@ namespace Umbraco.Cms.Core.Scoping
         public IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            IEventDispatcher? eventDispatcher = null,
             IScopedNotificationPublisher? notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
@@ -475,7 +480,8 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 IScopeContext? ambientContext = AmbientContext;
                 ScopeContext? newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+
                 // assign only if scope creation did not throw!
                 PushAmbientScope(scope);
                 if (newContext != null)
@@ -485,7 +491,7 @@ namespace Umbraco.Cms.Core.Scoping
                 return scope;
             }
 
-            var nested = new Scope(this, _coreDebugSettings, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
             PushAmbientScope(nested);
             return nested;
         }
