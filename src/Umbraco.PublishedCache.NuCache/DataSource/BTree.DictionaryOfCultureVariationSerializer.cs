@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
@@ -18,10 +18,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             if (pcount == 0) return Empty;
 
             // read each variation
-            var dict = new Dictionary<string, CultureVariation>(StringComparer.InvariantCultureIgnoreCase);
+            var dict = new Dictionary<string, CultureVariation>(pcount,StringComparer.InvariantCultureIgnoreCase);
             for (var i = 0; i < pcount; i++)
             {
-                var languageId = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
+                var languageId = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream,true);
                 var cultureVariation = new CultureVariation
                 {
                     Name = ReadStringObject(stream),

@@ -23,8 +23,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         public ContentData ReadFrom(Stream stream)
         {
             var published = PrimitiveSerializer.Boolean.ReadFrom(stream);
-            var name = PrimitiveSerializer.String.ReadFrom(stream);
-            var urlSegment = PrimitiveSerializer.String.ReadFrom(stream);
+            var name = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream);
+            var urlSegment = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream);
             var versionId = PrimitiveSerializer.Int32.ReadFrom(stream);
             var versionDate = PrimitiveSerializer.DateTime.ReadFrom(stream);
             var writerId = PrimitiveSerializer.Int32.ReadFrom(stream);
