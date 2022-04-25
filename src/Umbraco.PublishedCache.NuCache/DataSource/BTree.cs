@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                 CreateFile = exists ? CreatePolicy.IfNeeded : CreatePolicy.Always,
                 FileName = filepath,
 
-                // read or write but do *not* keep in memory
-                CachePolicy = CachePolicy.None,
+                // Cache Recent Nodes only. This allocates less memory than none as it does not track a storage handle and lock factory for all nodes
+                CachePolicy = CachePolicy.Recent,
 
                 // default is 4096, min 2^9 = 512, max 2^16 = 64K
                 FileBlockSize = GetBlockSize(settings),
