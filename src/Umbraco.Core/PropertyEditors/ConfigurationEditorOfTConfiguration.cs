@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -19,12 +20,19 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         where TConfiguration : new()
     {
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationEditor{TConfiguration}"/> class.
         /// </summary>
         protected ConfigurationEditor(IIOHelper ioHelper)
-            : base(DiscoverFields(ioHelper))
-        { }
+        : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        protected ConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(DiscoverFields(ioHelper)) =>
+            _editorConfigurationParser = editorConfigurationParser;
 
         /// <summary>
         /// Discovers fields from configuration properties marked with the field attribute.
@@ -135,43 +143,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValues">The configuration object posted by the editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        public virtual TConfiguration? FromConfigurationEditor(IDictionary<string, object?>? editorValues, TConfiguration? configuration)
-        {
-            // note - editorValue contains a mix of CLR types (string, int...) and JToken
-            // turning everything back into a JToken... might not be fastest but is simplest
-            // for now
-
-            var o = new JObject();
-
-            foreach (var field in Fields)
-            {
-                // field only, JsonPropertyAttribute is ignored here
-                // only keep fields that have a non-null/empty value
-                // rest will fall back to default during ToObject()
-                if (editorValues is not null && editorValues.TryGetValue(field.Key!, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
-                {
-                    if (value is JToken jtoken)
-                    {
-                        //if it's a jtoken then set it
-                        o[field.PropertyName!] = jtoken;
-                    }
-                    else if (field.PropertyType == typeof(bool) && value is string sBool)
-                    {
-                        //if it's a boolean property type but a string is found, try to do a conversion
-                        var converted = sBool.TryConvertTo<bool>();
-                        if (converted.Success)
-                            o[field.PropertyName!] = converted.Result;
-                    }
-                    else
-                    {
-                        //default behavior
-                        o[field.PropertyName!] = JToken.FromObject(value);
-                    }
-                }
-            }
-
-            return o.ToObject<TConfiguration>();
-        }
+        public virtual TConfiguration? FromConfigurationEditor(IDictionary<string, object?>? editorValues, TConfiguration? configuration) => _editorConfigurationParser.ParseFromConfigurationEditor<TConfiguration>(editorValues, Fields);
 
         /// <inheritdoc />
         public sealed override IDictionary<string, object> ToConfigurationEditor(object? configuration)
@@ -183,23 +155,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Converts configuration values to values for the editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration? configuration)
-        {
-            string FieldNamer(PropertyInfo property)
-            {
-                // try the field
-                var field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
-                if (field is not null && field.Key is not null)
-                {
-                    return field.Key;
-                }
-
-                // but the property may not be a field just an extra thing
-                var json = property.GetCustomAttribute<JsonPropertyAttribute>();
-                return json?.PropertyName ?? property.Name;
-            }
-
-            return ObjectJsonExtensions.ToObjectDictionary(configuration, FieldNamer);
-        }
+        public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration? configuration) => _editorConfigurationParser.ParseToConfigurationEditor(configuration);
     }
 }
