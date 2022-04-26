@@ -85,6 +85,9 @@
                     localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
                       action.label = data;
                     });
+                    
+                    action.useLegacyIcon = action.useLegacyIcon === false ? false : true;
+                    action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
                 }
               });
             }
