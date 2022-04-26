@@ -89,6 +89,12 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         setDirty();
     };
 
+    $scope.clear = function ($index) {
+      $scope.renderModel = [];
+
+      setDirty();
+    };
+
     $scope.openLinkPicker = function (link, $index) {
         var target = link ? {
             name: link.name,
