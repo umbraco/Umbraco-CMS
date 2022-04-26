@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Core.Models.Trees
             Icon = icon;
             Name = name;
             SeparatorBefore = separatorBefore;
+            UseLegacyIcon = false;
         }
 
         public CreateChildEntity(ILocalizedTextService textService, bool separatorBefore = false)
@@ -25,6 +26,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         {
             Icon = icon;
             SeparatorBefore = separatorBefore;
+            UseLegacyIcon = false;
         }
     }
 }

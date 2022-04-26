@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         {
             Icon = icon;
             SeparatorBefore = separatorBefore;
+            UseLegacyIcon = false;
         }
 
         public RefreshNode(ILocalizedTextService textService, bool separatorBefore = false)
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         {
             Icon = icon;
             SeparatorBefore = separatorBefore;
+            UseLegacyIcon = false;
         }
     }
 }

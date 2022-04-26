@@ -135,14 +135,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
             {

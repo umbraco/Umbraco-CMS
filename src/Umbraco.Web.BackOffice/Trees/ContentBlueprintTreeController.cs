@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 // root actions
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (cte != null)
             {
                 var ct = _contentTypeService.Get(cte.Id);
-                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true);
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
 
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             return menu;
         }

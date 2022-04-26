@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Models.Trees
 {
@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Core.Models.Trees
 
         public ExportMember(ILocalizedTextService textService) : base("export", textService)
         {
-            Icon = "download-alt";
+            Icon = "icon-download-alt";
+            UseLegacyIcon = false;
         }
     }
 }

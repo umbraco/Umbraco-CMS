@@ -168,8 +168,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -270,15 +270,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
             var menu = _menuItemCollectionFactory.Create();
-            AddActionNode<ActionNew>(item, menu, opensDialog: true);
-            AddActionNode<ActionDelete>(item, menu, opensDialog: true);
-            AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
-            AddActionNode<ActionMove>(item, menu, true, opensDialog: true);
-            AddActionNode<ActionCopy>(item, menu, opensDialog: true);
-            AddActionNode<ActionSort>(item, menu, true, opensDialog: true);
-            AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
-            AddActionNode<ActionRights>(item, menu, opensDialog: true);
-            AddActionNode<ActionProtect>(item, menu, true, opensDialog: true);
+            AddActionNode<ActionNew>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionDelete>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionMove>(item, menu, true, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionCopy>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionSort>(item, menu, true, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionRights>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionProtect>(item, menu, true, opensDialog: true, useLegacyIcon: false);
 
             if (_emailSender.CanSendRequiredEmail())
             {
@@ -286,7 +286,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 {
                     Icon = "icon-megaphone",
                     SeparatorBefore = true,
-                    OpensDialog = true
+                    OpensDialog = true,
+                    UseLegacyIcon = false,
                 });
             }
 
@@ -306,9 +307,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
             var menu = _menuItemCollectionFactory.Create();
-            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
@@ -360,10 +361,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
         }
 
-        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
+        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
             where TAction : IAction
         {
-            var menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog);
+            var menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog, useLegacyIcon);
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -32,16 +32,17 @@ namespace Umbraco.Cms.Core.Trees
         }
 
         /// <summary>
-        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
+        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="hasSeparator"></param>
-        /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on its alias</param>
+        /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on its alias.</param>
         /// <param name="opensDialog">Whether or not this action opens a dialog</param>
-        public MenuItem Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
+        /// <param name="useLegacyIcon">Whether or not this action should use legacy icon prefixed with "icon-" or full icon name is specified.</param>
+        public MenuItem Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
             where T : IAction
         {
-            var item = CreateMenuItem<T>(textService, hasSeparator, opensDialog);
+            var item = CreateMenuItem<T>(textService, hasSeparator, opensDialog, useLegacyIcon);
             if (item != null)
             {
                 Add(item);
@@ -50,7 +51,7 @@ namespace Umbraco.Cms.Core.Trees
             return null;
         }
 
-        private MenuItem CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
+        private MenuItem CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
             where T : IAction
         {
             var item = _actionCollection.GetAction<T>();
@@ -59,11 +60,12 @@ namespace Umbraco.Cms.Core.Trees
             var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
             values.TryGetValue($"visuallyHiddenTexts/{item.Alias}Description", out var textDescription);
 
-            var menuItem = new MenuItem(item, textService.Localize($"actions", item.Alias))
+            var menuItem = new MenuItem(item, textService.Localize("actions", item.Alias))
             {
                 SeparatorBefore = hasSeparator,
                 OpensDialog = opensDialog,
                 TextDescription = textDescription,
+                UseLegacyIcon = useLegacyIcon
             };
 
             return menuItem;

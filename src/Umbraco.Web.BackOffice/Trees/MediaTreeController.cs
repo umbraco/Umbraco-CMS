@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = MenuItemCollectionFactory.Create();
 
-            //set the default
+            // set the default
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             if (id == Constants.System.RootString)
@@ -117,8 +117,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 }
 
                 // root actions
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
@@ -127,13 +127,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 return NotFound();
             }
+
             var item = _entityService.Get(iid, UmbracoObjectTypes.Media);
             if (item == null)
             {
                 return NotFound();
             }
 
-            //if the user has no path access for this node, all they can do is refresh
+            // if the user has no path access for this node, all they can do is refresh
             if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService, _appCaches))
             {
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -141,12 +142,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
 
-            //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
+            // if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
             if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
-                menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 menu.DefaultMenuAlias = null;
@@ -154,14 +155,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             else
             {
-                //return a normal node menu:
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService);
+                // return a normal node menu:
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionSort>(LocalizedTextService, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
-                //set the default to create
+                // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
             }
 
@@ -171,7 +172,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected override UmbracoObjectTypes UmbracoObjectType => UmbracoObjectTypes.Media;
 
         /// <summary>
-        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
+        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
