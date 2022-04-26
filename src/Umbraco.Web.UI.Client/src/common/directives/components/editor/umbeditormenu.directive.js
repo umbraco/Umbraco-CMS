@@ -10,9 +10,7 @@
             };
 
             function onInit() {
-
                 getOptions();
-
             }
 
             //adds a handler to the context menu item click, we need to handle this differently
@@ -36,6 +34,11 @@
                 if (!scope.actions) {
                     treeService.getMenu({ treeNode: scope.currentNode }).then(data => {
                         scope.actions = data.menuItems;
+                        
+                        // Map action icons using legacy icon font or svg icons.
+                        Utilities.forEach(scope.actions, action => {
+                          action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
+                        });
                     });
                 }
             };
