@@ -33,8 +33,8 @@
         var unsubscribe = [];
 
         // Property actions:
-        var copyAllMediasAction = null;
-        var removeAllMediasAction = null;
+        let copyAllMediasAction = null;
+        let removeAllMediasAction = null;
 
         var vm = this;
 
@@ -71,7 +71,8 @@
                 labelTokens: [vm.model.label],
                 icon: "icon-documents",
                 method: requestCopyAllMedias,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             removeAllMediasAction = {
@@ -79,7 +80,8 @@
                 labelTokens: [],
                 icon: "icon-trash",
                 method: requestRemoveAllMedia,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             var propertyActions = [];

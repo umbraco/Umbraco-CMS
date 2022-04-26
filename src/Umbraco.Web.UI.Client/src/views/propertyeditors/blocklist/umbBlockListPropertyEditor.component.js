@@ -32,10 +32,10 @@
 
         var unsubscribe = [];
         var modelObject;
-
+        
         // Property actions:
-        var copyAllBlocksAction = null;
-        var deleteAllBlocksAction = null;
+        let copyAllBlocksAction = null;
+        let deleteAllBlocksAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -112,13 +112,14 @@
             } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
-
+            
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
                 icon: "icon-documents",
                 method: requestCopyAllBlocks,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             deleteAllBlocksAction = {
@@ -126,7 +127,8 @@
                 labelTokens: [],
                 icon: "icon-trash",
                 method: requestDeleteAllBlocks,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             var propertyActions = [

@@ -67,7 +67,8 @@
 
     function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
 
-        var vm = this;
+        const vm = this;
+        
         var model = $scope.$parent.$parent.model;
 
         var contentTypeAliases = [];
@@ -135,12 +136,13 @@
             });
         }
 
-        var copyAllEntriesAction = {
+        let copyAllEntriesAction = {
             labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: [model.label],
             icon: "icon-documents",
             method: copyAllEntries,
-            isDisabled: true
+            isDisabled: true,
+            useLegacyIcon: false
         };
 
         var removeAllEntries = function () {
@@ -161,21 +163,20 @@
             });
         }
 
-        var removeAllEntriesAction = {
+        let removeAllEntriesAction = {
             labelKey: "clipboard_labelForRemoveAllEntries",
             labelTokens: [],
             icon: "icon-trash",
             method: removeAllEntries,
-            isDisabled: true
+            isDisabled: true,
+            useLegacyIcon: false
         };
-
+        
         // helper to force the current form into the dirty state
         function setDirty() {
-
             if (vm.umbProperty) {
                 vm.umbProperty.setDirty();
             }
-
         };
 
         function addNode(alias) {
