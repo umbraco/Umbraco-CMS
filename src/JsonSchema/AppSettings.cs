@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Deploy.Core.Configuration.DebugConfiguration;
 using Umbraco.Deploy.Core.Configuration.DeployConfiguration;
 using Umbraco.Deploy.Core.Configuration.DeployProjectConfiguration;
 using Umbraco.Forms.Core.Configuration;
@@ -91,6 +92,8 @@ namespace JsonSchema
                 public ContentDashboardSettings ContentDashboard { get; set; }
 
                 public HelpPageSettings HelpPage { get; set; }
+
+                public InstallDefaultDataSettings DefaultDataCreation { get; set; }
             }
 
             /// <summary>
@@ -127,6 +130,8 @@ namespace JsonSchema
                 public DeploySettings Settings { get; set; }
 
                 public DeployProjectConfig Project { get; set; }
+
+                public DebugSettings Debug { get; set; }
             }
         }
     }

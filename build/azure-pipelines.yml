@@ -396,42 +396,27 @@ stages:
 
                         $ubuild = build/build.ps1 -get -continue
 
-
                         $version = $ubuild.GetUmbracoVersion()
 
                         $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
 
-                        if ($isRelease.Count -gt 0){
+                        if ($isRelease.Count -gt 0) {
                           $continuous = $version.Semver
-
-                        }
-                        else
-                        {
+                        } else {
                             $date = (Get-Date).ToString("yyyyMMdd")
                             $continuous = "$($version.release)-preview$date.$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
-                            #Update the version in templates also
-
-                            $templatePath =
-                            'build/templates/UmbracoProject/.template.config/template.json'
-
-                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
-                            $a.symbols.version.defaultValue = $continuous
-
-                            $a | ConvertTo-Json -depth 32| set-content $templatePath
-
-
-                            $templatePath =
-                            'build/templates/UmbracoPackage/.template.config/template.json'
-
-                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
-                            $a.symbols.version.defaultValue = $continuous
-
-                            $a | ConvertTo-Json -depth 32| set-content $templatePath
-                          }
+                            # Update the default Umbraco version in templates
+                            $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
+                            foreach ($templatePath in $templatePaths) {
+                              $a = Get-Content $templatePath -Raw | ConvertFrom-Json
+                              if ($a.symbols -and $a.symbols.UmbracoVersion) {
+                                $a.symbols.UmbracoVersion.defaultValue = $continuous
+                                $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                              }
+                            }
+                        }
 
                         Write-Host "##vso[build.updatebuildnumber]$continuous.$(Build.BuildId)"
 
@@ -538,7 +523,7 @@ stages:
                   inputs:
                       targetType: inline
                       script: |
-                        choco install docfx --version=2.58.5 -y
+                        choco install docfx --version=2.59.0 -y
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
@@ -15,36 +15,39 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
     [TestFixture]
     public class TelemetryServiceTests
     {
-        [TestCase("0F1785C5-7BA0-4C52-AB62-863BD2C8F3FE", true)]
-        [TestCase("This is not a guid", false)]
-        [TestCase("", false)]
-        public void OnlyParsesIfValidId(string guidString, bool shouldSucceed)
+        [Test]
+        public void UsesGetOrCreateSiteId()
         {
-            var globalSettings = CreateGlobalSettings(guidString);
-            var version = CreateUmbracoVersion(9, 1, 1);
-            var sut = new TelemetryService(globalSettings, Mock.Of<IManifestParser>(), version);
+            var version = CreateUmbracoVersion(9, 3, 1);
+            var siteIdentifierServiceMock = new Mock<ISiteIdentifierService>();
+            var usageInformationServiceMock = new Mock<IUsageInformationService>();
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, siteIdentifierServiceMock.Object, usageInformationServiceMock.Object, Mock.Of<IMetricsConsentService>());
+            Guid guid;
+
+            var result = sut.TryGetTelemetryReportData(out var telemetryReportData);
+            siteIdentifierServiceMock.Verify(x => x.TryGetOrCreateSiteIdentifier(out guid), Times.Once);
+        }
+
+        [Test]
+        public void SkipsIfCantGetOrCreateId()
+        {
+            var version = CreateUmbracoVersion(9, 3, 1);
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(false), Mock.Of<IUsageInformationService>(), Mock.Of<IMetricsConsentService>());
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
-            Assert.AreEqual(shouldSucceed, result);
-            if (shouldSucceed)
-            {
-                // When toString is called on a GUID it will to lower, so do the same to our guidString
-                Assert.AreEqual(guidString.ToLower(), telemetry.Id.ToString());
-            }
-            else
-            {
-                Assert.IsNull(telemetry);
-            }
+            Assert.IsFalse(result);
+            Assert.IsNull(telemetry);
         }
 
         [Test]
         public void ReturnsSemanticVersionWithoutBuild()
         {
-            var globalSettings = CreateGlobalSettings();
             var version = CreateUmbracoVersion(9, 1, 1, "-rc", "-ad2f4k2d");
 
-            var sut = new TelemetryService(globalSettings, Mock.Of<IManifestParser>(), version);
+            var metricsConsentService = new Mock<IMetricsConsentService>();
+            metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
+            var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
 
             var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -55,7 +58,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         [Test]
         public void CanGatherPackageTelemetry()
         {
-            var globalSettings = CreateGlobalSettings();
             var version = CreateUmbracoVersion(9, 1, 1);
             var versionPackageName = "VersionPackage";
             var packageVersion = "1.0.0";
@@ -66,7 +68,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 new () { PackageName = noVersionPackageName }
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(globalSettings, manifestParser, version);
+            var metricsConsentService = new Mock<IMetricsConsentService>();
+            metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
+            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -87,15 +91,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
         [Test]
         public void RespectsAllowPackageTelemetry()
         {
-            var globalSettings = CreateGlobalSettings();
             var version = CreateUmbracoVersion(9, 1, 1);
             PackageManifest[] manifests =
             {
                 new () { PackageName = "DoNotTrack", AllowPackageTelemetry = false },
-                new () { PackageName = "TrackingAllowed", AllowPackageTelemetry = true }
+                new () { PackageName = "TrackingAllowed", AllowPackageTelemetry = true },
             };
             var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(globalSettings, manifestParser, version);
+            var metricsConsentService = new Mock<IMetricsConsentService>();
+            metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
+            var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(), Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
 
             var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -121,15 +126,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             return Mock.Of<IUmbracoVersion>(x => x.SemanticVersion == version);
         }
 
-        private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString = null)
+        private ISiteIdentifierService createSiteIdentifierService(bool shouldSucceed = true)
         {
-            if (guidString is null)
-            {
-                guidString = Guid.NewGuid().ToString();
-            }
-
-            var globalSettings = new GlobalSettings { Id = guidString };
-            return Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
+            var mock = new Mock<ISiteIdentifierService>();
+            var siteIdentifier = shouldSucceed ? Guid.NewGuid() : Guid.Empty;
+            mock.Setup(x => x.TryGetOrCreateSiteIdentifier(out siteIdentifier)).Returns(shouldSucceed);
+            return mock.Object;
         }
     }
 }

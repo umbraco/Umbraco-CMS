@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource,
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, twoFactorLoginResource,
         userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
         usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
 
@@ -16,6 +16,7 @@
         };
         vm.breadcrumbs = [];
         vm.showBackButton = true;
+        vm.hasTwoFactorProviders = false;
         vm.avatarFile = {};
         vm.labels = {};
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
@@ -38,6 +39,7 @@
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
         vm.unlockUser = unlockUser;
+        vm.toggleConfigureTwoFactor = toggleConfigureTwoFactor;
         vm.resendInvite = resendInvite;
         vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
         vm.changeAvatar = changeAvatar;
@@ -101,6 +103,10 @@
                     $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
                     vm.loading = false;
                 });
+
+              twoFactorLoginResource.get2FAProvidersForUser(vm.user.id).then(function (providers) {
+                vm.hasTwoFactorProviders = providers.length > 0;
+              });
             });
         }
 
@@ -396,6 +402,23 @@
                 vm.unlockUserButtonState = "error";
             });
         }
+
+        function toggleConfigureTwoFactor() {
+
+          var configureTwoFactorSettings = {
+            create: true,
+            user: vm.user,
+            isCurrentUser:  vm.user.isCurrentUser,
+            size: "small",
+            view: "views/common/infiniteeditors/twofactor/configuretwofactor.html",
+            close: function() {
+              editorService.close();
+            }
+          };
+
+          editorService.open(configureTwoFactorSettings);
+        }
+
 
         function resendInvite() {
             vm.resendInviteButtonState = "busy";

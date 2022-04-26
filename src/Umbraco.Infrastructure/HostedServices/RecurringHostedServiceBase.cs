@@ -5,6 +5,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -21,25 +23,39 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
+        private readonly ILogger _logger;
         private TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringHostedServiceBase"/> class.
         /// </summary>
-        /// <param name="period">Timepsan representing how often the task should recur.</param>
-        /// <param name="delay">Timespan represeting the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
+        /// <param name="logger">Logger.</param>
+        /// <param name="period">Timespan representing how often the task should recur.</param>
+        /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
+        protected RecurringHostedServiceBase(ILogger logger, TimeSpan period, TimeSpan delay)
         {
+            _logger = logger;
             _period = period;
             _delay = delay;
         }
 
+        // Scheduled for removal in V11
+        [Obsolete("Please use constructor that takes an ILogger instead")]
+        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
+            : this(null, period, delay)
+        { }
+
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
+            using (!ExecutionContext.IsFlowSuppressed() ? (IDisposable)ExecutionContext.SuppressFlow() : null)
+            {
+                _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -60,6 +76,11 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // Hat-tip: https://stackoverflow.com/a/14207615/489433
                 await PerformExecuteAsync(state);
             }
+            catch (Exception ex)
+            {
+                ILogger logger = _logger ?? StaticApplicationLogging.CreateLogger(GetType());
+                logger.LogError(ex, "Unhandled exception in recurring hosted service.");
+            }
             finally
             {
                 // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
@@ -78,7 +99,24 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             return Task.CompletedTask;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _timer?.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
         /// <inheritdoc/>
-        public void Dispose() => _timer?.Dispose();
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

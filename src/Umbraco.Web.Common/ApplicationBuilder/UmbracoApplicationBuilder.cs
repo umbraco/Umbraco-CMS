@@ -92,8 +92,6 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         {
             UseUmbracoCoreMiddleware();
 
-            AppBuilder.UseStatusCodePages();
-
             // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
             AppBuilder.UseImageSharp();
 

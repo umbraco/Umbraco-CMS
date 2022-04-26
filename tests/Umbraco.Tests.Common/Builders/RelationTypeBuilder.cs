@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class RelationTypeBuilder
-        : ChildBuilderBase<RelationBuilder, IRelationType>,
+        : ChildBuilderBase<RelationBuilder, IRelationTypeWithIsDependency>,
             IWithIdBuilder,
             IWithAliasBuilder,
             IWithNameBuilder,
@@ -23,6 +23,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
         private DateTime? _deleteDate;
         private int? _id;
         private bool? _isBidirectional;
+        private bool? _isDependency;
         private Guid? _key;
         private string _name;
         private Guid? _parentObjectType;
@@ -42,6 +43,12 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             _isBidirectional = isBidirectional;
             return this;
+        } 
+        
+        public RelationTypeBuilder WithIsDependency(bool isDependency)
+        {
+            _isDependency = isDependency;
+            return this;
         }
 
         public RelationTypeBuilder WithChildObjectType(Guid childObjectType)
@@ -56,7 +63,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             return this;
         }
 
-        public override IRelationType Build()
+        public override IRelationTypeWithIsDependency Build()
         {
             var alias = _alias ?? Guid.NewGuid().ToString();
             var name = _name ?? Guid.NewGuid().ToString();
@@ -65,11 +72,12 @@ namespace Umbraco.Cms.Tests.Common.Builders
             var id = _id ?? 0;
             Guid key = _key ?? Guid.NewGuid();
             var isBidirectional = _isBidirectional ?? false;
+            var isDependency = _isDependency ?? false;
             DateTime createDate = _createDate ?? DateTime.Now;
             DateTime updateDate = _updateDate ?? DateTime.Now;
             DateTime? deleteDate = _deleteDate ?? null;
 
-            return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType)
+            return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType, isDependency)
             {
                 Id = id,
                 Key = key,

@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         internal const string StaticNuCacheSerializerType = "MessagePack";
         internal const int StaticSqlPageSize = 1000;
+        internal const int StaticKitBatchSize = 1;
 
         /// <summary>
         /// Gets or sets a value defining the BTree block size.
@@ -30,6 +31,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         [DefaultValue(StaticSqlPageSize)]
         public int SqlPageSize { get; set; } = StaticSqlPageSize;
+
+        /// <summary>
+        /// The size to use for nucache Kit batches.  Higher value means more content loaded into memory at a time.
+        /// </summary>
+        [DefaultValue(StaticKitBatchSize)]
+        public int KitBatchSize { get; set; } = StaticKitBatchSize;
 
         public bool UnPublishedContentCompression { get; set; } = false;
     }

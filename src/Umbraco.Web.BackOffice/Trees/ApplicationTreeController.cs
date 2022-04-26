@@ -349,7 +349,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
             var proxyControllerContext = new ControllerContext(actionContext);
-            var controller = (TreeController)_controllerFactory.CreateController(proxyControllerContext);
+            var controller = (TreeControllerBase)_controllerFactory.CreateController(proxyControllerContext);
 
             // TODO: What about other filters? Will they execute?
             var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);

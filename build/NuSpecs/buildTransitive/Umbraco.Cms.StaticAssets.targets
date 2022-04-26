@@ -1,19 +1,9 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
         <ContentFilesPath>$(MSBuildThisFileDirectory)..\content\umbraco\**\*.*</ContentFilesPath>
         <ContentWwwrootFilesPath>$(MSBuildThisFileDirectory)..\content\wwwroot\umbraco\**\*.*</ContentWwwrootFilesPath>
         <UmbracoWwwrootName Condition="'$(UmbracoWwwrootName)' == ''">umbraco</UmbracoWwwrootName>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <DefaultItemExcludes>$(DefaultItemExcludes);App_Plugins\**;</DefaultItemExcludes>
-
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\Data\**;</DefaultItemExcludes>
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\Logs\**;</DefaultItemExcludes>
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\mediacache\**;</DefaultItemExcludes>
-
-        <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot\media\**;</DefaultItemExcludes>
     </PropertyGroup>
 
     <Target Name="CopyUmbracoAssets" BeforeTargets="BeforeBuild">
@@ -39,6 +29,7 @@
 
             <ContentWithTargetPath
                 Include="@(_AppPluginsFiles)"
+                Exclude="@(ContentWithTargetPath)"
                 TargetPath="%(Identity)"
                 CopyToOutputDirectory="PreserveNewest"
                 CopyToPublishDirectory="PreserveNewest"/>
@@ -65,6 +56,7 @@
 
             <ContentWithTargetPath
                 Include="@(_UmbracoFolderFiles)"
+                Exclude="@(ContentWithTargetPath)"
                 TargetPath="%(Identity)"
                 CopyToOutputDirectory="PreserveNewest"
                 CopyToPublishDirectory="PreserveNewest"/>
@@ -92,7 +84,7 @@
 
     <Target Name="IncludeUmbracoRazorFiles" BeforeTargets="ResolveRazorGenerateInputs">
         <ItemGroup>
-            <Content Include="$(MSBuildProjectDirectory)\umbraco\**\*.cshtml" />
+            <Content Include="$(MSBuildProjectDirectory)\umbraco\**\*.cshtml" Exclude="@(Content)" />
         </ItemGroup>
     </Target>
 
