@@ -145,8 +145,18 @@
             useLegacyIcon: false
         };
 
-        var removeAllEntries = function () {
-            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+        let removeAllEntriesAction = {
+            labelKey: "clipboard_labelForRemoveAllEntries",
+            labelTokens: [],
+            icon: "icon-trash",
+            method: removeAllEntries,
+            isDisabled: true,
+            useLegacyIcon: false
+        };
+        
+        function removeAllEntries() {
+
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
                 overlayService.confirmDelete({
                     title: data[1],
                     content: data[0],
@@ -162,15 +172,6 @@
                 });
             });
         }
-
-        let removeAllEntriesAction = {
-            labelKey: "clipboard_labelForRemoveAllEntries",
-            labelTokens: [],
-            icon: "icon-trash",
-            method: removeAllEntries,
-            isDisabled: true,
-            useLegacyIcon: false
-        };
         
         // helper to force the current form into the dirty state
         function setDirty() {
