@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <summary>
-    /// A context menu item
+    /// A context menu item.
     /// </summary>
     [DataContract(Name = "menuItem", Namespace = "")]
     public class MenuItem
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         }
 
         /// <summary>
-        /// Create a menu item based on an <see cref="IAction"/> definition
+        /// Create a menu item based on an <see cref="IAction"/> definition.
         /// </summary>
         /// <param name="action"></param>
         /// <param name="name"></param>
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         public string TextDescription { get; set; }
 
         /// <summary>
-        /// Ensures a menu separator will exist before this menu item
+        /// Ensures a menu separator will exist before this menu item.
         /// </summary>
         [DataMember(Name = "separator")]
         public bool SeparatorBefore { get; set; }
@@ -92,7 +92,14 @@ namespace Umbraco.Cms.Core.Models.Trees
         public string Icon { get; set; }
 
         /// <summary>
-        /// Used in the UI to inform the user that the menu item will open a dialog/confirmation
+        /// Used in the UI to indicate whether icons should be prefixed with "icon-".
+        /// If not legacy icon full icon name should be specified.
+        /// </summary>
+        [DataMember(Name = "useLegacyIcon")]
+        public bool UseLegacyIcon { get; set; } = true;
+
+        /// <summary>
+        /// Used in the UI to inform the user that the menu item will open a dialog/confirmation.
         /// </summary>
         [DataMember(Name = "opensDialog")]
         public bool OpensDialog { get; set; }

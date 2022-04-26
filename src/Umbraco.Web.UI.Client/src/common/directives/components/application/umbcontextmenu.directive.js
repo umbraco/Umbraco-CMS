@@ -20,6 +20,11 @@ angular.module("umbraco.directives")
         templateUrl: 'views/components/application/umb-contextmenu.html',
         link: function (scope, element, attrs, ctrl) {
 
+            // Map action icons using legacy icon font or svg icons.
+            Utilities.forEach(scope.menuActions, action => {
+              action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
+            });
+
             //adds a handler to the context menu item click, we need to handle this differently
             //depending on what the menu item is supposed to do.
             scope.executeMenuItem = action => {
