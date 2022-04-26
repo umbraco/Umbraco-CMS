@@ -23,28 +23,8 @@ namespace Umbraco.Tests.Benchmarks
                 new NullLogger<TypeFinder>(),
                 new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance));
 
-            var cache = new ObjectCacheAppCache();
-            _typeLoader1 = new TypeLoader(
-                typeFinder1,
-                new VaryingRuntimeHash(),
-                cache,
-                null,
-                new NullLogger<TypeLoader>(),
-                new NoopProfiler());
-
-            // populate the cache
-            cache.Insert(
-                _typeLoader1.CacheKey,
-                GetCache,
-                TimeSpan.FromDays(1));
-
-            _typeLoader2 = new TypeLoader(
-                typeFinder1,
-                new VaryingRuntimeHash(),
-                NoAppCache.Instance,
-                null,
-                new NullLogger<TypeLoader>(),
-                new NoopProfiler());
+            _typeLoader1 = new TypeLoader(typeFinder1, NullLogger<TypeLoader>.Instance);
+            _typeLoader2 = new TypeLoader(typeFinder1, NullLogger<TypeLoader>.Instance);
         }
 
         /// <summary>
