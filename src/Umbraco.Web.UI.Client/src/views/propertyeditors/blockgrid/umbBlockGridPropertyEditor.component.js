@@ -763,18 +763,29 @@
 
         vm.sortableOptions = {
             axis: "y",
-            containment: "parent",
+            containment: ".umb-block-grid__wrapper",
             cursor: "grabbing",
             handle: ".blockelement__draggable-element",
             cancel: "input,textarea,select,option",
             classes: ".blockelement--dragging",
+            items: '.umb-block-grid__sortable-item',
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            accept: function (sourceItemHandleScope, destSortableScope) {
+                return true;
+                //sourceItemHandleScope.itemScope.sortableScope.$id === destSortableScope.$id;
+            },
             update: function (ev, ui) {
+                console.log("sort update")
                 setDirty();
+            },
+            itemMoved: function (ev) {
+                console.log("itemMoved", ev)
             }
         };
+        // see https://github.com/a5hik/ng-sortable/issues/13 for scrolling while dragging.
+        
 
         function onAmountOfBlocksChanged() {
 

@@ -6,24 +6,11 @@
 
         <div ui-sortable="vm.sortableOptions" ng-model="vm.layout" ng-if="vm.loading !== true">
 
-            <div ng-repeat="layout in vm.layout track by layout.$block.key">
+            <umb-block-grid-entries 
+                block-editor-api="vm.blockEditorApi"
+                entries="vm.layout">
+            </umb-block-grid-entries>
 
-                <button type="button"
-                        class="btn-reset umb-block-grid__block--create-button"
-                        ng-click="vm.requestShowCreate($index, $event)"
-                        ng-controller="Umbraco.PropertyEditors.BlockGridPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
-                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
-                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
-                        <umb-icon icon="icon-add" class="icon"></umb-icon>
-                    </div>
-                </button>
-
-                <umb-block-grid-row block-editor-api="vm.blockEditorApi"
-                                    layout="layout"
-                                    index="$index">
-                </umb-block-grid-row>
-
-            </div>
         </div>
 
         <div class="umb-block-grid__actions" ng-if="vm.loading !== true">
