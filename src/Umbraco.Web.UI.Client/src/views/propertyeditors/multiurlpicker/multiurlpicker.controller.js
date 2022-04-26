@@ -1,4 +1,4 @@
-function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService, overlayService) {
 
     var vm = {
         labels: {
@@ -75,6 +75,8 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+
+            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0;
             
             //Update value
             $scope.model.value = $scope.renderModel;
@@ -85,8 +87,6 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         $scope.renderModel.splice($index, 1);
         
         setDirty();
-        
-        removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0;
     };
 
     $scope.openLinkPicker = function (link, $index) {
