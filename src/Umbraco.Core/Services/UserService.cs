@@ -195,7 +195,6 @@ namespace Umbraco.Cms.Core.Services
         public IUser? GetByUsername(string? username)
         {
             if (username is null)
-            
             {
                 return null;
             }
