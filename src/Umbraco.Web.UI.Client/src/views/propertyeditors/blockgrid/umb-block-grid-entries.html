@@ -1,0 +1,19 @@
+<div ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key" class="umb-block-grid__sortable-item">
+
+    <button type="button"
+            class="btn-reset umb-block-grid__block--create-button"
+            ng-click="vm.requestShowCreate($index, $event)"
+            ng-controller="Umbraco.PropertyEditors.BlockGridPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
+            ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
+        <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
+            <umb-icon icon="icon-add" class="icon"></umb-icon>
+        </div>
+    </button>
+
+    <umb-block-grid-entry 
+        block-editor-api="vm.blockEditorApi"
+        layout="layoutEntry"
+        index="$index">
+    </umb-block-grid-entry>
+
+</div>
