@@ -1259,7 +1259,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getPublicAccess: function (contentId) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
-                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPublicAccess", {
+                    umbRequestHelper.getApiUrl("publicAccessApiBaseUrl", "GetPublicAccess", {
                         contentId: contentId
                     })
                 ),
@@ -1308,7 +1308,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
             return umbRequestHelper.resourcePromise(
                 $http.post(
-                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess)
+                    umbRequestHelper.getApiUrl("publicAccessApiBaseUrl", "PostPublicAccess", publicAccess)
                 ),
                 "Failed to update public access for content item with id " + contentId
             );

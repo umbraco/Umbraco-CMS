@@ -820,11 +820,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
                 defaultCulture);
 
+            //get the updated model
+            bool isBlueprint = contentItem.PersistedContent.Blueprint;
+
+            var contentSavedHeader = isBlueprint ? "editBlueprintSavedHeader" : "editContentSavedHeader";
+            var contentSavedText = isBlueprint ? "editBlueprintSavedText" : "editContentSavedText";
+
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, contentSavedHeader, contentSavedText, "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
                     break;
                 case ContentSaveAction.Schedule:
                 case ContentSaveAction.ScheduleNew:
@@ -834,7 +840,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         wasCancelled = false;
                         break;
                     }
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedHeader", "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
                     break;
 
                 case ContentSaveAction.SendPublish:
@@ -883,7 +890,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                         {
                             globalNotifications.AddErrorNotification(
-                                _localizedTextService.Localize(null,"publish"),
+                                _localizedTextService.Localize(null, "publish"),
                                 _localizedTextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
@@ -900,7 +907,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                         {
                             globalNotifications.AddErrorNotification(
-                                _localizedTextService.Localize(null,"publish"),
+                                _localizedTextService.Localize(null, "publish"),
                                 _localizedTextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
@@ -914,7 +921,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     throw new ArgumentOutOfRangeException();
             }
 
-            //get the updated model
+            // We have to map do display after we've actually saved the content, otherwise we'll miss information that's set when saving content, such as ID
             var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
@@ -1041,7 +1048,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, int variantCount,
             Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-            string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
+            string savedContentHeaderLocalizationAlias, string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
             out bool wasCancelled)
         {
             var saveResult = saveMethod(contentItem.PersistedContent);
@@ -1061,15 +1068,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         var variantName = GetVariantName(culture, segment);
 
                         AddSuccessNotification(notifications, culture, segment,
-                            _localizedTextService.Localize("speechBubbles", "editContentSavedHeader"),
-                            _localizedTextService.Localize(null,variantSavedLocalizationAlias, new[] { variantName }));
+                            _localizedTextService.Localize("speechBubbles", savedContentHeaderLocalizationAlias),
+                            _localizedTextService.Localize(null, variantSavedLocalizationAlias, new[] { variantName }));
                     }
                 }
                 else if (ModelState.IsValid)
                 {
                     globalNotifications.AddSuccessNotification(
-                        _localizedTextService.Localize("speechBubbles", "editContentSavedHeader"),
-                        _localizedTextService.Localize("speechBubbles",invariantSavedLocalizationAlias));
+                        _localizedTextService.Localize("speechBubbles", savedContentHeaderLocalizationAlias),
+                        _localizedTextService.Localize("speechBubbles", invariantSavedLocalizationAlias));
                 }
             }
         }
@@ -2117,21 +2124,34 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var variantIndex = 0;
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
 
-            //loop through each variant, set the correct name and property values
+            // loop through each variant, set the correct name and property values
             foreach (var variant in contentSave.Variants)
             {
-                //Don't update anything for this variant if Save is not true
-                if (!variant.Save) continue;
+                // Don't update anything for this variant if Save is not true
+                if (!variant.Save)
+                {
+                    continue;
+                }
 
-                //Don't update the name if it is empty
+                // Don't update the name if it is empty
                 if (!variant.Name.IsNullOrWhiteSpace())
                 {
                     if (contentSave.PersistedContent.ContentType.VariesByCulture())
                     {
                         if (variant.Culture.IsNullOrWhiteSpace())
+                        {
                             throw new InvalidOperationException($"Cannot set culture name without a culture.");
+                        }
+
                         contentSave.PersistedContent.SetCultureName(variant.Name, variant.Culture);
+
+                        // If the variant culture is the default culture we also want to update the name on the Content itself.
+                        if (variant.Culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            contentSave.PersistedContent.Name = variant.Name;
+                        }
                     }
                     else
                     {
@@ -2139,7 +2159,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                //This is important! We only want to process invariant properties with the first variant, for any other variant
+                // This is important! We only want to process invariant properties with the first variant, for any other variant
                 // we need to exclude invariant properties from being processed, otherwise they will be double processed for the
                 // same value which can cause some problems with things such as file uploads.
                 var propertyCollection = variantIndex == 0
@@ -2147,10 +2167,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     : new ContentPropertyCollectionDto
                     {
                         Properties = variant.PropertyCollectionDto.Properties.Where(
-                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace())
+                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace()),
                     };
 
-                //for each variant, map the property values
+                // for each variant, map the property values
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
                     propertyCollection,
@@ -2171,6 +2191,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 variantIndex++;
             }
 
+            // Map IsDirty cultures to edited cultures, to make it easier to verify changes on specific variants on Saving and Saved events.
+            IEnumerable<string> editedCultures = contentSave.PersistedContent.CultureInfos.Values
+                .Where(x => x.IsDirty())
+                .Select(x => x.Culture);
+            contentSave.PersistedContent.SetCultureEdited(editedCultures);
+
             // handle template
             if (string.IsNullOrWhiteSpace(contentSave.TemplateAlias)) // cleared: clear if not already null
             {
@@ -2181,10 +2207,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else // set: update if different
             {
-                var template = _fileService.GetTemplate(contentSave.TemplateAlias);
-                if (template == null)
+                ITemplate template = _fileService.GetTemplate(contentSave.TemplateAlias);
+                if (template is null)
                 {
-                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    // ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
                     _logger.LogWarning("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else if (template.Id != contentSave.PersistedContent.TemplateId)

@@ -300,9 +300,9 @@
                             <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
-                                    <a class="umb-package-details__link" href="{{ externalSource.url }}" target="_blank" rel="noopener noreferrer">
-                                        <i class="icon-out" aria-hidden="true"></i>
-                                        {{ externalSource.name }}
+                                    <a class="umb-package-details__link" href="{{externalSource.url}}" target="_blank" rel="noopener noreferrer">
+                                        <umb-icon icon="icon-out"></umb-icon>
+                                        {{externalSource.name}}
                                     </a>
                                 </div>
                             </div>

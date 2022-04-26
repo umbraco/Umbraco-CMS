@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoMapper _mapper;
         private readonly AppCaches _appCaches;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeUserStore"/> class.
@@ -48,7 +49,8 @@ namespace Umbraco.Cms.Core.Security
             IOptions<GlobalSettings> globalSettings,
             IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
-            AppCaches appCaches)
+            AppCaches appCaches,
+            ITwoFactorLoginService twoFactorLoginService)
             : base(describer)
         {
             _scopeProvider = scopeProvider;
@@ -58,11 +60,36 @@ namespace Umbraco.Cms.Core.Security
             _globalSettings = globalSettings.Value;
             _mapper = mapper;
             _appCaches = appCaches;
+            _twoFactorLoginService = twoFactorLoginService;
             _userService = userService;
             _externalLoginService = externalLoginService;
         }
 
-        [Obsolete("Use ctor injecting IExternalLoginWithKeyService ")]
+        [Obsolete("Use non obsolete ctor")]
+        public BackOfficeUserStore(
+            IScopeProvider scopeProvider,
+            IUserService userService,
+            IEntityService entityService,
+            IExternalLoginWithKeyService externalLoginService,
+            IOptions<GlobalSettings> globalSettings,
+            IUmbracoMapper mapper,
+            BackOfficeErrorDescriber describer,
+            AppCaches appCaches)
+            : this(
+                scopeProvider,
+                userService,
+                entityService,
+                externalLoginService,
+                globalSettings,
+                mapper,
+                describer,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+        {
+
+        }
+
+        [Obsolete("Use non obsolete ctor")]
         public BackOfficeUserStore(
             IScopeProvider scopeProvider,
             IUserService userService,
@@ -80,9 +107,22 @@ namespace Umbraco.Cms.Core.Security
                 globalSettings,
                 mapper,
                 describer,
-                appCaches)
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
         {
 
+        }
+
+        /// <inheritdoc />
+        public override async Task<bool> GetTwoFactorEnabledAsync(BackOfficeIdentityUser user,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intUserId))
+            {
+                return await base.GetTwoFactorEnabledAsync(user, cancellationToken);
+            }
+
+            return await _twoFactorLoginService.IsTwoFactorEnabledAsync(user.Key);
         }
 
         /// <inheritdoc />

@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -22,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var schema = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
+                var schema = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator, Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x => x.CurrentValue == new InstallDefaultDataSettings()));
                 result = schema.ValidateSchema(DatabaseSchemaCreator.OrderedTables);
             }
 

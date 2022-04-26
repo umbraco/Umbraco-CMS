@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
@@ -159,6 +160,7 @@ namespace Umbraco.Extensions
             ));
 
             builder.AddCoreInitialServices();
+            builder.AddTelemetryProviders();
 
             // aspnet app lifetime mgmt
             builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
@@ -191,6 +193,11 @@ namespace Umbraco.Extensions
         private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
         {
             builder.Services.AddHttpClient();
+            builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                });
             return builder;
         }
 

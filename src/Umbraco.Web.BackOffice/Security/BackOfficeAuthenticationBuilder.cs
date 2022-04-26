@@ -58,16 +58,15 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         // TODO: We could override and throw NotImplementedException for other methods?
 
         // Ensures that the sign in scheme is always the Umbraco back office external type
-        private class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions> where TOptions : RemoteAuthenticationOptions
+        internal class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions> where TOptions : RemoteAuthenticationOptions
         {
             public void PostConfigure(string name, TOptions options)
             {
-                if (!name.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
+                // ensure logic only applies to backoffice authentication schemes
+                if (name.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
                 {
-                    return;
+                    options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
                 }
-
-                options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
             }
         }
     }

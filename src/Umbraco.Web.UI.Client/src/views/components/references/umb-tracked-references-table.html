@@ -1,0 +1,35 @@
+<div>
+    <h5 class="mt0" style="margin-bottom: 20px;">
+        {{vm.headline}}
+    </h5>
+
+    <div class="umb-table">
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell"></div>
+                <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_nodeName">Node Name</localize></div>
+                <div ng-if="vm.showTypeName" class="umb-table-cell"><localize key="general_typeName">Type Name</localize></div>
+                <div ng-if="vm.showType" class="umb-table-cell"><localize key="general_type">Type</localize></div>
+                <div ng-if="vm.showRelationTypeName" class="umb-table-cell"><localize key="relationType_relation">Relation</localize></div>
+            </div>
+        </div>
+        <div class="umb-table-body">
+            <div class="umb-table-row" ng-repeat="reference in vm.items">
+                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                <div class="umb-table-cell umb-table__name"><a ng-href="{{vm.getUrl(reference.udi, reference.id)}}" ng-click="vm.referenceAnchorClicked($event, reference)">{{::reference.name}}</a></div>
+                <div ng-if="vm.showTypeName" class="umb-table-cell"><span title="{{::reference.contentTypeName}}">{{::reference.contentTypeName}}</span></div>
+                <div ng-if="vm.showType" class="umb-table-cell"><span title="{{::reference.type}}">{{::reference.type}}</span></div>
+                <div ng-if="vm.showRelationTypeName" class="umb-table-cell"><span title="{{::reference.relationTypeName}}">{{::reference.relationTypeName}}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center">
+        <umb-pagination ng-if="vm.totalPages"
+                        page-number="vm.pageNumber"
+                        total-pages="vm.totalPages"
+                        on-change="vm.changePageNumber(pageNumber)">
+        </umb-pagination>
+    </div>
+</div>

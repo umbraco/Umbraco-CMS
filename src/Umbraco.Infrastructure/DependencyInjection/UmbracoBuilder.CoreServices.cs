@@ -52,6 +52,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -196,6 +197,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddSingleton<PackageDataInstallation>();
 
+            builder.Services.AddTransient<INodeCountService, NodeCountService>();
             builder.AddInstaller();
 
             // Services required to run background jobs (with out the handler)
@@ -218,6 +220,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<IMainDomKeyGenerator, DefaultMainDomKeyGenerator>();
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
@@ -229,15 +232,20 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
                 var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
+                var mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
+
+                if (globalSettings.Value.MainDomLock == "FileSystemMainDomLock")
+                {
+                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(), mainDomKeyGenerator, hostingEnvironment, factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
+                }
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(
-                            loggerFactory.CreateLogger<SqlMainDomLock>(),
                             loggerFactory,
                             globalSettings,
                             connectionStrings,
                             dbCreator,
-                            hostingEnvironment,
+                            mainDomKeyGenerator,
                             databaseSchemaCreatorFactory,
                             npocoMappers)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);

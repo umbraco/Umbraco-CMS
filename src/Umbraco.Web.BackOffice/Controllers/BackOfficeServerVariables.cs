@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "hideBackofficeLogo"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "hideBackofficeLogo", "disableDeleteWhenReferenced", "disableUnpublishWhenReferenced"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -234,6 +234,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
                                 controller => controller.PostLogin(null))
+                        },
+                        {
+                            "twoFactorLoginApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TwoFactorLoginController>(
+                                controller => controller.SetupInfo(null))
                         },
                         {
                             "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
@@ -378,6 +382,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "previewHubUrl", _previewRoutes.GetPreviewHubRoute()
                         },
+                        {
+                            "trackedReferencesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TrackedReferencesController>(
+                                controller => controller.GetPagedReferences(0,  1, 1, false))
+                        },
+                        {
+                            "analyticsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AnalyticsController>(
+                                controller => controller.GetConsentLevel())
+                        },
                     }
                 },
                 {
@@ -409,6 +421,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
                         {"hideBackofficeLogo", _contentSettings.HideBackOfficeLogo },
+                        {"disableDeleteWhenReferenced", _contentSettings.DisableDeleteWhenReferenced },
+                        {"disableUnpublishWhenReferenced", _contentSettings.DisableUnpublishWhenReferenced },
                         {"showUserInvite", _emailSender.CanSendRequiredEmail()},
                         {"canSendRequiredEmail", _emailSender.CanSendRequiredEmail()},
                         {"showAllowSegmentationForDocumentTypes", false},

@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Options
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
@@ -31,7 +31,7 @@
                 <h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
 
                 <div class="cta">
-                    <a href="@Model.UmbracoPath" class="button">Open Umbraco</a>
+                    <a href="@Model?.UmbracoPath" class="button">Open Umbraco</a>
                 </div>
 
                 <div class="row">

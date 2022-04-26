@@ -1,7 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.InstallSteps;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 using Umbraco.Extensions;
@@ -19,7 +22,12 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<InstallSetupStep, NewInstallStep>();
             builder.Services.AddScoped<InstallSetupStep, UpgradeStep>();
             builder.Services.AddScoped<InstallSetupStep, FilePermissionsStep>();
-            builder.Services.AddScoped<InstallSetupStep, TelemetryIdentifierStep>();
+            builder.Services.AddScoped<InstallSetupStep, TelemetryIdentifierStep>(provider =>
+            {
+                return new TelemetryIdentifierStep(
+                    provider.GetRequiredService<IOptions<GlobalSettings>>(),
+                    provider.GetRequiredService<ISiteIdentifierService>());
+            });
             builder.Services.AddScoped<InstallSetupStep, DatabaseConfigureStep>();
             builder.Services.AddScoped<InstallSetupStep, DatabaseInstallStep>();
             builder.Services.AddScoped<InstallSetupStep, DatabaseUpgradeStep>();

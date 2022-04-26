@@ -310,6 +310,33 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             Debug.Print(json);
         }
 
+        [Test]
+        [TestCase(false, false, false)]
+        [TestCase(true, false, false)]
+        [TestCase(true, true, false)]
+        [TestCase(true, true, true)]
+        public void Can_Set_Is_Member_Specific_Property_Type_Options(bool isSensitive, bool canView, bool canEdit)
+        {
+            var propertyTypeAlias = "testType";
+            MemberType memberType = BuildMemberType();
+            var propertyType = new PropertyTypeBuilder()
+                .WithAlias("testType")
+                .Build();
+
+            memberType.AddPropertyType(propertyType);
+
+            memberType.SetIsSensitiveProperty(propertyTypeAlias, isSensitive);
+            memberType.SetMemberCanViewProperty(propertyTypeAlias, canView);
+            memberType.SetMemberCanEditProperty(propertyTypeAlias, canEdit);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(isSensitive, memberType.IsSensitiveProperty(propertyTypeAlias));
+                Assert.AreEqual(canView, memberType.MemberCanViewProperty(propertyTypeAlias));
+                Assert.AreEqual(canEdit, memberType.MemberCanEditProperty(propertyTypeAlias));
+            });
+        }
+
         private static MemberType BuildMemberType()
         {
             var builder = new MemberTypeBuilder();

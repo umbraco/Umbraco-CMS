@@ -45,6 +45,11 @@ namespace Umbraco.Extensions
                 {
                     o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
+                .AddCookie(Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType, o =>
+                {
+                    o.Cookie.Name = Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 });
 
             builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();

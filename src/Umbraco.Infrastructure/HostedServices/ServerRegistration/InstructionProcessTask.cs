@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _messenger;
         private readonly ILogger<InstructionProcessTask> _logger;
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstructionProcessTask"/> class.
@@ -29,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         /// <param name="logger">The typed logger.</param>
         /// <param name="globalSettings">The configuration for global settings.</param>
         public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings)
-            : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
+            : base(logger, globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
         {
             _runtimeState = runtimeState;
             _messenger = messenger;
@@ -53,6 +54,21 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             }
 
             return Task.CompletedTask;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing && _messenger is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
