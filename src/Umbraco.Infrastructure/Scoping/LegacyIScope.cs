@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Events;
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Scoping;
 
-[Obsolete("Please use Umbraco.Cms.Infrastructure.Scoping.IScope or Umbraco.Cms.Core.ICoreScope instead.")]
+[Obsolete("Please use Umbraco.Cms.Infrastructure.Scoping.IScope or Umbraco.Cms.Core.Scoping.ICoreScope instead.")]
 public interface IScope : Infrastructure.Scoping.IScope
 {
     /// <summary>
