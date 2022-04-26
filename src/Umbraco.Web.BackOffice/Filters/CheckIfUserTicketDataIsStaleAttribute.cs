@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private GlobalSettings _globalSettings;
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
-            private readonly IScopeProvider _scopeProvider;
+            private readonly ICoreScopeProvider _scopeProvider;
             private readonly AppCaches _appCaches;
 
             public CheckIfUserTicketDataIsStaleFilter(
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 IOptionsSnapshot<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery,
-                IScopeProvider scopeProvider,
+                ICoreScopeProvider scopeProvider,
                 AppCaches appCaches)
             {
                 _requestCache = requestCache;
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private async Task CheckStaleData(ActionExecutingContext actionContext)
             {
-                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                     {

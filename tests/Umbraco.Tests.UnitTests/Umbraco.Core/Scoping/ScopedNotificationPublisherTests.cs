@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
             var notificationPublisherMock = new Mock<IScopedNotificationPublisher>();
             ScopeProvider scopeProvider = GetScopeProvider(out var eventAggregatorMock);
 
-            using (IScope scope = scopeProvider.CreateScope(notificationPublisher: notificationPublisherMock.Object))
+            using (ICoreScope scope = scopeProvider.CreateScope(notificationPublisher: notificationPublisherMock.Object))
             {
                 scope.Notifications.Publish(Mock.Of<INotification>());
                 scope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 notificationPublisherMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Once);
 
                 // Ensure that the custom scope provider is till used in inner scope.
-                using (IScope innerScope = scopeProvider.CreateScope())
+                using (ICoreScope innerScope = scopeProvider.CreateScope())
                 {
                     innerScope.Notifications.Publish(Mock.Of<INotification>());
                     innerScope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
@@ -97,6 +97,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
                 new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
+                mediaFileManager,
                 loggerFactory,
                 Mock.Of<IRequestCache>(),
                 eventAggregatorMock.Object

@@ -16,6 +16,8 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {

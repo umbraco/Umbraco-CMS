@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Scoping
@@ -10,11 +10,11 @@ namespace Umbraco.Cms.Core.Scoping
     /// <remarks>Registered as Scoped in DI (per request)</remarks>
     internal class HttpScopeReference : IHttpScopeReference
     {
-        private readonly ScopeProvider _scopeProvider;
+        private readonly Infrastructure.Scoping.ScopeProvider _scopeProvider;
         private bool _disposedValue;
         private bool _registered = false;
 
-        public HttpScopeReference(ScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
+        public HttpScopeReference(Infrastructure.Scoping.ScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Scoping
                     {
                         // dispose the entire chain (if any)
                         // reset (don't commit by default)
-                        Scope? scope;
+                        Infrastructure.Scoping.Scope? scope;
                         while ((scope = _scopeProvider.AmbientScope) != null)
                         {
                             scope.Reset();

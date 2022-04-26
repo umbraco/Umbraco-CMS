@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IAuditEntryRepository _auditEntryRepository;
 
-        public AuditService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public AuditService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IAuditRepository auditRepository, IAuditEntryRepository auditEntryRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
                 scope.Complete();
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<IAuditItem>? GetLogs(int objectId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var result = _auditRepository.Get(Query<IAuditItem>().Where(x => x.Id == objectId));
                 scope.Complete();
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var result = sinceDate.HasValue == false
                     ? _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId))
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var result = sinceDate.HasValue == false
                     ? _auditRepository.Get(type, Query<IAuditItem>())
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void CleanLogs(int maximumAgeOfLogsInMinutes)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
                 scope.Complete();
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Enumerable.Empty<IAuditItem>();
             }
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IAuditItem>().Where(x => x.Id == entityId);
 
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Enumerable.Empty<IAuditItem>();
             }
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IAuditItem>().Where(x => x.UserId == userId);
 
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (_isAvailable.Value == false) return entry;
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _auditEntryRepository.Save(entry);
                 scope.Complete();
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             if (_isAvailable.Value == false) return Enumerable.Empty<IAuditEntry>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _auditEntryRepository.GetMany();
             }
@@ -219,7 +219,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Enumerable.Empty<IAuditEntry>();
             }
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _auditEntryRepository.GetPage(pageIndex, pageCount, out records);
             }
@@ -230,7 +230,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         private bool DetermineIsAvailable()
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _auditEntryRepository.IsAvailable();
             }

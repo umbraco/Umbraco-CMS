@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         public NuCacheContentService(
             INuCacheContentRepository repository,
             IKeyValueService keyValueService,
-            IScopeProvider provider,
+            ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
             IProfilingLogger profilingLogger,
             IEventMessagesFactory eventMessagesFactory,
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             IReadOnlyCollection<int>? mediaTypeIds = null,
             IReadOnlyCollection<int>? memberTypeIds = null)
         {
-            using (IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
 
                 scope.ReadLock(Constants.Locks.ContentTree);
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         /// <inheritdoc/>
         public bool VerifyContentDbCache()
         {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.ContentTree);
             return _repository.VerifyContentDbCache();
         }
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         /// <inheritdoc/>
         public bool VerifyMediaDbCache()
         {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
             return _repository.VerifyMediaDbCache();
         }
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         /// <inheritdoc/>
         public bool VerifyMemberDbCache()
         {
-            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
             return _repository.VerifyMemberDbCache();
         }

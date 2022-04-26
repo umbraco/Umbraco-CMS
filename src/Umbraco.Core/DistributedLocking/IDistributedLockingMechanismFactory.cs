@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.DistributedLocking;
 /// </summary>
 public interface IDistributedLockingMechanismFactory
 {
-    IDistributedLockingMechanism? DistributedLockingMechanism { get; }
+    IDistributedLockingMechanism DistributedLockingMechanism { get; }
 }

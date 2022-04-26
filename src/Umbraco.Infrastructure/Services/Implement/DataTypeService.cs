@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public DataTypeService(
             IDataValueEditorFactory dataValueEditorFactory,
-            IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+            ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 try
                 {
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public EntityContainer? GetContainer(int containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _dataTypeContainerRepository.Get(containerId);
             }
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public EntityContainer? GetContainer(Guid containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _dataTypeContainerRepository.Get(containerId);
             }
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _dataTypeContainerRepository.Get(name, level);
             }
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _dataTypeContainerRepository.GetMany(containerIds);
             }
@@ -158,7 +158,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return OperationResult.Attempt.Fail(evtMsgs, ex);
             }
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingEntityContainerNotification))
@@ -180,7 +180,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var container = _dataTypeContainerRepository.Get(containerId);
                 if (container == null) return OperationResult.Attempt.NoOperation(evtMsgs);
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 try
                 {
@@ -256,7 +256,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IDataType"/></returns>
         public IDataType? GetDataType(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
@@ -271,7 +271,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IDataType"/></returns>
         public IDataType? GetDataType(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var dataType = _dataTypeRepository.Get(id);
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
@@ -286,7 +286,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IDataType"/></returns>
         public IDataType? GetDataType(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.Key == id);
                 var dataType = _dataTypeRepository.Get(query)?.FirstOrDefault();
@@ -302,7 +302,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         public IEnumerable<IDataType>? GetByEditorAlias(string propertyEditorAlias)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
                 var dataType = _dataTypeRepository.Get(query);
@@ -322,7 +322,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
         public IEnumerable<IDataType>? GetAll(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var dataTypes = _dataTypeRepository.GetMany(ids);
                 if (dataTypes is null)
@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var evtMsgs = EventMessagesFactory.Get();
             var moveInfo = new List<MoveEventInfo<IDataType>>();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
 
@@ -408,7 +408,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var evtMsgs = EventMessagesFactory.Get();
             dataType.CreatorId = userId;
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
 
@@ -448,7 +448,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var evtMsgs = EventMessagesFactory.Get();
             var dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var savingDataTypeNotification = new DataTypeSavingNotification(dataTypeDefinitions, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingDataTypeNotification))
@@ -483,7 +483,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public void Delete(IDataType dataType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingDataTypeNotification))
@@ -534,7 +534,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete:true))
             {
                 return _dataTypeRepository.FindUsages(id);
             }

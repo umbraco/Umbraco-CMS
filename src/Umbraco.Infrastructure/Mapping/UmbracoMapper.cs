@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -44,14 +44,14 @@ namespace Umbraco.Cms.Core.Mapping
         private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
             = new ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
         /// </summary>
         /// <param name="profiles"></param>
         /// <param name="scopeProvider"></param>
-        public UmbracoMapper(MapDefinitionCollection profiles, IScopeProvider scopeProvider)
+        public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
 
@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Core.Mapping
             if (ctor != null && map != null)
             {
                 var target = ctor(source, context);
-                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     map(source, target, context);
                 }
@@ -259,7 +259,7 @@ namespace Umbraco.Cms.Core.Mapping
         {
             var targetList = (IList?)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 foreach (var sourceItem in source)
                 {
@@ -329,7 +329,7 @@ namespace Umbraco.Cms.Core.Mapping
             // if there is a direct map, map
             if (map != null)
             {
-                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     map(source!, target!, context);
                 }

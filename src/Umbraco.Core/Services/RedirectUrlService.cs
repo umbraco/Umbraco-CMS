@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IRedirectUrlRepository _redirectUrlRepository;
 
-        public RedirectUrlService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public RedirectUrlService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IRedirectUrlRepository redirectUrlRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void Register(string url, Guid contentKey, string? culture = null)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var redir = _redirectUrlRepository.Get(url, contentKey, culture);
                 if (redir != null)
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void Delete(IRedirectUrl redirectUrl)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _redirectUrlRepository.Delete(redirectUrl);
                 scope.Complete();
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void Delete(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _redirectUrlRepository.Delete(id);
                 scope.Complete();
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void DeleteContentRedirectUrls(Guid contentKey)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _redirectUrlRepository.DeleteContentUrls(contentKey);
                 scope.Complete();
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void DeleteAll()
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _redirectUrlRepository.DeleteAll();
                 scope.Complete();
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IRedirectUrl? GetMostRecentRedirectUrl(string url)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetMostRecentUrl(url);
             }
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetContentUrls(contentKey);
             }
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetAllUrls(pageIndex, pageSize, out total);
             }
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
             }
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.SearchUrls(searchTerm, pageIndex, pageSize, out total);
             }
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Services
         public IRedirectUrl? GetMostRecentRedirectUrl(string url, string? culture)
         {
             if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentRedirectUrl(url);
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetMostRecentUrl(url, culture);
             }
