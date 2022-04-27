@@ -84,7 +84,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Examine.Lucene" Version="3.0.0-beta.5" />
+    <PackageReference Include="Examine.Lucene" Version="3.0.0-beta.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.8" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.4" />
     <PackageReference Include="Bogus" Version="34.0.2" />

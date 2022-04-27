@@ -308,7 +308,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine
                     [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y",
                     [UmbracoExamineFieldNames.PublishedFieldName] = "y"
                 }));
-            Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
+             Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
             var valueSet = new ValueSet(
                 "555",
