@@ -92,7 +92,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                 }
             }
-            var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, filteredValues.ToDictionary(x=>x.Key, x=> (object)x.Value));
+
+            var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
             return new ValueSetValidationResult(isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
         }
     }

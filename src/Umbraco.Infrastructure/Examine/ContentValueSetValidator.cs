@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             if (pathValues[0].ToString().IsNullOrWhiteSpace()) return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
             var path = pathValues[0].ToString();
 
-            var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, filteredValues.ToDictionary(x=>x.Key, x=> (object)x.Value));
+            var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x=>x.Key, x=> (IEnumerable<object>)x.Value));
             // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
             // We cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
             // because we need to remove anything that doesn't pass by protected content in the cases that umbraco data is moved to an illegal parent.
