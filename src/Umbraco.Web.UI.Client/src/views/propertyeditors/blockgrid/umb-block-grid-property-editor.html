@@ -13,30 +13,7 @@
 
         </div>
 
-        <div class="umb-block-grid__actions" ng-if="vm.loading !== true">
-            <button
-                    id="{{vm.model.alias}}"
-                    type="button"
-                    class="btn-reset umb-block-grid__create-button umb-outline"
-                    ng-disabled="vm.availableBlockTypes.length === 0"
-                    ng-click="vm.requestShowCreate(vm.layout.length, $event)">
-                <localize ng-if="vm.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
-                <localize ng-if="vm.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
-            </button>
-            <button type="button"
-                    class="btn-reset umb-block-grid__clipboard-button umb-outline"
-                    ng-class="{'--jump': vm.jumpClipboardButton}"
-                    ng-disabled="vm.clipboardItems.length === 0"
-                    ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
-                    localize="title"
-                    title="@blockEditor_tabClipboard">
-                <umb-icon icon="icon-paste-in" class="icon"></umb-icon>
-                <span class="sr-only">
-                    <localize key="blockEditor_tabClipboard">Clipboard</localize>
-                </span>
-            </button>
-        </div>
-
+        <!-- TODO: make this work for each list.. -->
         <input type="hidden" name="minCount" ng-model="vm.layout" val-server="minCount" />
         <input type="hidden" name="maxCount" ng-model="vm.layout" val-server="maxCount" />
 
@@ -52,6 +29,7 @@
             </div>
             <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
         </div>
+        
 
     </div>
 

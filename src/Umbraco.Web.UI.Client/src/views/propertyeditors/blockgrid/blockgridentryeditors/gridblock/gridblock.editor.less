@@ -1,43 +1,56 @@
-.blockelement-labelblock-editor {
+.blockelement-gridblock-editor {
+    
     position: relative;
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
-    margin-top: 4px;
-    width: 100%;
-    min-height: 48px;
     border: 1px solid @gray-9;
     border-radius: @baseBorderRadius;
-    cursor: pointer;
-    color: @ui-action-discreet-type;
-    background-color: white;
-    text-align: left;
-    padding: 0 20px;
-    user-select: none;
-    transition: border-color 120ms, background-color 120ms;
 
-    > .icon {
-        font-size: 22px;
-        margin-right: 10px;
-        display: inline-block;
-    }
-
-    > span {
+    > umb-block-grid-entries {
+        border: 2px solid blue;
+        width: 100%;
+        min-height: 20px;
+        display: block;
         position: relative;
-        display: inline-block;
-        padding-top:2px;
-        padding-bottom:2px;
     }
 
-    &:hover {
-        color: @ui-action-discreet-type-hover;
-        background-color: @ui-action-hover;
-    }
+    > button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+        margin-top: 4px;
+        width: 100%;
+        min-height: 48px;
+        cursor: pointer;
+        color: @ui-action-discreet-type;
+        background-color: white;
+        text-align: left;
+        padding: 0 20px;
+        user-select: none;
+        transition: border-color 120ms, background-color 120ms;
 
-    &.--active {
-        color: @ui-active-type;
-        border-color: @ui-active;
-        background-color: @ui-active;
+        > .icon {
+            font-size: 22px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        > span {
+            position: relative;
+            display: inline-block;
+            padding-top:2px;
+            padding-bottom:2px;
+        }
+
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+            background-color: @ui-action-hover;
+        }
+
+        &.--active {
+            color: @ui-active-type;
+            border-color: @ui-active;
+            background-color: @ui-active;
+        }
     }
 
     ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
