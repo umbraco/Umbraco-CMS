@@ -840,7 +840,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
-                var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+                var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
 
                 if (!_contentSettings.IsFileAllowedForUpload(ext))
                 {
@@ -885,7 +885,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         }
 
                         // If media type is still File then let's check if it's an image.
-                        if (mediaTypeAlias == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
+                        if (mediaTypeAlias == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.IsSupportedImageFormat(ext))
                         {
                             mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
                         }
