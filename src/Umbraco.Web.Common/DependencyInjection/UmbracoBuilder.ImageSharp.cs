@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp.Web.Caching;
@@ -13,9 +12,10 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
+using Umbraco.Cms.Web.Common.Media;
 
 namespace Umbraco.Extensions
 {
@@ -26,6 +26,8 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+
             ImagingSettings imagingSettings = builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigImaging)
                 .Get<ImagingSettings>() ?? new ImagingSettings();
 

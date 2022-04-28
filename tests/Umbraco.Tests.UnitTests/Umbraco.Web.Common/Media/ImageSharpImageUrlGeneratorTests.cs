@@ -3,9 +3,9 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Media;
+using Umbraco.Cms.Web.Common.Media;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media
 {
     [TestFixture]
     public class ImageSharpImageUrlGeneratorTests
