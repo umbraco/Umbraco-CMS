@@ -21,14 +21,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
     {
         private readonly IJsonSerializer _jsonSerializer;
-
-        // Scheduled for removal in v12
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer)
-        : this(ioHelper, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-        }
-
         public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer, IEditorConfigurationParser editorConfigurationParser)
             : base(ioHelper, editorConfigurationParser)
         {

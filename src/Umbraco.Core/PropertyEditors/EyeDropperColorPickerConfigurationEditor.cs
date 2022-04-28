@@ -1,23 +1,12 @@
-
-using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
     internal class EyeDropperColorPickerConfigurationEditor : ConfigurationEditor<EyeDropperColorPickerConfiguration>
     {
-        // Scheduled for removal in v12
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-        public EyeDropperColorPickerConfigurationEditor(IIOHelper ioHelper)
-            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-        }
-
         public EyeDropperColorPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
         }

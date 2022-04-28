@@ -17,13 +17,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
     {
-        // Scheduled for removal in v12
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-        public MultipleTextStringConfigurationEditor(IIOHelper ioHelper)
-            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-        }
-
         public MultipleTextStringConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             Fields.Add(new ConfigurationField(new IntegerValidator())

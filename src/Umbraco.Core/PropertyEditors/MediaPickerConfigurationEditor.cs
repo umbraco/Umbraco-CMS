@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
@@ -14,14 +15,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class MediaPickerConfigurationEditor : ConfigurationEditor<MediaPickerConfiguration>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MediaPickerConfigurationEditor"/> class.
-        /// </summary>
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public MediaPickerConfigurationEditor(IIOHelper ioHelper)
             : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaPickerConfigurationEditor"/> class.
+        /// </summary>
         public MediaPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             // configure fields

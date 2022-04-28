@@ -12,13 +12,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 {
     internal class ContentPickerConfigurationEditor : ConfigurationEditor<ContentPickerConfiguration>
     {
-        // Scheduled for removal in v12
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-        public ContentPickerConfigurationEditor(IIOHelper ioHelper)
-            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-        }
-
         public ContentPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             // configure fields

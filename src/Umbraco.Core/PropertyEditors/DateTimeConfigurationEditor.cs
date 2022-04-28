@@ -27,13 +27,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return d;
         }
 
-        // Scheduled for removal in v12
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-        public DateTimeConfigurationEditor(IIOHelper ioHelper)
-            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-        }
-
         public DateTimeConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
         }

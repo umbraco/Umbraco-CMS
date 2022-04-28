@@ -14,11 +14,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 {
     internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
     {
-        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper)
-            : this(textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-        }
-
         public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             var items = Fields.First(x => x.Key == "items");

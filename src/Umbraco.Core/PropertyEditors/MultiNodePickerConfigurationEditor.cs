@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
@@ -14,6 +15,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class MultiNodePickerConfigurationEditor : ConfigurationEditor<MultiNodePickerConfiguration>
     {
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public MultiNodePickerConfigurationEditor(IIOHelper ioHelper)
             : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
