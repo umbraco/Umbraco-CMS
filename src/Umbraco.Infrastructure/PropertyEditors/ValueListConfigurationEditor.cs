@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </remarks>
     public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
     {
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper)
          : this(textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {

@@ -38,13 +38,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly IHtmlMacroParameterParser _macroParameterParser;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IIOHelper _ioHelper;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found.
-        /// </summary>
+        [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
         public RichTextPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -54,7 +53,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator,
             IHtmlMacroParameterParser macroParameterParser)
-            : base(dataValueEditorFactory)
+            : this(
+                dataValueEditorFactory,
+                backOfficeSecurityAccessor,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                ioHelper,
+                imageUrlGenerator,
+                macroParameterParser,
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;
@@ -74,9 +82,45 @@ namespace Umbraco.Cms.Core.PropertyEditors
             RichTextEditorPastedImages pastedImages,
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator)
-            : this (dataValueEditorFactory, backOfficeSecurityAccessor, imageSourceParser, localLinkParser, pastedImages, ioHelper, imageUrlGenerator, StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
+            : this(
+                dataValueEditorFactory,
+                backOfficeSecurityAccessor,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                ioHelper,
+                imageUrlGenerator,
+                StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>(),
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
         }
+
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found.
+        /// </summary>
+        public RichTextPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator,
+            IHtmlMacroParameterParser macroParameterParser,
+            IEditorConfigurationParser editorConfigurationParser)
+            : base(dataValueEditorFactory)
+        {
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _imageSourceParser = imageSourceParser;
+            _localLinkParser = localLinkParser;
+            _pastedImages = pastedImages;
+            _ioHelper = ioHelper;
+            _imageUrlGenerator = imageUrlGenerator;
+            _macroParameterParser = macroParameterParser;
+            _editorConfigurationParser = editorConfigurationParser;
+        }
+
+
 
         /// <summary>
         /// Create a custom value editor
@@ -86,7 +130,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute!);
 
         protected override IConfigurationEditor CreateConfigurationEditor() =>
-            new RichTextConfigurationEditor(_ioHelper);
+            new RichTextConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 
