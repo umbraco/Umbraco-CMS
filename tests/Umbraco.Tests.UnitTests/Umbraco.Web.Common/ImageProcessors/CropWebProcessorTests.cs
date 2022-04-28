@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Globalization;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -40,10 +39,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ImageProcessors
             {
                 { CropWebProcessor.Coordinates, coordinates },
             };
-            var parser = new CommandParser(new[]
+            var parser = new CommandParser(new ICommandConverter[]
             {
                 new ArrayConverter<float>(),
-                CreateSimpleCommandConverterOfFloat()
+                new SimpleCommandConverter<float>()
             });
             var culture = CultureInfo.InvariantCulture;
 
@@ -51,15 +50,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ImageProcessors
 
             Assert.AreEqual(width, image.Width);
             Assert.AreEqual(height, image.Height);
-        }
-
-        private static ICommandConverter CreateSimpleCommandConverterOfFloat()
-        {
-            // ImageSharp.Web's SimpleCommandConverter is internal, so we need to use reflection to instantiate.
-            var type = Type.GetType("SixLabors.ImageSharp.Web.Commands.Converters.SimpleCommandConverter`1, SixLabors.ImageSharp.Web");
-            var genericType = type.MakeGenericType(typeof(float));
-
-            return (ICommandConverter)Activator.CreateInstance(genericType);
         }
     }
 }
