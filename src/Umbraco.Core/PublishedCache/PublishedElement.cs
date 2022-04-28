@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -36,9 +36,10 @@ namespace Umbraco.Cms.Core.PublishedCache
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.Alias, out var value);
-                    return (IPublishedProperty) new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
+                    return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
                 })
-                .ToArray();
+                .ToArray()
+                ?? new IPublishedProperty[0];
         }
 
         // initializes a new instance of the PublishedElement class
@@ -72,9 +73,9 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         #region Properties
 
-        private readonly IPublishedProperty[]? _propertiesArray;
+        private readonly IPublishedProperty[] _propertiesArray;
 
-        public IEnumerable<IPublishedProperty>? Properties => _propertiesArray;
+        public IEnumerable<IPublishedProperty> Properties => _propertiesArray;
 
         public IPublishedProperty? GetProperty(string alias)
         {
