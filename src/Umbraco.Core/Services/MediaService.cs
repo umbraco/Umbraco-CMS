@@ -1176,10 +1176,12 @@ namespace Umbraco.Cms.Core.Services
 
         #region File Management
 
-        public Stream? GetMediaFileContentStream(string filepath)
+        public Stream GetMediaFileContentStream(string filepath)
         {
             if (_mediaFileManager.FileSystem.FileExists(filepath) == false)
-                return null;
+            {
+                return Stream.Null;
+            }
 
             try
             {
@@ -1187,7 +1189,7 @@ namespace Umbraco.Cms.Core.Services
             }
             catch
             {
-                return null; // deal with race conds
+                return Stream.Null; // deal with race conds
             }
         }
 

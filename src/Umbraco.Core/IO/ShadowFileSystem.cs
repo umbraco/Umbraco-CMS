@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,12 +37,9 @@ namespace Umbraco.Cms.Core.IO
                             }
                             else
                             {
-                                using (Stream? stream = _sfs.OpenFile(kvp.Key))
+                                using (Stream stream = _sfs.OpenFile(kvp.Key))
                                 {
-                                    if (stream is not null)
-                                    {
-                                        _fs.AddFile(kvp.Key, stream, true);
-                                    }
+                                    _fs.AddFile(kvp.Key, stream, true);
                                 }
                             }
                         }
@@ -227,11 +224,13 @@ namespace Umbraco.Cms.Core.IO
                 .Distinct();
         }
 
-        public Stream? OpenFile(string path)
+        public Stream OpenFile(string path)
         {
-            ShadowNode? sf;
-            if (Nodes.TryGetValue(NormPath(path), out sf))
-                return sf.IsDir || sf.IsDelete ? null : _sfs.OpenFile(path);
+            if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
+            {
+                return sf.IsDir || sf.IsDelete ? Stream.Null : _sfs.OpenFile(path);
+            }
+
             return _fs.OpenFile(path);
         }
 
