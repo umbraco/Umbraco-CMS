@@ -210,8 +210,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // Services required to run background jobs (with out the handler)
             builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            builder.Services.AddTransient<IEditorConfigurationParser, EditorConfigurationParser>();
-
             return builder;
         }
 
