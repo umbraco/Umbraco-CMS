@@ -442,9 +442,13 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
         /// <param name="source">The source objects.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
         {
-            return source.Select(Map<TSourceElement, TTargetElement>).ToList();
+            return source
+                .Select(Map<TSourceElement, TTargetElement>)
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
         }
 
         /// <summary>
@@ -455,11 +459,15 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source objects.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f)
         {
             var context = new MapperContext(this);
             f(context);
-            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
+            return source
+                .Select(x => Map<TSourceElement, TTargetElement>(x, context))
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
         }
 
         /// <summary>
@@ -470,9 +478,13 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source objects.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context)
         {
-            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
+            return source
+                .Select(x => Map<TSourceElement, TTargetElement>(x, context))
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
         }
 
         #endregion
