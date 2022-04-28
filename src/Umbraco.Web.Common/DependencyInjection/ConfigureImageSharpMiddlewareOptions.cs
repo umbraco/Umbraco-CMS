@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
         {
             options.Configuration = _configuration;
 
+            options.HMACSecretKey = _imagingSettings.HMACSecretKey;
             options.BrowserMaxAge = _imagingSettings.Cache.BrowserMaxAge;
             options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
             options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
             // Use configurable maximum width and height
             options.OnParseCommandsAsync = context =>
             {
-                if (context.Commands.Count == 0)
+                if (context.Commands.Count == 0 || _imagingSettings.HMACSecretKey?.Length > 0)
                 {
                     return Task.CompletedTask;
                 }

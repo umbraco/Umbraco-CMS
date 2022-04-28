@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Processors;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.ImageProcessors;
@@ -19,6 +23,8 @@ namespace Umbraco.Cms.Web.Common.Media
     /// <seealso cref="IImageUrlGenerator" />
     public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {
+        private readonly byte[]? _hmacSecretKey;
+
         /// <inheritdoc />
         public IEnumerable<string> SupportedImageFileTypes { get; }
 
@@ -26,18 +32,24 @@ namespace Umbraco.Cms.Web.Common.Media
         /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
         /// </summary>
         /// <param name="configuration">The ImageSharp configuration.</param>
-        public ImageSharpImageUrlGenerator(Configuration configuration)
-            : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray())
+        /// <param name="imagingSettings">The Umbraco imaging settings.</param>
+        public ImageSharpImageUrlGenerator(Configuration configuration, IOptions<ImagingSettings> imagingSettings)
+            : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray(), imagingSettings.Value.HMACSecretKey)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
         /// </summary>
         /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
+        /// <param name="hmacSecretKey">The HMAC security key.</param>
         /// <remarks>
         /// This constructor is only used for testing.
         /// </remarks>
-        internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes) => SupportedImageFileTypes = supportedImageFileTypes;
+        internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes, byte[]? hmacSecretKey)
+        {
+            SupportedImageFileTypes = supportedImageFileTypes;
+            _hmacSecretKey = hmacSecretKey;
+        }
 
         /// <inheritdoc/>
         public string? GetImageUrl(ImageUrlGenerationOptions options)
@@ -87,6 +99,13 @@ namespace Umbraco.Cms.Web.Common.Media
             foreach (KeyValuePair<string, StringValues> kvp in QueryHelpers.ParseQuery(options.FurtherOptions))
             {
                 queryString.Add(kvp.Key, kvp.Value);
+            }
+
+            if (_hmacSecretKey is byte[] secret && secret.Length > 0)
+            {
+                string value = CaseHandlingUriBuilder.BuildRelative(CaseHandlingUriBuilder.CaseHandling.LowerInvariant, null, options.ImageUrl, QueryString.Create(queryString));
+
+                queryString.Add(HMACUtilities.TokenCommand, HMACUtilities.ComputeHMACSHA256(value, secret));
             }
 
             if (options.CacheBusterValue is string cacheBusterValue && !string.IsNullOrWhiteSpace(cacheBusterValue))

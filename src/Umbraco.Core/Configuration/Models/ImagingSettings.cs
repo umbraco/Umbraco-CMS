@@ -10,6 +10,11 @@ namespace Umbraco.Cms.Core.Configuration.Models
     public class ImagingSettings
     {
         /// <summary>
+        /// Gets or sets a value for the HMAC security key.
+        /// </summary>
+        public byte[]? HMACSecretKey { get; set; }
+
+        /// <summary>
         /// Gets or sets a value for imaging cache settings.
         /// </summary>
         public ImagingCacheSettings Cache { get; set; } = new ImagingCacheSettings();
