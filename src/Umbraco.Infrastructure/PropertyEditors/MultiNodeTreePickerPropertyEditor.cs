@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute!);
 
         public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -49,11 +49,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-                var udiPaths = asString.Split(',');
+                var udiPaths = asString!.Split(',');
                 foreach (var udiPath in udiPaths)
                     if (UdiParser.TryParse(udiPath, out var udi))
                         yield return new UmbracoEntityReference(udi);

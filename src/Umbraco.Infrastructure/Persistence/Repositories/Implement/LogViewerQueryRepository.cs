@@ -25,10 +25,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
-        protected override IEnumerable<ILogViewerQuery> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ILogViewerQuery> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false).Where($"{Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery}.id > 0");
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.Where($"{Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery}.id in (@ids)", new { ids = ids });
             }
@@ -120,16 +120,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        protected override ILogViewerQuery PerformGet(int id)
+        protected override ILogViewerQuery? PerformGet(int id)
         {
             //use the underlying GetAll which will force cache all log queries
-            return GetMany().FirstOrDefault(x => x.Id == id);
+            return GetMany()?.FirstOrDefault(x => x.Id == id);
         }
 
-        public ILogViewerQuery GetByName(string name)
+        public ILogViewerQuery? GetByName(string name)
         {
             //use the underlying GetAll which will force cache all log queries
-            return GetMany().FirstOrDefault(x => x.Name == name);
+            return GetMany()?.FirstOrDefault(x => x.Name == name);
         }
     }
 }

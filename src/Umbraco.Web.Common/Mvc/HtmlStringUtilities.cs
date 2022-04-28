@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Web.Common.Mvc
             return new HtmlString(value);
         }
 
-        public HtmlString StripHtmlTags(string html, params string[] tags)
+        public HtmlString StripHtmlTags(string html, params string[]? tags)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml("<p>" + html + "</p>");
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Web.Common.Mvc
                     //is element
                     if (node.NodeType != HtmlNodeType.Element) continue;
                     var filterAllTags = (tags == null || !tags.Any());
-                    if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
+                    if (filterAllTags || (tags?.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false))
                     {
                         targets.Add(node);
                     }

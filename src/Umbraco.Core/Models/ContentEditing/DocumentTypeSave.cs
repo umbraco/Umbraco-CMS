@@ -16,13 +16,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The list of allowed templates to assign (template alias)
         /// </summary>
         [DataMember(Name = "allowedTemplates")]
-        public IEnumerable<string> AllowedTemplates { get; set; }
+        public IEnumerable<string>? AllowedTemplates { get; set; }
 
         /// <summary>
         /// The default template to assign (template alias)
         /// </summary>
         [DataMember(Name = "defaultTemplate")]
-        public string DefaultTemplate { get; set; }
+        public string? DefaultTemplate { get; set; }
 
         /// <summary>
         /// Custom validation
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// <returns></returns>
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (AllowedTemplates.Any(x => x.IsNullOrWhiteSpace()))
+            if (AllowedTemplates?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
                 yield return new ValidationResult("Template value cannot be null", new[] { "AllowedTemplates" });
 
             foreach (var v in base.Validate(validationContext))

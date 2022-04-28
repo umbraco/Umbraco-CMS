@@ -46,8 +46,8 @@ namespace Umbraco.Cms.Core.Security
             char permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck });
 
         public ContentAccess CheckPermissions(
-            IContent content,
-            IUser user,
+            IContent? content,
+            IUser? user,
             IReadOnlyList<char> permissionsToCheck)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -70,12 +70,12 @@ namespace Umbraco.Cms.Core.Security
 
         public ContentAccess CheckPermissions(
             IUmbracoEntity entity,
-            IUser user,
+            IUser? user,
             char permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck });
 
         public ContentAccess CheckPermissions(
             IUmbracoEntity entity,
-            IUser user,
+            IUser? user,
             IReadOnlyList<char> permissionsToCheck)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -109,8 +109,8 @@ namespace Umbraco.Cms.Core.Security
         public ContentAccess CheckPermissions(
             int nodeId,
             IUser user,
-            out IUmbracoEntity entity,
-            IReadOnlyList<char> permissionsToCheck = null)
+            out IUmbracoEntity? entity,
+            IReadOnlyList<char>? permissionsToCheck = null)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -159,9 +159,9 @@ namespace Umbraco.Cms.Core.Security
         /// <returns></returns>
         public ContentAccess CheckPermissions(
             int nodeId,
-            IUser user,
-            out IContent contentItem,
-            IReadOnlyList<char> permissionsToCheck = null)
+            IUser? user,
+            out IContent? contentItem,
+            IReadOnlyList<char>? permissionsToCheck = null)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Core.Security
                 : ContentAccess.Denied;
         }
 
-        private bool CheckPermissionsPath(string path, IUser user, IReadOnlyList<char> permissionsToCheck = null)
+        private bool CheckPermissionsPath(string? path, IUser user, IReadOnlyList<char>? permissionsToCheck = null)
         {
             if (permissionsToCheck == null)
             {
@@ -220,12 +220,12 @@ namespace Umbraco.Cms.Core.Security
             return allowed;
         }
 
-        public static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
+        public static bool HasPathAccess(string? path, int[]? startNodeIds, int recycleBinId)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             // check for no access
-            if (startNodeIds.Length == 0)
+            if (startNodeIds is null || startNodeIds.Length == 0)
                 return false;
 
             // check for root access
@@ -243,25 +243,25 @@ namespace Umbraco.Cms.Core.Security
             return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x.ToString(CultureInfo.InvariantCulture), ",")));
         }
 
-        public static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
+        public static bool IsInBranchOfStartNode(string path, int[]? startNodeIds, string[]? startNodePaths, out bool hasPathAccess)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             hasPathAccess = false;
 
             // check for no access
-            if (startNodeIds.Length == 0)
+            if (startNodeIds?.Length == 0)
                 return false;
 
             // check for root access
-            if (startNodeIds.Contains(Constants.System.Root))
+            if (startNodeIds?.Contains(Constants.System.Root) ?? false)
             {
                 hasPathAccess = true;
                 return true;
             }
 
             //is it self?
-            var self = startNodePaths.Any(x => x == path);
+            var self = startNodePaths?.Any(x => x == path) ?? false;
             if (self)
             {
                 hasPathAccess = true;
@@ -269,7 +269,7 @@ namespace Umbraco.Cms.Core.Security
             }
 
             //is it ancestor?
-            var ancestor = startNodePaths.Any(x => x.StartsWith(path));
+            var ancestor = startNodePaths?.Any(x => x.StartsWith(path)) ?? false;
             if (ancestor)
             {
                 //hasPathAccess = false;
@@ -277,7 +277,7 @@ namespace Umbraco.Cms.Core.Security
             }
 
             //is it descendant?
-            var descendant = startNodePaths.Any(x => path.StartsWith(x));
+            var descendant = startNodePaths?.Any(x => path.StartsWith(x)) ?? false;
             if (descendant)
             {
                 hasPathAccess = true;

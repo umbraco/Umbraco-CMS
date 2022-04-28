@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
         {
             var sourceString = source?.ToString() ?? string.Empty;
 

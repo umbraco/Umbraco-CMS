@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or Sets the Description for the ContentType
         /// </summary>
-        string Description { get; set; }
+        string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the icon for the content type. The value is a CSS class name representing
@@ -27,12 +27,12 @@ namespace Umbraco.Cms.Core.Models
         ///
         /// If a class name for the color isn't specified, the icon color will default to black.
         /// </summary>
-        string Icon { get; set; }
+        string? Icon { get; set; }
 
         /// <summary>
         /// Gets or Sets the Thumbnail for the ContentType
         /// </summary>
-        string Thumbnail { get; set; }
+        string? Thumbnail { get; set; }
 
         /// <summary>
         /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
-        IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }
+        IEnumerable<ContentTypeSort>? AllowedContentTypes { get; set; }
 
         /// <summary>
         /// Gets or sets the local property groups.
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="alias">Alias of the PropertyType</param>
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
-        bool PropertyTypeExists(string alias);
+        bool PropertyTypeExists(string? alias);
 
         /// <summary>
         /// Adds the property type to the specified property group (creates a new group if not found and a name is specified).
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Models
         /// <returns>
         /// Returns <c>true</c> if the property type was added; otherwise, <c>false</c>.
         /// </returns>
-        bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string propertyGroupName = null);
+        bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string? propertyGroupName = null);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.

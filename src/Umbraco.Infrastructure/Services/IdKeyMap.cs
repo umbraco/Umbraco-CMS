@@ -10,14 +10,14 @@ namespace Umbraco.Cms.Core.Services
 {
     public class IdKeyMap : IIdKeyMap,IDisposable
     {
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IScopeAccessor _scopeAccessor;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
         private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
         private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
-        public IdKeyMap(IScopeProvider scopeProvider, IScopeAccessor scopeAccessor)
+        public IdKeyMap(ICoreScopeProvider scopeProvider, IScopeAccessor scopeAccessor)
         {
             _scopeProvider = scopeProvider;
             _scopeAccessor = scopeAccessor;
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Services
             // don't if not empty
             if (_key2Id.Count > 0) return;
 
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 // populate content and media items
                 var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
@@ -168,16 +168,16 @@ namespace Umbraco.Cms.Core.Services
 
             if (val == null)
             {
-                using (var scope = _scopeProvider.CreateScope())
+                using (var scope = _scopeProvider.CreateCoreScope())
                 {
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
                     }
                     else
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
                             new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Cms.Core.Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
@@ -215,12 +215,12 @@ namespace Umbraco.Cms.Core.Services
             return GetIdForKey(guidUdi.Guid, umbracoType);
         }
 
-        public Attempt<Udi> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
+        public Attempt<Udi?> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
             var keyAttempt = GetKeyForId(id, umbracoObjectType);
-            return keyAttempt
-                ? Attempt.Succeed<Udi>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
-                : Attempt<Udi>.Fail();
+            return keyAttempt.Success
+                ? Attempt.Succeed<Udi?>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
+                : Attempt<Udi?>.Fail();
         }
 
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
@@ -256,16 +256,16 @@ namespace Umbraco.Cms.Core.Services
 
             if (val == null)
             {
-                using (var scope = _scopeProvider.CreateScope())
+                using (var scope = _scopeProvider.CreateCoreScope())
                 {
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
                     }
                     else
                     {
-                        val = _scopeAccessor.AmbientScope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                        val = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
                             new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Cms.Core.Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();

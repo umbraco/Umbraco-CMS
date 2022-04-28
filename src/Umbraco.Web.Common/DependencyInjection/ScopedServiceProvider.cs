@@ -12,6 +12,6 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
         public ScopedServiceProvider(IHttpContextAccessor accessor) => _accessor = accessor;
 
         /// <inheritdoc />
-        public IServiceProvider ServiceProvider => _accessor.HttpContext?.RequestServices;
+        public IServiceProvider? ServiceProvider => _accessor.HttpContext?.RequestServices;
     }
 }

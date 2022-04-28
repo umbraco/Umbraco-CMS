@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             LastChildContentId = -1;
             NextSiblingContentId = -1;
             PreviousSiblingContentId = -1;
+            Path = string.Empty;
         }
 
         // special ctor with no content data - for members
@@ -73,7 +74,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IPublishedModelFactory publishedModelFactory)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData? draftData, ContentData? publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IPublishedModelFactory publishedModelFactory)
         {
             ContentType = contentType;
 
@@ -89,7 +90,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         // clone
-        public ContentNode(ContentNode origin, IPublishedModelFactory publishedModelFactory, IPublishedContentType contentType = null)
+        public ContentNode(ContentNode origin, IPublishedModelFactory publishedModelFactory, IPublishedContentType? contentType = null)
         {
             _publishedModelFactory = publishedModelFactory;
             Id = origin.Id;
@@ -118,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 #pragma warning disable IDE1006 // Naming Styles
         public readonly int Id;
         public readonly Guid Uid;
-        public IPublishedContentType ContentType;
+        public IPublishedContentType ContentType = null!;
         public readonly int Level;
         public readonly string Path;
         public readonly int SortOrder;
@@ -137,21 +138,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public readonly int CreatorId;
 #pragma warning restore IDE1006 // Naming Styles
 
-        private ContentData _draftData;
-        private ContentData _publishedData;
-        private IVariationContextAccessor _variationContextAccessor;
-        private IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private ContentData? _draftData;
+        private ContentData? _publishedData;
+        private IVariationContextAccessor? _variationContextAccessor;
+        private IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
 
         public bool HasPublished => _publishedData != null;
-        public bool HasPublishedCulture(string culture) => _publishedData != null && _publishedData.CultureInfos.ContainsKey(culture);
+        public bool HasPublishedCulture(string culture) => _publishedData != null && (_publishedData.CultureInfos?.ContainsKey(culture) ?? false);
 
         // draft and published version (either can be null, but not both)
         // are models not direct PublishedContent instances
-        private IPublishedContent _draftModel;
-        private IPublishedContent _publishedModel;
-        private IPublishedModelFactory _publishedModelFactory;
+        private IPublishedContent? _draftModel;
+        private IPublishedContent? _publishedModel;
+        private IPublishedModelFactory? _publishedModelFactory;
 
-        private IPublishedContent GetModel(ref IPublishedContent model, ContentData contentData)
+        private IPublishedContent? GetModel(ref IPublishedContent? model, ContentData? contentData)
         {
             if (model != null) return model;
             if (contentData == null) return null;
@@ -166,13 +167,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // we know what we do, so it is fine here and avoids allocating an object
             lock (this)
             {
-                return model = model ?? m;
+                return model ??= m;
             }
         }
 
-        public IPublishedContent DraftModel => GetModel(ref _draftModel, _draftData);
+        public IPublishedContent? DraftModel => GetModel(ref _draftModel, _draftData);
 
-        public IPublishedContent PublishedModel => GetModel(ref _publishedModel, _publishedData);
+        public IPublishedContent? PublishedModel => GetModel(ref _publishedModel, _publishedData);
 
         public ContentNodeKit ToKit()
             => new ContentNodeKit(this, ContentType.Id, _draftData, _publishedData);

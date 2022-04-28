@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
 
         public string HashPassword(string password)
         {
-            return _underlyingHasher.HashPassword(null, password);
+            return _underlyingHasher.HashPassword(null!, password);
         }
     }
 }

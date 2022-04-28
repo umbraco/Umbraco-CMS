@@ -14,13 +14,19 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class Member : ContentBase, IMember
     {
-        private IDictionary<string, object> _additionalData;
+        private IDictionary<string, object?>? _additionalData;
         private string _username;
         private string _email;
-        private string _rawPasswordValue;
-        private string _passwordConfig;
+        private string? _rawPasswordValue;
+        private string? _passwordConfig;
         private DateTime? _emailConfirmedDate;
-        private string _securityStamp;
+        private string? _securityStamp;
+        private int _failedPasswordAttempts;
+        private bool _isApproved;
+        private bool _isLockedOut;
+        private DateTime? _lastLockoutDate;
+        private DateTime? _lastLoginDate;
+        private DateTime? _lastPasswordChangeDate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Member"/> class.
@@ -131,7 +137,7 @@ namespace Umbraco.Cms.Core.Models
         /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
         /// </param>
         /// <param name="contentType"></param>
-        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
+        public Member(string? name, string email, string username, string? rawPasswordValue, IMemberType? contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
             _email = email;
@@ -190,7 +196,7 @@ namespace Umbraco.Cms.Core.Models
         public string Username
         {
             get => _username;
-            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
+            set => SetPropertyValueAndDetectChanges(value, ref _username!, nameof(Username));
         }
 
         /// <summary>
@@ -200,7 +206,7 @@ namespace Umbraco.Cms.Core.Models
         public string Email
         {
             get => _email;
-            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
+            set => SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
         }
 
         [DataMember]
@@ -214,7 +220,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the raw password value
         /// </summary>
         [IgnoreDataMember]
-        public string RawPasswordValue
+        public string? RawPasswordValue
         {
             get => _rawPasswordValue;
             set
@@ -233,7 +239,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         [IgnoreDataMember]
-        public string PasswordConfiguration
+        public string? PasswordConfiguration
         {
             get => _passwordConfig;
             set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
@@ -243,7 +249,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Groups that Member is part of
         /// </summary>
         [DataMember]
-        public IEnumerable<string> Groups { get; set; }
+        public IEnumerable<string>? Groups { get; set; }
 
         // TODO: When get/setting all of these properties we MUST:
         // * Check if we are using the umbraco membership provider, if so then we need to use the configured fields - not the explicit fields below
@@ -257,7 +263,7 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public string Comments
+        public string? Comments
         {
             get
             {
@@ -265,9 +271,9 @@ namespace Umbraco.Cms.Core.Models
                 if (a.Success == false)
                     return a.Result;
 
-                return Properties[Constants.Conventions.Member.Comments].GetValue() == null
+                return Properties[Constants.Conventions.Member.Comments]?.GetValue() == null
                     ? string.Empty
-                    : Properties[Constants.Conventions.Member.Comments].GetValue().ToString();
+                    : Properties[Constants.Conventions.Member.Comments]?.GetValue()?.ToString();
             }
             set
             {
@@ -276,46 +282,18 @@ namespace Umbraco.Cms.Core.Models
                     nameof(Comments)) == false)
                     return;
 
-                Properties[Constants.Conventions.Member.Comments].SetValue(value);
+                Properties[Constants.Conventions.Member.Comments]?.SetValue(value);
             }
         }
 
         /// <summary>
-        /// Gets or sets a boolean indicating whether the Member is approved
+        /// Gets or sets a value indicating whether the Member is approved
         /// </summary>
-        /// <remarks>
-        /// Alias: umbracoMemberApproved
-        /// Part of the standard properties collection.
-        /// </remarks>
         [DataMember]
         public bool IsApproved
         {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, nameof(IsApproved),
-                    //This is the default value if the prop is not found
-                    true);
-                if (a.Success == false)
-                    return a.Result;
-                if (Properties[Constants.Conventions.Member.IsApproved].GetValue() == null)
-                    return true;
-                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].GetValue().TryConvertTo<bool>();
-                if (tryConvert.Success)
-                {
-                    return tryConvert.Result;
-                }
-                //if the property exists but it cannot be converted, we will assume true
-                return true;
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.IsApproved,
-                    nameof(IsApproved)) == false)
-                    return;
-
-                Properties[Constants.Conventions.Member.IsApproved].SetValue(value);
-            }
+            get => _isApproved;
+            set => SetPropertyValueAndDetectChanges(value, ref _isApproved, nameof(IsApproved));
         }
 
         /// <summary>
@@ -328,30 +306,8 @@ namespace Umbraco.Cms.Core.Models
         [DataMember]
         public bool IsLockedOut
         {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsLockedOut, nameof(IsLockedOut), false);
-                if (a.Success == false)
-                    return a.Result;
-                if (Properties[Constants.Conventions.Member.IsLockedOut].GetValue() == null)
-                    return false;
-                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].GetValue().TryConvertTo<bool>();
-                if (tryConvert.Success)
-                {
-                    return tryConvert.Result;
-                }
-                return false;
-                // TODO: Use TryConvertTo<T> instead
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.IsLockedOut,
-                    nameof(IsLockedOut)) == false)
-                    return;
-
-                Properties[Constants.Conventions.Member.IsLockedOut].SetValue(value);
-            }
+            get => _isLockedOut;
+            set => SetPropertyValueAndDetectChanges(value, ref _isLockedOut, nameof(IsLockedOut));
         }
 
         /// <summary>
@@ -362,32 +318,10 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public DateTime LastLoginDate
+        public DateTime? LastLoginDate
         {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLoginDate, nameof(LastLoginDate), default(DateTime));
-                if (a.Success == false)
-                    return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLoginDate].GetValue() == null)
-                    return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].GetValue().TryConvertTo<DateTime>();
-                if (tryConvert.Success)
-                {
-                    return tryConvert.Result;
-                }
-                return default(DateTime);
-                // TODO: Use TryConvertTo<T> instead
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.LastLoginDate,
-                    nameof(LastLoginDate)) == false)
-                    return;
-
-                Properties[Constants.Conventions.Member.LastLoginDate].SetValue(value);
-            }
+            get => _lastLoginDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastLoginDate, nameof(LastLoginDate));
         }
 
         /// <summary>
@@ -398,32 +332,10 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public DateTime LastPasswordChangeDate
+        public DateTime? LastPasswordChangeDate
         {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastPasswordChangeDate, nameof(LastPasswordChangeDate), default(DateTime));
-                if (a.Success == false)
-                    return a.Result;
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue() == null)
-                    return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue().TryConvertTo<DateTime>();
-                if (tryConvert.Success)
-                {
-                    return tryConvert.Result;
-                }
-                return default(DateTime);
-                // TODO: Use TryConvertTo<T> instead
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.LastPasswordChangeDate,
-                    nameof(LastPasswordChangeDate)) == false)
-                    return;
-
-                Properties[Constants.Conventions.Member.LastPasswordChangeDate].SetValue(value);
-            }
+            get => _lastPasswordChangeDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDate, nameof(LastPasswordChangeDate));
         }
 
         /// <summary>
@@ -434,32 +346,10 @@ namespace Umbraco.Cms.Core.Models
         /// Part of the standard properties collection.
         /// </remarks>
         [DataMember]
-        public DateTime LastLockoutDate
+        public DateTime? LastLockoutDate
         {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLockoutDate, nameof(LastLockoutDate), default(DateTime));
-                if (a.Success == false)
-                    return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].GetValue() == null)
-                    return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].GetValue().TryConvertTo<DateTime>();
-                if (tryConvert.Success)
-                {
-                    return tryConvert.Result;
-                }
-                return default(DateTime);
-                // TODO: Use TryConvertTo<T> instead
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.LastLockoutDate,
-                    nameof(LastLockoutDate)) == false)
-                    return;
-
-                Properties[Constants.Conventions.Member.LastLockoutDate].SetValue(value);
-            }
+            get => _lastLockoutDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastLockoutDate, nameof(LastLockoutDate));
         }
 
         /// <summary>
@@ -473,30 +363,8 @@ namespace Umbraco.Cms.Core.Models
         [DataMember]
         public int FailedPasswordAttempts
         {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.FailedPasswordAttempts, nameof(FailedPasswordAttempts), 0);
-                if (a.Success == false)
-                    return a.Result;
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue() == null)
-                    return default(int);
-                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue().TryConvertTo<int>();
-                if (tryConvert.Success)
-                {
-                    return tryConvert.Result;
-                }
-                return default(int);
-                // TODO: Use TryConvertTo<T> instead
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.FailedPasswordAttempts,
-                    nameof(FailedPasswordAttempts)) == false)
-                    return;
-
-                Properties[Constants.Conventions.Member.FailedPasswordAttempts].SetValue(value);
-            }
+            get => _failedPasswordAttempts;
+            set => SetPropertyValueAndDetectChanges(value, ref _failedPasswordAttempts, nameof(FailedPasswordAttempts));
         }
 
         /// <summary>
@@ -509,7 +377,7 @@ namespace Umbraco.Cms.Core.Models
         /// The security stamp used by ASP.Net identity
         /// </summary>
         [IgnoreDataMember]
-        public string SecurityStamp
+        public string? SecurityStamp
         {
             get => _securityStamp;
             set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
@@ -524,7 +392,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string LongStringPropertyValue { get; set; }
+        public string? LongStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
         /// </summary>
@@ -533,7 +401,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string ShortStringPropertyValue { get; set; }
+        public string? ShortStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
         /// </summary>
@@ -569,7 +437,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string PropertyTypeAlias { get; set; }
+        public string? PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
@@ -623,7 +491,7 @@ namespace Umbraco.Cms.Core.Models
         /// <inheritdoc />
         [DataMember]
         [DoNotClone]
-        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+        public IDictionary<string, object?>? AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object?>());
 
         /// <inheritdoc />
         [IgnoreDataMember]

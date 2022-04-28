@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp.Web.Caching;
@@ -13,6 +13,7 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
 
@@ -67,8 +68,11 @@ namespace Umbraco.Extensions
                         var headers = context.Response.GetTypedHeaders();
 
                         var cacheControl = headers.CacheControl;
-                        cacheControl.MustRevalidate = false;
-                        cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+                        if (cacheControl is not null)
+                        {
+                            cacheControl.MustRevalidate = false;
+                            cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+                        }
 
                         headers.CacheControl = cacheControl;
                     }

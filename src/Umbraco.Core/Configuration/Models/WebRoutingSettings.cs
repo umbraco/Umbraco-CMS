@@ -79,6 +79,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the Umbraco application URL.
         /// </summary>
-        public string UmbracoApplicationUrl { get; set; }
+        public string UmbracoApplicationUrl { get; set; } = null!;
     }
 }

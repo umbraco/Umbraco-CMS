@@ -1,20 +1,28 @@
 using System;
-using System.IO;
 using System.Reflection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
+using Serilog.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Serilog;
+using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Cms.Infrastructure.Logging.Serilog;
+using Umbraco.Cms.Web.Common.Logging.Enrichers;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Web.Common.Logging;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using ILogger = Serilog.ILogger;
 
 namespace Umbraco.Extensions
 {
@@ -23,6 +31,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Create and configure the logger
         /// </summary>
+        [Obsolete("Use the extension method that takes an IHostEnvironment instance instead.")]
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
             IHostingEnvironment hostingEnvironment,
@@ -64,16 +73,102 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Create and configure the logger.
+        /// </summary>
+        /// <remarks>
+        /// Additional Serilog services are registered during <see cref="HostBuilderExtensions.ConfigureUmbracoDefaults"/>.
+        /// </remarks>
+        public static IServiceCollection AddLogger(
+            this IServiceCollection services,
+            IHostEnvironment hostEnvironment,
+            IConfiguration configuration)
+        {
+            // TODO: WEBSITE_RUN_FROM_PACKAGE - can't assume this DIR is writable - we have an IConfiguration instance so a later refactor should be easy enough.
+            var loggingDir = hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
+            ILoggingConfiguration loggingConfig = new LoggingConfiguration(loggingDir);
+
+            var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
+
+            services.TryAddSingleton(umbracoFileConfiguration);
+            services.TryAddSingleton(loggingConfig);
+            services.TryAddSingleton<Serilog.Core.ILogEventEnricher, ApplicationIdEnricher>();
+
+            ///////////////////////////////////////////////
+            // Bootstrap logger setup
+            ///////////////////////////////////////////////
+
+            LoggerConfiguration serilogConfig = new LoggerConfiguration()
+                .MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
+                .ReadFrom.Configuration(configuration);
+
+            Log.Logger = serilogConfig.CreateBootstrapLogger();
+
+            ///////////////////////////////////////////////
+            // Runtime logger setup
+            ///////////////////////////////////////////////
+
+            services.AddSingleton(sp =>
+            {
+                var logger = new RegisteredReloadableLogger(Log.Logger as ReloadableLogger);
+
+                logger.Reload(cfg =>
+                {
+                    cfg.MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
+                        .ReadFrom.Configuration(configuration)
+                        .ReadFrom.Services(sp);
+
+                    return cfg;
+                });
+
+                return logger;
+            });
+
+            services.AddSingleton<Serilog.ILogger>(sp =>
+            {
+                ILogger logger = sp.GetRequiredService<RegisteredReloadableLogger>().Logger;
+                return logger.ForContext(new NoopEnricher());
+            });
+
+            services.AddSingleton<ILoggerFactory>(sp =>
+            {
+                ILogger logger = sp.GetRequiredService<RegisteredReloadableLogger>().Logger;
+                return new SerilogLoggerFactory(logger, false);
+            });
+
+            // Registered to provide two services...
+            var diagnosticContext = new DiagnosticContext(Log.Logger);
+
+            // Consumed by e.g. middleware
+            services.TryAddSingleton(diagnosticContext);
+
+            // Consumed by user code
+            services.TryAddSingleton<IDiagnosticContext>(diagnosticContext);
+
+            return services;
+        }
+
+        /// <summary>
         /// Called to create the <see cref="TypeLoader"/> to assign to the <see cref="IUmbracoBuilder"/>
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="entryAssembly"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="configuration"></param>
-        /// <param name="profiler"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// This should never be called in a web project. It is used internally by Umbraco but could be used in unit tests.
+        /// If called in a web project it will have no affect except to create and return a new TypeLoader but this will not
+        /// be the instance in DI.
+        /// </remarks>
+        [Obsolete("Please use alternative extension method.")]
+        public static TypeLoader AddTypeLoader(
+            this IServiceCollection services,
+            Assembly entryAssembly,
+            IHostingEnvironment hostingEnvironment,
+            ILoggerFactory loggerFactory,
+            AppCaches appCaches,
+            IConfiguration configuration,
+            IProfiler profiler) =>
+            services.AddTypeLoader(entryAssembly, loggerFactory, configuration);
+
+        /// <summary>
+        /// Called to create the <see cref="TypeLoader"/> to assign to the <see cref="IUmbracoBuilder"/>
+        /// </summary>
         /// <remarks>
         /// This should never be called in a web project. It is used internally by Umbraco but could be used in unit tests.
         /// If called in a web project it will have no affect except to create and return a new TypeLoader but this will not
@@ -82,11 +177,8 @@ namespace Umbraco.Extensions
         public static TypeLoader AddTypeLoader(
             this IServiceCollection services,
             Assembly entryAssembly,
-            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
-            AppCaches appCaches,
-            IConfiguration configuration,
-            IProfiler profiler)
+            IConfiguration configuration)
         {
             TypeFinderSettings typeFinderSettings = configuration.GetSection(Cms.Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
 
@@ -95,30 +187,14 @@ namespace Umbraco.Extensions
                 loggerFactory,
                 typeFinderSettings.AdditionalEntryAssemblies);
 
-            RuntimeHashPaths runtimeHashPaths = new RuntimeHashPaths().AddAssemblies(assemblyProvider);
-
-            var runtimeHash = new RuntimeHash(
-                new ProfilingLogger(
-                    loggerFactory.CreateLogger<RuntimeHash>(),
-                    profiler),
-                runtimeHashPaths);
-
             var typeFinderConfig = new TypeFinderConfig(Options.Create(typeFinderSettings));
 
             var typeFinder = new TypeFinder(
                 loggerFactory.CreateLogger<TypeFinder>(),
                 assemblyProvider,
-                typeFinderConfig
-            );
+                typeFinderConfig);
 
-            var typeLoader = new TypeLoader(
-                typeFinder,
-                runtimeHash,
-                appCaches.RuntimeCache,
-                new DirectoryInfo(hostingEnvironment.LocalTempPath),
-                loggerFactory.CreateLogger<TypeLoader>(),
-                profiler
-            );
+            var typeLoader = new TypeLoader(typeFinder, loggerFactory.CreateLogger<TypeLoader>());
 
             // This will add it ONCE and not again which is what we want since we don't actually want people to call this method
             // in the web project.

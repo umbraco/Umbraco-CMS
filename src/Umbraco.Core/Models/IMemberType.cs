@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="propertyTypeAlias">PropertyType Alias of the Property to check</param>
         /// <returns></returns>
-        bool MemberCanEditProperty(string propertyTypeAlias);
+        bool MemberCanEditProperty(string? propertyTypeAlias);
 
         /// <summary>
         /// Gets a boolean indicating whether a Property is visible on the Members profile.

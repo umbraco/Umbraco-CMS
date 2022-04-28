@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 {
     public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IScopeAccessor _scopeAccessor;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly ILogger<MigrationPlanExecutor> _logger;
 
         public MigrationPlanExecutor(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IScopeAccessor scopeAccessor,
             ILoggerFactory loggerFactory,
             IMigrationBuilder migrationBuilder)
@@ -52,12 +52,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
 
-            if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition transition))
+            if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition? transition))
             {
                 plan.ThrowOnUnknownInitialState(nextState);
             }
 
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // We want to suppress scope (service, etc...) notifications during a migration plan
                 // execution. This is because if a package that doesn't have their migration plan
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 // that packages notification handlers may explode because that package isn't fully installed yet.
                 using (scope.Notifications.Suppress())
                 {
-                    var context = new MigrationContext(plan, _scopeAccessor.AmbientScope.Database, _loggerFactory.CreateLogger<MigrationContext>());
+                    var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database, _loggerFactory.CreateLogger<MigrationContext>());
 
                     while (transition != null)
                     {

@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -62,7 +63,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
             Azure = 5
         }
 
-        public override DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString)
+        public override DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString)
         {
             var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
             var fromSettings = false;
@@ -97,14 +98,14 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
                 ProductLevel = productLevel;
             }
 
-            public string Edition { get; }
-            public string InstanceName { get; }
-            public string ProductVersion { get; }
+            public string? Edition { get; }
+            public string? InstanceName { get; }
+            public string? ProductVersion { get; }
             public VersionName ProductVersionName { get; }
             public EngineEdition EngineEdition { get; }
             public bool IsAzure => EngineEdition == EngineEdition.Azure;
-            public string MachineName { get; }
-            public string ProductLevel { get; }
+            public string? MachineName { get; }
+            public string? ProductLevel { get; }
         }
 
         private static VersionName MapProductVersion(string productVersion)
@@ -137,7 +138,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
             }
         }
 
-        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, ILogger logger)
+        internal ServerVersionInfo GetSetVersion(string? connectionString, string? providerName, ILogger logger)
         {
             //var factory = DbProviderFactories.GetFactory(providerName);
             var factory = SqlClientFactory.Instance;
@@ -212,7 +213,7 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
         }
 
-        public override string DbProvider => ServerVersion.IsAzure ? "SqlAzure" : "SqlServer";
+        public override string DbProvider => ServerVersion?.IsAzure ?? false ? "SqlAzure" : "SqlServer";
 
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
@@ -268,7 +269,7 @@ order by T.name, I.name");
         }
 
         /// <inheritdoc />
-        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
+        public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName)
         {
             constraintName = db.Fetch<string>(@"select con.[name] as [constraintName]
 from sys.default_constraints con
@@ -288,12 +289,12 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             return result > 0;
         }
 
-        public override string FormatColumnRename(string tableName, string oldName, string newName)
+        public override string FormatColumnRename(string? tableName, string? oldName, string? newName)
         {
             return string.Format(RenameColumn, tableName, oldName, newName);
         }
 
-        public override string FormatTableRename(string oldName, string newName)
+        public override string FormatTableRename(string? oldName, string? newName)
         {
             return string.Format(RenameTable, oldName, newName);
         }
@@ -313,7 +314,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             return "IDENTITY(1,1)";
         }
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        protected override string? FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {
@@ -411,7 +412,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         #region Sql Inspection
 
-        private static SqlInspectionUtilities _sqlInspector;
+        private static SqlInspectionUtilities? _sqlInspector;
 
         private static SqlInspectionUtilities SqlInspector => _sqlInspector ?? (_sqlInspector = new SqlInspectionUtilities());
 
@@ -420,13 +421,13 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             private readonly Func<Sql, string> _getSqlText;
             private readonly Action<Sql, string> _setSqlText;
             private readonly Func<Sql, Sql> _getSqlRhs;
-            private readonly Action<Sql, string> _setSqlFinal;
+            private readonly Action<Sql, string?> _setSqlFinal;
 
             public SqlInspectionUtilities()
             {
                 (_getSqlText, _setSqlText) = ReflectionUtilities.EmitFieldGetterAndSetter<Sql, string>("_sql");
                 _getSqlRhs = ReflectionUtilities.EmitFieldGetter<Sql, Sql>("_rhs");
-                _setSqlFinal = ReflectionUtilities.EmitFieldSetter<Sql, string>("_sqlFinal");
+                _setSqlFinal = ReflectionUtilities.EmitFieldSetter<Sql, string?>("_sqlFinal");
             }
 
             public string GetSqlText(Sql sql) => _getSqlText(sql);

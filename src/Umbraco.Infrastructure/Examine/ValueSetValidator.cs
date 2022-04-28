@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Infrastructure.Examine
     public class ValueSetValidator : IValueSetValidator
     {
         public ValueSetValidator(
-            IEnumerable<string> includeItemTypes,
-            IEnumerable<string> excludeItemTypes,
-            IEnumerable<string> includeFields,
-            IEnumerable<string> excludeFields)
+            IEnumerable<string>? includeItemTypes,
+            IEnumerable<string>? excludeItemTypes,
+            IEnumerable<string>? includeFields,
+            IEnumerable<string>? excludeFields)
         {
             IncludeItemTypes = includeItemTypes;
             ExcludeItemTypes = excludeItemTypes;
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             ValidIndexCategories = null;
         }
 
-        protected virtual IEnumerable<string> ValidIndexCategories { get; }
+        protected virtual IEnumerable<string>? ValidIndexCategories { get; }
 
         /// <summary>
         /// Optional inclusion list of content types to index
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <remarks>
         /// All other types will be ignored if they do not match this list
         /// </remarks>
-        public IEnumerable<string> IncludeItemTypes { get; }
+        public IEnumerable<string>? IncludeItemTypes { get; }
 
         /// <summary>
         /// Optional exclusion list of content types to ignore
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <remarks>
         /// Any content type alias matched in this will not be included in the index
         /// </remarks>
-        public IEnumerable<string> ExcludeItemTypes { get; }
+        public IEnumerable<string>? ExcludeItemTypes { get; }
 
         /// <summary>
         /// Optional inclusion list of index fields to index
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <remarks>
         /// If specified, all other fields in a <see cref="ValueSet"/> will be filtered
         /// </remarks>
-        public IEnumerable<string> IncludeFields { get; }
+        public IEnumerable<string>? IncludeFields { get; }
 
         /// <summary>
         /// Optional exclusion list of index fields
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <remarks>
         /// If specified, all fields matching these field names will be filtered from the <see cref="ValueSet"/>
         /// </remarks>
-        public IEnumerable<string> ExcludeFields { get; }
+        public IEnumerable<string>? ExcludeFields { get; }
 
         public virtual ValueSetValidationResult Validate(ValueSet valueSet)
         {

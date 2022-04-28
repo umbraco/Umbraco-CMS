@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Core.Models
     {
         private readonly GlobalSettings _globalSettings;
 
-        private string _isoCode;
-        private string _cultureName;
+        private string _isoCode = null!;
+        private string? _cultureName;
         private bool _isDefaultVariantLanguage;
         private bool _mandatory;
         private int? _fallbackLanguageId;
@@ -33,12 +33,12 @@ namespace Umbraco.Cms.Core.Models
         public string IsoCode
         {
             get => _isoCode;
-            set => SetPropertyValueAndDetectChanges(value, ref _isoCode, nameof(IsoCode));
+            set => SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
         }
 
         /// <inheritdoc />
         [DataMember]
-        public string CultureName
+        public string? CultureName
         {
             // CultureInfo.DisplayName is the name in the installed .NET language
             //            .NativeName is the name in culture info's language
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public CultureInfo CultureInfo => CultureInfo.GetCultureInfo(IsoCode);
+        public CultureInfo? CultureInfo => IsoCode is not null ? CultureInfo.GetCultureInfo(IsoCode) : null;
 
         /// <inheritdoc />
         public bool IsDefault

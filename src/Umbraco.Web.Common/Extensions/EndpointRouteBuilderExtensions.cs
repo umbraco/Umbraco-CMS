@@ -15,11 +15,11 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             Type controllerType,
             string rootSegment,
-            string areaName,
-            string prefixPathSegment,
+            string? areaName,
+            string? prefixPathSegment,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
-            object constraints = null)
+            object? constraints = null)
         {
             var controllerName = ControllerExtensions.GetControllerName(controllerType);
 
@@ -57,7 +57,7 @@ namespace Umbraco.Extensions
 
                     // named consistently
                     $"umbraco-{areaName}-{controllerName}".ToLowerInvariant(),
-                    areaName,
+                    areaName!,
                     pattern.ToString().ToLowerInvariant(),
                     defaults,
                     constraints);
@@ -72,10 +72,10 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             string rootSegment,
             string areaName,
-            string prefixPathSegment,
+            string? prefixPathSegment,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
-            object constraints = null)
+            object? constraints = null)
             where T : ControllerBase
             => endpoints.MapUmbracoRoute(typeof(T), rootSegment, areaName, prefixPathSegment, defaultAction, includeControllerNameInRoute, constraints);
 
@@ -89,7 +89,7 @@ namespace Umbraco.Extensions
             string areaName,
             bool isBackOffice,
             string defaultAction = "Index",
-            object constraints = null)
+            object? constraints = null)
             where T : ControllerBase
             => endpoints.MapUmbracoApiRoute(typeof(T), rootSegment, areaName, isBackOffice, defaultAction, constraints);
 
@@ -100,12 +100,12 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             Type controllerType,
             string rootSegment,
-            string areaName,
+            string? areaName,
             bool isBackOffice,
             string defaultAction = "Index",
-            object constraints = null)
+            object? constraints = null)
         {
-            string prefixPathSegment = isBackOffice
+            string? prefixPathSegment = isBackOffice
                 ? areaName.IsNullOrWhiteSpace()
                     ? $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/Api"
                     : $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"
@@ -127,13 +127,13 @@ namespace Umbraco.Extensions
             this IEndpointRouteBuilder endpoints,
             Type controllerType,
             string rootSegment,
-            string areaName,
+            string? areaName,
             string defaultAction = "Index",
             bool includeControllerNameInRoute = true,
-            object constraints = null)
+            object? constraints = null)
         {
             // If there is an area name it's a plugin controller, and we should use the area name instead of surface
-            string prefixPathSegment = areaName.IsNullOrWhiteSpace() ? "Surface" : areaName;
+            string prefixPathSegment = areaName.IsNullOrWhiteSpace() ? "Surface" : areaName!;
 
             endpoints.MapUmbracoRoute(
                 controllerType,

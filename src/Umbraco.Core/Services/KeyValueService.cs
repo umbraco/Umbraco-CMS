@@ -8,28 +8,28 @@ namespace Umbraco.Cms.Core.Services
 {
     internal class KeyValueService : IKeyValueService
     {
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IKeyValueRepository _repository;
 
-        public KeyValueService(IScopeProvider scopeProvider, IKeyValueRepository repository)
+        public KeyValueService(ICoreScopeProvider scopeProvider, IKeyValueRepository repository)
         {
             _scopeProvider = scopeProvider;
             _repository = repository;
         }
 
         /// <inheritdoc />
-        public string GetValue(string key)
+        public string? GetValue(string key)
         {
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _repository.Get(key)?.Value;
             }
         }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix)
+        public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
         {
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _repository.FindByKeyPrefix(keyPrefix);
             }
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetValue(string key, string value)
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.KeyValues);
 
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public bool TrySetValue(string key, string originalValue, string newValue)
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.KeyValues);
 

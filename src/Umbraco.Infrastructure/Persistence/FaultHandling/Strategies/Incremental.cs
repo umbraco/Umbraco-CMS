@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
         /// <param name="retryCount">The number of retry attempts.</param>
         /// <param name="initialInterval">The initial interval that will apply for the first retry.</param>
         /// <param name="increment">The incremental time value that will be used for calculating the progressive delay between retries.</param>
-        public Incremental(string name, int retryCount, TimeSpan initialInterval, TimeSpan increment)
+        public Incremental(string? name, int retryCount, TimeSpan initialInterval, TimeSpan increment)
             : this(name, retryCount, initialInterval, increment, DefaultFirstFastRetry)
         {
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
         /// <param name="initialInterval">The initial interval that will apply for the first retry.</param>
         /// <param name="increment">The incremental time value that will be used for calculating the progressive delay between retries.</param>
         /// <param name="firstFastRetry">a value indicating whether or not the very first retry attempt will be made immediately whereas the subsequent retries will remain subject to retry interval.</param>
-        public Incremental(string name, int retryCount, TimeSpan initialInterval, TimeSpan increment, bool firstFastRetry)
+        public Incremental(string? name, int retryCount, TimeSpan initialInterval, TimeSpan increment, bool firstFastRetry)
             : base(name, firstFastRetry)
         {
             //Guard.ArgumentNotNegativeValue(retryCount, "retryCount");

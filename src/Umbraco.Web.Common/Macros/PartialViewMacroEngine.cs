@@ -59,11 +59,11 @@ namespace Umbraco.Cms.Web.Common.Macros
             }
 
             HttpContext httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            
+
             RouteData currentRouteData = httpContext.GetRouteData();
 
             // Check if there's proxied ViewData (i.e. returned from a SurfaceController)
-            ProxyViewDataFeature proxyViewDataFeature = httpContext.Features.Get<ProxyViewDataFeature>();
+            ProxyViewDataFeature? proxyViewDataFeature = httpContext.Features.Get<ProxyViewDataFeature>();
             ViewDataDictionary viewData = proxyViewDataFeature?.ViewData ?? new ViewDataDictionary(_modelMetadataProvider, new ModelStateDictionary());
             ITempDataDictionary tempData = proxyViewDataFeature?.TempData ?? _tempDataDictionaryFactory.GetTempData(httpContext);
 
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             var writer = new StringWriter();
             var viewComponentContext = new ViewComponentContext(
                 new ViewComponentDescriptor(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 HtmlEncoder.Default,
                 viewContext,
                 writer);

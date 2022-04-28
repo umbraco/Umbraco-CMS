@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// <summary>
         /// Deserialize the data into a <see cref="ContentCacheDataModel"/>
         /// </summary>
-        ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published);
+        ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData, bool published);
 
         /// <summary>
         /// Serializes the <see cref="ContentCacheDataModel"/>

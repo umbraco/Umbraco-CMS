@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Persistence
         /// <summary>
         /// Gets entities.
         /// </summary>
-        IEnumerable<TEntity> Get(IQuery<TEntity> query);
+        IEnumerable<TEntity>? Get(IQuery<TEntity> query);
 
         /// <summary>
         /// Counts entities.

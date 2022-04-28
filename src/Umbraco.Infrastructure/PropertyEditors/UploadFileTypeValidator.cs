@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
@@ -26,9 +27,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             contentSettings.OnChange(x => _contentSettings = x);
         }
 
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
-            string selectedFiles = null;
+            string? selectedFiles = null;
             if (value is JObject jobject && jobject["selectedFiles"] is JToken jToken)
             {
                 selectedFiles = jToken.ToString();
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
         }
 
-        internal static bool IsValidFileExtension(string fileName, ContentSettings contentSettings)
+        internal static bool IsValidFileExtension(string? fileName, ContentSettings contentSettings)
         {
             if (TryGetFileExtension(fileName, out var extension) is false)
                 return false;
@@ -65,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return contentSettings.IsFileAllowedForUpload(extension);
         }
 
-        internal static bool IsAllowedInDataTypeConfiguration(string filename, object dataTypeConfiguration)
+        internal static bool IsAllowedInDataTypeConfiguration(string? filename, object? dataTypeConfiguration)
         {
             if (TryGetFileExtension(filename, out var extension) is false)
                 return false;
@@ -75,17 +76,19 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
                 // If there are any extensions specified, we need to check that the uploaded extension is one of them.
                 return fileUploadConfiguration.FileExtensions.IsCollectionEmpty() ||
-                       fileUploadConfiguration.FileExtensions.Any(x => x.Value.InvariantEquals(extension));
+                       fileUploadConfiguration.FileExtensions.Any(x => x.Value?.InvariantEquals(extension) ?? false);
             }
 
             return false;
         }
 
-        internal static bool TryGetFileExtension(string fileName, out string extension)
+        internal static bool TryGetFileExtension(string? fileName, [MaybeNullWhen(false)] out string extension)
         {
             extension = null;
-            if (fileName.IndexOf('.') <= 0)
+            if (fileName is null || fileName.IndexOf('.') <= 0)
+            {
                 return false;
+            }
 
             extension = fileName.GetFileExtension().TrimStart(".");
             return true;

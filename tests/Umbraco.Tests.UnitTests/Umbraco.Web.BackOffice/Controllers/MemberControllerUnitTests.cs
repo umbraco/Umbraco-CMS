@@ -520,13 +520,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     new Mock<IHostingEnvironment>().Object,
                     new Mock<IOptionsMonitor<ContentSettings>>().Object)
             });
-            var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
+            var scopeProvider = Mock.Of<ICoreScopeProvider>(x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
                 It.IsAny<IScopedNotificationPublisher>(),
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
-                It.IsAny<bool>()) == Mock.Of<IScope>());
+                It.IsAny<bool>()) == Mock.Of<ICoreScope>());
 
             _mapper = new UmbracoMapper(map, scopeProvider);
 
@@ -594,7 +595,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 Path = member.Path
             };
 
-            memberDisplay = new MemberDisplay()
+            memberDisplay = new MemberDisplay
             {
                 Id = memberId,
                 SortOrder = member.SortOrder,
@@ -609,33 +610,57 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 ContentTypeName = member.ContentType.Name,
                 Icon = fakeMemberData.Icon,
                 Path = member.Path,
-                Tabs = new List<Tab<ContentPropertyDisplay>>()
+                Tabs = new List<Tab<ContentPropertyDisplay>>
                 {
-                    new Tab<ContentPropertyDisplay>()
+                    new()
                     {
                         Alias = "test",
                         Id = 77,
-                        Properties = new List<ContentPropertyDisplay>()
+                        Properties = new List<ContentPropertyDisplay>
                         {
-                            new ContentPropertyDisplay()
+                            new()
                             {
-                                Alias = "_umb_login"
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
                             },
-                            new ContentPropertyDisplay()
+                            new()
                             {
-                                Alias= "_umb_email"
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
                             },
-                            new ContentPropertyDisplay()
+                            new()
                             {
-                                Alias = "_umb_password"
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                             },
-                            new ContentPropertyDisplay()
+                            new()
                             {
-                                Alias = "_umb_membergroup"
-                            }
-                        }
-                    }
-                }
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
+                            },
+                            new()
+                            {
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}failedPasswordAttempts",
+                            },
+                            new()
+                            {
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved",
+                            },
+                            new()
+                            {
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut",
+                            },
+                            new()
+                            {
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLockoutDate",
+                            },
+                            new()
+                            {
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLoginDate",
+                            },
+                            new()
+                            {
+                                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastPasswordChangeDate",
+                            },
+                        },
+                    },
+                },
             };
 
             return member;

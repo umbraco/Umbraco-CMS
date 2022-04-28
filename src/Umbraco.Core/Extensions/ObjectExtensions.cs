@@ -22,9 +22,9 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class ObjectExtensions
     {
-        private static readonly ConcurrentDictionary<Type, Type> NullableGenericCache = new ConcurrentDictionary<Type, Type>();
-        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
-        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
+        private static readonly ConcurrentDictionary<Type, Type?> NullableGenericCache = new ConcurrentDictionary<Type, Type?>();
+        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> InputTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?>();
+        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?> DestinationTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter?>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> AssignableTypeCache = new ConcurrentDictionary<CompositeTypeTypeKey, bool>();
         private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new ConcurrentDictionary<Type, bool>();
 
@@ -61,7 +61,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static T SafeCast<T>(this object input)
+        public static T? SafeCast<T>(this object input)
         {
             if (ReferenceEquals(null, input) || ReferenceEquals(default(T), input)) return default;
             if (input is T variable) return variable;
@@ -75,13 +75,13 @@ namespace Umbraco.Extensions
         /// <typeparam name="T">The type to convert to</typeparam>
         /// <param name="input">The input.</param>
         /// <returns>The <see cref="Attempt{T}"/></returns>
-        public static Attempt<T> TryConvertTo<T>(this object input)
+        public static Attempt<T> TryConvertTo<T>(this object? input)
         {
-            Attempt<object> result = TryConvertTo(input, typeof(T));
+            Attempt<object?> result = TryConvertTo(input, typeof(T));
 
             if (result.Success)
             {
-                return Attempt<T>.Succeed((T)result.Result);
+                return Attempt<T>.Succeed((T?)result.Result);
             }
 
             if (input == null)
@@ -94,7 +94,7 @@ namespace Umbraco.Extensions
                 else
                 {
                     // sure, null can be any object
-                    return Attempt<T>.Succeed((T)input);
+                    return Attempt<T>.Succeed((T)input!);
                 }
             }
 
@@ -116,11 +116,11 @@ namespace Umbraco.Extensions
         /// <param name="input">The input.</param>
         /// <param name="target">The type to convert to</param>
         /// <returns>The <see cref="Attempt{Object}"/></returns>
-        public static Attempt<object> TryConvertTo(this object input, Type target)
+        public static Attempt<object?> TryConvertTo(this object? input, Type target)
         {
             if (target == null)
             {
-                return Attempt<object>.Fail();
+                return Attempt<object?>.Fail();
             }
 
             try
@@ -130,11 +130,11 @@ namespace Umbraco.Extensions
                     // Nullable is ok
                     if (target.IsGenericType && GetCachedGenericNullableType(target) != null)
                     {
-                        return Attempt<object>.Succeed(null);
+                        return Attempt<object?>.Succeed(null);
                     }
 
                     // Reference types are ok
-                    return Attempt<object>.If(target.IsValueType == false, null);
+                    return Attempt<object?>.If(target.IsValueType == false, null);
                 }
 
                 var inputType = input.GetType();
@@ -148,7 +148,7 @@ namespace Umbraco.Extensions
                 // Check for string so that overloaders of ToString() can take advantage of the conversion.
                 if (target == typeof(string))
                 {
-                    return Attempt<object>.Succeed(input.ToString());
+                    return Attempt<object?>.Succeed(input.ToString());
                 }
 
                 // If we've got a nullable of something, we try to convert directly to that thing.
@@ -165,7 +165,7 @@ namespace Umbraco.Extensions
                             // TODO: Why the check against only bool/date when a string is null/empty? In what scenario can we convert to another type when the string is null or empty other than just being null?
                             if (string.IsNullOrEmpty(inputString) && (underlying == typeof(DateTime) || underlying == typeof(bool)))
                             {
-                                return Attempt<object>.Succeed(null);
+                                return Attempt<object?>.Succeed(null);
                             }
                         }
 
@@ -179,7 +179,7 @@ namespace Umbraco.Extensions
                         }
                         else
                         {
-                            return Attempt<object>.Fail(inner.Exception);
+                            return Attempt<object?>.Fail(inner.Exception);
                         }
                     }
                 }
@@ -211,7 +211,7 @@ namespace Umbraco.Extensions
                 {
                     if (GetCachedCanConvertToBoolean(inputType))
                     {
-                        return Attempt.Succeed(CustomBooleanTypeConverter.ConvertFrom(input));
+                        return Attempt.Succeed(CustomBooleanTypeConverter.ConvertFrom(input!));
                     }
                 }
 
@@ -224,7 +224,7 @@ namespace Umbraco.Extensions
                 var outputConverter = GetCachedTargetTypeConverter(inputType, target);
                 if (outputConverter != null)
                 {
-                    return Attempt.Succeed(outputConverter.ConvertFrom(input));
+                    return Attempt.Succeed(outputConverter.ConvertFrom(input!));
                 }
 
                 if (target.IsGenericType && GetCachedGenericNullableType(target) != null)
@@ -243,10 +243,10 @@ namespace Umbraco.Extensions
             }
             catch (Exception e)
             {
-                return Attempt<object>.Fail(e);
+                return Attempt<object?>.Fail(e);
             }
 
-            return Attempt<object>.Fail();
+            return Attempt<object?>.Fail();
         }
 
         /// <summary>
@@ -256,12 +256,12 @@ namespace Umbraco.Extensions
         /// <param name="input">The input.</param>
         /// <param name="target">The type to convert to</param>
         /// <returns>The <see cref="Nullable{Attempt}"/></returns>
-        private static Attempt<object>? TryConvertToFromString(this string input, Type target)
+        private static Attempt<object?>? TryConvertToFromString(this string input, Type target)
         {
             // Easy
             if (target == typeof(string))
             {
-                return Attempt<object>.Succeed(input);
+                return Attempt<object?>.Succeed(input);
             }
 
             // Null, empty, whitespaces
@@ -270,13 +270,13 @@ namespace Umbraco.Extensions
                 if (target == typeof(bool))
                 {
                     // null/empty = bool false
-                    return Attempt<object>.Succeed(false);
+                    return Attempt<object?>.Succeed(false);
                 }
 
                 if (target == typeof(DateTime))
                 {
                     // null/empty = min DateTime value
-                    return Attempt<object>.Succeed(DateTime.MinValue);
+                    return Attempt<object?>.Succeed(DateTime.MinValue);
                 }
 
                 // Cannot decide here,
@@ -296,25 +296,25 @@ namespace Umbraco.Extensions
                 {
                     if (int.TryParse(input,  out var value))
                     {
-                        return Attempt<object>.Succeed(value);
+                        return Attempt<object?>.Succeed(value);
                     }
 
                     // Because decimal 100.01m will happily convert to integer 100, it
                     // makes sense that string "100.01" *also* converts to integer 100.
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.If(decimal.TryParse(input2,  out var value2), Convert.ToInt32(value2));
+                    return Attempt<object?>.If(decimal.TryParse(input2,  out var value2), Convert.ToInt32(value2));
                 }
 
                 if (target == typeof(long))
                 {
                     if (long.TryParse(input, out var value))
                     {
-                        return Attempt<object>.Succeed(value);
+                        return Attempt<object?>.Succeed(value);
                     }
 
                     // Same as int
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.If(decimal.TryParse(input2, out var value2), Convert.ToInt64(value2));
+                    return Attempt<object?>.If(decimal.TryParse(input2, out var value2), Convert.ToInt64(value2));
                 }
 
                 // TODO: Should we do the decimal trick for short, byte, unsigned?
@@ -323,7 +323,7 @@ namespace Umbraco.Extensions
                 {
                     if (bool.TryParse(input,  out var value))
                     {
-                        return Attempt<object>.Succeed(value);
+                        return Attempt<object?>.Succeed(value);
                     }
 
                     // Don't declare failure so the CustomBooleanTypeConverter can try
@@ -334,38 +334,38 @@ namespace Umbraco.Extensions
                 switch (Type.GetTypeCode(target))
                 {
                     case TypeCode.Int16:
-                        return Attempt<object>.If(short.TryParse(input, out var value), value);
+                        return Attempt<object?>.If(short.TryParse(input, out var value), value);
 
                     case TypeCode.Double:
                         var input2 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.If(double.TryParse(input2,  out var valueD), valueD);
+                        return Attempt<object?>.If(double.TryParse(input2,  out var valueD), valueD);
 
                     case TypeCode.Single:
                         var input3 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.If(float.TryParse(input3,  out var valueF), valueF);
+                        return Attempt<object?>.If(float.TryParse(input3,  out var valueF), valueF);
 
                     case TypeCode.Char:
-                        return Attempt<object>.If(char.TryParse(input, out var valueC), valueC);
+                        return Attempt<object?>.If(char.TryParse(input, out var valueC), valueC);
 
                     case TypeCode.Byte:
-                        return Attempt<object>.If(byte.TryParse(input, out var valueB), valueB);
+                        return Attempt<object?>.If(byte.TryParse(input, out var valueB), valueB);
 
                     case TypeCode.SByte:
-                        return Attempt<object>.If(sbyte.TryParse(input, out var valueSb), valueSb);
+                        return Attempt<object?>.If(sbyte.TryParse(input, out var valueSb), valueSb);
 
                     case TypeCode.UInt32:
-                        return Attempt<object>.If(uint.TryParse(input,  out var valueU), valueU);
+                        return Attempt<object?>.If(uint.TryParse(input,  out var valueU), valueU);
 
                     case TypeCode.UInt16:
-                        return Attempt<object>.If(ushort.TryParse(input,  out var valueUs), valueUs);
+                        return Attempt<object?>.If(ushort.TryParse(input,  out var valueUs), valueUs);
 
                     case TypeCode.UInt64:
-                        return Attempt<object>.If(ulong.TryParse(input,  out var valueUl), valueUl);
+                        return Attempt<object?>.If(ulong.TryParse(input,  out var valueUl), valueUl);
                 }
             }
             else if (target == typeof(Guid))
             {
-                return Attempt<object>.If(Guid.TryParse(input, out var value), value);
+                return Attempt<object?>.If(Guid.TryParse(input, out var value), value);
             }
             else if (target == typeof(DateTime))
             {
@@ -375,34 +375,34 @@ namespace Umbraco.Extensions
                     {
                         case DateTimeKind.Unspecified:
                         case DateTimeKind.Utc:
-                            return Attempt<object>.Succeed(value);
+                            return Attempt<object?>.Succeed(value);
 
                         case DateTimeKind.Local:
-                            return Attempt<object>.Succeed(value.ToUniversalTime());
+                            return Attempt<object?>.Succeed(value.ToUniversalTime());
 
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
 
-                return Attempt<object>.Fail();
+                return Attempt<object?>.Fail();
             }
             else if (target == typeof(DateTimeOffset))
             {
-                return Attempt<object>.If(DateTimeOffset.TryParse(input, out var value), value);
+                return Attempt<object?>.If(DateTimeOffset.TryParse(input, out var value), value);
             }
             else if (target == typeof(TimeSpan))
             {
-                return Attempt<object>.If(TimeSpan.TryParse(input, out var value), value);
+                return Attempt<object?>.If(TimeSpan.TryParse(input, out var value), value);
             }
             else if (target == typeof(decimal))
             {
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Attempt<object>.If(decimal.TryParse(input2, out var value), value);
+                return Attempt<object?>.If(decimal.TryParse(input2, out var value), value);
             }
             else if (input != null && target == typeof(Version))
             {
-                return Attempt<object>.If(Version.TryParse(input, out var value), value);
+                return Attempt<object?>.If(Version.TryParse(input, out var value), value);
             }
 
             // E_NOTIMPL IPAddress, BigInteger
@@ -489,9 +489,9 @@ namespace Umbraco.Extensions
         /// <param name="o"></param>
         /// <param name="ignoreProperties"></param>
         /// <returns></returns>
-        public static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o, params Expression<Func<T, TProperty>>[] ignoreProperties)
+        public static IDictionary<string, TVal>? ToDictionary<T, TProperty, TVal>(this T o, params Expression<Func<T, TProperty>>[] ignoreProperties)
         {
-            return o.ToDictionary<TVal>(ignoreProperties.Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
+            return o?.ToDictionary<TVal>(ignoreProperties.Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
         }
 
         /// <summary>
@@ -521,7 +521,7 @@ namespace Umbraco.Extensions
 
 
 
-        internal static string ToDebugString(this object obj, int levels = 0)
+        internal static string? ToDebugString(this object? obj, int levels = 0)
         {
             if (obj == null) return "{null}";
             try
@@ -538,10 +538,8 @@ namespace Umbraco.Extensions
                 {
                     return "[{0}]".InvariantFormat(obj);
                 }
-                if (obj is IEnumerable)
+                if (obj is IEnumerable enumerable)
                 {
-                    var enumerable = (obj as IEnumerable);
-
                     var items = (from object enumItem in enumerable let value = GetEnumPropertyDebugString(enumItem, levels) where value != null select value).Take(10).ToList();
 
                     return items.Any()
@@ -589,7 +587,7 @@ namespace Umbraco.Extensions
         /// <param name="value"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal static Attempt<string> TryConvertToXmlString(this object value, Type type)
+        internal static Attempt<string?> TryConvertToXmlString(this object value, Type type)
         {
             try
             {
@@ -598,7 +596,7 @@ namespace Umbraco.Extensions
             }
             catch (NotSupportedException ex)
             {
-                return Attempt<string>.Fail(ex);
+                return Attempt<string?>.Fail(ex);
             }
         }
 
@@ -611,7 +609,7 @@ namespace Umbraco.Extensions
         public static string ToXmlString(this object value, Type type)
         {
             if (value == null) return string.Empty;
-            if (type == typeof(string)) return (value.ToString().IsNullOrWhiteSpace() ? "" : value.ToString());
+            if (type == typeof(string)) return (value.ToString().IsNullOrWhiteSpace() ? "" : value.ToString()!);
             if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
             if (type == typeof(byte)) return XmlConvert.ToString((byte)value);
             if (type == typeof(char)) return XmlConvert.ToString((char)value);
@@ -644,7 +642,7 @@ namespace Umbraco.Extensions
             return value.ToXmlString(typeof (T));
         }
 
-        private static string GetEnumPropertyDebugString(object enumItem, int levels)
+        private static string? GetEnumPropertyDebugString(object enumItem, int levels)
         {
             try
             {
@@ -656,7 +654,7 @@ namespace Umbraco.Extensions
             }
         }
 
-        private static string GetPropertyDebugString(PropertyInfo propertyInfo, object obj, int levels)
+        private static string? GetPropertyDebugString(PropertyInfo propertyInfo, object obj, int levels)
         {
             try
             {
@@ -682,7 +680,7 @@ namespace Umbraco.Extensions
 
         // gets a converter for source, that can convert to target, or null if none exists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static TypeConverter GetCachedSourceTypeConverter(Type source, Type target)
+        private static TypeConverter? GetCachedSourceTypeConverter(Type source, Type target)
         {
             var key = new CompositeTypeTypeKey(source, target);
 
@@ -697,12 +695,13 @@ namespace Umbraco.Extensions
                 return InputTypeConverterCache[key] = converter;
             }
 
-            return InputTypeConverterCache[key] = null;
+            InputTypeConverterCache[key] = null;
+            return null;
         }
 
         // gets a converter for target, that can convert from source, or null if none exists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static TypeConverter GetCachedTargetTypeConverter(Type source, Type target)
+        private static TypeConverter? GetCachedTargetTypeConverter(Type source, Type target)
         {
             var key = new CompositeTypeTypeKey(source, target);
 
@@ -717,12 +716,13 @@ namespace Umbraco.Extensions
                 return DestinationTypeConverterCache[key] = converter;
             }
 
-            return DestinationTypeConverterCache[key] = null;
+            DestinationTypeConverterCache[key] = null;
+            return null;
         }
 
         // gets the underlying type of a nullable type, or null if the type is not nullable
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Type GetCachedGenericNullableType(Type type)
+        private static Type? GetCachedGenericNullableType(Type type)
         {
             if (NullableGenericCache.TryGetValue(type, out var underlyingType))
             {
@@ -731,11 +731,12 @@ namespace Umbraco.Extensions
 
             if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                Type underlying = Nullable.GetUnderlyingType(type);
+                Type? underlying = Nullable.GetUnderlyingType(type);
                 return NullableGenericCache[type] = underlying;
             }
 
-            return NullableGenericCache[type] = null;
+            NullableGenericCache[type] = null;
+            return null;
         }
 
         // gets an IConvertible from source to target type, or null if none exists

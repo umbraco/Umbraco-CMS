@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="errorMessage"></param>
         /// <returns></returns>
-        protected override ActionResult ValidationProblem(string errorMessage)
+        protected override ActionResult ValidationProblem(string? errorMessage)
             => ValidationProblem(errorMessage, string.Empty);
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="errorHeader"></param>
         /// <param name="errorMessage"></param>
         /// <returns></returns>
-        protected ActionResult ValidationProblem(string errorHeader, string errorMessage)
+        protected ActionResult ValidationProblem(string? errorHeader, string errorMessage)
         {
             var notificationModel = new SimpleNotificationModel
             {
@@ -66,6 +66,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // returning an object of INotificationModel will ensure that any pending
             // notification messages are added to the response.
             => new ValidationErrorResult(new SimpleNotificationModel());
-    
+
     }
 }

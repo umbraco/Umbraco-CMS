@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var store = umbracoContext.Content;
-            if (store.HasContent())
+            if (store?.HasContent() ?? false)
             {
                 // If there is actually content, go to the root.
                 return Redirect("~/");

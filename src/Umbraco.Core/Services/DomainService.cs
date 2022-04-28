@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IDomainRepository _domainRepository;
 
-        public DomainService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public DomainService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDomainRepository domainRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -21,17 +21,17 @@ namespace Umbraco.Cms.Core.Services
 
         public bool Exists(string domainName)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _domainRepository.Exists(domainName);
             }
         }
 
-        public Attempt<OperationResult> Delete(IDomain domain)
+        public Attempt<OperationResult?> Delete(IDomain domain)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var deletingNotification = new DomainDeletingNotification(domain, eventMessages);
                 if (scope.Notifications.PublishCancelable(deletingNotification))
@@ -49,17 +49,17 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(eventMessages);
         }
 
-        public IDomain GetByName(string name)
+        public IDomain? GetByName(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _domainRepository.GetByName(name);
             }
         }
 
-        public IDomain GetById(int id)
+        public IDomain? GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _domainRepository.Get(id);
             }
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _domainRepository.GetAll(includeWildcards);
             }
@@ -75,17 +75,17 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _domainRepository.GetAssignedDomains(contentId, includeWildcards);
             }
         }
 
-        public Attempt<OperationResult> Save(IDomain domainEntity)
+        public Attempt<OperationResult?> Save(IDomain domainEntity)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new DomainSavingNotification(domainEntity, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))

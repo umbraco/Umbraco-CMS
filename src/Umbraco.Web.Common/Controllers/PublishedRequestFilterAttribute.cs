@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// </summary>
         protected UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
         {
-            UmbracoRouteValues routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
+            UmbracoRouteValues? routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
             if (routeVals == null)
             {
                 throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");

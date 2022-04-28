@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private LoggingSettings _settings;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<LogScrubber> _logger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogScrubber"/> class.
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IServerRoleAccessor serverRegistrar,
             IAuditService auditService,
             IOptionsMonitor<LoggingSettings> settings,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             ILogger<LogScrubber> logger,
             IProfilingLogger profilingLogger)
             : base(logger, TimeSpan.FromHours(4), DefaultDelay)
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             settings.OnChange(x => _settings = x);
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             switch (_serverRegistrar.CurrentServerRole)
             {
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
 
             // Ensure we use an explicit scope since we are running on a background thread.
-            using (IScope scope = _scopeProvider.CreateScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             using (_profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs((int)_settings.MaxLogAge.TotalMinutes);

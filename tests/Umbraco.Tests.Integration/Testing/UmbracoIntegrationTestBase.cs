@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Serilog;
@@ -93,12 +94,17 @@ public abstract class UmbracoIntegrationTestBase
                         Log.Logger = new LoggerConfiguration()
                             .WriteTo.File(path, rollingInterval: RollingInterval.Day)
                             .MinimumLevel.Debug()
+                            .ReadFrom.Configuration(Configuration)
                             .CreateLogger();
 
                         builder.AddSerilog(Log.Logger);
                     });
                 case UmbracoTestOptions.Logger.Console:
-                    return LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug));
+                    return LoggerFactory.Create(builder =>
+                    {
+                        builder.AddConfiguration(Configuration.GetSection("Logging"))
+                            .AddConsole();
+                    });
             }
         }
         catch

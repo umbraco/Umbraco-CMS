@@ -127,7 +127,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string GetSpecialDbType(SpecialDbType dbType, int customSize) => GetSpecialDbType(dbType);
 
     /// <inheritdoc />
-    public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName,
+    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
         out string constraintName)
     {
         // TODO: SQLite
@@ -135,8 +135,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return false;
     }
 
-    public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector,
-        string tableAlias = null)
+    public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector,
+        string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
         var fieldName = GetColumnName(field!);
@@ -151,7 +151,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
-    protected override string FormatSystemMethods(SystemMethods systemMethod)
+    protected override string? FormatSystemMethods(SystemMethods systemMethod)
     {
         // TODO: SQLite
         switch (systemMethod)
@@ -181,7 +181,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
-        string referenceName = null, bool forInsert = false)
+        string? referenceName = null, bool forInsert = false)
     {
         if (forInsert)
         {
@@ -409,16 +409,16 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     private class SqliteMaster
     {
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public string Sql { get; set; }
+        public string Type { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string Sql { get; set; } = null!;
     }
 
     private class IndexMeta
     {
-        public string TableName { get; set; }
-        public string IndexName { get; set; }
-        public string ColumnName { get; set; }
+        public string TableName { get; set; } = null!;
+        public string IndexName { get; set; } = null!;
+        public string ColumnName { get; set; } = null!;
         public bool IsUnique { get; set; }
     }
 }

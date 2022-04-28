@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _fileSystem = fileSystem;
         }
 
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? WebUtility.UrlDecode(id).TrimStart("/")
@@ -73,6 +73,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         }
 
         // We don't have any menu item options (such as create/delete/reload) & only use the root node to load a custom UI
-        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings) => null;
+        protected override ActionResult<MenuItemCollection>? GetMenuForNode(string id, FormCollection queryStrings) => null;
     }
 }

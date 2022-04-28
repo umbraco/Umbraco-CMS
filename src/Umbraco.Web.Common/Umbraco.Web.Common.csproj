@@ -1,51 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <OutputType>Library</OutputType>
-        <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
-        <PackageId>Umbraco.Cms.Web.Common</PackageId>
-        <Title>Umbraco CMS Web</Title>
-        <Description>Contains the Web assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
+    <PackageId>Umbraco.Cms.Web.Common</PackageId>
+    <Title>Umbraco CMS Web</Title>
+    <Description>Contains the Web assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\Umbraco.Web.Common.xml</DocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DocumentationFile>bin\Release\Umbraco.Web.Common.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-      <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
-      <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-      <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
-      <PackageReference Include="NETStandard.Library" Version="2.0.3" />
-      <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
-      <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.0" />
-      <PackageReference Include="Smidge.Nuglify" Version="4.0.3" />
-      <PackageReference Include="Smidge.InMemory" Version="4.0.3" />
-      <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-      <PackageReference Include="Umbraco.Code" Version="2.0.0">
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.4" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
+    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.0" />
+    <PackageReference Include="Smidge.InMemory" Version="4.0.4" />
+    <PackageReference Include="Smidge.Nuglify" Version="4.0.4" />
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

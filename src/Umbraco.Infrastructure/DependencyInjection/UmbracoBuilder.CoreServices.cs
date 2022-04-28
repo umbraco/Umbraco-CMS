@@ -55,6 +55,7 @@ using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -73,8 +74,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
             builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
             builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-            builder.NPocoMappers().Add<NullableDateMapper>();
-            builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+            builder.NPocoMappers()?.Add<NullableDateMapper>();
+            builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
 
             builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
             builder.Services.AddSingleton<IRuntime, CoreRuntime>();
@@ -93,11 +94,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
-            builder.Mappers().AddCoreMappers();
+            builder.Mappers()?.AddCoreMappers();
 
             // register the scope provider
             builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
-            builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<ICoreScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<Infrastructure.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
 
 
@@ -117,7 +120,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register the manifest filter collection builder (collection is empty by default)
             builder.ManifestFilters();
 
-            builder.MediaUrlGenerators()
+            builder.MediaUrlGenerators()?
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 
@@ -147,7 +150,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We will remove the basic one defined
             // in core so that the more enhanced version is active.
-            builder.PropertyValueConverters()
+            builder.PropertyValueConverters()?
                 .Remove<SimpleTinyMceValueConverter>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
@@ -201,6 +204,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddSingleton<PackageDataInstallation>();
 
+            builder.Services.AddTransient<INodeCountService, NodeCountService>();
             builder.AddInstaller();
 
             // Services required to run background jobs (with out the handler)
@@ -263,7 +267,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
         {
-            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
+            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()?
                 .Append<RenamingPreValueMigrator>()
                 .Append<RichTextPreValueMigrator>()
                 .Append<UmbracoSliderPreValueMigrator>()

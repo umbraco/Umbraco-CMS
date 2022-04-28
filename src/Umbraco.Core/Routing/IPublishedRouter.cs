@@ -47,6 +47,6 @@ namespace Umbraco.Cms.Core.Routing
         /// content matched we want to run the request through the last chance finders.
         /// </para>
         /// </remarks>
-        Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent publishedContent);
+        Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent? publishedContent);
     }
 }

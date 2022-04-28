@@ -12,11 +12,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     /// </summary>
     public class MigrationPlan
     {
-        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly Dictionary<string, Transition?> _transitions = new Dictionary<string, Transition?>(StringComparer.InvariantCultureIgnoreCase);
         private readonly List<Type> _postMigrationTypes = new List<Type>();
 
-        private string _prevState;
-        private string _finalState;
+        private string? _prevState;
+        private string? _finalState;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <summary>
         /// Gets the transitions.
         /// </summary>
-        public IReadOnlyDictionary<string, Transition> Transitions => _transitions;
+        public IReadOnlyDictionary<string, Transition?> Transitions => _transitions;
 
         public IReadOnlyList<Type> PostMigrationTypes => _postMigrationTypes;
 
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         public string Name { get; }
 
         // adds a transition
-        private MigrationPlan Add(string sourceState, string targetState, Type migration)
+        private MigrationPlan Add(string? sourceState, string targetState, Type? migration)
         {
             if (sourceState == null)
                 throw new ArgumentNullException(nameof(sourceState), $"{nameof(sourceState)} is null, {nameof(MigrationPlan)}.{nameof(MigrationPlan.From)} must not have been called.");
@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <summary>
         /// Adds a transition to a target state through a migration.
         /// </summary>
-        public MigrationPlan To(string targetState, Type migration)
+        public MigrationPlan To(string targetState, Type? migration)
             => Add(_prevState, targetState, migration);
 
         public MigrationPlan To(Guid targetState, Type migration)
@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <summary>
         /// Sets the starting state.
         /// </summary>
-        public MigrationPlan From(string sourceState)
+        public MigrationPlan From(string? sourceState)
         {
             _prevState = sourceState ?? throw new ArgumentNullException(nameof(sourceState));
             return this;
@@ -192,18 +192,18 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             while (state != endState)
             {
-                if (visited.Contains(state))
+                if (state is null || visited.Contains(state))
                     throw new InvalidOperationException("A loop was detected in the copied chain.");
                 visited.Add(state);
 
                 if (!_transitions.TryGetValue(state, out var transition))
                     throw new InvalidOperationException($"There is no transition from state \"{state}\".");
 
-                var newTargetState = transition.TargetState == endState
+                var newTargetState = transition?.TargetState == endState
                     ? targetState
                     : CreateRandomState();
-                To(newTargetState, transition.MigrationType);
-                state = transition.TargetState;
+                To(newTargetState, transition?.MigrationType);
+                state = transition?.TargetState;
             }
 
             return this;
@@ -255,7 +255,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 if (_finalState == null)
                     Validate();
 
-                return _finalState;
+                return _finalState!;
             }
         }
 
@@ -272,7 +272,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             // that is not null and does not match any source state. such a target state has
             // been registered as a source state with a null transition. so there should be only
             // one.
-            string finalState = null;
+            string? finalState = null;
             foreach (var kvp in _transitions.Where(x => x.Value == null))
             {
                 if (finalState == null)
@@ -302,7 +302,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 verified.AddRange(visited);
             }
 
-            _finalState = finalState;
+            _finalState = finalState!;
         }
 
         /// <summary>
@@ -317,9 +317,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// Follows a path (for tests and debugging).
         /// </summary>
         /// <remarks>Does the same thing Execute does, but does not actually execute migrations.</remarks>
-        internal IReadOnlyList<string> FollowPath(string fromState = null, string toState = null)
+        internal IReadOnlyList<string> FollowPath(string? fromState = null, string? toState = null)
         {
-            toState = toState.NullOrWhiteSpaceAsNull();
+            toState = toState?.NullOrWhiteSpaceAsNull();
 
             Validate();
 

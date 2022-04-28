@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Security
             // Else we need to detect what the password is. This will be the case
             // for upgrades since no password config will exist.
 
-            byte[] decodedHashedPassword = null;
+            byte[]? decodedHashedPassword = null;
             bool isAspNetIdentityHash = false;
 
             try
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Security
             // check for default ASP.NET Identity password hash flags
             if (isAspNetIdentityHash)
             {
-                if (decodedHashedPassword[0] == 0x00 || decodedHashedPassword[0] == 0x01)
+                if (decodedHashedPassword?[0] == 0x00 || decodedHashedPassword?[0] == 0x01)
                 {
                     return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
                 }

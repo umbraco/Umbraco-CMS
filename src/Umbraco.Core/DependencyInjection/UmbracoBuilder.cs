@@ -25,7 +25,7 @@ using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -42,14 +42,13 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
-        private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
+        private readonly Dictionary<Type, ICollectionBuilder?> _builders = new Dictionary<Type, ICollectionBuilder?>();
 
         public IServiceCollection Services { get; }
 
@@ -61,7 +60,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <inheritdoc />
-        public IHostingEnvironment BuilderHostingEnvironment { get; }
+        public IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         public IProfiler Profiler { get; }
 
@@ -84,7 +83,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             ILoggerFactory loggerFactory,
             IProfiler profiler,
             AppCaches appCaches,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment? hostingEnvironment)
         {
             Services = services;
             Config = config;
@@ -102,17 +101,17 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
         /// <returns>The collection builder.</returns>
-        public TBuilder WithCollectionBuilder<TBuilder>()
+        public TBuilder? WithCollectionBuilder<TBuilder>()
             where TBuilder : ICollectionBuilder
         {
             Type typeOfBuilder = typeof(TBuilder);
 
-            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder o))
+            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder? o))
             {
-                return (TBuilder)o;
+                return (TBuilder?)o;
             }
 
-            TBuilder builder;
+            TBuilder? builder;
 
             if (typeof(TBuilder).GetConstructor(Type.EmptyTypes) != null)
             {
@@ -121,7 +120,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             else if (typeof(TBuilder).GetConstructor(new[] { typeof(IUmbracoBuilder) }) != null)
             {
                 // Handle those collection builders which need a reference to umbraco builder i.e. DistributedLockingCollectionBuilder.
-                builder = (TBuilder)Activator.CreateInstance(typeof(TBuilder), this);
+                builder = (TBuilder?)Activator.CreateInstance(typeof(TBuilder), this);
             }
             else
             {
@@ -134,9 +133,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
         public void Build()
         {
-            foreach (ICollectionBuilder builder in _builders.Values)
+            foreach (ICollectionBuilder? builder in _builders.Values)
             {
-                builder.RegisterWith(Services);
+                builder?.RegisterWith(Services);
             }
 
             _builders.Clear();
@@ -148,7 +147,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton(Profiler);
 
             // Register as singleton to allow injection everywhere.
-            Services.AddSingleton<ServiceFactory>(p => p.GetService);
+            Services.AddSingleton<ServiceFactory>(p => p.GetService!);
             Services.AddSingleton<IEventAggregator, EventAggregator>();
 
             Services.AddLazySupport();
@@ -200,7 +199,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
-            Services.AddUnique<IUserDataService, UserDataService>();
+            Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
             Services.AddUnique<IInstallationService, InstallationService>();
@@ -309,7 +308,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
-                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
                 factory.GetRequiredService<IExternalLoginWithKeyRepository>()

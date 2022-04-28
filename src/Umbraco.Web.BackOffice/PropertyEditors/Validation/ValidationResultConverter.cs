@@ -39,12 +39,12 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
 
         public override bool CanConvert(Type objectType) => typeof(ValidationResult).IsAssignableFrom(objectType);
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             var camelCaseSerializer = new JsonSerializer
             {
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
             foreach (var c in serializer.Converters)
                 camelCaseSerializer.Converters.Add(c);
 
-            var validationResult = (ValidationResult)value;
+            var validationResult = (ValidationResult?)value;
 
             if (validationResult is ComplexEditorValidationResult nestedResult && nestedResult.ValidationResults.Count > 0)
             {
@@ -139,12 +139,12 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
                 }
 
                 var jo = new JObject();
-                if (!validationResult.ErrorMessage.IsNullOrWhiteSpace())
+                if (!validationResult?.ErrorMessage.IsNullOrWhiteSpace() ?? false)
                 {
-                    var errObj = JToken.FromObject(validationResult.ErrorMessage, camelCaseSerializer);
+                    var errObj = JToken.FromObject(validationResult!.ErrorMessage!, camelCaseSerializer);
                     jo.Add("errorMessage", errObj);
                 }
-                if (validationResult.MemberNames.Any())
+                if (validationResult?.MemberNames.Any() ?? false)
                 {
                     var memberNamesObj = JToken.FromObject(validationResult.MemberNames, camelCaseSerializer);
                     jo.Add("memberNames", memberNamesObj);

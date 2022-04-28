@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// </example>
     public class ModelType : Type
     {
-        private ModelType(string contentTypeAlias)
+        private ModelType(string? contentTypeAlias)
         {
             if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
             if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// </summary>
         /// <param name="alias">The published element type alias.</param>
         /// <returns>The model type for the published element type.</returns>
-        public static ModelType For(string alias)
+        public static ModelType For(string? alias)
             => new ModelType(alias);
 
         /// <summary>
@@ -50,25 +50,25 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <param name="type">The type.</param>
         /// <param name="modelTypes">The model types map.</param>
         /// <returns>The actual CLR type.</returns>
-        public static Type Map(Type type, Dictionary<string, Type> modelTypes)
+        public static Type Map(Type type, Dictionary<string, Type>? modelTypes)
             => Map(type, modelTypes, false);
 
-        public static Type Map(Type type, Dictionary<string, Type> modelTypes, bool dictionaryIsInvariant)
+        public static Type Map(Type type, Dictionary<string, Type>? modelTypes, bool dictionaryIsInvariant)
         {
             // it may be that senders forgot to send an invariant dictionary (garbage-in)
-            if (!dictionaryIsInvariant)
+            if (modelTypes is not null && !dictionaryIsInvariant)
                 modelTypes = new Dictionary<string, Type>(modelTypes, StringComparer.InvariantCultureIgnoreCase);
 
             if (type is ModelType modelType)
             {
-                if (modelTypes.TryGetValue(modelType.ContentTypeAlias, out var actualType))
+                if (modelTypes?.TryGetValue(modelType.ContentTypeAlias, out var actualType) ?? false)
                     return actualType;
                 throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
             }
 
             if (type is ModelTypeArrayType arrayType)
             {
-                if (modelTypes.TryGetValue(arrayType.ContentTypeAlias, out var actualType))
+                if (modelTypes?.TryGetValue(arrayType.ContentTypeAlias, out var actualType) ?? false)
                     return actualType.MakeArrayType();
                 throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
             }
@@ -113,13 +113,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             if (type.IsGenericType == false)
-                return type.FullName;
+                return type.FullName!;
             var def = type.GetGenericTypeDefinition();
             if (def == null)
                 throw new PanicException($"The type {type} has not generic type definition");
 
             var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
-            var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));
+            var defFullName = def.FullName?.Substring(0, def.FullName.IndexOf('`'));
             return defFullName + "<" + string.Join(", ", args) + ">";
         }
 
@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<ConstructorInfo>();
 
         /// <inheritdoc />
-        protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+        protected override ConstructorInfo? GetConstructorImpl(BindingFlags bindingAttr, Binder? binder, CallingConventions callConvention, Type[] types, ParameterModifier[]? modifiers)
             => null;
 
         /// <inheritdoc />
@@ -174,7 +174,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<Type>();
 
         /// <inheritdoc />
-        public override Type GetInterface(string name, bool ignoreCase)
+        public override Type? GetInterface(string name, bool ignoreCase)
             => null;
 
         /// <inheritdoc />
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<EventInfo>();
 
         /// <inheritdoc />
-        public override EventInfo GetEvent(string name, BindingFlags bindingAttr)
+        public override EventInfo? GetEvent(string name, BindingFlags bindingAttr)
             => null;
 
         /// <inheritdoc />
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<Type>();
 
         /// <inheritdoc />
-        public override Type GetNestedType(string name, BindingFlags bindingAttr)
+        public override Type? GetNestedType(string name, BindingFlags bindingAttr)
             => null;
 
         /// <inheritdoc />
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<PropertyInfo>();
 
         /// <inheritdoc />
-        protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
+        protected override PropertyInfo? GetPropertyImpl(string name, BindingFlags bindingAttr, Binder? binder, Type? returnType, Type[]? types, ParameterModifier[]? modifiers)
             => null;
 
         /// <inheritdoc />
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<MethodInfo>();
 
         /// <inheritdoc />
-        protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+        protected override MethodInfo? GetMethodImpl(string name, BindingFlags bindingAttr, Binder? binder, CallingConventions callConvention, Type[]? types, ParameterModifier[]? modifiers)
             => null;
 
         /// <inheritdoc />
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => Array.Empty<FieldInfo>();
 
         /// <inheritdoc />
-        public override FieldInfo GetField(string name, BindingFlags bindingAttr)
+        public override FieldInfo? GetField(string name, BindingFlags bindingAttr)
             => null;
 
         /// <inheritdoc />
@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => false;
 
         /// <inheritdoc />
-        public override Type GetElementType()
+        public override Type? GetElementType()
             => null;
 
         /// <inheritdoc />
@@ -262,14 +262,14 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             => false;
 
         /// <inheritdoc />
-        public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
+        public override object InvokeMember(string name, BindingFlags invokeAttr, Binder? binder, object? target, object?[]? args, ParameterModifier[]? modifiers, CultureInfo? culture, string[]? namedParameters)
             => throw new NotSupportedException();
 
         /// <inheritdoc />
         public override Type UnderlyingSystemType => this;
 
         /// <inheritdoc />
-        public override Type BaseType => null;
+        public override Type? BaseType => null;
 
         /// <inheritdoc />
         public override string Name { get; }
@@ -319,43 +319,43 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
             => Array.Empty<ConstructorInfo>();
 
-        protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+        protected override ConstructorInfo? GetConstructorImpl(BindingFlags bindingAttr, Binder? binder, CallingConventions callConvention, Type[] types, ParameterModifier[]? modifiers)
             => null;
 
         public override Type[] GetInterfaces()
             => Array.Empty<Type>();
 
-        public override Type GetInterface(string name, bool ignoreCase)
+        public override Type? GetInterface(string name, bool ignoreCase)
             => null;
 
         public override EventInfo[] GetEvents(BindingFlags bindingAttr)
             => Array.Empty<EventInfo>();
 
-        public override EventInfo GetEvent(string name, BindingFlags bindingAttr)
+        public override EventInfo? GetEvent(string name, BindingFlags bindingAttr)
             => null;
 
         public override Type[] GetNestedTypes(BindingFlags bindingAttr)
             => Array.Empty<Type>();
 
-        public override Type GetNestedType(string name, BindingFlags bindingAttr)
+        public override Type? GetNestedType(string name, BindingFlags bindingAttr)
             => null;
 
         public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
             => Array.Empty<PropertyInfo>();
 
-        protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
+        protected override PropertyInfo? GetPropertyImpl(string name, BindingFlags bindingAttr, Binder? binder, Type? returnType, Type[]? types, ParameterModifier[]? modifiers)
             => null;
 
         public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
             => Array.Empty<MethodInfo>();
 
-        protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+        protected override MethodInfo? GetMethodImpl(string name, BindingFlags bindingAttr, Binder? binder, CallingConventions callConvention, Type[]? types, ParameterModifier[]? modifiers)
             => null;
 
         public override FieldInfo[] GetFields(BindingFlags bindingAttr)
             => Array.Empty<FieldInfo>();
 
-        public override FieldInfo GetField(string name, BindingFlags bindingAttr)
+        public override FieldInfo? GetField(string name, BindingFlags bindingAttr)
             => null;
 
         public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
@@ -390,13 +390,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         protected override bool IsCOMObjectImpl()
             => false;
-        public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
+        public override object InvokeMember(string name, BindingFlags invokeAttr, Binder? binder, object? target, object?[]? args, ParameterModifier[]? modifiers, CultureInfo? culture, string[]? namedParameters)
         {
             throw new NotSupportedException();
         }
 
         public override Type UnderlyingSystemType => this;
-        public override Type BaseType => null;
+        public override Type? BaseType => null;
 
         public override string Name { get; }
         public override Guid GUID { get; } = Guid.NewGuid();

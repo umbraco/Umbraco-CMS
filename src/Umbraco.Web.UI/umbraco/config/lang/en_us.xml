@@ -579,17 +579,19 @@
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
+    <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
       Edit the different language versions for the dictionary item '<em>%0%</em>' below
-   ]]></key>
+   ]]>    </key>
     <key alias="displayName">Culture Name</key>
     <key alias="changeKeyError"><![CDATA[
       The key '%0%' already exists.
-   ]]></key>
+   ]]>    </key>
     <key alias="overviewTitle">Dictionary overview</key>
   </area>
   <area alias="examineManagement">
@@ -860,6 +862,7 @@
     <key alias="url">URL</key>
     <key alias="user">User</key>
     <key alias="username">Username</key>
+    <key alias="validate">Validate</key>
     <key alias="value">Value</key>
     <key alias="view">View</key>
     <key alias="welcome">Welcome...</key>
@@ -931,7 +934,7 @@
     <key alias="databaseHeader">Database configuration</key>
     <key alias="databaseInstall"><![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]></key>
+    ]]>    </key>
     <key alias="databaseInstallDone">
       <![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
@@ -949,7 +952,7 @@
       <p>
       Don't worry - no content will be deleted and everything will continue working afterwards!
       </p>
-      ]]></key>
+      ]]>    </key>
     <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br/>Press <strong>Next</strong> to
       proceed. ]]></key>
     <key alias="databaseUpToDate">
@@ -995,19 +998,19 @@
     <key alias="permissionsText"><![CDATA[
       Umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.
       It also stores temporary data (aka: cache) for enhancing the performance of your website.
-    ]]></key>
+    ]]>    </key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own Document Types and templates.
         (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
-      ]]></key>
+      ]]>    </key>
     <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
     <key alias="runwayInstalled">Runway is installed</key>
     <key alias="runwayInstalledText"><![CDATA[
       You have the foundation in place. Select what modules you wish to install on top of it.<br />
       This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>
-      ]]></key>
+      ]]>    </key>
     <key alias="runwayOnlyProUsers">Only recommended for experienced users</key>
     <key alias="runwaySimpleSite">I want to start with a simple website</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
@@ -1021,7 +1024,7 @@
         <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br />
         <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.
         </small>
-      ]]></key>
+      ]]>    </key>
     <key alias="runwayWhatIsRunway">What is Runway</key>
     <key alias="step1">Step 1/5 Accept license</key>
     <key alias="step2">Step 2/5: Database configuration</key>
@@ -1098,72 +1101,78 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 								<tr>
 									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
 										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
-										<div> </div>
-										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
-									</td>
-									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
-					<tr>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
-							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
-								<br>
-								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
-									<tr>
-										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
-											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
-												<tr>
-													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
-														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
 															Password reset requested
 														</h1>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Your username to login to the Umbraco backoffice is: <strong>%0%</strong>
-														</p>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
-																<tbody>
-																	<tr>
-																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+</p>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+<tbody>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Click this link to reset your password
 																			</a>
-																		</td>
-																	</tr>
-																</tbody>
-															</table>
-														</p>
-														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>
-															<table border='0' cellpadding='0' cellspacing='0'>
-																<tr>
-																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
-																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
-																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
-																		</font>
-																	</td>
-																</tr>
-															</table>
-														</p>
-													</td>
-												</tr>
-											</table>
-										</td>
-									</tr>
-								</table>
-								<br><br><br>
-							</div>
-						</td>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-					</tr>
-				</table>
-			</body>
-		</html>
-	]]></key>
+</td>
+</tr>
+</tbody>
+</table>
+</p>
+<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>
+<table border='0' cellpadding='0' cellspacing='0'>
+<tr>
+<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+</font>
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>
+	]]>    </key>
+    <key alias="2faTitle">One last step</key>
+    <key alias="2faText">You have enabled 2-factor authentication and must verify your identity.</key>
+    <key alias="2faMultipleText">Please choose a 2-factor provider</key>
+    <key alias="2faCodeInput">Verification code</key>
+    <key alias="2faCodeInputHelp">Please enter the verification code</key>
+    <key alias="2faInvalidCode">Invalid code entered</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -1203,7 +1212,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       Have a nice day!
 
       Cheers from the Umbraco robot
-    ]]></key>
+    ]]>    </key>
     <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
     <key alias="mailBodyHtml"><![CDATA[
         <html>
@@ -1220,70 +1229,70 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 								<tr>
 									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
 										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
-										<div> </div>
-										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
-									</td>
-									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
-					<tr>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
-							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
-								<br>
-								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
-									<tr>
-										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
-											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
-												<tr>
-													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
-														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
 															Hi %0%,
 														</h1>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															This is an automated mail to inform you that the task <strong>'%1%'</strong> has been performed on the page <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> by the user <strong>'%3%'</strong>
-														</p>
-														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
-															<tbody>
-																<tr>
-																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
-																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
-																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a> </td> </tr></tbody></table>
-																	</td>
-																</tr>
-															</tbody>
-														</table>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															<h3>Update summary:</h3>
+</p>
+<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+<tbody>
+<tr>
+<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a></td></tr></tbody></table>
+</td>
+</tr>
+</tbody>
+</table>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<h3>Update summary:</h3>
 															%6%
 														</p>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Have a nice day!<br /><br />
 															Cheers from the Umbraco robot
 														</p>
-													</td>
-												</tr>
-											</table>
-										</td>
-									</tr>
-								</table>
-								<br><br><br>
-							</div>
-						</td>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-					</tr>
-				</table>
-			</body>
-		</html>
-	]]></key>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>
+	]]>    </key>
     <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>The following languages have been modified:</p>
         %0%
-    ]]></key>
+    ]]>    </key>
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
     <key alias="notifications">Notifications</key>
   </area>
@@ -1294,7 +1303,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="chooseLocalPackageText"><![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
-      ]]></key>
+      ]]>    </key>
     <key alias="deletewarning">This will delete the package</key>
     <key alias="includeAllChildNodes">Include all child nodes</key>
     <key alias="installed">Installed</key>
@@ -1386,22 +1395,22 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="invalidPublishBranchPermissions">Insufficient user permissions to publish all descendant documents</key>
     <key alias="contentPublishedFailedIsTrashed"><![CDATA[
       %0% could not be published because the item is in the recycle bin.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedExpired"><![CDATA[
       %0% could not be published because the item has expired.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because some properties did not pass validation rules.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% could not be published, a 3rd party add-in cancelled the action.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedByMissingName">
       <![CDATA[%0% can not be published, because its missing a name.]]></key>
     <key alias="contentPublishedFailedReqCultureValidationError">Validation failed for required language '%0%'. This
@@ -1414,7 +1423,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishAll">Publish %0% and all its subpages</key>
     <key alias="publishHelp"><![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
       You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.
-      ]]></key>
+      ]]>    </key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">You have not configured any approved colors</key>
@@ -1692,23 +1701,23 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="renderBodyDesc"><![CDATA[
      Renders the contents of a child template, by inserting a
      <code>@RenderBody()</code> placeholder.
-      ]]></key>
+      ]]>    </key>
     <key alias="defineSection">Define a named section</key>
     <key alias="defineSectionDesc"><![CDATA[
          Defines a part of your template as a named section by wrapping it in
           <code>@section { ... }</code>. This can be rendered in a
           specific area of the parent of this template, by using <code>@RenderSection</code>.
-      ]]></key>
+      ]]>    </key>
     <key alias="renderSection">Render a named section</key>
     <key alias="renderSectionDesc"><![CDATA[
       Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.
       This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.
-      ]]></key>
+      ]]>    </key>
     <key alias="sectionName">Section Name</key>
     <key alias="sectionMandatory">Section is mandatory</key>
     <key alias="sectionMandatoryDesc"><![CDATA[
             If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.
-    ]]></key>
+    ]]>    </key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
     <key alias="iWant">I want</key>
@@ -2000,7 +2009,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       Have a nice day!
 
       Cheers from the Umbraco robot
-    ]]></key>
+    ]]>    </key>
     <key alias="noTranslators">No translator users found. Please create a translator user before you start sending
       content to translation
     </key>
@@ -2176,6 +2185,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       you. Click the circle above to upload your photo.
     </key>
     <key alias="writer">Writer</key>
+    <key alias="configureTwoFactor">Configure Two-Factor</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
@@ -2200,82 +2210,82 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 								<tr>
 									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
 										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
-										<div> </div>
-										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
-									</td>
-									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
-					<tr>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
-							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
-								<br>
-								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
-									<tr>
-										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
-											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
-												<tr>
-													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
-														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
 															Hi %0%,
 														</h1>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															You have been invited by <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
 														</p>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Message from <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
 															<br/>
-															<em>%2%</em>
-														</p>
-														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
-															<tbody>
-																<tr>
-																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
-																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
-																			<tbody>
-																				<tr>
-																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+<em>%2%</em>
+</p>
+<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+<tbody>
+<tr>
+<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+<tbody>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Click this link to accept the invite
 																						</a>
-																					</td>
-																				</tr>
-																			</tbody>
-																		</table>
-																	</td>
-																</tr>
-															</tbody>
-														</table>
-														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>
-															<table border='0' cellpadding='0' cellspacing='0'>
-																<tr>
-																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
-																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
-																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
-																		</font>
-																	</td>
-																</tr>
-															</table>
-														</p>
-													</td>
-												</tr>
-											</table>
-										</td>
-									</tr>
-								</table>
-								<br><br><br>
-							</div>
-						</td>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-					</tr>
-				</table>
-			</body>
-    </html>]]></key>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>
+<table border='0' cellpadding='0' cellspacing='0'>
+<tr>
+<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+</font>
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>]]></key>
     <key alias="defaultInvitationMessage">Resending invitation...</key>
     <key alias="deleteUser">Delete User</key>
     <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
@@ -2283,6 +2293,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stateActive">Active</key>
     <key alias="stateDisabled">Disabled</key>
     <key alias="stateLockedOut">Locked out</key>
+    <key alias="stateApproved">Approved</key>
     <key alias="stateInvited">Invited</key>
     <key alias="stateInactive">Inactive</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
@@ -2291,6 +2302,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="sortCreateDateDescending">Oldest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
+    <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
+    <key alias="2faProviderIsEnabled">This two-factor provider is enabled</key>
+    <key alias="2faProviderIsDisabledMsg">This two-factor provider is now disabled</key>
+    <key alias="2faProviderIsNotDisabledMsg">Something went wrong with trying to disable this two-factor provider</key>
+    <key alias="2faDisableForUser">Do you want to disable this two-factor provider for this user?</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
@@ -2495,6 +2511,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsAnalytics">Analytics</key>
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
@@ -2760,7 +2777,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
-    <key alias="headlineEditorAppearance">Editor apperance</key>
+    <key alias="headlineEditorAppearance">Editor appearance</key>
     <key alias="headlineDataModels">Data models</key>
     <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
     <key alias="labelBackgroundColor">Background color</key>
@@ -2849,5 +2866,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="treeSearch">
     <key alias="searchResult">item returned</key>
     <key alias="searchResults">items returned</key>
+  </area>
+  <area alias="analytics">
+    <key alias="consentForAnalytics">Consent for analytics</key>
+    <key alias="analyticsLevelSavedSuccess">Analytics level saved!</key>
   </area>
 </language>

@@ -47,12 +47,12 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         }
 
         /// <inheritdoc />
-        public async Task<Attempt<string>> ValidateRequestAsync(HttpContext httpContext)
+        public async Task<Attempt<string?>> ValidateRequestAsync(HttpContext httpContext)
         {
             try
             {
                 await _internalAntiForgery.ValidateRequestAsync(httpContext);
-                return Attempt<string>.Succeed();
+                return Attempt<string?>.Succeed();
             }
             catch (Exception ex)
             {

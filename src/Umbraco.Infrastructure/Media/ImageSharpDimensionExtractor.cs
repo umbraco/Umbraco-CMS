@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Media
         /// <returns>
         /// The dimension of the image.
         /// </returns>
-        public Size? GetDimensions(Stream stream)
+        public Size? GetDimensions(Stream? stream)
         {
             Size? size = null;
 

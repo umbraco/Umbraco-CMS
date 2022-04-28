@@ -34,12 +34,12 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private bool _pendingRebuild;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<InMemoryModelFactory> _logger;
-        private readonly FileSystemWatcher _watcher;
+        private readonly FileSystemWatcher? _watcher;
         private int _ver;
-        private int _skipver;
+        private int? _skipver;
         private readonly int _debugLevel;
-        private RoslynCompiler _roslynCompiler;
-        private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
+        private RoslynCompiler? _roslynCompiler;
+        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly ApplicationPartManager _applicationPartManager;
         private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
         private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
-        private readonly Lazy<string> _pureLiveDirectory;
+        private readonly Lazy<string> _pureLiveDirectory = null!;
         private bool _disposedValue;
 
 
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
         }
 
-        public event EventHandler ModelsChanged;
+        public event EventHandler? ModelsChanged;
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// <remarks>
         /// Can be null
         /// </remarks>
-        public Assembly CurrentModelsAssembly { get; private set; }
+        public Assembly? CurrentModelsAssembly { get; private set; }
 
         /// <inheritdoc />
         public object SyncRoot { get; } = new object();
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// This is required because the razor engine will only try to load things from the default context, it doesn't know anything
         /// about our context so we need to proxy.
         /// </remarks>
-        private Assembly OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
+        private Assembly? OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
             => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
                 ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
                 : null;
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         public IPublishedElement CreateModel(IPublishedElement element)
         {
             // get models, rebuilding them if needed
-            Dictionary<string, ModelInfo> infos = EnsureModels()?.ModelInfos;
+            Dictionary<string, ModelInfo>? infos = EnsureModels()?.ModelInfos;
             if (infos == null)
             {
                 return element;
@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             infos.TryGetValue(contentTypeAlias, out var info);
 
             // create model
-            return info == null ? element : info.Ctor(element, _publishedValueFallback);
+            return info is null || info.Ctor is null ? element : info.Ctor(element, _publishedValueFallback);
         }
 
         // this runs only once the factory is ready
@@ -179,30 +179,36 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         // this runs only once the factory is ready
         // NOT when building models
-        public IList CreateModelList(string alias)
+        public IList CreateModelList(string? alias)
         {
             Infos infos = EnsureModels();
 
             // fail fast
-            if (infos == null)
+            if (infos is null || alias is null)
             {
                 return new List<IPublishedElement>();
             }
 
-            if (!infos.ModelInfos.TryGetValue(alias, out ModelInfo modelInfo))
+            if (infos.ModelInfos is null || !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo))
             {
                 return new List<IPublishedElement>();
             }
 
-            Func<IList> ctor = modelInfo.ListCtor;
+            Func<IList>? ctor = modelInfo.ListCtor;
             if (ctor != null)
             {
                 return ctor();
             }
 
+            if (modelInfo.ModelType is null)
+            {
+                return new List<IPublishedElement>();
+            }
+
             Type listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
             ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
-            return ctor();
+
+            return ctor is null ? new List<IPublishedElement>() : ctor();
         }
 
         /// <inheritdoc />
@@ -360,7 +366,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 _currentAssemblyLoadContext.Unload();
 
                 // we need to remove the current part too
-                ApplicationPart currentPart = _applicationPartManager.ApplicationParts.FirstOrDefault(x => x.Name == RoslynCompiler.GeneratedAssemblyName);
+                ApplicationPart? currentPart = _applicationPartManager.ApplicationParts.FirstOrDefault(x => x.Name == RoslynCompiler.GeneratedAssemblyName);
                 if (currentPart != null)
                 {
                     _applicationPartManager.ApplicationParts.Remove(currentPart);
@@ -454,14 +460,14 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                     {
                         assembly = ReloadAssembly(dllPath);
 
-                        ModelsBuilderAssemblyAttribute attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+                        ModelsBuilderAssemblyAttribute? attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.IsInMemory && attr.SourceHash == currentHash)
                         {
                             // if we were to resume at that revision, then _ver would keep increasing
                             // and that is probably a bad idea - so, we'll always rebuild starting at
                             // ver 1, but we remember we want to skip that one - so we never end up
                             // with the "same but different" version of the assembly in memory
-                            _skipver = assembly.GetName().Version.Revision;
+                            _skipver = assembly.GetName().Version?.Revision;
 
                             _logger.LogDebug("Loading cached models (dll).");
                             return assembly;
@@ -561,8 +567,13 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             if (File.Exists(dllPathFile))
             {
                 var dllPath = File.ReadAllText(dllPathFile);
-                DirectoryInfo dirInfo = new DirectoryInfo(dllPath).Parent;
-                IEnumerable<FileInfo> files = dirInfo.GetFiles().Where(f => f.FullName != dllPath);
+                DirectoryInfo? dirInfo = new DirectoryInfo(dllPath).Parent;
+                IEnumerable<FileInfo>? files = dirInfo?.GetFiles().Where(f => f.FullName != dllPath);
+                if (files is null)
+                {
+                    return;
+                }
+
                 foreach (FileInfo file in files)
                 {
                     try
@@ -626,8 +637,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             foreach (Type type in types)
             {
-                ConstructorInfo constructor = null;
-                Type parameterType = null;
+                ConstructorInfo? constructor = null;
+                Type? parameterType = null;
 
                 foreach (ConstructorInfo ctor in type.GetConstructors())
                 {
@@ -649,12 +660,12 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                     throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
                 }
 
-                PublishedModelAttribute attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
+                PublishedModelAttribute? attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))
                 {
-                    throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
+                    throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType?.FullName} want to be a model type for content type with alias \"{typeName}\".");
                 }
 
                 // TODO: use Core's ReflectionUtilities.EmitCtor !!
@@ -800,8 +811,12 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             {
                 if (disposing)
                 {
-                    _watcher.EnableRaisingEvents = false;
-                    _watcher.Dispose();
+                    if (_watcher is not null)
+                    {
+                        _watcher.EnableRaisingEvents = false;
+                        _watcher.Dispose();
+                    }
+
                     _locker.Dispose();
                 }
 
@@ -817,20 +832,20 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         internal class Infos
         {
-            public Dictionary<string, Type> ModelTypeMap { get; set; }
+            public Dictionary<string, Type>? ModelTypeMap { get; set; }
 
-            public Dictionary<string, ModelInfo> ModelInfos { get; set; }
+            public Dictionary<string, ModelInfo>? ModelInfos { get; set; }
         }
 
         internal class ModelInfo
         {
-            public Type ParameterType { get; set; }
+            public Type? ParameterType { get; set; }
 
-            public Func<IPublishedElement, IPublishedValueFallback, IPublishedElement> Ctor { get; set; }
+            public Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>? Ctor { get; set; }
 
-            public Type ModelType { get; set; }
+            public Type? ModelType { get; set; }
 
-            public Func<IList> ListCtor { get; set; }
+            public Func<IList>? ListCtor { get; set; }
         }
     }
 }

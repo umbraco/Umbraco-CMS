@@ -17,13 +17,13 @@ namespace Umbraco.Cms.Core.Models
         private int? _templateId;
         private bool _published;
         private PublishedState _publishedState;
-        private HashSet<string> _editedCultures;
-        private ContentCultureInfosCollection _publishInfos;
+        private HashSet<string>? _editedCultures;
+        private ContentCultureInfosCollection? _publishInfos;
 
         #region Used for change tracking
 
-        private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _currentPublishCultureChanges;
-        private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _previousPublishCultureChanges;
+        private (HashSet<string>? addedCultures, HashSet<string>? removedCultures, HashSet<string>? updatedCultures) _currentPublishCultureChanges;
+        private (HashSet<string>? addedCultures, HashSet<string>? removedCultures, HashSet<string>? updatedCultures) _previousPublishCultureChanges;
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, IContent parent, IContentType contentType, string culture = null)
+        public Content(string name, IContent parent, IContentType contentType, string? culture = null)
             : this(name, parent, contentType, new PropertyCollection(), culture)
         { }
 
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="userId">The identifier of the user creating the Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, IContent parent, IContentType contentType, int userId, string culture = null)
+        public Content(string name, IContent parent, IContentType contentType, int userId, string? culture = null)
             : this(name, parent, contentType, new PropertyCollection(), culture)
         {
             CreatorId = userId;
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string? culture = null)
             : base(name, parent, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, string culture = null)
+        public Content(string? name, int parentId, IContentType? contentType, string? culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
 
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="userId">The identifier of the user creating the Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, int userId, string culture = null)
+        public Content(string name, int parentId, IContentType contentType, int userId, string? culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         {
             CreatorId = userId;
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
+        public Content(string? name, int parentId, IContentType? contentType, PropertyCollection properties, string? culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
@@ -180,13 +180,13 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public string PublishName { get; set; } // set by persistence
+        public string? PublishName { get; set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public IEnumerable<string> EditedCultures
+        public IEnumerable<string>? EditedCultures
         {
-            get => CultureInfos.Keys.Where(IsCultureEdited);
+            get => CultureInfos?.Keys.Where(IsCultureEdited);
             set => _editedCultures = value == null ? null : new HashSet<string>(value, StringComparer.OrdinalIgnoreCase);
         }
 
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public ContentCultureInfosCollection PublishCultureInfos
+        public ContentCultureInfosCollection? PublishCultureInfos
         {
             get
             {
@@ -233,12 +233,12 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc/>
-        public string GetPublishName(string culture)
+        public string? GetPublishName(string? culture)
         {
             if (culture.IsNullOrWhiteSpace()) return PublishName;
             if (!ContentType.VariesByCulture()) return null;
             if (_publishInfos == null) return null;
-            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
+            return _publishInfos.TryGetValue(culture!, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />
@@ -253,7 +253,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Handles culture infos collection changes.
         /// </summary>
-        private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void PublishNamesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(PublishCultureInfos));
 
@@ -263,30 +263,39 @@ namespace Umbraco.Cms.Core.Models
             {
                 case NotifyCollectionChangedAction.Add:
                     {
-                        var cultureInfo = e.NewItems.Cast<ContentCultureInfos>().First();
+                        var cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
                         if (_currentPublishCultureChanges.addedCultures == null) _currentPublishCultureChanges.addedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
                         if (_currentPublishCultureChanges.updatedCultures == null) _currentPublishCultureChanges.updatedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-                        _currentPublishCultureChanges.addedCultures.Add(cultureInfo.Culture);
-                        _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
-                        _currentPublishCultureChanges.removedCultures?.Remove(cultureInfo.Culture);
+                        if (cultureInfo is not null)
+                        {
+                            _currentPublishCultureChanges.addedCultures.Add(cultureInfo.Culture);
+                            _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                            _currentPublishCultureChanges.removedCultures?.Remove(cultureInfo.Culture);
+                        }
                         break;
                     }
                 case NotifyCollectionChangedAction.Remove:
                     {
                         //remove listening for changes
-                        var cultureInfo = e.OldItems.Cast<ContentCultureInfos>().First();
+                        var cultureInfo = e.OldItems?.Cast<ContentCultureInfos>().First();
                         if (_currentPublishCultureChanges.removedCultures == null) _currentPublishCultureChanges.removedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-                        _currentPublishCultureChanges.removedCultures.Add(cultureInfo.Culture);
-                        _currentPublishCultureChanges.updatedCultures?.Remove(cultureInfo.Culture);
-                        _currentPublishCultureChanges.addedCultures?.Remove(cultureInfo.Culture);
+                        if (cultureInfo is not null)
+                        {
+                            _currentPublishCultureChanges.removedCultures.Add(cultureInfo.Culture);
+                            _currentPublishCultureChanges.updatedCultures?.Remove(cultureInfo.Culture);
+                            _currentPublishCultureChanges.addedCultures?.Remove(cultureInfo.Culture);
+                        }
                         break;
                     }
                 case NotifyCollectionChangedAction.Replace:
                     {
                         //replace occurs when an Update occurs
-                        var cultureInfo = e.NewItems.Cast<ContentCultureInfos>().First();
+                        var cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
                         if (_currentPublishCultureChanges.updatedCultures == null) _currentPublishCultureChanges.updatedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-                        _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                        if (cultureInfo is not null)
+                        {
+                            _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                        }
                         break;
                     }
             }
@@ -441,8 +450,12 @@ namespace Umbraco.Cms.Core.Models
             if (clonedContent._publishInfos != null)
             {
                 clonedContent._publishInfos.ClearCollectionChangedEvents();          //clear this event handler if any
-                clonedContent._publishInfos = (ContentCultureInfosCollection)_publishInfos.DeepClone(); //manually deep clone
-                clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
+                clonedContent._publishInfos = (ContentCultureInfosCollection?)_publishInfos?.DeepClone(); //manually deep clone
+                if (clonedContent._publishInfos is not null)
+                {
+                    clonedContent._publishInfos.CollectionChanged +=
+                        clonedContent.PublishNamesCollectionChanged; //re-assign correct event handler
+                }
             }
 
             clonedContent._currentPublishCultureChanges.updatedCultures = null;

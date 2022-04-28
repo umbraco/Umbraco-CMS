@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Name of the RelationType
         /// </summary>
         [DataMember]
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Alias of the RelationType

@@ -114,9 +114,9 @@ namespace Umbraco.Cms.Core.Routing
             return request.Build();
         }
 
-        private void SetVariationContext(string culture)
+        private void SetVariationContext(string? culture)
         {
-            VariationContext variationContext = _variationContextAccessor.VariationContext;
+            VariationContext? variationContext = _variationContextAccessor.VariationContext;
             if (variationContext != null && variationContext.Culture == culture)
             {
                 return;
@@ -226,10 +226,10 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public async Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent publishedContent)
+        public async Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent? publishedContent)
         {
             // store the original (if any)
-            IPublishedContent content = request.PublishedContent;
+            IPublishedContent? content = request.PublishedContent;
 
             IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
@@ -272,8 +272,8 @@ namespace Umbraco.Cms.Core.Routing
             // note - we are not handling schemes nor ports here.
             _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IDomainCache domainsCache = umbracoContext.PublishedSnapshot.Domains;
-            var domains = domainsCache.GetAll(includeWildcards: false).ToList();
+            IDomainCache? domainsCache = umbracoContext.PublishedSnapshot.Domains;
+            var domains = domainsCache?.GetAll(includeWildcards: false).ToList();
 
             // determines whether a domain corresponds to a published document, since some
             // domains may exist but on a document that has been unpublished - as a whole - or
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Core.Routing
             bool IsPublishedContentDomain(Domain domain)
             {
                 // just get it from content cache - optimize there, not here
-                IPublishedContent domainDocument = umbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
+                IPublishedContent? domainDocument = umbracoContext.PublishedSnapshot.Content?.GetById(domain.ContentId);
 
                 // not published - at all
                 if (domainDocument == null)
@@ -297,15 +297,15 @@ namespace Umbraco.Cms.Core.Routing
                 }
 
                 // variant, ensure that the culture corresponding to the domain's language is published
-                return domainDocument.Cultures.ContainsKey(domain.Culture);
+                return domain.Culture is not null && domainDocument.Cultures.ContainsKey(domain.Culture);
             }
 
-            domains = domains.Where(IsPublishedContentDomain).ToList();
+            domains = domains?.Where(IsPublishedContentDomain).ToList();
 
-            var defaultCulture = domainsCache.DefaultCulture;
+            var defaultCulture = domainsCache?.DefaultCulture;
 
             // try to find a domain matching the current request
-            DomainAndUri domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
+            DomainAndUri? domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
 
             // handle domain - always has a contentId and a culture
             if (domainAndUri != null)
@@ -351,7 +351,7 @@ namespace Umbraco.Cms.Core.Routing
             _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            Domain domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
+            Domain? domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
             if (domain != null)
@@ -376,7 +376,7 @@ namespace Umbraco.Cms.Core.Routing
             if (pos > 0)
             {
                 // recurse
-                DirectoryInfo subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
+                DirectoryInfo? subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
                 alias = alias.Substring(pos + 1);
                 return subdir != null && FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
             }
@@ -410,9 +410,9 @@ namespace Umbraco.Cms.Core.Routing
                 _logger.LogDebug(
                     "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
                     found,
-                    request.HasPublishedContent() ? request.PublishedContent.Id : "NULL",
+                    request.HasPublishedContent() ? request.PublishedContent?.Id : "NULL",
                     request.HasTemplate() ? request.Template?.Alias : "NULL",
-                    request.HasDomain() ? request.Domain.ToString() : "NULL",
+                    request.HasDomain() ? request.Domain?.ToString() : "NULL",
                     request.Culture ?? "NULL",
                     request.ResponseStatusCode);
 
@@ -502,7 +502,7 @@ namespace Umbraco.Cms.Core.Routing
 
             var redirect = false;
             var valid = false;
-            IPublishedContent internalRedirectNode = null;
+            IPublishedContent? internalRedirectNode = null;
             var internalRedirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
@@ -510,16 +510,16 @@ namespace Umbraco.Cms.Core.Routing
             {
                 // try and get the redirect node from a legacy integer ID
                 valid = true;
-                internalRedirectNode = umbracoContext.Content.GetById(internalRedirectId);
+                internalRedirectNode = umbracoContext.Content?.GetById(internalRedirectId);
             }
             else
             {
-                GuidUdi udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId);
-                if (udiInternalRedirectId != null)
+                GuidUdi? udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId);
+                if (udiInternalRedirectId is not null)
                 {
                     // try and get the redirect node from a UDI Guid
                     valid = true;
-                    internalRedirectNode = umbracoContext.Content.GetById(udiInternalRedirectId.Guid);
+                    internalRedirectNode = umbracoContext.Content?.GetById(udiInternalRedirectId.Guid);
                 }
             }
 
@@ -528,14 +528,14 @@ namespace Umbraco.Cms.Core.Routing
                 // bad redirect - log and display the current page (legacy behavior)
                 _logger.LogDebug(
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
+                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)?.GetSourceValue());
             }
 
             if (internalRedirectNode == null)
             {
                 _logger.LogDebug(
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
+                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)?.GetSourceValue());
             }
             else if (internalRedirectId == request.PublishedContent.Id)
             {
@@ -545,7 +545,7 @@ namespace Umbraco.Cms.Core.Routing
             else
             {
                 // save since it will be cleared
-                ITemplate template = request.Template;
+                ITemplate? template = request.Template;
 
                 request.SetInternalRedirect(internalRedirectNode); // don't use .PublishedContent here
 
@@ -605,7 +605,7 @@ namespace Umbraco.Cms.Core.Routing
                 // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
                 // if the template isn't assigned to the document type we should log a warning and return 404
                 var templateId = request.PublishedContent.TemplateId;
-                ITemplate template = GetTemplate(templateId);
+                ITemplate? template = GetTemplate(templateId);
                 request.SetTemplate(template);
                 if (template != null)
                 {
@@ -639,7 +639,7 @@ namespace Umbraco.Cms.Core.Routing
                     altTemplate))
                 {
                     // allowed, use
-                    ITemplate template = _fileService.GetTemplate(altTemplate);
+                    ITemplate? template = _fileService.GetTemplate(altTemplate);
 
                     if (template != null)
                     {
@@ -657,9 +657,9 @@ namespace Umbraco.Cms.Core.Routing
 
                     // no allowed, back to default
                     var templateId = request.PublishedContent.TemplateId;
-                    ITemplate template = GetTemplate(templateId);
+                    ITemplate? template = GetTemplate(templateId);
                     request.SetTemplate(template);
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template?.Id, template?.Alias);
                 }
             }
 
@@ -678,7 +678,7 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
-        private ITemplate GetTemplate(int? templateId)
+        private ITemplate? GetTemplate(int? templateId)
         {
             if (templateId.HasValue == false || templateId.Value == default)
             {
@@ -693,7 +693,7 @@ namespace Umbraco.Cms.Core.Routing
                 throw new InvalidOperationException("The template is not set, the page cannot render.");
             }
 
-            ITemplate template = _fileService.GetTemplate(templateId.Value);
+            ITemplate? template = _fileService.GetTemplate(templateId.Value);
             if (template == null)
             {
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
@@ -729,8 +729,8 @@ namespace Umbraco.Cms.Core.Routing
             else
             {
                 // might be a UDI instead of an int Id
-                GuidUdi redirectUdi = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.Redirect);
-                if (redirectUdi != null)
+                GuidUdi? redirectUdi = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.Redirect);
+                if (redirectUdi is not null)
                 {
                     redirectUrl = _publishedUrlProvider.GetUrl(redirectUdi.Guid);
                 }

@@ -273,13 +273,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 
             internal void SetOwner(IPublishedElement owner) => _owner = owner;
 
-            public override bool HasValue(string culture = null, string segment = null) => _hasValue;
+            public override bool HasValue(string culture = null, string? segment = null) => _hasValue;
 
-            public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
+            public override object GetSourceValue(string culture = null, string? segment = null) => _sourceValue;
 
-            public override object GetValue(string culture = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+            public override object GetValue(string culture = null, string? segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
 
-            public override object GetXPathValue(string culture = null, string segment = null) => throw new InvalidOperationException("This method won't be implemented.");
+            public override object GetXPathValue(string culture = null, string? segment = null) => throw new InvalidOperationException("This method won't be implemented.");
         }
     }
 }

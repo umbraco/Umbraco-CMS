@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.Common.ModelBinders
     /// </summary>
     public class ContentModelBinderProvider : IModelBinderProvider
     {
-        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        public IModelBinder? GetBinder(ModelBinderProviderContext context)
         {
             var modelType = context.Metadata.ModelType;
 

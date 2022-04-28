@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <remarks>If <paramref name="previewToken"/> is null, the snapshot is not previewing, else it
         /// is previewing, and what is or is not visible in preview depends on the content of the token,
         /// which is not specified and depends on the actual published snapshot service implementation.</remarks>
-        IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
+        IPublishedSnapshot CreatePublishedSnapshot(string? previewToken);
 
         /// <summary>
         /// Rebuilds internal database caches (but does not reload).
@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.</para>
         /// </remarks>
         void Rebuild(
-            IReadOnlyCollection<int> contentTypeIds = null,
-            IReadOnlyCollection<int> mediaTypeIds = null,
-            IReadOnlyCollection<int> memberTypeIds = null);
+            IReadOnlyCollection<int>? contentTypeIds = null,
+            IReadOnlyCollection<int>? mediaTypeIds = null,
+            IReadOnlyCollection<int>? memberTypeIds = null);
 
         /* An IPublishedCachesService implementation can rely on transaction-level events to update
          * its internal, database-level data, as these events are purely internal. However, it cannot

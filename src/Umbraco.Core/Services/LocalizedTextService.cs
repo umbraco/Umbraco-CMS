@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services
     public class LocalizedTextService : ILocalizedTextService
     {
         private readonly ILogger<LocalizedTextService> _logger;
-        private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
+        private readonly Lazy<LocalizedTextServiceFileSources>? _fileSources;
 
         private IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> _dictionarySource =>
             _dictionarySourceLazy.Value;
@@ -160,7 +160,7 @@ namespace Umbraco.Cms.Core.Services
             return aliasValue;
         }
 
-        public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null)
+        public string Localize(string key, CultureInfo culture, IDictionary<string, string?>? tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
 
@@ -174,8 +174,8 @@ namespace Umbraco.Cms.Core.Services
             return Localize(area, alias, culture, tokens);
         }
 
-        public string Localize(string area, string alias, CultureInfo culture,
-            IDictionary<string, string> tokens = null)
+        public string Localize(string? area, string? alias, CultureInfo? culture,
+            IDictionary<string, string?>? tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
 
@@ -237,13 +237,13 @@ namespace Umbraco.Cms.Core.Services
                 foreach (var key in keys)
                 {
                     var dictionaryKey =
-                        (string)key.Attribute("alias");
+                        (string)key.Attribute("alias")!;
                     //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                     if (result.ContainsKey(dictionaryKey) == false)
                         result.Add(dictionaryKey, key.Value);
                 }
 
-                overallResult.Add(area.Attribute("alias").Value, result);
+                overallResult.Add(area.Attribute("alias")!.Value, result);
             }
 
             //Merge English Dictionary
@@ -255,24 +255,24 @@ namespace Umbraco.Cms.Core.Services
                 {
                     IDictionary<string, string>
                         result = new Dictionary<string, string>(StringComparer.InvariantCulture);
-                    if (overallResult.ContainsKey(area.Attribute("alias").Value))
+                    if (overallResult.ContainsKey(area.Attribute("alias")!.Value))
                     {
-                        result = overallResult[area.Attribute("alias").Value];
+                        result = overallResult[area.Attribute("alias")!.Value];
                     }
 
                     var keys = area.XPathSelectElements("./key");
                     foreach (var key in keys)
                     {
                         var dictionaryKey =
-                            (string)key.Attribute("alias");
+                            (string)key.Attribute("alias")!;
                         //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                         if (result.ContainsKey(dictionaryKey) == false)
                             result.Add(dictionaryKey, key.Value);
                     }
 
-                    if (!overallResult.ContainsKey(area.Attribute("alias").Value))
+                    if (!overallResult.ContainsKey(area.Attribute("alias")!.Value))
                     {
-                        overallResult.Add(area.Attribute("alias").Value, result);
+                        overallResult.Add(area.Attribute("alias")!.Value, result);
                     }
                 }
             }
@@ -289,7 +289,7 @@ namespace Umbraco.Cms.Core.Services
             foreach (var key in keys)
             {
                 var dictionaryKey =
-                    (string)key.Attribute("alias");
+                    (string)key.Attribute("alias")!;
                 //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                 if (result.ContainsKey(dictionaryKey) == false)
                     result.Add(dictionaryKey, key.Value);
@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services
                 foreach (var key in keys)
                 {
                     var dictionaryKey =
-                        (string)key.Attribute("alias");
+                        (string)key.Attribute("alias")!;
                     //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                     if (result.ContainsKey(dictionaryKey) == false)
                         result.Add(dictionaryKey, key.Value);
@@ -369,11 +369,11 @@ namespace Umbraco.Cms.Core.Services
             if (currentCulture.Name.Length > 2) return currentCulture;
 
             var attempt = _fileSources.Value.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
-            return attempt ? attempt.Result : currentCulture;
+            return attempt.Success ? attempt.Result! : currentCulture;
         }
 
-        private string GetFromDictionarySource(CultureInfo culture, string area, string key,
-            IDictionary<string, string> tokens)
+        private string GetFromDictionarySource(CultureInfo culture, string? area, string key,
+            IDictionary<string, string?>? tokens)
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
@@ -384,7 +384,7 @@ namespace Umbraco.Cms.Core.Services
             }
 
 
-            string found = null;
+            string? found = null;
             if (string.IsNullOrWhiteSpace(area))
             {
                 _noAreaDictionarySource[culture].Value.TryGetValue(key, out found);
@@ -426,7 +426,7 @@ namespace Umbraco.Cms.Core.Services
         /// we support a dictionary which means in the future we can really have any sort of token system.
         /// Currently though, the token key's will need to be an integer and sequential - though we aren't going to throw exceptions if that is not the case.
         /// </remarks>
-        internal static string ParseTokens(string value, IDictionary<string, string> tokens)
+        internal static string ParseTokens(string value, IDictionary<string, string?>? tokens)
         {
             if (tokens == null || tokens.Any() == false)
             {

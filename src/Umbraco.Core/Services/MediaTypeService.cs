@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services
 {
     public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType>, IMediaTypeService
     {
-        public MediaTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService,
+        public MediaTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService,
             IMediaTypeRepository mediaTypeRepository, IAuditRepository auditRepository, IMediaTypeContainerRepository entityContainerRepository,
             IEntityRepository entityRepository, IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory, mediaTypeRepository, auditRepository, entityContainerRepository, entityRepository, eventAggregator)

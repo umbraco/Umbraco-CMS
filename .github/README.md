@@ -1,4 +1,4 @@
-# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/contrib)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco)
+# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/contrib)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco) [![Discord](https://img.shields.io/discord/869656431308189746)](https://discord.gg/umbraco)
 
 Umbraco is the friendliest, most flexible and fastest growing ASP.NET CMS, and used by more than 500,000 websites worldwide. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social.
 
@@ -15,7 +15,7 @@ See the official [Umbraco website](https://umbraco.com) for an introduction, cor
 - [Community](#join-the-umbraco-community)
 - [Contributing](#contributing)
 
-Please also see our [Code of Conduct](CODE_OF_CONDUCT.md).
+Please also see our [Code of Conduct](https://github.com/umbraco/.github/blob/main/.github/CODE_OF_CONDUCT.md).
 
 ## Getting Started
 

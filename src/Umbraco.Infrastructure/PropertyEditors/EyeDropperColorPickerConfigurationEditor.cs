@@ -13,29 +13,29 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(EyeDropperColorPickerConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(EyeDropperColorPickerConfiguration? configuration)
         {
             return new Dictionary<string, object>
             {
-                { "showAlpha", configuration.ShowAlpha },
-                { "showPalette", configuration.ShowPalette }
+                { "showAlpha", configuration?.ShowAlpha ?? false },
+                { "showPalette", configuration?.ShowPalette ?? false },
             };
         }
 
         /// <inheritdoc />
-        public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyeDropperColorPickerConfiguration configuration)
+        public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, EyeDropperColorPickerConfiguration? configuration)
         {
             var showAlpha = true;
             var showPalette = true;
 
-            if (editorValues.TryGetValue("showAlpha", out var alpha))
+            if (editorValues is not null && editorValues.TryGetValue("showAlpha", out var alpha))
             {
                 var attempt = alpha.TryConvertTo<bool>();
                 if (attempt.Success)
                     showAlpha = attempt.Result;
             }
 
-            if (editorValues.TryGetValue("showPalette", out var palette))
+            if (editorValues is not null && editorValues.TryGetValue("showPalette", out var palette))
             {
                 var attempt = palette.TryConvertTo<bool>();
                 if (attempt.Success)

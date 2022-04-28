@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <summary>
         /// Gets the current <see cref="IBackOfficeSecurity"/> object.
         /// </summary>
-        public IBackOfficeSecurity BackOfficeSecurity
+        public IBackOfficeSecurity? BackOfficeSecurity
             => _httpContextAccessor.HttpContext?.RequestServices?.GetService<IBackOfficeSecurity>();
     }
 }

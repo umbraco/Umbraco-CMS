@@ -34,6 +34,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "parentTabContentTypeNames")]
         [ReadOnly(true)]
-        public IEnumerable<string> ParentTabContentTypeNames { get; set; }
+        public IEnumerable<string?> ParentTabContentTypeNames { get; set; }
     }
 }

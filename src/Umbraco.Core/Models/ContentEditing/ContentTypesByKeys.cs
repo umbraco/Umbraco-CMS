@@ -22,6 +22,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "contentTypeKeys")]
         [Required]
-        public Guid[] ContentTypeKeys { get; set; }
+        public Guid[]? ContentTypeKeys { get; set; }
     }
 }

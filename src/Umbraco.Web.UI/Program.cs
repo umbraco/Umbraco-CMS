@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Cms.Web.UI
 {
@@ -14,14 +13,7 @@ namespace Umbraco.Cms.Web.UI
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-#if DEBUG
-                .ConfigureAppConfiguration(config
-                    => config.AddJsonFile(
-                            "appsettings.Local.json",
-                            optional: true,
-                            reloadOnChange: true))
-#endif
-                .ConfigureLogging(x => x.ClearProviders())
+                .ConfigureUmbracoDefaults()
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }

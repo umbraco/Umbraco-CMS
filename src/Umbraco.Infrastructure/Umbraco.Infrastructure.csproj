@@ -1,11 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
         <PackageId>Umbraco.Cms.Infrastructure</PackageId>
         <Title>Umbraco CMS Infrastructure</Title>
         <Description>Contains the infrastructure assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -18,9 +19,9 @@
 
 
     <ItemGroup>
-      <PackageReference Include="HtmlAgilityPack" Version="1.11.38" />
-      <PackageReference Include="MailKit" Version="2.15.0" />
-      <PackageReference Include="IPNetwork2" Version="2.5.366" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+      <PackageReference Include="MailKit" Version="3.2.0" />
+      <PackageReference Include="IPNetwork2" Version="2.5.407" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -28,7 +29,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.4" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

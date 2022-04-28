@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// <summary>
         /// Gets or sets the embedded thumbnail image.
         /// </summary>
-        public ImageFile Thumbnail { get; set; }
+        public ImageFile? Thumbnail { get; set; }
         /// <summary>
         /// Gets or sets the Exif property with the given key.
         /// </summary>
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// </summary>
         /// <param name="filename">A string that contains the name of the file.</param>
         /// <returns>The <see cref="ImageFile"/> created from the file.</returns>
-        public static ImageFile FromFile (string filename)
+        public static ImageFile? FromFile (string filename)
         {
             return FromFile(filename, Encoding.Default);
         }
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// <param name="filename">A string that contains the name of the file.</param>
         /// <param name="encoding">The encoding to be used for text metadata when the source encoding is unknown.</param>
         /// <returns>The <see cref="ImageFile"/> created from the file.</returns>
-        public static ImageFile FromFile(string filename, Encoding encoding)
+        public static ImageFile? FromFile(string filename, Encoding encoding)
         {
             using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// </summary>
         /// <param name="stream">A <see cref="Sytem.IO.Stream"/> that contains image data.</param>
         /// <returns>The <see cref="ImageFile"/> created from the file.</returns>
-        public static ImageFile FromStream(Stream stream)
+        public static ImageFile? FromStream(Stream stream)
         {
             return FromStream(stream, Encoding.Default);
         }
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// <param name="stream">A <see cref="Sytem.IO.Stream"/> that contains image data.</param>
         /// <param name="encoding">The encoding to be used for text metadata when the source encoding is unknown.</param>
         /// <returns>The <see cref="ImageFile"/> created from the file.</returns>
-        public static ImageFile FromStream(Stream stream, Encoding encoding)
+        public static ImageFile? FromStream(Stream stream, Encoding encoding)
         {
             // JPEG
             if (JpegDetector.IsOfType(stream))

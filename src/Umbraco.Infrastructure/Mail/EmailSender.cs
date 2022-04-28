@@ -41,8 +41,8 @@ namespace Umbraco.Cms.Infrastructure.Mail
             ILogger<EmailSender> logger,
             IOptionsMonitor<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator,
-            INotificationHandler<SendEmailNotification> handler1,
-            INotificationAsyncHandler<SendEmailNotification> handler2)
+            INotificationHandler<SendEmailNotification>? handler1,
+            INotificationAsyncHandler<SendEmailNotification>? handler2)
         {
             _logger = logger;
             _eventAggregator = eventAggregator;
@@ -84,10 +84,10 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
             if (_globalSettings.IsPickupDirectoryLocationConfigured && !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From))
             {
-            // The following code snippet is the recommended way to handle PickupDirectoryLocation. 
+            // The following code snippet is the recommended way to handle PickupDirectoryLocation.
             // See more https://github.com/jstedfast/MailKit/blob/master/FAQ.md#q-how-can-i-send-email-to-a-specifiedpickupdirectory
                 do {
-                    var path = Path.Combine(_globalSettings.Smtp?.PickupDirectoryLocation, Guid.NewGuid () + ".eml");
+                    var path = Path.Combine(_globalSettings.Smtp.PickupDirectoryLocation!, Guid.NewGuid () + ".eml");
                     Stream stream;
 
                     try
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
                             FormatOptions options = FormatOptions.Default.Clone();
                             options.NewLineFormat = NewLineFormat.Dos;
 
-                            await message.ToMimeMessage(_globalSettings.Smtp?.From).WriteToAsync(options, filtered);
+                            await message.ToMimeMessage(_globalSettings.Smtp.From).WriteToAsync(options, filtered);
                             filtered.Flush();
                             return;
 
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
             using var client = new SmtpClient();
 
-            await client.ConnectAsync(_globalSettings.Smtp.Host,
+            await client.ConnectAsync(_globalSettings.Smtp!.Host,
                 _globalSettings.Smtp.Port,
                 (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 

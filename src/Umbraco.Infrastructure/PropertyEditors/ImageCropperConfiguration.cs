@@ -14,13 +14,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class ImageCropperConfiguration
     {
         [ConfigurationField("crops", "Define crops", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
-        public Crop[] Crops { get; set; }
+        public Crop[]? Crops { get; set; }
 
         [DataContract]
         public class Crop
         {
-            [DataMember(Name = "alias")]
-            public string Alias { get; set; }
+            [DataMember(Name = "alias")] public string Alias { get; set; } = null!;
 
             [DataMember(Name = "width")]
             public int Width { get; set; }
@@ -36,7 +35,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, ImageCropperConfiguration configuration)
+        public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, ImageCropperConfiguration? configuration)
         {
             var crops = new List<ImageCropperValue.ImageCropperCrop>();
 

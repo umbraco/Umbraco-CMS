@@ -14,6 +14,6 @@ namespace Umbraco.Cms.Core.Models
 
         [Required]
         [DataMember(Name = "resetCode", IsRequired = true)]
-        public string ResetCode { get; set; }
+        public string? ResetCode { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -138,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return dbTypeMap.Create();
         }
 
-        public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString) => current;
+        public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
         public abstract string ProviderName { get; }
 
@@ -164,17 +165,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return "concat(" + string.Join(",", args) + ")";
         }
 
-        public virtual string GetQuotedTableName(string tableName)
+        public virtual string GetQuotedTableName(string? tableName)
         {
             return $"\"{tableName}\"";
         }
 
-        public virtual string GetQuotedColumnName(string columnName)
+        public virtual string GetQuotedColumnName(string? columnName)
         {
             return $"\"{columnName}\"";
         }
 
-        public virtual string GetQuotedName(string name)
+        public virtual string GetQuotedName(string? name)
         {
             return $"\"{name}\"";
         }
@@ -221,7 +222,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) => $"{GetSpecialDbType(dbType)}({customSize})";
 
-        public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false)
+        public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
         {
             tableName = GetQuotedTableName(tableName);
             columnName = GetQuotedColumnName(columnName);
@@ -260,18 +261,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
-        public abstract bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+        public abstract bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
-        public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
+        public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
 
         public virtual Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql) => sql;
 
         public virtual Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql) => sql;
 
-        public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null);
+        public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null);
 
 
-        public virtual IDictionary<Type, IScalarMapper> ScalarMappers => null;
+        public virtual IDictionary<Type, IScalarMapper>? ScalarMappers => null;
 
         public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 
@@ -452,7 +453,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                                  columns);
         }
 
-        public virtual string FormatColumnRename(string tableName, string oldName, string newName)
+        public virtual string FormatColumnRename(string? tableName, string? oldName, string? newName)
         {
             return string.Format(RenameColumn,
                                  GetQuotedTableName(tableName),
@@ -460,7 +461,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                                  GetQuotedColumnName(newName));
         }
 
-        public virtual string FormatTableRename(string oldName, string newName)
+        public virtual string FormatTableRename(string? oldName, string? newName)
         {
             return string.Format(RenameTable, GetQuotedTableName(oldName), GetQuotedTableName(newName));
         }
@@ -523,7 +524,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                 return string.Format(DecimalColumnDefinitionFormat, precision, scale);
             }
 
-            var definition = DbTypeMap.ColumnTypeMap[type];
+            var definition = DbTypeMap.ColumnTypeMap[type!];
             var dbTypeDefinition = column.Size != default
                 ? $"{definition}({column.Size})"
                 : definition;
@@ -561,7 +562,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                 return string.IsNullOrEmpty(method) ? string.Empty : string.Format(DefaultValueFormat, method);
             }
 
-            return string.Format(DefaultValueFormat, GetQuotedValue(column.DefaultValue.ToString()));
+            return string.Format(DefaultValueFormat, GetQuotedValue(column.DefaultValue.ToString()!));
         }
 
         protected virtual string FormatPrimaryKey(ColumnDefinition column)
@@ -569,7 +570,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return string.Empty;
         }
 
-        protected abstract string FormatSystemMethods(SystemMethods systemMethod);
+        protected abstract string? FormatSystemMethods(SystemMethods systemMethod);
 
         protected abstract string FormatIdentity(ColumnDefinition column);
 

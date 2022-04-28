@@ -21,11 +21,13 @@ namespace Umbraco.Cms.Core.Models
 
         public Macro(IShortStringHelper shortStringHelper)
         {
+            _alias = string.Empty;
             _shortStringHelper = shortStringHelper;
             _properties = new MacroPropertyCollection();
             _properties.CollectionChanged += PropertiesChanged;
             _addedProperties = new List<string>();
             _removedProperties = new List<string>();
+            _macroSource = string.Empty;
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource)
+        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string? name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource)
             : this(shortStringHelper)
         {
             Id = id;
@@ -67,7 +69,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(IShortStringHelper shortStringHelper, string @alias, string name,
+        public Macro(IShortStringHelper shortStringHelper, string @alias, string? name,
             string macroSource,
             bool cacheByPage = false,
             bool cacheByMember = false,
@@ -87,7 +89,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         private string _alias;
-        private string _name;
+        private string? _name;
         private bool _useInEditor;
         private int _cacheDuration;
         private bool _cacheByPage;
@@ -98,35 +100,41 @@ namespace Umbraco.Cms.Core.Models
         private List<string> _addedProperties;
         private List<string> _removedProperties;
 
-        void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void PropertiesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Properties));
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 //listen for changes
-                var prop = e.NewItems.Cast<MacroProperty>().First();
-                prop.PropertyChanged += PropertyDataChanged;
-
-                var alias = prop.Alias;
-
-                if (_addedProperties.Contains(alias) == false)
+                MacroProperty? prop = e.NewItems?.Cast<MacroProperty>().First();
+                if (prop is not null)
                 {
-                    //add to the added props
-                    _addedProperties.Add(alias);
+                    prop.PropertyChanged += PropertyDataChanged;
+
+                    var alias = prop.Alias;
+
+                    if (_addedProperties.Contains(alias) == false)
+                    {
+                        //add to the added props
+                        _addedProperties.Add(alias);
+                    }
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 //remove listening for changes
-                var prop = e.OldItems.Cast<MacroProperty>().First();
-                prop.PropertyChanged -= PropertyDataChanged;
-
-                var alias = prop.Alias;
-
-                if (_removedProperties.Contains(alias) == false)
+                var prop = e.OldItems?.Cast<MacroProperty>().First();
+                if (prop is not null)
                 {
-                    _removedProperties.Add(alias);
+                    prop.PropertyChanged -= PropertyDataChanged;
+
+                    var alias = prop.Alias;
+
+                    if (_removedProperties.Contains(alias) == false)
+                    {
+                        _removedProperties.Add(alias);
+                    }
                 }
             }
         }
@@ -136,7 +144,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void PropertyDataChanged(object sender, PropertyChangedEventArgs e)
+        void PropertyDataChanged(object? sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Properties));
         }
@@ -171,14 +179,14 @@ namespace Umbraco.Cms.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias), ref _alias!, nameof(Alias));
         }
 
         /// <summary>
         /// Gets or sets the name of the Macro
         /// </summary>
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -241,7 +249,7 @@ namespace Umbraco.Cms.Core.Models
         public string MacroSource
         {
             get => _macroSource;
-            set => SetPropertyValueAndDetectChanges(value, ref _macroSource, nameof(MacroSource));
+            set => SetPropertyValueAndDetectChanges(value, ref _macroSource!, nameof(MacroSource));
         }
 
         /// <summary>

@@ -12,41 +12,41 @@ namespace Umbraco.Cms.Core.Services
         /// Gets an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim Get(int id);
+        IEntitySlim? Get(int id);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="key">The unique key of the entity.</param>
-        IEntitySlim Get(Guid key);
+        IEntitySlim? Get(Guid key);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
-        IEntitySlim Get(int id, UmbracoObjectTypes objectType);
+        IEntitySlim? Get(int id, UmbracoObjectTypes objectType);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="key">The unique key of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
-        IEntitySlim Get(Guid key, UmbracoObjectTypes objectType);
+        IEntitySlim? Get(Guid key, UmbracoObjectTypes objectType);
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim Get<T>(int id) where T : IUmbracoEntity;
+        IEntitySlim? Get<T>(int id) where T : IUmbracoEntity;
 
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="key">The unique key of the entity.</param>
-        IEntitySlim Get<T>(Guid key) where T : IUmbracoEntity;
+        IEntitySlim? Get<T>(Guid key) where T : IUmbracoEntity;
 
         /// <summary>
         /// Determines whether an entity exists.
@@ -136,14 +136,14 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the parent of an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim GetParent(int id);
+        IEntitySlim? GetParent(int id);
 
         /// <summary>
         /// Gets the parent of an entity.
         /// </summary>
         /// <param name="id">The identifier of the entity.</param>
         /// <param name="objectType">The object type of the parent.</param>
-        IEntitySlim GetParent(int id, UmbracoObjectTypes objectType);
+        IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType);
 
         /// <summary>
         /// Gets the children of an entity.
@@ -175,26 +175,26 @@ namespace Umbraco.Cms.Core.Services
         /// Gets children of an entity.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets descendants of an entity.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets descendants of entities.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null);
 
         // TODO: Do we really need this? why not just pass in -1
         /// <summary>
         /// Gets descendants of root.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null, bool includeTrashed = true);
+            IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null, bool includeTrashed = true);
 
         /// <summary>
         /// Gets the object type of an entity.
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the CLR type of an entity.
         /// </summary>
-        Type GetEntityType(int id);
+        Type? GetEntityType(int id);
 
         /// <summary>
         /// Gets the integer identifier corresponding to a unique Guid identifier.
@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets paths for entities.
         /// </summary>
-        IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[] ids);
+        IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[]? ids);
 
         /// <summary>
         /// Gets paths for entities.

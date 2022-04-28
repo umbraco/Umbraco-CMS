@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="savingCultures"></param>
         /// <param name="defaultCulture"></param>
         /// <returns></returns>
-        public static string GetCultureForInvariantErrors(IContent content, string[] savingCultures, string defaultCulture)
+        public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures, string? defaultCulture)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (savingCultures == null) throw new ArgumentNullException(nameof(savingCultures));
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-        private CultureImpact(string culture, bool isDefault = false)
+        private CultureImpact(string? culture, bool isDefault = false)
         {
             if (culture != null && culture.IsNullOrWhiteSpace())
                 throw new ArgumentException("Culture \"\" is not valid here.");
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-        public static CultureImpact Explicit(string culture, bool isDefault)
+        public static CultureImpact Explicit(string? culture, bool isDefault)
         {
             if (culture == null)
                 throw new ArgumentException("Culture <null> is not explicit.");
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// <para>Validates that the culture is compatible with the variation.</para>
         /// </remarks>
-        public static CultureImpact Create(string culture, bool isDefault, IContent content)
+        public static CultureImpact? Create(string culture, bool isDefault, IContent content)
         {
             // throws if not successful
             TryCreate(culture, isDefault, content.ContentType.Variations, true, out var impact);
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// <para>Validates that the culture is compatible with the variation.</para>
         /// </remarks>
-        internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, out CultureImpact impact)
+        internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, out CultureImpact? impact)
         {
             impact = null;
 
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// <para>Can be null (invariant) or * (all cultures) or a specific culture code.</para>
         /// </remarks>
-        public string Culture { get; }
+        public string? Culture { get; }
 
         /// <summary>
         /// Gets a value indicating whether this impact impacts all cultures, including,

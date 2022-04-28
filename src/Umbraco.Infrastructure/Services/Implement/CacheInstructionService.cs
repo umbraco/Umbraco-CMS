@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
         /// </summary>
         public CacheInstructionService(
-            IScopeProvider provider,
+            ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             ICacheInstructionRepository cacheInstructionRepository,
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc/>
         public bool IsColdBootRequired(int lastId)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 if (lastId <= 0)
                 {
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc/>
         public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
                 // row so we will sum these numbers to get the actual count.
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc/>
         public int GetMaxInstructionId()
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _cacheInstructionRepository.GetMaxId();
             }
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             CacheInstruction entity = CreateCacheInstruction(instructions, localIdentity);
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _cacheInstructionRepository.Add(entity);
                 scope.Complete();
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity)
         {
             // Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount.
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 foreach (IEnumerable<RefreshInstruction> instructionsBatch in instructions.InGroupsOf(_globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
                 {
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             int lastId)
         {
             using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 // Deserialize remote instructions & skip if it fails.
-                if (!TryDeserializeInstructions(instruction, out JArray jsonInstructions))
+                if (!TryDeserializeInstructions(instruction, out JArray? jsonInstructions))
                 {
                     lastId = instruction.Id; // skip
                     continue;
@@ -245,7 +245,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Attempts to deserialize the instructions to a JArray.
         /// </summary>
-        private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray jsonInstructions)
+        private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray? jsonInstructions)
         {
             if (instruction.Instructions is null)
             {
@@ -272,17 +272,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Parses out the individual instructions to be processed.
         /// </summary>
-        private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken> jsonInstructions)
+        private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
         {
             var result = new List<RefreshInstruction>();
-            foreach (JToken jsonItem in jsonInstructions)
+            if (jsonInstructions is not null)
+            {
+                return result;
+            }
+
+            foreach (JToken jsonItem in jsonInstructions!)
             {
                 // Could be a JObject in which case we can convert to a RefreshInstruction.
                 // Otherwise it could be another JArray - in which case we'll iterate that.
                 if (jsonItem is JObject jsonObj)
                 {
-                    RefreshInstruction instruction = jsonObj.ToObject<RefreshInstruction>();
-                    result.Add(instruction);
+                    RefreshInstruction? instruction = jsonObj.ToObject<RefreshInstruction>();
+                    if (instruction is not null)
+                    {
+                        result.Add(instruction);
+                    }
                 }
                 else
                 {
@@ -409,19 +417,32 @@ namespace Umbraco.Cms.Core.Services.Implement
             refresher.Refresh(id);
         }
 
-        private void RefreshByIds(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string jsonIds)
+        private void RefreshByIds(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonIds)
         {
             ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
-            foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
+            if (jsonIds is null)
             {
-                refresher.Refresh(id);
+                return;
+            }
+
+            var ids = JsonConvert.DeserializeObject<int[]>(jsonIds);
+            if (ids is not null)
+            {
+                foreach (var id in ids)
+                {
+                    refresher.Refresh(id);
+                }
             }
         }
 
-        private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string jsonPayload)
+        private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonPayload)
         {
             IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
-            refresher.Refresh(jsonPayload);
+            if (jsonPayload is not null)
+            {
+                refresher.Refresh(jsonPayload);
+            }
+
         }
 
         private void RemoveById(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, int id)
@@ -432,7 +453,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private ICacheRefresher GetRefresher(CacheRefresherCollection cacheRefreshers, Guid id)
         {
-            ICacheRefresher refresher = cacheRefreshers[id];
+            ICacheRefresher? refresher = cacheRefreshers[id];
             if (refresher == null)
             {
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");

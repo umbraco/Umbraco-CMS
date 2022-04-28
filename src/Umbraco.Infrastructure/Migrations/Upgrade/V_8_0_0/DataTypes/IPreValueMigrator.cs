@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         /// when for instance we know it will fail, and another, later migration will
         /// deal with it.</para>
         /// </remarks>
-        string GetNewAlias(string editorAlias);
+        string? GetNewAlias(string editorAlias);
 
         /// <summary>
         /// Gets the configuration object corresponding to preValue.

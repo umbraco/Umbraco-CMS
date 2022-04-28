@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Web.Website.Models
     {
         private readonly IMemberService _memberService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private string _redirectUrl;
+        private string? _redirectUrl;
         private bool _lookupProperties;
 
         public ProfileModelBuilder(
@@ -40,16 +40,16 @@ namespace Umbraco.Cms.Web.Website.Models
             return this;
         }
 
-        public async Task<ProfileModel> BuildForCurrentMemberAsync()
+        public async Task<ProfileModel?> BuildForCurrentMemberAsync()
         {
-            IMemberManager memberManager = _httpContextAccessor.HttpContext?.RequestServices.GetRequiredService<IMemberManager>();
+            IMemberManager? memberManager = _httpContextAccessor.HttpContext?.RequestServices.GetRequiredService<IMemberManager>();
 
             if (memberManager == null)
             {
                 return null;
             }
 
-            MemberIdentityUser member = await memberManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            MemberIdentityUser? member = _httpContextAccessor.HttpContext is null ? null : await memberManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
 
             if (member == null)
             {
@@ -72,14 +72,14 @@ namespace Umbraco.Cms.Web.Website.Models
                 Key = member.Key
             };
 
-            IMemberType memberType = MemberTypeService.Get(member.MemberTypeAlias);
+            IMemberType? memberType = member.MemberTypeAlias is null ? null : MemberTypeService.Get(member.MemberTypeAlias);
             if (memberType == null)
             {
                 throw new InvalidOperationException($"Could not find a member type with alias: {member.MemberTypeAlias}.");
             }
 
             // TODO: This wouldn't be required if we support exposing custom member properties on the MemberIdentityUser at the ASP.NET Identity level.
-            IMember persistedMember = _memberService.GetByKey(member.Key);
+            IMember? persistedMember = _memberService.GetByKey(member.Key);
             if (persistedMember == null)
             {
                 // should never happen

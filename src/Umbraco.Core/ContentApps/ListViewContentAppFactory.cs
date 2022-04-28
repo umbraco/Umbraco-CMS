@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.ContentApps
             _propertyEditors = propertyEditors;
         }
 
-        public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
+        public ContentApp? GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             string contentTypeAlias, entityType;
             int dtdId;

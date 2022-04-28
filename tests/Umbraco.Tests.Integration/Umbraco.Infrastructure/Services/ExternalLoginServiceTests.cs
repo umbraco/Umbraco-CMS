@@ -12,6 +12,9 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
@@ -33,7 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             DateTime latest = DateTime.Now.AddDays(-1);
             DateTime oldest = DateTime.Now.AddDays(-10);
 
-            using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 // insert duplicates manuall
                 ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
