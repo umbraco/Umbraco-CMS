@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor()
         {
-            return new ContentPickerConfigurationEditor(_ioHelper);
+            return new ContentPickerConfigurationEditor(_ioHelper, _editorConfigurationParser);
         }
 
         protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute!);

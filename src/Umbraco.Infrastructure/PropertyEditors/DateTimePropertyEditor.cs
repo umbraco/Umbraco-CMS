@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -23,15 +25,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class DateTimePropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+            : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+            _ioHelper = ioHelper;
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.
         /// </summary>
         /// <param name="loggerFactory"></param>
-        public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+        public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         /// <inheritdoc />
@@ -43,6 +52,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor(_ioHelper, _editorConfigurationParser);
     }
 }
