@@ -56,6 +56,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return JsonConvert.SerializeObject(blockListValue.BlockValue, Formatting.None);
         }
 
+        /*
+        Niels:
+        Change:
+        TODO: Here we need to take children of layout item into account.
+        */
         private void UpdateBlockListRecursively(BlockEditorData blockListData, Func<Guid> createGuid)
         {
             var oldToNew = new Dictionary<Udi, Udi>();
@@ -82,7 +87,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             layout.Clear();
             foreach (var reference in blockListData.References)
             {
-                layout.Add(JObject.FromObject(new BlockListLayoutItem
+                layout.Add(JObject.FromObject(new BlockGridLayoutItem
                 {
                     ContentUdi = reference.ContentUdi,
                     SettingsUdi = reference.SettingsUdi

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
-    /// Data converter for the block list property editor
+    /// Data converter for the block grid property editor
     /// </summary>
     public class BlockGridEditorDataConverter : BlockEditorDataConverter
     {
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
 
         protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout)
         {
-            var blockListLayout = jsonLayout.ToObject<IEnumerable<BlockListLayoutItem>>();
+            var blockListLayout = jsonLayout.ToObject<IEnumerable<BlockGridLayoutItem>>();
             return blockListLayout.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
         }
     }

@@ -5,9 +5,11 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
-    /// Represents a layout item for the Block List editor.
+    /// Represents a layout item for the Block Grid editor.
     /// </summary>
     /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
+
+    // TODO: Change: Niels: this is also called block, be aware!
     [DataContract(Name = "block", Namespace = "")]
     public class BlockGridItem : IBlockReference<IPublishedElement>
     {
@@ -18,6 +20,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings UDI.</param>
         /// <param name="settings">The settings.</param>
+        /// <param name="children">The children of this block</param>
         /// <exception cref="System.ArgumentNullException">contentUdi
         /// or
         /// content</exception>
@@ -64,6 +67,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// </value>
         [DataMember(Name = "settings")]
         public IPublishedElement Settings { get; }
+
     }
 
     /// <summary>
