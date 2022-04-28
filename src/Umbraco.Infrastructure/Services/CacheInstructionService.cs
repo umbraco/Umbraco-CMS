@@ -25,7 +25,7 @@ namespace Umbraco.Cms
         public class CacheInstructionService : Infrastructure.Services.CacheInstructionService
         {
             public CacheInstructionService(
-                IScopeProvider provider,
+                ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
                 IEventMessagesFactory eventMessagesFactory,
                 ICacheInstructionRepository cacheInstructionRepository,
@@ -61,7 +61,7 @@ namespace Umbraco.Cms
             /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
             /// </summary>
             public CacheInstructionService(
-                IScopeProvider provider,
+                ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
                 IEventMessagesFactory eventMessagesFactory,
                 ICacheInstructionRepository cacheInstructionRepository,
@@ -79,7 +79,7 @@ namespace Umbraco.Cms
             /// <inheritdoc/>
             public bool IsColdBootRequired(int lastId)
             {
-                using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     if (lastId <= 0)
                     {
@@ -107,7 +107,7 @@ namespace Umbraco.Cms
             /// <inheritdoc/>
             public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
             {
-                using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
                     // row so we will sum these numbers to get the actual count.
@@ -119,7 +119,7 @@ namespace Umbraco.Cms
             /// <inheritdoc/>
             public int GetMaxInstructionId()
             {
-                using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     return _cacheInstructionRepository.GetMaxId();
                 }
@@ -130,7 +130,7 @@ namespace Umbraco.Cms
             {
                 CacheInstruction entity = CreateCacheInstruction(instructions, localIdentity);
 
-                using (IScope scope = ScopeProvider.CreateScope())
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
                     _cacheInstructionRepository.Add(entity);
                     scope.Complete();
@@ -141,7 +141,7 @@ namespace Umbraco.Cms
             public void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity)
             {
                 // Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount.
-                using (IScope scope = ScopeProvider.CreateScope())
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
                     foreach (IEnumerable<RefreshInstruction> instructionsBatch in instructions.InGroupsOf(
                                  _globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
@@ -169,7 +169,7 @@ namespace Umbraco.Cms
                 int lastId)
             {
                 using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                using (IScope scope = ScopeProvider.CreateScope())
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken,
                         localIdentity, ref lastId);
