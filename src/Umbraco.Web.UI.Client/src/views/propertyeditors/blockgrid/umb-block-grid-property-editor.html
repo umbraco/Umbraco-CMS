@@ -4,9 +4,9 @@
 
     <div class="umb-block-grid__wrapper" ng-style="vm.listWrapperStyles">
 
-        <div ui-sortable="vm.sortableOptions" ng-model="vm.layout" ng-if="vm.loading !== true">
+        <div ng-if="vm.loading !== true">
 
-            <umb-block-grid-entries 
+            <umb-block-grid-entries  
                 block-editor-api="vm.blockEditorApi"
                 entries="vm.layout">
             </umb-block-grid-entries>

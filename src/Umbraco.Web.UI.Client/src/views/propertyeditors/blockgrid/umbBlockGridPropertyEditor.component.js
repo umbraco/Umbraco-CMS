@@ -813,15 +813,17 @@
 
         vm.sortableOptions = {
             axis: "y",
-            containment: ".umb-block-grid__wrapper",
             cursor: "grabbing",
             cancel: "input,textarea,select,option",
-            appendTo: ".umb-block-grid__wrapper",
 
+            //appendTo: ".umb-block-grid__wrapper",
+            containment: ".umb-block-grid__wrapper",
 
+            connectWith: "umb-block-grid-entries",
             handle: ".blockelement__draggable-element",
             classes: ".blockelement--dragging",
             items: '.umb-block-grid__sortable-item',
+            placeholder: "umb-group-builder__property_sortable-placeholder",
 
             //connectWith: ".umb-group-builder__tabs",
             //placeholder: "umb-group-builder__tab-sortable-placeholder",
