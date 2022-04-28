@@ -97,6 +97,7 @@ namespace Umbraco.Extensions
                     // request all the files out of the path, these will have physicalPath set.
                     var files = fileProvider.GetDirectoryContents(langFolderPath)
                         .Where(x => x.Name.InvariantEndsWith(".xml"))
+                        .Where(x => !string.IsNullOrEmpty(x.PhysicalPath))
                         .Select(x => new FileInfo(x.PhysicalPath))
                         .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, overwriteCoreKeys))
                         .ToList();
