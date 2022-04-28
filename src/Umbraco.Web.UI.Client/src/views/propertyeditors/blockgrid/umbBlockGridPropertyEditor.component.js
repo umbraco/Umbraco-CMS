@@ -335,8 +335,6 @@
 
         function addNewBlock(parentLayoutEntry, index, contentElementTypeKey) {
 
-            console.log("addNewBlock", parentLayoutEntry, index);
-
             // Create layout entry. (not added to property model jet.)
             var layoutEntry = modelObject.create(contentElementTypeKey);
             if (layoutEntry === null) {
@@ -359,10 +357,8 @@
 
             // add layout entry at the decided location in layout.
             if(parentLayoutEntry != null) {
-                console.log("new added as child")
                 parentLayoutEntry.children.splice(index, 0, layoutEntry);
             } else {
-                console.log("new added in root")
                 vm.layout.splice(index, 0, layoutEntry);
             }
 
@@ -372,19 +368,29 @@
             return true;
         }
 
+        function getLayoutEntryByContentID(layoutList, contentUdi) {
+            for(const entry of layoutList) {
+                if(entry.contentUdi === contentUdi) {
+                    return {entry: entry, layoutList: layoutList};
+                }
+                const result = getLayoutEntryByContentID(entry.children, contentUdi);
+                if(result !== null) {
+                    return result;
+                }
+            }
+            return null;
+        }
+
         function deleteBlock(block) {
 
-            console.error("To be done.")
-            // TODO: Make delete work with children.
-
-            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.layout.contentUdi);
-            if (layoutIndex === -1) {
+            const result = getLayoutEntryByContentID(vm.layout, block.layout.contentUdi);
+            if (result === null) {
                 throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
             }
 
             setDirty();
-
-            var removed = vm.layout.splice(layoutIndex, 1);
+            const layoutListIndex = result.layoutList.indexOf(result.entry);
+            var removed = result.layoutList.splice(layoutListIndex, 1);
             removed.forEach(x => {
                 // remove any server validation errors associated
                 var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
