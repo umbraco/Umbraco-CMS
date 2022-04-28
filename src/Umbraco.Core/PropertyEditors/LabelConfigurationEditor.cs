@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -11,7 +15,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     {
-        public LabelConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes and IEditorConfigurationParser instead")]
+        public LabelConfigurationEditor(IIOHelper ioHelper)
+            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public LabelConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
         }
 

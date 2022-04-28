@@ -2,7 +2,10 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -14,7 +17,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPickerConfigurationEditor"/> class.
         /// </summary>
-        public MediaPickerConfigurationEditor(IIOHelper ioHelper): base(ioHelper)
+        public MediaPickerConfigurationEditor(IIOHelper ioHelper)
+            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public MediaPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             // configure fields
             // this is not part of ContentPickerConfiguration,

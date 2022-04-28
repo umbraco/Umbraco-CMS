@@ -2,7 +2,10 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -11,7 +14,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class MultiNodePickerConfigurationEditor : ConfigurationEditor<MultiNodePickerConfiguration>
     {
-        public MultiNodePickerConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        public MultiNodePickerConfigurationEditor(IIOHelper ioHelper)
+            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public MultiNodePickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             Field(nameof(MultiNodePickerConfiguration.TreeSource))
                 .Config = new Dictionary<string, object> { { "idType", "udi" } };

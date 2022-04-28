@@ -1,15 +1,19 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -18,7 +22,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly IJsonSerializer _jsonSerializer;
 
-        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer) : base(ioHelper)
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer)
+        : this(ioHelper, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer, IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
             _jsonSerializer = jsonSerializer;
             var items = Fields.First(x => x.Key == "items");
