@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.Common.Media
         /// <inheritdoc/>
         public string? GetImageUrl(ImageUrlGenerationOptions options)
         {
-            if (options == null || string.IsNullOrEmpty(options.ImageUrl))
+            if (options?.ImageUrl == null)
             {
                 return null;
             }
