@@ -1,11 +1,11 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -59,7 +59,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // We cannot use the WebUtility, as we only want to encode the path, and not the entire string
             var encodedImagePath = HttpUtility.UrlPathEncode(imagePath);
 
-
             var ext = Path.GetExtension(encodedImagePath);
 
             // check if imagePath is local to prevent open redirect
@@ -88,13 +87,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // so ignore and we won't set a last modified date.
             }
 
-            var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
+            var rnd = imageLastModified.HasValue ? imageLastModified.Value.ToFileTime().ToString(CultureInfo.InvariantCulture) : null;
             var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath)
             {
                 Width = width,
                 ImageCropMode = ImageCropMode.Max,
                 CacheBusterValue = rnd
             });
+
             if (Url.IsLocalUrl(imageUrl))
             {
                 return new LocalRedirectResult(imageUrl, false);
@@ -118,18 +118,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
-        public string? GetProcessedImageUrl(string imagePath,
+        public string? GetProcessedImageUrl(
+            string imagePath,
             int? width = null,
             int? height = null,
             decimal? focalPointLeft = null,
             decimal? focalPointTop = null,
             ImageCropMode mode = ImageCropMode.Max,
-            string cacheBusterValue = "",
+            string? cacheBusterValue = null,
             decimal? cropX1 = null,
             decimal? cropX2 = null,
             decimal? cropY1 = null,
-            decimal? cropY2 = null
-            )
+            decimal? cropY2 = null)
         {
             var options = new ImageUrlGenerationOptions(imagePath)
             {
