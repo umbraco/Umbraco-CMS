@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
 
-        public MemberTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
+        public MemberTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
             IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityRepository entityRepository, IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository, eventAggregator)
         {
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.Services
 
         public string GetDefault()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
 

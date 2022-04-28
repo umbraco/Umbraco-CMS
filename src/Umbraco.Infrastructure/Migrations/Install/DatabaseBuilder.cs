@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
     public class DatabaseBuilder
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IScopeAccessor _scopeAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly IKeyValueService _keyValueService;
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// Initializes a new instance of the <see cref="DatabaseBuilder"/> class.
         /// </summary>
         public DatabaseBuilder(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IScopeAccessor scopeAccessor,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtimeState,
@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public bool HasSomeNonDefaultUser()
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 // look for the super user with default password
                 var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         internal bool IsUmbracoInstalled()
         {
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scopeAccessor.AmbientScope?.Database.IsUmbracoInstalled() ?? false;
             }
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </remarks>
         public DatabaseSchemaResult? ValidateSchema()
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 var result = ValidateSchema(scope);
                 scope.Complete();
@@ -216,7 +216,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
-        private DatabaseSchemaResult? ValidateSchema(IScope scope)
+        private DatabaseSchemaResult? ValidateSchema(ICoreScope scope)
         {
             if (_databaseFactory.Initialized == false)
                 return new DatabaseSchemaResult();
@@ -240,7 +240,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </remarks>
         public Result? CreateSchemaAndData()
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 var result = CreateSchemaAndData(scope);
                 scope.Complete();
@@ -248,7 +248,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
-        private Result? CreateSchemaAndData(IScope scope)
+        private Result? CreateSchemaAndData(ICoreScope scope)
         {
             try
             {

@@ -71,14 +71,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 Mock.Of<IServiceProvider>(),
                 Options.Create(new ContentSettings()));
             IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
-            var scopeProvider = new ScopeProvider(Mock.Of<IDistributedLockingMechanismFactory>(),f , fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), loggerFactory, NoAppCache.Instance, eventAggregator);
+            var scopeProvider = new ScopeProvider(Mock.Of<IDistributedLockingMechanismFactory>(),f , fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), mediaFileManager, loggerFactory, NoAppCache.Instance, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);
             mock.Setup(x => x.GetService(typeof(ILoggerFactory))).Returns(loggerFactory);
             mock.Setup(x => x.GetService(typeof(IProfilingLogger))).Returns(new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetService(typeof(IUmbracoDatabaseFactory))).Returns(f);
-            mock.Setup(x => x.GetService(typeof(IScopeProvider))).Returns(scopeProvider);
+            mock.Setup(x => x.GetService(typeof(ICoreScopeProvider))).Returns(scopeProvider);
 
             setup?.Invoke(mock);
             return mock.Object;

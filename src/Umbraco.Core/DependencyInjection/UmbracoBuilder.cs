@@ -308,7 +308,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
-                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
                 factory.GetRequiredService<IExternalLoginWithKeyRepository>()

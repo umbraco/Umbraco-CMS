@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Security
         private const string GenericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
         private readonly IUmbracoMapper _mapper;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IExternalLoginWithKeyService _externalLoginService;
         private readonly ITwoFactorLoginService _twoFactorLoginService;
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Security
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IExternalLoginWithKeyService externalLoginService,
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Security
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IExternalLoginService externalLoginService)
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Security
         public MemberUserStore(
             IMemberService memberService,
             IUmbracoMapper mapper,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor)
             : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(), StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Core.Security
                     throw new ArgumentNullException(nameof(user));
                 }
 
-                using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+                using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
                 // create member
                 IMember memberEntity = _memberService.CreateMember(
@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.Security
                     throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
                 }
 
-                using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+                using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
                 IMember? found = _memberService.GetById(asInt);
                 if (found != null)

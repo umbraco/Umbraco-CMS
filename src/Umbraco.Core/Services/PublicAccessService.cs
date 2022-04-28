@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IPublicAccessRepository _publicAccessRepository;
 
-        public PublicAccessService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public PublicAccessService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IPublicAccessRepository publicAccessRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _publicAccessRepository.GetMany();
             }
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Services
             //start with the deepest id
             ids.Reverse();
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 //This will retrieve from cache!
                 var entries = _publicAccessRepository.GetMany().ToList();
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry? entry;
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry? entry;
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotifiation))
@@ -216,7 +216,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var deletingNotification = new PublicAccessEntryDeletingNotification(entry, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingNotification))

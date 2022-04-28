@@ -15,12 +15,21 @@ namespace Umbraco.Cms.Core.Hosting
         /// between restarts of that Umbraco website/application on that specific server.
         /// </para>
         /// <para>
-        /// The value of this does not necesarily distinguish between unique workers/servers for this Umbraco application.
+        /// The value of this does not distinguish between unique workers/servers for this Umbraco application.
         /// Usage of this must take into account that the same <see cref="ApplicationId"/> may be returned for the same
-        /// Umbraco website hosted on different servers. Similarly the usage of this must take into account that a different
+        /// Umbraco website hosted on different servers.<br/>
+        /// Similarly the usage of this must take into account that a different
         /// <see cref="ApplicationId"/> may be returned for the same Umbraco website hosted on different servers.
         /// </para>
+        /// <para>
+        /// This returns a hash of the value of IApplicationDiscriminator.Discriminator (which is most likely just the value of <see cref=" Microsoft.Extensions.Hosting.IHostEnvironment.ContentRootPath"/> unless an alternative implementation of IApplicationDiscriminator has been registered).<br/>
+        /// However during ConfigureServices a temporary instance of IHostingEnvironment is constructed which guarantees that this will be the hash of <see cref=" Microsoft.Extensions.Hosting.IHostEnvironment.ContentRootPath"/>, so the value may differ depend on when the property is used.
+        /// </para>
+        /// <para>
+        /// If you require this value during ConfigureServices it is probably a code smell.
+        /// </para>
         /// </remarks>
+        [Obsolete("Please use IApplicationDiscriminator.Discriminator instead.")]
         string ApplicationId { get; }
 
         /// <summary>
@@ -58,6 +67,7 @@ namespace Umbraco.Cms.Core.Hosting
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
         /// </remarks>
+        [Obsolete("Please use the MapPathWebRoot extension method on an instance of IWebHostEnvironment instead")]
         string MapPathWebRoot(string path);
 
         /// <summary>
@@ -67,6 +77,7 @@ namespace Umbraco.Cms.Core.Hosting
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
         /// </remarks>
+        [Obsolete("Please use the MapPathContentRoot extension method on an instance of IHostEnvironment (or IWebHostEnvironment) instead")]
         string MapPathContentRoot(string path);
 
         /// <summary>

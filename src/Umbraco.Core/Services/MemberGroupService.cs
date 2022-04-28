@@ -14,14 +14,14 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberGroupService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public MemberGroupService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IMemberGroupRepository memberGroupRepository)
             : base(provider, loggerFactory, eventMessagesFactory) =>
             _memberGroupRepository = memberGroupRepository;
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _memberGroupRepository.GetMany();
             }
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services
                 return new IMemberGroup[0];
             }
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _memberGroupRepository.GetMany(ids.ToArray());
             }
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IMemberGroup? GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _memberGroupRepository.Get(id);
             }
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IMemberGroup? GetById(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _memberGroupRepository.Get(id);
             }
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IMemberGroup? GetByName(string? name)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _memberGroupRepository.GetByName(name);
             }
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Services
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var deletingNotification = new MemberGroupDeletingNotification(memberGroup, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingNotification))

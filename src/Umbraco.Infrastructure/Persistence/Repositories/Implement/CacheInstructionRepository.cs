@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public CacheInstructionRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
         /// <inheritdoc/>
-        private IDatabaseScope? AmbientScope => _scopeAccessor.AmbientScope;
+        private Scoping.IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
         /// <inheritdoc/>
         public int CountAll()

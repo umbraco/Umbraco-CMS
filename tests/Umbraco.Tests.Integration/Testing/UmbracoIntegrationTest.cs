@@ -25,7 +25,9 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Extensions;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
@@ -66,6 +68,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         private IHostBuilder CreateHostBuilder()
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureUmbracoDefaults()
 
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
@@ -106,6 +109,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
             services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
 
+            services.AddLogger(webHostEnvironment, Configuration);
+
             // Add it!
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
             TypeLoader typeLoader = services.AddTypeLoader(
@@ -116,8 +121,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 Configuration,
                 TestHelper.Profiler);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
-
-            builder.Services.AddLogger(hostingEnvironment, TestHelper.GetLoggingConfiguration(), Configuration);
 
             builder.AddConfiguration()
                 .AddUmbracoCore()

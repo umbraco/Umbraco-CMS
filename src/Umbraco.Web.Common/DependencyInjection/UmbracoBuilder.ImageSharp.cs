@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp.Web.Caching;
@@ -12,6 +12,7 @@ using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
 
@@ -73,9 +74,13 @@ namespace Umbraco.Extensions
 
                     return Task.CompletedTask;
                 };
-            })
-                .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment?.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
-                .AddProcessor<CropWebProcessor>();
+            }).AddProcessor<CropWebProcessor>();
+
+            builder.Services.AddOptions<PhysicalFileSystemCacheOptions>()
+                .Configure<IHostEnvironment>((opt, hostEnvironment) =>
+                {
+                    opt.CacheFolder = hostEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder);
+                });
 
             // Configure middleware to use the registered/shared ImageSharp configuration
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();

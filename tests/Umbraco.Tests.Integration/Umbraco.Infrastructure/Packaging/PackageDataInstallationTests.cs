@@ -22,6 +22,9 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 {
     [TestFixture]
