@@ -68,7 +68,7 @@
             }
         };
 
-        // We need to watch for changes on primitive types and upate the $scope values.
+        // We need to watch for changes on primitive types and update the $scope values.
         model.$onChanges = function (changes) {
             if (changes.index) {
                 var index = changes.index.currentValue;
@@ -79,6 +79,7 @@
                 model.block.updateLabel();
             }
         };
+        
     }
 
 

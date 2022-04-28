@@ -1,0 +1,17 @@
+<div class="blockelement-gridblock-editor">
+    <button type="button" class="btn-reset umb-outline blockelement__draggable-element"
+        ng-click="block.edit()"
+        ng-focus="block.focus"
+        ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }"
+        val-server-property-class="">
+        <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
+        <span>{{block.label}}</span>
+    </button>
+
+    <umb-block-grid-entries 
+        block-editor-api="api"
+        entries="block.layout.children"
+        container-layout-entry="block.layout">
+    </umb-block-grid-entries>
+
+</div>

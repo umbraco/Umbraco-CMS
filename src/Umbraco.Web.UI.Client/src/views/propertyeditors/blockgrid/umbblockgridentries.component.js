@@ -16,7 +16,8 @@
             controllerAs: "vm",
             bindings: {
                 blockEditorApi: "<",
-                entries: "<"
+                entries: "<",
+                containerLayoutEntry: "<?"
             },
             require: {
                 valFormManager: "^^valFormManager"
@@ -29,7 +30,6 @@
         var vm = this;
 
         vm.$onInit = function () {
-          console.log(vm);
         };
     }   
 

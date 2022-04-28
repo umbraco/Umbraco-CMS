@@ -16,7 +16,8 @@
             controllerAs: "vm",
             bindings: {
                 blockEditorApi: "<",
-                layout: "<",
+                layoutEntry: "<",
+                containerLayoutEntry: "<?", 
                 index: "<"
             },
             require: {

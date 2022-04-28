@@ -1,6 +1,7 @@
 (function () {
     "use strict";
 
+    // TODO: make sure clipboardService handles children.
 
     /**
      * @ngdoc directive
@@ -163,15 +164,18 @@
             }
         }
 
-        function onLoaded() {
+        function initializeLayout(layoutList) {
 
-            // Store a reference to the layout model, because we need to maintain this model.
-            vm.layout = modelObject.getLayout([]);
+            console.log("initializeLayout", layoutList)
 
+            // reference the invalid items of this list, to be removed after the loop.
             var invalidLayoutItems = [];
 
             // Append the blockObjects to our layout.
-            vm.layout.forEach(entry => {
+            layoutList.forEach(entry => {
+                // each layout entry should have a child array,
+                entry.children = entry.children || [];
+
                 // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
                 if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
                     var block = getBlockObject(entry);
@@ -192,11 +196,20 @@
 
             // remove the ones that are invalid
             invalidLayoutItems.forEach(entry => {
-                var index = vm.layout.findIndex(x => x === entry);
+                var index = layoutList.findIndex(x => x === entry);
                 if (index >= 0) {
-                    vm.layout.splice(index, 1);
+                    layoutList.splice(index, 1);
                 }
             });
+        }
+
+        function onLoaded() {
+
+            // Store a reference to the layout model, because we need to maintain this model.
+            vm.layout = modelObject.getLayout([]);
+
+
+            initializeLayout(vm.layout);
 
             vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
@@ -226,7 +239,7 @@
             if (block.config.unsupported === true)
                 return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
                 
-            return defaultViewFolderPath + "labelblock/labelblock.editor.html";
+            return defaultViewFolderPath + "gridblock/gridblock.editor.html";
         }
 
         /**
@@ -256,6 +269,8 @@
             var block = modelObject.getBlockObject(entry);
 
             if (block === null) return null;
+
+            initializeLayout(entry.children);
 
             block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
@@ -318,13 +333,18 @@
             block._copy = copyBlock.bind(null, block);
         }
 
-        function addNewBlock(index, contentElementTypeKey) {
+        function addNewBlock(parentLayoutEntry, index, contentElementTypeKey) {
+
+            console.log("addNewBlock", parentLayoutEntry, index);
 
             // Create layout entry. (not added to property model jet.)
             var layoutEntry = modelObject.create(contentElementTypeKey);
             if (layoutEntry === null) {
                 return false;
             }
+
+            // create array for children.
+            layoutEntry.children = [];
 
             // make block model
             var blockObject = getBlockObject(layoutEntry);
@@ -337,8 +357,14 @@
             // Add the Block Object to our layout entry.
             layoutEntry.$block = blockObject;
 
-            // add layout entry at the decired location in layout.
-            vm.layout.splice(index, 0, layoutEntry);
+            // add layout entry at the decided location in layout.
+            if(parentLayoutEntry != null) {
+                console.log("new added as child")
+                parentLayoutEntry.children.splice(index, 0, layoutEntry);
+            } else {
+                console.log("new added in root")
+                vm.layout.splice(index, 0, layoutEntry);
+            }
 
             // lets move focus to this new block.
             vm.setBlockFocus(blockObject);
@@ -347,6 +373,9 @@
         }
 
         function deleteBlock(block) {
+
+            console.error("To be done.")
+            // TODO: Make delete work with children.
 
             var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.layout.contentUdi);
             if (layoutIndex === -1) {
@@ -384,9 +413,12 @@
             options = options || vm.options;
 
             // this must be set
+            /*
+            TODO: This is not possibility in grid, cause of the polymorphism 
             if (blockIndex === undefined) {
                 throw "blockIndex was not specified on call to editBlock";
             }
+            */
 
             var wasNotActiveBefore = blockObject.active !== true;
 
@@ -459,7 +491,9 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
-        function requestShowCreate(createIndex, mouseEvent) {
+        function requestShowCreate(parentLayoutEntry, createIndex, mouseEvent) {
+
+            console.log("requestShowCreate", parentLayoutEntry, createIndex)
 
             if (vm.blockTypePicker) {
                 return;
@@ -469,23 +503,23 @@
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
-                wasAdded = addNewBlock(createIndex, blockType.blockConfigModel.contentElementTypeKey);
+                wasAdded = addNewBlock(parentLayoutEntry, createIndex, blockType.blockConfigModel.contentElementTypeKey);
 
                 if(wasAdded && !(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                     userFlowWhenBlockWasCreated(createIndex);
                 }
             } else {
-                showCreateDialog(createIndex);
+                showCreateDialog(parentLayoutEntry, createIndex);
             }
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(createIndex, mouseEvent) {
-            showCreateDialog(createIndex, true);
+        function requestShowClipboard(parentLayoutEntry, createIndex, mouseEvent) {
+            showCreateDialog(parentLayoutEntry, createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
-        function showCreateDialog(createIndex, openClipboard) {
+        function showCreateDialog(parentLayoutEntry, createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
                 return;
@@ -510,12 +544,12 @@
                     if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
-                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
+                            if (requestPasteFromClipboard(parentLayoutEntry, createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(createIndex, item.pasteData, item.type);
+                        requestPasteFromClipboard(parentLayoutEntry, createIndex, item.pasteData, item.type);
                     }
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         blockPickerModel.close();
@@ -524,20 +558,21 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var wasAdded = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        wasAdded = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                        wasAdded = addNewBlock(parentLayoutEntry, createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
                         if (wasAdded) {
-                            userFlowWhenBlockWasCreated(createIndex);
+                            userFlowWhenBlockWasCreated(parentLayoutEntry, createIndex);
                         }
                     }
                 },
                 close: function() {
-                    // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                    // if opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
-                        vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
+                        const blockOfInterest = parentLayoutEntry ? parentLayoutEntry.children[Math.max(createIndex-1, 0)].$block : vm.layout[Math.max(createIndex-1, 0)].$block
+                        vm.setBlockFocus(blockOfInterest);
                     }
 
                     editorService.close();
@@ -555,9 +590,9 @@
             editorService.open(blockPickerModel);
 
         };
-        function userFlowWhenBlockWasCreated(createIndex) {
+        function userFlowWhenBlockWasCreated(parentLayoutEntry, createIndex) {
             if (vm.layout.length > createIndex) {
-                var blockObject = vm.layout[createIndex].$block;
+                var blockObject = parentLayoutEntry ? parentLayoutEntry.children[createIndex].$block : vm.layout[createIndex].$block;
                 if (inlineEditing === true) {
                     blockObject.activate();
                 } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
@@ -674,7 +709,7 @@
             clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
 
-        function requestPasteFromClipboard(index, pasteEntry, pasteType) {
+        function requestPasteFromClipboard(parentLayoutEntry, index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
                 return false;
@@ -695,6 +730,8 @@
                 return false;
             }
 
+            layoutEntry.children = layoutEntry.children || [];
+
             // make block model
             var blockObject = getBlockObject(layoutEntry);
             if (blockObject === null) {
@@ -705,8 +742,12 @@
             // set the BlockObject on our layout entry.
             layoutEntry.$block = blockObject;
 
-            // insert layout entry at the decired location in layout.
-            vm.layout.splice(index, 0, layoutEntry);
+            // insert layout entry at the decided location in layout.
+            if(parentLayoutEntry != null) {
+                parentLayoutEntry.children.splice(index, 0, layoutEntry);
+            } else {
+                vm.layout.splice(index, 0, layoutEntry);
+            }
 
             vm.currentBlockInFocus = blockObject;
 
@@ -758,17 +799,29 @@
             copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
-            openSettingsForBlock: openSettingsForBlock
+            openSettingsForBlock: openSettingsForBlock,
+            requestShowCreate: requestShowCreate,
+            requestShowClipboard: requestShowClipboard,
+            internal: vm
         };
 
         vm.sortableOptions = {
             axis: "y",
             containment: ".umb-block-grid__wrapper",
             cursor: "grabbing",
-            handle: ".blockelement__draggable-element",
             cancel: "input,textarea,select,option",
+            appendTo: ".umb-block-grid__wrapper",
+
+
+            handle: ".blockelement__draggable-element",
             classes: ".blockelement--dragging",
             items: '.umb-block-grid__sortable-item',
+
+            //connectWith: ".umb-group-builder__tabs",
+            //placeholder: "umb-group-builder__tab-sortable-placeholder",
+            //handle: ".umb-group-builder__tab-handle",
+            //items: ".umb-group-builder__tab-sortable",
+            
             distance: 5,
             tolerance: "pointer",
             scroll: true,
