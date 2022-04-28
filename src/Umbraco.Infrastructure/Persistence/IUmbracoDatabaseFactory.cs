@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
@@ -53,6 +53,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// Configures the database factory.
         /// </summary>
         void Configure(ConnectionStrings umbracoConnectionString);
+
+        [Obsolete("Please use alternative Configure method.")]
+        void Configure(string connectionString, string providerName) =>
+            Configure(new ConnectionStrings { ConnectionString = connectionString, ProviderName = providerName });
 
         /// <summary>
         /// Gets the <see cref="ISqlContext"/>.
