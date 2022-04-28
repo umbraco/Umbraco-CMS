@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IPackagingService, PackagingService>();
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
             builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
-            builder.Services.AddTransient(SourcesFactory);
+            builder.Services.AddTransient(LocalizedTextServiceFileSourcesFactory);
             builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
             builder.Services.AddSingleton<PackageDataInstallation>();
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<FileSystems>(),
                 packageRepoFileName);
 
-        private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)
+        private static LocalizedTextServiceFileSources LocalizedTextServiceFileSourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));

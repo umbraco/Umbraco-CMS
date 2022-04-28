@@ -18,10 +18,8 @@ namespace Umbraco.Extensions
     public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
-        ///  Add the SupplementaryLocalizedTextFilesSources 
+        /// Adds the supplementary localized texxt file sources from the various physical and virtual locations supported.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
         private static IUmbracoBuilder AddSupplemenataryLocalizedTextFileSources(this IUmbracoBuilder builder)
         {
             builder.Services.AddTransient(sp =>
@@ -40,24 +38,24 @@ namespace Umbraco.Extensions
         private static IEnumerable<LocalizedTextServiceSupplementaryFileSource> GetSupplementaryFileSources(
             IWebHostEnvironment webHostEnvironment)
         {
-            var webFileProvider = webHostEnvironment.WebRootFileProvider;
-            var contentFileProvider = webHostEnvironment.ContentRootFileProvider;
+            IFileProvider webFileProvider = webHostEnvironment.WebRootFileProvider;
+            IFileProvider contentFileProvider = webHostEnvironment.ContentRootFileProvider;
 
             // gets all langs files in /app_plugins real or virtual locations
-            var pluginLangFolders = GetPluginLanguageFileSources(webFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> pluginLangFileSources = GetPluginLanguageFileSources(webFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
 
             // user defined langs that overwrite the default, these should not be used by plugin creators
             var userConfigLangFolder = Cms.Core.Constants.SystemDirectories.Config
                                             .TrimStart(Cms.Core.Constants.CharArrays.Tilde);
 
-            var userLangFolders = contentFileProvider.GetDirectoryContents(userConfigLangFolder)
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> userLangFileSources = contentFileProvider.GetDirectoryContents(userConfigLangFolder)
                     .Where(x => x.IsDirectory && x.Name.InvariantEquals("lang"))
                     .Select(x => new DirectoryInfo(x.PhysicalPath))
                     .SelectMany(x => x.GetFiles("*.user.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
-            return pluginLangFolders
-                .Concat(userLangFolders);
+            return pluginLangFileSources
+                .Concat(userLangFileSources);
         }
 
 
@@ -78,13 +76,13 @@ namespace Umbraco.Extensions
             var pluginFolders = fileProvider.GetDirectoryContents(folder)
                     .Where(x => x.IsDirectory).ToList();
 
-            foreach (var pluginFolder in pluginFolders)
+            foreach (IFileInfo pluginFolder in pluginFolders)
             {
                 // get the full virtual path for the plugin folder
                 var pluginFolderPath = WebPath.Combine(folder, pluginFolder.Name);
 
                 // get any lang folders in this plugin
-                var langFolders = fileProvider.GetDirectoryContents(pluginFolderPath)
+                IEnumerable<IFileInfo> langFolders = fileProvider.GetDirectoryContents(pluginFolderPath)
                     .Where(x => x.IsDirectory && x.Name.InvariantEquals("lang"));
 
                 // loop through the lang folder(s)
@@ -96,8 +94,7 @@ namespace Umbraco.Extensions
 
                     // request all the files out of the path, these will have physicalPath set.
                     var files = fileProvider.GetDirectoryContents(langFolderPath)
-                        .Where(x => x.Name.InvariantEndsWith(".xml"))
-                        .Where(x => !string.IsNullOrEmpty(x.PhysicalPath))
+                        .Where(x => x.Name.InvariantEndsWith(".xml") && !string.IsNullOrEmpty(x.PhysicalPath))
                         .Select(x => new FileInfo(x.PhysicalPath))
                         .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, overwriteCoreKeys))
                         .ToList();
