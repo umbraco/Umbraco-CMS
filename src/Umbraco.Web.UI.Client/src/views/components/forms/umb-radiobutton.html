@@ -11,7 +11,8 @@
                ng-disabled="vm.disabled"
                ng-required="vm.required"
                ng-change="vm.change()"
-               no-dirty-check="{{vm.disableDirtyCheck}}" />
+               no-dirty-check="{{vm.disableDirtyCheck}}"
+               ng-click="vm.click($event)" />
 
         <span class="umb-form-check__state" aria-hidden="true">
             <span class="umb-form-check__check"></span>
