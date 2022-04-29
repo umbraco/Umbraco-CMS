@@ -536,6 +536,7 @@
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
+    <key alias="selectLanguages">Vælg sprog</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUser">Vælg bruger</key>
     <key alias="selectUsers">Vælg brugere</key>
@@ -1867,6 +1868,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
+    <key alias="languagesHelp">Tilføj sprog for at give brugerne adgang til at redigere</key>
     <key alias="sectionsHelp">Tilføj sektioner for at give brugerne adgang</key>
     <key alias="selectUserGroups">Vælg brugergrupper</key>
     <key alias="noStartNode">Ingen startnode valgt</key>
