@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var systemListViewDataTypeIds = GetNonDeletableSystemListViewDataTypeIds();
 
             var children = _entityService.GetChildren(intId, UmbracoObjectTypes.DataType).ToArray();
-            var dataTypes = Enumerable.ToDictionary(_dataTypeService.GetAll(children.Select(c => c.Id).ToArray()) ?? Enumerable.Empty<IDataType>(), dt => dt.Id);
+            var dataTypes = Enumerable.ToDictionary(_dataTypeService.GetAll(children.Select(c => c.Id).ToArray()), dt => dt.Id);
 
             nodes.AddRange(
                 children
