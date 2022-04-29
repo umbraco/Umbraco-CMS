@@ -1,14 +1,12 @@
 angular.module("umbraco")
-  .controller("Umbraco.Editors.UserController", function ($scope, $location, $timeout,
+  .controller("Umbraco.Editors.UserController", function ($scope, $location,
     dashboardResource, userService, historyService, eventsService,
-    externalLoginInfoService, authResource,
-    currentUserResource, formHelper, localizationService, editorService, twoFactorLoginResource) {
+    externalLoginInfoService, authResource, contentEditingHelper,
+    currentUserResource, usersResource, overlayService, localizationService, editorService, twoFactorLoginResource) {
 
     let vm = this;
 
     vm.history = historyService.getCurrent();
-    vm.showPasswordFields = false;
-    vm.changePasswordButtonState = "init";
     vm.hasTwoFactorProviders = false;
 
     localizationService.localize("general_user").then(function (value) {
@@ -130,6 +128,7 @@ angular.module("umbraco")
     //create the initial model for change password
     vm.changePasswordModel = {
       config: {},
+      isChanging: false,
       value: {}
     };
 
@@ -144,51 +143,38 @@ angular.module("umbraco")
 
     });
 
-    vm.changePassword = function () {
-
-      if (formHelper.submitForm({ scope: $scope })) {
-
-        vm.changePasswordButtonState = "busy";
-
-        currentUserResource.changePassword(vm.changePasswordModel.value).then(function (data) {
-
-          //reset old data
-          clearPasswordFields();
-
-          formHelper.resetForm({ scope: $scope });
-
-          vm.changePasswordButtonState = "success";
-          $timeout(function () {
-            vm.togglePasswordFields();
-          }, 2000);
-
-        }, function (err) {
-          formHelper.resetForm({ scope: $scope, hasErrors: true });
-          formHelper.handleError(err);
-
-          vm.changePasswordButtonState = "error";
-
-        });
-
-      }
-
-    };
-
-    vm.togglePasswordFields = function () {
-      clearPasswordFields();
-      vm.showPasswordFields = !vm.showPasswordFields;
-    }
-
-    function clearPasswordFields() {
-      vm.changePasswordModel.value.oldPassword = "";
-      vm.changePasswordModel.value.newPassword = "";
-      vm.changePasswordModel.value.confirm = "";
-    }
-
     vm.editUser = function () {
       $location
         .path('/users/users/user/' + vm.user.id);
       vm.close();
+    }
+
+    vm.toggleChangePassword = function () {
+      //reset it
+      vm.user.changePassword = null;
+
+      localizationService.localizeMany(["general_cancel", "general_confirm", "general_changePassword"])
+        .then(function (data) {
+          const overlay = {
+            view: "changepassword",
+            title: data[2],
+            changePassword: vm.user.changePassword,
+            config: vm.changePasswordModel.config,
+            closeButtonLabel: data[0],
+            submitButtonLabel: data[1],
+            submitButtonStyle: 'success',
+            close: () => overlayService.close(),
+            submit: model => {
+              vm.changePasswordModel.value = model.changePassword;
+              userService.changePassword(vm.changePasswordModel, vm.user).then(result => {
+                if (result) {
+                  overlayService.close();
+                }
+              });
+            }
+          };
+          overlayService.open(overlay);
+        });
     }
 
     vm.toggleConfigureTwoFactor = function () {
