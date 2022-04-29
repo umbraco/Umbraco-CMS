@@ -1253,6 +1253,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
         }
 
+        public IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, int userId)
+        {
+            var languages = _localizationService.GetAllLanguages().ToList();
+            return ImportDictionaryItem(dictionaryItemElement, languages, null, userId);
+        }
+
         private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
         {
             var items = new List<IDictionaryItem>();

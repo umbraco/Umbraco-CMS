@@ -331,6 +331,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
+    <key alias="failedFileUpload">Failed to upload file</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="disallowedMediaType">Cannot upload this file, the media type with alias '%0%' is not allowed here</key>
     <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
@@ -569,9 +570,14 @@
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      To import a dictionary item, find the ".udt" file on your computer by clicking the
+      "Import" button (you'll be asked for confirmation on the next screen)
+    </key>
     <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="noItemsInFile">There are no dictionary items in this file.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -1592,6 +1598,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
     <key alias="documentTypeExportedSuccess">Document Type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the Document Type</key>
+    <key alias="dictionaryItemExportedSuccess">Dictionary item(s) was exported to file</key>
+    <key alias="dictionaryItemExportedError">An error occurred while exporting the dictionary item(s)</key>
     <key alias="publishWithNoDomains">Domains are not configured for multilingual site, please contact an administrator,
       see log for more information
     </key>

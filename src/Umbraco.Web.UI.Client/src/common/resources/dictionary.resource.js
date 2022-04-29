@@ -3,7 +3,7 @@
     * @name umbraco.resources.dictionaryResource
     * @description Loads in data for dictionary items
 **/
-function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataFormatter) {
+function dictionaryResource($q, $http, $location, localizationService, umbRequestHelper, umbDataFormatter) {
 
   /**
          * @ngdoc method
@@ -160,6 +160,76 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
             "Failed to save data for dictionary id " + dictionary.id);
     }
 
+      /**
+        * @ngdoc method
+        * @name umbraco.resources.dictionaryResource#export
+        * @methodOf umbraco.resources.dictionaryResource
+        *
+        * @description
+        * Export dictionary items of a given id.
+        *
+        * ##usage
+        * <pre>
+        * dictionaryResource.exportItem(1234){
+        *    .then(function() {
+        *       Do stuff..
+        *    });
+        * </pre>
+        *
+        * @param {Int} id the ID of the dictionary item so export
+        * @param {Bool?} includeChildren if children should also be exported
+        * @returns {Promise} resourcePromise object.
+        *
+        */
+      function exportItem(id, includeChildren) {
+          if (!id) {
+              throw "id cannot be null";
+          }
+
+          var url = umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "ExportDictionary", { id: id, includeChildren: includeChildren });
+
+          return umbRequestHelper.downloadFile(url).then(function () {
+              localizationService.localize("speechBubbles_dictionaryItemExportedSuccess").then(function(value) {
+                  notificationsService.success(value);
+              });
+          }, function (data) {
+              localizationService.localize("speechBubbles_dictionaryItemExportedError").then(function(value) {
+                  notificationsService.error(value);
+              });
+          });
+      }
+
+    /**
+        * @ngdoc method
+        * @name umbraco.resources.dictionaryResource#import
+        * @methodOf umbraco.resources.dictionaryResource
+        *
+        * @description
+        * Import a dictionary item from a file
+        *
+        * ##usage
+        * <pre>
+        * dictionaryResource.importItem("path to file"){
+        *    .then(function() {
+        *       Do stuff..
+        *    });
+        * </pre>
+        *
+        * @param {String} file path of the file to import
+        * @returns {Promise} resourcePromise object.
+        *
+        */
+    function importItem(file) {
+        if (!file) {
+            throw "file cannot be null";
+        }
+
+        return umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "ImportDictionary", { file: file })),
+            "Failed to import dictionary item " + file
+        );
+    }
+
     /**
          * @ngdoc method
          * @name umbraco.resources.dictionaryResource#getList
@@ -194,6 +264,8 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
     getById: getById,
     save: save,
     move: move,
+    exportItem: exportItem,
+    importItem: importItem,
     getList : getList
   };
 
