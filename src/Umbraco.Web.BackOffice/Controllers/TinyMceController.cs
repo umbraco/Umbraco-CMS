@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -75,9 +75,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //  var file = result.FileData[0];
             var fileName = formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
-            var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+            var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
 
-            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _imageUrlGenerator.SupportedImageFileTypes.Contains(ext) == false)
+            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _imageUrlGenerator.IsSupportedImageFormat(ext) == false)
             {
                 // Throw some error - to say can't upload this IMG type
                 return new UmbracoProblemResult("This is not an image filetype extension that is approved", HttpStatusCode.BadRequest);
