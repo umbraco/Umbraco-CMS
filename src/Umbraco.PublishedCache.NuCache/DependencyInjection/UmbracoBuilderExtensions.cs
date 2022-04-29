@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
@@ -13,7 +14,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Extensions
 {
@@ -43,7 +43,7 @@ namespace Umbraco.Extensions
             // TODO: Gotta wonder how much this does actually improve perf? It's a lot of weird code to make this happen so hope it's worth it
             builder.Services.AddUnique<IIdKeyMap>(factory =>
             {
-                var idkSvc = new IdKeyMap(factory.GetRequiredService<ICoreScopeProvider>(), factory.GetRequiredService<IScopeAccessor>());
+                var idkSvc = new IdKeyMap(factory.GetRequiredService<ICoreScopeProvider>(), factory.GetRequiredService<IIdKeyMapRepository>());
                 if (factory.GetRequiredService<IPublishedSnapshotService>() is PublishedSnapshotService publishedSnapshotService)
                 {
                     idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id), uid => publishedSnapshotService.GetDocumentId(uid));
