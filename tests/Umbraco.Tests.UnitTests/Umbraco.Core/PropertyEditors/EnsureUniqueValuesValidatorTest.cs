@@ -26,7 +26,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         private ColorPickerPropertyEditor ColorPickerPropertyEditor => new ColorPickerPropertyEditor(
             Mock.Of<IDataValueEditorFactory>(),
             Mock.Of<IIOHelper>(),
-            new JsonNetSerializer());
+            new JsonNetSerializer(),
+            Mock.Of<IEditorConfigurationParser>());
         [Test]
         public void Only_Tests_On_JArray()
         {
@@ -38,7 +39,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                     new ColorPickerPropertyEditor(
                         Mock.Of<IDataValueEditorFactory>(),
                         Mock.Of<IIOHelper>(),
-                        new JsonNetSerializer()));
+                        new JsonNetSerializer(),
+                        Mock.Of<IEditorConfigurationParser>()));
             Assert.AreEqual(0, result.Count());
         }
 
