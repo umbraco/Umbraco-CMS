@@ -2,7 +2,7 @@ angular.module("umbraco")
   .controller("Umbraco.Editors.UserController", function ($scope, $location,
     dashboardResource, userService, historyService, eventsService,
     externalLoginInfoService, authResource, contentEditingHelper,
-    currentUserResource, usersResource, overlayService, localizationService, editorService, twoFactorLoginResource) {
+    currentUserResource, overlayService, localizationService, editorService, twoFactorLoginResource) {
 
     let vm = this;
 
@@ -49,20 +49,7 @@ angular.module("umbraco")
       $location.path(link);
       vm.close();
     };
-    /*
-    //Manually update the remaining timeout seconds
-    function updateTimeout() {
-        $timeout(function () {
-            if (vm.remainingAuthSeconds > 0) {
-                vm.remainingAuthSeconds--;
-                $scope.$digest();
-                //recurse
-                updateTimeout();
-            }
 
-        }, 1000, false); // 1 second, do NOT execute a global digest
-    }
-    */
     function updateUserInfo() {
       //get the user
       userService.getCurrentUser().then(function (user) {
@@ -70,8 +57,6 @@ angular.module("umbraco")
         if (vm.user) {
           vm.remainingAuthSeconds = vm.user.remainingAuthSeconds;
           vm.canEditProfile = _.indexOf(vm.user.allowedSections, "users") > -1;
-          //set the timer
-          //updateTimeout();
 
           currentUserResource.getCurrentUserLinkedLogins().then(function (logins) {
 
@@ -105,9 +90,20 @@ angular.module("umbraco")
 
         }
       });
-
-
     }
+
+    function changePassword() {
+      return currentUserResource.changePassword(vm.changePasswordModel.value).then(function (data) {
+        console.log('password changed');
+        return true;
+      }, function (err) {
+        contentEditingHelper.handleSaveError({
+          err: err,
+          showNotifications: true
+        });
+        return false;
+      });
+    };
 
     vm.linkProvider = function (e) {
       e.target.submit();
@@ -128,7 +124,6 @@ angular.module("umbraco")
     //create the initial model for change password
     vm.changePasswordModel = {
       config: {},
-      isChanging: false,
       value: {}
     };
 
@@ -166,7 +161,7 @@ angular.module("umbraco")
             close: () => overlayService.close(),
             submit: model => {
               vm.changePasswordModel.value = model.changePassword;
-              userService.changePassword(vm.changePasswordModel, vm.user).then(result => {
+              changePassword().then(result => {
                 if (result) {
                   overlayService.close();
                 }
