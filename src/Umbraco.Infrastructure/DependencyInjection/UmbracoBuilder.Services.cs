@@ -16,10 +16,12 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
+using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -43,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IPackagingService, PackagingService>();
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
             builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
-            builder.Services.AddTransient(SourcesFactory);
+            builder.Services.AddTransient(LocalizedTextServiceFileSourcesFactory);
             builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
             builder.Services.AddSingleton<PackageDataInstallation>();
@@ -52,6 +54,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
             builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
             builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
+            builder.Services.AddTransient<IEditorConfigurationParser, EditorConfigurationParser>();
+
 
             return builder;
         }
@@ -73,7 +77,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<FileSystems>(),
                 packageRepoFileName);
 
-        private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)
+        private static LocalizedTextServiceFileSources LocalizedTextServiceFileSourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));

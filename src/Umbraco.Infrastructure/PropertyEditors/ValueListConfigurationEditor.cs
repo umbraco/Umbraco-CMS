@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -18,7 +21,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </remarks>
     public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
     {
-        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper) : base(ioHelper)
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper)
+         : this(textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
             var items = Fields.First(x => x.Key == "items");
 
