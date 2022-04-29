@@ -401,6 +401,7 @@
                 })
             });
 
+            // TODO: make sure that children is handled, either by this or by modelObject?..
             modelObject.removeDataAndDestroyModel(block);
         }
 
