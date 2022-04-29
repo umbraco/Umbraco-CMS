@@ -19,6 +19,8 @@
     <PackageTags>umbraco</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/umbraco/umbraco-cms</RepositoryUrl>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup>
