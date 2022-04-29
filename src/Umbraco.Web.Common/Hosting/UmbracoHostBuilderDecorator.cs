@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Web.Common.Hosting;
 internal class UmbracoHostBuilderDecorator : IHostBuilder
 {
     private readonly IHostBuilder _inner;
-    private readonly Action<IHost> _onBuild;
+    private readonly Action<IHost>? _onBuild;
 
-    public UmbracoHostBuilderDecorator(IHostBuilder inner, Action<IHost> onBuild = null)
+    public UmbracoHostBuilderDecorator(IHostBuilder inner, Action<IHost>? onBuild = null)
     {
         _inner = inner;
         _onBuild = onBuild;
@@ -29,10 +29,12 @@ internal class UmbracoHostBuilderDecorator : IHostBuilder
     public IHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate) =>
         _inner.ConfigureServices(configureDelegate);
 
-    public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory) =>
+    public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
+        where TContainerBuilder : notnull =>
         _inner.UseServiceProviderFactory(factory);
 
-    public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory) =>
+    public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
+        where TContainerBuilder : notnull =>
         _inner.UseServiceProviderFactory(factory);
 
     public IDictionary<object, object> Properties => _inner.Properties;

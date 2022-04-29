@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Composing
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new ();
         private readonly object _locko = new ();
 
-        private IEnumerable<Assembly> _assemblies;
+        private IEnumerable<Assembly>? _assemblies;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
@@ -121,11 +121,11 @@ namespace Umbraco.Cms.Core.Composing
 
         // internal for tests
         [Obsolete("This will be removed in a future version.")]
-        public Dictionary<(string, string), IEnumerable<string>> ReadCache() => null;
+        public Dictionary<(string, string), IEnumerable<string>>? ReadCache() => null;
 
         // internal for tests
         [Obsolete("This will be removed in a future version.")]
-        public string GetTypesListFilePath() => null;
+        public string? GetTypesListFilePath() => null;
 
         // internal for tests
         [Obsolete("This will be removed in a future version.")]
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Core.Composing
             // check if the TypeList already exists, if so return it, if not we'll create it
             var tobject = typeof(object); // CompositeTypeTypeKey does not support null values
             var listKey = new CompositeTypeTypeKey(baseType ?? tobject, attributeType ?? tobject);
-            TypeList typeList = null;
+            TypeList? typeList = null;
 
             if (cache)
             {
@@ -411,7 +411,7 @@ namespace Umbraco.Cms.Core.Composing
             /// </summary>
             public void Add(Type type)
             {
-                if (BaseType.IsAssignableFrom(type) == false)
+                if (BaseType?.IsAssignableFrom(type) == false)
                     throw new ArgumentException("Base type " + BaseType + " is not assignable from type " + type + ".", nameof(type));
                 _types.Add(type);
             }

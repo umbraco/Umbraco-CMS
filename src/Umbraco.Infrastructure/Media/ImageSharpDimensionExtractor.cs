@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Media
 
         private static ushort GetExifOrientation(IImageInfo imageInfo)
         {
-            IExifValue<ushort> orientation = imageInfo.Metadata.ExifProfile?.GetValue(ExifTag.Orientation);
+            IExifValue<ushort>? orientation = imageInfo.Metadata.ExifProfile?.GetValue(ExifTag.Orientation);
             if (orientation is not null)
             {
                 if (orientation.DataType == ExifDataType.Short)

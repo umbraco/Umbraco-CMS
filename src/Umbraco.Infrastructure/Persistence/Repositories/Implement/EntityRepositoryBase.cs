@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
 
             // ensure we don't include any null refs in the returned collection!
-            return PerformGetByQuery(query)?
+            return PerformGetByQuery(query)
                 .WhereNotNull();
         }
 
