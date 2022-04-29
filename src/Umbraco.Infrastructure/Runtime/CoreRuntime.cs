@@ -35,8 +35,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly IServiceProvider? _serviceProvider;
+        private readonly IHostApplicationLifetime? _hostApplicationLifetime;
         private readonly ILogger<CoreRuntime> _logger;
         private CancellationToken _cancellationToken;
 
@@ -54,8 +54,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IEventAggregator eventAggregator,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
-            IServiceProvider serviceProvider,
-            IHostApplicationLifetime hostApplicationLifetime)
+            IServiceProvider? serviceProvider,
+            IHostApplicationLifetime? hostApplicationLifetime)
         {
             State = state;
 
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IEventAggregator eventAggregator,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
-            IServiceProvider serviceProvider)
+            IServiceProvider? serviceProvider)
             : this(
                 state,
                 loggerFactory,
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Just in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
             if (StaticServiceProvider.Instance == null!)
             {
-                StaticServiceProvider.Instance = _serviceProvider;
+                StaticServiceProvider.Instance = _serviceProvider!;
             }
 
             if (isRestarting == false)
@@ -221,8 +221,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             if (isRestarting == false)
             {
                 // Add application started and stopped notifications last (to ensure they're always published after starting)
-                _hostApplicationLifetime.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
-                _hostApplicationLifetime.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
+                _hostApplicationLifetime?.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
+                _hostApplicationLifetime?.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
             }
         }
 
@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         private void AcquireMainDom()
         {
-            using DisposableTimer timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
+            using DisposableTimer? timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
 
             try
             {
@@ -255,7 +255,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 return;
             }
 
-            using DisposableTimer timer = _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
+            using DisposableTimer? timer = _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
 
             try
             {

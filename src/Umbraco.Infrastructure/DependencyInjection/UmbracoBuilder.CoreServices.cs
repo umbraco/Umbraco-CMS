@@ -55,6 +55,7 @@ using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
@@ -208,7 +209,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // Services required to run background jobs (with out the handler)
             builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-
             return builder;
         }
 

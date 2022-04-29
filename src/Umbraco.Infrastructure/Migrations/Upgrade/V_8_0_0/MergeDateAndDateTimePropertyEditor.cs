@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
@@ -13,12 +16,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
     {
         private readonly IIOHelper _ioHelper;
         private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public MergeDateAndDateTimePropertyEditor(IMigrationContext context, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+            : this(context, ioHelper, configurationEditorJsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public MergeDateAndDateTimePropertyEditor(IMigrationContext context, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer, IEditorConfigurationParser editorConfigurationParser)
             : base(context)
         {
             _ioHelper = ioHelper;
             _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         protected override void Migrate()
@@ -30,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                 DateTimeConfiguration config;
                 try
                 {
-                    config = (DateTimeConfiguration) new CustomDateTimeConfigurationEditor(_ioHelper).FromDatabase(
+                    config = (DateTimeConfiguration) new CustomDateTimeConfigurationEditor(_ioHelper, _editorConfigurationParser).FromDatabase(
                         dataType.Configuration, _configurationEditorJsonSerializer);
 
                     // If the Umbraco.Date type is the default from V7 and it has never been updated, then the
@@ -76,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 
         private class CustomDateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfiguration>
         {
-            public CustomDateTimeConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+            public CustomDateTimeConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
             {
             }
         }

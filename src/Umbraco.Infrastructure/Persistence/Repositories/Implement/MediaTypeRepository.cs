@@ -61,14 +61,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
         }
 
-        protected override IEnumerable<IMediaType>? PerformGetByQuery(IQuery<IMediaType> query)
+        protected override IEnumerable<IMediaType> PerformGetByQuery(IQuery<IMediaType> query)
         {
             var baseQuery = GetBaseQuery(false);
             var translator = new SqlTranslator<IMediaType>(baseQuery, query);
             var sql = translator.Translate();
             var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            return ids.Length > 0 ? GetMany(ids)?.OrderBy(x => x.Name) : Enumerable.Empty<IMediaType>();
+            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name).WhereNotNull() : Enumerable.Empty<IMediaType>();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)

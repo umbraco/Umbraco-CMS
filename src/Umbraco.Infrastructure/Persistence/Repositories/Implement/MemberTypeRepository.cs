@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return CommonRepository.GetAllTypes()?.OfType<IMemberType>();
         }
 
-        protected override IEnumerable<IMemberType>? PerformGetByQuery(IQuery<IMemberType> query)
+        protected override IEnumerable<IMemberType> PerformGetByQuery(IQuery<IMemberType> query)
         {
             var subQuery = GetSubquery();
             var translator = new SqlTranslator<IMemberType>(subQuery, query);
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderBy<NodeDto>(x => x.SortOrder);
             var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            return ids.Length > 0 ? GetMany(ids)?.OrderBy(x => x.Name) : Enumerable.Empty<IMemberType>();
+            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IMemberType>();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)

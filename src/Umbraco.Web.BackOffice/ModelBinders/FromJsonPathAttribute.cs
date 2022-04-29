@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
+using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
