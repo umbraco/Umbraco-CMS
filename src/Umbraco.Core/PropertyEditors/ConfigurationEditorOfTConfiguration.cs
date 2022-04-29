@@ -22,14 +22,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly IEditorConfigurationParser _editorConfigurationParser;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationEditor{TConfiguration}"/> class.
-        /// </summary>
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         protected ConfigurationEditor(IIOHelper ioHelper)
         : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigurationEditor{TConfiguration}"/> class.
+        /// </summary>
         protected ConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
         : base(DiscoverFields(ioHelper)) =>
             _editorConfigurationParser = editorConfigurationParser;

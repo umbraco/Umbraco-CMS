@@ -2,9 +2,11 @@
 // See LICENSE for more details.
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -29,7 +31,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IDataValueEditorFactory dataValueEditorFactory,
             ILocalizedTextService textService,
             IIOHelper ioHelper)
-            : base(dataValueEditorFactory)
+            : this(dataValueEditorFactory, textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
         }
 

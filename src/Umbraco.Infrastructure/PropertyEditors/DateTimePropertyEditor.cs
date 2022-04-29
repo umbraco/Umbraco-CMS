@@ -30,7 +30,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
             : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
-            _ioHelper = ioHelper;
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.

@@ -37,6 +37,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public NestedContentPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper)
