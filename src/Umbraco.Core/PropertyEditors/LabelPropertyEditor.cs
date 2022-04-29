@@ -2,11 +2,13 @@
 // See LICENSE for more details.
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -27,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public LabelPropertyEditor(IDataValueEditorFactory dataValueEditorFactory,
              IIOHelper ioHelper)
-            : base(dataValueEditorFactory)
+            : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
         }
 
