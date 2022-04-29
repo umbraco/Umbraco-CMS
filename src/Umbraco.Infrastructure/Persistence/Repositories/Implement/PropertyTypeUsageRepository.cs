@@ -16,9 +16,9 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
         _scopeAccessor = scopeAccessor;
     }
 
-    public bool HasValues(string propertyTypeAlias)
+    public bool HasSavedPropertyValues(string propertyTypeAlias)
     {
-        var database = _scopeAccessor.AmbientScope?.Database;
+        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
 
         if (database is null)
         {
