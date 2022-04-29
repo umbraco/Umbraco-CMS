@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var installedPackages = new Dictionary<string, InstalledPackage>();
 
             // Collect the package from the package migration plans
-            foreach(PackageMigrationPlan plan in _packageMigrationPlans)
+            foreach (PackageMigrationPlan plan in _packageMigrationPlans)
             {
                 if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
                 {
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             // Collect and merge the packages from the manifests
-            foreach(PackageManifest package in _manifestParser.GetManifests())
+            foreach (PackageManifest package in _manifestParser.GetManifests())
             {
                 if (package.PackageName is null)
                 {
@@ -157,17 +157,15 @@ namespace Umbraco.Cms.Core.Services.Implement
                     {
                         PackageName = package.PackageName
                     };
+
                     installedPackages.Add(package.PackageName, installedPackage);
                 }
 
                 installedPackage.PackageView = package.PackageView;
             }
 
-            // Filter the packages listed here. i.e. only packages that have migrations or views.
-            // Else whats the point in showing them?
-            return installedPackages
-                .Values
-                .Where(x => !x.PackageView.IsNullOrWhiteSpace() || x.PackageMigrationPlans.Any());
+            // Return all packages with a name in the package.manifest or package migrations
+            return installedPackages.Values;
         }
 
         #endregion
