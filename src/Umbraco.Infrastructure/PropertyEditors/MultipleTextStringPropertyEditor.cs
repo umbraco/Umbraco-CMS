@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
@@ -14,6 +15,7 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -30,23 +32,36 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class MultipleTextStringPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
+
+
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public MultipleTextStringPropertyEditor(
+            IIOHelper ioHelper,
+            IDataValueEditorFactory dataValueEditorFactory)
+            : this(ioHelper, dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
         public MultipleTextStringPropertyEditor(
             IIOHelper ioHelper,
-            IDataValueEditorFactory dataValueEditorFactory)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute!);
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         /// <summary>
         /// Custom value editor so we can format the value for the editor and the database

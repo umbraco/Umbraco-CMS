@@ -698,7 +698,7 @@ AND cmsContentNu.nodeId IS NULL
             }
         }
 
-        public ContentNodeKit GetMediaSource(IDatabaseScope scope, int id)
+        public ContentNodeKit GetMediaSource(Scoping.IScope scope, int id)
         {
             var sql = SqlMediaSourcesSelect()
                 .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))

@@ -273,8 +273,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
         {
             public ComplexTestEditor(
                 IDataValueEditorFactory dataValueEditorFactory,
-                IIOHelper ioHelper)
-                : base(dataValueEditorFactory, ioHelper)
+                IIOHelper ioHelper,
+                IEditorConfigurationParser editorConfigurationParser)
+                : base(dataValueEditorFactory, ioHelper, editorConfigurationParser)
             {
             }
 

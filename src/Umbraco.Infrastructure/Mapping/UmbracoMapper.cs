@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -44,14 +44,14 @@ namespace Umbraco.Cms.Core.Mapping
         private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
             = new ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
         /// </summary>
         /// <param name="profiles"></param>
         /// <param name="scopeProvider"></param>
-        public UmbracoMapper(MapDefinitionCollection profiles, IScopeProvider scopeProvider)
+        public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
 
@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Core.Mapping
             if (ctor != null && map != null)
             {
                 var target = ctor(source, context);
-                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     map(source, target, context);
                 }
@@ -259,7 +259,7 @@ namespace Umbraco.Cms.Core.Mapping
         {
             var targetList = (IList?)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 foreach (var sourceItem in source)
                 {
@@ -329,7 +329,7 @@ namespace Umbraco.Cms.Core.Mapping
             // if there is a direct map, map
             if (map != null)
             {
-                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     map(source!, target!, context);
                 }
@@ -442,9 +442,13 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
         /// <param name="source">The source objects.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
         {
-            return source.Select(Map<TSourceElement, TTargetElement>).ToList();
+            return source
+                .Select(Map<TSourceElement, TTargetElement>)
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
         }
 
         /// <summary>
@@ -455,11 +459,15 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source objects.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f)
         {
             var context = new MapperContext(this);
             f(context);
-            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
+            return source
+                .Select(x => Map<TSourceElement, TTargetElement>(x, context))
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
         }
 
         /// <summary>
@@ -470,9 +478,13 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source objects.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context)
         {
-            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
+            return source
+                .Select(x => Map<TSourceElement, TTargetElement>(x, context))
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
         }
 
         #endregion

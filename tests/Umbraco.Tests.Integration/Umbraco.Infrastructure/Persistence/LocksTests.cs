@@ -8,10 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
-using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -438,7 +436,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 {
                     using var scope = ScopeProvider.CreateScope();
 
-                    _ = (scope as Scope)?.Database; // Begin transaction
+                    _ = scope.Database; // Begin transaction
                     Interlocked.Increment(ref counter);
                     gate.Wait();
 
@@ -461,7 +459,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 {
                     using var scope = ScopeProvider.CreateScope();
 
-                    _ = (scope as Scope)?.Database; // Begin transaction
+                    _ = scope.Database; // Begin transaction
                     Interlocked.Increment(ref counter);
                     gate.Wait();
                     Thread.Sleep(100); // Let other transaction obtain write lock first.

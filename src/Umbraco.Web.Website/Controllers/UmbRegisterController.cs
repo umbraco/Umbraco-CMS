@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly IMemberManager _memberManager;
         private readonly IMemberService _memberService;
         private readonly IMemberSignInManager _memberSignInManager;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         public UmbRegisterController(
             IMemberManager memberManager,
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
             IMemberSignInManager memberSignInManager,
-            IScopeProvider scopeProvider)
+            ICoreScopeProvider scopeProvider)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
             _memberManager = memberManager;
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         /// <returns>Result of registration operation.</returns>
         private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
         {
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
             // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
             // If name field is empty, add the email address instead.

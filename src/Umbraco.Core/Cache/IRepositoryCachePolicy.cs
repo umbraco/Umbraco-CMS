@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="performGetAll">The repository PerformGetAll method.</param>
         /// <returns>If <paramref name="ids"/> is empty, all entities, else the entities with the specified identifiers.</returns>
         /// <remarks>Get all the entities. Either from the cache or the repository depending on the implementation.</remarks>
-        TEntity[]? GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
+        TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>> performGetAll);
 
         /// <summary>
         /// Clears the entire cache.

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
     {
-        public ContentTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
+        public ContentTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
             IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository,
             IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository, eventAggregator)
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Services
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var typeIdsA = typeIds.ToArray();
                 ContentService.DeleteOfTypes(typeIdsA);
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>Beware! Works across content, media and member types.</remarks>
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
                 scope.ReadLock(new[] { Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes });
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>Beware! Works across content, media and member types.</remarks>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
                 scope.ReadLock(new[] { Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes });
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>Beware! Works across content, media and member types.</remarks>
         public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
                 scope.ReadLock(new[] { Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes });
