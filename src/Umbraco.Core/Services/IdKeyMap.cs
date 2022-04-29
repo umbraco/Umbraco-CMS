@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 using (var scope = _scopeProvider.CreateCoreScope())
                 {
-                    _idKeyMapRepository.GetIdForKey(id, umbracoObjectType);
+                    val = _idKeyMapRepository.GetIdForKey(id, umbracoObjectType);
                     scope.Complete();
                 }
             }
