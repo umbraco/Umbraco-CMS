@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>Contains one <c>IPublishedProperty</c> for each property defined for the content type, including
         /// inherited properties. Some properties may have no value.</remarks>
-        IEnumerable<IPublishedProperty>? Properties { get; }
+        IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <summary>
         /// Gets a property identified by its alias.

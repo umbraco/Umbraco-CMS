@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -176,7 +175,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         ///     Gets a list of entities by the passed in query
         /// </summary>
-        public IEnumerable<TEntity>? Get(IQuery<TEntity> query)
+        public IEnumerable<TEntity> Get(IQuery<TEntity> query)
         {
 
             // ensure we don't include any null refs in the returned collection!
@@ -210,9 +209,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected abstract TEntity? PerformGet(TId? id);
 
-        protected abstract IEnumerable<TEntity>? PerformGetAll(params TId[]? ids);
+        protected abstract IEnumerable<TEntity> PerformGetAll(params TId[]? ids);
 
-        protected abstract IEnumerable<TEntity>? PerformGetByQuery(IQuery<TEntity> query);
+        protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
 
         protected abstract void PersistNewItem(TEntity item);
 

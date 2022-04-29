@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _macroByAliasCachePolicy.Get(alias, PerformGetByAlias, PerformGetAllByAlias);
         }
 
-        public IEnumerable<IMacro>? GetAllByAlias(string[] aliases)
+        public IEnumerable<IMacro> GetAllByAlias(string[] aliases)
         {
             if (aliases.Any() is false)
             {
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return PerformGetByQuery(query)?.FirstOrDefault();
         }
 
-        private IEnumerable<IMacro>? PerformGetAllByAlias(params string[]? aliases)
+        private IEnumerable<IMacro> PerformGetAllByAlias(params string[]? aliases)
         {
             if (aliases is null || aliases.Any() is false)
             {

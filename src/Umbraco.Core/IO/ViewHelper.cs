@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.IO
 
             if (_viewFileSystem.FileExists(path))
             {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)!))
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
                 {
                     viewContent = tr.ReadToEnd();
                     tr.Close();
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.IO
             }
             else
             {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)!))
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
                 {
                     viewContent = tr.ReadToEnd();
                     tr.Close();

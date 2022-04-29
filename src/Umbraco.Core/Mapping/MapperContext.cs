@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Umbraco.Cms.Core.Mapping
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
         /// <param name="source">The source objects.</param>
         /// <returns>A list containing the target objects.</returns>
-        public List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
         {
             return source.Select(Map<TSourceElement, TTargetElement>).ToList();
         }
