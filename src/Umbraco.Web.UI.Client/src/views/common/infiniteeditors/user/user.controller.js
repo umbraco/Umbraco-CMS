@@ -93,8 +93,7 @@ angular.module("umbraco")
     }
 
     function changePassword() {
-      return currentUserResource.changePassword(vm.changePasswordModel.value).then(function (data) {
-        console.log('password changed');
+      return currentUserResource.changePassword(vm.changePasswordModel.value).then(function () {
         return true;
       }, function (err) {
         contentEditingHelper.handleSaveError({
