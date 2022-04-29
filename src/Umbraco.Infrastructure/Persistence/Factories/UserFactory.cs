@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -112,6 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         {
             return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
                 group.StartContentId, group.StartMediaId, group.Alias,
+                Enumerable.Empty<int>(), // TODO: Need to find the real languages when the dto model is updated
                 group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
                 group.DefaultPermissions == null ? Enumerable.Empty<string>() : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()));
         }

@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public UserGroupBasic()
         {
             Notifications = new List<BackOfficeNotification>();
+            Languages = Enumerable.Empty<Language>();
             Sections = Enumerable.Empty<Section>();
         }
 
@@ -18,6 +19,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<BackOfficeNotification> Notifications { get; private set; }
+
+        [DataMember(Name = "languages")]
+        public IEnumerable<Language> Languages { get; set; }
 
         [DataMember(Name = "sections")]
         public IEnumerable<Section> Sections { get; set; }
