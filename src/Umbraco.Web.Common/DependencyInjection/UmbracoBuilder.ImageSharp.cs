@@ -20,6 +20,7 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+            builder.Services.AddSingleton<IImageUrlTokenGenerator, ImageSharpImageUrlTokenGenerator>();
 
             builder.Services.AddImageSharp()
                 // Replace default image provider

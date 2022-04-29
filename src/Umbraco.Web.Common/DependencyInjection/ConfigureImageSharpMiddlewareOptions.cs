@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -9,6 +10,7 @@ using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Media;
 
 namespace Umbraco.Cms.Web.Common.DependencyInjection
 {
@@ -20,16 +22,18 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
     {
         private readonly Configuration _configuration;
         private readonly ImagingSettings _imagingSettings;
+        private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
         /// </summary>
         /// <param name="configuration">The ImageSharp configuration.</param>
         /// <param name="imagingSettings">The Umbraco imaging settings.</param>
-        public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings)
+        public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings, IImageUrlTokenGenerator imageUrlTokenGenerator)
         {
             _configuration = configuration;
             _imagingSettings = imagingSettings.Value;
+            _imageUrlTokenGenerator = imageUrlTokenGenerator;
         }
 
         /// <inheritdoc />
@@ -41,6 +45,14 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
             options.BrowserMaxAge = _imagingSettings.Cache.BrowserMaxAge;
             options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
             options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
+
+            // Use our own image URL token generator
+            options.OnComputeHMACAsync = (context, secret) =>
+            {
+                string imageUrl = UriHelper.BuildRelative(context.Context.Request.PathBase, context.Context.Request.Path);
+
+                return Task.FromResult(_imageUrlTokenGenerator.GetImageUrlToken(imageUrl, context.Commands));
+            };
 
             // Use configurable maximum width and height
             options.OnParseCommandsAsync = context =>
