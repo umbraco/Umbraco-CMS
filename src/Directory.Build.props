@@ -21,6 +21,7 @@
     <RepositoryUrl>https://github.com/umbraco/umbraco-cms</RepositoryUrl>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup>
