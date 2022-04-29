@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _scopeAccessor = scopeAccessor;
         }
 
-        private IDatabaseScope? AmbientScope => _scopeAccessor.AmbientScope;
+        private Scoping.IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
         public IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
         {

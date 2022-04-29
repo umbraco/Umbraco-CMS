@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public IPublishedContentType ContentType { get; set; }
 
-        public IEnumerable<IPublishedProperty>? Properties { get; set; }
+        public IEnumerable<IPublishedProperty> Properties { get; set; }
 
         public IPublishedProperty? GetProperty(string alias) => Properties?.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
 

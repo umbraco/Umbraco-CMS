@@ -36,12 +36,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// </summary>
         /// <param name="scopeProvider">A scope provider.</param>
         /// <param name="keyValueService">A key-value service.</param>
-        public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
+        public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
             if (keyValueService == null) throw new ArgumentNullException(nameof(keyValueService));
 
-            using (IScope scope = scopeProvider.CreateScope())
+            using (ICoreScope scope = scopeProvider.CreateCoreScope())
             {   
                 // read current state
                 var currentState = keyValueService.GetValue(StateValueKey);

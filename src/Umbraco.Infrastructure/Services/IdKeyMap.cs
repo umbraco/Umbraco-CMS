@@ -10,14 +10,14 @@ namespace Umbraco.Cms.Core.Services
 {
     public class IdKeyMap : IIdKeyMap,IDisposable
     {
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IScopeAccessor _scopeAccessor;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
         private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
         private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
-        public IdKeyMap(IScopeProvider scopeProvider, IScopeAccessor scopeAccessor)
+        public IdKeyMap(ICoreScopeProvider scopeProvider, IScopeAccessor scopeAccessor)
         {
             _scopeProvider = scopeProvider;
             _scopeAccessor = scopeAccessor;
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Services
             // don't if not empty
             if (_key2Id.Count > 0) return;
 
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 // populate content and media items
                 var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Core.Services
 
             if (val == null)
             {
-                using (var scope = _scopeProvider.CreateScope())
+                using (var scope = _scopeProvider.CreateCoreScope())
                 {
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
@@ -256,7 +256,7 @@ namespace Umbraco.Cms.Core.Services
 
             if (val == null)
             {
-                using (var scope = _scopeProvider.CreateScope())
+                using (var scope = _scopeProvider.CreateCoreScope())
                 {
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)

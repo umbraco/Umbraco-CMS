@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberController"/> class.
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer,
             IPasswordChanger<MemberIdentityUser> passwordChanger,
-            IScopeProvider scopeProvider)
+            ICoreScopeProvider scopeProvider)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
             _propertyEditors = propertyEditors;
@@ -268,7 +268,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // Create a scope here which will wrap all child data operations in a single transaction.
             // We'll complete this at the end of this method if everything succeeeds, else
             // all data operations will roll back.
-            using IScope scope = _scopeProvider.CreateScope();
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // Depending on the action we need to first do a create or update using the membership manager
             // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.

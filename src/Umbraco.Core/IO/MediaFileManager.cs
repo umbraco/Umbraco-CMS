@@ -120,14 +120,14 @@ namespace Umbraco.Cms.Core.IO
         #region Associated Media Files
 
         /// <summary>
-        /// Returns a stream (file) for a content item or null if there is no file.
+        /// Returns a stream (file) for a content item (or a null stream if there is no file).
         /// </summary>
         /// <param name="content"></param>
         /// <param name="mediaFilePath">The file path if a file was found</param>
         /// <param name="propertyTypeAlias"></param>
         /// <param name="variationContextAccessor"></param>
         /// <returns></returns>
-        public Stream? GetFile(
+        public Stream GetFile(
             IContentBase content,
             out string? mediaFilePath,
             string propertyTypeAlias = Constants.Conventions.Media.File,
@@ -142,17 +142,10 @@ namespace Umbraco.Cms.Core.IO
 
             if (!content.TryGetMediaPath(propertyTypeAlias, _mediaUrlGenerators!, out mediaFilePath, culture, segment))
             {
-                return null;
+                return Stream.Null;
             }
 
-            Stream? stream = FileSystem.OpenFile(mediaFilePath!);
-            if (stream != null)
-            {
-                return stream;
-            }
-
-            mediaFilePath = null;
-            return null;
+            return FileSystem.OpenFile(mediaFilePath!);
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly ILogger<ContentVersionService> _logger;
         private readonly IDocumentVersionRepository _documentVersionRepository;
         private readonly IContentVersionCleanupPolicy _contentVersionCleanupPolicy;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly IAuditRepository _auditRepository;
         private readonly ILanguageRepository _languageRepository;
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services
             ILogger<ContentVersionService> logger,
             IDocumentVersionRepository documentVersionRepository,
             IContentVersionCleanupPolicy contentVersionCleanupPolicy,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IEventMessagesFactory eventMessagesFactory,
             IAuditRepository auditRepository,
             ILanguageRepository languageRepository)
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Services
              *
              * tl;dr lots of scopes to enable other connections to use the DB whilst we work.
              */
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 IReadOnlyCollection<ContentVersionMeta>? allHistoricVersions = _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.Services
 
             foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     scope.WriteLock(Constants.Locks.ContentTree);
                     var groupEnumerated = group.ToList();
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.Services
                 }
             }
 
-            using (_scopeProvider.CreateScope(autoComplete: true))
+            using (_scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
             }
@@ -151,7 +151,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
             }
 
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var languageId = _languageRepository.GetIdByIsoCode(culture, throwOnNotFound: true);
                 scope.ReadLock(Constants.Locks.ContentTree);
@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
         {
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);

@@ -441,22 +441,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return null;
             }
 
-            using Stream? stream = fs.OpenFile(filename);
-            if (stream is not null)
-            {
-                using var reader = new StreamReader(stream, Encoding.UTF8, true);
-                return reader.ReadToEnd();
-            }
-
-            return null;
+            using Stream stream = fs.OpenFile(filename);
+            using var reader = new StreamReader(stream, Encoding.UTF8, true);
+            return reader.ReadToEnd();
         }
 
-        public Stream? GetFileContentStream(string filepath)
+        public Stream GetFileContentStream(string filepath)
         {
             IFileSystem? fileSystem = GetFileSystem(filepath);
             if (fileSystem?.FileExists(filepath) == false)
             {
-                return null;
+                return Stream.Null;
             }
 
             try
@@ -465,7 +460,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
             catch
             {
-                return null; // deal with race conds
+                return Stream.Null; // deal with race conds
             }
         }
 

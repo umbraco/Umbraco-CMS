@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         IMacro? GetByAlias(string alias);
 
-        IEnumerable<IMacro>? GetAllByAlias(string[] aliases);
+        IEnumerable<IMacro> GetAllByAlias(string[] aliases);
     }
 }

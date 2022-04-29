@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Cms.Core.Scoping
 {
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <remarks>
         /// <para></para>
         /// </remarks>
-        public static T? Get<T>(IScopeProvider scopeProvider, string key, Func<bool, T> ctor)
+        public static T? Get<T>(ICoreScopeProvider scopeProvider, string key, Func<bool, T> ctor)
             where T : ScopeContextualBase
         {
             // no scope context = create a non-scoped object

@@ -98,7 +98,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // register the scope provider
             builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
-            builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<ICoreScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<Infrastructure.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
 
 
