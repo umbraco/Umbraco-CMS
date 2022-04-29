@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         // Scheduled for removal in v12
         [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-
         public FileUploadConfigurationEditor(IIOHelper ioHelper)
             : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {

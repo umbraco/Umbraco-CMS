@@ -26,11 +26,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper)
          : this(textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
-            var items = Fields.First(x => x.Key == "items");
-
-            // customize the items field
-            items.Name = textService.Localize("editdatatype", "addPrevalue");
-            items.Validators.Add(new ValueListUniqueValueValidator());
         }
 
         public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
