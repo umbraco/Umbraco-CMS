@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Mapping
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
         /// <param name="source">The source objects.</param>
         /// <returns>A list containing the target objects.</returns>
-        List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source);
+        List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source);
 
         /// <summary>
         /// Maps an enumerable of source objects to a new list of target objects.
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source objects.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>A list containing the target objects.</returns>
-        List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f);
+        List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f);
 
         /// <summary>
         /// Maps an enumerable of source objects to a new list of target objects.
@@ -151,6 +151,6 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source objects.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>A list containing the target objects.</returns>
-        List<TTargetElement?> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context);
+        List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context);
     }
 }

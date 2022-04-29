@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Extensions;
@@ -36,6 +37,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedContentService = publishedContentService;
+        }
+
+        [Obsolete("Please use alternative constructor.")]
+        public PublishedSnapshotServiceEventHandler(
+            IRuntimeState runtime,
+            IPublishedSnapshotService publishedSnapshotService,
+            INuCacheContentService publishedContentService,
+            IContentService contentService,
+            IMediaService mediaService)
+            : this(publishedSnapshotService, publishedContentService)
+        {
         }
 
         // note: if the service is not ready, ie _isReady is false, then we still handle repository events,

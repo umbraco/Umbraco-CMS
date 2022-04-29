@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly IScopeProvider _uowProvider;
+        private readonly ICoreScopeProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
         private readonly ILocalizationService _localizationService;
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly ILogger<NotificationService> _logger;
         private readonly IIOHelper _ioHelper;
 
-        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
+        public NotificationService(ICoreScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
             ILogger<NotificationService> logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
         {
             _notificationsRepository = notificationsRepository;
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Core.Services
 
         private IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
         {
-            using (var scope = _uowProvider.CreateScope(autoComplete: true))
+            using (var scope = _uowProvider.CreateCoreScope(autoComplete: true))
             {
                 return _notificationsRepository.GetUsersNotifications(userIds, action, nodeIds, objectType);
             }
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification>? GetUserNotifications(IUser user)
         {
-            using (var scope = _uowProvider.CreateScope(autoComplete: true))
+            using (var scope = _uowProvider.CreateCoreScope(autoComplete: true))
             {
                 return _notificationsRepository.GetUserNotifications(user);
             }
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification>? GetEntityNotifications(IEntity entity)
         {
-            using (var scope = _uowProvider.CreateScope(autoComplete: true))
+            using (var scope = _uowProvider.CreateCoreScope(autoComplete: true))
             {
                 return _notificationsRepository.GetEntityNotifications(entity);
             }
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IEntity entity)
         {
-            using (var scope = _uowProvider.CreateScope())
+            using (var scope = _uowProvider.CreateCoreScope())
             {
                 _notificationsRepository.DeleteNotifications(entity);
                 scope.Complete();
@@ -221,7 +221,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="user"></param>
         public void DeleteNotifications(IUser user)
         {
-            using (var scope = _uowProvider.CreateScope())
+            using (var scope = _uowProvider.CreateCoreScope())
             {
                 _notificationsRepository.DeleteNotifications(user);
                 scope.Complete();
@@ -235,7 +235,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IUser user, IEntity entity)
         {
-            using (var scope = _uowProvider.CreateScope())
+            using (var scope = _uowProvider.CreateCoreScope())
             {
                 _notificationsRepository.DeleteNotifications(user, entity);
                 scope.Complete();
@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Core.Services
                 return null;
             }
 
-            using (var scope = _uowProvider.CreateScope())
+            using (var scope = _uowProvider.CreateCoreScope())
             {
                 var notifications = _notificationsRepository.SetNotifications(user, entity, actions);
                 scope.Complete();
@@ -275,7 +275,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            using (var scope = _uowProvider.CreateScope())
+            using (var scope = _uowProvider.CreateCoreScope())
             {
                 var notification = _notificationsRepository.CreateNotification(user, entity, action);
                 scope.Complete();

@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IContentVersionService _contentVersionService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         public object? Domains { get; private set; }
 
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ActionCollection actionCollection,
             ISqlContext sqlContext,
             IJsonSerializer serializer,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IAuthorizationService authorizationService,
             IContentVersionService contentVersionService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
@@ -392,7 +392,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<IDictionary<string, ContentItemDisplay>> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
         {
             // It's important to do this operation within a scope to reduce the amount of readlock queries.
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            using var scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             var contentTypes = contentTypesByAliases.ContentTypeAliases?.Select(alias => _contentTypeService.Get(alias)).WhereNotNull();
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
         }
@@ -405,7 +405,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public ActionResult<ContentItemDisplay?> GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateCoreScope())
             {
                 var contentType = _contentTypeService.Get(contentTypeKey);
                 if (contentType == null)
@@ -497,7 +497,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(Guid[]? contentTypeKeys, int parentId)
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            using var scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
             return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
         }

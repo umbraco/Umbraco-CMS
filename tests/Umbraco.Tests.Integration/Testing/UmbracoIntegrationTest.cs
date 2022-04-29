@@ -27,6 +27,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Extensions;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {

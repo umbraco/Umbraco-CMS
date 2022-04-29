@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Services
         private IQuery<IUmbracoEntity>? _queryRootEntity;
         private readonly IIdKeyMap _idKeyMap;
 
-        public EntityService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
+        public EntityService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _idKeyMap = idKeyMap;
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEntitySlim? Get(int id)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Get(id);
             }
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEntitySlim? Get(Guid key)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Get(key);
             }
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEntitySlim? Get(int id, UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Get(id, objectType.GetGuid());
             }
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEntitySlim? Get(Guid key, UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Get(key, objectType.GetGuid());
             }
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.Services
         public virtual IEntitySlim? Get<T>(int id)
             where T : IUmbracoEntity
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Get(id);
             }
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Services
         public virtual IEntitySlim? Get<T>(Guid key)
             where T : IUmbracoEntity
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Get(key);
             }
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public bool Exists(int id)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Exists(id);
             }
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public bool Exists(Guid key)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.Exists(key);
             }
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Core.Services
             var objectType = GetObjectType(entityType);
             var objectTypeId = objectType.GetGuid();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAll(objectTypeId, ids);
             }
@@ -160,7 +160,7 @@ namespace Umbraco.Cms.Core.Services
 
             GetObjectType(entityType);
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAll(objectType.GetGuid(), ids);
             }
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.Services
             var entityType = ObjectTypes.GetClrType(objectType);
             GetObjectType(entityType);
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAll(objectType, ids);
             }
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Services
             var objectType = GetObjectType(entityType);
             var objectTypeId = objectType.GetGuid();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAll(objectTypeId, keys);
             }
@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Core.Services
             var entityType = objectType.GetClrType();
             GetObjectType(entityType);
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAll(objectType.GetGuid(), keys);
             }
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Core.Services
             var entityType = ObjectTypes.GetClrType(objectType);
             GetObjectType(entityType);
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAll(objectType, keys);
             }
@@ -223,7 +223,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetRootEntities(UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetByQuery(QueryRootEntity, objectType.GetGuid());
             }
@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEntitySlim? GetParent(int id)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
                 if (entity is null || entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
@@ -244,7 +244,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
                 if (entity is null || entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
@@ -256,7 +256,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetChildren(int parentId)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 return _entityRepository.GetByQuery(query);
@@ -266,7 +266,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetChildren(int parentId, UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 return _entityRepository.GetByQuery(query, objectType.GetGuid());
@@ -276,7 +276,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetDescendants(int id)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
                 var pathMatch = entity?.Path + ",";
@@ -288,7 +288,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var entity = _entityRepository.Get(id);
                 if (entity is null)
@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
 
@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var objectTypeGuid = objectType.GetGuid();
                 var query = Query<IUmbracoEntity>();
@@ -348,7 +348,7 @@ namespace Umbraco.Cms.Core.Services
             if (idsA.Length == 0)
                 return Enumerable.Empty<IEntitySlim>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var objectTypeGuid = objectType.GetGuid();
                 var query = Query<IUmbracoEntity>();
@@ -385,7 +385,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null, bool includeTrashed = true)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUmbracoEntity>();
                 if (includeTrashed == false)
@@ -398,7 +398,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual UmbracoObjectTypes GetObjectType(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetObjectType(id);
             }
@@ -407,7 +407,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public virtual UmbracoObjectTypes GetObjectType(Guid key)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetObjectType(key);
             }
@@ -452,7 +452,7 @@ namespace Umbraco.Cms.Core.Services
             var entityType = objectType.GetClrType();
             GetObjectType(entityType);
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAllPaths(objectType.GetGuid(), ids);
             }
@@ -464,7 +464,7 @@ namespace Umbraco.Cms.Core.Services
             var entityType = objectType.GetClrType();
             GetObjectType(entityType);
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.GetAllPaths(objectType.GetGuid(), keys);
             }
@@ -473,7 +473,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public int ReserveId(Guid key)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _entityRepository.ReserveId(key);
             }

@@ -12,6 +12,8 @@
       <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
       <PackageReference Include="Umbraco.Deploy.Core" Version="9.3.1" />
       <PackageReference Include="Umbraco.Forms.Core" Version="9.3.0" />
+      <PackageReference Include="Umbraco.Deploy.Core" Version="9.4.0" />
+      <PackageReference Include="Umbraco.Forms.Core" Version="9.4.0" />
     </ItemGroup>
 
   <ItemGroup>

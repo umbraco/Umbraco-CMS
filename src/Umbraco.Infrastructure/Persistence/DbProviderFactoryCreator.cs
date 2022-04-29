@@ -16,6 +16,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private readonly IDictionary<string, IBulkSqlInsertProvider> _bulkSqlInsertProviders;
         private readonly IDictionary<string, IProviderSpecificMapperFactory> _providerSpecificMapperFactories;
 
+        [Obsolete("Please use an alternative constructor.")]
+        public DbProviderFactoryCreator(
+            Func<string, DbProviderFactory> getFactory,
+            IEnumerable<ISqlSyntaxProvider> syntaxProviders,
+            IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
+            IEnumerable<IDatabaseCreator> databaseCreators,
+            IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories)
+        : this(
+            getFactory,
+            syntaxProviders,
+            bulkSqlInsertProviders,
+            databaseCreators,
+            providerSpecificMapperFactories,
+            Enumerable.Empty<IProviderSpecificInterceptor>())
+        {
+        }
+
         public DbProviderFactoryCreator(
             Func<string, DbProviderFactory> getFactory,
             IEnumerable<ISqlSyntaxProvider> syntaxProviders,

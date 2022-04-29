@@ -12,7 +12,7 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
 {
     private object _lock = new();
     private bool _initialized;
-    private IDistributedLockingMechanism? _distributedLockingMechanism;
+    private IDistributedLockingMechanism _distributedLockingMechanism = null!;
 
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IEnumerable<IDistributedLockingMechanism> _distributedLockingMechanisms;
@@ -25,7 +25,7 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
         _distributedLockingMechanisms = distributedLockingMechanisms;
     }
 
-    public IDistributedLockingMechanism? DistributedLockingMechanism
+    public IDistributedLockingMechanism DistributedLockingMechanism
     {
         get
         {
