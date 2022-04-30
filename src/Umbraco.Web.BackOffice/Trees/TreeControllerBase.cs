@@ -47,7 +47,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        [Obsolete("See GetTreeNodesAsync")]
         protected abstract ActionResult<TreeNodeCollection?> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
@@ -56,7 +55,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [Obsolete("See GetMenuForNodeAsync")]
         protected abstract ActionResult<MenuItemCollection>? GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
