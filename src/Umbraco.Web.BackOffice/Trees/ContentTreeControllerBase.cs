@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         protected abstract int[] UserStartNodes { get; }
 
-        protected virtual ActionResult<TreeNodeCollection?> PerformGetTreeNodes(string id, FormCollection queryStrings)
+        protected virtual ActionResult<TreeNodeCollection> PerformGetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <remarks>
         /// This method is overwritten strictly to render the recycle bin, it should serve no other purpose
         /// </remarks>
-        protected sealed override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
+        protected sealed override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             //check if we're rendering the root
             if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
@@ -384,7 +384,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
                 }
 
-                return nodes;
+                return nodes ?? new TreeNodeCollection();
             }
 
             return GetTreeNodesInternal(id, queryStrings);
@@ -435,7 +435,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <remarks>
         /// Currently this just checks if it is a container type, if it is we cannot render children. In the future this might check for other things.
         /// </remarks>
-        private ActionResult<TreeNodeCollection?> GetTreeNodesInternal(string id, FormCollection queryStrings)
+        private ActionResult<TreeNodeCollection> GetTreeNodesInternal(string id, FormCollection queryStrings)
         {
             var current = GetEntityFromId(id);
 
