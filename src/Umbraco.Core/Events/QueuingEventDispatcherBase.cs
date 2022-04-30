@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Collections;
@@ -62,13 +62,13 @@ namespace Umbraco.Cms.Core.Events
             Events.Add(new EventDefinition(eventHandler, sender, args, eventName));
         }
 
-        public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string eventName = null)
+        public void Dispatch<TArgs>(EventHandler<TArgs?> eventHandler, object sender, TArgs args, string eventName = null)
         {
             if (eventHandler == null) return;
             Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args, eventName));
         }
 
-        public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string eventName = null)
+        public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender?, TArgs> eventHandler, TSender sender, TArgs args, string eventName = null)
         {
             if (eventHandler == null) return;
             Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args, eventName));
