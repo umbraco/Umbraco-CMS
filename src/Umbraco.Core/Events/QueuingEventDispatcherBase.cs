@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Events
     public abstract class QueuingEventDispatcherBase : IEventDispatcher
     {
         //events will be enlisted in the order they are raised
-        private List<IEventDefinition> _events;
+        private List<IEventDefinition>? _events;
         private readonly bool _raiseCancelable;
 
         protected QueuingEventDispatcherBase(bool raiseCancelable)
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Events
 
         private List<IEventDefinition> Events => _events ?? (_events = new List<IEventDefinition>());
 
-        public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args, string eventName = null)
+        public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args, string? eventName = null)
         {
             if (eventHandler == null) return args.Cancel;
             if (_raiseCancelable == false) return args.Cancel;
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Events
             return args.Cancel;
         }
 
-        public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string eventName = null)
+        public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string? eventName = null)
             where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Events
             return args.Cancel;
         }
 
-        public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string eventName = null)
+        public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? eventName = null)
             where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
@@ -56,19 +56,19 @@ namespace Umbraco.Cms.Core.Events
             return args.Cancel;
         }
 
-        public void Dispatch(EventHandler eventHandler, object sender, EventArgs args, string eventName = null)
+        public void Dispatch(EventHandler eventHandler, object sender, EventArgs args, string? eventName = null)
         {
             if (eventHandler == null) return;
             Events.Add(new EventDefinition(eventHandler, sender, args, eventName));
         }
 
-        public void Dispatch<TArgs>(EventHandler<TArgs?> eventHandler, object sender, TArgs args, string eventName = null)
+        public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string? eventName = null)
         {
             if (eventHandler == null) return;
             Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args, eventName));
         }
 
-        public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender?, TArgs> eventHandler, TSender sender, TArgs args, string eventName = null)
+        public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? eventName = null)
         {
             if (eventHandler == null) return;
             Events.Add(new EventDefinition<TSender, TArgs>(eventHandler, sender, args, eventName));
@@ -106,8 +106,8 @@ namespace Umbraco.Cms.Core.Events
 
         private class EventDefinitionInfos
         {
-            public IEventDefinition EventDefinition { get; set; }
-            public Type[] SupersedeTypes { get; set; }
+            public IEventDefinition? EventDefinition { get; set; }
+            public Type[]? SupersedeTypes { get; set; }
         }
 
         // this is way too convoluted, the supersede attribute is used only on DeleteEventargs to specify
@@ -291,13 +291,13 @@ namespace Umbraco.Cms.Core.Events
         private static bool IsSuperceeded(IEntity entity, EventDefinitionInfos infos, List<Tuple<IEntity, EventDefinitionInfos>> entities)
         {
             //var argType = meta.EventArgsType;
-            var argType = infos.EventDefinition.Args.GetType();
+            var argType = infos.EventDefinition?.Args.GetType();
 
             // look for other instances of the same entity, coming from an event args that supersedes other event args,
             // ie is marked with the attribute, and is not this event args (cannot supersede itself)
             var superceeding = entities
-                .Where(x => x.Item2.SupersedeTypes.Length > 0 // has the attribute
-                    && x.Item2.EventDefinition.Args.GetType() != argType // is not the same
+                .Where(x => x.Item2.SupersedeTypes?.Length > 0 // has the attribute
+                    && x.Item2.EventDefinition?.Args.GetType() != argType // is not the same
                     && Equals(x.Item1, entity)) // same entity
                 .ToArray();
 
@@ -306,27 +306,27 @@ namespace Umbraco.Cms.Core.Events
                 return false;
 
             // delete event args does NOT supersedes 'unpublished' event
-            if (argType.IsGenericType && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition.EventName == "Unpublished")
+            if ((argType?.IsGenericType ?? false) && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition?.EventName == "Unpublished")
                 return false;
 
             // found occurrences, need to determine if this event args is superseded
-            if (argType.IsGenericType)
+            if (argType?.IsGenericType ?? false)
             {
                 // generic, must compare type arguments
                 var supercededBy = superceeding.FirstOrDefault(x =>
-                    x.Item2.SupersedeTypes.Any(y =>
+                    x.Item2.SupersedeTypes?.Any(y =>
                         // superseding a generic type which has the same generic type definition
                         // (but ... no matter the generic type parameters? could be different?)
                         y.IsGenericTypeDefinition && y == argType.GetGenericTypeDefinition()
                         // or superceeding a non-generic type which is ... (but... how is this ever possible? argType *is* generic?
-                        || y.IsGenericTypeDefinition == false && y == argType));
+                        || y.IsGenericTypeDefinition == false && y == argType) ?? false);
                 return supercededBy != null;
             }
             else
             {
                 // non-generic, can compare types 1:1
                 var supercededBy = superceeding.FirstOrDefault(x =>
-                    x.Item2.SupersedeTypes.Any(y => y == argType));
+                    x.Item2.SupersedeTypes?.Any(y => y == argType) ?? false);
                 return supercededBy != null;
             }
         }

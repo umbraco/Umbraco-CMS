@@ -6,7 +6,6 @@
     <PackageId>Umbraco.Cms.PublishedCache.NuCache</PackageId>
     <Title>Umbraco CMS Published Cache</Title>
     <Description>Contains the Published Cache assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

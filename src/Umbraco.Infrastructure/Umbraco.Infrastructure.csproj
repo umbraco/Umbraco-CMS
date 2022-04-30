@@ -6,7 +6,6 @@
         <PackageId>Umbraco.Cms.Infrastructure</PackageId>
         <Title>Umbraco CMS Infrastructure</Title>
         <Description>Contains the infrastructure assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -49,7 +48,7 @@
       <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
-      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />

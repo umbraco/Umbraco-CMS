@@ -15,7 +15,7 @@ internal class RegisteredReloadableLogger
     private static object s_frozenLock = new();
     private readonly ReloadableLogger _logger;
 
-    public RegisteredReloadableLogger(ReloadableLogger logger) =>
+    public RegisteredReloadableLogger(ReloadableLogger? logger) =>
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public ILogger Logger => _logger;
