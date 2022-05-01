@@ -25,6 +25,10 @@
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
     </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot" />
+  </ItemGroup>
+
     <!-- Keep this as false if ModelsBuilder mode is InMemoryAuto -->
     <PropertyGroup>
         <RazorCompileOnBuild>false</RazorCompileOnBuild>

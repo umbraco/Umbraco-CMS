@@ -5,6 +5,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <PackageId>Umbraco.Cms.StaticAssets</PackageId>
     <Description>Contains the static assets that is required to run Umbraco CMS.</Description>
+    <StaticWebAssetBasePath>umbraco</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>

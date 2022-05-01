@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common.Extensions;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
