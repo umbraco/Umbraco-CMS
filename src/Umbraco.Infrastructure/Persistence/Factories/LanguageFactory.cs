@@ -1,4 +1,3 @@
-using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -8,7 +7,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
     {
         public static ILanguage BuildEntity(LanguageDto dto)
         {
-            var lang = new Language(dto.IsoCode!, dto.CultureName!)
+            ArgumentNullException.ThrowIfNull(dto);
+            if (dto.IsoCode == null || dto.CultureName == null)
+            {
+                throw new InvalidOperationException("Language ISO code and/or culture name can't be null.");
+            }
+
+            var lang = new Language(dto.IsoCode, dto.CultureName)
             {
                 Id = dto.Id,
                 IsDefault = dto.IsDefault,
@@ -16,17 +21,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 FallbackLanguageId = dto.FallbackLanguageId
             };
 
-            // reset dirty initial properties (U4-1946)
+            // Reset dirty initial properties
             lang.ResetDirtyProperties(false);
+
             return lang;
         }
 
         public static LanguageDto BuildDto(ILanguage entity)
         {
+            ArgumentNullException.ThrowIfNull(entity);
+
             var dto = new LanguageDto
             {
-                CultureName = entity.CultureName,
                 IsoCode = entity.IsoCode,
+                CultureName = entity.CultureName,
                 IsDefault = entity.IsDefault,
                 IsMandatory = entity.IsMandatory,
                 FallbackLanguageId = entity.FallbackLanguageId
@@ -34,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
             if (entity.HasIdentity)
             {
-                dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
+                dto.Id = (short)entity.Id;
             }
 
             return dto;

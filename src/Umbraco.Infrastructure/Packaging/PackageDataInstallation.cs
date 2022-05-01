@@ -1426,14 +1426,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             foreach (var languageElement in languageElements)
             {
                 var isoCode = languageElement.AttributeValue<string>("CultureAlias");
+                if (string.IsNullOrEmpty(isoCode))
+                {
+                    continue;
+                }
+
                 var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
                 if (existingLanguage != null)
                 {
                     continue;
                 }
 
-                var langauge = new Language(isoCode!, languageElement.AttributeValue<string>("FriendlyName")!);
+                var cultureName = languageElement.AttributeValue<string>("FriendlyName") ?? isoCode;
+
+                var langauge = new Language(isoCode, cultureName);
                 _localizationService.Save(langauge, userId);
+
                 list.Add(langauge);
             }
 
