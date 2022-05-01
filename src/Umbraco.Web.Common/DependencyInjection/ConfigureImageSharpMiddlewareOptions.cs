@@ -46,8 +46,8 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
             options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
             options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
 
-            // Use our own image URL token generator
-            options.OnComputeHMACAsync = (context, secret) =>
+            // Use the image URL token generator to compute the HMAC
+            options.OnComputeHMACAsync = (context, _) =>
             {
                 string imageUrl = UriHelper.BuildRelative(context.Context.Request.PathBase, context.Context.Request.Path);
 
@@ -59,6 +59,7 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
             {
                 if (context.Commands.Count == 0 || _imagingSettings.HMACSecretKey?.Length > 0)
                 {
+                    // Nothing to parse or using HMAC authentication
                     return Task.CompletedTask;
                 }
 
@@ -88,9 +89,12 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
                     {
                         Public = true
                     };
-                    cacheControl.MustRevalidate = false; // ImageSharp enables this by default
+
+                    // ImageSharp enables cache revalidation by default, so disable and add immutable directive
+                    cacheControl.MustRevalidate = false;
                     cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
 
+                    // Set updated value
                     headers.CacheControl = cacheControl;
                 }
 
