@@ -22,9 +22,9 @@ namespace Umbraco.Extensions
             var root = webHostEnvironment.WebRootPath;
 
             //Create if missing
-            if (string.IsNullOrWhiteSpace(webHostEnvironment.WebRootPath))
+            if (string.IsNullOrWhiteSpace(root))
             {
-                webHostEnvironment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                root = webHostEnvironment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             }
 
             var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
