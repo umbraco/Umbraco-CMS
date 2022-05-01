@@ -81,6 +81,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="TSource">Source type</typeparam>
         /// <typeparam name="TKey">Key type</typeparam>
         /// <returns>the unique list</returns>
+        [Obsolete("Use the DistinctBy extension method added in .NET 6 instead.")]
         public static IEnumerable<TSource> LegacyDistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource?, TKey> keySelector)
             where TKey : IEquatable<TKey>
         {
