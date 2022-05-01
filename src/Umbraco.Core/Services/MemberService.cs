@@ -852,7 +852,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private void DeleteLocked(ICoreScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object>? notificationState = null)
+        private void DeleteLocked(ICoreScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object?>? notificationState = null)
         {
             // a member has no descendants
             _memberRepository.Delete(member);

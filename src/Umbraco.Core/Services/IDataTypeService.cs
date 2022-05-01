@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        IEnumerable<IDataType>? GetAll(params int[] ids);
+        IEnumerable<IDataType> GetAll(params int[] ids);
 
         /// <summary>
         /// Saves an <see cref="IDataType"/>

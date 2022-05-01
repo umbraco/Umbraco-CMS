@@ -364,15 +364,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        public IEnumerable<IDataType>? GetAll(params int[] ids)
+        public IEnumerable<IDataType> GetAll(params int[] ids)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var dataTypes = _dataTypeRepository.GetMany(ids);
-                if (dataTypes is null)
-                {
-                    return null;
-                }
 
                 ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
                 return dataTypes;
