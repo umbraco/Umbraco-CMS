@@ -94,18 +94,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
-
-        [Test]
-        public void LanguageFilesAreLowercase()
-        {
-            IEnumerable<string> files = GetUiFiles(new[] { "umbraco", "config", "lang" });
-            foreach (var fileName in files)
-            {
-                Assert.AreEqual(
-                    fileName.ToLower(),
-                    fileName,
-                    $"Language files must be all lowercase but {fileName} is not lowercase.");
-            }
-        }
+        
     }
 }
