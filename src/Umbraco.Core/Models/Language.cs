@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
@@ -18,10 +17,15 @@ namespace Umbraco.Cms.Core.Models
         private bool _mandatory;
         private int? _fallbackLanguageId;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Language" /> class.
+        /// </summary>
+        /// <param name="isoCode">The ISO code of the language.</param>
+        /// <param name="cultureName">The name of the language.</param>
         public Language(string isoCode, string cultureName)
         {
-            IsoCode = isoCode;
-            CultureName = cultureName;
+            _isoCode = isoCode ?? throw new ArgumentNullException(nameof(isoCode));
+            _cultureName = cultureName ?? throw new ArgumentNullException(nameof(cultureName));
         }
 
         /// <inheritdoc />
@@ -29,15 +33,25 @@ namespace Umbraco.Cms.Core.Models
         public string IsoCode
         {
             get => _isoCode;
-            set => SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+
+                SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
+            }
         }
 
         /// <inheritdoc />
         [DataMember]
-        public string? CultureName
+        public string CultureName
         {
             get => _cultureName;
-            set => SetPropertyValueAndDetectChanges(value, ref _cultureName, nameof(CultureName));
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+
+                SetPropertyValueAndDetectChanges(value, ref _cultureName!, nameof(CultureName));
+            }
         }
 
         /// <inheritdoc />

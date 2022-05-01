@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -152,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 // create it (creating a new language cannot create a fallback cycle)
-                var newLang = new Cms.Core.Models.Language(culture.Name, language.Name)
+                var newLang = new Cms.Core.Models.Language(culture.Name, language.Name!)
                 {
                     IsDefault = language.IsDefault,
                     IsMandatory = language.IsMandatory,
@@ -163,8 +160,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return _umbracoMapper.Map<Language>(newLang);
             }
 
-            existingById.IsoCode = language.IsoCode;
-            existingById.CultureName = language.Name;
+            existingById.IsoCode = language.IsoCode!;
+            existingById.CultureName = language.Name!;
 
             // note that the service will prevent the default language from being "un-defaulted"
             // but does not hurt to test here - though the UI should prevent it too

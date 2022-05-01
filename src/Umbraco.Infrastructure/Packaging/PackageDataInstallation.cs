@@ -1432,7 +1432,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                var langauge = new Language(isoCode, languageElement.AttributeValue<string>("FriendlyName"));
+                var langauge = new Language(isoCode!, languageElement.AttributeValue<string>("FriendlyName")!);
                 _localizationService.Save(langauge, userId);
                 list.Add(langauge);
             }

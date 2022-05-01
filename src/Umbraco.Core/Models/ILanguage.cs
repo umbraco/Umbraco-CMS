@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the culture name of the language.
         /// </summary>
         [DataMember]
-        string? CultureName { get; set; }
+        string CultureName { get; set; }
 
         /// <summary>
         /// Gets the <see cref="CultureInfo"/> object for the language.
