@@ -12,7 +12,7 @@ module.exports = function (config) {
         files: [
 
             // Jasmine plugins
-            
+
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/angular/angular.min.js',
@@ -34,12 +34,12 @@ module.exports = function (config) {
             'test/config/app.unit.js',
 
             //application files
-            '../Umbraco.Web.UI/wwwroot/umbraco/js/*.controllers.min.js',
-            '../Umbraco.Web.UI/wwwroot/umbraco/js/*.directives.min.js',
-            '../Umbraco.Web.UI/wwwroot/umbraco/js/*.filters.min.js',
-            '../Umbraco.Web.UI/wwwroot/umbraco/js/*.services.min.js',
-            '../Umbraco.Web.UI/wwwroot/umbraco/js/*.interceptors.min.js',
-            '../Umbraco.Web.UI/wwwroot/umbraco/js/*.resources.min.js',
+            '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.controllers.min.js',
+            '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.directives.min.js',
+            '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.filters.min.js',
+            '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.services.min.js',
+            '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.interceptors.min.js',
+            '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.resources.min.js',
 
             //mocked data and routing
             'src/common/mocks/umbraco.servervariables.js',
@@ -102,7 +102,7 @@ module.exports = function (config) {
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
         browsers: ['jsdom'],
-		
+
 		// Configure a user agent so the log file gets generated properly
 		jsdomLauncher: {
 		  jsdom: {
@@ -111,7 +111,7 @@ module.exports = function (config) {
 			})
 		  }
 		},
-		
+
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms

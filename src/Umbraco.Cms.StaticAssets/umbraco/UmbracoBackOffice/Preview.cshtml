@@ -108,7 +108,7 @@
     @await Html.BareMinimumServerVariablesScriptAsync(BackOfficeServerVariables)
 
     <script src="../lib/lazyload-js/LazyLoad.min.js"></script>
-    <script src="@Url.GetUrlWithCacheBust("Application", "Preview", null, HostingEnvironment, UmbracoVersion, RuntimeMinifier)"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "Preview", null!, HostingEnvironment, UmbracoVersion, RuntimeMinifier)"></script>
 
 </body>
 </html>
