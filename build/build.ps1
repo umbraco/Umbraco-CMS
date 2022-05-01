@@ -301,13 +301,6 @@
       $_.CreationTime = $_.CreationTime.AddHours(-11)
       $_.LastWriteTime = $_.LastWriteTime.AddHours(-11)
     }
-
-    # copy Belle
-    Write-Host "Copy Belle"
-    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
-    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
-    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
-    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
   })
 
 
