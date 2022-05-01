@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Web.Common.Media
 
             if (options.CacheBusterValue is string cacheBusterValue && !string.IsNullOrEmpty(cacheBusterValue))
             {
-                queryString.Add("rnd", cacheBusterValue);
+                queryString.Add("v", cacheBusterValue);
             }
 
             return QueryHelpers.AddQueryString(options.ImageUrl, queryString);

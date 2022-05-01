@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // so ignore and we won't set a last modified date.
             }
 
-            var rnd = imageLastModified.HasValue ? imageLastModified.Value.ToFileTime().ToString(CultureInfo.InvariantCulture) : null;
+            var rnd = imageLastModified.HasValue ? imageLastModified.Value.ToFileTime().ToString("x", CultureInfo.InvariantCulture) : null;
             var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath)
             {
                 Width = width,

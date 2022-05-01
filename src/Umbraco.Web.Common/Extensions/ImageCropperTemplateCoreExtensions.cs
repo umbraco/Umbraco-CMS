@@ -273,7 +273,7 @@ namespace Umbraco.Extensions
                 }
             }
 
-            var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
+            var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString("x", CultureInfo.InvariantCulture) : null;
 
             return GetCropUrl(
                 mediaItemUrl, imageUrlGenerator, localCrops, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,

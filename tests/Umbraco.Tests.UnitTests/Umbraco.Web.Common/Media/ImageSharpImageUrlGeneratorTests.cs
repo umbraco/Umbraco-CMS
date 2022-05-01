@@ -176,15 +176,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media
 
             // CacheBusterValue isn't included in HMAC generation
             options.CacheBusterValue = "not-included-in-hmac";
-            Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&rnd=not-included-in-hmac", generator.GetImageUrl(options));
+            Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=not-included-in-hmac", generator.GetImageUrl(options));
 
             // Removing height should generate a different HMAC
             options.Height = null;
-            Assert.AreEqual(MediaPath + "?width=400&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&rnd=not-included-in-hmac", generator.GetImageUrl(options));
+            Assert.AreEqual(MediaPath + "?width=400&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&v=not-included-in-hmac", generator.GetImageUrl(options));
 
             // But adding it again using FurtherOptions should include it (and produce the same HMAC as before)
             options.FurtherOptions = "height=400";
-            Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&rnd=not-included-in-hmac", generator.GetImageUrl(options));
+            Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=not-included-in-hmac", generator.GetImageUrl(options));
         }
     }
 }
