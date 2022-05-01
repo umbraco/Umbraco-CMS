@@ -5,7 +5,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <PackageId>Umbraco.Cms.StaticAssets</PackageId>
     <Description>Contains the static assets that is required to run Umbraco CMS.</Description>
-    <StaticWebAssetBasePath>umbraco</StaticWebAssetBasePath>
+    <StaticWebAssetBasePath>wwwroot// </StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" PrivateAssets="All"  />
   </ItemGroup>
 
 
