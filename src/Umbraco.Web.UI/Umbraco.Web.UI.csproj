@@ -4,12 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
   </PropertyGroup>
-
-  <Import Project="../../build/NuSpecs/buildTransitive/Umbraco.Cms.StaticAssets.props" />
-  <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot/umbraco/**</DefaultItemExcludes>
-  </PropertyGroup>
-  
+    
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
   </PropertyGroup>
