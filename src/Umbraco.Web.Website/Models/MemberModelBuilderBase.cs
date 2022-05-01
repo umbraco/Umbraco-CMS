@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Website.Models
 
         public IMemberTypeService MemberTypeService { get; }
 
-        protected List<MemberPropertyModel> GetMemberPropertiesViewModel(IMemberType memberType, IMember member = null)
+        protected List<MemberPropertyModel> GetMemberPropertiesViewModel(IMemberType memberType, IMember? member = null)
         {
             var viewProperties = new List<MemberPropertyModel>();
 
@@ -35,10 +35,10 @@ namespace Umbraco.Cms.Web.Website.Models
                 var value = string.Empty;
                 if (member != null)
                 {
-                    IProperty propValue = member.Properties[prop.Alias];
+                    IProperty? propValue = member.Properties[prop.Alias];
                     if (propValue != null && propValue.GetValue() != null)
                     {
-                        value = propValue.GetValue().ToString();
+                        value = propValue.GetValue()?.ToString();
                     }
                 }
 

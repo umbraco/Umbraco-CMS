@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _serverMessenger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IUmbracoContextFactory umbracoContextFactory,
             ILogger<ScheduledPublishing> logger,
             IServerMessenger serverMessenger,
-            IScopeProvider scopeProvider)
+            ICoreScopeProvider scopeProvider)
             : base(logger, TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtimeState = runtimeState;
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _scopeProvider = scopeProvider;
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
             {
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // - and we should definitively *not* have to flush it here (should be auto)
 
                 using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
-                using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+                using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
                 /* We used to assume that there will never be two instances running concurrently where (IsMainDom && ServerRole == SchedulingPublisher)
                  * However this is possible during an azure deployment slot swap for the SchedulingPublisher instance when trying to achieve zero downtime deployments.

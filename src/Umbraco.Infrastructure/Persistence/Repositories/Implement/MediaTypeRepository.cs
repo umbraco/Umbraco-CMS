@@ -38,27 +38,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         // every PerformGet/Exists just GetMany() and then filters
         // except PerformGetAll which is the one really doing the job
 
-        protected override IMediaType PerformGet(int id)
-            => GetMany().FirstOrDefault(x => x.Id == id);
+        protected override IMediaType? PerformGet(int id)
+            => GetMany()?.FirstOrDefault(x => x.Id == id);
 
-        protected override IMediaType PerformGet(Guid id)
-            => GetMany().FirstOrDefault(x => x.Key == id);
+        protected override IMediaType? PerformGet(Guid id)
+            => GetMany()?.FirstOrDefault(x => x.Key == id);
 
         protected override bool PerformExists(Guid id)
-            => GetMany().FirstOrDefault(x => x.Key == id) != null;
+            => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
 
-        protected override IMediaType PerformGet(string alias)
-            => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        protected override IMediaType? PerformGet(string alias)
+            => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
-        protected override IEnumerable<IMediaType> GetAllWithFullCachePolicy()
+        protected override IEnumerable<IMediaType>? GetAllWithFullCachePolicy()
         {
-            return CommonRepository.GetAllTypes().OfType<IMediaType>();
+            return CommonRepository.GetAllTypes()?.OfType<IMediaType>();
         }
 
-        protected override IEnumerable<IMediaType> PerformGetAll(params Guid[] ids)
+        protected override IEnumerable<IMediaType>? PerformGetAll(params Guid[]? ids)
         {
             var all = GetMany();
-            return ids.Any() ? all.Where(x => ids.Contains(x.Key)) : all;
+            return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
         }
 
         protected override IEnumerable<IMediaType> PerformGetByQuery(IQuery<IMediaType> query)
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sql = translator.Translate();
             var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IMediaType>();
+            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name).WhereNotNull() : Enumerable.Empty<IMediaType>();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)

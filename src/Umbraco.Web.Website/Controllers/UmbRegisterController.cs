@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly IMemberManager _memberManager;
         private readonly IMemberService _memberService;
         private readonly IMemberSignInManager _memberSignInManager;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         public UmbRegisterController(
             IMemberManager memberManager,
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
             IMemberSignInManager memberSignInManager,
-            IScopeProvider scopeProvider)
+            ICoreScopeProvider scopeProvider)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
             _memberManager = memberManager;
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 // If there is a specified path to redirect to then use it.
                 if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
                 {
-                    return Redirect(model.RedirectUrl);
+                    return Redirect(model.RedirectUrl!);
                 }
 
                 // Redirect to current page by default.
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
             if (RouteData.Values.TryGetValue(nameof(RegisterModel.MemberTypeAlias), out var memberTypeAlias) && memberTypeAlias != null)
             {
-                model.MemberTypeAlias = memberTypeAlias.ToString();
+                model.MemberTypeAlias = memberTypeAlias.ToString()!;
             }
 
             if (RouteData.Values.TryGetValue(nameof(RegisterModel.UsernameIsEmail), out var usernameIsEmail) && usernameIsEmail != null)
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         /// <returns>Result of registration operation.</returns>
         private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
         {
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
             // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
             // If name field is empty, add the email address instead.
@@ -136,11 +136,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
             {
                 // Update the custom properties
                 // TODO: See TODO in MembersIdentityUser, Should we support custom member properties for persistence/retrieval?
-                IMember member = _memberService.GetByKey(identityUser.Key);
+                IMember? member = _memberService.GetByKey(identityUser.Key);
                 if (member == null)
                 {
                     // should never happen
-                    throw new InvalidOperationException($"Could not find a member with key: {member.Key}.");
+                    throw new InvalidOperationException($"Could not find a member with key: {member?.Key}.");
                 }
 
                 if (model.MemberProperties != null)
@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                     foreach (MemberPropertyModel property in model.MemberProperties.Where(p => p.Value != null)
                         .Where(property => member.Properties.Contains(property.Alias)))
                     {
-                        member.Properties[property.Alias].SetValue(property.Value);
+                        member.Properties[property.Alias]?.SetValue(property.Value);
                     }
                 }
                 _memberService.Save(member);

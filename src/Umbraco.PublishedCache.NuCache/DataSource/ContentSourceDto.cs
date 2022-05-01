@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         public int ContentTypeId { get; set; }
 
         public int Level { get; set; }
-        public string Path { get; set; }
+        public string Path { get; set; } = string.Empty;
         public int SortOrder { get; set; }
         public int ParentId { get; set; }
 
@@ -23,25 +23,25 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
         // edited data
         public int VersionId { get; set; }
-        public string EditName { get; set; }
+        public string? EditName { get; set; }
         public DateTime EditVersionDate { get; set; }
         public int EditWriterId { get; set; }
         public int EditTemplateId { get; set; }
-        public string EditData { get; set; }
-        public byte[] EditDataRaw { get; set; }
+        public string? EditData { get; set; }
+        public byte[]? EditDataRaw { get; set; }
 
         // published data
         public int PublishedVersionId { get; set; }
-        public string PubName { get; set; }
+        public string? PubName { get; set; }
         public DateTime PubVersionDate { get; set; }
         public int PubWriterId { get; set; }
         public int PubTemplateId { get; set; }
-        public string PubData { get; set; }
-        public byte[] PubDataRaw { get; set; }
+        public string? PubData { get; set; }
+        public byte[]? PubDataRaw { get; set; }
 
         // Explicit implementation
         DateTime IReadOnlyContentBase.UpdateDate => EditVersionDate;
-        string IReadOnlyContentBase.Name => EditName;
+        string? IReadOnlyContentBase.Name => EditName;
         int IReadOnlyContentBase.WriterId => EditWriterId;
     }
 }

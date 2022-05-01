@@ -53,19 +53,19 @@ namespace Umbraco.Cms.Core.Cache
                     if (payload.ChangeTypes == TreeChangeTypes.Remove)
                        _idKeyMap.ClearCache(payload.Id);
 
-                    if (!mediaCache) continue;
+                    if (!mediaCache.Success) continue;
 
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
-                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
+                    mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+                    mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
 
                     // remove those that are in the branch
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                     {
                         var pathid = "," + payload.Id + ",";
-                        mediaCache.Result.ClearOfType<IMedia>((_, v) => v.Path.Contains(pathid));
+                        mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
                     }
                 }
             }

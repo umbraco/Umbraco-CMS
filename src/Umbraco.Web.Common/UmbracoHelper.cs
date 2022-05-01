@@ -24,8 +24,8 @@ namespace Umbraco.Cms.Web.Common
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
 
-        private IPublishedContent _currentPage;
-        private ICultureDictionary _cultureDictionary;
+        private IPublishedContent? _currentPage;
+        private ICultureDictionary? _cultureDictionary;
 
         #region Constructors
 
@@ -50,7 +50,9 @@ namespace Umbraco.Cms.Web.Common
         /// Initializes a new empty instance of <see cref="UmbracoHelper"/>.
         /// </summary>
         /// <remarks>For tests - nothing is initialized.</remarks>
+#pragma warning disable CS8618
         internal UmbracoHelper()
+#pragma warning restore CS8618
         { }
 
         #endregion
@@ -137,7 +139,7 @@ namespace Umbraco.Cms.Web.Common
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string GetDictionaryValue(string key)
+        public string? GetDictionaryValue(string key)
         {
             return CultureDictionary[key];
         }
@@ -174,14 +176,14 @@ namespace Umbraco.Cms.Web.Common
         /// </summary>
         /// <param name="id">The unique identifier, or the key, of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(object id)
+        public IPublishedContent? Content(object id)
         {
             return ContentForObject(id);
         }
 
-        private IPublishedContent ContentForObject(object id) => _publishedContentQuery.Content(id);
+        private IPublishedContent? ContentForObject(object id) => _publishedContentQuery.Content(id);
 
-        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
         }
@@ -191,23 +193,23 @@ namespace Umbraco.Cms.Web.Common
         /// </summary>
         /// <param name="id">The unique identifier of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(int id) => _publishedContentQuery.Content(id);
+        public IPublishedContent? Content(int id) => _publishedContentQuery.Content(id);
 
         /// <summary>
         /// Gets a content item from the cache.
         /// </summary>
         /// <param name="id">The key of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(Guid id) => _publishedContentQuery.Content(id);
+        public IPublishedContent? Content(Guid id) => _publishedContentQuery.Content(id);
 
         /// <summary>
         /// Gets a content item from the cache.
         /// </summary>
         /// <param name="id">The unique identifier, or the key, of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(string id) => _publishedContentQuery.Content(id);
+        public IPublishedContent? Content(string id) => _publishedContentQuery.Content(id);
 
-        public IPublishedContent Content(Udi id) => _publishedContentQuery.Content(id);
+        public IPublishedContent? Content(Udi id) => _publishedContentQuery.Content(id);
 
         /// <summary>
         /// Gets content items from the cache.
@@ -318,9 +320,9 @@ namespace Umbraco.Cms.Web.Common
         #endregion
         #region Media
 
-        public IPublishedContent Media(Udi id) => _publishedContentQuery.Media(id);
+        public IPublishedContent? Media(Udi id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(Guid id) => _publishedContentQuery.Media(id);
+        public IPublishedContent? Media(Guid id) => _publishedContentQuery.Media(id);
 
         /// <summary>
         /// Overloaded method accepting an 'object' type
@@ -332,16 +334,16 @@ namespace Umbraco.Cms.Web.Common
         /// this result in to this method.
         /// This method will throw an exception if the value is not of type int or string.
         /// </remarks>
-        public IPublishedContent Media(object id)
+        public IPublishedContent? Media(object id)
         {
             return MediaForObject(id);
         }
 
-        private IPublishedContent MediaForObject(object id) => _publishedContentQuery.Media(id);
+        private IPublishedContent? MediaForObject(object id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(int id) => _publishedContentQuery.Media(id);
+        public IPublishedContent? Media(int id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(string id) => _publishedContentQuery.Media(id);
+        public IPublishedContent? Media(string id) => _publishedContentQuery.Media(id);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.

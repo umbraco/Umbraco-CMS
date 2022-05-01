@@ -21,6 +21,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public bool Duplicate { get; set; }
 
         [DataMember(Name = "other")]
-        public string Other { get; set; }
+        public string? Other { get; set; }
     }
 }

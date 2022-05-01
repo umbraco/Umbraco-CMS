@@ -200,6 +200,10 @@ angular.module('umbraco.services')
          * localizationService.localizeMany(["speechBubbles_templateErrorHeader", "speechBubbles_templateErrorText"]).then(function(data){
          *      var header = data[0];
          *      var message = data[1];
+         *
+         *
+         *
+         *
          *      notificationService.error(header, message);
          * });
          * </pre>

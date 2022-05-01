@@ -26,7 +26,7 @@ namespace Umbraco.Extensions
         /// <param name="cacheKey">used to cache the partial view, this key could change if it is cached by page or by member</param>
         /// <param name="viewData"></param>
         /// <returns></returns>
-        public static IHtmlContent CachedPartialView(
+        public static IHtmlContent? CachedPartialView(
             this AppCaches appCaches,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContext umbracoContext,
@@ -35,7 +35,7 @@ namespace Umbraco.Extensions
             object model,
             TimeSpan cacheTimeout,
             string cacheKey,
-            ViewDataDictionary viewData = null
+            ViewDataDictionary? viewData = null
             )
         {
             //disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940

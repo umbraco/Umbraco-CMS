@@ -2,6 +2,6 @@
 {
     public class NoNodesViewModel
     {
-        public string UmbracoPath { get; set; }
+        public string? UmbracoPath { get; set; }
     }
 }

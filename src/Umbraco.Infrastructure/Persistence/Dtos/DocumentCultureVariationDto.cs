@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         // this is convenient to carry the culture around, but has no db counterpart
         [Ignore]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         // authority on whether a culture has been edited
         [Column("edited")]
@@ -47,6 +47,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         // (otherwise, it's the published one, 'cos we need to have one)
         [Column("name")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

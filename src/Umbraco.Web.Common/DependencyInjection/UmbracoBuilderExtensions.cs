@@ -1,23 +1,23 @@
 using System;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Hosting;
+using Serilog.Extensions.Logging;
 using Smidge;
 using Smidge.Cache;
 using Smidge.FileProcessors;
@@ -29,6 +29,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
@@ -90,15 +91,12 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(config));
             }
 
-            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
-            var loggingConfig = new LoggingConfiguration(loggingDir);
-
-            services.AddLogger(tempHostingEnvironment, loggingConfig, config);
+            // Setup static application logging ASAP (e.g. during configure services).
+            // Will log to SilentLogger until Serilog.Log.Logger is setup.
+            StaticApplicationLogging.Initialize(new SerilogLoggerFactory());
 
             // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
-            AppDomain.CurrentDomain.SetData("DataDirectory", tempHostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
+            AppDomain.CurrentDomain.SetData("DataDirectory", webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data));
 
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
@@ -114,18 +112,16 @@ namespace Umbraco.Extensions
 
             IProfiler profiler = GetWebProfiler(config);
 
-            ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+            services.AddLogger(webHostEnvironment, config);
 
-            TypeLoader typeLoader = services.AddTypeLoader(
-                Assembly.GetEntryAssembly(),
-                tempHostingEnvironment,
-                loggerFactory,
-                appCaches,
-                config,
-                profiler);
+            ILoggerFactory loggerFactory = new SerilogLoggerFactory();
 
+            TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
+
+            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
         }
+
 
         /// <summary>
         /// Adds core Umbraco services
@@ -142,7 +138,8 @@ namespace Umbraco.Extensions
 
             // Add ASP.NET specific services
             builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
-            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
+            builder.Services.AddUnique<IHostingEnvironment>(sp => ActivatorUtilities.CreateInstance<AspNetCoreHostingEnvironment>(sp, sp.GetRequiredService<IApplicationDiscriminator>()));
+
             builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
@@ -159,10 +156,12 @@ namespace Umbraco.Extensions
             ));
 
             builder.AddCoreInitialServices();
+            builder.AddTelemetryProviders();
 
             // aspnet app lifetime mgmt
             builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
             builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
+            builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
 
             return builder;
         }
@@ -220,7 +219,7 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder> mvcBuilding = null)
+        public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder>? mvcBuilding = null)
         {
             // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
             // this will directly affect developers who need to call that themselves.
@@ -344,7 +343,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()?
                 .Add(umbracoApiControllerTypes);
 
             builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
@@ -412,22 +411,15 @@ namespace Umbraco.Extensions
         private static IHostingEnvironment GetTemporaryHostingEnvironment(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
             var hostingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
-            var webRoutingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigWebRouting).Get<WebRoutingSettings>() ?? new WebRoutingSettings();
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
+
+            var webRoutingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigWebRouting).Get<WebRoutingSettings>() ?? new WebRoutingSettings();
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
-            // This is needed in order to create a unique Application Id
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddDataProtection();
-            serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-
             return new AspNetCoreHostingEnvironment(
-                serviceProvider,
                 wrappedHostingSettings,
                 wrappedWebRoutingSettings,
                 webHostEnvironment);
         }
-
     }
 }

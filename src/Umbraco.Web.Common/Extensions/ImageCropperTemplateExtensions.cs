@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
 
         internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {
-            ImageCropperValue imageCrops = null;
+            ImageCropperValue? imageCrops = null;
 
             if (json.DetectIsJson())
             {

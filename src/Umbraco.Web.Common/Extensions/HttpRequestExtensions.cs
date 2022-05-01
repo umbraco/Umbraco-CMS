@@ -29,8 +29,8 @@ namespace Umbraco.Extensions
         public static bool IsBackOfficeRequest(this HttpRequest request)
         {
             PathString absPath = request.Path;
-            UmbracoRequestPaths umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
-            return umbReqPaths.IsBackOfficeRequest(absPath);
+            UmbracoRequestPaths? umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
+            return umbReqPaths?.IsBackOfficeRequest(absPath) ?? false;
         }
 
         /// <summary>
@@ -39,11 +39,11 @@ namespace Umbraco.Extensions
         public static bool IsClientSideRequest(this HttpRequest request)
         {
             PathString absPath = request.Path;
-            UmbracoRequestPaths umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
-            return umbReqPaths.IsClientSideRequest(absPath);
+            UmbracoRequestPaths? umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
+            return umbReqPaths?.IsClientSideRequest(absPath) ?? false;
         }
 
-        public static string ClientCulture(this HttpRequest request)
+        public static string? ClientCulture(this HttpRequest request)
             => request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;
 
         /// <summary>
@@ -56,10 +56,10 @@ namespace Umbraco.Extensions
         public static bool IsLocal(this HttpRequest request)
         {
             var connection = request.HttpContext.Connection;
-            if (connection.RemoteIpAddress.IsSet())
+            if (connection.RemoteIpAddress?.IsSet() ?? false)
             {
                 // We have a remote address set up
-                return connection.LocalIpAddress.IsSet()
+                return connection.LocalIpAddress?.IsSet() ?? false
                     // Is local is same as remote, then we are local
                     ? connection.RemoteIpAddress.Equals(connection.LocalIpAddress)
                     // else we are remote if the remote IP address is not a loopback address
@@ -75,7 +75,7 @@ namespace Umbraco.Extensions
             return address != null && address.ToString() != NullIpAddress;
         }
 
-        public static string GetRawBodyString(this HttpRequest request, Encoding encoding = null)
+        public static string GetRawBodyString(this HttpRequest request, Encoding? encoding = null)
         {
             if (request.Body.CanSeek)
             {
@@ -94,7 +94,7 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding encoding = null)
+        public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding? encoding = null)
         {
             if (!request.Body.CanSeek)
             {
@@ -143,7 +143,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="request">The current request</param>
         /// <returns>The extracted `ufprt` token.</returns>
-        public static string GetUfprt(this HttpRequest request)
+        public static string? GetUfprt(this HttpRequest request)
         {
             if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal) && formVal != StringValues.Empty)
             {

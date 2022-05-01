@@ -29,12 +29,12 @@ namespace Umbraco.Cms.Core.Models
         public string IsoCode
         {
             get => _isoCode;
-            set => SetPropertyValueAndDetectChanges(value, ref _isoCode, nameof(IsoCode));
+            set => SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
         }
 
         /// <inheritdoc />
         [DataMember]
-        public string CultureName
+        public string? CultureName
         {
             get => _cultureName;
             set => SetPropertyValueAndDetectChanges(value, ref _cultureName, nameof(CultureName));
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public CultureInfo CultureInfo => CultureInfo.GetCultureInfo(IsoCode);
+        public CultureInfo? CultureInfo => IsoCode is not null ? CultureInfo.GetCultureInfo(IsoCode) : null;
 
         /// <inheritdoc />
         public bool IsDefault

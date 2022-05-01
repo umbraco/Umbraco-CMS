@@ -15,11 +15,11 @@ namespace Umbraco.Extensions
         /// Return the Url for a Surface Controller
         /// </summary>
         /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
-        public static string GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
+        public static string? GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
             where T : SurfaceController
         {
-            MethodInfo method = ExpressionHelper.GetMethodInfo(methodSelector);
-            IDictionary<string, object> methodParams = ExpressionHelper.GetMethodParams(methodSelector);
+            MethodInfo? method = ExpressionHelper.GetMethodInfo(methodSelector);
+            IDictionary<string, object?>? methodParams = ExpressionHelper.GetMethodParams(methodSelector);
 
             if (method == null)
             {
@@ -27,7 +27,7 @@ namespace Umbraco.Extensions
                     $"Could not find the method {methodSelector} on type {typeof(T)} or the result ");
             }
 
-            if (methodParams.Any() == false)
+            if (methodParams is null || methodParams.Any() == false)
             {
                 return linkGenerator.GetUmbracoSurfaceUrl<T>(method.Name);
             }
@@ -39,11 +39,11 @@ namespace Umbraco.Extensions
         /// Return the Url for a Surface Controller
         /// </summary>
         /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
-        public static string GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, string actionName, object id = null)
+        public static string? GetUmbracoSurfaceUrl<T>(this LinkGenerator linkGenerator, string actionName, object? id = null)
             where T : SurfaceController => linkGenerator.GetUmbracoControllerUrl(
                 actionName,
                 typeof(T),
-                new Dictionary<string, object>()
+                new Dictionary<string, object?>()
                 {
                     ["id"] = id
                 });

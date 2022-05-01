@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.Common.Filters
 
             httpContext.Response.StatusCode = (int)_statusCode;
 
-            var disableIisCustomErrors = httpContext.RequestServices.GetService<IOptions<WebRoutingSettings>>().Value.TrySkipIisCustomErrors;
+            var disableIisCustomErrors = httpContext.RequestServices.GetService<IOptions<WebRoutingSettings>>()?.Value.TrySkipIisCustomErrors ?? false;
             var statusCodePagesFeature = httpContext.Features.Get<IStatusCodePagesFeature>();
 
             if (statusCodePagesFeature != null)

@@ -37,19 +37,22 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => PropertyCacheLevel.Element;
 
         /// <inheritdoc />
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner,
+            IPublishedPropertyType propertyType, object? source, bool preview)
         {
             return source?.ToString();
         }
 
         /// <inheritdoc />
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
+            PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // NOTE: The intermediate object is just a json string, we don't actually convert from source -> intermediate since source is always just a json string
 
-            using (_proflog.DebugDuration<BlockListPropertyValueConverter>($"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
+            using (_proflog.DebugDuration<BlockListPropertyValueConverter>(
+                       $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
             {
-                var value = (string)inter;
+                var value = (string?)inter;
 
                 // Short-circuit on empty values
                 if (string.IsNullOrWhiteSpace(value)) return BlockListModel.Empty;
@@ -57,12 +60,17 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 var converted = _blockListEditorDataConverter.Deserialize(value);
                 if (converted.BlockValue.ContentData.Count == 0) return BlockListModel.Empty;
 
-                var blockListLayout = converted.Layout.ToObject<IEnumerable<BlockListLayoutItem>>();
+                var blockListLayout = converted.Layout?.ToObject<IEnumerable<BlockListLayoutItem>>();
 
                 // Get configuration
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
+                if (configuration is null)
+                {
+                    return null;
+                }
                 var blockConfigMap = configuration.Blocks.ToDictionary(x => x.ContentElementTypeKey);
-                var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey).Where(x => x.HasValue).Distinct().ToList();
+                var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey)
+                    .Where(x => x.HasValue).Distinct().ToList();
 
                 // Convert the content data
                 var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -83,7 +91,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
                 foreach (var data in converted.BlockValue.SettingsData)
                 {
-                    if (!validSettingsElementTypes.Contains(data.ContentTypeKey)) continue;
+                    if (!validSettingsElementTypes?.Contains(data.ContentTypeKey) ?? false) continue;
 
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
@@ -92,46 +100,53 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 var layout = new List<BlockListItem>();
-                foreach (var layoutItem in blockListLayout)
+                if (blockListLayout is not null)
                 {
-                    // Get the content reference
-                    var contentGuidUdi = (GuidUdi)layoutItem.ContentUdi;
-                    if (!contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
-                        continue;
-
-                    if (!blockConfigMap.TryGetValue(contentData.ContentType.Key, out var blockConfig))
-                        continue;
-
-                    // Get the setting reference
-                    IPublishedElement settingsData = null;
-                    var settingGuidUdi = layoutItem.SettingsUdi != null ? (GuidUdi)layoutItem.SettingsUdi : null;
-                    if (settingGuidUdi != null)
-                        settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
-
-                    // This can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
-                    // We also ensure that the content types match, since maybe the settings type has been changed after this has been persisted
-                    if (settingsData != null && (!blockConfig.SettingsElementTypeKey.HasValue || settingsData.ContentType.Key != blockConfig.SettingsElementTypeKey))
+                    foreach (var layoutItem in blockListLayout)
                     {
-                        settingsData = null;
+                        // Get the content reference
+                        var contentGuidUdi = (GuidUdi?)layoutItem.ContentUdi;
+                        if (contentGuidUdi is null || !contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
+                            continue;
+
+                        if (contentData is null || (!blockConfigMap.TryGetValue(contentData.ContentType.Key, out var blockConfig)))
+                            continue;
+
+                        // Get the setting reference
+                        IPublishedElement? settingsData = null;
+                        var settingGuidUdi = layoutItem.SettingsUdi is not null ? (GuidUdi)layoutItem.SettingsUdi : null;
+                        if (settingGuidUdi is not null)
+                            settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
+
+                        // This can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
+                        // We also ensure that the content types match, since maybe the settings type has been changed after this has been persisted
+                        if (settingsData != null && (!blockConfig.SettingsElementTypeKey.HasValue ||
+                                                     settingsData.ContentType.Key !=
+                                                     blockConfig.SettingsElementTypeKey))
+                        {
+                            settingsData = null;
+                        }
+
+                        // Get settings type from configuration
+                        var settingsType = blockConfig.SettingsElementTypeKey.HasValue
+                            ? _blockConverter.GetModelType(blockConfig.SettingsElementTypeKey.Value)
+                            : typeof(IPublishedElement);
+
+                        // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
+                        var layoutType = typeof(BlockListItem<,>).MakeGenericType(contentData.GetType(), settingsType);
+                        var layoutRef = (BlockListItem?)Activator.CreateInstance(layoutType, contentGuidUdi, contentData,
+                            settingGuidUdi, settingsData);
+
+                        if (layoutRef is not null)
+                        {
+                            layout.Add(layoutRef);
+                        }
                     }
-
-                    // Get settings type from configuration
-                    var settingsType = blockConfig.SettingsElementTypeKey.HasValue
-                        ? _blockConverter.GetModelType(blockConfig.SettingsElementTypeKey.Value)
-                        : typeof(IPublishedElement);
-
-                    // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
-                    var layoutType = typeof(BlockListItem<,>).MakeGenericType(contentData.GetType(), settingsType);
-                    var layoutRef = (BlockListItem)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
-
-                    layout.Add(layoutRef);
                 }
 
                 var model = new BlockListModel(layout);
                 return model;
             }
         }
-
-
     }
 }

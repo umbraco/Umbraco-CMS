@@ -18,14 +18,14 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentService"/> class.
         /// </summary>
-        public ConsentService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
+        public ConsentService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _consentRepository = consentRepository;
         }
 
         /// <inheritdoc />
-        public IConsent RegisterConsent(string source, string context, string action, ConsentState state, string comment = null)
+        public IConsent RegisterConsent(string source, string context, string action, ConsentState state, string? comment = null)
         {
             // prevent stupid states
             var v = 0;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Services
                 Comment = comment
             };
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _consentRepository.ClearCurrent(source, context, action);
                 _consentRepository.Save(consent);
@@ -57,20 +57,20 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent> LookupConsent(string source = null, string context = null, string action = null,
+        public IEnumerable<IConsent>? LookupConsent(string? source = null, string? context = null, string? action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IConsent>();
 
                 if (string.IsNullOrWhiteSpace(source) == false)
-                    query = sourceStartsWith ? query.Where(x => x.Source.StartsWith(source)) : query.Where(x => x.Source == source);
+                    query = sourceStartsWith ? query.Where(x => x.Source!.StartsWith(source)) : query.Where(x => x.Source == source);
                 if (string.IsNullOrWhiteSpace(context) == false)
-                    query = contextStartsWith ? query.Where(x => x.Context.StartsWith(context)) : query.Where(x => x.Context == context);
+                    query = contextStartsWith ? query.Where(x => x.Context!.StartsWith(context)) : query.Where(x => x.Context == context);
                 if (string.IsNullOrWhiteSpace(action) == false)
-                    query = actionStartsWith ? query.Where(x => x.Action.StartsWith(action)) : query.Where(x => x.Action == action);
+                    query = actionStartsWith ? query.Where(x => x.Action!.StartsWith(action)) : query.Where(x => x.Action == action);
                 if (includeHistory == false)
                     query = query.Where(x => x.Current);
 

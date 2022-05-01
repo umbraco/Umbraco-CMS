@@ -15,8 +15,8 @@ namespace Umbraco.Cms.Core.Security
     public class BackOfficeIdentityUser : UmbracoIdentityUser
     {
         private string _culture;
-        private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
-        private string[] _allowedSections;
+        private IReadOnlyCollection<IReadOnlyUserGroup> _groups = null!;
+        private string[]? _allowedSections;
         private int[] _startMediaIds;
         private int[] _startContentIds;
         private DateTime? _inviteDateUtc;
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Security
         ///  Used to construct a new instance without an identity
         /// </summary>
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
-        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture, string name = null)
+        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Security
             user.UserName = username;
             user.Email = email;
 
-            user.Id = null;
+            user.Id = string.Empty;
             user.HasIdentity = false;
             user._culture = culture;
             user.Name = name;
@@ -74,8 +74,8 @@ namespace Umbraco.Cms.Core.Security
             Id = UserIdToString(userId);
         }
 
-        public int[] CalculatedMediaStartNodeIds { get; set; }
-        public int[] CalculatedContentStartNodeIds { get; set; }
+        public int[]? CalculatedMediaStartNodeIds { get; set; }
+        public int[]? CalculatedContentStartNodeIds { get; set; }
 
         /// <summary>
         /// Gets or sets invite date
@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Core.Security
                     value = new int[0];
                 }
 
-                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), s_startIdsComparer);
+                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds), s_startIdsComparer);
             }
         }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Security
                     value = new int[0];
                 }
 
-                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), s_startIdsComparer);
+                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds), s_startIdsComparer);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Security
         public string Culture
         {
             get => _culture;
-            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, nameof(Culture));
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _culture!, nameof(Culture));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Core.Security
             foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
             {
                 RoleId = x.Alias,
-                UserId = Id?.ToString()
+                UserId = Id.ToString()
             }))
             {
                 roles.Add(identityUserRole);
@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Core.Security
         public Guid Key => UserIdToInt(Id).ToGuid();
 
 
-        private static int UserIdToInt(string userId)
+        private static int UserIdToInt(string? userId)
         {
             if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
             {

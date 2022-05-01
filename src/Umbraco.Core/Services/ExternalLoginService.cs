@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
 
-        public ExternalLoginService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public ExternalLoginService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IExternalLoginWithKeyRepository externalLoginRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         [Obsolete("Use ctor injecting IExternalLoginWithKeyRepository")]
-        public ExternalLoginService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public ExternalLoginService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IExternalLoginRepository externalLoginRepository)
             : this(provider, loggerFactory, eventMessagesFactory, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyRepository>())
         {
@@ -33,12 +33,12 @@ namespace Umbraco.Cms.Core.Services
 
         /// <inheritdoc />
         [Obsolete("Use overload that takes a user/member key (Guid).")]
-        public IEnumerable<IIdentityUserLogin> GetExternalLogins(int userId)
+        public IEnumerable<IIdentityUserLogin>? GetExternalLogins(int userId)
             => GetExternalLogins(userId.ToGuid());
 
         /// <inheritdoc />
         [Obsolete("Use overload that takes a user/member key (Guid).")]
-        public IEnumerable<IIdentityUserToken> GetExternalLoginTokens(int userId) =>
+        public IEnumerable<IIdentityUserToken>? GetExternalLoginTokens(int userId) =>
             GetExternalLoginTokens(userId.ToGuid());
 
         /// <inheritdoc />
@@ -57,32 +57,32 @@ namespace Umbraco.Cms.Core.Services
             => DeleteUserLogins(userId.ToGuid());
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserLogin> GetExternalLogins(Guid userOrMemberKey)
+        public IEnumerable<IIdentityUserLogin>? GetExternalLogins(Guid userOrMemberKey)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.Key == userOrMemberKey))
+                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.Key == userOrMemberKey))?
                     .ToList();
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserToken> GetExternalLoginTokens(Guid userOrMemberKey)
+        public IEnumerable<IIdentityUserToken>? GetExternalLoginTokens(Guid userOrMemberKey)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.Key == userOrMemberKey))
+                return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.Key == userOrMemberKey))?
                     .ToList();
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
+        public IEnumerable<IIdentityUserLogin>? Find(string loginProvider, string providerKey)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>()
-                    .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))
+                    .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))?
                     .ToList();
             }
         }
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void Save(Guid userOrMemberKey, IEnumerable<IExternalLogin> logins)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _externalLoginRepository.Save(userOrMemberKey, logins);
                 scope.Complete();
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void Save(Guid userOrMemberKey, IEnumerable<IExternalLoginToken> tokens)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _externalLoginRepository.Save(userOrMemberKey, tokens);
                 scope.Complete();
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void DeleteUserLogins(Guid userOrMemberKey)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _externalLoginRepository.DeleteUserLogins(userOrMemberKey);
                 scope.Complete();

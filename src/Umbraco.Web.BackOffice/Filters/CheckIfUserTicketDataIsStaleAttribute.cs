@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private GlobalSettings _globalSettings;
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
-            private readonly IScopeProvider _scopeProvider;
+            private readonly ICoreScopeProvider _scopeProvider;
             private readonly AppCaches _appCaches;
 
             public CheckIfUserTicketDataIsStaleFilter(
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 IOptionsSnapshot<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery,
-                IScopeProvider scopeProvider,
+                ICoreScopeProvider scopeProvider,
                 AppCaches appCaches)
             {
                 _requestCache = requestCache;
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 var tokenFilter = new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery);
                 await tokenFilter.OnActionExecutionAsync(
                     actionContext,
-                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
+                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), new { })));
 
                 // add the header
                 AppendUserModifiedHeaderAttribute.AppendHeader(actionContext);
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private async Task CheckStaleData(ActionExecutingContext actionContext)
             {
-                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                     {
@@ -118,7 +118,13 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    IUser user = _userService.GetUserById(identity.GetId());
+                    var id = identity.GetId();
+                    if (id is null)
+                    {
+                        return;
+                    }
+
+                    IUser? user = _userService.GetUserById(id.Value);
                     if (user == null)
                     {
                         return;
@@ -159,8 +165,11 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             /// </summary>
             private async Task ReSync(IUser user, ActionExecutingContext actionContext)
             {
-                BackOfficeIdentityUser backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
-                await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                BackOfficeIdentityUser? backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
+                if (backOfficeIdentityUser is not null)
+                {
+                    await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
+                }
 
                 // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);

@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "culture", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string IsoCode { get; set; }
+        public string? IsoCode { get; set; }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "isDefault")]
         public bool IsDefault { get; set; }

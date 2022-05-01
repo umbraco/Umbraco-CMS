@@ -36,11 +36,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 
         [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeAlias")]
         [Column("Alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [Column("Name")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("sortOrder")]
         [Constraint(Default = "0")]
@@ -52,12 +52,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 
         [Column("validationRegExp")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string ValidationRegExp { get; set; }
+        public string? ValidationRegExp { get; set; }
 
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(2000)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("variations")]
         [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
-        public DataTypeDto DataTypeDto { get; set; }
+        public DataTypeDto? DataTypeDto { get; set; }
 
         [Column("UniqueID")]
         [NullSetting(NullSetting = NullSettings.NotNull)]

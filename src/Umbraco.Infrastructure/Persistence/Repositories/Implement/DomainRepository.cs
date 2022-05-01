@@ -29,16 +29,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
-        protected override IDomain PerformGet(int id)
+        protected override IDomain? PerformGet(int id)
         {
             //use the underlying GetAll which will force cache all domains
-            return GetMany().FirstOrDefault(x => x.Id == id);
+            return GetMany()?.FirstOrDefault(x => x.Id == id);
         }
 
-        protected override IEnumerable<IDomain> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IDomain> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false).Where<DomainDto>(x => x.Id > 0);
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.WhereIn<DomainDto>(x => x.Id, ids);
             }
@@ -152,14 +152,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
-        public IDomain GetByName(string domainName)
+        public IDomain? GetByName(string domainName)
         {
-            return GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
+            return GetMany()?.FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
         }
 
         public bool Exists(string domainName)
         {
-            return GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
+            return GetMany()?.Any(x => x.DomainName.InvariantEquals(domainName)) ?? false;
         }
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)

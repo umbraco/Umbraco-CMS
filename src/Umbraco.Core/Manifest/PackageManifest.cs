@@ -13,13 +13,13 @@ namespace Umbraco.Cms.Core.Manifest
     [DataContract]
     public class PackageManifest
     {
-        private string _packageName;
+        private string? _packageName;
 
         /// <summary>
         /// An optional package name. If not specified then the directory name is used.
         /// </summary>
         [DataMember(Name = "name")]
-        public string PackageName
+        public string? PackageName
         {
             get
             {
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Manifest
         }
 
         [DataMember(Name = "packageView")]
-        public string PackageView { get; set; }
+        public string? PackageView { get; set; }
 
         /// <summary>
         /// Gets the source path of the manifest.
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// using system directory separators.</para>
         /// </remarks>
         [IgnoreDataMember]
-        public string Source { get; set; }
+        public string Source { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the version of the package

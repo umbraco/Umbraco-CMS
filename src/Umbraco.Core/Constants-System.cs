@@ -62,7 +62,7 @@
 
             public const string UmbracoDefaultDatabaseName = "Umbraco";
 
-            public const string UmbracoConnectionName = "umbracoDbDSN";
+            public const string UmbracoConnectionName = "umbracoDbDSN";public const string DefaultUmbracoPath = "~/umbraco";
         }
     }
 }

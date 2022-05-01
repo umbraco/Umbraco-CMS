@@ -8,6 +8,6 @@ namespace JsonSchema
 {
     internal class NamespacePrefixedSchemaNameGenerator : DefaultSchemaNameGenerator
     {
-        public override string Generate(Type type) => type.Namespace.Replace(".", string.Empty) + base.Generate(type);
+        public override string Generate(Type type) => type.Namespace?.Replace(".", string.Empty) + base.Generate(type);
     }
 }

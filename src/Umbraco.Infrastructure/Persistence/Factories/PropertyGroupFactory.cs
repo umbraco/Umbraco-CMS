@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                                                              int contentTypeId,
                                                              DateTime createDate,
                                                              DateTime updateDate,
-                                                             Func<string, ValueStorageType, string, PropertyType> propertyTypeCtor)
+                                                             Func<string?, ValueStorageType, string?, PropertyType> propertyTypeCtor)
         {
             // groupDtos contains all the groups, those that are defined on the current
             // content type, and those that are inherited from composition content types
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                     group.PropertyTypes = new PropertyTypeCollection(isPublishing);
 
                     //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
-                    var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
+                    var typeDtos = groupDto.PropertyTypeDtos?.Where(x => x.Id > 0) ?? Enumerable.Empty<PropertyTypeDto>();
                     foreach (var typeDto in typeDtos)
                     {
                         var tempGroupDto = groupDto;
@@ -56,13 +56,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                         {
                             propertyType.DisableChangeTracking();
 
-                            propertyType.Alias = typeDto.Alias;
+                            propertyType.Alias = typeDto.Alias ?? string.Empty;
                             propertyType.DataTypeId = typeDto.DataTypeId;
                             propertyType.DataTypeKey = typeDto.DataTypeDto.NodeDto.UniqueId;
                             propertyType.Description = typeDto.Description;
                             propertyType.Id = typeDto.Id;
                             propertyType.Key = typeDto.UniqueId;
-                            propertyType.Name = typeDto.Name;
+                            propertyType.Name = typeDto.Name ?? string.Empty;
                             propertyType.Mandatory = typeDto.Mandatory;
                             propertyType.MandatoryMessage = typeDto.MandatoryMessage;
                             propertyType.SortOrder = typeDto.SortOrder;
@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
             if (propertyGroup.HasIdentity)
                 dto.Id = propertyGroup.Id;
 
-            dto.PropertyTypeDtos = propertyGroup.PropertyTypes.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList();
+            dto.PropertyTypeDtos = propertyGroup.PropertyTypes?.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList();
 
             return dto;
         }

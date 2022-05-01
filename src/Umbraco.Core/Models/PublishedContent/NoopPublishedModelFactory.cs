@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public IPublishedElement CreateModel(IPublishedElement element) => element;
 
         /// <inheritdoc />
-        public IList CreateModelList(string alias) => new List<IPublishedElement>();
+        public IList CreateModelList(string? alias) => new List<IPublishedElement>();
 
         /// <inheritdoc />
         public Type MapModelType(Type type) => typeof(IPublishedElement);

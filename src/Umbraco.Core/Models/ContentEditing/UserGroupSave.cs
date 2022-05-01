@@ -22,13 +22,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
-        public override string Alias { get; set; }
+        public override string Alias { get; set; } = string.Empty;
 
         [DataMember(Name = "sections")]
-        public IEnumerable<string> Sections { get; set; }
+        public IEnumerable<string>? Sections { get; set; }
 
         [DataMember(Name = "users")]
-        public IEnumerable<int> Users { get; set; }
+        public IEnumerable<int>? Users { get; set; }
 
         [DataMember(Name = "startContentId")]
         public int? StartContentId { get; set; }
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The list of letters (permission codes) to assign as the default for the user group
         /// </summary>
         [DataMember(Name = "defaultPermissions")]
-        public IEnumerable<string> DefaultPermissions { get; set; }
+        public IEnumerable<string>? DefaultPermissions { get; set; }
 
         /// <summary>
         /// The assigned permissions for content
@@ -49,27 +49,30 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The key is the content id and the list is the list of letters (permission codes) to assign
         /// </remarks>
         [DataMember(Name = "assignedPermissions")]
-        public IDictionary<int, IEnumerable<string>> AssignedPermissions { get; set; }
+        public IDictionary<int, IEnumerable<string>>? AssignedPermissions { get; set; }
 
         /// <summary>
         /// The real persisted user group
         /// </summary>
         [IgnoreDataMember]
-        public IUserGroup PersistedUserGroup { get; set; }
+        public IUserGroup? PersistedUserGroup { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (DefaultPermissions.Any(x => x.IsNullOrWhiteSpace()))
+            if (DefaultPermissions?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
             {
                 yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
             }
 
-            foreach (var assignedPermission in AssignedPermissions)
+            if (AssignedPermissions is not null)
             {
-                foreach (var permission in assignedPermission.Value)
+                foreach (var assignedPermission in AssignedPermissions)
                 {
-                    if (permission.IsNullOrWhiteSpace())
-                        yield return new ValidationResult("A permission value cannot be null or empty", new[] { "AssignedPermissions" });
+                    foreach (var permission in assignedPermission.Value)
+                    {
+                        if (permission.IsNullOrWhiteSpace())
+                            yield return new ValidationResult("A permission value cannot be null or empty", new[] { "AssignedPermissions" });
+                    }
                 }
             }
         }

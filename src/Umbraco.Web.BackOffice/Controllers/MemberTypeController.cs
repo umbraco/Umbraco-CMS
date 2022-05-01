@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<MemberTypeDisplay> GetById(int id)
+        public ActionResult<MemberTypeDisplay?> GetById(int id)
         {
             var mt = _memberTypeService.Get(id);
             if (mt == null)
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<MemberTypeDisplay> GetById(Guid id)
+        public ActionResult<MemberTypeDisplay?> GetById(Guid id)
         {
             var memberType = _memberTypeService.Get(id);
             if (memberType == null)
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<MemberTypeDisplay> GetById(Udi id)
+        public ActionResult<MemberTypeDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -129,7 +129,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            _memberTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _memberTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             return Ok();
         }
 
@@ -160,7 +160,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return actionResult.Result;
             }
 
-            var result = actionResult.Value
+            var result = actionResult.Value?
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return Ok(result);
         }
 
-        public MemberTypeDisplay GetEmpty()
+        public MemberTypeDisplay? GetEmpty()
         {
             var ct = new MemberType(_shortStringHelper, -1);
             ct.Icon = Constants.Icons.Member;
@@ -187,16 +187,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<ContentTypeBasic> GetAllTypes()
         {
             return _memberTypeService.GetAll()
-                               .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>);
+                               .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>).WhereNotNull();
         }
 
-        public ActionResult<MemberTypeDisplay> PostSave(MemberTypeSave contentTypeSave)
+        public ActionResult<MemberTypeDisplay?> PostSave(MemberTypeSave contentTypeSave)
         {
             //get the persisted member type
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? _memberTypeService.Get(ctId) : null;
 
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
+            if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false)
             {
                 //We need to validate if any properties on the contentTypeSave have had their IsSensitiveValue changed,
                 //and if so, we need to check if the current user has access to sensitive values. If not, we have to return an error
@@ -246,11 +246,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var display =_umbracoMapper.Map<MemberTypeDisplay>(savedCt.Value);
 
-            display.AddSuccessNotification(
+            display?.AddSuccessNotification(
                 _localizedTextService.Localize("speechBubbles","memberTypeSavedHeader"),
                             string.Empty);
 
             return display;
+        }
+
+        /// <summary>
+        /// Copy the member type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+        public IActionResult PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                i => _memberTypeService.Get(i),
+                (type, i) => _memberTypeService.Copy(type, i));
         }
     }
 }

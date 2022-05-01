@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
         private IExternalLoginWithKeyService ExternalLoginService => GetRequiredService<IExternalLoginWithKeyService>();
         private IUmbracoMapper UmbracoMapper => GetRequiredService<IUmbracoMapper>();
         private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
+        private ITwoFactorLoginService TwoFactorLoginService => GetRequiredService<ITwoFactorLoginService>();
 
         private BackOfficeUserStore GetUserStore()
             => new BackOfficeUserStore(
@@ -37,7 +38,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
                     new TestOptionsSnapshot<GlobalSettings>(GlobalSettings),
                     UmbracoMapper,
                     new BackOfficeErrorDescriber(TextService),
-                    AppCaches);
+                    AppCaches,
+                    TwoFactorLoginService
+                    );
 
         [Test]
         public async Task Can_Persist_Is_Approved()

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
     /// </summary>
     public sealed class AppendUserModifiedHeaderAttribute : ActionFilterAttribute
     {
-        private readonly string _userIdParameter;
+        private readonly string? _userIdParameter;
 
         /// <summary>
         /// An empty constructor which will always set the header.
@@ -38,19 +38,19 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             }
             else
             {
-                if (!context.ActionArguments.ContainsKey(_userIdParameter))
+                if (!context.ActionArguments.ContainsKey(_userIdParameter!))
                 {
                     throw new InvalidOperationException($"No argument found for the current action with the name: {_userIdParameter}");
                 }
 
                 var backofficeSecurityAccessor = context.HttpContext.RequestServices.GetService<IBackOfficeSecurityAccessor>();
-                var user = backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var user = backofficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
                 if (user == null)
                 {
                     return;
                 }
 
-                var userId = GetUserIdFromParameter(context.ActionArguments[_userIdParameter]);
+                var userId = GetUserIdFromParameter(context.ActionArguments[_userIdParameter!]);
                 if (userId == user.Id)
                 {
                     AppendHeader(context);
@@ -67,14 +67,14 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             }
         }
 
-        private int GetUserIdFromParameter(object parameterValue)
+        private int GetUserIdFromParameter(object? parameterValue)
         {
             if (parameterValue is int)
             {
                 return (int)parameterValue;
             }
 
-            throw new InvalidOperationException($"The id type: {parameterValue.GetType()} is not a supported id.");
+            throw new InvalidOperationException($"The id type: {parameterValue?.GetType()} is not a supported id.");
         }
     }
 }

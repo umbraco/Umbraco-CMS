@@ -31,7 +31,7 @@ namespace JsonSchema
 
             var path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, options.OutputFile));
             Console.WriteLine("Path to use {0}", path);
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             Console.WriteLine("Ensured directory exists");
             await File.WriteAllTextAsync(path, schema);
 

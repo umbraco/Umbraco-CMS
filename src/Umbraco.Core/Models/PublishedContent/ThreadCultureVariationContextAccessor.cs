@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     {
         private readonly ConcurrentDictionary<string, VariationContext> _contexts = new ConcurrentDictionary<string, VariationContext>();
 
-        public VariationContext VariationContext
+        public VariationContext? VariationContext
         {
             get => _contexts.GetOrAdd(Thread.CurrentThread.CurrentUICulture.Name, culture => new VariationContext(culture));
             set => throw new NotSupportedException();

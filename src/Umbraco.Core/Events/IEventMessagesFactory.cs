@@ -7,6 +7,6 @@
     {
         EventMessages Get();
 
-        EventMessages GetOrDefault();
+        EventMessages? GetOrDefault();
     }
 }

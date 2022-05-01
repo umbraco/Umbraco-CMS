@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.Common.Security
 {
     public interface IPasswordChanger<TUser> where TUser : UmbracoIdentityUser
     {
-        public Task<Attempt<PasswordChangedModel>> ChangePasswordWithIdentityAsync(
+        public Task<Attempt<PasswordChangedModel?>> ChangePasswordWithIdentityAsync(
             ChangingPasswordModel passwordModel,
             IUmbracoUserManager<TUser> userMgr);
     }

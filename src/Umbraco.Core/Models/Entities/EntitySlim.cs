@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Entities
     /// </remarks>
     public class EntitySlim : IEntitySlim
     {
-        private IDictionary<string, object> _additionalData;
+        private IDictionary<string, object?>? _additionalData;
 
         /// <summary>
         /// Gets an entity representing "root".
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <inheritdoc />
         [DataMember]
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         public int ParentId { get; set; }
 
         /// <inheritdoc />
-        public void SetParent(ITreeEntity parent) => throw new InvalidOperationException("This property won't be implemented.");
+        public void SetParent(ITreeEntity? parent) => throw new InvalidOperationException("This property won't be implemented.");
 
         /// <inheritdoc />
         [DataMember]
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public string Path { get; set; }
+        public string Path { get; set; } = string.Empty;
 
         /// <inheritdoc />
         [DataMember]
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Models.Entities
 
         /// <inheritdoc />
         [DataMember]
-        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+        public IDictionary<string, object?>? AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object?>());
 
         /// <inheritdoc />
         [IgnoreDataMember]

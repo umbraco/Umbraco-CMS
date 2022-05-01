@@ -11,17 +11,17 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// Get all saved searches from your chosen data source
         /// </summary>
-        IReadOnlyList<SavedLogSearch> GetSavedSearches();
+        IReadOnlyList<SavedLogSearch>? GetSavedSearches();
 
         /// <summary>
         /// Adds a new saved search to chosen data source and returns the updated searches
         /// </summary>
-        IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query);
+        IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query);
 
         /// <summary>
         /// Deletes a saved search to chosen data source and returns the remaining searches
         /// </summary>
-        IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query);
+        IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string? name, string? query);
 
         /// <summary>
         /// A count of number of errors
@@ -57,8 +57,8 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             int pageNumber = 1,
             int pageSize = 100,
             Direction orderDirection = Direction.Descending,
-            string filterExpression = null,
-            string[] logLevels = null);
+            string? filterExpression = null,
+            string[]? logLevels = null);
 
     }
 }

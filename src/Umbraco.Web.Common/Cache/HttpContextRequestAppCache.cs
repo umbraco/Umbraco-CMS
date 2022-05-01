@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
@@ -31,14 +32,14 @@ namespace Umbraco.Cms.Core.Cache
 
         public bool IsAvailable => TryGetContextItems(out _);
 
-        private bool TryGetContextItems(out IDictionary<object, object> items)
+        private bool TryGetContextItems([MaybeNullWhen(false)] out IDictionary<object, object?> items)
         {
             items = _httpContextAccessor.HttpContext?.Items;
             return items != null;
         }
 
         /// <inheritdoc />
-        public override object Get(string key, Func<object> factory)
+        public override object? Get(string key, Func<object?> factory)
         {
             //no place to cache so just return the callback result
             if (!TryGetContextItems(out var items))
@@ -48,12 +49,12 @@ namespace Umbraco.Cms.Core.Cache
 
             key = GetCacheKey(key);
 
-            Lazy<object> result;
+            Lazy<object?>? result;
 
             try
             {
                 EnterWriteLock();
-                result = items[key] as Lazy<object>; // null if key not found
+                result = items[key] as Lazy<object?>; // null if key not found
 
                 // cannot create value within the lock, so if result.IsValueCreated is false, just
                 // do nothing here - means that if creation throws, a race condition could cause
@@ -86,7 +87,7 @@ namespace Umbraco.Cms.Core.Cache
             return value;
         }
 
-        public bool Set(string key, object value)
+        public bool Set(string key, object? value)
         {
             //no place to cache so just return the callback result
             if (!TryGetContextItems(out var items))
@@ -151,7 +152,7 @@ namespace Umbraco.Cms.Core.Cache
             items.Remove(key);
         }
 
-        protected override object GetEntry(string key)
+        protected override object? GetEntry(string key)
         {
             return !TryGetContextItems(out var items) ? null : items[key];
         }
@@ -162,7 +163,7 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void EnterReadLock()
         {
-            object locker = GetLock();
+            object? locker = GetLock();
             if (locker == null)
             {
                 return;
@@ -172,7 +173,7 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void EnterWriteLock()
         {
-            object locker = GetLock();
+            object? locker = GetLock();
             if (locker == null)
             {
                 return;
@@ -182,7 +183,7 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void ExitReadLock()
         {
-            object locker = GetLock();
+            object? locker = GetLock();
             if (locker == null)
             {
                 return;
@@ -195,7 +196,7 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void ExitWriteLock()
         {
-            object locker = GetLock();
+            object? locker = GetLock();
             if (locker == null)
             {
                 return;
@@ -208,16 +209,16 @@ namespace Umbraco.Cms.Core.Cache
 
         #endregion
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
         {
-            if (!TryGetContextItems(out IDictionary<object, object> items))
+            if (!TryGetContextItems(out IDictionary<object, object?>? items))
             {
                 yield break;
             }
 
-            foreach (KeyValuePair<object, object> item in items)
+            foreach (KeyValuePair<object, object?> item in items)
             {
-                yield return new KeyValuePair<string, object>(item.Key.ToString(), item.Value);
+                yield return new KeyValuePair<string, object?>(item.Key.ToString()!, item.Value);
             }
         }
 
@@ -227,22 +228,22 @@ namespace Umbraco.Cms.Core.Cache
         /// Ensures and returns the current lock
         /// </summary>
         /// <returns></returns>
-        private object GetLock()
+        private object? GetLock()
         {
-            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            HttpContext? httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null)
             {
                 return null;
             }
 
-            RequestLock requestLock = httpContext.Features.Get<RequestLock>();
+            RequestLock? requestLock = httpContext.Features.Get<RequestLock>();
             if (requestLock != null)
             {
                 return requestLock.SyncRoot;
             }
 
             IFeatureCollection features = httpContext.Features;
-            
+
             lock (httpContext)
             {
                 requestLock = new RequestLock();

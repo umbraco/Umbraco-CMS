@@ -20,6 +20,7 @@ namespace Umbraco.Extensions
         /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
         public static IdentityBuilder AddMemberManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder)
             where TUserManager : UserManager<MemberIdentityUser>, TInterface
+            where TInterface : notnull
         {
             identityBuilder.AddUserManager<TUserManager>();
             // use a UniqueServiceDescriptor so we can check if it's already been added
@@ -31,6 +32,7 @@ namespace Umbraco.Extensions
 
         public static IdentityBuilder AddRoleManager<TInterface, TRoleManager>(this IdentityBuilder identityBuilder)
             where TRoleManager : RoleManager<UmbracoIdentityRole>, TInterface
+            where TInterface : notnull
         {
             identityBuilder.AddRoleManager<TRoleManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TRoleManager));

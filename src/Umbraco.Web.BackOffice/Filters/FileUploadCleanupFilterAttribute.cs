@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             {
                                 //track all temp folders so we can remove old files afterwards
                                 var dir = Path.GetDirectoryName(f.TempFilePath);
-                                if (tempFolders.Contains(dir) == false)
+                                if (dir is not null && tempFolders.Contains(dir) == false)
                                 {
                                     tempFolders.Add(dir);
                                 }
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                 {
                                     //track all temp folders so we can remove old files afterwards
                                     var dir = Path.GetDirectoryName(f.TempFilePath);
-                                    if (tempFolders.Contains(dir) == false)
+                                    if (dir is not null && tempFolders.Contains(dir) == false)
                                     {
                                         tempFolders.Add(dir);
                                     }
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                     {
                         _logger.LogWarning(
                             "The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}",
-                            objectResult.Value.GetType());
+                            objectResult.Value?.GetType());
                     }
                 }
             }

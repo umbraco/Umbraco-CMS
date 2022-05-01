@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Services
         private const string PartialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage";
 
-        public FileService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public FileService(ICoreScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
             IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
@@ -58,25 +58,31 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _stylesheetRepository.GetMany(paths);
             }
         }
 
         /// <inheritdoc />
-        public IStylesheet GetStylesheet(string path)
+        public IStylesheet? GetStylesheet(string? path)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _stylesheetRepository.Get(path);
             }
         }
 
         /// <inheritdoc />
-        public void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId)
+        public void SaveStylesheet(IStylesheet? stylesheet, int? userId = null)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            if (stylesheet is null)
+            {
+                return;
+            }
+
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
@@ -86,21 +92,21 @@ namespace Umbraco.Cms.Core.Services
                     return;
                 }
 
-
+                userId ??= Constants.Security.SuperUserId;
                 _stylesheetRepository.Save(stylesheet);
                 scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
-                Audit(AuditType.Save, userId, -1, "Stylesheet");
+                Audit(AuditType.Save, userId.Value, -1, "Stylesheet");
 
                 scope.Complete();
             }
         }
 
         /// <inheritdoc />
-        public void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId)
+        public void DeleteStylesheet(string path, int? userId)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                IStylesheet stylesheet = _stylesheetRepository.Get(path);
+                IStylesheet? stylesheet = _stylesheetRepository.Get(path);
                 if (stylesheet == null)
                 {
                     scope.Complete();
@@ -115,10 +121,11 @@ namespace Umbraco.Cms.Core.Services
                     return; // causes rollback
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 _stylesheetRepository.Delete(stylesheet);
 
                 scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
-                Audit(AuditType.Delete, userId, -1, "Stylesheet");
+                Audit(AuditType.Delete, userId.Value, -1, "Stylesheet");
 
                 scope.Complete();
             }
@@ -127,7 +134,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void CreateStyleSheetFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _stylesheetRepository.AddFolder(folderPath);
                 scope.Complete();
@@ -137,7 +144,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void DeleteStyleSheetFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _stylesheetRepository.DeleteFolder(folderPath);
                 scope.Complete();
@@ -145,9 +152,9 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetStylesheetFileContentStream(string filepath)
+        public Stream? GetStylesheetFileContentStream(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _stylesheetRepository.GetFileContentStream(filepath);
             }
@@ -156,7 +163,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetStylesheetFileContent(string filepath, Stream content)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _stylesheetRepository.SetFileContent(filepath, content);
                 scope.Complete();
@@ -166,7 +173,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public long GetStylesheetFileSize(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _stylesheetRepository.GetFileSize(filepath);
             }
@@ -179,25 +186,35 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public IEnumerable<IScript> GetScripts(params string[] names)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scriptRepository.GetMany(names);
             }
         }
 
         /// <inheritdoc />
-        public IScript GetScript(string name)
+        public IScript? GetScript(string? name)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scriptRepository.Get(name);
             }
         }
 
         /// <inheritdoc />
-        public void SaveScript(IScript script, int userId = Constants.Security.SuperUserId)
+        public void SaveScript(IScript? script, int? userId)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            if (userId is null)
+            {
+                userId = Constants.Security.SuperUserId;
+            }
+            if (script is null)
+            {
+                return;
+            }
+
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new ScriptSavingNotification(script, eventMessages);
@@ -210,17 +227,17 @@ namespace Umbraco.Cms.Core.Services
                 _scriptRepository.Save(script);
                 scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
 
-                Audit(AuditType.Save, userId, -1, "Script");
+                Audit(AuditType.Save, userId.Value, -1, "Script");
                 scope.Complete();
             }
         }
 
         /// <inheritdoc />
-        public void DeleteScript(string path, int userId = Constants.Security.SuperUserId)
+        public void DeleteScript(string path, int? userId = null)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                IScript script = _scriptRepository.Get(path);
+                IScript? script = _scriptRepository.Get(path);
                 if (script == null)
                 {
                     scope.Complete();
@@ -235,10 +252,11 @@ namespace Umbraco.Cms.Core.Services
                     return;
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 _scriptRepository.Delete(script);
                 scope.Notifications.Publish(new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
 
-                Audit(AuditType.Delete, userId, -1, "Script");
+                Audit(AuditType.Delete, userId.Value, -1, "Script");
                 scope.Complete();
             }
         }
@@ -246,7 +264,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void CreateScriptFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _scriptRepository.AddFolder(folderPath);
                 scope.Complete();
@@ -256,7 +274,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void DeleteScriptFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _scriptRepository.DeleteFolder(folderPath);
                 scope.Complete();
@@ -264,9 +282,9 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetScriptFileContentStream(string filepath)
+        public Stream? GetScriptFileContentStream(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scriptRepository.GetFileContentStream(filepath);
             }
@@ -275,7 +293,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetScriptFileContent(string filepath, Stream content)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _scriptRepository.SetFileContent(filepath, content);
                 scope.Complete();
@@ -285,7 +303,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public long GetScriptFileSize(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scriptRepository.GetFileSize(filepath);
             }
@@ -304,7 +322,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        public Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
         {
             var template = new Template(_shortStringHelper, contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
@@ -322,15 +340,15 @@ namespace Umbraco.Cms.Core.Services
 
             // check that the template hasn't been created on disk before creating the content type
             // if it exists, set the new template content to the existing file content
-            string content = GetViewContent(contentTypeAlias);
+            string? content = GetViewContent(contentTypeAlias);
             if (content != null)
             {
                 template.Content = content;
             }
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias);
+                var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
                 if (scope.Notifications.PublishCancelable(savingEvent))
                 {
                     scope.Complete();
@@ -356,7 +374,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="masterTemplate"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId)
+        public ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId)
         {
             if (name == null)
             {
@@ -393,11 +411,11 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
+        public IEnumerable<ITemplate>? GetTemplates(params string[] aliases)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
+                return _templateRepository.GetAll(aliases)?.OrderBy(x => x.Name);
             }
         }
 
@@ -405,11 +423,11 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
+        public IEnumerable<ITemplate>? GetTemplates(int masterTemplateId)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
+                return _templateRepository.GetChildren(masterTemplateId)?.OrderBy(x => x.Name);
             }
         }
 
@@ -418,9 +436,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
-        public ITemplate GetTemplate(string alias)
+        public ITemplate? GetTemplate(string? alias)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _templateRepository.Get(alias);
             }
@@ -431,9 +449,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">The identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        public ITemplate GetTemplate(int id)
+        public ITemplate? GetTemplate(int id)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _templateRepository.Get(id);
             }
@@ -444,12 +462,12 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">The guid identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        public ITemplate GetTemplate(Guid id)
+        public ITemplate? GetTemplate(Guid id)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                IQuery<ITemplate> query = Query<ITemplate>().Where(x => x.Key == id);
-                return _templateRepository.Get(query).SingleOrDefault();
+                IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
+                return _templateRepository.Get(query)?.SingleOrDefault();
             }
         }
 
@@ -460,7 +478,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _templateRepository.GetDescendants(masterTemplateId);
             }
@@ -484,7 +502,7 @@ namespace Umbraco.Cms.Core.Services
             }
 
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new TemplateSavingNotification(template, eventMessages);
@@ -511,7 +529,7 @@ namespace Umbraco.Cms.Core.Services
         public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
         {
             ITemplate[] templatesA = templates.ToArray();
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new TemplateSavingNotification(templatesA, eventMessages);
@@ -540,9 +558,9 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId"></param>
         public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                ITemplate template = _templateRepository.Get(alias);
+                ITemplate? template = _templateRepository.Get(alias);
                 if (template == null)
                 {
                     scope.Complete();
@@ -566,19 +584,19 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private string GetViewContent(string fileName)
+        private string? GetViewContent(string? fileName)
         {
             if (fileName.IsNullOrWhiteSpace())
             {
                 throw new ArgumentNullException(nameof(fileName));
             }
 
-            if (!fileName.EndsWith(".cshtml"))
+            if (!fileName!.EndsWith(".cshtml"))
             {
                 fileName = $"{fileName}.cshtml";
             }
 
-            Stream fs = _templateRepository.GetFileContentStream(fileName);
+            Stream? fs = _templateRepository.GetFileContentStream(fileName);
             if (fs == null)
             {
                 return null;
@@ -591,9 +609,9 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetTemplateFileContentStream(string filepath)
+        public Stream? GetTemplateFileContentStream(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _templateRepository.GetFileContentStream(filepath);
             }
@@ -602,7 +620,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetTemplateFileContent(string filepath, Stream content)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _templateRepository.SetFileContent(filepath, content);
                 scope.Complete();
@@ -612,7 +630,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public long GetTemplateFileSize(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _templateRepository.GetFileSize(filepath);
             }
@@ -631,16 +649,16 @@ namespace Umbraco.Cms.Core.Services
                 .ToArray();
 
             //Ensure the ones that are called 'Empty' are at the top
-            var empty = files.Where(x => Path.GetFileName(x).InvariantStartsWith("Empty"))
-                .OrderBy(x => x.Length)
+            var empty = files.Where(x => Path.GetFileName(x)?.InvariantStartsWith("Empty") ?? false)
+                .OrderBy(x => x?.Length)
                 .ToArray();
 
-            return empty.Union(files.Except(empty));
+            return empty.Union(files.Except(empty)).WhereNotNull();
         }
 
         public void DeletePartialViewFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _partialViewRepository.DeleteFolder(folderPath);
                 scope.Complete();
@@ -649,7 +667,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void DeletePartialViewMacroFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _partialViewMacroRepository.DeleteFolder(folderPath);
                 scope.Complete();
@@ -658,35 +676,35 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IPartialView> GetPartialViews(params string[] names)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewRepository.GetMany(names);
             }
         }
 
-        public IPartialView GetPartialView(string path)
+        public IPartialView? GetPartialView(string path)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewRepository.Get(path);
             }
         }
 
-        public IPartialView GetPartialViewMacro(string path)
+        public IPartialView? GetPartialViewMacro(string path)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.Get(path);
             }
         }
 
-        public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
             CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
 
-        public Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
             CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
 
-        private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string snippetName = null, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string? snippetName = null, int? userId = Constants.Security.SuperUserId)
         {
             string partialViewHeader;
             switch (partialViewType)
@@ -701,7 +719,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(partialViewType));
             }
 
-            string partialViewContent = null;
+            string? partialViewContent = null;
             if (snippetName.IsNullOrWhiteSpace() == false)
             {
                 //create the file
@@ -711,7 +729,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new InvalidOperationException("Could not load snippet with name " + snippetName);
                 }
 
-                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result!)))
                 {
                     var snippetContent = snippetFile.ReadToEnd().Trim();
 
@@ -728,14 +746,14 @@ namespace Umbraco.Cms.Core.Services
                 }
             }
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var creatingNotification = new PartialViewCreatingNotification(partialView, eventMessages);
                 if (scope.Notifications.PublishCancelable(creatingNotification))
                 {
                     scope.Complete();
-                    return Attempt<IPartialView>.Fail();
+                    return Attempt<IPartialView?>.Fail();
                 }
 
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
@@ -748,26 +766,27 @@ namespace Umbraco.Cms.Core.Services
 
                 scope.Notifications.Publish(new PartialViewCreatedNotification(partialView, eventMessages).WithStateFrom(creatingNotification));
 
-                Audit(AuditType.Save, userId, -1, partialViewType.ToString());
+                Audit(AuditType.Save, userId!.Value, -1, partialViewType.ToString());
 
                 scope.Complete();
             }
 
-            return Attempt<IPartialView>.Succeed(partialView);
+            return Attempt<IPartialView?>.Succeed(partialView);
         }
 
-        public bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId) =>
+        public bool DeletePartialView(string path, int? userId = null) =>
             DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
 
-        public bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId) =>
+        public bool DeletePartialViewMacro(string path, int? userId = null) =>
             DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
 
-        private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int? userId = null)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
-                IPartialView partialView = repository.Get(path);
+                IPartialView? partialView = repository.Get(path);
                 if (partialView == null)
                 {
                     scope.Complete();
@@ -782,9 +801,10 @@ namespace Umbraco.Cms.Core.Services
                     return false;
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 repository.Delete(partialView);
                 scope.Notifications.Publish(new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
-                Audit(AuditType.Delete, userId, -1, partialViewType.ToString());
+                Audit(AuditType.Delete, userId.Value, -1, partialViewType.ToString());
 
                 scope.Complete();
             }
@@ -792,28 +812,29 @@ namespace Umbraco.Cms.Core.Services
             return true;
         }
 
-        public Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
             SavePartialView(partialView, PartialViewType.PartialView, userId);
 
-        public Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId) =>
+        public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null) =>
             SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
-        private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new PartialViewSavingNotification(partialView, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
-                    return Attempt<IPartialView>.Fail();
+                    return Attempt<IPartialView?>.Fail();
                 }
 
+                userId ??= Constants.Security.SuperUserId;
                 IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
                 repository.Save(partialView);
 
-                Audit(AuditType.Save, userId, -1, partialViewType.ToString());
+                Audit(AuditType.Save, userId.Value, -1, partialViewType.ToString());
                 scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
 
                 scope.Complete();
@@ -828,9 +849,9 @@ namespace Umbraco.Cms.Core.Services
             return headerMatch.Replace(contents, string.Empty);
         }
 
-        internal Attempt<string> TryGetSnippetPath(string fileName)
+        internal Attempt<string> TryGetSnippetPath(string? fileName)
         {
-            if (fileName.EndsWith(".cshtml") == false)
+            if (fileName?.EndsWith(".cshtml") == false)
             {
                 fileName += ".cshtml";
             }
@@ -843,7 +864,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void CreatePartialViewFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _partialViewRepository.AddFolder(folderPath);
                 scope.Complete();
@@ -852,7 +873,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void CreatePartialViewMacroFolder(string folderPath)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _partialViewMacroRepository.AddFolder(folderPath);
                 scope.Complete();
@@ -873,9 +894,9 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream GetPartialViewFileContentStream(string filepath)
+        public Stream? GetPartialViewFileContentStream(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewRepository.GetFileContentStream(filepath);
             }
@@ -884,7 +905,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetPartialViewFileContent(string filepath, Stream content)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _partialViewRepository.SetFileContent(filepath, content);
                 scope.Complete();
@@ -894,16 +915,16 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public long GetPartialViewFileSize(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewRepository.GetFileSize(filepath);
             }
         }
 
         /// <inheritdoc />
-        public Stream GetPartialViewMacroFileContentStream(string filepath)
+        public Stream? GetPartialViewMacroFileContentStream(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.GetFileContentStream(filepath);
             }
@@ -912,7 +933,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetPartialViewMacroFileContent(string filepath, Stream content)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 _partialViewMacroRepository.SetFileContent(filepath, content);
                 scope.Complete();
@@ -922,7 +943,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public long GetPartialViewMacroFileSize(string filepath)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.GetFileSize(filepath);
             }
@@ -963,7 +984,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new InvalidOperationException("Could not load snippet with name " + snippetName);
             }
 
-            using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+            using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result!)))
             {
                 var snippetContent = snippetFile.ReadToEnd().Trim();
 
@@ -985,7 +1006,7 @@ namespace Umbraco.Cms.Core.Services
 
         #endregion
 
-        private void Audit(AuditType type, int userId, int objectId, string entityType) => _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
+        private void Audit(AuditType type, int userId, int objectId, string? entityType) => _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
         // TODO: Method to change name and/or alias of view template
     }

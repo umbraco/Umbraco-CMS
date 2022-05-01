@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         }
 
         // we never load anything directly by assembly name. This method will never be called
-        protected override Assembly Load(AssemblyName assemblyName) => null;
+        protected override Assembly? Load(AssemblyName assemblyName) => null;
     }
 }

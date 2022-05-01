@@ -35,10 +35,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
-            var sourceString = source.ToString();
+            var sourceString = source.ToString()!;
 
             if (sourceString.DetectIsJson())
             {
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     //so we have the grid json... we need to merge in the grid's configuration values with the values
                     // we've saved in the database so that when the front end gets this value, it is up-to-date.
 
-                    var sections = GetArray(obj, "sections");
+                    var sections = GetArray(obj!, "sections");
                     foreach (var section in sections.Cast<JObject>())
                     {
                         var rows = GetArray(section, "rows");
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         private JArray GetArray(JObject obj, string propertyName)
         {
-            JToken token;
+            JToken? token;
             if (obj.TryGetValue(propertyName, out token))
             {
                 var asArray = token as JArray;

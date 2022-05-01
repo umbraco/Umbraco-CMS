@@ -134,7 +134,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 }
 
                 menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
-                if(ct.IsSystemMediaType() == false)
+                if(ct?.IsSystemMediaType() == false)
                 {
                     menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
                 }
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity?> Search(string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
             => _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out totalFound, searchFrom);
 
     }

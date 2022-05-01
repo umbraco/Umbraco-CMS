@@ -18,16 +18,16 @@ namespace Umbraco.Cms.Core.Models
             _version = version;
         }
 
-        private string _migrationName;
-        private SemVersion _version;
+        private string? _migrationName;
+        private SemVersion? _version;
 
-        public string MigrationName
+        public string? MigrationName
         {
             get => _migrationName;
             set => SetPropertyValueAndDetectChanges(value, ref _migrationName, nameof(MigrationName));
         }
 
-        public SemVersion Version
+        public SemVersion? Version
         {
             get => _version;
             set => SetPropertyValueAndDetectChanges(value, ref _version, nameof(Version));

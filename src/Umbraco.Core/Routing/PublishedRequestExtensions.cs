@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets the alias of the template to use to display the requested content.
         /// </summary>
-        public static string GetTemplateAlias(this IPublishedRequest publishedRequest) => publishedRequest.Template?.Alias;
+        public static string? GetTemplateAlias(this IPublishedRequest publishedRequest) => publishedRequest.Template?.Alias;
 
         /// <summary>
         /// Gets a value indicating whether the requested content could not be found.

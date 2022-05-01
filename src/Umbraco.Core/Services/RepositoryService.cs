@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Services
     {
         protected IEventMessagesFactory EventMessagesFactory { get; }
 
-        protected IScopeProvider ScopeProvider { get; }
+        protected ICoreScopeProvider ScopeProvider { get; }
 
         protected ILoggerFactory LoggerFactory { get; }
 
-        protected RepositoryService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
+        protected RepositoryService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
         {
             EventMessagesFactory = eventMessagesFactory ?? throw new ArgumentNullException(nameof(eventMessagesFactory));
             ScopeProvider = provider ?? throw new ArgumentNullException(nameof(provider));

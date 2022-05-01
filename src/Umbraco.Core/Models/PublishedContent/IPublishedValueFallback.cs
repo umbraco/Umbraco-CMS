@@ -25,7 +25,7 @@
         /// so the variant context should be used to contextualize them (see our default implementation in
         /// the web project.</para>
         /// </remarks>
-        bool TryGetValue(IPublishedProperty property, string culture, string segment, Fallback fallback, object defaultValue, out object value);
+        bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value);
 
         /// <summary>
         /// Tries to get a fallback value for a property.
@@ -45,7 +45,7 @@
         /// <para>At property level, property.GetValue() does *not* implement fallback, and one has to
         /// get property.Value() or property.Value{T}() to trigger fallback.</para>
         /// </remarks>
-        bool TryGetValue<T>(IPublishedProperty property, string culture, string segment, Fallback fallback, T defaultValue, out T value);
+        bool TryGetValue<T>(IPublishedProperty property, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value);
 
         /// <summary>
         /// Tries to get a fallback value for a published element property.
@@ -63,7 +63,7 @@
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
         /// <para>It can only fallback at element level (no recurse).</para>
         /// </remarks>
-        bool TryGetValue(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value);
+        bool TryGetValue(IPublishedElement content, string alias, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value);
 
         /// <summary>
         /// Tries to get a fallback value for a published element property.
@@ -82,7 +82,7 @@
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
         /// <para>It can only fallback at element level (no recurse).</para>
         /// </remarks>
-        bool TryGetValue<T>(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value);
+        bool TryGetValue<T>(IPublishedElement content, string alias, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value);
 
         /// <summary>
         /// Tries to get a fallback value for a published content property.
@@ -104,7 +104,7 @@
         /// parameter is used to return a property with no value. That can then be used to invoke a converter and get the
         /// converter's interpretation of "no value".</para>
         /// </remarks>
-        bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value, out IPublishedProperty noValueProperty);
+        bool TryGetValue(IPublishedContent content, string alias, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value, out IPublishedProperty? noValueProperty);
 
         /// <summary>
         /// Tries to get a fallback value for a published content property.
@@ -127,6 +127,6 @@
         /// parameter is used to return a property with no value. That can then be used to invoke a converter and get the
         /// converter's interpretation of "no value".</para>
         /// </remarks>
-        bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value, out IPublishedProperty noValueProperty);
+        bool TryGetValue<T>(IPublishedContent content, string alias, string? culture, string? segment, Fallback fallback, T defaultValue, out T? value, out IPublishedProperty? noValueProperty);
     }
 }

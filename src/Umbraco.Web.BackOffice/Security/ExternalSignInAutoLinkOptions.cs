@@ -22,8 +22,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="allowManualLinking"></param>
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
-            string[] defaultUserGroups = null,
-            string defaultCulture = null,
+            string[]? defaultUserGroups = null,
+            string? defaultCulture = null,
             bool allowManualLinking = true)
         {
             DefaultUserGroups = defaultUserGroups ?? new[] { SecurityConstants.EditorGroupAlias };
@@ -36,14 +36,14 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
         [IgnoreDataMember]
-        public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
+        public Action<BackOfficeIdentityUser, ExternalLoginInfo>? OnAutoLinking { get; set; }
 
         /// <summary>
         /// A callback executed during every time a user authenticates using an external login.
         /// returns a boolean indicating if sign in should continue or not.
         /// </summary>
         [IgnoreDataMember]
-        public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
+        public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool>? OnExternalLogin { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether flag indicating if logging in with the external provider should auto-link/create a local user
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// </summary>
         public string[] DefaultUserGroups { get; }
 
-        private readonly string _defaultCulture;
+        private readonly string? _defaultCulture;
 
         /// <summary>
         /// The default Culture to use for auto-linking users

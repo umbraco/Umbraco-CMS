@@ -15,11 +15,11 @@ namespace Umbraco.Cms.Core.Models.Packaging
                 ImportMode = xml.AttributeValue<string>("importMode")
             };
 
-        public string ImportMode { get; set; } //this is never used
+        public string? ImportMode { get; set; } //this is never used
 
         /// <summary>
         /// The serialized version of the content
         /// </summary>
-        public XElement XmlData { get; set; }
+        public XElement XmlData { get; set; } = null!;
     }
 }

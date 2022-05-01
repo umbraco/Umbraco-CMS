@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models
     {
         int Id { get; }
         Guid Key { get; }
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Gets the alias of the content type.
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the default template of the content type.
         /// </summary>
-        ITemplate DefaultTemplate { get; }
+        ITemplate? DefaultTemplate { get; }
 
         /// <summary>
         /// Gets the content variation of the content type.
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the icon of the content type.
         /// </summary>
-        string Icon { get; }
+        string? Icon { get; }
 
         /// <summary>
         /// Gets a value indicating whether the content type is a container.
@@ -58,6 +58,6 @@ namespace Umbraco.Cms.Core.Models
         /// then an invariant culture is valid, because some properties may be invariant. On the other hand, if the content type is invariant,
         /// then a variant culture is invalid, because no property could possibly vary by culture.</para>
         /// </remarks>
-        bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false);
+        bool SupportsPropertyVariation(string? culture, string segment, bool wildcards = false);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Cms.Core.Persistence;
@@ -15,7 +16,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
-        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string connectionString);
+        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
+            current; // Default implementation.
 
         string ProviderName { get; }
 
@@ -26,11 +28,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
         string GetConcat(params string[] args);
 
-        string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null, bool forInsert = false);
+        string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false);
 
-        string GetQuotedTableName(string tableName);
-        string GetQuotedColumnName(string columnName);
-        string GetQuotedName(string name);
+        string GetQuotedTableName(string? tableName);
+        string GetQuotedColumnName(string? columnName);
+        string GetQuotedName(string? name);
         bool DoesTableExist(IDatabase db, string tableName);
         string GetIndexType(IndexTypes indexTypes);
         string GetSpecialDbType(SpecialDbType dbType);
@@ -65,12 +67,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
         string Format(IndexDefinition index);
         string Format(ForeignKeyDefinition foreignKey);
-        string FormatColumnRename(string tableName, string oldName, string newName);
-        string FormatTableRename(string oldName, string newName);
+        string FormatColumnRename(string? tableName, string? oldName, string? newName);
+        string FormatTableRename(string? oldName, string? newName);
 
         void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
-
-
 
         /// <summary>
         /// Gets a regex matching aliased fields.
@@ -138,10 +138,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// in which case the function may return true, but <paramref name="constraintName"/> is
         /// unspecified.</para>
         /// </remarks>
-        bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+        bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
 
-        string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object>> fieldSelector, string tableAlias = null);
+        string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null);
 
         /// <summary>
         /// Appends the relevant ForUpdate hint.
@@ -159,8 +159,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
             Sql<ISqlContext> sql,
             Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
-            string alias = null);
+            string? alias = null);
 
-        IDictionary<Type, IScalarMapper> ScalarMappers { get; }
+        IDictionary<Type, IScalarMapper>? ScalarMappers => null;
     }
 }

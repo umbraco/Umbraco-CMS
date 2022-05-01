@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Actions
         /// </summary>
         /// <typeparam name="T">The specified type to get</typeparam>
         /// <returns>The action</returns>
-        public T GetAction<T>()
+        public T? GetAction<T>()
             where T : IAction => this.OfType<T>().FirstOrDefault();
 
         /// <summary>

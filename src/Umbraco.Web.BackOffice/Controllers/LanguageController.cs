@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<Language> GetAllLanguages()
+        public IEnumerable<Language>? GetAllLanguages()
         {
             var allLanguages = _localizationService.GetAllLanguages();
 
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<Language> GetLanguage(int id)
+        public ActionResult<Language?> GetLanguage(int id)
         {
             var lang = _localizationService.GetLanguageById(id);
             if (lang == null)
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
         [HttpPost]
-        public ActionResult<Language> SaveLanguage(Language language)
+        public ActionResult<Language?> SaveLanguage(Language language)
         {
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 CultureInfo culture;
                 try
                 {
-                    culture = CultureInfo.GetCultureInfo(language.IsoCode);
+                    culture = CultureInfo.GetCultureInfo(language.IsoCode!);
                 }
                 catch (CultureNotFoundException)
                 {

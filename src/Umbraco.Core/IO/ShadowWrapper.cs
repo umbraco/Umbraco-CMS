@@ -13,16 +13,16 @@ namespace Umbraco.Cms.Core.IO
     {
         private static readonly string ShadowFsPath = Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
 
-        private readonly Func<bool> _isScoped;
+        private readonly Func<bool?>? _isScoped;
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;
-        private ShadowFileSystem _shadowFileSystem;
-        private string _shadowDir;
+        private ShadowFileSystem? _shadowFileSystem;
+        private string? _shadowDir;
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILoggerFactory _loggerFactory;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool?>? isScoped = null)
         {
             _innerFileSystem = innerFileSystem;
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
@@ -81,17 +81,17 @@ namespace Umbraco.Cms.Core.IO
             try
             {
                 // this may throw an AggregateException if some of the changes could not be applied
-                if (complete) shadowFileSystem.Complete();
+                if (complete) shadowFileSystem?.Complete();
             }
             finally
             {
                 // in any case, cleanup
                 try
                 {
-                    Directory.Delete(dir, true);
+                    Directory.Delete(dir!, true);
 
                     // shadowPath make be path/to/dir, remove each
-                    dir = dir.Replace('/', Path.DirectorySeparatorChar);
+                    dir = dir!.Replace('/', Path.DirectorySeparatorChar);
                     var min = _hostingEnvironment.MapPathContentRoot(ShadowFsPath).Length;
                     var pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                     while (pos > min)
@@ -117,16 +117,21 @@ namespace Umbraco.Cms.Core.IO
         {
             get
             {
-                var isScoped = _isScoped();
+                if (_isScoped is not null && _shadowFileSystem is not null)
+                {
+                    var isScoped = _isScoped!();
 
-                // if the filesystem is created *after* shadowing starts, it won't be shadowing
-                // better not ignore that situation and raised a meaningful (?) exception
-                if (isScoped && _shadowFileSystem == null)
-                    throw new Exception("The filesystems are shadowing, but this filesystem is not.");
+                    // if the filesystem is created *after* shadowing starts, it won't be shadowing
+                    // better not ignore that situation and raised a meaningful (?) exception
+                    if ( isScoped.HasValue && isScoped.Value && _shadowFileSystem == null)
+                        throw new Exception("The filesystems are shadowing, but this filesystem is not.");
 
-                return isScoped
-                    ? _shadowFileSystem
-                    : _innerFileSystem;
+                    return isScoped.HasValue && isScoped.Value
+                        ? _shadowFileSystem
+                        : _innerFileSystem;
+                }
+
+                return _innerFileSystem;
             }
         }
 
@@ -195,7 +200,7 @@ namespace Umbraco.Cms.Core.IO
             return FileSystem.GetFullPath(path);
         }
 
-        public string GetUrl(string path)
+        public string GetUrl(string? path)
         {
             return FileSystem.GetUrl(path);
         }
@@ -223,6 +228,6 @@ namespace Umbraco.Cms.Core.IO
         }
 
         /// <inheritdoc />
-        public IFileProvider Create() => _innerFileSystem.TryCreateFileProvider(out IFileProvider fileProvider) ? fileProvider : null;
+        public IFileProvider? Create() => _innerFileSystem.TryCreateFileProvider(out IFileProvider? fileProvider) ? fileProvider : null;
     }
 }

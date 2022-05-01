@@ -34,6 +34,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
         private IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
 
+        private IEditorConfigurationParser EditorConfigurationParser { get; } = Mock.Of<IEditorConfigurationParser>();
+
         [Test]
         public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
         {
@@ -42,7 +44,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             // label does not implement IDataValueReference
             var labelEditor = new LabelPropertyEditor(
                 DataValueEditorFactory,
-                IOHelper);
+                IOHelper,
+                EditorConfigurationParser);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelEditor.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -108,7 +111,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
                 DataValueEditorFactory,
-                IOHelper);
+                IOHelper,
+                EditorConfigurationParser);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -174,7 +178,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
                 DataValueEditorFactory,
-                IOHelper);
+                IOHelper,
+                EditorConfigurationParser);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();

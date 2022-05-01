@@ -16,13 +16,19 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         }
 
         [DataMember(Name = "contentType")]
-        public ContentTypeBasic ContentType { get; set; }
+        public ContentTypeBasic? ContentType { get; set; }
 
         [DataMember(Name = "username")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [DataMember(Name = "email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
+
+        [DataMember(Name = "isLockedOut")]
+        public bool IsLockedOut { get; set; }
+
+        [DataMember(Name = "isApproved")]
+        public bool IsApproved { get; set; }
 
         //[DataMember(Name = "membershipScenario")]
         //public MembershipScenario MembershipScenario { get; set; }
@@ -40,6 +46,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
 
         [DataMember(Name = "membershipProperties")]
-        public IEnumerable<ContentPropertyDisplay> MembershipProperties { get; set; }
+        public IEnumerable<ContentPropertyDisplay>? MembershipProperties { get; set; }
     }
 }

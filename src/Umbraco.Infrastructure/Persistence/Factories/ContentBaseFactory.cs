@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
-        public static Content BuildEntity(DocumentDto dto, IContentType contentType)
+        public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
         {
             var contentDto = dto.ContentDto;
             var nodeDto = contentDto.NodeDto;
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType contentType)
+        public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
         {
             var nodeDto = dto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Member BuildEntity(MemberDto dto, IMemberType contentType)
+        public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
         {
             var nodeDto = dto.ContentDto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 content.PasswordConfiguration = dto.PasswordConfig;
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
-                
+
                 // TODO: missing names?
 
                 content.Path = nodeDto.Path;
@@ -143,6 +143,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 content.WriterId = contentVersionDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
+                content.FailedPasswordAttempts = dto.FailedPasswordAttempts ?? default;
+                content.IsLockedOut = dto.IsLockedOut;
+                content.IsApproved = dto.IsApproved;
+                content.LastLoginDate = dto.LastLoginDate;
+                content.LastLockoutDate = dto.LastLockoutDate;
+                content.LastPasswordChangeDate = dto.LastPasswordChangeDate;
 
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
@@ -219,7 +225,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 EmailConfirmedDate = entity.EmailConfirmedDate,
                 ContentDto = contentDto,
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto),
-                PasswordConfig = entity.PasswordConfiguration
+                PasswordConfig = entity.PasswordConfiguration,
+                FailedPasswordAttempts = entity.FailedPasswordAttempts,
+                IsApproved = entity.IsApproved,
+                IsLockedOut = entity.IsLockedOut,
+                LastLockoutDate = entity.LastLockoutDate,
+                LastLoginDate = entity.LastLoginDate,
+                LastPasswordChangeDate = entity.LastPasswordChangeDate,
             };
             return dto;
         }
@@ -297,7 +309,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
             // try to get a path from the string being stored for media
             // TODO: only considering umbracoFile
 
-            string path = null;
+            string? path = null;
 
             if (entity.Properties.TryGetValue(Cms.Core.Constants.Conventions.Media.File, out var property)
                 && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath))

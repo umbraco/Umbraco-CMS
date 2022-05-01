@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, UserGroupRequirement requirement)
         {
-            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
             var querystring = _httpContextAccessor.HttpContext?.Request.Query[requirement.QueryStringName];
             if (querystring is null)
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 _entityService,
                 _appCaches);
 
-            Attempt<string> isAuth = authHelper.AuthorizeGroupAccess(currentUser, intIds);
+            Attempt<string?> isAuth = authHelper.AuthorizeGroupAccess(currentUser, intIds);
 
             return Task.FromResult(isAuth.Success);
         }

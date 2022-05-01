@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Web.Common.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var culture = context.HttpContext.User.Identity.GetCulture();
+            var culture = context.HttpContext.User.Identity?.GetCulture();
             if (culture != null)
             {
                 SetCurrentThreadCulture(culture);

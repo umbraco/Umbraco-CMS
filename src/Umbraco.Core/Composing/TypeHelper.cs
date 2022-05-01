@@ -29,8 +29,13 @@ namespace Umbraco.Cms.Core.Composing
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.
         /// </summary>
-        public static IList CreateGenericEnumerableFromObject(object obj)
+        public static IList? CreateGenericEnumerableFromObject(object? obj)
         {
+            if (obj is null)
+            {
+                return null;
+            }
+
             var type = obj.GetType();
 
             if (type.IsGenericType)
@@ -48,16 +53,20 @@ namespace Umbraco.Cms.Core.Composing
                     //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
                     var genericType = typeof(List<>).MakeGenericType(type.GetGenericArguments());
                     //pass in obj to fill the list
-                    return (IList)Activator.CreateInstance(genericType, obj);
+                    return (IList?)Activator.CreateInstance(genericType, obj);
                 }
             }
 
             if (type.IsArray)
             {
                 //if its an array, we'll use a List<>
-                var genericType = typeof(List<>).MakeGenericType(type.GetElementType());
-                //pass in obj to fill the list
-                return (IList)Activator.CreateInstance(genericType, obj);
+                var typeArguments = type.GetElementType();
+                if (typeArguments is not null)
+                {
+                    Type genericType = typeof(List<>).MakeGenericType(typeArguments);
+                    //pass in obj to fill the list
+                    return (IList?)Activator.CreateInstance(genericType, obj);
+                }
             }
 
             return null;
@@ -93,7 +102,7 @@ namespace Umbraco.Cms.Core.Composing
             // should only be scanning those assemblies because any other assembly will definitely not
             // contain sub type's of the one we're currently looking for
             var name = assembly.GetName().Name;
-            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToList();
+            return assemblies.Where(x => x == assembly || name is not null ? HasReference(x, name!) : false).ToList();
         }
 
         /// <summary>
@@ -145,10 +154,10 @@ namespace Umbraco.Cms.Core.Composing
         /// The term 'lowest' refers to the most base class of the type collection.
         /// If a base type is not found amongst the type collection then an invalid attempt is returned.
         /// </remarks>
-        public static Attempt<Type> GetLowestBaseType(params Type[] types)
+        public static Attempt<Type?> GetLowestBaseType(params Type[] types)
         {
             if (types.Length == 0)
-                return Attempt<Type>.Fail();
+                return Attempt<Type?>.Fail();
 
             if (types.Length == 1)
                 return Attempt.Succeed(types[0]);
@@ -167,7 +176,7 @@ namespace Umbraco.Cms.Core.Composing
                 }
             }
 
-            return Attempt<Type>.Fail();
+            return Attempt<Type?>.Fail();
         }
 
         /// <summary>
@@ -179,7 +188,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns>
         ///     <c>true</c> if [is type assignable from] [the specified contract]; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsTypeAssignableFrom(Type contract, Type implementation)
+        public static bool IsTypeAssignableFrom(Type contract, Type? implementation)
         {
             return contract.IsAssignableFrom(implementation);
         }
@@ -235,7 +244,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="includeIndexed"></param>
         /// <param name="caseSensitive"> </param>
         /// <returns></returns>
-        public static PropertyInfo GetProperty(Type type, string name,
+        public static PropertyInfo? GetProperty(Type type, string name,
             bool mustRead = true,
             bool mustWrite = true,
             bool includeIndexed = false,

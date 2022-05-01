@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>otherwise return a property -- that may have no value (ie <c>HasValue</c> is <c>false</c>).</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        IPublishedProperty GetProperty(string alias);
+        IPublishedProperty? GetProperty(string alias);
 
         #endregion
     }

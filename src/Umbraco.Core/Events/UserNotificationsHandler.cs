@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Events
                 globalSettings.OnChange(x => _globalSettings = x);
             }
 
-            public void Notify(IAction action, params IContent[] entities)
+            public void Notify(IAction? action, params IContent[] entities)
             {
                 var user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Core.Events
                 SendNotification(user, entities, action, _hostingEnvironment.ApplicationMainUrl);
             }
 
-            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
+            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction? action, Uri? siteUri)
             {
                 if (sender == null)
                     throw new ArgumentNullException(nameof(sender));
@@ -185,8 +185,8 @@ namespace Umbraco.Cms.Core.Events
                     _notificationService.SendNotifications(
                         sender,
                         contentVariantGroup,
-                        action.Letter.ToString(CultureInfo.InvariantCulture),
-                        _textService.Localize("actions", action.Alias),
+                        action?.Letter.ToString(CultureInfo.InvariantCulture),
+                        _textService.Localize("actions", action?.Alias),
                         siteUri,
                         ((IUser user, NotificationEmailSubjectParams subject) x)
                             => _textService.Localize(
@@ -217,22 +217,22 @@ namespace Umbraco.Cms.Core.Events
 
         public void Handle(AssignedUserGroupPermissionsNotification notification)
         {
-            var entities = _contentService.GetByIds(notification.EntityPermissions.Select(e => e.EntityId)).ToArray();
-            if (entities.Any() == false)
+            var entities = _contentService.GetByIds(notification.EntityPermissions.Select(e => e.EntityId))?.ToArray();
+            if (entities?.Any() == false)
             {
                 return;
             }
-            _notifier.Notify(_actions.GetAction<ActionRights>(), entities);
+            _notifier.Notify(_actions.GetAction<ActionRights>(), entities!);
         }
 
         public void Handle(PublicAccessEntrySavedNotification notification)
         {
-            var entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
-            if (entities.Any() == false)
+            var entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId))?.ToArray();
+            if (entities?.Any() == false)
             {
                 return;
             }
-            _notifier.Notify(_actions.GetAction<ActionProtect>(), entities);
+            _notifier.Notify(_actions.GetAction<ActionProtect>(), entities!);
         }
     }
 }

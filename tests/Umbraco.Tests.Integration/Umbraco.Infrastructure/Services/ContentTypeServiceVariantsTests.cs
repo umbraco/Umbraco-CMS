@@ -21,6 +21,9 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using Language = Umbraco.Cms.Core.Models.Language;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]

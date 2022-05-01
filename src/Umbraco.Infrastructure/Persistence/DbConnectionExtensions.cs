@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
 {
     public static class DbConnectionExtensions
     {
-        public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
+        public static bool IsConnectionAvailable(string? connectionString, DbProviderFactory? factory)
         {
             var connection = factory?.CreateConnection();
 

@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class ContentRepositoryExtensions
     {
-        public static void SetCultureInfo(this IContentBase content, string culture, string name, DateTime date)
+        public static void SetCultureInfo(this IContentBase content, string? culture, string? name, DateTime date)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
@@ -18,17 +18,25 @@ namespace Umbraco.Extensions
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
-            content.CultureInfos.AddOrUpdate(culture, name, date);
+            content.CultureInfos?.AddOrUpdate(culture, name, date);
         }
 
         /// <summary>
         /// Updates a culture date, if the culture exists.
         /// </summary>
-        public static void TouchCulture(this IContentBase content, string culture)
+        public static void TouchCulture(this IContentBase content, string? culture)
         {
-            if (culture.IsNullOrWhiteSpace()) return;
-            if (!content.CultureInfos.TryGetValue(culture, out var infos)) return;
-            content.CultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
+            if (culture.IsNullOrWhiteSpace() || content.CultureInfos is null)
+            {
+                return;
+            }
+
+            if (!content.CultureInfos.TryGetValue(culture!, out var infos))
+            {
+                return;
+            }
+
+            content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.Now);
         }
 
         /// <summary>
@@ -42,21 +50,30 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static void AdjustDates(this IContent content, DateTime date, bool publishing)
         {
-            foreach(var culture in content.EditedCultures.ToList())
+            if (content.EditedCultures is not null)
             {
-                if (!content.CultureInfos.TryGetValue(culture, out ContentCultureInfos editedInfos))
+                foreach(var culture in content.EditedCultures.ToList())
                 {
-                    continue;
-                }
+                    if (content.CultureInfos is null)
+                    {
+                        continue;
+                    }
 
-                // if it's not dirty, it means it hasn't changed so there's nothing to adjust
-                if (!editedInfos.IsDirty())
-                {
-                    continue;
-                }
+                    if (!content.CultureInfos.TryGetValue(culture, out var editedInfos))
+                    {
+                        continue;
+                    }
 
-                content.CultureInfos.AddOrUpdate(culture, editedInfos.Name, date);
+                    // if it's not dirty, it means it hasn't changed so there's nothing to adjust
+                    if (!editedInfos.IsDirty())
+                    {
+                        continue;
+                    }
+
+                    content.CultureInfos?.AddOrUpdate(culture, editedInfos?.Name, date);
+                }
             }
+
 
             if (!publishing)
             {
@@ -65,6 +82,10 @@ namespace Umbraco.Extensions
 
             foreach (var culture in content.PublishedCultures.ToList())
             {
+                if (content.PublishCultureInfos is null)
+                {
+                    continue;
+                }
                 if (!content.PublishCultureInfos.TryGetValue(culture, out ContentCultureInfos publishInfos))
                 {
                     continue;
@@ -78,7 +99,7 @@ namespace Umbraco.Extensions
 
                 content.PublishCultureInfos.AddOrUpdate(culture, publishInfos.Name, date);
 
-                if (content.CultureInfos.TryGetValue(culture, out ContentCultureInfos infos))
+                if (content.CultureInfos?.TryGetValue(culture, out ContentCultureInfos infos) ?? false)
                 {
                     SetCultureInfo(content, culture, infos.Name, date);
                 }
@@ -89,22 +110,22 @@ namespace Umbraco.Extensions
         /// Gets the cultures that have been flagged for unpublishing.
         /// </summary>
         /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
-        public static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
+        public static IReadOnlyList<string>? GetCulturesUnpublishing(this IContent content)
         {
             if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
                 return Array.Empty<string>();
 
-            var culturesUnpublishing = content.CultureInfos.Values
+            var culturesUnpublishing = content.CultureInfos?.Values
                 .Where(x => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + x.Culture))
                 .Select(x => x.Culture);
 
-            return culturesUnpublishing.ToList();
+            return culturesUnpublishing?.ToList();
         }
 
         /// <summary>
         /// Copies values from another document.
         /// </summary>
-        public static void CopyFrom(this IContent content, IContent other, string culture = "*")
+        public static void CopyFrom(this IContent content, IContent other, string? culture = "*")
         {
             if (other.ContentTypeId != content.ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
@@ -127,12 +148,12 @@ namespace Umbraco.Extensions
             foreach (var property in content.Properties)
             {
                 // each property type may or may not support the variation
-                if (!property.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                if (!property.PropertyType?.SupportsVariation(culture, "*", wildcards: true) ?? false)
                     continue;
 
                 foreach (var pvalue in property.Values)
-                    if (property.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
-                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    if ((property.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) ?? false) &&
+                        (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
                     {
                         property.SetValue(null, pvalue.Culture, pvalue.Segment);
                     }
@@ -142,17 +163,20 @@ namespace Umbraco.Extensions
             var otherProperties = other.Properties;
             foreach (var otherProperty in otherProperties)
             {
-                if (!otherProperty.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                if (!otherProperty?.PropertyType?.SupportsVariation(culture, "*", wildcards: true) ?? true)
                     continue;
 
-                var alias = otherProperty.PropertyType.Alias;
-                foreach (var pvalue in otherProperty.Values)
+                var alias = otherProperty?.PropertyType.Alias;
+                if (otherProperty is not null && alias is not null)
                 {
-                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
-                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    foreach (var pvalue in otherProperty.Values)
                     {
-                        var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                        content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                        if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                            (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false)))
+                        {
+                            var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                            content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                        }
                     }
                 }
             }
@@ -161,7 +185,7 @@ namespace Umbraco.Extensions
 
             if (culture == "*")
             {
-                content.CultureInfos.Clear();
+                content.CultureInfos?.Clear();
                 content.CultureInfos = null;
             }
 
@@ -169,14 +193,17 @@ namespace Umbraco.Extensions
                 content.Name = other.Name;
 
             // ReSharper disable once UseDeconstruction
-            foreach (var cultureInfo in other.CultureInfos)
+            if (other.CultureInfos is not null)
             {
-                if (culture == "*" || culture == cultureInfo.Culture)
-                    content.SetCultureName(cultureInfo.Name, cultureInfo.Culture);
+                foreach (var cultureInfo in other.CultureInfos)
+                {
+                    if (culture == "*" || culture == cultureInfo.Culture)
+                        content.SetCultureName(cultureInfo.Name, cultureInfo.Culture);
+                }
             }
         }
 
-        public static void SetPublishInfo(this IContent content, string culture, string name, DateTime date)
+        public static void SetPublishInfo(this IContent content, string? culture, string? name, DateTime date)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
@@ -184,17 +211,17 @@ namespace Umbraco.Extensions
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
-            content.PublishCultureInfos.AddOrUpdate(culture, name, date);
+            content.PublishCultureInfos?.AddOrUpdate(culture, name, date);
         }
 
         // sets the edited cultures on the content
-        public static void SetCultureEdited(this IContent content, IEnumerable<string> cultures)
+        public static void SetCultureEdited(this IContent content, IEnumerable<string?>? cultures)
         {
             if (cultures == null)
                 content.EditedCultures = null;
             else
             {
-                var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace()), StringComparer.OrdinalIgnoreCase);
+                var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace())!, StringComparer.OrdinalIgnoreCase);
                 content.EditedCultures = editedCultures.Count > 0 ? editedCultures : null;
             }
         }
@@ -206,7 +233,7 @@ namespace Umbraco.Extensions
         /// <param name="impact"></param>
         /// <returns>A value indicating whether it was possible to publish the names and values for the specified
         /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
-        public static bool PublishCulture(this IContent content, CultureImpact impact)
+        public static bool PublishCulture(this IContent content, CultureImpact? impact)
         {
             if (impact == null) throw new ArgumentNullException(nameof(impact));
 
@@ -265,9 +292,9 @@ namespace Umbraco.Extensions
         /// <param name="content"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static bool UnpublishCulture(this IContent content, string culture = "*")
+        public static bool UnpublishCulture(this IContent content, string? culture = "*")
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
 
             // the variation should be supported by the content type properties
             if (!content.ContentType.SupportsPropertyVariation(culture, "*", true))
@@ -309,18 +336,18 @@ namespace Umbraco.Extensions
         /// <param name="content"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static bool ClearPublishInfo(this IContent content, string culture)
+        public static bool ClearPublishInfo(this IContent content, string? culture)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
-            var removed = content.PublishCultureInfos.Remove(culture);
-            if (removed)
+            var removed = content.PublishCultureInfos?.Remove(culture);
+            if (removed ?? false)
             {
                 // set the culture to be dirty - it's been modified
                 content.TouchCulture(culture);
             }
-            return removed;
+            return removed ?? false;
         }
     }
 }

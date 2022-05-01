@@ -16,8 +16,12 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Services;
+using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
+using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -41,12 +45,17 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IPackagingService, PackagingService>();
             builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
             builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
-            builder.Services.AddTransient(SourcesFactory);
+            builder.Services.AddTransient(LocalizedTextServiceFileSourcesFactory);
             builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
             builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
             builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
+            builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
+            builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
+            builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
+            builder.Services.AddTransient<IEditorConfigurationParser, EditorConfigurationParser>();
+
 
             return builder;
         }
@@ -68,34 +77,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<FileSystems>(),
                 packageRepoFileName);
 
-        private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)
+        private static LocalizedTextServiceFileSources LocalizedTextServiceFileSourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
-            var globalSettings = container.GetRequiredService<IOptions<GlobalSettings>>().Value;
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));
-            var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
-            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config, "lang")));
-
-            var pluginLangFolders = appPlugins.Exists == false
-                ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
-                : appPlugins.GetDirectories()
-                    // Check for both Lang & lang to support case sensitive file systems.
-                    .SelectMany(x => x.GetDirectories("?ang", SearchOption.AllDirectories).Where(x => x.Name.InvariantEquals("lang")))
-                    .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
-                    .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
-
-            // user defined langs that overwrite the default, these should not be used by plugin creators
-            var userLangFolders = configLangFolder.Exists == false
-                ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
-                : configLangFolder
-                    .GetFiles("*.user.xml", SearchOption.TopDirectoryOnly)
-                    .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
             return new LocalizedTextServiceFileSources(
                 container.GetRequiredService<ILogger<LocalizedTextServiceFileSources>>(),
                 container.GetRequiredService<AppCaches>(),
                 mainLangFolder,
-                pluginLangFolders.Concat(userLangFolders));
+                container.GetServices<LocalizedTextServiceSupplementaryFileSource>());
         }
     }
 }

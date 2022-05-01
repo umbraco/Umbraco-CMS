@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     .Select(dt =>
                     {
                         var dataType = dataTypes[dt.Id];
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, dataType.Editor.Icon, false);
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, dataType.Editor?.Icon, false);
                         node.Path = dt.Path;
                         return node;
                     })
@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity?> Search(string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
             => _treeSearcher.EntitySearch(UmbracoObjectTypes.DataType, query, pageSize, pageIndex, out totalFound, searchFrom);
     }
 }

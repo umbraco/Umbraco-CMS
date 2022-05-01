@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             Endpoint e = _endpointDataSource.Endpoints.First(x =>
             {
                 // return the endpoint for the RenderController.Index action.
-                ControllerActionDescriptor descriptor = x.Metadata?.GetMetadata<ControllerActionDescriptor>();
+                ControllerActionDescriptor? descriptor = x.Metadata?.GetMetadata<ControllerActionDescriptor>();
                 return descriptor?.ControllerTypeInfo == typeof(RenderController)
                        && descriptor?.ActionName == nameof(RenderController.Index);
             });
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             // i.e. only dynamic routes.
             foreach (Endpoint endpoint in endpoints)
             {
-                ControllerAttribute controller = endpoint.Metadata?.GetMetadata<ControllerAttribute>();
+                ControllerAttribute? controller = endpoint.Metadata?.GetMetadata<ControllerAttribute>();
                 if (controller != null)
                 {
                     return false;
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         {
             if (AllInvalid(candidates))
             {
-                UmbracoRouteValues umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
+                UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
                 if (umbracoRouteValues?.PublishedRequest != null
                     && !umbracoRouteValues.PublishedRequest.HasPublishedContent()
                     && umbracoRouteValues.PublishedRequest.ResponseStatusCode == StatusCodes.Status404NotFound)

@@ -39,7 +39,7 @@
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe URL segment.</returns>
-        string CleanStringForUrlSegment(string text, string culture);
+        string CleanStringForUrlSegment(string text, string? culture);
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
