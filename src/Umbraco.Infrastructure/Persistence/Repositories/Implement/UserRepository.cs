@@ -284,7 +284,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
             var dtos = GetDtosWith(sql => new SqlTranslator<IUser>(sql, query).Translate(), true)
-                .LegacyDistinctBy(x => x!.Id)
+                .DistinctBy(x => x.Id)
                 .ToList();
 
             var users = new IUser[dtos.Count];
