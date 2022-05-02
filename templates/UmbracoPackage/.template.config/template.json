@@ -46,7 +46,7 @@
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "9.5.0-rc2",
+      "defaultValue": "9.5.0-rc3",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "namespaceReplacer": {
