@@ -29,7 +29,6 @@ public class ControllerActionSearcher : IControllerActionSearcher
         _actionSelector = actionSelector;
     }
 
-
     /// <summary>
     ///     Determines if a custom controller can hijack the current route
     /// </summary>
@@ -54,7 +53,6 @@ public class ControllerActionSearcher : IControllerActionSearcher
         return null;
     }
 
-
     /// <summary>
     ///     Return a list of controller candidates that match the custom controller and action names
     /// </summary>
@@ -69,7 +67,7 @@ public class ControllerActionSearcher : IControllerActionSearcher
         var routeValues = new RouteValueDictionary
         {
             [ControllerToken] = customControllerName,
-            [ActionToken] = customActionName // first try to find the custom action
+            [ActionToken] = customActionName, // first try to find the custom action
         };
 
         if (area != null)
@@ -78,7 +76,7 @@ public class ControllerActionSearcher : IControllerActionSearcher
         }
 
         var routeData = new RouteData(routeValues);
-        var routeContext = new RouteContext(httpContext) {RouteData = routeData};
+        var routeContext = new RouteContext(httpContext) { RouteData = routeData };
 
         // try finding candidates for the custom action
         var candidates = _actionSelector.SelectCandidates(routeContext)?

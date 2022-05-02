@@ -69,7 +69,7 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             LastLoginDate = member.LastLoginDateUtc?.ToLocalTime(),
             LastPasswordChangedDate = member.LastPasswordChangeDateUtc?.ToLocalTime(),
             RedirectUrl = _redirectUrl,
-            Key = member.Key
+            Key = member.Key,
         };
 
         IMemberType? memberType = member.MemberTypeAlias is null ? null : MemberTypeService.Get(member.MemberTypeAlias);

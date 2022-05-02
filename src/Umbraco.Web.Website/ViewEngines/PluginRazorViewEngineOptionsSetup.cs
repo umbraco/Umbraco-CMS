@@ -36,7 +36,7 @@ public class PluginRazorViewEngineOptionsSetup : IConfigureOptions<RazorViewEngi
 
                 // will be used when we have partial view and child action macros
                 string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
-                string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml")
+                string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml"),
             };
 
             viewLocations = umbViewLocations.Concat(viewLocations);
@@ -45,6 +45,8 @@ public class PluginRazorViewEngineOptionsSetup : IConfigureOptions<RazorViewEngi
         }
 
         // not a dynamic expander
-        public void PopulateValues(ViewLocationExpanderContext context) { }
+        public void PopulateValues(ViewLocationExpanderContext context)
+        {
+        }
     }
 }

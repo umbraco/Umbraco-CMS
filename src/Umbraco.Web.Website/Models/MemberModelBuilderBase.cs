@@ -39,7 +39,7 @@ public abstract class MemberModelBuilderBase
                 }
             }
 
-            var viewProperty = new MemberPropertyModel {Alias = prop.Alias, Name = prop.Name, Value = value};
+            var viewProperty = new MemberPropertyModel { Alias = prop.Alias, Name = prop.Name, Value = value };
 
             // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers
             // can just render their own.
@@ -49,12 +49,12 @@ public abstract class MemberModelBuilderBase
             //// for a given property.
             ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “HTML”, “Object”, “String”, “Text”, and “Url”
             //// by default we'll render a text box since we've defined that metadata on the UmbracoProperty.Value property directly.
-            //if (prop.DataTypeId == new Guid(Constants.PropertyEditors.TrueFalse))
-            //{
+            // if (prop.DataTypeId == new Guid(Constants.PropertyEditors.TrueFalse))
+            // {
             //    viewProperty.EditorTemplate = "UmbracoBoolean";
-            //}
-            //else
-            //{
+            // }
+            // else
+            // {
             //    switch (prop.DataTypeDatabaseType)
             //    {
             //        case DataTypeDatabaseType.Integer:
@@ -67,8 +67,7 @@ public abstract class MemberModelBuilderBase
             //        case DataTypeDatabaseType.Nvarchar:
             //            break;
             //    }
-            //}
-
+            // }
             viewProperties.Add(viewProperty);
         }
 

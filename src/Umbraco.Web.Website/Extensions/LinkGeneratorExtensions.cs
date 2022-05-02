@@ -42,5 +42,5 @@ public static class LinkGeneratorExtensions
         where T : SurfaceController => linkGenerator.GetUmbracoControllerUrl(
         actionName,
         typeof(T),
-        new Dictionary<string, object?> {["id"] = id});
+        new Dictionary<string, object?> { ["id"] = id });
 }

@@ -124,7 +124,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             return new RouteValueDictionary
             {
                 [ControllerToken] = ControllerExtensions.GetControllerName<RenderNoContentController>(),
-                [ActionToken] = nameof(RenderNoContentController.Index)
+                [ActionToken] = nameof(RenderNoContentController.Index),
             };
         }
 
@@ -161,7 +161,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         // See https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.routing.dynamicroutevaluetransformer.transformasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Mvc_Routing_DynamicRouteValueTransformer_TransformAsync_Microsoft_AspNetCore_Http_HttpContext_Microsoft_AspNetCore_Routing_RouteValueDictionary_
         // We should apparenlty not be modified these values.
         // So we create new ones.
-        var newValues = new RouteValueDictionary {[ControllerToken] = umbracoRouteValues?.ControllerName};
+        var newValues = new RouteValueDictionary { [ControllerToken] = umbracoRouteValues?.ControllerName };
         if (string.IsNullOrWhiteSpace(umbracoRouteValues?.ActionName) == false)
         {
             newValues[ActionToken] = umbracoRouteValues.ActionName;
@@ -230,7 +230,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
                 WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Controller).Value),
             ActionName =
                 WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Action).Value),
-            Area = WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Area).Value)
+            Area = WebUtility.UrlDecode(decodedUfprt.First(x => x.Key == ReservedAdditionalKeys.Area).Value),
         };
     }
 
@@ -239,7 +239,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         // set the standard route values/tokens
         var values = new RouteValueDictionary
         {
-            [ControllerToken] = postedInfo.ControllerName, [ActionToken] = postedInfo.ActionName
+            [ControllerToken] = postedInfo.ControllerName, [ActionToken] = postedInfo.ActionName,
         };
 
         ControllerActionDescriptor? surfaceControllerDescriptor =
@@ -277,6 +277,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         internal const string Action = "a";
         internal const string Area = "ar";
 
-        internal static readonly string[] AllKeys = {Controller, Action, Area};
+        internal static readonly string[] AllKeys = { Controller, Action, Area };
     }
 }

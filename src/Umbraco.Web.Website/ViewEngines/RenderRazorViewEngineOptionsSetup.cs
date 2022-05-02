@@ -30,7 +30,7 @@ public class RenderRazorViewEngineOptionsSetup : IConfigureOptions<RazorViewEngi
             string[] umbViewLocations =
             {
                 "/Views/{0}.cshtml", "/Views/Shared/{0}.cshtml", "/Views/Partials/{0}.cshtml",
-                "/Views/MacroPartials/{0}.cshtml"
+                "/Views/MacroPartials/{0}.cshtml",
             };
 
             viewLocations = umbViewLocations.Concat(viewLocations);
@@ -39,6 +39,8 @@ public class RenderRazorViewEngineOptionsSetup : IConfigureOptions<RazorViewEngi
         }
 
         // not a dynamic expander
-        public void PopulateValues(ViewLocationExpanderContext context) { }
+        public void PopulateValues(ViewLocationExpanderContext context)
+        {
+        }
     }
 }

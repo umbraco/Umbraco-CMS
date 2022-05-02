@@ -52,7 +52,6 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
         {
             _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Loop {LoopCounter}", i);
 
-
             IPublishedContent? publishedContent = routeValues.PublishedRequest?.PublishedContent;
             if (publishedContent == null)
             {
@@ -116,8 +115,7 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
                 _logger.LogDebug("EnsurePublishedContentAccess: Page is not protected");
             }
 
-
-            //loop until we have access or reached max loops
+            // loop until we have access or reached max loops
         } while (publicAccessStatus != PublicAccessStatus.AccessAccepted && i++ < maxLoop);
 
         if (i == maxLoop)
@@ -128,7 +126,6 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
 
         return routeValues;
     }
-
 
     private async Task<UmbracoRouteValues> SetPublishedContentAsOtherPageAsync(
         HttpContext httpContext, IPublishedRequest? publishedRequest, int pageId)
