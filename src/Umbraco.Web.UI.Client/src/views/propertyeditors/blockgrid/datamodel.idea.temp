@@ -5,7 +5,8 @@
     columnSpanOptions: [4, 6, 12],
     areas: [
         {
-            key: "ABD23",
+            key: "ABD1",
+            alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
             columnSpan: 6,
             minAllowed: 1,
             maxAllowed: 2,
@@ -19,6 +20,8 @@
             ]
         },
         {
+            key: "ABD2",
+            alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
             columnSpan: 6,
             allowedTypes: [.. ,.. ,..]
         }
@@ -32,7 +35,7 @@ layout: [
         contentUDI: 123,
         columnSpan: 12,
         // grid 2 column
-        // Section with placeholder A B
+        // Section with area A B
         areas: [
             {
                 key: "ABD1"// Generated GUID
