@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
         }
 
-        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? WebUtility.UrlDecode(id).TrimStart("/")

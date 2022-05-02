@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Web;
@@ -14,7 +14,6 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-
         /// <summary>
         /// If session isn't enabled this will throw an exception so we check
         /// </summary>
@@ -24,7 +23,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         {
             get
             {
-                var httpContext = _httpContextAccessor?.HttpContext;
+                HttpContext? httpContext = _httpContextAccessor?.HttpContext;
 
                 return IsSessionsAvailable
                     ? httpContext?.Session?.Id
@@ -32,17 +31,35 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             }
         }
 
-        public string? GetSessionValue(string sessionName)
+        public string? GetSessionValue(string key)
         {
-            if(!IsSessionsAvailable) return null;
-            return _httpContextAccessor.HttpContext?.Session.GetString(sessionName);
+            if (!IsSessionsAvailable)
+            {
+                return null;
+            }
+
+            return _httpContextAccessor.HttpContext?.Session.GetString(key);
         }
 
 
-        public void SetSessionValue(string sessionName, string value)
+        public void SetSessionValue(string key, string value)
         {
-            if(!IsSessionsAvailable) return;
-            _httpContextAccessor.HttpContext?.Session.SetString(sessionName, value);
+            if (!IsSessionsAvailable)
+            {
+                return;
+            }
+
+            _httpContextAccessor.HttpContext?.Session.SetString(key, value);
+        }
+
+        public void ClearSessionValue(string key)
+        {
+            if (!IsSessionsAvailable)
+            {
+                return;
+            }
+
+            _httpContextAccessor.HttpContext?.Session.Remove(key);
         }
     }
 }

@@ -1377,7 +1377,7 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         private PublishResult CommitDocumentChangesInternal(ICoreScope scope, IContent content,
             EventMessages eventMessages, IReadOnlyCollection<ILanguage> allLangs,
-            IDictionary<string, object>? notificationState,
+            IDictionary<string, object?>? notificationState,
             int userId = Constants.Security.SuperUserId,
             bool branchOne = false, bool branchRoot = false)
         {
@@ -3036,7 +3036,7 @@ namespace Umbraco.Cms.Core.Services
         private PublishResult StrategyCanPublish(ICoreScope scope, IContent content, bool checkPath,
             IReadOnlyList<string>? culturesPublishing,
             IReadOnlyCollection<string>? culturesUnpublishing, EventMessages evtMsgs,
-            IReadOnlyCollection<ILanguage> allLangs, IDictionary<string, object>? notificationState)
+            IReadOnlyCollection<ILanguage> allLangs, IDictionary<string, object?>? notificationState)
         {
             // raise Publishing notification
             if (scope.Notifications.PublishCancelable(

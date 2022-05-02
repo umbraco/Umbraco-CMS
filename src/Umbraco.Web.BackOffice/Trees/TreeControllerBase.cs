@@ -47,8 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        [Obsolete("See GetTreeNodesAsync")]
-        protected abstract ActionResult<TreeNodeCollection?> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
+        protected abstract ActionResult<TreeNodeCollection> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// Returns the menu structure for the node
@@ -56,8 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [Obsolete("See GetMenuForNodeAsync")]
-        protected abstract ActionResult<MenuItemCollection>? GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
+        protected abstract ActionResult<MenuItemCollection> GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// The method called to render the contents of the tree structure
@@ -71,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected virtual async Task<ActionResult<TreeNodeCollection?>> GetTreeNodesAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+        protected virtual async Task<ActionResult<TreeNodeCollection>> GetTreeNodesAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
         {
             return GetTreeNodes(id, queryStrings);
         }
@@ -85,7 +83,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <remarks>
         /// If overriden, GetMenuForNode will not be called
         /// </remarks>
-        protected virtual async Task<ActionResult<MenuItemCollection>?> GetMenuForNodeAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+        protected virtual async Task<ActionResult<MenuItemCollection>> GetMenuForNodeAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
         {
             return GetMenuForNode(id, queryStrings);
         }
