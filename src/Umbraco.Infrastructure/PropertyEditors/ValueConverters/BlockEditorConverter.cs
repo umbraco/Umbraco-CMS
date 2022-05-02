@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -53,11 +52,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
             var publishedContentType = publishedContentCache?.GetContentType(contentTypeKey);
-            if (publishedContentType != null)
+            if (publishedContentType != null && publishedContentType.IsElement)
             {
-                var modelType = ModelType.For(publishedContentType.Alias);
-
-                return _publishedModelFactory.MapModelType(modelType);
+                // TODO Get the model type without having to construct a list
+                var listType = _publishedModelFactory.CreateModelList(publishedContentType.Alias)?.GetType();
+                if (listType?.GenericTypeArguments.Length == 1)
+                {
+                    return listType.GenericTypeArguments[0];
+                }
             }
 
             return typeof(IPublishedElement);
