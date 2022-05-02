@@ -1,14 +1,20 @@
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
     <div class="umb-block-grid__block" ng-class="{'--active':vm.layoutEntry.$block.active, '--show-validation': vm.layoutEntry.$block.showValidation === true}">
 
-        <umb-block-grid-block stylesheet="{{::vm.layoutEntry.$block.config.stylesheet}}"
-                              class="umb-block-grid__block--content"
-                              ng-class="{'blockelement__draggable-element': vm.layoutEntry.$block.config.stylesheet}"
-                              view="{{vm.layoutEntry.$block.view}}"
+        <umb-block-grid-block stylesheet="{{::vm.layoutEntry.$block.stylesheet}}"
+                              class="umb-block-grid__block--content blockelement__draggable-element"
+                              view="{{::vm.layoutEntry.$block.view}}"
                               api="vm.blockEditorApi"
                               block="vm.layoutEntry.$block"
                               index="vm.index"
                               parent-form="vm.blockRowForm">
+            <h2 slot="test">Slotted element test</h2>
+            <umb-block-grid-entries 
+                slot="areas"
+                block-editor-api="vm.blockEditorApi"
+                entries="vm.layoutEntry.$block.layout.children"
+                container-layout-entry="vm.layoutEntry.$block.layout">
+            </umb-block-grid-entries>
         </umb-block-grid-block>
 
         <div class="umb-block-grid__block--actions">

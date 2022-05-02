@@ -232,14 +232,14 @@
             });
         }
 
-        function getDefaultViewForBlock(block) {
+        function applyDefaultViewForBlock(block) {
 
             var defaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
 
             if (block.config.unsupported === true)
-                return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+                block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
                 
-            return defaultViewFolderPath + "gridblock/gridblock.editor.html";
+            block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
         }
 
         /**
@@ -272,7 +272,13 @@
 
             initializeLayout(entry.children);
 
-            block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
+            if (!block.config.view) {
+                applyDefaultViewForBlock(block);
+            } else {
+                block.view = block.config.view;
+            }
+
+            block.stylesheet = block.config.stylesheet;
             block.showValidation = block.config.view ? true : false;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
@@ -813,18 +819,18 @@
         };
 
         vm.sortableOptions = {
-            axis: "y",
             cursor: "grabbing",
             cancel: "input,textarea,select,option",
 
             //appendTo: ".umb-block-grid__wrapper",
             containment: ".umb-block-grid__wrapper",
 
-            connectWith: "umb-block-grid-entries",
+            connectWith: ".umb-block-grid__layout-container",
             handle: ".blockelement__draggable-element",
             classes: ".blockelement--dragging",
-            items: '.umb-block-grid__sortable-item',
-            placeholder: "umb-group-builder__property_sortable-placeholder",
+            items: '.umb-block-grid__layout-item',
+            placeholder: "umb-block-grid__layout-sort-placeholder",
+            //forcePlaceholderSize: true,
 
             //connectWith: ".umb-group-builder__tabs",
             //placeholder: "umb-group-builder__tab-sortable-placeholder",
@@ -834,6 +840,9 @@
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            start: function(event, ui) {
+                ui.placeholder.css("grid-column", "span 4");// TODO: get right width.
+            },
             accept: function (sourceItemHandleScope, destSortableScope) {
                 return true;
                 //sourceItemHandleScope.itemScope.sortableScope.$id === destSortableScope.$id;

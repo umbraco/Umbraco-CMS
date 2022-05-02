@@ -1,8 +1,9 @@
     <div 
         ui-sortable="vm.blockEditorApi.internal.sortableOptions"
         ng-model="vm.entries"
+        class="umb-block-grid__layout-container"
     >
-    <div ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key" class="umb-block-grid__sortable-item">
+    <div ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key" class="umb-block-grid__layout-item">
 
         <button type="button"
                 class="btn-reset umb-block-grid__block--create-button"
