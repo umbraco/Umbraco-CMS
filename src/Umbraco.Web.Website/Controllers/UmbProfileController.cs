@@ -117,7 +117,6 @@ public class UmbProfileController : SurfaceController
 
         // now we can update the custom properties
         // TODO: Ideally we could do this all through our MemberIdentityUser
-
         IMember? member = _memberService.GetByKey(currentMember.Key);
         if (member == null)
         {
@@ -128,10 +127,12 @@ public class UmbProfileController : SurfaceController
         IMemberType? memberType = _memberTypeService.Get(member.ContentTypeId);
 
         foreach (MemberPropertyModel property in model.MemberProperties
-                     //ensure the property they are posting exists
+
+                     // ensure the property they are posting exists
                      .Where(p => memberType?.PropertyTypeExists(p.Alias) ?? false)
                      .Where(property => member.Properties.Contains(property.Alias))
-                     //needs to be editable
+
+                     // needs to be editable
                      .Where(p => memberType?.MemberCanEditProperty(p.Alias) ?? false))
         {
             member.Properties[property.Alias]?.SetValue(property.Value);

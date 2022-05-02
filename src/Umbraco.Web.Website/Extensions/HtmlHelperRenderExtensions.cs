@@ -105,6 +105,7 @@ public static class HtmlHelperRenderExtensions
         Func<object, ViewDataDictionary?, string>? contextualKeyBuilder = null)
     {
         var cacheKey = new StringBuilder(partialViewName);
+
         // let's always cache by the current culture to allow variants to have different cache results
         var cultureName = Thread.CurrentThread.CurrentUICulture.Name;
         if (!string.IsNullOrEmpty(cultureName))
@@ -190,7 +191,8 @@ public static class HtmlHelperRenderExtensions
         IHtmlGenerator htmlGenerator = GetRequiredService<IHtmlGenerator>(htmlHelper);
 
         ViewContext viewContext = htmlHelper.ViewContext.Clone();
-        //change the HTML field name
+
+        // change the HTML field name
         viewContext.ViewData.TemplateInfo.HtmlFieldPrefix = prefix;
 
         TagBuilder? tagBuilder = htmlGenerator.GenerateValidationSummary(
@@ -245,7 +247,7 @@ public static class HtmlHelperRenderExtensions
                                                 surfaceType.FullName);
         }
 
-        var routeVals = new RouteValueDictionary(new {area = string.Empty});
+        var routeVals = new RouteValueDictionary(new { area = string.Empty });
 
         PluginControllerMetadata metaData = PluginController.GetMetadata(surfaceController);
         if (!metaData.AreaName.IsNullOrWhiteSpace())
@@ -831,7 +833,6 @@ public static class HtmlHelperRenderExtensions
             base.GenerateEndForm();
         }
     }
-
 
     #region If
 

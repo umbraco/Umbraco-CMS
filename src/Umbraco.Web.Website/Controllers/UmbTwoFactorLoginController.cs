@@ -103,7 +103,7 @@ public class UmbTwoFactorLoginController : SurfaceController
             }
         }
 
-        //We need to set this, to ensure we show the 2fa login page
+        // We need to set this, to ensure we show the 2fa login page
         IEnumerable<string> providerNames =
             await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key);
         ViewData.SetTwoFactorProviderNames(providerNames);
@@ -130,7 +130,7 @@ public class UmbTwoFactorLoginController : SurfaceController
 
         var twoFactorLogin = new TwoFactorLogin
         {
-            Confirmed = true, Secret = secret, UserOrMemberKey = member.Key, ProviderName = providerName
+            Confirmed = true, Secret = secret, UserOrMemberKey = member.Key, ProviderName = providerName,
         };
 
         await _twoFactorLoginService.SaveAsync(twoFactorLogin);

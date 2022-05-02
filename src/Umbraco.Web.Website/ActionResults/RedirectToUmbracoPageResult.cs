@@ -79,6 +79,8 @@ public class RedirectToUmbracoPageResult : IKeepTempDataResult
         _umbracoContextAccessor = umbracoContextAccessor;
     }
 
+    public Guid Key { get; }
+
     private string Url
     {
         get
@@ -106,8 +108,6 @@ public class RedirectToUmbracoPageResult : IKeepTempDataResult
             return _url;
         }
     }
-
-    public Guid Key { get; }
 
     private IPublishedContent? PublishedContent
     {

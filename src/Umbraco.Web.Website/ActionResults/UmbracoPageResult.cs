@@ -47,7 +47,7 @@ public class UmbracoPageResult : IActionResult
         // Copy the action context - this also copies the ModelState
         var renderActionContext = new ActionContext(context)
         {
-            ActionDescriptor = umbracoRouteValues.ControllerActionDescriptor
+            ActionDescriptor = umbracoRouteValues.ControllerActionDescriptor,
         };
         IActionInvokerFactory actionInvokerFactory =
             context.HttpContext.RequestServices.GetRequiredService<IActionInvokerFactory>();

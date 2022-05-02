@@ -23,7 +23,6 @@ public class UmbLoginController : SurfaceController
     private readonly IMemberSignInManager _signInManager;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
 
-
     [ActivatorUtilitiesConstructor]
     public UmbLoginController(
         IUmbracoContextAccessor umbracoContextAccessor,
