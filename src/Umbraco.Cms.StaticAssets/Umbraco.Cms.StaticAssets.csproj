@@ -14,9 +14,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" PrivateAssets="All"  />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" PrivateAssets="All" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <BellePath>$(ProjectDir)wwwroot/umbraco</BellePath>
+  </PropertyGroup>
 
   <Target Name="CheckPreconditions" BeforeTargets="Build">
     <Message Text="-CheckPreconditions-" Importance="high" />

@@ -55,7 +55,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot/umbraco</BellePath>
     <JsonSchemaPath>$(ProjectDir)umbraco/config/appsettings-schema.json</JsonSchemaPath>
   </PropertyGroup>
   

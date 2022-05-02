@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.BackOffice.Services
 {
@@ -17,15 +21,32 @@ namespace Umbraco.Cms.Web.BackOffice.Services
     {
         private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IAppPolicyCache _cache;
 
+        [Obsolete("Use other ctor - Will be removed in Umbraco 12")]
         public IconService(
             IOptionsMonitor<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             AppCaches appCaches)
+            : this(globalSettings,
+                hostingEnvironment,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
+        {
+
+        }
+
+        [Obsolete("Use other ctor - Will be removed in Umbraco 12")]
+        public IconService(
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            AppCaches appCaches,
+            IWebHostEnvironment webHostEnvironment)
         {
             _globalSettings = globalSettings.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
+            _webHostEnvironment = webHostEnvironment;
             _cache = appCaches.RuntimeCache;
 
             globalSettings.OnChange(x => _globalSettings = x);
@@ -125,9 +146,11 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 }
             }
 
-            // add icons from IconsPath if not already added from plugins
-            var coreIconsDirectory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.IconsPath}/"));
-            var coreIcons = coreIconsDirectory.GetFiles("*.svg");
+            var iconFolder = _webHostEnvironment.WebRootFileProvider.GetDirectoryContents(_globalSettings.IconsPath);
+
+            var coreIcons = iconFolder
+                .Where(x => !x.IsDirectory && x.Name.EndsWith(".svg"))
+                .Select(x => new FileInfo(x.PhysicalPath));
 
             icons.UnionWith(coreIcons);
 

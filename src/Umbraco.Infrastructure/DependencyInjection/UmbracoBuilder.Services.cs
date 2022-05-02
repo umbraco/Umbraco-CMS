@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
@@ -22,6 +24,7 @@ using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -80,13 +83,16 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         private static LocalizedTextServiceFileSources LocalizedTextServiceFileSourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
-            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));
+            var webHostEnvironment = container.GetRequiredService<IWebHostEnvironment>();
+            var subPath = WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang");
+            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(subPath));
 
             return new LocalizedTextServiceFileSources(
                 container.GetRequiredService<ILogger<LocalizedTextServiceFileSources>>(),
                 container.GetRequiredService<AppCaches>(),
                 mainLangFolder,
-                container.GetServices<LocalizedTextServiceSupplementaryFileSource>());
+                container.GetServices<LocalizedTextServiceSupplementaryFileSource>(),
+                new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang").GetDirectoryContents(string.Empty));
         }
     }
 }
