@@ -52,14 +52,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
             var publishedContentType = publishedContentCache?.GetContentType(contentTypeKey);
-            if (publishedContentType != null && publishedContentType.IsElement)
+            if (publishedContentType is not null && publishedContentType.IsElement)
             {
-                // TODO Get the model type without having to construct a list
-                var listType = _publishedModelFactory.CreateModelList(publishedContentType.Alias)?.GetType();
-                if (listType?.GenericTypeArguments.Length == 1)
-                {
-                    return listType.GenericTypeArguments[0];
-                }
+                return _publishedModelFactory.GetModelType(publishedContentType.Alias);
             }
 
             return typeof(IPublishedElement);

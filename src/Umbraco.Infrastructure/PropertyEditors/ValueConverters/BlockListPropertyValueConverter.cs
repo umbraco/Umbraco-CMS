@@ -39,8 +39,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => source?.ToString();
 
         /// <inheritdoc />
-        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
             using (_proflog.DebugDuration<BlockListPropertyValueConverter>($"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
@@ -71,9 +70,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 {
                     return null;
                 }
+
                 var blockConfigMap = configuration.Blocks.ToDictionary(x => x.ContentElementTypeKey);
-                var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey)
-                    .Where(x => x.HasValue).Distinct().ToList();
 
                 // Convert the content data
                 var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -101,20 +99,24 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                 // Convert the settings data
                 var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
-                foreach (var data in converted.BlockValue.SettingsData)
+                var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey).Where(x => x.HasValue).Distinct().ToList();
+                if (validSettingsElementTypes is not null)
                 {
-                    if (!validSettingsElementTypes?.Contains(data.ContentTypeKey) ?? false)
+                    foreach (var data in converted.BlockValue.SettingsData)
                     {
-                        continue;
-                    }
+                        if (!validSettingsElementTypes.Contains(data.ContentTypeKey))
+                        {
+                            continue;
+                        }
 
-                    var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
-                    if (element == null)
-                    {
-                        continue;
-                    }
+                        var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
+                        if (element is null)
+                        {
+                            continue;
+                        }
 
-                    settingsPublishedElements[element.Key] = element;
+                        settingsPublishedElements[element.Key] = element;
+                    }
                 }
 
                 // Cache constructors locally (it's tied to the current IPublishedSnapshot and IPublishedModelFactory)
@@ -145,7 +147,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                     // This can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
                     // We also ensure that the content types match, since maybe the settings type has been changed after this has been persisted
-                    if (settingsData != null && (!blockConfig.SettingsElementTypeKey.HasValue || settingsData.ContentType.Key != blockConfig.SettingsElementTypeKey))
+                    if (settingsData is not null && (!blockConfig.SettingsElementTypeKey.HasValue || settingsData.ContentType.Key != blockConfig.SettingsElementTypeKey))
                     {
                         settingsData = null;
                     }
