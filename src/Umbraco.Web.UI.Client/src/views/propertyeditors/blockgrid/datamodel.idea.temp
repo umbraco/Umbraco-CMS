@@ -1,0 +1,92 @@
+
+//Pre-values:
+{
+    blocktype: 123,
+    columnSpanOptions: [4, 6, 12],
+    areas: [
+        {
+            key: "ABD23",
+            columnSpan: 6,
+            minAllowed: 1,
+            maxAllowed: 2,
+            allowAll: false,
+            allowedTypes: [{
+                    elementTypeUdi: 345; //image
+                    max: 1,
+                    min: 1,
+                },
+                .. ,..
+            ]
+        },
+        {
+            columnSpan: 6,
+            allowedTypes: [.. ,.. ,..]
+        }
+    ]
+}
+
+// property value (model.value):
+// grid 12 column
+layout: [
+    {
+        contentUDI: 123,
+        columnSpan: 12,
+        // grid 2 column
+        // Section with placeholder A B
+        areas: [
+            {
+                key: "ABD1"// Generated GUID
+                items: [
+                    {
+                        contentUDI: 867587685, // Headline
+                    },
+                    {
+                        contentUDI: 3455434, // Button
+                    },
+                    {
+                        contentUDI: 324345, // gallery
+                        columnSpan: 6,
+                        areas: [
+                            {
+                                items: [
+                                    {
+                                        contentUDI: 867587685, // Image A
+                                    },
+                                    {
+                                        contentUDI: 3455434, // Image B
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                key: "ABD2"// Generated GUID
+                items: [
+                    {
+                        contentUDI: 6575676, //Image
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        contentUDI: 4565, // Image
+        columnSpan: 6,
+    },
+    {
+        contentUDI: 123, // Text
+        columnSpan: 6,
+    },
+    {
+        contentUDI: 4566, // Footer
+        columnSpan: 12,
+    }
+],
+content: [
+   {
+        UID: 867587685
+        elementTypeUID; sdfds
+   }
+]
