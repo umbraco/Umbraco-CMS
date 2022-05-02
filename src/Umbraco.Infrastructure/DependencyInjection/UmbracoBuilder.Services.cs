@@ -1,9 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
@@ -24,6 +26,7 @@ using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -61,17 +64,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             return builder;
         }
 
-        private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(IServiceProvider container)
-        {
-            var hostEnvironment = container.GetRequiredService<IHostEnvironment>();
-            var mainLangFolder = new DirectoryInfo(hostEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));
-
-            return new LocalizedTextServiceFileSources(
-                container.GetRequiredService<ILogger<LocalizedTextServiceFileSources>>(),
-                container.GetRequiredService<AppCaches>(),
-                mainLangFolder,
-                container.GetServices<LocalizedTextServiceSupplementaryFileSource>());
-        }
 
         private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
             => new PackagesRepository(
@@ -109,5 +101,18 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>());
 
+        private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(IServiceProvider container)
+        {
+            var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
+            var subPath = WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang");
+            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(subPath));
+
+            return new LocalizedTextServiceFileSources(
+                container.GetRequiredService<ILogger<LocalizedTextServiceFileSources>>(),
+                container.GetRequiredService<AppCaches>(),
+                mainLangFolder,
+                container.GetServices<LocalizedTextServiceSupplementaryFileSource>(),
+                new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang").GetDirectoryContents(string.Empty));
+        }
     }
 }

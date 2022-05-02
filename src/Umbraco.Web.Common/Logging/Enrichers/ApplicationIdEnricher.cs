@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Serilog.Core;
 using Serilog.Events;
-using Umbraco.Cms.Web.Common.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Logging.Enrichers;
 
