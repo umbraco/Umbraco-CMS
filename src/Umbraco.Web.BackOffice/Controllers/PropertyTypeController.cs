@@ -16,8 +16,14 @@ public class PropertyTypeController : UmbracoAuthorizedJsonController
 
     public PropertyTypeController(IPropertyTypeUsageService propertyTypeUsageService) => _propertyTypeUsageService = propertyTypeUsageService;
 
+    [HttpGet]
     public ActionResult<PropertyTypeHasValuesDisplay> HasValues(string alias)
     {
+        if (string.IsNullOrWhiteSpace(alias))
+        {
+            return BadRequest("A property type alias is required");
+        }
+
         bool hasValue = _propertyTypeUsageService.HasSavedPropertyValues(alias);
         return new PropertyTypeHasValuesDisplay(alias, hasValue);
     }
