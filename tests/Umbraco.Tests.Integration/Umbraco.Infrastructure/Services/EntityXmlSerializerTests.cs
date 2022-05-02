@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ILanguage languageNbNo = new LanguageBuilder()
                 .WithCultureInfo("nb-NO")
-                .WithCultureName("Norwegian")
+                .WithCultureName("Norwegian Bokmål (Norway)")
                 .Build();
             localizationService.Save(languageNbNo);
 

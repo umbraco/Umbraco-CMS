@@ -63,15 +63,49 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             var languages = new List<Language>
             {
-                new Language(GlobalSettings, "en-US") { Id = 1, CultureName = "English", IsDefault = true },
-                new Language(GlobalSettings, "fr") { Id = 2, CultureName = "French" },
-                new Language(GlobalSettings, "es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
-                new Language(GlobalSettings, "it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
-                new Language(GlobalSettings, "de") { Id = 5, CultureName = "German" },
-                new Language(GlobalSettings, "da") { Id = 6, CultureName = "Danish", FallbackLanguageId = 8 },
-                new Language(GlobalSettings, "sv") { Id = 7, CultureName = "Swedish", FallbackLanguageId = 6 },
-                new Language(GlobalSettings, "no") { Id = 8, CultureName = "Norweigan", FallbackLanguageId = 7 },
-                new Language(GlobalSettings, "nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
+                new Language("en-US", "English (United States)")
+                {
+                    Id = 1,
+                    IsDefault = true
+                },
+                new Language("fr", "French")
+                {
+                    Id = 2,
+                },
+                new Language("es", "Spanish")
+                {
+                    Id = 3,
+                    FallbackLanguageId = 1
+                },
+                new Language("it", "Italian")
+                {
+                    Id = 4,
+                    FallbackLanguageId = 3
+                },
+                new Language("de", "German")
+                {
+                    Id = 5
+                },
+                new Language("da", "Danish")
+                {
+                    Id = 6,
+                    FallbackLanguageId = 8
+                },
+                new Language("sv", "Swedish")
+                {
+                    Id = 7,
+                    FallbackLanguageId = 6
+                },
+                new Language("no", "Norweigan")
+                {
+                    Id = 8,
+                    FallbackLanguageId = 7
+                },
+                new Language("nl", "Dutch")
+                {
+                    Id = 9,
+                    FallbackLanguageId = 1
+                }
             };
 
             localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
