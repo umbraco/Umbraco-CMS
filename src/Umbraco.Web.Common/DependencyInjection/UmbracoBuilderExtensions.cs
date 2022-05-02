@@ -96,7 +96,7 @@ namespace Umbraco.Extensions
             StaticApplicationLogging.Initialize(new SerilogLoggerFactory());
 
             // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
-            AppDomain.CurrentDomain.SetData("DataDirectory", webHostEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
+            AppDomain.CurrentDomain.SetData("DataDirectory", webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data));
 
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
@@ -161,6 +161,7 @@ namespace Umbraco.Extensions
             // aspnet app lifetime mgmt
             builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
             builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
+            builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
 
             return builder;
         }

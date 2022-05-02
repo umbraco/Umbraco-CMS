@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
             Version = Guid.Empty;
             Path = string.Empty;
             ContentType = contentType;
+            Properties = Enumerable.Empty<IPublishedProperty>();
         }
 
         private Dictionary<string, PublishedCultureInfo>? _cultures;

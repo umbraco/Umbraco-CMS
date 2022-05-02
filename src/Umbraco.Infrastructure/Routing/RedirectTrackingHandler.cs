@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Routing
                 notification.State[NotificationStateKey] = new OldRoutesDictionary();
             }
 
-            return (OldRoutesDictionary)notification.State[NotificationStateKey];
+            return (OldRoutesDictionary?)notification.State[NotificationStateKey] ?? new OldRoutesDictionary();
         }
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)

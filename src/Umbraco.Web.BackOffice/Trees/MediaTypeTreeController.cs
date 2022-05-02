@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _entityService = entityService;
         }
 
-        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {

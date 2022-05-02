@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return root;
         }
 
-        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 

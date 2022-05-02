@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             IOptionsMonitor<HostingSettings> hostingSettings,
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IWebHostEnvironment webHostEnvironment)
-        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>())
+        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>()!)
         {
         }
 

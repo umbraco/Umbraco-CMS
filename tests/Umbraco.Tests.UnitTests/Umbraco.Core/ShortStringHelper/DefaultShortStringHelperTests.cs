@@ -109,6 +109,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("whatIfWeDoItAgain", "whatIfWeDoItAgain")]
         [TestCase("WhatIfWEDOITAgain", "WhatIfWEDOITAgain")]
         [TestCase("WhatIfWe doItAgain", "WhatIfWeDoItAgain")]
+        [TestCase("What if I have emojis 🎈", "WhatIfIHaveEmojis")]
         public void CleanStringForSafeAlias(string input, string expected)
         {
             var output = ShortStringHelper.CleanStringForSafeAlias(input);
@@ -123,6 +124,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("汉#字*/漢?字", "")]
         [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-losk")]
         [TestCase("200 ways to be happy", "200-ways-to-be-happy")]
+        [TestCase("What if I have emojis 🎈", "what-if-i-have-emojis")]
         public void CleanStringForUrlSegment(string input, string expected)
         {
             var output = ShortStringHelper.CleanStringForUrlSegment(input);
@@ -137,6 +139,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("ThisIsTHEEndMyFriendXYZ", "This Is THE End My Friend XYZ")]
         [TestCase("ThisIsTHEEndMyFriendXYZt", "This Is THE End My Friend XY Zt")]
         [TestCase("UneÉlévationÀPartir", "Une Élévation À Partir")]
+        [TestCase("WhatIfIHaveEmojis🎈", "What If I Have Emojis🎈")]
         public void SplitPascalCasing(string input, string expected)
         {
             var output = ShortStringHelper.SplitPascalCasing(input, ' ');
@@ -172,6 +175,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("yop.Straße Zvöskî", "yop.strasse-zvoski")]
         [TestCase("yop.Straße Zvös--kî", "yop.strasse-zvos-ki")]
         [TestCase("ma--ma---ma.ma-----ma", "ma-ma-ma.ma-ma")]
+        [TestCase("What if I have emojis 🎈", "what-if-i-have-emojis")]
         public void CleanStringForSafeFileName(string input, string expected)
         {
             var output = ShortStringHelper.CleanStringForSafeFileName(input);

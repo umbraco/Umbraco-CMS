@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -34,7 +36,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IContentService _contentService;
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public FileUploadPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             MediaFileManager mediaFileManager,
@@ -43,6 +48,27 @@ namespace Umbraco.Cms.Core.PropertyEditors
             UploadAutoFillProperties uploadAutoFillProperties,
             IContentService contentService,
             IIOHelper ioHelper)
+            : this(
+                dataValueEditorFactory,
+                mediaFileManager,
+                contentSettings,
+                localizedTextService,
+                uploadAutoFillProperties,
+                contentService,
+                ioHelper,
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public FileUploadPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            MediaFileManager mediaFileManager,
+            IOptionsMonitor<ContentSettings> contentSettings,
+            ILocalizedTextService localizedTextService,
+            UploadAutoFillProperties uploadAutoFillProperties,
+            IContentService contentService,
+            IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -51,9 +77,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _uploadAutoFillProperties = uploadAutoFillProperties;
             _contentService = contentService;
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
 
         /// <summary>

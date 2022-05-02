@@ -424,8 +424,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
         public IEnumerable<DataTypeBasic>? GetAll()
         {
-            return _dataTypeService?
-                     .GetAll()?
+            return _dataTypeService
+                     .GetAll()
                      .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>).WhereNotNull().Where(x => x.IsSystemDataType == false);
         }
 
@@ -439,8 +439,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
         public IDictionary<string, IEnumerable<DataTypeBasic>>? GetGroupedDataTypes()
         {
-            var dataTypes = _dataTypeService?
-                     .GetAll()?
+            var dataTypes = _dataTypeService
+                     .GetAll()
                      .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>)
                      .ToArray();
 

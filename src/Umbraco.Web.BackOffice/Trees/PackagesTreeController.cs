@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         }
 
 
-        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             //full screen app without tree nodes
             return TreeNodeCollection.Empty;

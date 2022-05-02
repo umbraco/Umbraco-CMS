@@ -12,7 +12,9 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -31,6 +33,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class MediaPicker3PropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
+
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public MediaPicker3PropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper,
+            EditorType type = EditorType.PropertyValue)
+            : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPicker3PropertyEditor" /> class.
@@ -38,16 +51,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public MediaPicker3PropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser,
             EditorType type = EditorType.PropertyValue)
             : base(dataValueEditorFactory, type)
         {
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() =>
-            new MediaPicker3ConfigurationEditor(_ioHelper);
+            new MediaPicker3ConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() =>
