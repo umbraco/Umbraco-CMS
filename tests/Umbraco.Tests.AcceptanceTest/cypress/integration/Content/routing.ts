@@ -26,15 +26,18 @@ context('Routing', () => {
         // Save Danish
         const url = "/umbraco/backoffice/umbracoapi/language/SaveLanguage";
         const danishRequestBody = {
-            culture: danishCulture
+            culture: danishCulture,
+            name: danishCulture
         }
 
         cy.umbracoApiRequest(url, "POST", danishRequestBody);
 
         // Save Swedish
         const swedishRequestBody = {
-            culture: swedishCulture
+            culture: swedishCulture,
+            name: swedishCulture
         }
+        
         cy.umbracoApiRequest(url, "POST", swedishRequestBody).then((responseBody) => {
             swedishLanguageId = responseBody["id"];
         });
