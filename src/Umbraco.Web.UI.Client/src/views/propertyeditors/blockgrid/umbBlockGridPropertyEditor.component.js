@@ -823,7 +823,7 @@
             cancel: "input,textarea,select,option",
 
             //appendTo: ".umb-block-grid__wrapper",
-            containment: ".umb-block-grid__wrapper",
+            containment: ".umb-el-wrap",
 
             connectWith: ".umb-block-grid__layout-container",
             handle: ".blockelement__draggable-element",
