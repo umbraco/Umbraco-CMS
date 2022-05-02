@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 updatedValues[UmbracoExamineFieldNames.IconFieldName] = icon;
             }
 
-            e.ValueSet = new ValueSet(e.ValueSet.Id, e.ValueSet.Category,e.ValueSet.ItemType, updatedValues);
+            e.SetValues(updatedValues);
         }
 
         public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();
