@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Web.Common.Templates
 
                 requestBuilder.SetCulture(defaultLanguage == null
                     ? CultureInfo.CurrentUICulture.Name
-                    : defaultLanguage.CultureInfo?.Name);
+                    : defaultLanguage.IsoCode);
             }
             else
             {

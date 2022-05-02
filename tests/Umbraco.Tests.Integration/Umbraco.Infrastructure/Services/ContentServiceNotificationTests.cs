@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Saving_Culture()
         {
-            LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
+            LocalizationService.Save(new Language("fr-FR", "French (France)"));
 
             _contentType.Variations = ContentVariation.Culture;
             foreach (IPropertyType propertyType in _contentType.PropertyTypes)
@@ -181,7 +181,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Publishing_Culture()
         {
-            LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
+            LocalizationService.Save(new Language("fr-FR", "French (France)"));
 
             _contentType.Variations = ContentVariation.Culture;
             foreach (IPropertyType propertyType in _contentType.PropertyTypes)
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Unpublishing_Culture()
         {
-            LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
+            LocalizationService.Save(new Language("fr-FR", "French (France)"));
 
             _contentType.Variations = ContentVariation.Culture;
             foreach (IPropertyType propertyType in _contentType.PropertyTypes)
@@ -350,18 +350,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ContentTypeService.Save(_contentType);
 
-            var contentService = (ContentService)ContentService;
-
             IContent document = new Content("content", -1, _contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
-            contentService.SaveAndPublish(document);
+            ContentService.SaveAndPublish(document);
 
             Assert.IsTrue(document.IsCulturePublished("fr-FR"));
             Assert.IsTrue(document.IsCulturePublished("en-US"));
 
             // re-get - dirty properties need resetting
-            document = contentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
 
             document.UnpublishCulture("fr-FR");
 
@@ -402,7 +400,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             try
             {
-                contentService.CommitDocumentChanges(document);
+                ContentService.CommitDocumentChanges(document);
                 Assert.IsTrue(publishingWasCalled);
                 Assert.IsTrue(publishedWasCalled);
             }
@@ -412,7 +410,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ContentNotificationHandler.PublishedContent = null;
             }
 
-            document = contentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
 
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsTrue(document.IsCulturePublished("en-US"));
