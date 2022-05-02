@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly IOptions<SecuritySettings> _securitySettings;
         private readonly ILogger<UmbExternalLoginController> _logger;
-        private readonly IMemberSignInManagerExternalLogins _memberSignInManager;
+        private readonly IMemberSignInManager _memberSignInManager;
 
         public UmbExternalLoginController(
             ILogger<UmbExternalLoginController> logger,
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
-            IMemberSignInManagerExternalLogins memberSignInManager,
+            IMemberSignInManager memberSignInManager,
             IMemberManager memberManager,
             ITwoFactorLoginService twoFactorLoginService,
             IOptions<SecuritySettings> securitySettings)
