@@ -163,27 +163,27 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
 
 .umb-block-grid__block--create-button {
     position: absolute;
-    width: 100%;
+    height: 100%;
     z-index: 1;
     opacity: 0;
     outline: none;
-    height: 12px;
-    margin-top: -9px;
-    padding-top: 6px;
-    margin-bottom: -6px;
+    width: 12px;
+    margin-left: -9px;
+    padding-left: 6px;
+    margin-right: -6px;
     transition: opacity 240ms;
 
     &::before {
         content: '';
         position: absolute;
         background-color: @blueMid;
-        border-top: 1px solid white;
+        border-left: 1px solid white;
         border-bottom: 1px solid white;
         border-radius: 2px;
-        top: 5px;
-        right: 0;
-        left: 0;
-        height: 2px;
+        left: 5px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
         animation: umb-block-grid__block--create-button_before 400ms ease-in-out alternate infinite;
         transform: scaleX(.99);
         transition: transform 240ms ease-out;
@@ -337,3 +337,31 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
         }
     }
 }
+
+
+
+
+
+/*
+Grid part:
+*/
+.umb-block-grid__layout-container {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-gap: 10px;
+
+    grid-auto-flow: row;
+}
+
+
+.umb-block-grid__layout-item {
+    grid-column: span 4;
+}
+
+.umb-block-grid__layout-sort-placeholder {
+    background: transparent;
+    border: 1px dashed @gray-8;
+    border-radius: 3px;
+    min-height: 100px;
+    min-width: 100px;
+  }

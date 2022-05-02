@@ -53,19 +53,19 @@
             $scope.parentForm = model.parentForm;
             $scope.valFormManager = model.valFormManager;
 
-            if (model.stylesheet) {
-                var shadowRoot = $element[0].attachShadow({ mode: 'open' });
-                shadowRoot.innerHTML = `
+            var shadowRoot = $element[0].attachShadow({ mode: 'open' });
+            shadowRoot.innerHTML = 
+            `
+                ${ model.stylesheet ? `
                     <style>
                     @import "${model.stylesheet}"
-                    </style>
-                    <div class="umb-block-grid__block--view" ng-include="'${model.view}'"></div>
-                `;
-                $compile(shadowRoot)($scope);
-            }
-            else {
-                $element.append($compile('<div class="umb-block-grid__block--view" ng-include="model.view"></div>')($scope));
-            }
+                    </style>`
+                    : ''
+                }
+                <div class="umb-block-grid__block--view" ng-include="'${model.view}'"></div>
+            `;
+            $compile(shadowRoot)($scope);
+            
         };
 
         // We need to watch for changes on primitive types and update the $scope values.
