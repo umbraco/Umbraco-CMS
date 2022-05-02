@@ -32,7 +32,7 @@
     <button type="button" class="add-link" localize="title" title="@content_addTextBox"
        ng-show="model.config.max <= 0 || model.value.length < model.config.max"
        ng-click="add($event)"
-       ng-attr-readonly="{{ readonly || undefined }}">
+       ng-disabled="readonly">
         <localize key="general_add">Add</localize>
     </button>
 
