@@ -13,7 +13,8 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [Required(AllowEmptyStrings = false)]
         public string? IsoCode { get; set; }
 
-        [DataMember(Name = "name")]
+        [DataMember(Name = "name", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
         public string? Name { get; set; }
 
         [DataMember(Name = "isDefault")]
