@@ -12,8 +12,8 @@
                               published="node.published"
                               description="node.url"
                               sortable="!sortableOptions.disabled"
-                              allow-remove="allowRemoveButton"
-                              allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
+                              allow-remove="allowRemove"
+                              allow-open="model.config.showOpenButton && allowOpen && !dialogEditor && !readonly"
                               on-remove="remove($index)"
                               on-open="openEditor(node)">
             </umb-node-preview>
@@ -24,7 +24,8 @@
                 class="umb-node-preview-add"
                 ng-click="openCurrentPicker()"
                 id="{{model.alias}}"
-                aria-label="{{model.label}}: {{labels.general_add}}">
+                aria-label="{{model.label}}: {{labels.general_add}}"
+                ng-disabled="readonly">
             <localize key="general_add">Add</localize>
             <span class="sr-only">...</span>
         </button>

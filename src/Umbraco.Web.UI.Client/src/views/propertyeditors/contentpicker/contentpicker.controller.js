@@ -165,8 +165,9 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             : "Document";
     
     $scope.allowOpenButton = false;
-    $scope.allowEditButton = entityType === "Document";
-    $scope.allowRemoveButton = true;
+    $scope.allowEditButton = entityType === "Document" && !$scope.readonly;
+    $scope.allowRemove = !$scope.readonly;
+    $scope.allowAdd = !$scope.readonly;
 
     //the dialog options for the picker
     var dialogOptions = {
@@ -290,6 +291,8 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     };
 
     $scope.remove = function (index) {
+        if (!$scope.allowRemove) return;
+
         var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
         if (currIds.length > 0) {
             currIds.splice(index, 1);
@@ -316,6 +319,8 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     }
 
     $scope.add = function (item) {
+        if (!$scope.allowAdd) return;
+
         var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
         var itemId = ($scope.model.config.idType === "udi" ? item.udi : item.id).toString();
@@ -394,7 +399,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         //sync the sortable model
         $scope.sortableModel = valueIds;
 
-        removeAllEntriesAction.isDisabled = valueIds.length === 0;
+        removeAllEntriesAction.isDisabled = valueIds.length === 0 || $scope.readonly;
 
         //load current data if anything selected
         if (valueIds.length > 0) {
@@ -522,10 +527,10 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     function setSortingState(items) {
         // disable sorting if the list only consist of one item
-        if (items.length > 1) {
-            $scope.sortableOptions.disabled = false;
-        } else {
+        if (items.length <= 1 || $scope.readonly) {
             $scope.sortableOptions.disabled = true;
+        } else {
+            $scope.sortableOptions.disabled = false;
         }
     }
 
@@ -551,15 +556,15 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             switch (entityType) {
                 case "Document":
                     var hasAccessToContent = user.allowedSections.indexOf("content") !== -1;
-                    $scope.allowOpenButton = hasAccessToContent;
+                    $scope.allowOpen = hasAccessToContent;
                     break;
                 case "Media":
                     var hasAccessToMedia = user.allowedSections.indexOf("media") !== -1;
-                    $scope.allowOpenButton = hasAccessToMedia;
+                    $scope.allowOpen = hasAccessToMedia;
                     break;
                 case "Member":
                     var hasAccessToMember = user.allowedSections.indexOf("member") !== -1;
-                    $scope.allowOpenButton = hasAccessToMember;
+                    $scope.allowOpen = hasAccessToMember;
                     break;
 
                 default:
