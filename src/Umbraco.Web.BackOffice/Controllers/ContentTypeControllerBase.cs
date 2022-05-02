@@ -286,7 +286,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             text = text.Substring(1);
-            return CultureDictionary[text]?.IfNullOrWhiteSpace(text);
+            return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
         protected ActionResult<TContentType?> PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
