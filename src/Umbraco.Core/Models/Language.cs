@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models
@@ -26,6 +27,13 @@ namespace Umbraco.Cms.Core.Models
         {
             _isoCode = isoCode ?? throw new ArgumentNullException(nameof(isoCode));
             _cultureName = cultureName ?? throw new ArgumentNullException(nameof(cultureName));
+        }
+
+        [Obsolete("Use the constructor not requiring global settings and accepting an explicit name instead, scheduled for removal in V11.")]
+        public Language(GlobalSettings globalSettings, string isoCode)
+        {
+            _isoCode = isoCode ?? throw new ArgumentNullException(nameof(isoCode));
+            _cultureName = CultureInfo.GetCultureInfo(isoCode).EnglishName;
         }
 
         /// <inheritdoc />

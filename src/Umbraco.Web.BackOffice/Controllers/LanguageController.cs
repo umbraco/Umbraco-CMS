@@ -1,6 +1,9 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -21,11 +24,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoMapper _umbracoMapper;
 
+        [ActivatorUtilitiesConstructor]
         public LanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
         }
+
+        [Obsolete("Use the constructor without global settings instead, scheduled for removal in V11.")]
+        public LanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper, IOptionsSnapshot<GlobalSettings> globalSettings)
+            : this(localizationService, umbracoMapper)
+        { }
 
         /// <summary>
         /// Returns all cultures available for creating languages.
