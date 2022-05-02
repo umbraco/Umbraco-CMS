@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -83,7 +79,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         private static LocalizedTextServiceFileSources LocalizedTextServiceFileSourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
-            var webHostEnvironment = container.GetRequiredService<IWebHostEnvironment>();
             var subPath = WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang");
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(subPath));
 
