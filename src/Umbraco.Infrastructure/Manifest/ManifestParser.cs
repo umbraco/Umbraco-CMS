@@ -140,6 +140,7 @@ namespace Umbraco.Cms.Core.Manifest
                         scriptsPerBundleOption = new List<ManifestAssets>();
                         scripts[manifest.BundleOptions] = scriptsPerBundleOption;
                     }
+
                     scriptsPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Scripts));
                 }
 
@@ -150,15 +151,39 @@ namespace Umbraco.Cms.Core.Manifest
                         stylesPerBundleOption = new List<ManifestAssets>();
                         stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
                     }
+
                     stylesPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Stylesheets));
                 }
 
-                if (manifest.PropertyEditors != null) propertyEditors.AddRange(manifest.PropertyEditors);
-                if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
-                if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
-                if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
-                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
-                if (manifest.Sections != null) sections.AddRange(manifest.Sections.LegacyDistinctBy(x => x!.Alias.ToLowerInvariant()));
+                if (manifest.PropertyEditors != null)
+                {
+                    propertyEditors.AddRange(manifest.PropertyEditors);
+                }
+
+                if (manifest.ParameterEditors != null)
+                {
+                    parameterEditors.AddRange(manifest.ParameterEditors);
+                }
+
+                if (manifest.GridEditors != null)
+                {
+                    gridEditors.AddRange(manifest.GridEditors);
+                }
+
+                if (manifest.ContentApps != null)
+                {
+                    contentApps.AddRange(manifest.ContentApps);
+                }
+
+                if (manifest.Dashboards != null)
+                {
+                    dashboards.AddRange(manifest.Dashboards);
+                }
+
+                if (manifest.Sections != null)
+                {
+                    sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias, StringComparer.OrdinalIgnoreCase));
+                }
             }
 
             return new CompositePackageManifest(
