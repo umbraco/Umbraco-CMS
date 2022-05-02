@@ -64,17 +64,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             return builder;
         }
 
-        private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(IServiceProvider container)
-        {
-            var hostEnvironment = container.GetRequiredService<IHostEnvironment>();
-            var mainLangFolder = new DirectoryInfo(hostEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));
-
-            return new LocalizedTextServiceFileSources(
-                container.GetRequiredService<ILogger<LocalizedTextServiceFileSources>>(),
-                container.GetRequiredService<AppCaches>(),
-                mainLangFolder,
-                container.GetServices<LocalizedTextServiceSupplementaryFileSource>());
-        }
 
         private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
             => new PackagesRepository(
@@ -112,7 +101,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>());
 
-        private static LocalizedTextServiceFileSources LocalizedTextServiceFileSourcesFactory(IServiceProvider container)
+        private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
             var subPath = WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang");
