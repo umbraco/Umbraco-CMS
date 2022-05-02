@@ -328,6 +328,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
 
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
+            Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
         }
     }
 }
