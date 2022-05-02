@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<Member2MemberGroupDto>(x => x.Member == memberId);
 
             return Database.Fetch<NodeDto>(sql)
-                .LegacyDistinctBy(dto => dto!.NodeId)
+                .DistinctBy(dto => dto.NodeId)
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where("cmsMember.LoginName=@loginName", new { loginName = username });
 
             return Database.Fetch<NodeDto>(sql)
-                .LegacyDistinctBy(dto => dto!.NodeId)
+                .DistinctBy(dto => dto.NodeId)
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 

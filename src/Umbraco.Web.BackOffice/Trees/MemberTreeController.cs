@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 nodes.AddRange(_memberTypeService.GetAll()
                         .Select(memberType =>
-                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon?.IfNullOrWhiteSpace(Constants.Icons.Member), true,
+                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
                                 queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
             }
 
