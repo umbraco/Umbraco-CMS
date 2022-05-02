@@ -705,6 +705,21 @@ namespace Umbraco.Core.Services.Implement
 
                     copy.ParentId = containerId;
                     Repository.Save(copy);
+
+                    // handle events for the copied node
+                    // figure out impacted content types
+                    var changes = ComposeContentTypeChanges(copy).ToArray();
+                    var args = changes.ToEventArgs();
+
+                    OnUowRefreshedEntity(args);
+
+                    OnChanged(scope, args);
+                    var saveEventArgs = new SaveEventArgs<TItem>(copy, canCancel: false);
+                    OnSaved(scope, saveEventArgs);
+
+                    // Since this overload doesn't accept a user id, set the super users.
+                    Audit(AuditType.Save, Constants.Security.SuperUserId, copy.Id);
+
                     scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
