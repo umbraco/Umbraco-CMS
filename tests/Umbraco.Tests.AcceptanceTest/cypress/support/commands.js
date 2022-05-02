@@ -36,7 +36,6 @@ Cypress.Commands.add('umbracoCreateLanguage', (culture, isMandatory = false, fal
     var langData =
     {
         "culture": culture,
-        "name": culture,
         "isMandatory": isMandatory,
         "fallbackLanguageId": fallbackLanguageId        
     };
