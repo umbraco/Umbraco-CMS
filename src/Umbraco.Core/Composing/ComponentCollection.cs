@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Extensions;
@@ -24,7 +26,7 @@ namespace Umbraco.Cms.Core.Composing
             _logger = logger;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken cancellationToken)
         {
             using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
             {
@@ -33,13 +35,13 @@ namespace Umbraco.Cms.Core.Composing
                     var componentType = component.GetType();
                     using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
-                        component.Initialize();
+                        await component.InitializeAsync(cancellationToken);
                     }
                 }
             }
         }
 
-        public void Terminate()
+        public async Task TerminateAsync(CancellationToken cancellationToken)
         {
             using (_profilingLogger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
@@ -50,7 +52,7 @@ namespace Umbraco.Cms.Core.Composing
                     {
                         try
                         {
-                            component.Terminate();
+                            await component.TerminateAsync(cancellationToken);
                             component.DisposeIfDisposable();
                         }
                         catch (Exception ex)

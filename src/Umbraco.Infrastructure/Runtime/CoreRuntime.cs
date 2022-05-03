@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
 
             // Initialize the components
-            _components.Initialize();
+            await _components.InitializeAsync(cancellationToken);
 
             await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
 
@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
         {
-            _components.Terminate();
+            await _components.TerminateAsync(cancellationToken);
             await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
         }
 

@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Composing
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Represents a component.
@@ -15,11 +18,11 @@
         /// <summary>
         /// Initializes the component.
         /// </summary>
-        void Initialize();
+        Task InitializeAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Terminates the component.
         /// </summary>
-        void Terminate();
+        Task TerminateAsync(CancellationToken cancellationToken);
     }
 }

@@ -61,9 +61,9 @@ namespace Umbraco.Cms.Tests.Integration
 
             public MyComponent(ILogger<MyComponent> logger) => _logger = logger;
 
-            public void Initialize() => IsInit = true;
+            public async Task InitializeAsync(CancellationToken cancellationToken) => IsInit = true;
 
-            public void Terminate() => IsTerminated = true;
+            public async Task TerminateAsync(CancellationToken cancellationToken) => IsTerminated = true;
 
         }
     }

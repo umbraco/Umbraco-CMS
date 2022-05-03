@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-
+using Task = System.Threading.Tasks.Task;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
 {
     [TestFixture]
@@ -89,7 +90,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         private static TypeLoader MockTypeLoader() => new TypeLoader(Mock.Of<ITypeFinder>(), new VaryingRuntimeHash(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>());
 
         [Test]
-        public void Boot1A()
+        public async Task Boot1A()
         {
             IServiceCollection register = MockRegister();
             var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
@@ -141,11 +142,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
             ComponentCollectionBuilder builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
             builder.RegisterWith(register);
             ComponentCollection components = builder.CreateCollection(factory);
-
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Assert.IsEmpty(components);
-            components.Initialize();
+            await components.InitializeAsync(cancellationTokenSource.Token);
             Assert.IsEmpty(Initialized);
-            components.Terminate();
+            await components.TerminateAsync(cancellationTokenSource.Token);
             Assert.IsEmpty(Terminated);
         }
 
@@ -242,7 +243,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         }
 
         [Test]
-        public void Initialize()
+        public async Task Initialize()
         {
             Composed.Clear();
             Initialized.Clear();
@@ -305,13 +306,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
             ComponentCollectionBuilder builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
             builder.RegisterWith(register);
             ComponentCollection components = builder.CreateCollection(factory);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             Assert.IsEmpty(Initialized);
-            components.Initialize();
+            await components.InitializeAsync(cancellationTokenSource.Token);
             AssertTypeArray(TypeArray<Component5, Component5a>(), Initialized);
 
             Assert.IsEmpty(Terminated);
-            components.Terminate();
+            await components.TerminateAsync(cancellationTokenSource.Token);
             AssertTypeArray(TypeArray<Component5a, Component5>(), Terminated);
         }
 
@@ -509,9 +511,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
 
         public class TestComponentBase : IComponent
         {
-            public virtual void Initialize() => Initialized.Add(GetType());
+            public virtual async Task InitializeAsync(CancellationToken cancellationToken) => Initialized.Add(GetType());
 
-            public virtual void Terminate() => Terminated.Add(GetType());
+            public virtual async Task TerminateAsync(CancellationToken cancellationToken) => Terminated.Add(GetType());
         }
 
         public class Component5 : TestComponentBase

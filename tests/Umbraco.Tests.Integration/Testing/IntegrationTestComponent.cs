@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Examine;
 using Examine.Lucene.Providers;
 using Umbraco.Cms.Core.Composing;
@@ -16,9 +18,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         public IntegrationTestComponent(IExamineManager examineManager) => _examineManager = examineManager;
 
-        public void Initialize() => ConfigureExamineIndexes();
+        public async Task InitializeAsync(CancellationToken cancellationToken) => ConfigureExamineIndexes();
 
-        public void Terminate()
+        public async Task TerminateAsync(CancellationToken cancellationToken)
         {
         }
 
