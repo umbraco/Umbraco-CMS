@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Core.Routing
             return publishedRequestBuilder;
         }
 
-        private IPublishedRequest TryRouteRequest(IPublishedRequestBuilder request)
+        private async Task<IPublishedRequest> TryRouteRequest(IPublishedRequestBuilder request)
         {
             FindDomain(request);
 
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Routing
                 return request.Build();
             }
 
-            FindPublishedContent(request);
+            await FindPublishedContent(request);
 
             return request.Build();
         }
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Routing
             // outbound routing performs different/simpler logic
             if (options.RouteDirection == RouteDirection.Outbound)
             {
-                return TryRouteRequest(builder);
+                return await TryRouteRequest(builder);
             }
 
             // find domain
@@ -166,17 +166,20 @@ namespace Umbraco.Cms.Core.Routing
             // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
             if (!builder.HasPublishedContent())
             {
-                _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", builder.Uri.AbsolutePath);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", builder.Uri.AbsolutePath);
+                }
 
                 // run the document finders
-                foundContentByFinders = FindPublishedContent(builder);
+                foundContentByFinders = await FindPublishedContent(builder);
             }
 
             // if we are not a redirect
             if (!builder.IsRedirect())
             {
                 // handle not-found, redirects, access...
-                HandlePublishedContent(builder);
+                await HandlePublishedContent(builder);
 
                 // find a template
                 FindTemplate(builder, foundContentByFinders);
@@ -270,7 +273,10 @@ namespace Umbraco.Cms.Core.Routing
             const string tracePrefix = "FindDomain: ";
 
             // note - we are not handling schemes nor ports here.
-            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
+            }
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             IDomainCache? domainsCache = umbracoContext.PublishedSnapshot.Domains;
             var domains = domainsCache?.GetAll(includeWildcards: false).ToList();
@@ -311,8 +317,10 @@ namespace Umbraco.Cms.Core.Routing
             if (domainAndUri != null)
             {
                 // matching an existing domain
-                _logger.LogDebug("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}", tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
-
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}", tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
+                }
                 request.SetDomain(domainAndUri);
 
                 // canonical? not implemented at the moment
@@ -325,12 +333,17 @@ namespace Umbraco.Cms.Core.Routing
             else
             {
                 // not matching any existing domain
-                _logger.LogDebug("{TracePrefix}Matches no domain", tracePrefix);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("{TracePrefix}Matches no domain", tracePrefix);
+                }
 
                 request.SetCulture(defaultCulture ?? CultureInfo.CurrentUICulture.Name);
             }
-
-            _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture);
+            }
 
             return request.Domain != null;
         }
@@ -348,7 +361,10 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             var nodePath = request.PublishedContent.Path;
-            _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
+            }
             var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             Domain? domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath, rootNodeId);
@@ -357,11 +373,17 @@ namespace Umbraco.Cms.Core.Routing
             if (domain != null)
             {
                 request.SetCulture(domain.Culture);
-                _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture);
+                }
             }
             else
             {
-                _logger.LogDebug("{TracePrefix}No match.", tracePrefix);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("{TracePrefix}No match.", tracePrefix);
+                }
             }
         }
 
@@ -389,25 +411,41 @@ namespace Umbraco.Cms.Core.Routing
         /// Tries to find the document matching the request, by running the IPublishedContentFinder instances.
         /// </summary>
         /// <exception cref="InvalidOperationException">There is no finder collection.</exception>
-        internal bool FindPublishedContent(IPublishedRequestBuilder request)
+        internal async Task<bool> FindPublishedContent(IPublishedRequestBuilder request)
         {
             const string tracePrefix = "FindPublishedContent: ";
 
             // look for the document
             // the first successful finder, if any, will set this.PublishedContent, and may also set this.Template
             // some finders may implement caching
-            using (_profilingLogger.DebugDuration<PublishedRouter>(
-                $"{tracePrefix}Begin finders",
-                $"{tracePrefix}End finders"))
+            DisposableTimer? profilingScope = null;
+            try
             {
-                // iterate but return on first one that finds it
-                var found = _contentFinders.Any(finder =>
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
-                    _logger.LogDebug("Finder {ContentFinderType}", finder.GetType().FullName);
-                    return finder.TryFindContent(request);
-                });
+                    profilingScope = _profilingLogger.DebugDuration<PublishedRouter>(
+                    $"{tracePrefix}Begin finders",
+                    $"{tracePrefix}End finders");
+                }
 
-                _logger.LogDebug(
+                // iterate but return on first one that finds it
+                var found = false;
+                foreach (var contentFinder in _contentFinders)
+                {
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Finder {ContentFinderType}", contentFinder.GetType().FullName);
+                    }
+                    found = await contentFinder.TryFindContent(request);
+                    if (found)
+                    {
+                        break;
+                    }
+                }
+
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
                     found,
                     request.HasPublishedContent() ? request.PublishedContent?.Id : "NULL",
@@ -415,8 +453,13 @@ namespace Umbraco.Cms.Core.Routing
                     request.HasDomain() ? request.Domain?.ToString() : "NULL",
                     request.Culture ?? "NULL",
                     request.ResponseStatusCode);
+                }
 
                 return found;
+            }
+            finally
+            {
+                profilingScope?.Dispose();
             }
         }
 
@@ -428,29 +471,40 @@ namespace Umbraco.Cms.Core.Routing
         /// Handles "not found", internal redirects ...
         /// things that must be handled in one place because they can create loops
         /// </remarks>
-        private void HandlePublishedContent(IPublishedRequestBuilder request)
+        private async Task HandlePublishedContent(IPublishedRequestBuilder request)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0, j = 0;
             const int maxLoop = 8;
             do
             {
-                _logger.LogDebug("HandlePublishedContent: Loop {LoopCounter}", i);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("HandlePublishedContent: Loop {LoopCounter}", i);
+                }
 
                 // handle not found
                 if (request.PublishedContent == null)
                 {
                     request.SetIs404();
-                    _logger.LogDebug("HandlePublishedContent: No document, try last chance lookup");
-
-                    // if it fails then give up, there isn't much more that we can do
-                    if (_contentLastChanceFinder.TryFindContent(request) == false)
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                     {
-                        _logger.LogDebug("HandlePublishedContent: Failed to find a document, give up");
-                        break;
+                        _logger.LogDebug("HandlePublishedContent: No document, try last chance lookup");
                     }
 
-                    _logger.LogDebug("HandlePublishedContent: Found a document");
+                    // if it fails then give up, there isn't much more that we can do
+                    if (await _contentLastChanceFinder.TryFindContent(request) == false)
+                    {
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("HandlePublishedContent: Failed to find a document, give up");
+                        }
+                        break;
+                    }
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("HandlePublishedContent: Found a document");
+                    }
                 }
 
                 // follow internal redirects as long as it's not running out of control ie infinite loop of some sort
@@ -471,11 +525,16 @@ namespace Umbraco.Cms.Core.Routing
 
             if (i == maxLoop || j == maxLoop)
             {
-                _logger.LogDebug("HandlePublishedContent: Looks like we are running into an infinite loop, abort");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("HandlePublishedContent: Looks like we are running into an infinite loop, abort");
+                }
                 request.SetPublishedContent(null);
             }
-
-            _logger.LogDebug("HandlePublishedContent: End");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("HandlePublishedContent: End");
+            }
         }
 
         /// <summary>
@@ -526,21 +585,30 @@ namespace Umbraco.Cms.Core.Routing
             if (valid == false)
             {
                 // bad redirect - log and display the current page (legacy behavior)
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
                     request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)?.GetSourceValue());
+                }
             }
 
             if (internalRedirectNode == null)
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
                     request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)?.GetSourceValue());
+                }
             }
             else if (internalRedirectId == request.PublishedContent.Id)
             {
                 // redirect to self
-                _logger.LogDebug("FollowInternalRedirects: Redirecting to self, ignore");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("FollowInternalRedirects: Redirecting to self, ignore");
+                }
             }
             else
             {
@@ -557,7 +625,10 @@ namespace Umbraco.Cms.Core.Routing
                 }
 
                 redirect = true;
-                _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+                }
             }
 
             return redirect;
@@ -598,7 +669,10 @@ namespace Umbraco.Cms.Core.Routing
                 // else lookup the template id on the document then lookup the template with that id.
                 if (request.HasTemplate())
                 {
-                    _logger.LogDebug("FindTemplate: Has a template already, and no alternate template.");
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("FindTemplate: Has a template already, and no alternate template.");
+                    }
                     return;
                 }
 
@@ -609,7 +683,10 @@ namespace Umbraco.Cms.Core.Routing
                 request.SetTemplate(template);
                 if (template != null)
                 {
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                    }
                 }
                 else
                 {
@@ -625,10 +702,15 @@ namespace Umbraco.Cms.Core.Routing
                 // ignore if the alias does not match - just trace
                 if (request.HasTemplate())
                 {
-                    _logger.LogDebug("FindTemplate: Has a template already, but also an alternative template.");
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("FindTemplate: Has a template already, but also an alternative template.");
+                    }
                 }
-
-                _logger.LogDebug("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
+                }
 
                 // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
                 if (request.PublishedContent.IsAllowedTemplate(
@@ -644,28 +726,39 @@ namespace Umbraco.Cms.Core.Routing
                     if (template != null)
                     {
                         request.SetTemplate(template);
-                        _logger.LogDebug("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                        }
                     }
                     else
                     {
-                        _logger.LogDebug("FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.", altTemplate);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.", altTemplate);
+                        }
                     }
                 }
                 else
                 {
                     _logger.LogWarning("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
-
                     // no allowed, back to default
                     var templateId = request.PublishedContent.TemplateId;
                     ITemplate? template = GetTemplate(templateId);
                     request.SetTemplate(template);
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template?.Id, template?.Alias);
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template?.Id, template?.Alias);
+                    }
                 }
             }
 
             if (!request.HasTemplate())
             {
-                _logger.LogDebug("FindTemplate: No template was found.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("FindTemplate: No template was found.");
+                }
 
                 // initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
                 // then reset _pcr.Document to null to force a 404.
@@ -682,11 +775,16 @@ namespace Umbraco.Cms.Core.Routing
         {
             if (templateId.HasValue == false || templateId.Value == default)
             {
-                _logger.LogDebug("GetTemplateModel: No template.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("GetTemplateModel: No template.");
+                }
                 return null;
             }
-
-            _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
+            }
 
             if (templateId == null)
             {
@@ -698,8 +796,10 @@ namespace Umbraco.Cms.Core.Routing
             {
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
             }
-
-            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+            }
             return template;
         }
 

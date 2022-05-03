@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
@@ -24,7 +25,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [InlineAutoMoqData("/only/one/alias", 100111)]
         [InlineAutoMoqData("/ONLY/one/Alias", 100111)]
         [InlineAutoMoqData("/alias43", 100121)]
-        public void Lookup_By_Url_Alias (
+        public async Task Lookup_By_Url_Alias (
             string relativeUrl,
             int nodeMatch,
             [Frozen] IPublishedContentCache publishedContentCache,
@@ -54,7 +55,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             Mock.Get(variationContextAccessor).Setup(x => x.VariationContext).Returns(variationContext);
             var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
             //Act
-            var result = sut.TryFindContent(publishedRequestBuilder);
+            var result = await sut.TryFindContent(publishedRequestBuilder);
 
             Assert.IsTrue(result);
             Assert.AreEqual(publishedRequestBuilder.PublishedContent.Id, nodeMatch);

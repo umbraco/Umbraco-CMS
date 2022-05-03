@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -51,14 +52,16 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
         {
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return false;
             }
-
-            _logger.LogDebug("Looking for a page to handle 404.");
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Looking for a page to handle 404.");
+            }
 
             int? domainContentId = null;
 
@@ -107,17 +110,24 @@ namespace Umbraco.Cms.Core.Routing
 
             if (error404.HasValue)
             {
-                _logger.LogDebug("Got id={ErrorNodeId}.", error404.Value);
-
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Got id={ErrorNodeId}.", error404.Value);
+                }
                 content = umbracoContext.Content?.GetById(error404.Value);
-
-                _logger.LogDebug(content == null
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug(content == null
                     ? "Could not find content with that id."
                     : "Found corresponding content.");
+                }
             }
             else
             {
-                _logger.LogDebug("Got nothing.");
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Got nothing.");
+                }
             }
 
             frequest?
