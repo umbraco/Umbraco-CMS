@@ -108,7 +108,7 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
     {
         IPublishedRequest request = def.PublishedRequest;
 
-        var customControllerName = request.PublishedContent?.ContentType.Alias;
+        var customControllerName = request.PublishedContent?.ContentType?.Alias;
         if (customControllerName != null)
         {
             ControllerActionDescriptor? descriptor =
