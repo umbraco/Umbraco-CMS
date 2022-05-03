@@ -76,10 +76,6 @@
       <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
       <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
       <_UmbracoFolderFiles Include="umbraco\Licenses\**" />
-
-      <!-- This could be handled in deploy if it's not already -->
-      <_UmbracoFolderFiles Include="umbraco\Deploy\**" />
-
       <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
