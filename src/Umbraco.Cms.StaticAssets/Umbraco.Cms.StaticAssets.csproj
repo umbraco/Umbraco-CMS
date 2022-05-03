@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="buildTransitive\**\*.*">
+      <Pack>true</Pack>
+      <PackagePath>buildTransitive</PackagePath>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -34,7 +41,7 @@
     <Message Text="Generate the appsettings json schema." Importance="High" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
   </Target>
 
-  
+
   <Target Name="BelleBuild">
     <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm ci --no-fund --no-audit --prefer-offline" />
     <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm run build:skip-tests" />
@@ -54,5 +61,23 @@
     <Delete Files="$(JsonSchemaPath)" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
   </Target>
 
-  
+
+  <!--
+      The set of files to publish is generated really early and doesn't currently account for files added by targets e.g. BeforeBuild.
+      A fix was put in place in Web SDK to update for wwwwroot in case someone runs npm build etc in a target, we're borrowing their trick.
+      https://github.com/dotnet/sdk/blob/e2b2b1a4ac56c955b84d62fe71cda3b6f258b42b/src/WebSdk/Publish/Targets/ComputeTargets/Microsoft.NET.Sdk.Publish.ComputeFiles.targets
+   -->
+  <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
+    <ItemGroup>
+      <_UmbracoFolderFiles Include="umbraco\config\**" />
+      <_UmbracoFolderFiles Include="umbraco\PartialViewMacros\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoBackOffice\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoInstall\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
+      <_UmbracoFolderFiles Include="umbraco\Licenses\**" />
+      <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
 </Project>
