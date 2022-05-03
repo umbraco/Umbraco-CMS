@@ -69,7 +69,7 @@
             "installApiBaseUrl": "@ViewData.GetInstallApiBaseUrl()",
             "umbracoBaseUrl": "@ViewData.GetUmbracoBaseFolder()",
             "application": {
-               version: "@ViewData.GetUmbracoVersion().Major"
+               version: "@ViewData.GetUmbracoVersion()?.Major"
            }
         };
     </script>

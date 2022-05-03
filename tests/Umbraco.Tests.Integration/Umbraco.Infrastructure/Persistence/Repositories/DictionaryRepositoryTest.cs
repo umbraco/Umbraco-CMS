@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -288,8 +287,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 IDictionaryRepository repository = CreateRepository();
 
-                var globalSettings = new GlobalSettings();
-                var languageNo = new Language(globalSettings, "nb-NO") { CultureName = "nb-NO" };
+                var languageNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
                 localizationService.Save(languageNo);
 
                 // Act
@@ -371,25 +369,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             ILanguage language = localizationService.GetLanguageByIsoCode("en-US");
 
-            var globalSettings = new GlobalSettings();
-            var languageDK = new Language(globalSettings, "da-DK") { CultureName = "da-DK" };
-            localizationService.Save(languageDK); // Id 2
+            var languageDK = new Language("da-DK", "Danish (Denmark)");
+            localizationService.Save(languageDK);//Id 2
 
             var readMore = new DictionaryItem("Read More");
             var translations = new List<IDictionaryTranslation>
-                                   {
-                                       new DictionaryTranslation(language, "Read More"),
-                                       new DictionaryTranslation(languageDK, "Læs mere")
-                                   };
+            {
+                new DictionaryTranslation(language, "Read More"),
+                new DictionaryTranslation(languageDK, "Læs mere")
+            };
             readMore.Translations = translations;
             localizationService.Save(readMore); // Id 1
 
             var article = new DictionaryItem("Article");
             var translations2 = new List<IDictionaryTranslation>
-                                   {
-                                       new DictionaryTranslation(language, "Article"),
-                                       new DictionaryTranslation(languageDK, "Artikel")
-                                   };
+            {
+                new DictionaryTranslation(language, "Article"),
+                new DictionaryTranslation(languageDK, "Artikel")
+            };
             article.Translations = translations2;
             localizationService.Save(article); // Id 2
         }

@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Contains extension methods for the <see cref="IApplicationDiscriminator" /> interface.
