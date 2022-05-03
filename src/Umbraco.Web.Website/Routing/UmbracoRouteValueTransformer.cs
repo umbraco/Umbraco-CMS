@@ -39,9 +39,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
 {
     private readonly IControllerActionSearcher _controllerActionSearcher;
     private readonly IDataProtectionProvider _dataProtectionProvider;
-    private readonly IEventAggregator _eventAggregator;
-    private readonly GlobalSettings _globalSettings;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILogger<UmbracoRouteValueTransformer> _logger;
     private readonly IPublicAccessRequestHandler _publicAccessRequestHandler;
     private readonly IPublishedRouter _publishedRouter;
@@ -50,9 +47,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     private readonly IRuntimeState _runtime;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
-    /// </summary>
+    [Obsolete("Please use constructor that does not take IOptions<GlobalSettings>, IHostingEnvironment & IEventAggregator instead")]
     public UmbracoRouteValueTransformer(
         ILogger<UmbracoRouteValueTransformer> logger,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -66,25 +61,34 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IControllerActionSearcher controllerActionSearcher,
         IEventAggregator eventAggregator,
         IPublicAccessRequestHandler publicAccessRequestHandler)
+    : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler)
     {
-        if (globalSettings is null)
-        {
-            throw new ArgumentNullException(nameof(globalSettings));
-        }
+    }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
+    /// </summary>
+    public UmbracoRouteValueTransformer(
+        ILogger<UmbracoRouteValueTransformer> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedRouter publishedRouter,
+        IRuntimeState runtime,
+        IUmbracoRouteValuesFactory routeValuesFactory,
+        IRoutableDocumentFilter routableDocumentFilter,
+        IDataProtectionProvider dataProtectionProvider,
+        IControllerActionSearcher controllerActionSearcher,
+        IPublicAccessRequestHandler publicAccessRequestHandler)
+    {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
         _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
-        _globalSettings = globalSettings.Value;
-        _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
         _routeValuesFactory = routeValuesFactory ?? throw new ArgumentNullException(nameof(routeValuesFactory));
         _routableDocumentFilter =
             routableDocumentFilter ?? throw new ArgumentNullException(nameof(routableDocumentFilter));
         _dataProtectionProvider = dataProtectionProvider;
         _controllerActionSearcher = controllerActionSearcher;
-        _eventAggregator = eventAggregator;
         _publicAccessRequestHandler = publicAccessRequestHandler;
     }
 

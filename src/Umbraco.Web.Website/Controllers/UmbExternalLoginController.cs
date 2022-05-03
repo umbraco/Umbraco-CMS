@@ -72,7 +72,7 @@ public class UmbExternalLoginController : SurfaceController
         }
 
         var wrappedReturnUrl =
-            Url.SurfaceAction(nameof(ExternalLoginCallback), this.GetControllerName(), new {returnUrl});
+            Url.SurfaceAction(nameof(ExternalLoginCallback), this.GetControllerName(), new { returnUrl });
 
         AuthenticationProperties properties =
             _memberSignInManager.ConfigureExternalAuthenticationProperties(provider, wrappedReturnUrl);
@@ -118,7 +118,6 @@ public class UmbExternalLoginController : SurfaceController
                     return new ValidationErrorResult(
                         $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
                 }
-
 
                 IEnumerable<string> providerNames =
                     await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(attemptedUser.Key);
@@ -204,7 +203,7 @@ public class UmbExternalLoginController : SurfaceController
         }
 
         var wrappedReturnUrl =
-            Url.SurfaceAction(nameof(ExternalLinkLoginCallback), this.GetControllerName(), new {returnUrl});
+            Url.SurfaceAction(nameof(ExternalLinkLoginCallback), this.GetControllerName(), new { returnUrl });
 
         // Configures the redirect URL and user identifier for the specified external login including xsrf data
         AuthenticationProperties properties =
@@ -234,7 +233,7 @@ public class UmbExternalLoginController : SurfaceController
 
             if (info == null)
             {
-                //Add error and redirect for it to be displayed
+                // Add error and redirect for it to be displayed
                 errors.Add("An error occurred, could not get external login info");
             }
             else
@@ -249,7 +248,7 @@ public class UmbExternalLoginController : SurfaceController
                     return RedirectToLocal(returnUrl);
                 }
 
-                //Add errors and redirect for it to be displayed
+                // Add errors and redirect for it to be displayed
                 errors.AddRange(addLoginResult.Errors.Select(x => x.Description));
             }
         }

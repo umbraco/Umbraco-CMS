@@ -46,7 +46,7 @@ public class MemberAuthenticationBuilder : AuthenticationBuilder
 
         // add our login provider to the container along with a custom options configuration
         Services.Configure(authenticationScheme, _loginProviderOptions);
-        base.Services.AddSingleton(services =>
+        Services.AddSingleton(services =>
         {
             return new MemberExternalLoginProvider(
                 authenticationScheme,
