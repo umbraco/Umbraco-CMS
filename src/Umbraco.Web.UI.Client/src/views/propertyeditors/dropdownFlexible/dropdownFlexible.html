@@ -8,7 +8,10 @@
                 ng-change="updateSingleDropdownValue()"
                 ng-model="model.singleDropdownValue"
                 ng-options="item.value as item.value for item in model.config.items"
-                ng-required="model.validation.mandatory">
+                ng-required="model.validation.mandatory"
+                ng-keydown="onKeyDown($event)"
+                ng-change="onChange($event)"
+                ng-disabled="readonly">
             <option></option>
         </select>
 
@@ -19,7 +22,11 @@
                 multiple
                 ng-model="model.value"
                 ng-options="item.value as item.value for item in model.config.items"
-                ng-required="model.validation.mandatory"></select>
+                ng-required="model.validation.mandatory"
+                ng-keydown="onKeyDown($event)"
+                ng-change="onChange($event)"
+                ng-disabled="readonly">
+        </select>
 
         <div ng-messages="dropDownListForm.dropDownList.$error" show-validation-on-submit>
             <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
