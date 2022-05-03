@@ -30,8 +30,14 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
-        UrlMode urlMode = UrlMode.Default) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback,
-        publishedUrlProvider, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaItem.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            cropAlias: cropAlias,
+            useCropDimensions: true,
+            urlMode: urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias in the
@@ -52,8 +58,14 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
-        UrlMode urlMode = UrlMode.Default) => mediaWithCrops.GetCropUrl(imageUrlGenerator, publishedValueFallback,
-        publishedUrlProvider, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaWithCrops.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            cropAlias: cropAlias,
+            useCropDimensions: true,
+            urlMode: urlMode);
 
     /// <summary>
     ///     Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
@@ -75,8 +87,16 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
-        UrlMode urlMode = UrlMode.Default) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback,
-        publishedUrlProvider, imageCropperValue, true, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaItem.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            imageCropperValue,
+            true,
+            cropAlias: cropAlias,
+            useCropDimensions: true,
+            urlMode: urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL by the crop alias using the specified property containing the
@@ -99,9 +119,15 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
-        UrlMode urlMode = UrlMode.Default) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback,
-        publishedUrlProvider, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true,
-        urlMode: urlMode);
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaItem.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            propertyAlias: propertyAlias,
+            cropAlias: cropAlias,
+            useCropDimensions: true,
+            urlMode: urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL by the crop alias using the specified property containing the
@@ -124,9 +150,15 @@ public static class ImageCropperTemplateCoreExtensions
         string propertyAlias,
         string cropAlias,
         IImageUrlGenerator imageUrlGenerator,
-        UrlMode urlMode = UrlMode.Default) => mediaWithCrops.GetCropUrl(imageUrlGenerator, publishedValueFallback,
-        publishedUrlProvider, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true,
-        urlMode: urlMode);
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaWithCrops.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            propertyAlias: propertyAlias,
+            cropAlias: cropAlias,
+            useCropDimensions: true,
+            urlMode: urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the IPublishedContent item.
@@ -180,9 +212,25 @@ public static class ImageCropperTemplateCoreExtensions
         bool useCropDimensions = false,
         bool cacheBuster = true,
         string? furtherOptions = null,
-        UrlMode urlMode = UrlMode.Default) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback,
-        publishedUrlProvider, null, false, width, height, propertyAlias, cropAlias, quality, imageCropMode,
-        imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaItem.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            null,
+            false,
+            width,
+            height,
+            propertyAlias,
+            cropAlias,
+            quality,
+            imageCropMode,
+            imageCropAnchor,
+            preferFocalPoint,
+            useCropDimensions,
+            cacheBuster,
+            furtherOptions,
+            urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the MediaWithCrops item.
@@ -243,9 +291,24 @@ public static class ImageCropperTemplateCoreExtensions
             throw new ArgumentNullException(nameof(mediaWithCrops));
         }
 
-        return mediaWithCrops.Content.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider,
-            mediaWithCrops.LocalCrops, false, width, height, propertyAlias, cropAlias, quality, imageCropMode,
-            imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
+        return mediaWithCrops.Content.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            mediaWithCrops.LocalCrops,
+            false,
+            width,
+            height,
+            propertyAlias,
+            cropAlias,
+            quality,
+            imageCropMode,
+            imageCropAnchor,
+            preferFocalPoint,
+            useCropDimensions,
+            cacheBuster,
+            furtherOptions,
+            urlMode);
     }
 
     /// <summary>
@@ -310,79 +373,19 @@ public static class ImageCropperTemplateCoreExtensions
         }
 
         return GetCropUrl(
-            imageUrl, imageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode,
-            imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
-    }
-
-    private static string? GetCropUrl(
-        this IPublishedContent mediaItem,
-        IImageUrlGenerator imageUrlGenerator,
-        IPublishedValueFallback publishedValueFallback,
-        IPublishedUrlProvider publishedUrlProvider,
-        ImageCropperValue? localCrops,
-        bool localCropsOnly,
-        int? width = null,
-        int? height = null,
-        string propertyAlias = Constants.Conventions.Media.File,
-        string? cropAlias = null,
-        int? quality = null,
-        ImageCropMode? imageCropMode = null,
-        ImageCropAnchor? imageCropAnchor = null,
-        bool preferFocalPoint = false,
-        bool useCropDimensions = false,
-        bool cacheBuster = true,
-        string? furtherOptions = null,
-        UrlMode urlMode = UrlMode.Default)
-    {
-        if (mediaItem == null)
-        {
-            throw new ArgumentNullException(nameof(mediaItem));
-        }
-
-        if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
-        {
-            return null;
-        }
-
-        var mediaItemUrl = mediaItem.MediaUrl(publishedUrlProvider, propertyAlias: propertyAlias, mode: urlMode);
-
-        // Only get crops from media when required and used
-        if (localCropsOnly == false && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
-        {
-            // Get the default cropper value from the value converter
-            var cropperValue = mediaItem.Value(publishedValueFallback, propertyAlias);
-
-            var mediaCrops = cropperValue as ImageCropperValue;
-
-            if (mediaCrops == null && cropperValue is JObject jobj)
-            {
-                mediaCrops = jobj.ToObject<ImageCropperValue>();
-            }
-
-            if (mediaCrops == null && cropperValue is string imageCropperValue &&
-                string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson())
-            {
-                mediaCrops = imageCropperValue.DeserializeImageCropperValue();
-            }
-
-            // Merge crops
-            if (localCrops == null)
-            {
-                localCrops = mediaCrops;
-            }
-            else if (mediaCrops != null)
-            {
-                localCrops = localCrops.Merge(mediaCrops);
-            }
-        }
-
-        var cacheBusterValue =
-            cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
-
-        return GetCropUrl(
-            mediaItemUrl, imageUrlGenerator, localCrops, width, height, cropAlias, quality, imageCropMode,
-            imageCropAnchor, preferFocalPoint, useCropDimensions,
-            cacheBusterValue, furtherOptions);
+            imageUrl,
+            imageUrlGenerator,
+            cropDataSet,
+            width,
+            height,
+            cropAlias,
+            quality,
+            imageCropMode,
+            imageCropAnchor,
+            preferFocalPoint,
+            useCropDimensions,
+            cacheBusterValue,
+            furtherOptions);
     }
 
     /// <summary>
@@ -453,8 +456,7 @@ public static class ImageCropperTemplateCoreExtensions
                 return null;
             }
 
-            options = cropDataSet.GetCropBaseOptions(imageUrl, crop,
-                preferFocalPoint || string.IsNullOrWhiteSpace(cropAlias));
+            options = cropDataSet.GetCropBaseOptions(imageUrl, crop, preferFocalPoint || string.IsNullOrWhiteSpace(cropAlias));
 
             if (crop != null && useCropDimensions)
             {
@@ -491,5 +493,86 @@ public static class ImageCropperTemplateCoreExtensions
         options.CacheBusterValue = cacheBusterValue;
 
         return imageUrlGenerator.GetImageUrl(options);
+    }
+
+    private static string? GetCropUrl(
+        this IPublishedContent mediaItem,
+        IImageUrlGenerator imageUrlGenerator,
+        IPublishedValueFallback publishedValueFallback,
+        IPublishedUrlProvider publishedUrlProvider,
+        ImageCropperValue? localCrops,
+        bool localCropsOnly,
+        int? width = null,
+        int? height = null,
+        string propertyAlias = Constants.Conventions.Media.File,
+        string? cropAlias = null,
+        int? quality = null,
+        ImageCropMode? imageCropMode = null,
+        ImageCropAnchor? imageCropAnchor = null,
+        bool preferFocalPoint = false,
+        bool useCropDimensions = false,
+        bool cacheBuster = true,
+        string? furtherOptions = null,
+        UrlMode urlMode = UrlMode.Default)
+    {
+        if (mediaItem == null)
+        {
+            throw new ArgumentNullException(nameof(mediaItem));
+        }
+
+        if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
+        {
+            return null;
+        }
+
+        var mediaItemUrl = mediaItem.MediaUrl(publishedUrlProvider, propertyAlias: propertyAlias, mode: urlMode);
+
+        // Only get crops from media when required and used
+        if (localCropsOnly == false && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
+        {
+            // Get the default cropper value from the value converter
+            var cropperValue = mediaItem.Value(publishedValueFallback, propertyAlias);
+
+            var mediaCrops = cropperValue as ImageCropperValue;
+
+            if (mediaCrops == null && cropperValue is JObject jobj)
+            {
+                mediaCrops = jobj.ToObject<ImageCropperValue>();
+            }
+
+            if (mediaCrops == null && cropperValue is string imageCropperValue &&
+                string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson())
+            {
+                mediaCrops = imageCropperValue.DeserializeImageCropperValue();
+            }
+
+            // Merge crops
+            if (localCrops == null)
+            {
+                localCrops = mediaCrops;
+            }
+            else if (mediaCrops != null)
+            {
+                localCrops = localCrops.Merge(mediaCrops);
+            }
+        }
+
+        var cacheBusterValue =
+            cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
+
+        return GetCropUrl(
+            mediaItemUrl,
+            imageUrlGenerator,
+            localCrops,
+            width,
+            height,
+            cropAlias,
+            quality,
+            imageCropMode,
+            imageCropAnchor,
+            preferFocalPoint,
+            useCropDimensions,
+            cacheBusterValue,
+            furtherOptions);
     }
 }

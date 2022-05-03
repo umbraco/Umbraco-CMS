@@ -27,6 +27,19 @@ public sealed class HttpUmbracoFormRouteStringException : Exception
     /// <summary>
     ///     Initializes a new instance of the <see cref="HttpUmbracoFormRouteStringException" /> class.
     /// </summary>
+    /// <param name="message">The error message displayed to the client when the exception is thrown.</param>
+    /// <param name="innerException">
+    ///     The <see cref="P:System.Exception.InnerException" />, if any, that threw the current
+    ///     exception.
+    /// </param>
+    public HttpUmbracoFormRouteStringException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HttpUmbracoFormRouteStringException" /> class.
+    /// </summary>
     /// <param name="info">
     ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
     ///     data about the exception being thrown.
@@ -37,19 +50,6 @@ public sealed class HttpUmbracoFormRouteStringException : Exception
     /// </param>
     private HttpUmbracoFormRouteStringException(SerializationInfo info, StreamingContext context)
         : base(info, context)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="HttpUmbracoFormRouteStringException" /> class.
-    /// </summary>
-    /// <param name="message">The error message displayed to the client when the exception is thrown.</param>
-    /// <param name="innerException">
-    ///     The <see cref="P:System.Exception.InnerException" />, if any, that threw the current
-    ///     exception.
-    /// </param>
-    public HttpUmbracoFormRouteStringException(string message, Exception innerException)
-        : base(message, innerException)
     {
     }
 }

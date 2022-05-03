@@ -182,7 +182,9 @@ public class UmbracoRequestMiddleware : IMiddleware
             // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
             // strange since we always logged the beginning, so now we just log start/end of all requests)
             LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
-            _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId,
+            _logger.LogTrace(
+                "End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)",
+                httpRequestId,
                 pathAndQuery,
                 DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
 
@@ -205,8 +207,6 @@ public class UmbracoRequestMiddleware : IMiddleware
     /// <summary>
     ///     Used to lazily initialize any back office services when the first request to the back office is made
     /// </summary>
-    /// <param name="umbracoContext"></param>
-    /// <returns></returns>
     private void LazyInitializeBackOfficeServices(PathString absPath)
     {
         if (s_firstBackOfficeRequest)

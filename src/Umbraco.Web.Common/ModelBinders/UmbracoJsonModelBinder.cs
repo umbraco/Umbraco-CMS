@@ -2,7 +2,6 @@ using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -15,16 +14,18 @@ namespace Umbraco.Cms.Web.Common.ModelBinders;
 ///     A custom body model binder that only uses a <see cref="NewtonsoftJsonInputFormatter" /> to bind body action
 ///     parameters
 /// </summary>
-public class UmbracoJsonModelBinder : BodyModelBinder, IModelBinder
+public class UmbracoJsonModelBinder : BodyModelBinder
 {
-    public UmbracoJsonModelBinder(ArrayPool<char> arrayPool, ObjectPoolProvider objectPoolProvider,
-        IHttpRequestStreamReaderFactory readerFactory, ILoggerFactory loggerFactory)
+    public UmbracoJsonModelBinder(
+        ArrayPool<char> arrayPool,
+        ObjectPoolProvider objectPoolProvider,
+        IHttpRequestStreamReaderFactory readerFactory,
+        ILoggerFactory loggerFactory)
         : base(GetNewtonsoftJsonFormatter(loggerFactory, arrayPool, objectPoolProvider), readerFactory, loggerFactory)
     {
     }
 
-    private static IInputFormatter[] GetNewtonsoftJsonFormatter(ILoggerFactory logger, ArrayPool<char> arrayPool,
-        ObjectPoolProvider objectPoolProvider)
+    private static IInputFormatter[] GetNewtonsoftJsonFormatter(ILoggerFactory logger, ArrayPool<char> arrayPool, ObjectPoolProvider objectPoolProvider)
     {
         var jsonOptions = new MvcNewtonsoftJsonOptions { AllowInputFormatterExceptionMessages = true };
 

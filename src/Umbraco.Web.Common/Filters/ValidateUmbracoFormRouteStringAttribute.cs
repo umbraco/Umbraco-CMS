@@ -44,21 +44,18 @@ public class ValidateUmbracoFormRouteStringAttribute : TypeFilterAttribute
 
             if (context.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
             {
-                ValidateRouteString(ufprt, controllerActionDescriptor.ControllerName,
-                    controllerActionDescriptor.ActionName, context.RouteData?.DataTokens["area"]?.ToString());
+                ValidateRouteString(ufprt, controllerActionDescriptor.ControllerName, controllerActionDescriptor.ActionName, context.RouteData.DataTokens["area"]?.ToString());
             }
         }
 
-        public void ValidateRouteString(string? ufprt, string currentController, string currentAction,
-            string? currentArea)
+        public void ValidateRouteString(string? ufprt, string currentController, string currentAction, string? currentArea)
         {
             if (ufprt.IsNullOrWhiteSpace())
             {
                 throw new HttpUmbracoFormRouteStringException("The required request field \"ufprt\" is not present.");
             }
 
-            if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(_dataProtectionProvider, ufprt!,
-                    out IDictionary<string, string?>? additionalDataParts))
+            if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(_dataProtectionProvider, ufprt!, out IDictionary<string, string?>? additionalDataParts))
             {
                 throw new HttpUmbracoFormRouteStringException(
                     "The Umbraco form request route string could not be decrypted.");

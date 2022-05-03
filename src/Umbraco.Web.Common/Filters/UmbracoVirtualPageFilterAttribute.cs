@@ -48,7 +48,7 @@ public class UmbracoVirtualPageFilterAttribute : Attribute, IAsyncActionFilter
         }
     }
 
-    private async Task SetUmbracoRouteValues(ActionExecutingContext context, IPublishedContent content)
+    private async Task SetUmbracoRouteValues(ActionExecutingContext context, IPublishedContent? content)
     {
         if (content != null)
         {

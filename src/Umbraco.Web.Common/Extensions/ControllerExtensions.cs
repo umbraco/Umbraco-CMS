@@ -26,7 +26,7 @@ public static class ControllerExtensions
                                                 " does not follow conventions, MVC Controller class names must be suffixed with the term 'Controller'");
         }
 
-        return controllerType.Name[..controllerType.Name.LastIndexOf("Controller")];
+        return controllerType.Name[..controllerType.Name.LastIndexOf("Controller", StringComparison.Ordinal)];
     }
 
     /// <summary>

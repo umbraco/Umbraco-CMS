@@ -46,7 +46,14 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         ILogger<SignInManager<MemberIdentityUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<MemberIdentityUser> confirmation)
-        : this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation,
+        : this(
+            memberManager,
+            contextAccessor,
+            claimsFactory,
+            optionsAccessor,
+            logger,
+            schemes,
+            confirmation,
             StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>(),
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
     {
@@ -64,17 +71,16 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     // use default scheme for members
     protected override string TwoFactorRememberMeAuthenticationType => IdentityConstants.TwoFactorRememberMeScheme;
 
-    /// <inheritdoc />
     public override async Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-        AuthenticateResult? auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
-        IDictionary<string, string?>? items = auth?.Properties?.Items;
-        if (auth?.Principal == null || items == null)
+        AuthenticateResult auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
+        IDictionary<string, string?>? items = auth.Properties?.Items;
+        if (auth.Principal == null || items == null)
         {
             Logger.LogDebug(
-                auth?.Failure ??
+                auth.Failure ??
                 new NullReferenceException("Context.AuthenticateAsync(ExternalAuthenticationType) is null"),
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
             return null;
@@ -101,7 +107,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
 
         var providerKey = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (providerKey == null || items[UmbracoSignInMgrLoginProviderKey] is not string provider)
+        var provider = items[UmbracoSignInMgrLoginProviderKey];
+        if (providerKey == null || provider is null)
         {
             return null;
         }
@@ -119,14 +126,12 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     /// <summary>
     ///     Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking
     /// </summary>
-    public async Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent,
-        bool bypassTwoFactor = false)
+    public async Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to be able to deal with auto-linking and reduce duplicate lookups
         MemberExternalSignInAutoLinkOptions? autoLinkOptions =
-            (await _memberExternalLoginProviders.GetAsync(loginInfo.LoginProvider))?.ExternalLoginProvider?.Options
-            ?.AutoLinkOptions;
+            (await _memberExternalLoginProviders.GetAsync(loginInfo.LoginProvider))?.ExternalLoginProvider.Options.AutoLinkOptions;
         MemberIdentityUser? user = await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
         if (user == null)
         {
@@ -153,10 +158,10 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         return await SignInOrTwoFactorAsync(user, isPersistent, loginInfo.LoginProvider, bypassTwoFactor);
     }
 
-    /// <inheritdoc />
     public override AuthenticationProperties ConfigureExternalAuthenticationProperties(
         string provider,
-        string redirectUrl, string? userId = null)
+        string redirectUrl,
+        string? userId = null)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to be able to use our own XsrfKey/LoginProviderKey because the default is private :/

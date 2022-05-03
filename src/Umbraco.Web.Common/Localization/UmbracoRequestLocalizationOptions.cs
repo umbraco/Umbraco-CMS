@@ -24,12 +24,6 @@ public class UmbracoRequestLocalizationOptions : IConfigureOptions<RequestLocali
         // set the default culture to what is in config
         options.DefaultRequestCulture = new RequestCulture(_globalSettings.DefaultUILanguage);
 
-        // add a custom provider
-        if (options.RequestCultureProviders == null)
-        {
-            options.RequestCultureProviders = new List<IRequestCultureProvider>();
-        }
-
         options.RequestCultureProviders.Insert(0, new UmbracoBackOfficeIdentityCultureProvider(options));
         options.RequestCultureProviders.Insert(1, new UmbracoPublishedContentCultureProvider(options));
     }

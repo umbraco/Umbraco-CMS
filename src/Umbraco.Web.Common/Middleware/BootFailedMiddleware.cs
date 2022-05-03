@@ -1,9 +1,13 @@
 using System.Text;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
 
@@ -13,12 +17,21 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 public class BootFailedMiddleware : IMiddleware
 {
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IRuntimeState _runtimeState;
 
     public BootFailedMiddleware(IRuntimeState runtimeState, IHostingEnvironment hostingEnvironment)
+    : this(runtimeState, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
     {
         _runtimeState = runtimeState;
         _hostingEnvironment = hostingEnvironment;
+    }
+
+    public BootFailedMiddleware(IRuntimeState runtimeState, IHostingEnvironment hostingEnvironment, IWebHostEnvironment webHostEnvironment)
+    {
+        _runtimeState = runtimeState;
+        _hostingEnvironment = hostingEnvironment;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -34,8 +47,9 @@ public class BootFailedMiddleware : IMiddleware
             {
                 BootFailedException.Rethrow(_runtimeState.BootFailedException);
             }
-            else // Print a nice error page
+            else
             {
+                // Print a nice error page
                 context.Response.Clear();
                 context.Response.StatusCode = 500;
 
@@ -53,12 +67,12 @@ public class BootFailedMiddleware : IMiddleware
 
     private string GetBootErrorFileName()
     {
-        var fileName = _hostingEnvironment.MapPathWebRoot("~/config/errors/BootFailed.html");
+        var fileName = _webHostEnvironment.MapPathWebRoot("~/config/errors/BootFailed.html");
         if (File.Exists(fileName))
         {
             return fileName;
         }
 
-        return _hostingEnvironment.MapPathWebRoot("~/umbraco/views/errors/BootFailed.html");
+        return _webHostEnvironment.MapPathWebRoot("~/umbraco/views/errors/BootFailed.html");
     }
 }

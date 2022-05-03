@@ -13,8 +13,7 @@ public static class HttpContextExtensions
     /// <summary>
     ///     Try to get the basic auth username and password from the http context.
     /// </summary>
-    public static bool TryGetBasicAuthCredentials(this HttpContext httpContext, out string? username,
-        out string? password)
+    public static bool TryGetBasicAuthCredentials(this HttpContext httpContext, out string? username, out string? password)
     {
         username = null;
         password = null;
@@ -44,7 +43,7 @@ public static class HttpContextExtensions
     /// <summary>
     ///     Runs the authentication process
     /// </summary>
-    public static async Task<AuthenticateResult> AuthenticateBackOfficeAsync(this HttpContext httpContext)
+    public static async Task<AuthenticateResult> AuthenticateBackOfficeAsync(this HttpContext? httpContext)
     {
         if (httpContext == null)
         {
@@ -99,16 +98,6 @@ public static class HttpContextExtensions
     /// </returns>
     public static ClaimsIdentity? GetCurrentIdentity(this HttpContext http)
     {
-        if (http == null)
-        {
-            throw new ArgumentNullException(nameof(http));
-        }
-
-        if (http.User == null)
-        {
-            return null; // there's no user at all so no identity
-        }
-
         // If it's already a UmbracoBackOfficeIdentity
         ClaimsIdentity? backOfficeIdentity = http.User.GetUmbracoIdentity();
         if (backOfficeIdentity != null)

@@ -48,8 +48,7 @@ public class OutgoingNoHyphenGuidFormatAttribute : TypeFilterAttribute
         /// </summary>
         private class GuidNoHyphenConverter : JsonConverter
         {
-            public override object ReadJson(JsonReader reader, Type objectType, object? existingValue,
-                JsonSerializer serializer)
+            public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
             {
                 switch (reader.TokenType)
                 {

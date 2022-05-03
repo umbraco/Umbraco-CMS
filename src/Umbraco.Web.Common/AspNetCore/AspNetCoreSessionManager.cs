@@ -16,10 +16,10 @@ internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
     {
         get
         {
-            HttpContext? httpContext = _httpContextAccessor?.HttpContext;
+            HttpContext? httpContext = _httpContextAccessor.HttpContext;
 
             return IsSessionsAvailable
-                ? httpContext?.Session?.Id
+                ? httpContext?.Session.Id
                 : "0";
         }
     }

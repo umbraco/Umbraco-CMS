@@ -21,7 +21,7 @@ public static class LinkGeneratorExtensions
         try
         {
             backOfficeControllerType = Assembly.Load("Umbraco.Web.BackOffice")
-                ?.GetType("Umbraco.Web.BackOffice.Controllers.BackOfficeController");
+                .GetType("Umbraco.Web.BackOffice.Controllers.BackOfficeController");
             if (backOfficeControllerType == null)
             {
                 return "/"; // this would indicate that the installer is installed without the back office
@@ -44,15 +44,13 @@ public static class LinkGeneratorExtensions
     ///     Return the Url for a Web Api service
     /// </summary>
     /// <typeparam name="T">The <see cref="UmbracoApiControllerBase" /></typeparam>
-    public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName,
-        object? id = null)
+    public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, object? id = null)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(
         actionName,
         typeof(T),
         new Dictionary<string, object?> { ["id"] = id });
 
-    public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName,
-        IDictionary<string, object?>? values)
+    public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, IDictionary<string, object?>? values)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), values);
 
     public static string? GetUmbracoApiServiceBaseUrl<T>(
@@ -73,8 +71,7 @@ public static class LinkGeneratorExtensions
     /// <summary>
     ///     Return the Url for an Umbraco controller
     /// </summary>
-    public static string? GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName,
-        string controllerName, string? area, IDictionary<string, object?>? dict = null)
+    public static string? GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName, string controllerName, string? area, IDictionary<string, object?>? dict = null)
     {
         if (actionName == null)
         {
@@ -124,8 +121,7 @@ public static class LinkGeneratorExtensions
     /// <summary>
     ///     Return the Url for an Umbraco controller
     /// </summary>
-    public static string? GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName,
-        Type controllerType, IDictionary<string, object?>? values = null)
+    public static string? GetUmbracoControllerUrl(this LinkGenerator linkGenerator, string actionName, Type controllerType, IDictionary<string, object?>? values = null)
     {
         if (actionName == null)
         {
@@ -158,8 +154,7 @@ public static class LinkGeneratorExtensions
             area = metaData.AreaName;
         }
 
-        return linkGenerator.GetUmbracoControllerUrl(actionName, ControllerExtensions.GetControllerName(controllerType),
-            area, values);
+        return linkGenerator.GetUmbracoControllerUrl(actionName, ControllerExtensions.GetControllerName(controllerType), area, values);
     }
 
     public static string? GetUmbracoApiService<T>(

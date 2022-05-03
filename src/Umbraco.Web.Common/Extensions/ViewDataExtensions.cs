@@ -33,9 +33,6 @@ public static class ViewDataExtensions
     /// <summary>
     ///     Copies data from a request cookie to view data and then clears the cookie in the response
     /// </summary>
-    /// <param name="viewData"></param>
-    /// <param name="httpContext"></param>
-    /// <param name="cookieName"></param>
     /// <returns></returns>
     /// <remarks>
     ///     <para>
@@ -44,8 +41,11 @@ public static class ViewDataExtensions
     ///         The cookie value can either be a simple string value
     ///     </para>
     /// </remarks>
-    public static bool FromBase64CookieData<T>(this ViewDataDictionary viewData, HttpContext? httpContext,
-        string cookieName, IJsonSerializer serializer)
+    public static bool FromBase64CookieData<T>(
+        this ViewDataDictionary viewData,
+        HttpContext? httpContext,
+        string cookieName,
+        IJsonSerializer serializer)
     {
         var hasCookie = httpContext?.Request.Cookies.ContainsKey(cookieName) ?? false;
         if (!hasCookie)

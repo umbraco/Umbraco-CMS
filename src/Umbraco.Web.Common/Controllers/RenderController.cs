@@ -24,8 +24,7 @@ public class RenderController : UmbracoPageController, IRenderController
     /// <summary>
     ///     Initializes a new instance of the <see cref="RenderController" /> class.
     /// </summary>
-    public RenderController(ILogger<RenderController> logger, ICompositeViewEngine compositeViewEngine,
-        IUmbracoContextAccessor umbracoContextAccessor)
+    public RenderController(ILogger<RenderController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
         : base(logger, compositeViewEngine)
     {
         _logger = logger;

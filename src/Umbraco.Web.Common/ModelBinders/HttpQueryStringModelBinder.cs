@@ -31,7 +31,7 @@ public sealed class HttpQueryStringModelBinder : IModelBinder
         return Task.CompletedTask;
     }
 
-    private Dictionary<string, StringValues> GetQueryAsDictionary(IQueryCollection query)
+    private Dictionary<string, StringValues> GetQueryAsDictionary(IQueryCollection? query)
     {
         var result = new Dictionary<string, StringValues>();
         if (query == null)

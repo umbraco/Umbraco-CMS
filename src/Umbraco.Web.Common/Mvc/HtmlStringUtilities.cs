@@ -19,7 +19,7 @@ public sealed class HtmlStringUtilities
     /// </returns>
     public IHtmlContent ReplaceLineBreaks(string text)
     {
-        var value = WebUtility.HtmlEncode(text)?
+        var value = WebUtility.HtmlEncode(text)
             .Replace("\r\n", "<br />")
             .Replace("\r", "<br />")
             .Replace("\n", "<br />");
@@ -71,7 +71,6 @@ public sealed class HtmlStringUtilities
     public string Join(string separator, params object[] args)
     {
         IEnumerable<string?> results = args
-            .Where(x => x != null)
             .Select(x => x.ToString())
             .Where(x => string.IsNullOrWhiteSpace(x) == false);
         return string.Join(separator, results);
@@ -81,7 +80,6 @@ public sealed class HtmlStringUtilities
     {
         var sb = new StringBuilder();
         foreach (var arg in args
-                     .Where(x => x != null)
                      .Select(x => x.ToString())
                      .Where(x => string.IsNullOrWhiteSpace(x) == false))
         {
@@ -94,7 +92,6 @@ public sealed class HtmlStringUtilities
     public string Coalesce(params object[] args)
     {
         var arg = args
-            .Where(x => x != null)
             .Select(x => x.ToString())
             .FirstOrDefault(x => string.IsNullOrWhiteSpace(x) == false);
 
@@ -126,7 +123,7 @@ public sealed class HtmlStringUtilities
                                 insideTagSpaceEncountered = false,
                                 isTagClose = false;
 
-                            int ic = 0,
+                            int ic,
 
                                 // currentLength = 0,
                                 currentTextLength = 0;
@@ -190,7 +187,6 @@ public sealed class HtmlStringUtilities
                                                     }
 
                                                     outputtw.Write(tagContents);
-                                                    write = true;
                                                     insideTagSpaceEncountered = false;
                                                 }
 
@@ -278,7 +274,7 @@ public sealed class HtmlStringUtilities
                 outputms.Position = 0;
                 using (TextReader outputtr = new StreamReader(outputms))
                 {
-                    var result = string.Empty;
+                    string result;
 
                     var firstTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
 
@@ -306,7 +302,6 @@ public sealed class HtmlStringUtilities
     /// </summary>
     /// <param name="html">HTML text</param>
     /// <param name="words">Amount of words you would like to measure</param>
-    /// <param name="tagsAsContent"></param>
     /// <returns></returns>
     public int WordsToLength(string html, int words)
     {

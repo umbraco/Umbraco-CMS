@@ -49,7 +49,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
 
         public void OnException(ExceptionContext filterContext)
         {
-            var disabled = _exceptionFilterSettings?.Disabled ?? false;
+            var disabled = _exceptionFilterSettings.Disabled;
             if (_publishedModelFactory.IsLiveFactoryEnabled()
                 && !disabled
                 && !filterContext.ExceptionHandled

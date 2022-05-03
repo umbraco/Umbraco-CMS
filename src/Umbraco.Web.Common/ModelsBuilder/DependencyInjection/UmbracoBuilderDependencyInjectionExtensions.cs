@@ -149,7 +149,8 @@ public static class UmbracoBuilderDependencyInjectionExtensions
                     // is produced, if we don't re-create the container then it will just return the same instance.
                     ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
                     return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                }, s.GetRequiredService<InMemoryModelFactory>()));
+                },
+                s.GetRequiredService<InMemoryModelFactory>()));
 
         return builder;
     }

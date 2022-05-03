@@ -35,8 +35,7 @@ public static class UrlHelperExtensions
             return "/"; // this would indicate that the installer is installed without the back office
         }
 
-        return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType),
-            new { area = Constants.Web.Mvc.BackOfficeApiArea });
+        return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
     }
 
     /// <summary>
@@ -50,7 +49,9 @@ public static class UrlHelperExtensions
     /// <returns></returns>
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
-        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, string actionName, object? id = null)
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        string actionName,
+        object? id = null)
         where T : UmbracoApiController =>
         url.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, typeof(T), id);
 
@@ -73,8 +74,7 @@ public static class UrlHelperExtensions
             return url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, method.Name);
         }
 
-        return url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, method.Name,
-            methodParams?.Values.First());
+        return url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, method.Name, methodParams?.Values.First());
     }
 
     /// <summary>
@@ -88,8 +88,10 @@ public static class UrlHelperExtensions
     /// <returns></returns>
     public static string? GetUmbracoApiService(
         this IUrlHelper url,
-        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, string actionName,
-        Type apiControllerType, object? id = null)
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        string actionName,
+        Type apiControllerType,
+        object? id = null)
     {
         if (actionName == null)
         {
@@ -124,8 +126,7 @@ public static class UrlHelperExtensions
             area = metaData.AreaName;
         }
 
-        return url.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area!,
-            id);
+        return url.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area!, id);
     }
 
     /// <summary>
@@ -136,8 +137,7 @@ public static class UrlHelperExtensions
     /// <param name="controllerName"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public static string? GetUmbracoApiService(this IUrlHelper url, string actionName, string controllerName,
-        object? id = null) => url.GetUmbracoApiService(actionName, controllerName, string.Empty, id);
+    public static string? GetUmbracoApiService(this IUrlHelper url, string actionName, string controllerName, object? id = null) => url.GetUmbracoApiService(actionName, controllerName, string.Empty, id);
 
     /// <summary>
     ///     Return the Url for a Web Api service
@@ -148,8 +148,12 @@ public static class UrlHelperExtensions
     /// <param name="area"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public static string? GetUmbracoApiService(this IUrlHelper url, string actionName, string controllerName,
-        string area, object? id = null)
+    public static string? GetUmbracoApiService(
+        this IUrlHelper url,
+        string actionName,
+        string controllerName,
+        string area,
+        object? id = null)
     {
         if (actionName == null)
         {
@@ -203,7 +207,8 @@ public static class UrlHelperExtensions
     /// <returns></returns>
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
-        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, string actionName)
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        string actionName)
         where T : UmbracoApiController =>
         url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEnd(actionName);
 
@@ -226,14 +231,15 @@ public static class UrlHelperExtensions
     /// <summary>
     ///     Return the Url for an action with a cache-busting hash appended
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="actionName"></param>
-    /// <param name="controllerName"></param>
-    /// <param name="routeVals"></param>
     /// <returns></returns>
-    public static string GetUrlWithCacheBust(this IUrlHelper url, string actionName, string controllerName,
+    public static string GetUrlWithCacheBust(
+        this IUrlHelper url,
+        string actionName,
+        string controllerName,
         RouteValueDictionary routeVals,
-        IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IRuntimeMinifier runtimeMinifier)
+        IHostingEnvironment hostingEnvironment,
+        IUmbracoVersion umbracoVersion,
+        IRuntimeMinifier runtimeMinifier)
     {
         var applicationJs = url.Action(actionName, controllerName, routeVals);
         applicationJs = applicationJs + "?umb__rnd=" +
@@ -244,8 +250,7 @@ public static class UrlHelperExtensions
     /// <summary>
     /// </summary>
     /// <returns></returns>
-    public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion,
-        IRuntimeMinifier runtimeMinifier)
+    public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IRuntimeMinifier runtimeMinifier)
     {
         // make a hash of umbraco and client dependency version
         // in case the user bypasses the installer and just bumps the web.config or client dependency config
@@ -260,8 +265,7 @@ public static class UrlHelperExtensions
         return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
     }
 
-    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias,
-        bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
+    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
     {
         if (mediaItem == null)
         {
@@ -272,25 +276,20 @@ public static class UrlHelperExtensions
         return CreateHtmlString(url, htmlEncode);
     }
 
-    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias,
-        string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
+    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
     {
         if (mediaItem == null)
         {
             return HtmlString.Empty;
         }
 
-        var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true,
-            urlMode: urlMode);
+        var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
         return CreateHtmlString(url, htmlEncode);
     }
 
-    private static IHtmlContent CreateHtmlString(string? url, bool htmlEncode) =>
-        htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
-
     public static IHtmlContent GetCropUrl(
         this IUrlHelper urlHelper,
-        IPublishedContent mediaItem,
+        IPublishedContent? mediaItem,
         int? width = null,
         int? height = null,
         string propertyAlias = Constants.Conventions.Media.File,
@@ -310,15 +309,26 @@ public static class UrlHelperExtensions
             return HtmlString.Empty;
         }
 
-        var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
-            imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
+        var url = mediaItem.GetCropUrl(
+            width,
+            height,
+            propertyAlias,
+            cropAlias,
+            quality,
+            imageCropMode,
+            imageCropAnchor,
+            preferFocalPoint,
+            useCropDimensions,
+            cacheBuster,
+            furtherOptions,
+            urlMode);
 
         return CreateHtmlString(url, htmlEncode);
     }
 
     public static IHtmlContent GetCropUrl(
         this IUrlHelper urlHelper,
-        ImageCropperValue imageCropperValue,
+        ImageCropperValue? imageCropperValue,
         string cropAlias,
         int? width = null,
         int? height = null,
@@ -337,8 +347,18 @@ public static class UrlHelperExtensions
         }
 
         var imageUrl = imageCropperValue.Src;
-        var url = imageUrl?.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
-            imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
+        var url = imageUrl?.GetCropUrl(
+            imageCropperValue,
+            width,
+            height,
+            cropAlias,
+            quality,
+            imageCropMode,
+            imageCropAnchor,
+            preferFocalPoint,
+            useCropDimensions,
+            cacheBusterValue,
+            furtherOptions);
 
         return CreateHtmlString(url, htmlEncode);
     }
@@ -347,40 +367,47 @@ public static class UrlHelperExtensions
     ///     Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified
     ///     SurfaceController
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="action"></param>
-    /// <param name="controllerName"></param>
     /// <returns></returns>
-    public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext,
-        IDataProtectionProvider dataProtectionProvider, string action, string controllerName) =>
+    public static string SurfaceAction(
+        this IUrlHelper url,
+        IUmbracoContext umbracoContext,
+        IDataProtectionProvider dataProtectionProvider,
+        string action,
+        string controllerName) =>
         url.SurfaceAction(umbracoContext, dataProtectionProvider, action, controllerName, null);
 
     /// <summary>
     ///     Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified
     ///     SurfaceController
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="action"></param>
-    /// <param name="controllerName"></param>
-    /// <param name="additionalRouteVals"></param>
     /// <returns></returns>
-    public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext,
-        IDataProtectionProvider dataProtectionProvider, string action, string controllerName,
-        object? additionalRouteVals) => url.SurfaceAction(umbracoContext, dataProtectionProvider, action,
-        controllerName, string.Empty, additionalRouteVals);
+    public static string SurfaceAction(
+        this IUrlHelper url,
+        IUmbracoContext umbracoContext,
+        IDataProtectionProvider dataProtectionProvider,
+        string action,
+        string controllerName,
+        object? additionalRouteVals) =>
+        url.SurfaceAction(
+            umbracoContext,
+            dataProtectionProvider,
+            action,
+            controllerName,
+            string.Empty,
+            additionalRouteVals);
 
     /// <summary>
     ///     Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified
     ///     SurfaceController
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="action"></param>
-    /// <param name="controllerName"></param>
-    /// <param name="area"></param>
-    /// <param name="additionalRouteVals"></param>
     /// <returns></returns>
-    public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext,
-        IDataProtectionProvider dataProtectionProvider, string action, string controllerName, string area,
+    public static string SurfaceAction(
+        this IUrlHelper url,
+        IUmbracoContext umbracoContext,
+        IDataProtectionProvider dataProtectionProvider,
+        string action,
+        string controllerName,
+        string area,
         object? additionalRouteVals)
     {
         if (action == null)
@@ -409,4 +436,7 @@ public static class UrlHelperExtensions
         var result = umbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
         return result;
     }
+
+    private static IHtmlContent CreateHtmlString(string? url, bool htmlEncode) =>
+        htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
 }

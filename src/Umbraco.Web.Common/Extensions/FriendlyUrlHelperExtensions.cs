@@ -34,8 +34,7 @@ public static class FriendlyUrlHelperExtensions
     /// <param name="controllerName"></param>
     /// <param name="additionalRouteVals"></param>
     /// <returns></returns>
-    public static string SurfaceAction(this IUrlHelper url, string action, string controllerName,
-        object additionalRouteVals)
+    public static string SurfaceAction(this IUrlHelper url, string action, string controllerName, object additionalRouteVals)
         => url.SurfaceAction(UmbracoContext, DataProtectionProvider, action, controllerName, additionalRouteVals);
 
     /// <summary>
@@ -48,7 +47,6 @@ public static class FriendlyUrlHelperExtensions
     /// <param name="area"></param>
     /// <param name="additionalRouteVals"></param>
     /// <returns></returns>
-    public static string SurfaceAction(this IUrlHelper url, string action, string controllerName, string area,
-        object additionalRouteVals)
+    public static string SurfaceAction(this IUrlHelper url, string action, string controllerName, string area, object additionalRouteVals)
         => url.SurfaceAction(UmbracoContext, DataProtectionProvider, action, controllerName, area, additionalRouteVals);
 }

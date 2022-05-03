@@ -10,8 +10,7 @@ public static class BlockListTemplateExtensions
     public const string DefaultFolder = "blocklist/";
     public const string DefaultTemplate = "default";
 
-    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, BlockListModel? model,
-        string template = DefaultTemplate)
+    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, BlockListModel? model, string template = DefaultTemplate)
     {
         if (model?.Count == 0)
         {
@@ -22,14 +21,13 @@ public static class BlockListTemplateExtensions
         return html.Partial(view, model);
     }
 
-    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedProperty property,
-        string template = DefaultTemplate) => GetBlockListHtml(html, property?.GetValue() as BlockListModel, template);
+    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
+        => GetBlockListHtml(html, property.GetValue() as BlockListModel, template);
 
-    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem,
-        string propertyAlias) => GetBlockListHtml(html, contentItem, propertyAlias, DefaultTemplate);
+    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
+        => GetBlockListHtml(html, contentItem, propertyAlias, DefaultTemplate);
 
-    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem,
-        string propertyAlias, string template)
+    public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         if (propertyAlias == null)
         {
@@ -49,6 +47,6 @@ public static class BlockListTemplateExtensions
             throw new InvalidOperationException("No property type found with alias " + propertyAlias);
         }
 
-        return GetBlockListHtml(html, prop?.GetValue() as BlockListModel, template);
+        return GetBlockListHtml(html, prop.GetValue() as BlockListModel, template);
     }
 }

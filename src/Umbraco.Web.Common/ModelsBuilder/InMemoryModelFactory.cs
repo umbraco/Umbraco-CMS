@@ -4,18 +4,21 @@ using System.Reflection.Emit;
 using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder;
 
@@ -35,9 +38,9 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         new("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
     private readonly ApplicationPartManager _applicationPartManager;
+    private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly int _debugLevel;
     private readonly ModelsGenerationError _errors;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IApplicationShutdownRegistry _hostingLifetime;
     private readonly ReaderWriterLockSlim _locker = new();
     private readonly ILogger<InMemoryModelFactory> _logger;
@@ -64,17 +67,18 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         IHostingEnvironment hostingEnvironment,
         IApplicationShutdownRegistry hostingLifetime,
         IPublishedValueFallback publishedValueFallback,
-        ApplicationPartManager applicationPartManager)
+        ApplicationPartManager applicationPartManager,
+        IWebHostEnvironment webHostEnvironment)
     {
         _umbracoServices = umbracoServices;
         _profilingLogger = profilingLogger;
         _logger = logger;
         _config = config.CurrentValue;
-        _hostingEnvironment = hostingEnvironment;
         _hostingLifetime = hostingLifetime;
         _publishedValueFallback = publishedValueFallback;
         _applicationPartManager = applicationPartManager;
-        _errors = new ModelsGenerationError(config, _hostingEnvironment);
+        _webHostEnvironment = webHostEnvironment;
+        _errors = new ModelsGenerationError(config, hostingEnvironment);
         _ver = 1; // zero is for when we had no version
         _skipver = -1; // nothing to skip
         if (!hostingEnvironment.IsHosted)
@@ -142,7 +146,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
     public IPublishedElement CreateModel(IPublishedElement element)
     {
         // get models, rebuilding them if needed
-        Dictionary<string, ModelInfo>? infos = EnsureModels()?.ModelInfos;
+        Dictionary<string, ModelInfo>? infos = EnsureModels().ModelInfos;
         if (infos == null)
         {
             return element;
@@ -173,7 +177,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         Infos infos = EnsureModels();
 
         // fail fast
-        if (infos is null || alias is null)
+        if (alias is null)
         {
             return new List<IPublishedElement>();
         }
@@ -222,7 +226,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
     }
 
     public string PureLiveDirectoryAbsolute() =>
-        _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
+        _webHostEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
 
     // ensure that the factory is running with the lastest generation of models
     internal Infos EnsureModels()
@@ -832,7 +836,8 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
 
         _logger.LogInformation("Detected files changes.");
 
-        lock (SyncRoot) // don't reset while being locked
+        // don't reset while being locked
+        lock (SyncRoot)
         {
             ResetModels();
         }

@@ -22,7 +22,7 @@ public class JsonExceptionFilterAttribute : TypeFilterAttribute
 
         public void OnException(ExceptionContext filterContext)
         {
-            if (filterContext.Exception != null && !filterContext.ExceptionHandled)
+            if (!filterContext.ExceptionHandled)
             {
                 filterContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 

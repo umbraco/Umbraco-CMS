@@ -30,8 +30,7 @@ public sealed class RoutableDocumentFilter : IRoutableDocumentFilter
     /// <summary>
     ///     Initializes a new instance of the <see cref="RoutableDocumentFilter" /> class.
     /// </summary>
-    public RoutableDocumentFilter(IOptions<GlobalSettings> globalSettings, IOptions<WebRoutingSettings> routingSettings,
-        IHostingEnvironment hostingEnvironment, EndpointDataSource endpointDataSource)
+    public RoutableDocumentFilter(IOptions<GlobalSettings> globalSettings, IOptions<WebRoutingSettings> routingSettings, IHostingEnvironment hostingEnvironment, EndpointDataSource endpointDataSource)
     {
         _globalSettings = globalSettings.Value;
         _routingSettings = routingSettings.Value;
@@ -168,13 +167,13 @@ public sealed class RoutableDocumentFilter : IRoutableDocumentFilter
         // Borrowed and modified from https://stackoverflow.com/a/59550580
 
         // Return a collection of Microsoft.AspNetCore.Http.Endpoint instances.
-        IEnumerable<RouteEndpoint>? routeEndpoints = _endpointDataSource?.Endpoints
+        IEnumerable<RouteEndpoint>? routeEndpoints = _endpointDataSource.Endpoints
             .OfType<RouteEndpoint>()
             .Where(x =>
             {
                 // We don't want to include dynamic endpoints in this check since we would have no idea if that
                 // matches since they will probably match everything.
-                var isDynamic = x.Metadata.OfType<IDynamicEndpointMetadata>().Any(x => x.IsDynamic);
+                var isDynamic = x.Metadata.OfType<IDynamicEndpointMetadata>().Any(y => y.IsDynamic);
                 if (isDynamic)
                 {
                     return false;
@@ -194,7 +193,7 @@ public sealed class RoutableDocumentFilter : IRoutableDocumentFilter
         var routeValues = new RouteValueDictionary();
 
         // To get the matchedEndpoint of the provide url
-        RouteEndpoint? matchedEndpoint = routeEndpoints?
+        RouteEndpoint? matchedEndpoint = routeEndpoints
             .Where(e => e.RoutePattern.RawText != null)
             .Where(e => new TemplateMatcher(
                     TemplateParser.Parse(e.RoutePattern.RawText!),

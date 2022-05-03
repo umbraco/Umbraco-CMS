@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +16,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.Macros;
 
@@ -23,8 +26,8 @@ public class MacroRenderer : IMacroRenderer
 {
     private readonly AppCaches _appCaches;
     private readonly ICookieManager _cookieManager;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILogger<MacroRenderer> _logger;
     private readonly IMacroService _macroService;
     private readonly PartialViewMacroEngine _partialViewMacroEngine;
@@ -35,6 +38,7 @@ public class MacroRenderer : IMacroRenderer
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private ContentSettings _contentSettings;
 
+    [Obsolete("Please use constructor that takes an IWebHostEnvironment instead")]
     public MacroRenderer(
         IProfilingLogger profilingLogger,
         ILogger<MacroRenderer> logger,
@@ -49,6 +53,37 @@ public class MacroRenderer : IMacroRenderer
         IRequestAccessor requestAccessor,
         PartialViewMacroEngine partialViewMacroEngine,
         IHttpContextAccessor httpContextAccessor)
+    : this(
+        profilingLogger,
+        logger,
+        umbracoContextAccessor,
+        contentSettings,
+        textService,
+        appCaches,
+        macroService,
+        cookieManager,
+        sessionManager,
+        requestAccessor,
+        partialViewMacroEngine,
+        httpContextAccessor,
+        StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
+    {
+    }
+
+    public MacroRenderer(
+        IProfilingLogger profilingLogger,
+        ILogger<MacroRenderer> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IOptionsMonitor<ContentSettings> contentSettings,
+        ILocalizedTextService textService,
+        AppCaches appCaches,
+        IMacroService macroService,
+        ICookieManager cookieManager,
+        ISessionManager sessionManager,
+        IRequestAccessor requestAccessor,
+        PartialViewMacroEngine partialViewMacroEngine,
+        IHttpContextAccessor httpContextAccessor,
+        IWebHostEnvironment webHostEnvironment)
     {
         _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
         _logger = logger;
@@ -58,12 +93,12 @@ public class MacroRenderer : IMacroRenderer
         _textService = textService;
         _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
-        _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _cookieManager = cookieManager;
         _sessionManager = sessionManager;
         _requestAccessor = requestAccessor;
         _partialViewMacroEngine = partialViewMacroEngine;
         _httpContextAccessor = httpContextAccessor;
+        _webHostEnvironment = webHostEnvironment;
 
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -91,8 +126,7 @@ public class MacroRenderer : IMacroRenderer
         // ensure we only process valid input ie each token must be [?x] and not eg a json array
         // like [1,2,3] which we don't want to parse - however the last one can be a literal, so
         // don't check on the last one which can be just anything - check all previous tokens
-
-        char[] validTypes = {'@', '%'};
+        char[] validTypes = { '@', '%' };
         if (tokens.Take(tokens.Length - 1).Any(x =>
                 x.Length < 4 // ie "[?x]".Length - too short
                 || x[0] != '[' // starts with [
@@ -153,7 +187,8 @@ public class MacroRenderer : IMacroRenderer
 
         var alias = model.Alias;
         id.AppendFormat("{0}-", alias);
-        //always add current culture to the key to allow variants to have different cache results
+
+        // always add current culture to the key to allow variants to have different cache results
         if (!string.IsNullOrEmpty(cultureName))
         {
             // are there any unusual culture formats we'd need to handle?
@@ -169,7 +204,7 @@ public class MacroRenderer : IMacroRenderer
         {
             object key = 0;
 
-            if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+            if (_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
             {
                 IMemberManager memberManager =
                     _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
@@ -249,12 +284,6 @@ public class MacroRenderer : IMacroRenderer
             return;
         }
 
-        // just make sure...
-        if (macroContent == null)
-        {
-            return;
-        }
-
         // do not cache if it should cache by member and there's not member
         if (model.CacheByMember)
         {
@@ -274,8 +303,7 @@ public class MacroRenderer : IMacroRenderer
         cache.Insert(
             CacheKeys.MacroContentCacheKey + model.CacheIdentifier,
             () => macroContent,
-            new TimeSpan(0, 0, model.CacheDuration)
-        );
+            new TimeSpan(0, 0, model.CacheDuration));
 
         _logger.LogDebug("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
     }
@@ -299,11 +327,7 @@ public class MacroRenderer : IMacroRenderer
             return null;
         }
 
-        var mapped = _hostingEnvironment.MapPathContentRoot(filename);
-        if (mapped == null)
-        {
-            return null;
-        }
+        var mapped = _webHostEnvironment.MapPathContentRoot(filename);
 
         var file = new FileInfo(mapped);
         return file.Exists ? file : null;
@@ -325,11 +349,9 @@ public class MacroRenderer : IMacroRenderer
 
     #region Render/Execute
 
-    public async Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent? content,
-        IDictionary<string, object?>? macroParams)
+    public async Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent? content, IDictionary<string, object?>? macroParams)
     {
-        IMacro? m = _appCaches.RuntimeCache.GetCacheItem(CacheKeys.MacroFromAliasCacheKey + macroAlias,
-            () => _macroService.GetByAlias(macroAlias));
+        IMacro? m = _appCaches.RuntimeCache.GetCacheItem(CacheKeys.MacroFromAliasCacheKey + macroAlias, () => _macroService.GetByAlias(macroAlias));
 
         if (m == null)
         {
@@ -400,8 +422,7 @@ public class MacroRenderer : IMacroRenderer
     /// <summary>
     ///     Executes a macro of a given type.
     /// </summary>
-    private Attempt<MacroContent?> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut,
-        Func<MacroContent> getMacroContent, Func<string> msgErr)
+    private Attempt<MacroContent?> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut, Func<MacroContent> getMacroContent, Func<string> msgErr)
     {
         using (_profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
         {
@@ -412,8 +433,7 @@ public class MacroRenderer : IMacroRenderer
     /// <summary>
     ///     Executes a macro of a given type.
     /// </summary>
-    private Attempt<MacroContent?> ExecuteProfileMacroWithErrorWrapper(MacroModel macro, string msgIn,
-        Func<MacroContent> getMacroContent, Func<string> msgErr)
+    private Attempt<MacroContent?> ExecuteProfileMacroWithErrorWrapper(MacroModel macro, string msgIn, Func<MacroContent> getMacroContent, Func<string> msgErr)
     {
         try
         {
@@ -429,21 +449,22 @@ public class MacroRenderer : IMacroRenderer
                 Alias = macro.Alias,
                 MacroSource = macro.MacroSource,
                 Exception = e,
-                Behaviour = _contentSettings.MacroErrors
+                Behaviour = _contentSettings.MacroErrors,
             };
 
             switch (macroErrorEventArgs.Behaviour)
             {
                 case MacroErrorBehaviour.Inline:
                     // do not throw, eat the exception, display the trace error message
-                    return Attempt.Fail(new MacroContent {Text = msgErr()}, e);
+                    return Attempt.Fail(new MacroContent { Text = msgErr() }, e);
                 case MacroErrorBehaviour.Silent:
                     // do not throw, eat the exception, do not display anything
-                    return Attempt.Fail(new MacroContent {Text = string.Empty}, e);
+                    return Attempt.Fail(new MacroContent { Text = string.Empty }, e);
                 case MacroErrorBehaviour.Content:
                     // do not throw, eat the exception, display the custom content
-                    return Attempt.Fail(new MacroContent {Text = macroErrorEventArgs.Html ?? string.Empty}, e);
-                //case MacroErrorBehaviour.Throw:
+                    return Attempt.Fail(new MacroContent { Text = macroErrorEventArgs.Html ?? string.Empty }, e);
+
+                // case MacroErrorBehaviour.Throw:
                 default:
                     // see http://issues.umbraco.org/issue/U4-497 at the end
                     // throw the original exception
@@ -460,7 +481,7 @@ public class MacroRenderer : IMacroRenderer
     ///     to run properly, the attempt fails, though it may contain a content. But for instance that content
     ///     should not be cached. In that case the attempt may also contain an exception.
     /// </remarks>
-    private Attempt<MacroContent?> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
+    private Attempt<MacroContent?> ExecuteMacroOfType(MacroModel model, IPublishedContent? content)
     {
         if (model == null)
         {
@@ -469,18 +490,17 @@ public class MacroRenderer : IMacroRenderer
 
         // ensure that we are running against a published node (ie available in XML)
         // that may not be the case if the macro is embedded in a RTE of an unpublished document
-
         if (content == null)
         {
-            return Attempt.Fail(new MacroContent {Text = "[macro failed (no content)]"});
+            return Attempt.Fail(new MacroContent { Text = "[macro failed (no content)]" });
         }
 
-
-        return ExecuteMacroWithErrorWrapper(model,
+        return ExecuteMacroWithErrorWrapper(
+            model,
             $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
             "Executed PartialView.",
             () => _partialViewMacroEngine.Execute(model, content),
-            () => _textService.Localize("errors", "macroErrorLoadingPartialView", new[] {model.MacroSource}));
+            () => _textService.Localize("errors", "macroErrorLoadingPartialView", new[] { model.MacroSource }));
     }
 
     #endregion

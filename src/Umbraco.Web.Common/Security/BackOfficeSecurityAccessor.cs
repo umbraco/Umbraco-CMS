@@ -18,5 +18,5 @@ public class BackOfficeSecurityAccessor : IBackOfficeSecurityAccessor
     ///     Gets the current <see cref="IBackOfficeSecurity" /> object.
     /// </summary>
     public IBackOfficeSecurity? BackOfficeSecurity
-        => _httpContextAccessor.HttpContext?.RequestServices?.GetService<IBackOfficeSecurity>();
+        => _httpContextAccessor.HttpContext?.RequestServices.GetService<IBackOfficeSecurity>();
 }

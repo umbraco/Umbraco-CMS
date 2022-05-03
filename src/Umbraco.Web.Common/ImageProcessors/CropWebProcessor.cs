@@ -29,8 +29,7 @@ public class CropWebProcessor : IImageWebProcessor
     public IEnumerable<string> Commands { get; } = new[] { Coordinates, Orient };
 
     /// <inheritdoc />
-    public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands,
-        CommandParser parser, CultureInfo culture)
+    public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands, CommandParser parser, CultureInfo culture)
     {
         Rectangle? cropRectangle = GetCropRectangle(image, commands, parser, culture);
         if (cropRectangle.HasValue)
@@ -45,8 +44,7 @@ public class CropWebProcessor : IImageWebProcessor
     public bool RequiresTrueColorPixelFormat(CommandCollection commands, CommandParser parser, CultureInfo culture) =>
         false;
 
-    private static Rectangle? GetCropRectangle(FormattedImage image, CommandCollection commands, CommandParser parser,
-        CultureInfo culture)
+    private static Rectangle? GetCropRectangle(FormattedImage image, CommandCollection commands, CommandParser parser, CultureInfo culture)
     {
         var coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Coordinates), culture);
         if (coordinates.Length != 4 ||
@@ -76,8 +74,7 @@ public class CropWebProcessor : IImageWebProcessor
             MathF.Max(xy1.Y, xy2.Y) * size.Height));
     }
 
-    private static ushort GetExifOrientation(FormattedImage image, CommandCollection commands, CommandParser parser,
-        CultureInfo culture)
+    private static ushort GetExifOrientation(FormattedImage image, CommandCollection commands, CommandParser parser, CultureInfo culture)
     {
         if (commands.Contains(Orient) && !parser.ParseValue<bool>(commands.GetValueOrDefault(Orient), culture))
         {

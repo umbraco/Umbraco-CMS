@@ -32,11 +32,12 @@ public static class PublishedContentExtensions
     /// </remarks>
     public static string? GetCultureFromDomains(
         this IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri? current = null)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ISiteDomainMapper siteDomainHelper,
+        Uri? current = null)
     {
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext,
-            siteDomainHelper);
+        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
     }
 
     #endregion
@@ -65,7 +66,9 @@ public static class PublishedContentExtensions
 
     public static IEnumerable<PublishedSearchResult> SearchDescendants(
         this IPublishedContent content,
-        IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term,
+        IExamineManager examineManager,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        string term,
         string? indexName = null)
     {
         indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
@@ -86,7 +89,9 @@ public static class PublishedContentExtensions
 
     public static IEnumerable<PublishedSearchResult> SearchChildren(
         this IPublishedContent content,
-        IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term,
+        IExamineManager examineManager,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        string term,
         string? indexName = null)
     {
         indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
@@ -134,7 +139,10 @@ public static class PublishedContentExtensions
     /// <returns>
     ///     The HTML encoded value.
     /// </returns>
-    public static IHtmlContent IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue,
+    public static IHtmlContent IsEqual(
+        this IPublishedContent content,
+        IPublishedContent other,
+        string valueIfTrue,
         string valueIfFalse) =>
         new HtmlString(HttpUtility.HtmlEncode(content.IsEqual(other) ? valueIfTrue : valueIfFalse));
 
@@ -163,8 +171,7 @@ public static class PublishedContentExtensions
     /// <returns>
     ///     The HTML encoded value.
     /// </returns>
-    public static IHtmlContent IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue,
-        string valueIfFalse) =>
+    public static IHtmlContent IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse) =>
         new HtmlString(HttpUtility.HtmlEncode(content.IsNotEqual(other) ? valueIfTrue : valueIfFalse));
 
     #endregion
@@ -196,12 +203,10 @@ public static class PublishedContentExtensions
     /// <returns>
     ///     The HTML encoded value.
     /// </returns>
-    public static IHtmlContent IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue,
-        string valueIfFalse) =>
+    public static IHtmlContent IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse) =>
         new HtmlString(HttpUtility.HtmlEncode(content.IsDescendant(other) ? valueIfTrue : valueIfFalse));
 
-    public static IHtmlContent IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other,
-        string valueIfTrue) => content.IsDescendantOrSelf(other, valueIfTrue, string.Empty);
+    public static IHtmlContent IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue) => content.IsDescendantOrSelf(other, valueIfTrue, string.Empty);
 
     /// <summary>
     ///     If the specified <paramref name="content" /> is a decendant of <paramref name="other" /> or are the same, the HTML
@@ -214,8 +219,7 @@ public static class PublishedContentExtensions
     /// <returns>
     ///     The HTML encoded value.
     /// </returns>
-    public static IHtmlContent IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other,
-        string valueIfTrue, string valueIfFalse) =>
+    public static IHtmlContent IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse) =>
         new HtmlString(HttpUtility.HtmlEncode(content.IsDescendantOrSelf(other) ? valueIfTrue : valueIfFalse));
 
     public static IHtmlContent
@@ -233,12 +237,11 @@ public static class PublishedContentExtensions
     /// <returns>
     ///     The HTML encoded value.
     /// </returns>
-    public static IHtmlContent IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue,
-        string valueIfFalse) =>
+    public static IHtmlContent IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse) =>
         new HtmlString(HttpUtility.HtmlEncode(content.IsAncestor(other) ? valueIfTrue : valueIfFalse));
 
-    public static IHtmlContent IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other,
-        string valueIfTrue) => content.IsAncestorOrSelf(other, valueIfTrue, string.Empty);
+    public static IHtmlContent IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
+        => content.IsAncestorOrSelf(other, valueIfTrue, string.Empty);
 
     /// <summary>
     ///     If the specified <paramref name="content" /> is an ancestor of <paramref name="other" /> or are the same, the HTML
@@ -251,9 +254,8 @@ public static class PublishedContentExtensions
     /// <returns>
     ///     The HTML encoded value.
     /// </returns>
-    public static IHtmlContent IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other,
-        string valueIfTrue, string valueIfFalse) =>
-        new HtmlString(HttpUtility.HtmlEncode(content.IsAncestorOrSelf(other) ? valueIfTrue : valueIfFalse));
+    public static IHtmlContent IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
+        => new HtmlString(HttpUtility.HtmlEncode(content.IsAncestorOrSelf(other) ? valueIfTrue : valueIfFalse));
 
     #endregion
 }

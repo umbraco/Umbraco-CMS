@@ -30,7 +30,10 @@ public class EncryptionHelper
     /// </summary>
     public static string CreateEncryptedRouteString(
         IDataProtectionProvider dataProtectionProvider,
-        string controllerName, string controllerAction, string area, object? additionalRouteVals = null)
+        string controllerName,
+        string controllerAction,
+        string area,
+        object? additionalRouteVals = null)
     {
         if (dataProtectionProvider is null)
         {
@@ -86,7 +89,8 @@ public class EncryptionHelper
 
     public static bool DecryptAndValidateEncryptedRouteString(
         IDataProtectionProvider dataProtectionProvider,
-        string encryptedString, [MaybeNullWhen(false)] out IDictionary<string, string?> parts)
+        string encryptedString,
+        [MaybeNullWhen(false)] out IDictionary<string, string?> parts)
     {
         if (dataProtectionProvider == null)
         {

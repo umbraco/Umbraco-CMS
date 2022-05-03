@@ -89,12 +89,6 @@ public static class HttpRequestExtensions
         }
     }
 
-    private static bool IsSet(this IPAddress address)
-    {
-        const string NullIpAddress = "::1";
-        return address != null && address.ToString() != NullIpAddress;
-    }
-
     public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding? encoding = null)
     {
         if (!request.Body.CanSeek)
@@ -158,5 +152,11 @@ public static class HttpRequestExtensions
         }
 
         return null;
+    }
+
+    private static bool IsSet(this IPAddress address)
+    {
+        const string nullIpAddress = "::1";
+        return address.ToString() != nullIpAddress;
     }
 }

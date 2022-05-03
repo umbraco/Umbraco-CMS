@@ -54,7 +54,6 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl())
         : null;
 
-    /// <inheritdoc />
     public Uri? GetApplicationUrl()
     {
         // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
@@ -77,7 +76,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         }
 
         var url = UriHelper.BuildAbsolute(request.Scheme, request.Host);
-        if (url != null && !_applicationUrls.Contains(url))
+        if (!_applicationUrls.Contains(url))
         {
             _applicationUrls.Add(url);
 

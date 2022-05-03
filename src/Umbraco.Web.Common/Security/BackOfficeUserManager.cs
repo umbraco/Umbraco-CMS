@@ -35,8 +35,17 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IEventAggregator eventAggregator,
         IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker)
-        : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services,
-            logger, passwordConfiguration)
+        : base(
+            ipResolver,
+            store,
+            optionsAccessor,
+            passwordHasher,
+            userValidators,
+            passwordValidators,
+            errors,
+            services,
+            logger,
+            passwordConfiguration)
     {
         _httpContextAccessor = httpContextAccessor;
         _eventAggregator = eventAggregator;
@@ -81,8 +90,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token,
-        string? newPassword)
+    public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
     {
         IdentityResult result = await base.ChangePasswordWithResetAsync(userId, token, newPassword);
         if (result.Succeeded)
@@ -93,8 +101,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    public override async Task<IdentityResult> ChangePasswordAsync(BackOfficeIdentityUser user, string? currentPassword,
-        string? newPassword)
+    public override async Task<IdentityResult> ChangePasswordAsync(BackOfficeIdentityUser user, string? currentPassword, string? newPassword)
     {
         IdentityResult result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
         if (result.Succeeded)
@@ -105,7 +112,6 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    /// <inheritdoc />
     public override async Task<IdentityResult> SetLockoutEndDateAsync(
         BackOfficeIdentityUser user,
         DateTimeOffset? lockoutEnd)
@@ -133,7 +139,6 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    /// <inheritdoc />
     public override async Task<IdentityResult> ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
     {
         IdentityResult result = await base.ResetAccessFailedCountAsync(user);

@@ -31,8 +31,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         IWebHostEnvironment webHostEnvironment)
-        : this(hostingSettings, webRoutingSettings, webHostEnvironment,
-            serviceProvider.GetService<IApplicationDiscriminator>()!)
+        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>()!)
     {
     }
 
@@ -72,6 +71,8 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         }
     }
 
+    // Scheduled for removal in v12
+    [Obsolete("This will never have a value")]
     public Version? IISVersion { get; }
 
     /// <inheritdoc />
@@ -181,7 +182,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         // see U4-10626 - in some cases we want to reset the application url
         // (this is a simplified version of what was in 7.x)
         // note: should this be optional? is it expensive?
-
         if (currentApplicationUrl is null)
         {
             return;

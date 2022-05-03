@@ -2,17 +2,18 @@ using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions;
 
@@ -113,7 +114,7 @@ public static class ApplicationBuilderExtensions
     /// <returns></returns>
     public static IApplicationBuilder UseUmbracoPluginsStaticFiles(this IApplicationBuilder app)
     {
-        IHostingEnvironment hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+        IHostEnvironment hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostEnvironment>();
 
         var pluginFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
         if (Directory.Exists(pluginFolder))

@@ -173,6 +173,7 @@ internal class ModelsBuilderNotificationHandler :
                     modelClassName: className,
                     modelNamespace: modelNamespace); /*,
                         modelNamespaceAlias: modelNamespaceAlias*/
+
                 // set the template content to the new markup
                 template.Content = markup;
             }

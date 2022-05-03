@@ -38,7 +38,7 @@ public static class CacheHelperExtensions
     {
         // disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940
         // disable cached partials in preview mode: https://github.com/umbraco/Umbraco-CMS/issues/10384
-        if (hostingEnvironment.IsDebugMode || umbracoContext?.InPreviewMode == true)
+        if (hostingEnvironment.IsDebugMode || umbracoContext.InPreviewMode)
         {
             // just return a normal partial view instead
             return htmlHelper.Partial(partialViewName, model, viewData);

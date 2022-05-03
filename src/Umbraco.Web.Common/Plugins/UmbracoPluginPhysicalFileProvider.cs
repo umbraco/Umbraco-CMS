@@ -26,8 +26,7 @@ public class UmbracoPluginPhysicalFileProvider : PhysicalFileProvider, IFileProv
     /// <param name="root">The root directory. This should be an absolute path.</param>
     /// <param name="options">The configuration options.</param>
     /// <param name="filters">Specifies which files or directories are excluded.</param>
-    public UmbracoPluginPhysicalFileProvider(string root, IOptionsMonitor<UmbracoPluginSettings> options,
-        ExclusionFilters filters = ExclusionFilters.Sensitive)
+    public UmbracoPluginPhysicalFileProvider(string root, IOptionsMonitor<UmbracoPluginSettings> options, ExclusionFilters filters = ExclusionFilters.Sensitive)
         : base(root, filters)
     {
         _options = options.CurrentValue;

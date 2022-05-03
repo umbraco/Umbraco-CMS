@@ -34,6 +34,10 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
     public IServiceProvider ApplicationServices { get; }
 
+    public IRuntimeState RuntimeState { get; }
+
+    public IApplicationBuilder AppBuilder { get; }
+
     /// <inheritdoc />
     public IUmbracoEndpointBuilder WithCustomMiddleware(
         Action<IUmbracoApplicationBuilderContext> configureUmbracoMiddleware)
@@ -66,10 +70,6 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         return this;
     }
-
-    public IRuntimeState RuntimeState { get; }
-
-    public IApplicationBuilder AppBuilder { get; }
 
     /// <summary>
     ///     Registers the default required middleware to run Umbraco.
@@ -152,8 +152,6 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
     /// <inheritdoc />
     public void WithEndpoints(Action<IUmbracoEndpointBuilderContext> configureUmbraco)
     {
-        IOptions<UmbracoPipelineOptions> startupOptions =
-            ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
         RunPreEndpointsPipeline();
 
         AppBuilder.UseEndpoints(endpoints =>

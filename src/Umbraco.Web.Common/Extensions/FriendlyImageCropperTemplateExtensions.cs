@@ -46,10 +46,8 @@ public static class FriendlyImageCropperTemplateExtensions
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
-    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias,
-        UrlMode urlMode = UrlMode.Default)
-        => mediaWithCrops.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider,
-            urlMode);
+    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias, UrlMode urlMode = UrlMode.Default)
+        => mediaWithCrops.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
     /// <summary>
     ///     Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
@@ -66,8 +64,7 @@ public static class FriendlyImageCropperTemplateExtensions
         ImageCropperValue imageCropperValue,
         string cropAlias,
         UrlMode urlMode = UrlMode.Default)
-        => mediaItem.GetCropUrl(imageCropperValue, cropAlias, ImageUrlGenerator, PublishedValueFallback,
-            PublishedUrlProvider, urlMode);
+        => mediaItem.GetCropUrl(imageCropperValue, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL by the crop alias using the specified property containing the
@@ -85,8 +82,7 @@ public static class FriendlyImageCropperTemplateExtensions
         string propertyAlias,
         string cropAlias,
         UrlMode urlMode = UrlMode.Default) =>
-        mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider,
-            urlMode);
+        mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL by the crop alias using the specified property containing the
@@ -99,10 +95,8 @@ public static class FriendlyImageCropperTemplateExtensions
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
-    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias,
-        UrlMode urlMode = UrlMode.Default)
-        => mediaWithCrops.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback,
-            PublishedUrlProvider, urlMode);
+    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, UrlMode urlMode = UrlMode.Default)
+        => mediaWithCrops.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the IPublishedContent item.
@@ -346,7 +340,8 @@ public static class FriendlyImageCropperTemplateExtensions
             width,
             height,
             cropAlias,
-            quality, imageCropMode,
+            quality,
+            imageCropMode,
             imageCropAnchor,
             preferFocalPoint,
             useCropDimensions,
@@ -359,6 +354,5 @@ public static class FriendlyImageCropperTemplateExtensions
         this MediaWithCrops mediaWithCrops,
         string alias,
         string? cacheBusterValue = null) => mediaWithCrops.LocalCrops.Src +
-                                            mediaWithCrops.LocalCrops.GetCropUrl(alias, ImageUrlGenerator,
-                                                cacheBusterValue: cacheBusterValue);
+                                            mediaWithCrops.LocalCrops.GetCropUrl(alias, ImageUrlGenerator, cacheBusterValue: cacheBusterValue);
 }

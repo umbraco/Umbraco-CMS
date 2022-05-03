@@ -41,48 +41,49 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// <inheritdoc />
     public string? GetImageUrl(ImageUrlGenerationOptions options)
     {
-        if (options?.ImageUrl == null)
+        if (options.ImageUrl == null)
         {
             return null;
         }
 
         var queryString = new Dictionary<string, string?>();
 
-        if (options.Crop is CropCoordinates crop)
+        if (options.Crop is not null)
         {
+            CropCoordinates? crop = options.Crop;
             queryString.Add(
                 CropWebProcessor.Coordinates,
                 FormattableString.Invariant($"{crop.Left},{crop.Top},{crop.Right},{crop.Bottom}"));
         }
 
-        if (options.FocalPoint is FocalPointPosition focalPoint)
+        if (options.FocalPoint is not null)
         {
-            queryString.Add(ResizeWebProcessor.Xy, FormattableString.Invariant($"{focalPoint.Left},{focalPoint.Top}"));
+            queryString.Add(ResizeWebProcessor.Xy, FormattableString.Invariant($"{options.FocalPoint.Left},{options.FocalPoint.Top}"));
         }
 
-        if (options.ImageCropMode is ImageCropMode imageCropMode)
+        if (options.ImageCropMode is not null)
         {
-            queryString.Add(ResizeWebProcessor.Mode, imageCropMode.ToString().ToLowerInvariant());
+            queryString.Add(ResizeWebProcessor.Mode, options.ImageCropMode.ToString()?.ToLowerInvariant());
         }
 
-        if (options.ImageCropAnchor is ImageCropAnchor imageCropAnchor)
+        if (options.ImageCropAnchor is not null)
         {
-            queryString.Add(ResizeWebProcessor.Anchor, imageCropAnchor.ToString().ToLowerInvariant());
+            queryString.Add(ResizeWebProcessor.Anchor, options.ImageCropAnchor.ToString()?.ToLowerInvariant());
         }
 
-        if (options.Width is int width)
+        if (options.Width is not null)
         {
-            queryString.Add(ResizeWebProcessor.Width, width.ToString(CultureInfo.InvariantCulture));
+            queryString.Add(ResizeWebProcessor.Width, options.Width?.ToString(CultureInfo.InvariantCulture));
         }
 
-        if (options.Height is int height)
+        if (options.Height is not null)
         {
-            queryString.Add(ResizeWebProcessor.Height, height.ToString(CultureInfo.InvariantCulture));
+            queryString.Add(ResizeWebProcessor.Height, options.Height?.ToString(CultureInfo.InvariantCulture));
         }
 
-        if (options.Quality is int quality)
+        if (options.Quality is not null)
         {
-            queryString.Add(QualityWebProcessor.Quality, quality.ToString(CultureInfo.InvariantCulture));
+            queryString.Add(QualityWebProcessor.Quality, options.Quality?.ToString(CultureInfo.InvariantCulture));
         }
 
         foreach (KeyValuePair<string, StringValues> kvp in QueryHelpers.ParseQuery(options.FurtherOptions))
@@ -90,9 +91,9 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(kvp.Key, kvp.Value);
         }
 
-        if (options.CacheBusterValue is string cacheBusterValue && !string.IsNullOrWhiteSpace(cacheBusterValue))
+        if (options.CacheBusterValue is not null && !string.IsNullOrWhiteSpace(options.CacheBusterValue))
         {
-            queryString.Add("rnd", cacheBusterValue);
+            queryString.Add("rnd", options.CacheBusterValue);
         }
 
         return QueryHelpers.AddQueryString(options.ImageUrl, queryString);

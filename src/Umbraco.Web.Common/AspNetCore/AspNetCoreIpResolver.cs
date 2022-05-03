@@ -10,5 +10,5 @@ public class AspNetCoreIpResolver : IIpResolver
     public AspNetCoreIpResolver(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
     public string GetCurrentRequestIpAddress() =>
-        _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty;
+        _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
 }

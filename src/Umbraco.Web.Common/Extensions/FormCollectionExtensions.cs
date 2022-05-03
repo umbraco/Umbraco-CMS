@@ -14,7 +14,7 @@ public static class FormCollectionExtensions
     /// <param name="items"></param>
     /// <param name="keysToIgnore">Any keys found in this collection will be removed from the output</param>
     /// <returns></returns>
-    public static string ToQueryString(this FormCollection items, params string[] keysToIgnore)
+    public static string ToQueryString(this FormCollection? items, params string[] keysToIgnore)
     {
         if (items == null)
         {

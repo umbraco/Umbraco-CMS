@@ -22,7 +22,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="HttpRequestAppCache" /> class with a context, for unit tests!
+    ///     Initializes a new instance of the <see cref="HttpContextRequestAppCache" /> class with a context, for unit tests!
     /// </summary>
     public HttpContextRequestAppCache(IHttpContextAccessor httpContextAccessor) =>
         _httpContextAccessor = httpContextAccessor;
@@ -32,7 +32,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
     /// <inheritdoc />
     public override object? Get(string key, Func<object?> factory)
     {
-        //no place to cache so just return the callback result
+        // no place to cache so just return the callback result
         if (!TryGetContextItems(out IDictionary<object, object?>? items))
         {
             return factory();
@@ -50,10 +50,10 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
             // cannot create value within the lock, so if result.IsValueCreated is false, just
             // do nothing here - means that if creation throws, a race condition could cause
             // more than one thread to reach the return statement below and throw - accepted.
-
+            // get non-created as NonCreatedValue & exceptions as null
             if (result == null ||
                 SafeLazy.GetSafeLazyValue(result, true) ==
-                null) // get non-created as NonCreatedValue & exceptions as null
+                null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
                 items[key] = result;
@@ -69,8 +69,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
         // some point we have to report them - so need to re-throw here
 
         // this does not throw anymore
-        //return result.Value;
-
+        // return result.Value;
         var value = result.Value; // will not throw (safe lazy)
         if (value is SafeLazy.ExceptionHolder eh)
         {
@@ -82,7 +81,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
 
     public bool Set(string key, object? value)
     {
-        //no place to cache so just return the callback result
+        // no place to cache so just return the callback result
         if (!TryGetContextItems(out IDictionary<object, object?>? items))
         {
             return false;
@@ -104,7 +103,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
 
     public bool Remove(string key)
     {
-        //no place to cache so just return the callback result
+        // no place to cache so just return the callback result
         if (!TryGetContextItems(out IDictionary<object, object?>? items))
         {
             return false;

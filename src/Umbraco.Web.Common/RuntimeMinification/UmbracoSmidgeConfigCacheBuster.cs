@@ -67,7 +67,7 @@ internal class UmbracoSmidgeConfigCacheBuster : ICacheBuster
 
             // Assembly Name adds a bit of uniqueness across sites when version missing from config.
             // Adds a bit of security through obscurity that was asked for in standup.
-            var prefix = _runtimeMinificationSettings.Value.Version ?? _entryAssemblyMetadata.Name ?? string.Empty;
+            var prefix = _runtimeMinificationSettings.Value.Version ?? _entryAssemblyMetadata.Name;
             var umbracoVersion = _umbracoVersion.SemanticVersion.ToString();
             var downstreamVersion = _entryAssemblyMetadata.InformationalVersion;
 

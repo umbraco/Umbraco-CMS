@@ -148,12 +148,10 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
             case AssetType.Javascript:
                 return await _jsMinPipeline.Value
                     .ProcessAsync(
-                        new FileProcessContext(fileContent, new JavaScriptFile(),
-                            BundleContext.CreateEmpty(CacheBuster)));
+                        new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty(CacheBuster)));
             case AssetType.Css:
                 return await _cssMinPipeline.Value
-                    .ProcessAsync(new FileProcessContext(fileContent, new CssFile(),
-                        BundleContext.CreateEmpty(CacheBuster)));
+                    .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty(CacheBuster)));
             default:
                 throw new NotSupportedException("Unexpected AssetType");
         }

@@ -39,8 +39,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         // Create a serilog logger
-        var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration,
-            configuration, out UmbracoFileConfiguration umbracoFileConfig);
+        var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out UmbracoFileConfiguration umbracoFileConfig);
         services.AddSingleton(umbracoFileConfig);
 
         // This is nessasary to pick up all the loggins to MS ILogger.

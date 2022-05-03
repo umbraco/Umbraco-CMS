@@ -32,8 +32,17 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfiguration,
         IPublicAccessService publicAccessService,
         IHttpContextAccessor httpContextAccessor)
-        : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors,
-            services, logger, passwordConfiguration)
+        : base(
+            ipResolver,
+            store,
+            optionsAccessor,
+            passwordHasher,
+            userValidators,
+            passwordValidators,
+            errors,
+            services,
+            logger,
+            passwordConfiguration)
     {
         _store = store;
         _publicAccessService = publicAccessService;
@@ -43,7 +52,8 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     /// <inheritdoc />
     public async Task<bool> IsMemberAuthorizedAsync(
         IEnumerable<string>? allowTypes = null,
-        IEnumerable<string>? allowGroups = null, IEnumerable<int>? allowMembers = null)
+        IEnumerable<string>? allowGroups = null,
+        IEnumerable<int>? allowMembers = null)
     {
         if (allowTypes == null)
         {
@@ -190,7 +200,6 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     ///     This will check if the member has access to this path
     /// </summary>
     /// <param name="path"></param>
-    /// <param name="roleProvider"></param>
     /// <returns></returns>
     private async Task<bool> HasAccessAsync(string path)
     {

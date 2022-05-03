@@ -44,8 +44,6 @@ public static class EndpointRouteBuilderExtensions
         if (areaName.IsNullOrWhiteSpace())
         {
             endpoints.MapControllerRoute(
-
-                // named consistently
                 $"umbraco-{areaName}-{controllerName}".ToLowerInvariant(),
                 pattern.ToString().ToLowerInvariant(),
                 defaults,
@@ -54,8 +52,6 @@ public static class EndpointRouteBuilderExtensions
         else
         {
             endpoints.MapAreaControllerRoute(
-
-                // named consistently
                 $"umbraco-{areaName}-{controllerName}".ToLowerInvariant(),
                 areaName!,
                 pattern.ToString().ToLowerInvariant(),
@@ -77,8 +73,7 @@ public static class EndpointRouteBuilderExtensions
         bool includeControllerNameInRoute = true,
         object? constraints = null)
         where T : ControllerBase
-        => endpoints.MapUmbracoRoute(typeof(T), rootSegment, areaName, prefixPathSegment, defaultAction,
-            includeControllerNameInRoute, constraints);
+        => endpoints.MapUmbracoRoute(typeof(T), rootSegment, areaName, prefixPathSegment, defaultAction, includeControllerNameInRoute, constraints);
 
     /// <summary>
     ///     Used to map controllers as Umbraco API routes consistently

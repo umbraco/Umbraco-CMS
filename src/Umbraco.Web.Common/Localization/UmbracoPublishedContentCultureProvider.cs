@@ -28,7 +28,7 @@ public class UmbracoPublishedContentCultureProvider : RequestCultureProvider
         UmbracoRouteValues? routeValues = httpContext.Features.Get<UmbracoRouteValues>();
         if (routeValues != null)
         {
-            var culture = routeValues.PublishedRequest?.Culture;
+            var culture = routeValues.PublishedRequest.Culture;
             if (culture != null)
             {
                 lock (_locker)

@@ -6,8 +6,7 @@ namespace Umbraco.Extensions;
 
 public static class GridTemplateExtensions
 {
-    public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedProperty property,
-        string framework = "bootstrap3")
+    public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
     {
         if (property.GetValue() is string asString && string.IsNullOrEmpty(asString))
         {
@@ -38,8 +37,7 @@ public static class GridTemplateExtensions
         return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
     }
 
-    public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias,
-        string framework)
+    public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string framework)
     {
         if (propertyAlias == null)
         {
@@ -90,8 +88,7 @@ public static class GridTemplateExtensions
         return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
     }
 
-    public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedElement contentItem, string propertyAlias,
-        string framework)
+    public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedElement contentItem, string propertyAlias, string framework)
     {
         if (propertyAlias == null)
         {
@@ -122,8 +119,7 @@ public static class GridTemplateExtensions
         return html.Partial(view, model);
     }
 
-    public static IHtmlContent GetGridHtml(this IPublishedProperty property, IHtmlHelper html,
-        string framework = "bootstrap3")
+    public static IHtmlContent GetGridHtml(this IPublishedProperty property, IHtmlHelper html, string framework = "bootstrap3")
     {
         if (property.GetValue() is string asString && string.IsNullOrEmpty(asString))
         {
@@ -154,8 +150,7 @@ public static class GridTemplateExtensions
         return GetGridHtml(contentItem, html, propertyAlias, "bootstrap3");
     }
 
-    public static IHtmlContent GetGridHtml(this IPublishedContent contentItem, IHtmlHelper html, string propertyAlias,
-        string framework)
+    public static IHtmlContent GetGridHtml(this IPublishedContent contentItem, IHtmlHelper html, string propertyAlias, string framework)
     {
         if (propertyAlias == null)
         {

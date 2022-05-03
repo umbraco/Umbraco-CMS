@@ -13,15 +13,13 @@ public interface IMemberSignInManager
 
     Task SignOutAsync();
 
-    AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl,
-        string? userId = null);
+    AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl, string? userId = null);
 
     Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null);
 
     Task<IdentityResult> UpdateExternalAuthenticationTokensAsync(ExternalLoginInfo externalLogin);
 
-    Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent,
-        bool bypassTwoFactor = false);
+    Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false);
 
     Task<MemberIdentityUser> GetTwoFactorAuthenticationUserAsync();
 

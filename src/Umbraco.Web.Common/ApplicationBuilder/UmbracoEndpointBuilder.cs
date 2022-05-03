@@ -9,8 +9,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 /// </summary>
 internal class UmbracoEndpointBuilder : IUmbracoEndpointBuilderContext
 {
-    public UmbracoEndpointBuilder(IServiceProvider services, IRuntimeState runtimeState, IApplicationBuilder appBuilder,
-        IEndpointRouteBuilder endpointRouteBuilder)
+    public UmbracoEndpointBuilder(IServiceProvider services, IRuntimeState runtimeState, IApplicationBuilder appBuilder, IEndpointRouteBuilder endpointRouteBuilder)
     {
         ApplicationServices = services;
         EndpointRouteBuilder = endpointRouteBuilder;

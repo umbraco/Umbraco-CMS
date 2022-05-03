@@ -34,7 +34,6 @@ public class PreviewAuthenticationMiddleware : IMiddleware
         try
         {
             var isPreview = request.HasPreviewCookie()
-                            && context.User != null
                             && !request.IsBackOfficeRequest();
 
             if (isPreview)
@@ -62,7 +61,7 @@ public class PreviewAuthenticationMiddleware : IMiddleware
                         // Ok, we've got a real ticket, now we can add this ticket's identity to the current
                         // Principal, this means we'll have 2 identities assigned to the principal which we can
                         // use to authorize the preview and allow for a back office User.
-                        context.User?.AddIdentity(backOfficeIdentity);
+                        context.User.AddIdentity(backOfficeIdentity);
                     }
                 }
             }

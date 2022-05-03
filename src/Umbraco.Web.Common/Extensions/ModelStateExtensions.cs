@@ -21,7 +21,7 @@ public static class ModelStateExtensions
         {
             var key = keyModelStatePair.Key;
             ModelErrorCollection errors = keyModelStatePair.Value.Errors;
-            if (errors != null && errors.Count > 0)
+            if (errors.Count > 0)
             {
                 modelStateError.Add(key, errors.Select(error => error.ErrorMessage));
             }
@@ -35,7 +35,7 @@ public static class ModelStateExtensions
     /// </summary>
     /// <param name="state"></param>
     /// <returns></returns>
-    public static JsonResult? ToJsonErrors(this ModelStateDictionary state) =>
+    public static JsonResult ToJsonErrors(this ModelStateDictionary state) =>
         new(new
         {
             success = state.IsValid.ToString().ToLower(),
@@ -47,7 +47,7 @@ public static class ModelStateExtensions
                                    name = e.Key,
                                    errors = e.Value.Errors.Select(x => x.ErrorMessage)
                                        .Concat(
-                                           e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception!.Message))
+                                           e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception!.Message)),
                                },
         });
 }

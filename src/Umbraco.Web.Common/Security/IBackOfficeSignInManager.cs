@@ -11,11 +11,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 /// </summary>
 public interface IBackOfficeSignInManager
 {
-    AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string? redirectUrl,
-        string? userId = null);
+    AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string? redirectUrl, string? userId = null);
 
-    Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent,
-        bool bypassTwoFactor = false);
+    Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false);
 
     Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
 

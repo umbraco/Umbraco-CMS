@@ -9,8 +9,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification;
 /// </summary>
 public class SmidgeNuglifyJs : NuglifyJs
 {
-    public SmidgeNuglifyJs(NuglifySettings settings, ISourceMapDeclaration sourceMapDeclaration,
-        IRequestHelper requestHelper)
+    public SmidgeNuglifyJs(NuglifySettings settings, ISourceMapDeclaration sourceMapDeclaration, IRequestHelper requestHelper)
         : base(GetSettings(settings), sourceMapDeclaration, requestHelper)
     {
     }

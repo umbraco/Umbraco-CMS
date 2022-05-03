@@ -17,8 +17,7 @@ public class AngularJsonMediaTypeFormatter : NewtonsoftJsonOutputFormatter
 {
     public const string XsrfPrefix = ")]}',\n";
 
-    public AngularJsonMediaTypeFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool,
-        MvcOptions mvcOptions)
+    public AngularJsonMediaTypeFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, MvcOptions mvcOptions)
         : base(RegisterJsonConverters(serializerSettings), charPool, mvcOptions)
     {
     }

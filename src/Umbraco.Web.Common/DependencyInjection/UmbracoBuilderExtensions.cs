@@ -116,8 +116,7 @@ public static partial class UmbracoBuilderExtensions
         TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
 
         IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches,
-            tempHostingEnvironment);
+        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
     }
 
     /// <summary>
@@ -252,7 +251,6 @@ public static partial class UmbracoBuilderExtensions
                 hostEnv.WebRootFileProvider,
                 new GlobPatternFilterFileProvider(
                     hostEnv.ContentRootFileProvider,
-
                     // only include js or css files within App_Plugins
                     new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
         });
@@ -271,32 +269,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<SmidgeOptionsSetup>();
 
         return builder;
-    }
-
-    /// <summary>
-    ///     This fixes an issue for .NET6 Preview1, that in AddRazorRuntimeCompilation cannot remove the existing
-    ///     IViewCompilerProvider.
-    /// </summary>
-    /// <remarks>
-    ///     When running .NET6 Preview1 there is an issue with looks to be fixed when running ASP.NET Core 6.
-    ///     This issue is because the default implementation of IViewCompilerProvider has changed, so the
-    ///     AddRazorRuntimeCompilation extension can't remove the default and replace with the runtimeviewcompiler.
-    ///     This method basically does the same as the ASP.NET Core 6 version of AddRazorRuntimeCompilation
-    ///     https://github.com/dotnet/aspnetcore/blob/f7dc5e24af7f9692a1db66741954b90b42d84c3a/src/Mvc/Mvc.Razor.RuntimeCompilation/src/DependencyInjection/RazorRuntimeCompilationMvcCoreBuilderExtensions.cs#L71-L80
-    ///     While running .NET5 this does nothing as the ImplementationType has another FullName, and this is handled by the
-    ///     .NET5 version of AddRazorRuntimeCompilation
-    /// </remarks>
-    private static void FixForDotnet6Preview1(IServiceCollection services)
-    {
-        ServiceDescriptor? compilerProvider = services.FirstOrDefault(f =>
-            f.ServiceType == typeof(IViewCompilerProvider) &&
-            f.ImplementationType?.Assembly == typeof(IViewCompilerProvider).Assembly &&
-            f.ImplementationType.FullName == "Microsoft.AspNetCore.Mvc.Razor.Compilation.DefaultViewCompiler");
-
-        if (compilerProvider != null)
-        {
-            services.Remove(compilerProvider);
-        }
     }
 
     /// <summary>
@@ -430,5 +402,31 @@ public static partial class UmbracoBuilderExtensions
             wrappedHostingSettings,
             wrappedWebRoutingSettings,
             webHostEnvironment);
+    }
+
+    /// <summary>
+    ///     This fixes an issue for .NET6 Preview1, that in AddRazorRuntimeCompilation cannot remove the existing
+    ///     IViewCompilerProvider.
+    /// </summary>
+    /// <remarks>
+    ///     When running .NET6 Preview1 there is an issue with looks to be fixed when running ASP.NET Core 6.
+    ///     This issue is because the default implementation of IViewCompilerProvider has changed, so the
+    ///     AddRazorRuntimeCompilation extension can't remove the default and replace with the runtimeviewcompiler.
+    ///     This method basically does the same as the ASP.NET Core 6 version of AddRazorRuntimeCompilation
+    ///     https://github.com/dotnet/aspnetcore/blob/f7dc5e24af7f9692a1db66741954b90b42d84c3a/src/Mvc/Mvc.Razor.RuntimeCompilation/src/DependencyInjection/RazorRuntimeCompilationMvcCoreBuilderExtensions.cs#L71-L80
+    ///     While running .NET5 this does nothing as the ImplementationType has another FullName, and this is handled by the
+    ///     .NET5 version of AddRazorRuntimeCompilation
+    /// </remarks>
+    private static void FixForDotnet6Preview1(IServiceCollection services)
+    {
+        ServiceDescriptor? compilerProvider = services.FirstOrDefault(f =>
+            f.ServiceType == typeof(IViewCompilerProvider) &&
+            f.ImplementationType?.Assembly == typeof(IViewCompilerProvider).Assembly &&
+            f.ImplementationType.FullName == "Microsoft.AspNetCore.Mvc.Razor.Compilation.DefaultViewCompiler");
+
+        if (compilerProvider != null)
+        {
+            services.Remove(compilerProvider);
+        }
     }
 }

@@ -19,8 +19,12 @@ public abstract class PluginController : Controller, IDiscoverable
 {
     private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new();
 
-    protected PluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+    protected PluginController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger)
     {
         UmbracoContextAccessor = umbracoContextAccessor;
         DatabaseFactory = databaseFactory;
@@ -40,9 +44,6 @@ public abstract class PluginController : Controller, IDiscoverable
             return umbracoContext;
         }
     }
-
-    // for debugging purposes
-    internal Guid InstanceId { get; } = Guid.NewGuid();
 
     /// <summary>
     ///     Gets the database context accessor.
@@ -73,6 +74,9 @@ public abstract class PluginController : Controller, IDiscoverable
     ///     Gets metadata for this instance.
     /// </summary>
     internal PluginControllerMetadata Metadata => GetMetadata(GetType());
+
+    // for debugging purposes
+    internal Guid InstanceId { get; } = Guid.NewGuid();
 
     /// <summary>
     ///     Gets metadata for a controller type.
