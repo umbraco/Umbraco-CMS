@@ -16,13 +16,6 @@
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="buildTransitive\**">
-      <Pack>true</Pack>
-      <PackagePath>buildTransitive</PackagePath>
-    </None>
-  </ItemGroup>
-
   <PropertyGroup>
     <BellePath>$(ProjectDir)wwwroot\umbraco</BellePath>
   </PropertyGroup>

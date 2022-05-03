@@ -298,11 +298,11 @@
         -c Release `
         -p:PackageVersion="$($this.Version.Semver.ToString())" > "$($this.BuildTemp)\pack.umbraco.log"
 
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
+    &$this.BuildEnv.NuGet Pack "$nuspecs\Umbraco.Cms.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+    if (-not $?) { throw "Failed to pack NuGet Umbraco.Cms." }
 
     &$this.BuildEnv.NuGet Pack "$templates\Umbraco.Templates.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
@@ -323,7 +323,7 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms"),
+      ("Umbraco.Cms"),
       ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Cms.Persistence.Sqlite", "Umbraco.Cms.Persistence.SqlServer"))
     if ($this.OnError()) { return }
   })
