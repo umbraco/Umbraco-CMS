@@ -28,7 +28,11 @@ public class DataTypeControllerTests : UmbracoTestServerTestBase
         IContentService contentService = GetRequiredService<IContentService>();
         IJsonSerializer serializer = GetRequiredService<IJsonSerializer>();
 
-        var dataType = new DataTypeBuilder().Build();
+        var dataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithoutIdentity()
+            .WithDatabaseType(ValueStorageType.Ntext)
+            .Build();
         dataTypeService.Save(dataType);
 
         IContentType contentType = new ContentTypeBuilder()
