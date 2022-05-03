@@ -215,59 +215,6 @@
         --outputFile "$($this.BuildTemp)\WebApp\umbraco\config\appsettings-schema.json"
   })
 
-  $ubuild.DefineMethod("PrepareTests",
-  {
-    Write-Host "Prepare Tests"
-
-    # FIXME: - idea is to avoid rebuilding everything for tests
-    # but because of our weird assembly versioning (with .* stuff)
-    # everything gets rebuilt all the time...
-    #Copy-Files "$tmp\bin" "." "$tmp\tests"
-
-    # data
-    Write-Host "Copy data files"
-    if (-not (Test-Path -Path "$($this.BuildTemp)\tests\Packaging" ))
-    {
-      Write-Host "Create packaging directory"
-      mkdir "$($this.BuildTemp)\tests\Packaging" > $null
-    }
-    #$this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Tests\Packaging\Packages", "*", "$($this.BuildTemp)\tests\Packaging\Packages")
-
-    # required for package install tests
-    if (-not (Test-Path -Path "$($this.BuildTemp)\tests\bin" ))
-    {
-      Write-Host "Create bin directory"
-      mkdir "$($this.BuildTemp)\tests\bin" > $null
-    }
-  })
-
-  $ubuild.DefineMethod("CompileTests",
-  {
-    $buildConfiguration = "Release"
-    $log = "$($this.BuildTemp)\msbuild.tests.log"
-
-    Write-Host "Compile Tests"
-    Write-Host "Logging to $log"
-
-    # beware of the weird double \\ at the end of paths
-    # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &dotnet msbuild "$($this.SolutionRoot)\tests\Umbraco.Tests\Umbraco.Tests.csproj" `
-      -target:Build `
-      -property:WarningLevel=0 `
-      -property:Configuration=$buildConfiguration `
-      -property:Platform=AnyCPU `
-      -property:UseWPP_CopyWebApplication=True `
-      -property:PipelineDependsOnBuild=False `
-      -property:OutDir="$($this.BuildTemp)\tests\\" `
-      -property:Verbosity=minimal `
-      -property:UmbracoBuild=True `
-      > $log
-
-    if (-not $?) { throw "Failed to compile tests." }
-
-    # /p:UmbracoBuild tells the csproj that we are building from PS
-  })
-
   $ubuild.DefineMethod("PreparePackages",
   {
     Write-Host "Prepare Packages"
@@ -302,7 +249,6 @@
       $_.LastWriteTime = $_.LastWriteTime.AddHours(-11)
     }
   })
-
 
   $ubuild.DefineMethod("PrepareBuild",
   {
@@ -444,11 +390,6 @@
     if ($this.OnError()) { return }
     $this.CompileJsonSchema()
     if ($this.OnError()) { return }
-    $this.PrepareTests()
-    if ($this.OnError()) { return }
-    $this.CompileTests()
-    if ($this.OnError()) { return }
-    # not running tests
     $this.PreparePackages()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
