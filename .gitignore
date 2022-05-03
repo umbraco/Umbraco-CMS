@@ -73,17 +73,19 @@ preserve.belle
 /src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 /src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
+/src/Umbraco.Web.UI/wwwroot/[Mm]edia/
+/src/Umbraco.Web.UI/App_Code/
+/src/Umbraco.Web.UI/App_Plugins/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/
-/src/Umbraco.Web.UI/appsettings.json
-/src/Umbraco.Web.UI/appsettings.Development.json
-/src/Umbraco.Web.UI/appsettings.Local.json
-/src/Umbraco.Web.UI/wwwroot/[Mm]edia/
 /src/Umbraco.Web.UI/Views/
 !/src/Umbraco.Web.UI/Views/Partials/blocklist/
 !/src/Umbraco.Web.UI/Views/Partials/grid/
 !/src/Umbraco.Web.UI/Views/_ViewImports.cshtml
+/src/Umbraco.Web.UI/appsettings.json
+/src/Umbraco.Web.UI/appsettings.Development.json
+/src/Umbraco.Web.UI/appsettings.Local.json
 
 # Tests
 cypress.env.json
