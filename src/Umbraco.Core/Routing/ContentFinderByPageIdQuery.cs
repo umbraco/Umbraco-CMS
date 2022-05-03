@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -27,7 +28,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc/>
-        public bool TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
         {
             if(!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {

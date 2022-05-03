@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             publishedRouter.FindDomain(frequest);
 
             var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
-            var result = lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             Assert.AreEqual(expectedCulture, frequest.Culture);
 
             var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
-            var result = lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }

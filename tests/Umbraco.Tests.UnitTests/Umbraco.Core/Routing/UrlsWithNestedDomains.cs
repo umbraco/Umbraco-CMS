@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             // check that it's been routed
             var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
-            var result = lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(100111, frequest.PublishedContent.Id);
 
