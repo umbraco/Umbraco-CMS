@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
@@ -11,6 +13,6 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="request">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        bool TryFindContent(IPublishedRequestBuilder request);
+        Task<bool> TryFindContent(IPublishedRequestBuilder request);
     }
 }
