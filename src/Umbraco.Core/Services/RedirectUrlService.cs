@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -76,6 +77,13 @@ namespace Umbraco.Cms.Core.Services
                 return _redirectUrlRepository.GetMostRecentUrl(url);
             }
         }
+        public async Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url)
+        {
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return await _redirectUrlRepository.GetMostRecentUrlAsync(url);
+            }
+        }
 
         public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
@@ -115,6 +123,19 @@ namespace Umbraco.Cms.Core.Services
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetMostRecentUrl(url, culture);
+            }
+
+        }
+        public async Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                return await GetMostRecentRedirectUrlAsync(url);
+            }
+
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
             }
 
         }
