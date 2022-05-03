@@ -25,11 +25,9 @@ public class RenderNoContentController : Controller
         IOptionsSnapshot<GlobalSettings> globalSettings)
     : this(umbracoContextAccessor, globalSettings, StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>())
     {
-        _umbracoContextAccessor =
-            umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-        _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
     }
 
+    [ActivatorUtilitiesConstructor]
     public RenderNoContentController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IOptionsSnapshot<GlobalSettings> globalSettings,
