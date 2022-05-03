@@ -37,74 +37,67 @@ _NCrunch_*/
 tools/NDepend/
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
-[sS]ource
-[sS]andbox
+[Ss]ource
+[Ss]andbox
 node_modules
 lib-bower
 *.psess
 *.vspx
-NDependOut/*
+NDependOut/
 QueryResult.htm
-tools/docfx/*
+tools/docfx/
 
 # Ignore rule for clearing out Belle (avoid rebuilding all the time)
 preserve.belle
 
 # Ignore rule for output of generated documentation files from grunt docserve
-src/Umbraco.Web.UI.Docs/api
-src/Umbraco.Web.UI.Docs/package-lock.json
+/src/Umbraco.Web.UI.Docs/api/
+/src/Umbraco.Web.UI.Docs/package-lock.json
 
 # Build
-build.out/
-build.tmp/
-build/hooks/
-build/temp/
+/build.out/
+/build.tmp/
+/build/hooks/
+/build/temp/
 
 # Build output
-build/docs.zip
-build/ui-docs.zip
-build/csharp-docs.zip
-build/ApiDocs/*
-build/ApiDocs/Output/*
-src/ApiDocs/api/*
+/build/docs.zip
+/build/ui-docs.zip
+/build/csharp-docs.zip
+/build/ApiDocs/
+/src/ApiDocs/api/
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/
 
 # Environment specific data
-src/Umbraco.Web.UI.Client/[Bb]uild/*
-src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
-src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
-src/Umbraco.Web.UI.Client/TESTS-*.xml
-src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/*
-src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs
-src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/*
-src/Umbraco.Web.UI/appsettings.Development.json
-src/Umbraco.Web.UI/appsettings.json
-src/Umbraco.Web.UI/appsettings.Local.json
-src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/assets/*
-src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/js/*
-src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
-src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/views/*
-src/Umbraco.Web.UI/wwwroot/Media/*
-src/Umbraco.Web.UI/Smidge/
-src/Umbraco.Web.UI/App_Code/
-src/Umbraco.Web.UI/App_Plugins/
-src/Umbraco.Web.UI/Views/
-!src/Umbraco.Web.UI/Views/Partials/blocklist/
-!src/Umbraco.Web.UI/Views/Partials/grid/
-!src/Umbraco.Web.UI/Views/_ViewImports.cshtml
+/src/Umbraco.Web.UI.Client/[Bb]uild/
+/src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
+/src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
+/src/Umbraco.Web.UI.Client/TESTS-*.xml
+/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/
+/src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs/
+/src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/
+/src/Umbraco.Web.UI/appsettings.json
+/src/Umbraco.Web.UI/appsettings.Development.json
+/src/Umbraco.Web.UI/appsettings.Local.json
+/src/Umbraco.Web.UI/wwwroot/[Mm]edia/
+/src/Umbraco.Web.UI/Views/
+!/src/Umbraco.Web.UI/Views/Partials/blocklist/
+!/src/Umbraco.Web.UI/Views/Partials/grid/
+!/src/Umbraco.Web.UI/Views/_ViewImports.cshtml
 
 # Tests
 cypress.env.json
-tests/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
-tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
-tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
-tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
-tests/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
-tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
-tests/Umbraco.Tests.Integration/TEMP/*
-tests/Umbraco.Tests.Integration/umbraco/Data/
-tests/Umbraco.Tests.Integration/umbraco/logs/
-tests/Umbraco.Tests.Integration/Views/
-tests/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
+/tests/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
+/tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
+/tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
+/tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
+/tests/Umbraco.Tests.Integration.SqlCe/[Uu]mbraco/[Dd]ata/TEMP/
+/tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
+/tests/Umbraco.Tests.Integration/TEMP/
+/tests/Umbraco.Tests.Integration/[Uu]mbraco/[Dd]ata/
+/tests/Umbraco.Tests.Integration/[Uu]mbraco/[Ll]ogs/
+/tests/Umbraco.Tests.Integration/Views/
+/tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
 
 # Ignore auto-generated schema
-src/Umbraco.Web.UI/umbraco/config/appsettings-schema.json
+/src/Umbraco.Web.UI/[Uu]mbraco/config/appsettings-schema.json
