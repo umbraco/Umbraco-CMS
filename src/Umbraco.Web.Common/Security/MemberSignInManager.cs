@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.Common.Security
     /// <summary>
     /// The sign in manager for members
     /// </summary>
-    public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManagerExternalLogins
+    public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManager
     {
         private readonly IMemberExternalLoginProviders _memberExternalLoginProviders;
         private readonly IEventAggregator _eventAggregator;

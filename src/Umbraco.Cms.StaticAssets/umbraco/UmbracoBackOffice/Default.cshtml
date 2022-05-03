@@ -120,8 +120,8 @@
 
     <script>
         document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors())
-            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
+            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
+            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode]!)
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
@@ -129,7 +129,7 @@
     </script>
 
     <script src="@WebPath.Combine(backOfficePath.TrimStart("~"), "/lib/lazyload-js/LazyLoad.min.js")"></script>
-    <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null!, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
 
     @if (isDebug)
     {

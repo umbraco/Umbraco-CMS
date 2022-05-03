@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Contains extension methods for the <see cref="IWebHostEnvironment" /> interface.
@@ -20,6 +21,12 @@ namespace Umbraco.Cms.Web.Common.Extensions
         {
             var root = webHostEnvironment.WebRootPath;
 
+            //Create if missing
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                root = webHostEnvironment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            }
+
             var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
 
             // TODO: This is a temporary error because we switched from IOHelper.MapPath to HostingEnvironment.MapPathXXX
@@ -32,7 +39,7 @@ namespace Umbraco.Cms.Web.Common.Extensions
                 throw new ArgumentException("The path appears to already be fully qualified.  Please remove the call to MapPathWebRoot");
             }
 
-            return Path.Combine(root, newPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlashBackSlash));
+            return Path.Combine(root, newPath.TrimStart(Constants.CharArrays.TildeForwardSlashBackSlash));
         }
     }
 }

@@ -16,10 +16,6 @@
       "isVisible": "true"
     },
     {
-      "id": "UseSqlCe",
-      "isVisible": "true"
-    },
-    {
       "id": "SkipRestore",
       "isVisible": "true"
     },

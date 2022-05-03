@@ -4,7 +4,7 @@ using Smidge.Nuglify;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static partial class UmbracoApplicationBuilderExtensions
     {

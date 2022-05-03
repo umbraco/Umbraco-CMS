@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
@@ -112,18 +113,22 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             base.OnTransformingIndexValues(e);
 
+            var updatedValues = e.ValueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>) x.Value);
+
             //ensure special __Path field
             var path = e.ValueSet.GetValue("path");
             if (path != null)
             {
-                e.ValueSet.Set(UmbracoExamineFieldNames.IndexPathFieldName, path);
+                updatedValues[UmbracoExamineFieldNames.IndexPathFieldName] = path.Yield();
             }
 
             //icon
             if (e.ValueSet.Values.TryGetValue("icon", out var icon) && e.ValueSet.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName) == false)
             {
-                e.ValueSet.Values[UmbracoExamineFieldNames.IconFieldName] = icon;
+                updatedValues[UmbracoExamineFieldNames.IconFieldName] = icon;
             }
+
+            e.SetValues(updatedValues);
         }
 
         public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();

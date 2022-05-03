@@ -365,7 +365,7 @@ namespace Umbraco.Extensions
         /// returns <see langword="false"/>.</returns>
         public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
 
-        public static string? IfNullOrWhiteSpace(this string str, string? defaultValue)
+        public static string? IfNullOrWhiteSpace(this string? str, string? defaultValue)
         {
             return str.IsNullOrWhiteSpace() ? defaultValue : str;
         }

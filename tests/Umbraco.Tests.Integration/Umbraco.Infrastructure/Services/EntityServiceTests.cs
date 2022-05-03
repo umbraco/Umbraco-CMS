@@ -51,9 +51,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             if (_langFr == null && _langEs == null)
             {
-                var globalSettings = new GlobalSettings();
-                _langFr = new Language(globalSettings, "fr-FR");
-                _langEs = new Language(globalSettings, "es-ES");
+                _langFr = new Language("fr-FR", "French (France)");
+                _langEs = new Language("es-ES", "Spanish (Spain)");
                 LocalizationService.Save(_langFr);
                 LocalizationService.Save(_langEs);
             }
