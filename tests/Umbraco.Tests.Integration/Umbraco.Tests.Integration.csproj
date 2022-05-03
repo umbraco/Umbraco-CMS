@@ -43,9 +43,6 @@
     <None Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="App_Data\**" />
     <Compile Remove="TEMP\**" />
     <Compile Remove="Umbraco\**" />
