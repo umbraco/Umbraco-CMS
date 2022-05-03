@@ -30,6 +30,7 @@
         -->
         <contentFiles />
     </metadata>
-    <files>
-    </files>
+  <files>
+    <file src="buildTransitive\**" target="buildTransitive\" />
+  </files>
 </package>
