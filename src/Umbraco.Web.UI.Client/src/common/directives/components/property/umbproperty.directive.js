@@ -29,7 +29,7 @@
 
     
 
-    function UmbPropertyController($scope, userService, serverValidationManager, udiService, angularHelper) {
+    function UmbPropertyController($scope, userService, serverValidationManager, udiService, angularHelper, assetsService) {
 
         const vm = this;
 

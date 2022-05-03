@@ -9,14 +9,11 @@ angular.module("umbraco.filters").filter('simpleMarkdown', function () {
 	if (!text) {
 		return '';
     }
-    if (window.markdown) {
-      return window.markdown.toHTML(text).trim();
+    if (window.Markdown) {
+      var converter = new window.Markdown.Converter();
+      var markup = converter.makeHtml(text).trim();
+      return markup.replace('<a', '<a target="_blank" rel="noopener" class="underline" ');
     }
-    return text
-      .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
-      .replace(/\*(.*)\*/gim, '<i>$1</i>')
-      .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' />")
-      .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank' rel='noopener' class='underline'>$1</a>")
-      .replace(/\n/g, '<br />').trim();
+    return text;
   };
 });
