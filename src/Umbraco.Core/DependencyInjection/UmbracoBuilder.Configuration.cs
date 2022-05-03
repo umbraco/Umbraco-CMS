@@ -88,7 +88,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
                 .AddUmbracoOptions<PackageMigrationSettings>()
                 .AddUmbracoOptions<ContentDashboardSettings>()
-                .AddUmbracoOptions<HelpPageSettings>();
+                .AddUmbracoOptions<HelpPageSettings>()
+                .AddUmbracoOptions<DataTypesSettings>();
 
             builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
 
