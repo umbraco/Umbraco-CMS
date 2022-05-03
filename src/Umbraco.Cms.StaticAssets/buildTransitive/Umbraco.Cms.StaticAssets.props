@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);App_Plugins/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);umbraco/Data/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);umbraco/Logs/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot/media/**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>
