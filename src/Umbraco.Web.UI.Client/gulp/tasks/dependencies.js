@@ -142,8 +142,8 @@ function dependencies() {
         },
         {
             "name": "animejs",
-            "src":  ["./node_modules/animejs/anime.min.js"],
-            "base": "./node_modules/animejs"
+            "src":  ["./node_modules/animejs/lib/anime.min.js"],
+            "base": "./node_modules/animejs/lib"
         },
         {
             "name": "bootstrap-social",
