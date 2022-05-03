@@ -140,6 +140,8 @@ angular.module('umbraco')
              * @param {any} targetCrop
              */
             function crop(targetCrop) {
+                if ($scope.readonly) return;
+
                 if (!$scope.currentCrop) {
                     // clone the crop so we can discard the changes
                     $scope.currentCrop = Utilities.copy(targetCrop);
