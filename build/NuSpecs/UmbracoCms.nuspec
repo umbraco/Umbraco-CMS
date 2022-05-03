@@ -2,7 +2,6 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.1.0">
     <id>Umbraco.Cms</id>
-    <version>10.0.0</version>
     <title>Umbraco CMS</title>
     <authors>Umbraco HQ</authors>
     <owners>Umbraco HQ</owners>
