@@ -49,13 +49,6 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "UseSqlCe": {
-      "displayName": "Add dependencies to use SQL CE database provider",
-      "description": "Adds the required dependencies to use SQL Compact Edition as database provider (Windows only).",
-      "type": "parameter",
-      "datatype": "bool",
-      "defaultValue": "false"
-    },
     "SkipRestore": {
       "displayName": "Skip restore",
       "description": "If specified, skips the automatic restore of the project on create.",
