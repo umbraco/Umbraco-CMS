@@ -1,17 +1,15 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Cms.Web.Common.Events
+namespace Umbraco.Cms.Web.Common.Events;
+
+public class ActionExecutedEventArgs : EventArgs
 {
-    public class ActionExecutedEventArgs : EventArgs
+    public ActionExecutedEventArgs(Controller controller, object model)
     {
-        public Controller Controller { get; set; }
-        public object Model { get; set; }
-
-        public ActionExecutedEventArgs(Controller controller, object model)
-        {
-            Controller = controller;
-            Model = model;
-        }
+        Controller = controller;
+        Model = model;
     }
+
+    public Controller Controller { get; set; }
+    public object Model { get; set; }
 }

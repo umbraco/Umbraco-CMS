@@ -1,66 +1,66 @@
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Web.Common.Middleware
+namespace Umbraco.Cms.Web.Common.Middleware;
+
+/// <summary>
+///     Executes when Umbraco booting fails in order to show the problem
+/// </summary>
+public class BootFailedMiddleware : IMiddleware
 {
-    /// <summary>
-    /// Executes when Umbraco booting fails in order to show the problem
-    /// </summary>
-    public class BootFailedMiddleware : IMiddleware
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IRuntimeState _runtimeState;
+
+    public BootFailedMiddleware(IRuntimeState runtimeState, IHostingEnvironment hostingEnvironment)
     {
-        private readonly IRuntimeState _runtimeState;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        _runtimeState = runtimeState;
+        _hostingEnvironment = hostingEnvironment;
+    }
 
-        public BootFailedMiddleware(IRuntimeState runtimeState, IHostingEnvironment hostingEnvironment)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        // TODO: It would be possible to redirect to the installer here in debug mode while
+        // still showing the error. This would be a lot more friendly than just the YSOD.
+        // We could also then have a different installer view for when package migrations fails
+        // and to retry each one individually. Perhaps this can happen in the future.
+
+        if (_runtimeState.Level == RuntimeLevel.BootFailed)
         {
-            _runtimeState = runtimeState;
-            _hostingEnvironment = hostingEnvironment;
-        }
+            // short circuit
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-        {
-            // TODO: It would be possible to redirect to the installer here in debug mode while
-            // still showing the error. This would be a lot more friendly than just the YSOD.
-            // We could also then have a different installer view for when package migrations fails
-            // and to retry each one individually. Perhaps this can happen in the future.
-
-            if (_runtimeState.Level == RuntimeLevel.BootFailed)
+            if (_hostingEnvironment.IsDebugMode)
             {
-                // short circuit
-
-                if (_hostingEnvironment.IsDebugMode)
-                {
-                    BootFailedException.Rethrow(_runtimeState.BootFailedException);
-                }
-                else  // Print a nice error page
-                {
-                    context.Response.Clear();
-                    context.Response.StatusCode = 500;
-
-                    var file = GetBootErrorFileName();
-
-                    var viewContent = await File.ReadAllTextAsync(file);
-                    await context.Response.WriteAsync(viewContent, Encoding.UTF8);
-                }
+                BootFailedException.Rethrow(_runtimeState.BootFailedException);
             }
-            else
+            else // Print a nice error page
             {
-                await next(context);
+                context.Response.Clear();
+                context.Response.StatusCode = 500;
+
+                var file = GetBootErrorFileName();
+
+                var viewContent = await File.ReadAllTextAsync(file);
+                await context.Response.WriteAsync(viewContent, Encoding.UTF8);
             }
-
         }
-        private string GetBootErrorFileName()
+        else
         {
-            var fileName = _hostingEnvironment.MapPathWebRoot("~/config/errors/BootFailed.html");
-            if (File.Exists(fileName)) return fileName;
-
-            return _hostingEnvironment.MapPathWebRoot("~/umbraco/views/errors/BootFailed.html");
+            await next(context);
         }
+    }
+
+    private string GetBootErrorFileName()
+    {
+        var fileName = _hostingEnvironment.MapPathWebRoot("~/config/errors/BootFailed.html");
+        if (File.Exists(fileName))
+        {
+            return fileName;
+        }
+
+        return _hostingEnvironment.MapPathWebRoot("~/umbraco/views/errors/BootFailed.html");
     }
 }

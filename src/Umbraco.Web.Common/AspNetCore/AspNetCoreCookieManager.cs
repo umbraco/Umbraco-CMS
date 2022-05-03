@@ -1,49 +1,34 @@
-﻿using System;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Cms.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore;
+
+public class AspNetCoreCookieManager : ICookieManager
 {
-    public class AspNetCoreCookieManager : ICookieManager
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public AspNetCoreCookieManager(IHttpContextAccessor httpContextAccessor) =>
+        _httpContextAccessor = httpContextAccessor;
+
+    public void ExpireCookie(string cookieName)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
 
-        public AspNetCoreCookieManager(IHttpContextAccessor httpContextAccessor)
+        if (httpContext is null)
         {
-            _httpContextAccessor = httpContextAccessor;
+            return;
         }
 
-        public void ExpireCookie(string cookieName)
-        {
-            var httpContext = _httpContextAccessor.HttpContext;
+        var cookieValue = httpContext.Request.Cookies[cookieName];
 
-            if (httpContext is null) return;
-
-            var cookieValue = httpContext.Request.Cookies[cookieName];
-
-            httpContext.Response.Cookies.Append(cookieName, cookieValue ?? string.Empty, new CookieOptions()
-            {
-                Expires = DateTime.Now.AddYears(-1)
-            });
-        }
-
-        public string? GetCookieValue(string cookieName)
-        {
-            return _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
-        }
-
-        public void SetCookieValue(string cookieName, string value)
-        {
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, new CookieOptions()
-            {
-
-            });
-        }
-
-        public bool HasCookie(string cookieName)
-        {
-            return !(GetCookieValue(cookieName) is null);
-        }
-
+        httpContext.Response.Cookies.Append(cookieName, cookieValue ?? string.Empty,
+            new CookieOptions {Expires = DateTime.Now.AddYears(-1)});
     }
+
+    public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
+
+    public void SetCookieValue(string cookieName, string value) =>
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, new CookieOptions());
+
+    public bool HasCookie(string cookieName) => !(GetCookieValue(cookieName) is null);
 }

@@ -1,18 +1,17 @@
-using System;
 using Serilog;
 using Serilog.Extensions.Hosting;
 
 namespace Umbraco.Cms.Web.Common.Logging;
 
 /// <remarks>
-/// HACK:
-/// Ensures freeze is only called a single time even when resolving a logger from the snapshot container
-/// built for <see cref="ModelsBuilder.RefreshingRazorViewEngine"/>.
+///     HACK:
+///     Ensures freeze is only called a single time even when resolving a logger from the snapshot container
+///     built for <see cref="ModelsBuilder.RefreshingRazorViewEngine" />.
 /// </remarks>
 internal class RegisteredReloadableLogger
 {
     private static bool s_frozen;
-    private static object s_frozenLock = new();
+    private static readonly object s_frozenLock = new();
     private readonly ReloadableLogger _logger;
 
     public RegisteredReloadableLogger(ReloadableLogger? logger) =>
@@ -37,4 +36,3 @@ internal class RegisteredReloadableLogger
         }
     }
 }
-
