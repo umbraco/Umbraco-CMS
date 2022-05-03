@@ -171,7 +171,7 @@ function dependencies() {
         },
         {
             "name": "jsdiff",
-            "src":  ["./node_modules/diff/dist/diff.min.js"],
+            "src":  ["./node_modules/diff/dist/diff.js"],
             "base": "./node_modules/diff/dist"
         },
         {
