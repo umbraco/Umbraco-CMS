@@ -12,7 +12,7 @@ angular.module("umbraco.filters").filter('simpleMarkdown', function () {
     if (window.Markdown) {
       var converter = new window.Markdown.Converter();
       var markup = converter.makeHtml(text).trim();
-      return markup.replace('<a', '<a target="_blank" rel="noopener" class="underline" ');
+      return markup.replaceAll('<a', '<a target="_blank" rel="noopener" class="underline" ');
     }
     return text;
   };
