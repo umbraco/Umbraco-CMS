@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services
@@ -55,6 +56,14 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="culture">The culture of the request.</param>
         /// <returns>The most recent redirect URLs corresponding to the route.</returns>
         IRedirectUrl? GetMostRecentRedirectUrl(string url, string? culture);
+
+        /// <summary>
+        /// Gets the most recent redirect URLs corresponding to an Umbraco redirect URL route.
+        /// </summary>
+        /// <param name="url">The Umbraco redirect URL route.</param>
+        /// <param name="culture">The culture of the request.</param>
+        /// <returns>The most recent redirect URLs corresponding to the route.</returns>
+        Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture);
 
         /// <summary>
         /// Gets all redirect URLs for a content item.
