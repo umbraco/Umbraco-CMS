@@ -27,11 +27,9 @@ public class BootFailedMiddleware : IMiddleware
         // still showing the error. This would be a lot more friendly than just the YSOD.
         // We could also then have a different installer view for when package migrations fails
         // and to retry each one individually. Perhaps this can happen in the future.
-
         if (_runtimeState.Level == RuntimeLevel.BootFailed)
         {
             // short circuit
-
             if (_hostingEnvironment.IsDebugMode)
             {
                 BootFailedException.Rethrow(_runtimeState.BootFailedException);

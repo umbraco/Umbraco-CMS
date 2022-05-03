@@ -30,8 +30,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<MemberIdentityUser> confirmation,
         IMemberExternalLoginProviders memberExternalLoginProviders,
-        IEventAggregator eventAggregator) :
-        base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+        IEventAggregator eventAggregator)
+        : base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
     {
         _memberExternalLoginProviders = memberExternalLoginProviders;
         _eventAggregator = eventAggregator;
@@ -45,8 +45,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IOptions<IdentityOptions> optionsAccessor,
         ILogger<SignInManager<MemberIdentityUser>> logger,
         IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<MemberIdentityUser> confirmation) :
-        this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation,
+        IUserConfirmation<MemberIdentityUser> confirmation)
+        : this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation,
             StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>(),
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
     {
@@ -69,7 +69,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-
         AuthenticateResult? auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
         IDictionary<string, string?>? items = auth?.Properties?.Items;
         if (auth?.Principal == null || items == null)
@@ -112,7 +111,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             provider;
         return new ExternalLoginInfo(auth.Principal, provider, providerKey, providerDisplayName)
         {
-            AuthenticationTokens = auth.Properties?.GetTokens(), AuthenticationProperties = auth.Properties
+            AuthenticationTokens = auth.Properties?.GetTokens(),
+            AuthenticationProperties = auth.Properties,
         };
     }
 
@@ -124,7 +124,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to be able to deal with auto-linking and reduce duplicate lookups
-
         MemberExternalSignInAutoLinkOptions? autoLinkOptions =
             (await _memberExternalLoginProviders.GetAsync(loginInfo.LoginProvider))?.ExternalLoginProvider?.Options
             ?.AutoLinkOptions;
@@ -155,13 +154,13 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     }
 
     /// <inheritdoc />
-    public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider,
+    public override AuthenticationProperties ConfigureExternalAuthenticationProperties(
+        string provider,
         string redirectUrl, string? userId = null)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to be able to use our own XsrfKey/LoginProviderKey because the default is private :/
-
-        var properties = new AuthenticationProperties {RedirectUri = redirectUrl};
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
         properties.Items[UmbracoSignInMgrLoginProviderKey] = provider;
         if (userId != null)
         {
@@ -171,6 +170,24 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         return properties;
     }
 
+    /// <inheritdoc />
+    public override Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync() =>
+
+        // That can be done by either checking the scheme (maybe) or comparing it to what we have registered in the collection of BackOfficeExternalLoginProvider
+        base.GetExternalAuthenticationSchemesAsync();
+
+    protected override async Task<SignInResult> SignInOrTwoFactorAsync(MemberIdentityUser user, bool isPersistent,
+        string? loginProvider = null, bool bypassTwoFactor = false)
+    {
+        SignInResult result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
+
+        if (result.RequiresTwoFactor)
+        {
+            NotifyRequiresTwoFactor(user);
+        }
+
+        return result;
+    }
 
     /// <summary>
     ///     Used for auto linking/creating user accounts for external logins
@@ -178,7 +195,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     /// <param name="loginInfo"></param>
     /// <param name="autoLinkOptions"></param>
     /// <returns></returns>
-    private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo,
+    private async Task<SignInResult> AutoLinkAndSignInExternalAccount(
+        ExternalLoginInfo loginInfo,
         MemberExternalSignInAutoLinkOptions? autoLinkOptions)
     {
         // If there are no autolink options then the attempt is failed (user does not exist)
@@ -189,19 +207,19 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
         var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
 
-        //we are allowing auto-linking/creating of local accounts
+        // we are allowing auto-linking/creating of local accounts
         if (email.IsNullOrWhiteSpace())
         {
             return AutoLinkSignInResult.FailedNoEmail;
         }
 
-        //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
+        // Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
         MemberIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email);
         if (autoLinkUser != null)
         {
             try
             {
-                //call the callback if one is assigned
+                // call the callback if one is assigned
                 autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
             }
             catch (Exception ex)
@@ -235,7 +253,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             autoLinkUser.AddRole(userGroup);
         }
 
-        //call the callback if one is assigned
+        // call the callback if one is assigned
         try
         {
             autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
@@ -267,11 +285,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
     }
 
-    /// <inheritdoc />
-    public override Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync() =>
-        // That can be done by either checking the scheme (maybe) or comparing it to what we have registered in the collection of BackOfficeExternalLoginProvider
-        base.GetExternalAuthenticationSchemesAsync();
-
     private async Task<SignInResult> LinkUser(MemberIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)
     {
         IList<UserLoginInfo>? existingLogins = await UserManager.GetLoginsAsync(autoLinkUser);
@@ -281,18 +294,18 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         // if it already exists (perhaps it was added in the AutoLink callbak) then we just continue
         if (exists != null)
         {
-            //sign in
+            // sign in
             return await SignInOrTwoFactorAsync(autoLinkUser, false, loginInfo.LoginProvider);
         }
 
         IdentityResult? linkResult = await UserManager.AddLoginAsync(autoLinkUser, loginInfo);
         if (linkResult.Succeeded)
         {
-            //we're good! sign in
+            // we're good! sign in
             return await SignInOrTwoFactorAsync(autoLinkUser, false, loginInfo.LoginProvider);
         }
 
-        //If this fails, we should really delete the user since it will be in an inconsistent state!
+        // If this fails, we should really delete the user since it will be in an inconsistent state!
         IdentityResult? deleteResult = await UserManager.DeleteAsync(autoLinkUser);
         if (deleteResult.Succeeded)
         {
@@ -301,7 +314,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
         else
         {
-            //DOH! ... this isn't good, combine all errors to be shown
+            // DOH! ... this isn't good, combine all errors to be shown
             var errors = linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList();
             return AutoLinkSignInResult.FailedLinkingUser(errors);
         }
@@ -312,22 +325,9 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
             loginInfo.LoginProvider, user.Id);
 
-    protected override async Task<SignInResult> SignInOrTwoFactorAsync(MemberIdentityUser user, bool isPersistent,
-        string? loginProvider = null, bool bypassTwoFactor = false)
-    {
-        SignInResult result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
-
-        if (result.RequiresTwoFactor)
-        {
-            NotifyRequiresTwoFactor(user);
-        }
-
-        return result;
-    }
-
-    protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(user,
-        currentUser => new MemberTwoFactorRequestedNotification(currentUser.Key)
-    );
+    protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(
+        user,
+        currentUser => new MemberTwoFactorRequestedNotification(currentUser.Key));
 
     private T Notify<T>(MemberIdentityUser currentUser, Func<MemberIdentityUser, T> createNotification)
         where T : INotification
@@ -340,7 +340,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     // TODO in v10 we can share this with backoffice by moving the backoffice into common.
     public class ExternalLoginSignInResult : SignInResult
     {
-        public static ExternalLoginSignInResult NotAllowed { get; } = new() {Succeeded = false};
+        public static new ExternalLoginSignInResult NotAllowed { get; } = new() { Succeeded = false };
     }
 
     // TODO in v10 we can share this with backoffice by moving the backoffice into common.
@@ -353,18 +353,18 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         {
         }
 
-        public static AutoLinkSignInResult FailedNotLinked { get; } = new() {Succeeded = false};
+        public static AutoLinkSignInResult FailedNotLinked { get; } = new() { Succeeded = false };
 
-        public static AutoLinkSignInResult FailedNoEmail { get; } = new() {Succeeded = false};
+        public static AutoLinkSignInResult FailedNoEmail { get; } = new() { Succeeded = false };
 
         public IReadOnlyCollection<string> Errors { get; } = Array.Empty<string>();
 
-        public static AutoLinkSignInResult FailedException(string error) => new(new[] {error}) {Succeeded = false};
+        public static AutoLinkSignInResult FailedException(string error) => new(new[] { error }) { Succeeded = false };
 
         public static AutoLinkSignInResult FailedCreatingUser(IReadOnlyCollection<string> errors) =>
-            new(errors) {Succeeded = false};
+            new(errors) { Succeeded = false };
 
         public static AutoLinkSignInResult FailedLinkingUser(IReadOnlyCollection<string> errors) =>
-            new(errors) {Succeeded = false};
+            new(errors) { Succeeded = false };
     }
 }

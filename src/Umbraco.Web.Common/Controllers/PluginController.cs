@@ -29,9 +29,6 @@ public abstract class PluginController : Controller, IDiscoverable
         ProfilingLogger = profilingLogger;
     }
 
-    // for debugging purposes
-    internal Guid InstanceId { get; } = Guid.NewGuid();
-
     /// <summary>
     ///     Gets the Umbraco context.
     /// </summary>
@@ -43,6 +40,9 @@ public abstract class PluginController : Controller, IDiscoverable
             return umbracoContext;
         }
     }
+
+    // for debugging purposes
+    internal Guid InstanceId { get; } = Guid.NewGuid();
 
     /// <summary>
     ///     Gets the database context accessor.
@@ -93,7 +93,7 @@ public abstract class PluginController : Controller, IDiscoverable
                 ControllerName = ControllerExtensions.GetControllerName(controllerType),
                 ControllerNamespace = controllerType.Namespace,
                 ControllerType = controllerType,
-                IsBackOffice = backOfficeAttribute != null
+                IsBackOffice = backOfficeAttribute != null,
             };
         });
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,14 +8,17 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Infrastructure.Security;
 
 public class
-    TwoFactorBackOfficeValidationProvider<TTwoFactorSetupGenerator> : TwoFactorValidationProvider<BackOfficeIdentityUser
-        , TTwoFactorSetupGenerator>
+    TwoFactorBackOfficeValidationProvider<TTwoFactorSetupGenerator> : TwoFactorValidationProvider<BackOfficeIdentityUser,
+        TTwoFactorSetupGenerator>
     where TTwoFactorSetupGenerator : ITwoFactorProvider
 {
-    public TwoFactorBackOfficeValidationProvider(IDataProtectionProvider dataProtectionProvider,
+    public TwoFactorBackOfficeValidationProvider(
+        IDataProtectionProvider dataProtectionProvider,
         IOptions<DataProtectionTokenProviderOptions> options,
         ILogger<TwoFactorBackOfficeValidationProvider<TTwoFactorSetupGenerator>> logger,
-        ITwoFactorLoginService twoFactorLoginService, TTwoFactorSetupGenerator generator) : base(dataProtectionProvider,
+        ITwoFactorLoginService twoFactorLoginService, TTwoFactorSetupGenerator generator)
+        : base(
+            dataProtectionProvider,
         options, logger, twoFactorLoginService, generator)
     {
     }
@@ -26,10 +29,13 @@ public class
         TTwoFactorSetupGenerator>
     where TTwoFactorSetupGenerator : ITwoFactorProvider
 {
-    public TwoFactorMemberValidationProvider(IDataProtectionProvider dataProtectionProvider,
+    public TwoFactorMemberValidationProvider(
+        IDataProtectionProvider dataProtectionProvider,
         IOptions<DataProtectionTokenProviderOptions> options,
         ILogger<TwoFactorMemberValidationProvider<TTwoFactorSetupGenerator>> logger,
-        ITwoFactorLoginService twoFactorLoginService, TTwoFactorSetupGenerator generator) : base(dataProtectionProvider,
+        ITwoFactorLoginService twoFactorLoginService, TTwoFactorSetupGenerator generator)
+        : base(
+            dataProtectionProvider,
         options, logger, twoFactorLoginService, generator)
     {
     }
@@ -55,7 +61,8 @@ public class TwoFactorValidationProvider<TUmbracoIdentityUser, TTwoFactorSetupGe
         _generator = generator;
     }
 
-    public override Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<TUmbracoIdentityUser> manager,
+    public override Task<bool> CanGenerateTwoFactorTokenAsync(
+        UserManager<TUmbracoIdentityUser> manager,
         TUmbracoIdentityUser user) => Task.FromResult(_generator is not null);
 
     public override async Task<bool> ValidateAsync(string purpose, string token,
@@ -70,7 +77,6 @@ public class TwoFactorValidationProvider<TUmbracoIdentityUser, TTwoFactorSetupGe
         }
 
         var validToken = _generator.ValidateTwoFactorPIN(secret, token);
-
 
         return validToken;
     }

@@ -32,6 +32,8 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         _umbracoPipelineStartupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
     }
 
+    public IServiceProvider ApplicationServices { get; }
+
     /// <inheritdoc />
     public IUmbracoEndpointBuilder WithCustomMiddleware(
         Action<IUmbracoApplicationBuilderContext> configureUmbracoMiddleware)
@@ -64,8 +66,6 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         return this;
     }
-
-    public IServiceProvider ApplicationServices { get; }
 
     public IRuntimeState RuntimeState { get; }
 

@@ -20,10 +20,10 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
 
+    private readonly UrlMode _urlProviderMode;
+
     private string? _applicationId;
     private string? _localTempPath;
-
-    private readonly UrlMode _urlProviderMode;
 
     [Obsolete("Please use an alternative constructor.")]
     public AspNetCoreHostingEnvironment(
@@ -181,7 +181,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         // see U4-10626 - in some cases we want to reset the application url
         // (this is a simplified version of what was in 7.x)
         // note: should this be optional? is it expensive?
-
 
         if (currentApplicationUrl is null)
         {

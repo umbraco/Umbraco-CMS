@@ -51,7 +51,6 @@ public static class ServiceCollectionExtensions
         // is the only other option that these ext methods allow.
         // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
         // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
-
         services.AddLogging(configure =>
         {
             configure.AddSerilog(logger.SerilogLog);

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
@@ -39,7 +39,7 @@ public sealed class HtmlStringUtilities
         {
             foreach (HtmlNode? node in nodes)
             {
-                //is element
+                // is element
                 if (node.NodeType != HtmlNodeType.Element)
                 {
                     continue;
@@ -127,7 +127,8 @@ public sealed class HtmlStringUtilities
                                 isTagClose = false;
 
                             int ic = 0,
-                                //currentLength = 0,
+
+                                // currentLength = 0,
                                 currentTextLength = 0;
 
                             string currentTag = string.Empty,
@@ -240,7 +241,8 @@ public sealed class HtmlStringUtilities
                                     {
                                         var charToWrite = (char)ic;
                                         outputtw.Write(charToWrite);
-                                        //currentLength++;
+
+                                        // currentLength++;
                                     }
                                 }
 

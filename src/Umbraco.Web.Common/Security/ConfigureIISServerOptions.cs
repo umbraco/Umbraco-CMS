@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
@@ -14,6 +14,7 @@ public class ConfigureIISServerOptions : IConfigureOptions<IISServerOptions>
         _runtimeSettings = runtimeSettings;
 
     public void Configure(IISServerOptions options) =>
+
         // convert from KB to bytes
         options.MaxRequestBodySize = _runtimeSettings.Value.MaxRequestLength.HasValue
             ? _runtimeSettings.Value.MaxRequestLength.Value * 1024

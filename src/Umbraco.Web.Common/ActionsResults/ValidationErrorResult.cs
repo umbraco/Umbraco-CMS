@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ActionsResults;
+
 // TODO: This should probably follow the same conventions as in aspnet core and use ProblemDetails
 // and ProblemDetails factory. See https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ControllerBase.cs#L1977
 // ProblemDetails is explicitly checked for in the application model.
@@ -26,17 +27,21 @@ public class ValidationErrorResult : ObjectResult
     {
     }
 
-    public ValidationErrorResult(object? value, int statusCode) : base(value) => StatusCode = statusCode;
+    public ValidationErrorResult(object? value, int statusCode)
+        : base(value) => StatusCode = statusCode;
 
-    public ValidationErrorResult(object? value) : this(value, StatusCodes.Status400BadRequest)
+    public ValidationErrorResult(object? value)
+        : this(value, StatusCodes.Status400BadRequest)
     {
     }
 
     // TODO: Like here, shouldn't we use ProblemDetails?
-    public ValidationErrorResult(string errorMessage, int statusCode) : base(new {Message = errorMessage}) =>
+    public ValidationErrorResult(string errorMessage, int statusCode)
+        : base(new { Message = errorMessage }) =>
         StatusCode = statusCode;
 
-    public ValidationErrorResult(string errorMessage) : this(errorMessage, StatusCodes.Status400BadRequest)
+    public ValidationErrorResult(string errorMessage)
+        : this(errorMessage, StatusCodes.Status400BadRequest)
     {
     }
 
@@ -47,7 +52,7 @@ public class ValidationErrorResult : ObjectResult
     /// <returns></returns>
     public static ValidationErrorResult CreateNotificationValidationErrorResult(string errorMessage)
     {
-        var notificationModel = new SimpleNotificationModel {Message = errorMessage};
+        var notificationModel = new SimpleNotificationModel { Message = errorMessage };
         notificationModel.AddErrorNotification(errorMessage, string.Empty);
         return new ValidationErrorResult(notificationModel);
     }

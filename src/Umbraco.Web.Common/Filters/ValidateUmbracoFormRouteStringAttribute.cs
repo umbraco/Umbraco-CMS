@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -22,8 +22,8 @@ namespace Umbraco.Cms.Web.Common.Filters;
 public class ValidateUmbracoFormRouteStringAttribute : TypeFilterAttribute
 {
     // TODO: Lets revisit this when we get members done and the front-end working and whether it can moved to an authz policy
-
-    public ValidateUmbracoFormRouteStringAttribute() : base(typeof(ValidateUmbracoFormRouteStringFilter)) =>
+    public ValidateUmbracoFormRouteStringAttribute()
+        : base(typeof(ValidateUmbracoFormRouteStringFilter)) =>
         Arguments = new object[] { };
 
     internal class ValidateUmbracoFormRouteStringFilter : IAuthorizationFilter

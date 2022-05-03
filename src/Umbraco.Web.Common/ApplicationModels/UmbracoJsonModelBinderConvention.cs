@@ -33,7 +33,8 @@ public class UmbracoJsonModelBinderConvention : IActionModelConvention
                 {
                     p.BindingInfo = new BindingInfo
                     {
-                        BindingSource = BindingSource.Body, BinderType = typeof(UmbracoJsonModelBinder)
+                        BindingSource = BindingSource.Body,
+                        BinderType = typeof(UmbracoJsonModelBinder),
                     };
                 }
 

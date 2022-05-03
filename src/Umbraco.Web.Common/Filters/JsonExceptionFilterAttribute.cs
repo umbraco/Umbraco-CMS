@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -9,7 +9,8 @@ namespace Umbraco.Cms.Web.Common.Filters;
 
 public class JsonExceptionFilterAttribute : TypeFilterAttribute
 {
-    public JsonExceptionFilterAttribute() : base(typeof(JsonExceptionFilter))
+    public JsonExceptionFilterAttribute()
+        : base(typeof(JsonExceptionFilter))
     {
     }
 
@@ -29,8 +30,9 @@ public class JsonExceptionFilterAttribute : TypeFilterAttribute
                 {
                     StatusCode = (int)HttpStatusCode.InternalServerError,
                     ContentType = MediaTypeNames.Application.Json,
-                    Content = JsonConvert.SerializeObject(GetModel(filterContext.Exception),
-                        new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore})
+                    Content = JsonConvert.SerializeObject(
+                        GetModel(filterContext.Exception),
+                        new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }),
                 };
                 filterContext.ExceptionHandled = true;
             }
@@ -38,7 +40,7 @@ public class JsonExceptionFilterAttribute : TypeFilterAttribute
 
         private object GetModel(Exception ex)
         {
-            var error = new ExceptionViewModel {ExceptionMessage = ex.Message};
+            var error = new ExceptionViewModel { ExceptionMessage = ex.Message };
 
             if (_hostingEnvironment.IsDebugMode)
             {

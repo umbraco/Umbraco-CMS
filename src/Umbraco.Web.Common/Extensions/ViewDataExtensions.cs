@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -70,6 +70,7 @@ public static class ViewDataExtensions
         try
         {
             var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(WebUtility.UrlDecode(cookieVal)!));
+
             // deserialize to T and store in viewdata
             viewData[cookieName] = serializer.Deserialize<T>(decoded);
             return true;
@@ -117,7 +118,8 @@ public static class ViewDataExtensions
     /// </summary>
     /// <param name="viewData"></param>
     /// <param name="errors"></param>
-    public static void SetExternalSignInProviderErrors(this ViewDataDictionary viewData,
+    public static void SetExternalSignInProviderErrors(
+        this ViewDataDictionary viewData,
         BackOfficeExternalLoginProviderErrors errors) => viewData[TokenExternalSignInError] = errors;
 
     public static string? GetPasswordResetCode(this ViewDataDictionary viewData) =>
@@ -129,7 +131,8 @@ public static class ViewDataExtensions
     public static void SetTwoFactorProviderNames(this ViewDataDictionary viewData, IEnumerable<string> providerNames) =>
         viewData[TokenTwoFactorRequired] = providerNames;
 
-    public static bool TryGetTwoFactorProviderNames(this ViewDataDictionary viewData,
+    public static bool TryGetTwoFactorProviderNames(
+        this ViewDataDictionary viewData,
         [MaybeNullWhen(false)] out IEnumerable<string> providerNames)
     {
         providerNames = viewData[TokenTwoFactorRequired] as IEnumerable<string>;

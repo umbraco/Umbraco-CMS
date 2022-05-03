@@ -30,7 +30,8 @@ public static class PublishedContentExtensions
     ///         a culture to that document.
     ///     </para>
     /// </remarks>
-    public static string? GetCultureFromDomains(this IPublishedContent content,
+    public static string? GetCultureFromDomains(
+        this IPublishedContent content,
         IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri? current = null)
     {
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
@@ -62,7 +63,8 @@ public static class PublishedContentExtensions
 
     #region Search
 
-    public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content,
+    public static IEnumerable<PublishedSearchResult> SearchDescendants(
+        this IPublishedContent content,
         IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term,
         string? indexName = null)
     {
@@ -72,9 +74,8 @@ public static class PublishedContentExtensions
             throw new InvalidOperationException("No index found with name " + indexName);
         }
 
-        //var t = term.Escape().Value;
-        //var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
-
+        // var t = term.Escape().Value;
+        // var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
         IBooleanOperation? query = index.Searcher.CreateQuery()
             .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
             .And()
@@ -83,7 +84,8 @@ public static class PublishedContentExtensions
         return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
     }
 
-    public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content,
+    public static IEnumerable<PublishedSearchResult> SearchChildren(
+        this IPublishedContent content,
         IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term,
         string? indexName = null)
     {
@@ -93,9 +95,8 @@ public static class PublishedContentExtensions
             throw new InvalidOperationException("No index found with name " + indexName);
         }
 
-        //var t = term.Escape().Value;
-        //var luceneQuery = "+parentID:" + content.Id + " +" + t;
-
+        // var t = term.Escape().Value;
+        // var luceneQuery = "+parentID:" + content.Id + " +" + t;
         IBooleanOperation? query = index.Searcher.CreateQuery()
             .Field("parentID", content.Id)
             .And()
@@ -216,7 +217,6 @@ public static class PublishedContentExtensions
     public static IHtmlContent IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other,
         string valueIfTrue, string valueIfFalse) =>
         new HtmlString(HttpUtility.HtmlEncode(content.IsDescendantOrSelf(other) ? valueIfTrue : valueIfFalse));
-
 
     public static IHtmlContent
         IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue) =>

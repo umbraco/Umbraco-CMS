@@ -15,6 +15,8 @@ internal class UmbracoHostBuilderDecorator : IHostBuilder
         _onBuild = onBuild;
     }
 
+    public IDictionary<object, object> Properties => _inner.Properties;
+
     public IHostBuilder
         ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate) =>
         _inner.ConfigureAppConfiguration(configureDelegate);
@@ -37,8 +39,6 @@ internal class UmbracoHostBuilderDecorator : IHostBuilder
         Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
         where TContainerBuilder : notnull =>
         _inner.UseServiceProviderFactory(factory);
-
-    public IDictionary<object, object> Properties => _inner.Properties;
 
     public IHost Build()
     {

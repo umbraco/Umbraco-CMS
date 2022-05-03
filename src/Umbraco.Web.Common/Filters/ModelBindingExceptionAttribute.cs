@@ -32,13 +32,14 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
 
     private class ModelBindingExceptionFilter : IExceptionFilter
     {
-        private static readonly Regex s_getPublishedModelsTypesRegex =
+        private static readonly Regex GetPublishedModelsTypesRegex =
             new("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
 
         private readonly ExceptionFilterSettings _exceptionFilterSettings;
         private readonly IPublishedModelFactory _publishedModelFactory;
 
-        public ModelBindingExceptionFilter(IOptionsSnapshot<ExceptionFilterSettings> exceptionFilterSettings,
+        public ModelBindingExceptionFilter(
+            IOptionsSnapshot<ExceptionFilterSettings> exceptionFilterSettings,
             IPublishedModelFactory publishedModelFactory)
         {
             _exceptionFilterSettings = exceptionFilterSettings.Value;
@@ -86,7 +87,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
         /// </remarks>
         private bool IsMessageAboutTheSameModelType(string exceptionMessage)
         {
-            MatchCollection matches = s_getPublishedModelsTypesRegex.Matches(exceptionMessage);
+            MatchCollection matches = GetPublishedModelsTypesRegex.Matches(exceptionMessage);
 
             if (matches.Count >= 2)
             {

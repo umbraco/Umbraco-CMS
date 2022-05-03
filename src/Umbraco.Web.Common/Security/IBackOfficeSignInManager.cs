@@ -18,12 +18,20 @@ public interface IBackOfficeSignInManager
         bool bypassTwoFactor = false);
 
     Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
+
     Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null);
+
     Task<BackOfficeIdentityUser> GetTwoFactorAuthenticationUserAsync();
+
     Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure);
+
     Task SignOutAsync();
+
     Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent, string? authenticationMethod = null);
+
     Task<ClaimsPrincipal> CreateUserPrincipalAsync(BackOfficeIdentityUser user);
+
     Task<SignInResult> TwoFactorSignInAsync(string? provider, string? code, bool isPersistent, bool rememberClient);
+
     Task<IdentityResult> UpdateExternalAuthenticationTokensAsync(ExternalLoginInfo externalLogin);
 }

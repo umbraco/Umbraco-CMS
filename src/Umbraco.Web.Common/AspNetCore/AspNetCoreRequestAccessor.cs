@@ -54,17 +54,6 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl())
         : null;
 
-    private string? GetFormValue(string name)
-    {
-        HttpRequest request = _httpContextAccessor.GetRequiredHttpContext().Request;
-        if (!request.HasFormContentType)
-        {
-            return null;
-        }
-
-        return request.Form[name];
-    }
-
     /// <inheritdoc />
     public Uri? GetApplicationUrl()
     {
@@ -75,7 +64,6 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         // see U4-10626 - in some cases we want to reset the application url
         // (this is a simplified version of what was in 7.x)
         // note: should this be optional? is it expensive?
-
         if (!(_webRoutingSettings.UmbracoApplicationUrl is null))
         {
             return new Uri(_webRoutingSettings.UmbracoApplicationUrl);
@@ -97,5 +85,16 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         }
 
         return _currentApplicationUrl;
+    }
+
+    private string? GetFormValue(string name)
+    {
+        HttpRequest request = _httpContextAccessor.GetRequiredHttpContext().Request;
+        if (!request.HasFormContentType)
+        {
+            return null;
+        }
+
+        return request.Form[name];
     }
 }

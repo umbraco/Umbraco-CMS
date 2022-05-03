@@ -58,6 +58,7 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
         _jsNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() =>
         {
             PreProcessPipeline defaultJs = bundles.PipelineFactory.DefaultJs();
+
             // remove minification from this pipeline
             defaultJs.Processors.RemoveAll(x => x is JsMinifier);
             return defaultJs;
@@ -67,6 +68,7 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
         _cssNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() =>
         {
             PreProcessPipeline defaultCss = bundles.PipelineFactory.DefaultCss();
+
             // remove minification from this pipeline
             defaultCss.Processors.RemoveAll(x => x is CssMinifier);
             return defaultCss;
@@ -77,7 +79,7 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
             RuntimeMinificationCacheBuster.AppDomain => typeof(AppDomainLifetimeCacheBuster),
             RuntimeMinificationCacheBuster.Version => typeof(UmbracoSmidgeConfigCacheBuster),
             RuntimeMinificationCacheBuster.Timestamp => typeof(TimestampCacheBuster),
-            _ => throw new NotImplementedException()
+            _ => throw new NotImplementedException(),
         };
 
         _cacheBusterType = cacheBusterType;
@@ -168,11 +170,14 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
     private BundleEnvironmentOptions ConfigureBundleEnvironmentOptions(BundlingOptions bundleOptions)
     {
         var bundleEnvironmentOptions = new BundleEnvironmentOptions();
+
         // auto-invalidate bundle if files change in debug
         bundleEnvironmentOptions.DebugOptions.FileWatchOptions.Enabled = true;
+
         // set cache busters
         bundleEnvironmentOptions.DebugOptions.SetCacheBusterType(_cacheBusterType);
         bundleEnvironmentOptions.ProductionOptions.SetCacheBusterType(_cacheBusterType);
+
         // config if the files should be combined
         bundleEnvironmentOptions.ProductionOptions.ProcessAsCompositeFile = bundleOptions.EnabledCompositeFiles;
 

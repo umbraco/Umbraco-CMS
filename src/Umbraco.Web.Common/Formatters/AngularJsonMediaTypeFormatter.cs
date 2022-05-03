@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Newtonsoft.Json;
@@ -23,6 +23,14 @@ public class AngularJsonMediaTypeFormatter : NewtonsoftJsonOutputFormatter
     {
     }
 
+    protected static JsonSerializerSettings RegisterJsonConverters(JsonSerializerSettings serializerSettings)
+    {
+        serializerSettings.Converters.Add(new StringEnumConverter());
+        serializerSettings.Converters.Add(new UdiJsonConverter());
+
+        return serializerSettings;
+    }
+
     protected override JsonWriter CreateJsonWriter(TextWriter writer)
     {
         JsonWriter jsonWriter = base.CreateJsonWriter(writer);
@@ -30,13 +38,5 @@ public class AngularJsonMediaTypeFormatter : NewtonsoftJsonOutputFormatter
         jsonWriter.WriteRaw(XsrfPrefix);
 
         return jsonWriter;
-    }
-
-    protected static JsonSerializerSettings RegisterJsonConverters(JsonSerializerSettings serializerSettings)
-    {
-        serializerSettings.Converters.Add(new StringEnumConverter());
-        serializerSettings.Converters.Add(new UdiJsonConverter());
-
-        return serializerSettings;
     }
 }

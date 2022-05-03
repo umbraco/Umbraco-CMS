@@ -14,16 +14,15 @@ namespace Umbraco.Cms.Web.Common.Profiler;
 
 public class WebProfiler : IProfiler
 {
-    private const string WebProfileCookieKey = "umbracoWebProfiler";
-
     public static readonly AsyncLocal<MiniProfiler> MiniProfilerContext = new(x =>
     {
         _ = x;
     });
 
+    private const string WebProfileCookieKey = "umbracoWebProfiler";
+
     private int _first;
     private MiniProfiler? _startupProfiler;
-
 
     public IDisposable? Step(string name) => MiniProfiler.Current?.Step(name);
 
@@ -51,12 +50,9 @@ public class WebProfiler : IProfiler
             Start();
             ICookieManager cookieManager = GetCookieManager(context);
             cookieManager.ExpireCookie(
-                WebProfileCookieKey); //Ensure we expire the cookie, so we do not reuse the old potential value saved
+                WebProfileCookieKey); // Ensure we expire the cookie, so we do not reuse the old potential value saved
         }
     }
-
-    private static ICookieManager GetCookieManager(HttpContext context) =>
-        context.RequestServices.GetRequiredService<ICookieManager>();
 
     public void UmbracoApplicationEndRequest(HttpContext context, RuntimeLevel runtimeLevel)
     {
@@ -91,7 +87,7 @@ public class WebProfiler : IProfiler
                     AddSubProfiler(MiniProfiler.FromJson(cookieValue));
                 }
 
-                //If it is a redirect to a relative path (local redirect)
+                // If it is a redirect to a relative path (local redirect)
                 if (context.Response.StatusCode == (int)HttpStatusCode.Redirect
                     && context.Response.Headers.TryGetValue(HeaderNames.Location, out StringValues location)
                     && !location.Contains("://"))
@@ -103,16 +99,8 @@ public class WebProfiler : IProfiler
         }
     }
 
-    private void AddSubProfiler(MiniProfiler subProfiler)
-    {
-        var startupDuration = subProfiler.Root.DurationMilliseconds.GetValueOrDefault();
-        if (MiniProfilerContext.Value is not null)
-        {
-            MiniProfilerContext.Value.DurationMilliseconds += startupDuration;
-            MiniProfilerContext.Value.GetTimingHierarchy().First().DurationMilliseconds += startupDuration;
-            MiniProfilerContext.Value.Root.AddChild(subProfiler.Root);
-        }
-    }
+    private static ICookieManager GetCookieManager(HttpContext context) =>
+        context.RequestServices.GetRequiredService<ICookieManager>();
 
     private static bool ShouldProfile(HttpRequest request)
     {
@@ -137,5 +125,16 @@ public class WebProfiler : IProfiler
         }
 
         return false;
+    }
+
+    private void AddSubProfiler(MiniProfiler subProfiler)
+    {
+        var startupDuration = subProfiler.Root.DurationMilliseconds.GetValueOrDefault();
+        if (MiniProfilerContext.Value is not null)
+        {
+            MiniProfilerContext.Value.DurationMilliseconds += startupDuration;
+            MiniProfilerContext.Value.GetTimingHierarchy().First().DurationMilliseconds += startupDuration;
+            MiniProfilerContext.Value.Root.AddChild(subProfiler.Root);
+        }
     }
 }

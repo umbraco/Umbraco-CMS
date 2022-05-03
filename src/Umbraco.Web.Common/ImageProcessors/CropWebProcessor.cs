@@ -26,7 +26,7 @@ public class CropWebProcessor : IImageWebProcessor
     public const string Orient = "orient";
 
     /// <inheritdoc />
-    public IEnumerable<string> Commands { get; } = new[] {Coordinates, Orient};
+    public IEnumerable<string> Commands { get; } = new[] { Coordinates, Orient };
 
     /// <inheritdoc />
     public FormattedImage Process(FormattedImage image, ILogger logger, CommandCollection commands,

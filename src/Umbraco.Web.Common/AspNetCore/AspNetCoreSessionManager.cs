@@ -12,11 +12,6 @@ internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
     public AspNetCoreSessionManager(IHttpContextAccessor httpContextAccessor) =>
         _httpContextAccessor = httpContextAccessor;
 
-    /// <summary>
-    ///     If session isn't enabled this will throw an exception so we check
-    /// </summary>
-    private bool IsSessionsAvailable => !(_httpContextAccessor.HttpContext?.Features.Get<ISessionFeature>() is null);
-
     public string? SessionId
     {
         get
@@ -29,6 +24,11 @@ internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
         }
     }
 
+    /// <summary>
+    ///     If session isn't enabled this will throw an exception so we check
+    /// </summary>
+    private bool IsSessionsAvailable => !(_httpContextAccessor.HttpContext?.Features.Get<ISessionFeature>() is null);
+
     public string? GetSessionValue(string key)
     {
         if (!IsSessionsAvailable)
@@ -38,7 +38,6 @@ internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
 
         return _httpContextAccessor.HttpContext?.Session.GetString(key);
     }
-
 
     public void SetSessionValue(string key, string value)
     {

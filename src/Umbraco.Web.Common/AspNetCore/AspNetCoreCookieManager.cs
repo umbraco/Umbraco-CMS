@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
@@ -22,7 +22,7 @@ public class AspNetCoreCookieManager : ICookieManager
         var cookieValue = httpContext.Request.Cookies[cookieName];
 
         httpContext.Response.Cookies.Append(cookieName, cookieValue ?? string.Empty,
-            new CookieOptions {Expires = DateTime.Now.AddYears(-1)});
+            new CookieOptions { Expires = DateTime.Now.AddYears(-1) });
     }
 
     public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];

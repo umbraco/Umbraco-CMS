@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 public interface IUmbracoApplicationBuilderServices
 {
     IApplicationBuilder AppBuilder { get; }
+
     IServiceProvider ApplicationServices { get; }
+
     IRuntimeState RuntimeState { get; }
 }

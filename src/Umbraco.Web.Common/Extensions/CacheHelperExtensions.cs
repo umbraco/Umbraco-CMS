@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Cms.Core.Cache;
@@ -34,11 +34,10 @@ public static class CacheHelperExtensions
         object model,
         TimeSpan cacheTimeout,
         string cacheKey,
-        ViewDataDictionary? viewData = null
-    )
+        ViewDataDictionary? viewData = null)
     {
-        //disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940
-        //disable cached partials in preview mode: https://github.com/umbraco/Umbraco-CMS/issues/10384
+        // disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940
+        // disable cached partials in preview mode: https://github.com/umbraco/Umbraco-CMS/issues/10384
         if (hostingEnvironment.IsDebugMode || umbracoContext?.InPreviewMode == true)
         {
             // just return a normal partial view instead

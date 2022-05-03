@@ -7,7 +7,7 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ApplicationDiscriminatorExtensions
 {
-    private static string? s_applicationId;
+    private static string? applicationId;
 
     /// <summary>
     ///     Gets an application id which respects downstream customizations.
@@ -17,9 +17,9 @@ public static class ApplicationDiscriminatorExtensions
     /// </remarks>
     public static string? GetApplicationId(this IApplicationDiscriminator applicationDiscriminator)
     {
-        if (s_applicationId != null)
+        if (applicationId != null)
         {
-            return s_applicationId;
+            return applicationId;
         }
 
         if (applicationDiscriminator == null)
@@ -27,6 +27,6 @@ public static class ApplicationDiscriminatorExtensions
             throw new ArgumentNullException(nameof(applicationDiscriminator));
         }
 
-        return s_applicationId = applicationDiscriminator.Discriminator?.GenerateHash();
+        return applicationId = applicationDiscriminator.Discriminator?.GenerateHash();
     }
 }

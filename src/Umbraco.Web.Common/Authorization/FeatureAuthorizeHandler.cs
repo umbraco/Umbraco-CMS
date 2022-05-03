@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -16,7 +16,8 @@ public class FeatureAuthorizeHandler : AuthorizationHandler<FeatureAuthorizeRequ
 
     public FeatureAuthorizeHandler(UmbracoFeatures umbracoFeatures) => _umbracoFeatures = umbracoFeatures;
 
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         FeatureAuthorizeRequirement requirement)
     {
         var allowed = IsAllowed(context);

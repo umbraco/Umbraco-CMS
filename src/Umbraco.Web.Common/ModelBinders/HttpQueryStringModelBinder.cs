@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Extensions;
@@ -21,7 +21,8 @@ public sealed class HttpQueryStringModelBinder : IModelBinder
         var queryStringKeys = queryStrings.Select(kvp => kvp.Key).ToArray();
         if (queryStringKeys.InvariantContains("culture") == false)
         {
-            queryStrings.Add("culture",
+            queryStrings.Add(
+                "culture",
                 new StringValues(bindingContext.ActionContext.HttpContext.Request.ClientCulture()));
         }
 

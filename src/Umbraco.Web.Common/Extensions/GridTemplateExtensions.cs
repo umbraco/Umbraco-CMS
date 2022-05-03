@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -9,8 +9,7 @@ public static class GridTemplateExtensions
     public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedProperty property,
         string framework = "bootstrap3")
     {
-        var asString = property.GetValue() as string;
-        if (asString != null && string.IsNullOrEmpty(asString))
+        if (property.GetValue() is string asString && string.IsNullOrEmpty(asString))
         {
             return new HtmlString(string.Empty);
         }
@@ -31,7 +30,8 @@ public static class GridTemplateExtensions
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(propertyAlias));
         }
 
@@ -48,7 +48,8 @@ public static class GridTemplateExtensions
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(propertyAlias));
         }
 
@@ -61,8 +62,7 @@ public static class GridTemplateExtensions
 
         var model = prop.GetValue();
 
-        var asString = model as string;
-        if (asString != null && string.IsNullOrEmpty(asString))
+        if (model is string asString && string.IsNullOrEmpty(asString))
         {
             return new HtmlString(string.Empty);
         }
@@ -82,7 +82,8 @@ public static class GridTemplateExtensions
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(propertyAlias));
         }
 
@@ -99,7 +100,8 @@ public static class GridTemplateExtensions
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(propertyAlias));
         }
 
@@ -112,8 +114,7 @@ public static class GridTemplateExtensions
 
         var model = prop.GetValue();
 
-        var asString = model as string;
-        if (asString != null && string.IsNullOrEmpty(asString))
+        if (model is string asString && string.IsNullOrEmpty(asString))
         {
             return new HtmlString(string.Empty);
         }
@@ -124,8 +125,7 @@ public static class GridTemplateExtensions
     public static IHtmlContent GetGridHtml(this IPublishedProperty property, IHtmlHelper html,
         string framework = "bootstrap3")
     {
-        var asString = property.GetValue() as string;
-        if (asString != null && string.IsNullOrEmpty(asString))
+        if (property.GetValue() is string asString && string.IsNullOrEmpty(asString))
         {
             return new HtmlString(string.Empty);
         }
@@ -146,7 +146,8 @@ public static class GridTemplateExtensions
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(propertyAlias));
         }
 
@@ -163,7 +164,8 @@ public static class GridTemplateExtensions
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(propertyAlias));
         }
 
@@ -176,8 +178,7 @@ public static class GridTemplateExtensions
 
         var model = prop.GetValue();
 
-        var asString = model as string;
-        if (asString != null && string.IsNullOrEmpty(asString))
+        if (model is string asString && string.IsNullOrEmpty(asString))
         {
             return new HtmlString(string.Empty);
         }

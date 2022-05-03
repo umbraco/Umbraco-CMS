@@ -38,7 +38,6 @@ public static partial class UmbracoBuilderExtensions
         // then we'll probably have to change this and make it more flexible like how we do for Users. Which means booting up
         // identity here with the basics and registering all of our own custom services.
         // Since we are using the defaults in v8 (and below) for members, I think using the default for members now is OK!
-
         services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
             .AddDefaultTokenProviders()
             .AddUserStore<IUserStore<MemberIdentityUser>, MemberUserStore>(factory => new MemberUserStore(
@@ -48,15 +47,13 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IdentityErrorDescriber>(),
                 factory.GetRequiredService<IPublishedSnapshotAccessor>(),
                 factory.GetRequiredService<IExternalLoginWithKeyService>(),
-                factory.GetRequiredService<ITwoFactorLoginService>()
-            ))
+                factory.GetRequiredService<ITwoFactorLoginService>()))
             .AddRoleStore<MemberRoleStore>()
             .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
             .AddMemberManager<IMemberManager, MemberManager>()
             .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
             .AddErrorDescriber<MembersErrorDescriber>()
             .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
-
 
         builder.AddNotificationHandler<MemberDeletedNotification, DeleteExternalLoginsOnMemberDeletedHandler>();
         builder.AddNotificationAsyncHandler<MemberDeletedNotification, DeleteTwoFactorLoginsOnMemberDeletedHandler>();

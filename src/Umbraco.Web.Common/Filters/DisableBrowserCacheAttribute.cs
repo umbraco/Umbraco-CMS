@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 
@@ -21,7 +21,7 @@ public class DisableBrowserCacheAttribute : ActionFilterAttribute
         }
 
         httpResponse.GetTypedHeaders().CacheControl =
-            new CacheControlHeaderValue {NoCache = true, MaxAge = TimeSpan.Zero, MustRevalidate = true, NoStore = true};
+            new CacheControlHeaderValue { NoCache = true, MaxAge = TimeSpan.Zero, MustRevalidate = true, NoStore = true };
 
         httpResponse.Headers[HeaderNames.LastModified] = DateTime.Now.ToString("R"); // Format RFC1123
         httpResponse.Headers[HeaderNames.Pragma] = "no-cache";

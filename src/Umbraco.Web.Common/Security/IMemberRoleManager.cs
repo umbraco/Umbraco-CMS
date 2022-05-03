@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security;
 

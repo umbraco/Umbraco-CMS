@@ -11,7 +11,10 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 /// </remarks>
 public class UmbracoPipelineFilter : IUmbracoPipelineFilter
 {
-    public UmbracoPipelineFilter(string name) : this(name, null, null, null) { }
+    public UmbracoPipelineFilter(string name)
+        : this(name, null, null, null)
+    {
+    }
 
     public UmbracoPipelineFilter(
         string name,
@@ -26,11 +29,16 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
     }
 
     public Action<IApplicationBuilder>? PrePipeline { get; set; }
+
     public Action<IApplicationBuilder>? PostPipeline { get; set; }
+
     public Action<IApplicationBuilder>? Endpoints { get; set; }
+
     public string Name { get; }
 
     public void OnPrePipeline(IApplicationBuilder app) => PrePipeline?.Invoke(app);
+
     public void OnPostPipeline(IApplicationBuilder app) => PostPipeline?.Invoke(app);
+
     public void OnEndpoints(IApplicationBuilder app) => Endpoints?.Invoke(app);
 }

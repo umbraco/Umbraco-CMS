@@ -13,5 +13,6 @@ public class MemberExternalLoginProviderScheme
     }
 
     public MemberExternalLoginProvider ExternalLoginProvider { get; }
+
     public AuthenticationScheme AuthenticationScheme { get; }
 }

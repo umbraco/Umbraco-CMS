@@ -43,7 +43,7 @@ public sealed class JsonDateTimeFormatAttribute : TypeFilterAttribute
             {
                 var serializerSettings = new JsonSerializerSettings();
                 serializerSettings.Converters.Add(
-                    new IsoDateTimeConverter {DateTimeFormat = _format});
+                    new IsoDateTimeConverter { DateTimeFormat = _format });
                 objectResult.Formatters.Clear();
                 objectResult.Formatters.Add(
                     new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));

@@ -41,13 +41,13 @@ public static class ModelStateExtensions
             success = state.IsValid.ToString().ToLower(),
             failureType = "ValidationError",
             validationErrors = from e in state
-                where e.Value.Errors.Count > 0
-                select new
-                {
-                    name = e.Key,
-                    errors = e.Value.Errors.Select(x => x.ErrorMessage)
-                        .Concat(
-                            e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception!.Message))
-                }
+                               where e.Value.Errors.Count > 0
+                               select new
+                               {
+                                   name = e.Key,
+                                   errors = e.Value.Errors.Select(x => x.ErrorMessage)
+                                       .Concat(
+                                           e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception!.Message))
+                               },
         });
 }

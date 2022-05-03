@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -35,7 +35,6 @@ public class UmbracoApiBehaviorApplicationModelProvider : IApplicationModelProvi
         // see see https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-3.1#apicontroller-attribute
         // for what these things actually do
         // NOTE: we don't have attribute routing requirements and we cannot use ApiVisibilityConvention without attribute routing
-
         _actionModelConventions = new List<IActionModelConvention>
         {
             new ClientErrorResultFilterConvention(), // Ensures the responses without any body is converted into a simple json object with info instead of a string like "Status Code: 404; Not Found"
@@ -43,7 +42,7 @@ public class UmbracoApiBehaviorApplicationModelProvider : IApplicationModelProvi
 
             // This ensures that all parameters of type BindingSource.Body and those of complex type are bound
             // using our own UmbracoJsonModelBinder
-            new UmbracoJsonModelBinderConvention(modelMetadataProvider)
+            new UmbracoJsonModelBinderConvention(modelMetadataProvider),
         };
 
         Type defaultErrorType = typeof(ProblemDetails);

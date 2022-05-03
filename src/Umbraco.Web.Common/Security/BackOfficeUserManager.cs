@@ -43,7 +43,6 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         _backOfficeUserPasswordChecker = backOfficeUserPasswordChecker;
     }
 
-
     /// <summary>
     ///     Override to check the user approval value as well as the user lock out date, by default this only checks the user's
     ///     locked out date
@@ -107,7 +106,8 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
     }
 
     /// <inheritdoc />
-    public override async Task<IdentityResult> SetLockoutEndDateAsync(BackOfficeIdentityUser user,
+    public override async Task<IdentityResult> SetLockoutEndDateAsync(
+        BackOfficeIdentityUser user,
         DateTimeOffset? lockoutEnd)
     {
         if (user == null)
@@ -144,22 +144,26 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    public void NotifyForgotPasswordRequested(IPrincipal currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserForgotPasswordRequestedNotification(ip, userId, currentUserId)
-    );
+    public void NotifyForgotPasswordRequested(IPrincipal currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserForgotPasswordRequestedNotification(ip, userId, currentUserId));
 
-    public void NotifyForgotPasswordChanged(IPrincipal currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserForgotPasswordChangedNotification(ip, userId, currentUserId)
-    );
+    public void NotifyForgotPasswordChanged(IPrincipal currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserForgotPasswordChangedNotification(ip, userId, currentUserId));
 
     public SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string? userId)
     {
-        UserLogoutSuccessNotification notification = Notify(currentUser,
-            (currentUserId, ip) => new UserLogoutSuccessNotification(ip, userId, currentUserId)
-        );
+        UserLogoutSuccessNotification notification = Notify(
+            currentUser,
+            (currentUserId, ip) => new UserLogoutSuccessNotification(ip, userId, currentUserId));
 
-        return new SignOutSuccessResult {SignOutRedirectUrl = notification.SignOutRedirectUrl};
+        return new SignOutSuccessResult { SignOutRedirectUrl = notification.SignOutRedirectUrl };
     }
+
+    public void NotifyAccountLocked(IPrincipal? currentUser, string? userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserLockedNotification(ip, userId, currentUserId));
 
     /// <summary>
     ///     Override to allow checking the password via the <see cref="IBackOfficeUserPasswordChecker" /> if one is configured
@@ -199,39 +203,36 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return currentUserId;
     }
 
-    public void NotifyAccountLocked(IPrincipal? currentUser, string? userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserLockedNotification(ip, userId, currentUserId)
-    );
+    public void NotifyAccountUnlocked(IPrincipal? currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserUnlockedNotification(ip, userId, currentUserId));
 
-    public void NotifyAccountUnlocked(IPrincipal? currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserUnlockedNotification(ip, userId, currentUserId)
-    );
+    public void NotifyLoginFailed(IPrincipal? currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserLoginFailedNotification(ip, userId, currentUserId));
 
-    public void NotifyLoginFailed(IPrincipal? currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserLoginFailedNotification(ip, userId, currentUserId)
-    );
+    public void NotifyLoginRequiresVerification(IPrincipal currentUser, string? userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserLoginRequiresVerificationNotification(ip, userId, currentUserId));
 
-    public void NotifyLoginRequiresVerification(IPrincipal currentUser, string? userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserLoginRequiresVerificationNotification(ip, userId, currentUserId)
-    );
+    public void NotifyLoginSuccess(IPrincipal currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserLoginSuccessNotification(ip, userId, currentUserId));
 
-    public void NotifyLoginSuccess(IPrincipal currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserLoginSuccessNotification(ip, userId, currentUserId)
-    );
+    public void NotifyPasswordChanged(IPrincipal? currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserPasswordChangedNotification(ip, userId, currentUserId));
 
-    public void NotifyPasswordChanged(IPrincipal? currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserPasswordChangedNotification(ip, userId, currentUserId)
-    );
+    public void NotifyPasswordReset(IPrincipal? currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserPasswordResetNotification(ip, userId, currentUserId));
 
-    public void NotifyPasswordReset(IPrincipal? currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserPasswordResetNotification(ip, userId, currentUserId)
-    );
+    public void NotifyResetAccessFailedCount(IPrincipal? currentUser, string userId) => Notify(
+        currentUser,
+        (currentUserId, ip) => new UserResetAccessFailedCountNotification(ip, userId, currentUserId));
 
-    public void NotifyResetAccessFailedCount(IPrincipal? currentUser, string userId) => Notify(currentUser,
-        (currentUserId, ip) => new UserResetAccessFailedCountNotification(ip, userId, currentUserId)
-    );
-
-    private T Notify<T>(IPrincipal? currentUser, Func<string, string, T> createNotification) where T : INotification
+    private T Notify<T>(IPrincipal? currentUser, Func<string, string, T> createNotification)
+        where T : INotification
     {
         var currentUserId = GetCurrentUserId(currentUser);
         var ip = IpResolver.GetCurrentRequestIpAddress();

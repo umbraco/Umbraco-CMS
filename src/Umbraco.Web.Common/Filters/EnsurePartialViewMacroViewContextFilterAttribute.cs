@@ -85,8 +85,8 @@ public class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttr
 
     private class DummyView : IView
     {
-        public Task RenderAsync(ViewContext context) => Task.CompletedTask;
-
         public string Path { get; } = null!;
+
+        public Task RenderAsync(ViewContext context) => Task.CompletedTask;
     }
 }

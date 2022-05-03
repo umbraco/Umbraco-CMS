@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
@@ -18,12 +18,12 @@ public static class FormCollectionExtensions
     {
         if (items == null)
         {
-            return "";
+            return string.Empty;
         }
 
         if (items.Any() == false)
         {
-            return "";
+            return string.Empty;
         }
 
         var builder = new StringBuilder();

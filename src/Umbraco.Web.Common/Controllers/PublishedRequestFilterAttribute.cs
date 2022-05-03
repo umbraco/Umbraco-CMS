@@ -11,21 +11,6 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 internal class PublishedRequestFilterAttribute : ResultFilterAttribute
 {
     /// <summary>
-    ///     Gets the <see cref="UmbracoRouteValues" />
-    /// </summary>
-    protected UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
-    {
-        UmbracoRouteValues? routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
-        if (routeVals == null)
-        {
-            throw new InvalidOperationException(
-                $"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
-        }
-
-        return routeVals;
-    }
-
-    /// <summary>
     ///     Deals with custom headers for the umbraco request
     /// </summary>
     public override void OnResultExecuting(ResultExecutingContext context)
@@ -49,6 +34,21 @@ internal class PublishedRequestFilterAttribute : ResultFilterAttribute
                 context.HttpContext.Response.Headers.Append(header.Key, header.Value);
             }
         }
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="UmbracoRouteValues" />
+    /// </summary>
+    protected UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
+    {
+        UmbracoRouteValues? routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
+        if (routeVals == null)
+        {
+            throw new InvalidOperationException(
+                $"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
+        }
+
+        return routeVals;
     }
 
     private void AddCacheControlHeaders(ResultExecutingContext context, IPublishedRequest pcr)

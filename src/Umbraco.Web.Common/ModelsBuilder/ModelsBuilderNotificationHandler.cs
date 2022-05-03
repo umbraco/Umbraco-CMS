@@ -171,9 +171,8 @@ internal class ModelsBuilderNotificationHandler :
                 // var modelNamespaceAlias = ...;
                 var markup = _defaultViewContentProvider.GetDefaultFileContent(
                     modelClassName: className,
-                    modelNamespace: modelNamespace /*,
-                        modelNamespaceAlias: modelNamespaceAlias*/);
-
+                    modelNamespace: modelNamespace); /*,
+                        modelNamespaceAlias: modelNamespaceAlias*/
                 // set the template content to the new markup
                 template.Content = markup;
             }
@@ -182,7 +181,7 @@ internal class ModelsBuilderNotificationHandler :
 
     private Dictionary<string, object> GetModelsBuilderSettings()
     {
-        var settings = new Dictionary<string, object> {{"mode", _config.ModelsMode.ToString()}};
+        var settings = new Dictionary<string, object> { { "mode", _config.ModelsMode.ToString() } };
 
         return settings;
     }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.Common.PublishedModels;
+namespace Umbraco.Cms.Web.Common.PublishedModels;
 
 // this is here so that Umbraco.Web.PublishedModels namespace exists in views
 // even if people are not using models at all - because we are referencing it

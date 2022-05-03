@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -59,19 +59,15 @@ public static class HttpRequestExtensions
         {
             // We have a remote address set up
             return connection.LocalIpAddress?.IsSet() ?? false
+
                 // Is local is same as remote, then we are local
                 ? connection.RemoteIpAddress.Equals(connection.LocalIpAddress)
+
                 // else we are remote if the remote IP address is not a loopback address
                 : IPAddress.IsLoopback(connection.RemoteIpAddress);
         }
 
         return true;
-    }
-
-    private static bool IsSet(this IPAddress address)
-    {
-        const string NullIpAddress = "::1";
-        return address != null && address.ToString() != NullIpAddress;
     }
 
     public static string GetRawBodyString(this HttpRequest request, Encoding? encoding = null)
@@ -91,6 +87,12 @@ public static class HttpRequestExtensions
 
             return result;
         }
+    }
+
+    private static bool IsSet(this IPAddress address)
+    {
+        const string NullIpAddress = "::1";
+        return address != null && address.ToString() != NullIpAddress;
     }
 
     public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding? encoding = null)

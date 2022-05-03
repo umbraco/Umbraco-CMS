@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.Common.Macros;
 /// <summary>
 ///     Controller to render macro content for Partial View Macros
 /// </summary>
-//[MergeParentContextViewData] // TODO is this requeired now it is a ViewComponent?
+// [MergeParentContextViewData] // TODO is this requeired now it is a ViewComponent?
 [HideFromTypeFinder] // explicitly used: do *not* find and register it!
 internal class PartialViewMacroViewComponent : ViewComponent
 {
@@ -24,6 +24,7 @@ internal class PartialViewMacroViewComponent : ViewComponent
     {
         _macro = macro;
         _content = content;
+
         // This must be set before Invoke is called else the call to View will end up
         // using an empty ViewData instance because this hasn't been set yet.
         ViewComponentContext = viewComponentContext;

@@ -68,8 +68,7 @@ public class PartialViewMacroEngine
             viewData,
             tempData,
             TextWriter.Null,
-            new HtmlHelperOptions()
-        );
+            new HtmlHelperOptions());
 
         var writer = new StringWriter();
         var viewComponentContext = new ViewComponentContext(
@@ -85,15 +84,15 @@ public class PartialViewMacroEngine
 
         var output = writer.GetStringBuilder().ToString();
 
-        return new MacroContent {Text = output};
+        return new MacroContent { Text = output };
     }
 
     private class FakeView : IView
     {
         /// <inheritdoc />
-        public Task RenderAsync(ViewContext context) => Task.CompletedTask;
+        public string Path { get; } = "View";
 
         /// <inheritdoc />
-        public string Path { get; } = "View";
+        public Task RenderAsync(ViewContext context) => Task.CompletedTask;
     }
 }

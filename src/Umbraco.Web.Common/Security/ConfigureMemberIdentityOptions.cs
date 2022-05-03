@@ -10,7 +10,8 @@ public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityO
     private readonly MemberPasswordConfigurationSettings _memberPasswordConfiguration;
     private readonly SecuritySettings _securitySettings;
 
-    public ConfigureMemberIdentityOptions(IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
+    public ConfigureMemberIdentityOptions(
+        IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
         IOptions<SecuritySettings> securitySettings)
     {
         _memberPasswordConfiguration = memberPasswordConfiguration.Value;
@@ -29,6 +30,7 @@ public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityO
         options.User.AllowedUserNameCharacters = _securitySettings.AllowedUserNameCharacters;
 
         options.Lockout.AllowedForNewUsers = true;
+
         // TODO: Implement this
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 

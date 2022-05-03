@@ -50,7 +50,8 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
 
         if (options.Crop is CropCoordinates crop)
         {
-            queryString.Add(CropWebProcessor.Coordinates,
+            queryString.Add(
+                CropWebProcessor.Coordinates,
                 FormattableString.Invariant($"{crop.Left},{crop.Top},{crop.Right},{crop.Bottom}"));
         }
 

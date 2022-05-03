@@ -82,7 +82,8 @@ internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
     ///     A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine" />
     /// </param>
     /// <param name="inMemoryModelFactory">The <see cref="InMemoryModelFactory" /></param>
-    public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory,
+    public RefreshingRazorViewEngine(
+        Func<IRazorViewEngine> defaultRazorViewEngineFactory,
         InMemoryModelFactory inMemoryModelFactory)
     {
         _inMemoryModelFactory = inMemoryModelFactory;
@@ -92,6 +93,7 @@ internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
     }
 
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
@@ -160,6 +162,20 @@ internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
         }
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                _inMemoryModelFactory.ModelsChanged -= InMemoryModelFactoryModelsChanged;
+                _locker.Dispose();
+            }
+
+            _disposedValue = true;
+        }
+    }
+
     /// <summary>
     ///     When the models change, re-construct the razor stack
     /// </summary>
@@ -173,20 +189,6 @@ internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
         finally
         {
             _locker.ExitWriteLock();
-        }
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _inMemoryModelFactory.ModelsChanged -= InMemoryModelFactoryModelsChanged;
-                _locker.Dispose();
-            }
-
-            _disposedValue = true;
         }
     }
 }

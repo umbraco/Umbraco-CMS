@@ -41,7 +41,8 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsMemberAuthorizedAsync(IEnumerable<string>? allowTypes = null,
+    public async Task<bool> IsMemberAuthorizedAsync(
+        IEnumerable<string>? allowTypes = null,
         IEnumerable<string>? allowGroups = null, IEnumerable<int>? allowMembers = null)
     {
         if (allowTypes == null)
@@ -140,6 +141,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         foreach (var path in paths)
         {
             pathsWithAccess.TryGetValue(path, out var hasAccess);
+
             // if it's not found it's false anyways
             result[path] = !pathsWithProtection.Contains(path) || hasAccess;
         }
@@ -159,7 +161,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         var result = new Dictionary<string, bool>();
         foreach (var path in paths)
         {
-            //this is a cached call
+            // this is a cached call
             result[path] = _publicAccessService.IsProtected(path).Success;
         }
 
@@ -217,7 +219,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         // ensure we only lookup user roles once
         IList<string>? userRoles = null;
 
-        async Task<IList<string>> getUserRolesAsync()
+        async Task<IList<string>> GetUserRolesAsync()
         {
             if (userRoles != null)
             {
@@ -233,7 +235,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
             result[path] = await _publicAccessService.HasAccessAsync(
                 path,
                 currentMember.UserName,
-                async () => await getUserRolesAsync());
+                async () => await GetUserRolesAsync());
         }
 
         return result;

@@ -15,5 +15,5 @@ public class MemberRoleManager : RoleManager<UmbracoIdentityRole>, IMemberRoleMa
     {
     }
 
-    IEnumerable<UmbracoIdentityRole> IMemberRoleManager.Roles => base.Roles.ToList();
+    IEnumerable<UmbracoIdentityRole> IMemberRoleManager.Roles => Roles.ToList();
 }

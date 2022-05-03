@@ -20,7 +20,7 @@ public static class WebHostEnvironmentExtensions
     {
         var root = webHostEnvironment.WebRootPath;
 
-        //Create if missing
+        // Create if missing
         if (string.IsNullOrWhiteSpace(root))
         {
             root = webHostEnvironment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");

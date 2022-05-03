@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels;
 /// </summary>
 public class VirtualPageApplicationModelProvider : IApplicationModelProvider
 {
-    private readonly List<IActionModelConvention> _actionModelConventions = new() {new VirtualPageConvention()};
+    private readonly List<IActionModelConvention> _actionModelConventions = new() { new VirtualPageConvention() };
 
     /// <inheritdoc />
     /// <summary>
@@ -20,7 +20,9 @@ public class VirtualPageApplicationModelProvider : IApplicationModelProvider
     public int Order => 0;
 
     /// <inheritdoc />
-    public void OnProvidersExecuted(ApplicationModelProviderContext context) { }
+    public void OnProvidersExecuted(ApplicationModelProviderContext context)
+    {
+    }
 
     /// <inheritdoc />
     public void OnProvidersExecuting(ApplicationModelProviderContext context)

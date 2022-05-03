@@ -43,8 +43,9 @@ public class PublishedContentNotFoundResult : IActionResult
             reason = "No template exists to render the document at URL '{0}'.";
         }
 
-        var viewResult = new ViewResult {ViewName = "~/umbraco/UmbracoWebsite/NotFound.cshtml"};
-        context.HttpContext.Items.Add("reason",
+        var viewResult = new ViewResult { ViewName = "~/umbraco/UmbracoWebsite/NotFound.cshtml" };
+        context.HttpContext.Items.Add(
+            "reason",
             string.Format(reason, WebUtility.HtmlEncode(_umbracoContext.OriginalRequestUrl.PathAndQuery)));
         context.HttpContext.Items.Add("message", _message);
 

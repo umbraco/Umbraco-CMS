@@ -25,22 +25,8 @@ public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
 
 public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 {
+    private readonly IUmbracoContext? _umbracoContext;
     private UmbracoHelper? _helper;
-    private IUmbracoContext? _umbracoContext;
-
-    private IUmbracoContextAccessor UmbracoContextAccessor =>
-        Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
-
-    private GlobalSettings GlobalSettings =>
-        Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-
-    private ContentSettings ContentSettings =>
-        Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
-
-    private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
-
-    private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
-
 
     /// <summary>
     ///     Gets the Umbraco helper.
@@ -77,6 +63,34 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
         }
     }
 
+    /// <inheritdoc />
+    public override ViewContext ViewContext
+    {
+        get => base.ViewContext;
+        set
+        {
+            // Here we do the magic model swap
+            ViewContext ctx = value;
+            ctx.ViewData = BindViewData(
+                ctx.HttpContext.RequestServices.GetRequiredService<ContentModelBinder>(),
+                ctx.ViewData);
+            base.ViewContext = ctx;
+        }
+    }
+
+    private IUmbracoContextAccessor UmbracoContextAccessor =>
+        Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+
+    private GlobalSettings GlobalSettings =>
+        Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+    private ContentSettings ContentSettings =>
+        Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
+
+    private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
+
+    private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
+
     /// <summary>
     ///     Gets the <see cref="IUmbracoContext" />
     /// </summary>
@@ -90,20 +104,6 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
             }
 
             return umbracoContext;
-        }
-    }
-
-    /// <inheritdoc />
-    public override ViewContext ViewContext
-    {
-        get => base.ViewContext;
-        set
-        {
-            // Here we do the magic model swap
-            ViewContext ctx = value;
-            ctx.ViewData = BindViewData(ctx.HttpContext.RequestServices.GetRequiredService<ContentModelBinder>(),
-                ctx.ViewData);
-            base.ViewContext = ctx;
         }
     }
 
@@ -158,6 +158,12 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
             }
         }
     }
+
+    /// <summary>
+    ///     Renders a section with default content if the section isn't defined
+    /// </summary>
+    public HtmlString? RenderSection(string name, HtmlString defaultContents) =>
+        RazorPageExtensions.RenderSection(this, name, defaultContents);
 
     /// <summary>
     ///     Dynamically binds the incoming <see cref="ViewDataDictionary" /> to the required
@@ -244,16 +250,10 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 
         // if not possible or it is not generic then we need to create a new ViewDataDictionary
         Type nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
-        var tViewData = new ViewDataDictionary(viewData) {Model = default(TModel)}; // temp view data to copy values
+        var tViewData = new ViewDataDictionary(viewData) { Model = default(TModel) }; // temp view data to copy values
         var nViewData = (ViewDataDictionary?)Activator.CreateInstance(nViewDataType, tViewData);
         return nViewData;
     }
-
-    /// <summary>
-    ///     Renders a section with default content if the section isn't defined
-    /// </summary>
-    public HtmlString? RenderSection(string name, HtmlString defaultContents) =>
-        RazorPageExtensions.RenderSection(this, name, defaultContents);
 
     /// <summary>
     ///     Renders a section with default content if the section isn't defined

@@ -35,8 +35,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     protected abstract string AuthenticationType { get; }
+
     protected abstract string ExternalAuthenticationType { get; }
+
     protected abstract string TwoFactorAuthenticationType { get; }
+
     protected abstract string TwoFactorRememberMeAuthenticationType { get; }
 
     /// <inheritdoc />
@@ -53,7 +56,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-
         AuthenticateResult? auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
         IDictionary<string, string?>? items = auth?.Properties?.Items;
         if (auth?.Principal == null || items == null)
@@ -94,7 +96,8 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
             provider;
         return new ExternalLoginInfo(auth.Principal, provider, providerKey, providerDisplayName)
         {
-            AuthenticationTokens = auth.Properties?.GetTokens(), AuthenticationProperties = auth.Properties
+            AuthenticationTokens = auth.Properties?.GetTokens(),
+            AuthenticationProperties = auth.Properties,
         };
     }
 
@@ -103,7 +106,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // replaced in order to use a custom auth type
-
         TwoFactorAuthenticationInfo? info = await RetrieveTwoFactorInfoAsync();
         if (info == null)
         {
@@ -132,7 +134,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L126
         // replaced in order to use a custom auth type
-
         if (principal == null)
         {
             throw new ArgumentNullException(nameof(principal));
@@ -148,7 +149,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L552
         // replaced in order to use a custom auth type and to implement logging/events
-
         TwoFactorAuthenticationInfo? twoFactorInfo = await RetrieveTwoFactorInfoAsync();
         if (twoFactorInfo == null || twoFactorInfo.UserId == null)
         {
@@ -183,7 +183,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L126
         // replaced in order to use a custom auth type
-
         AuthenticateResult? auth = await Context.AuthenticateAsync(AuthenticationType);
         IList<Claim> claims = Array.Empty<Claim>();
 
@@ -234,7 +233,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // own ConfigureUmbracoBackOfficeCookieOptions which assigns the current HttpContext.User to the IPrincipal created
 
         // Also note, this method gets called when performing 2FA logins
-
         await Context.SignInAsync(
             AuthenticationType,
             userPrincipal,
@@ -246,7 +244,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // override to replace IdentityConstants.ApplicationScheme with custom auth types
         // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-
         await Context.SignOutAsync(AuthenticationType);
         await Context.SignOutAsync(ExternalAuthenticationType);
         await Context.SignOutAsync(TwoFactorAuthenticationType);
@@ -257,7 +254,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-
         var userId = await UserManager.GetUserIdAsync(user);
         AuthenticateResult? result = await Context.AuthenticateAsync(TwoFactorRememberMeAuthenticationType);
         return result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId;
@@ -268,11 +264,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-
         ClaimsPrincipal principal = await StoreRememberClient(user);
-        await Context.SignInAsync(TwoFactorRememberMeAuthenticationType,
+        await Context.SignInAsync(
+            TwoFactorRememberMeAuthenticationType,
             principal,
-            new AuthenticationProperties {IsPersistent = true});
+            new AuthenticationProperties { IsPersistent = true });
     }
 
     /// <inheritdoc />
@@ -280,7 +276,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-
         TwoFactorAuthenticationInfo? twoFactorInfo = await RetrieveTwoFactorInfoAsync();
         if (twoFactorInfo == null || twoFactorInfo.UserId == null)
         {
@@ -306,6 +301,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
     /// <inheritdoc />
     public override Task ForgetTwoFactorClientAsync() =>
+
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
         Context.SignOutAsync(TwoFactorRememberMeAuthenticationType);
@@ -320,7 +316,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     protected virtual async Task<SignInResult> HandleSignIn(TUser? user, string? username, SignInResult result)
     {
         // TODO: Here I believe we can do all (or most) of the usermanager event raising so that it is not in the AuthenticationController
-
         if (username.IsNullOrWhiteSpace())
         {
             username = "UNKNOWN"; // could happen in 2fa or something else weird
@@ -328,11 +323,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         if (result.Succeeded)
         {
-            //track the last login date
+            // track the last login date
             user!.LastLoginDateUtc = DateTime.UtcNow;
             if (user.AccessFailedCount > 0)
             {
-                //we have successfully logged in, reset the AccessFailedCount
+                // we have successfully logged in, reset the AccessFailedCount
                 user.AccessFailedCount = 0;
             }
 
@@ -372,7 +367,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to replace custom auth types
-
         if (!bypassTwoFactor && await IsTfaEnabled(user))
         {
             if (!await IsTwoFactorClientRememberedAsync(user))
@@ -392,7 +386,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         if (loginProvider == null)
         {
-            await SignInWithClaimsAsync(user, isPersistent, new[] {new("amr", "pwd")});
+            await SignInWithClaimsAsync(user, isPersistent, new[] { new("amr", "pwd") });
         }
         else
         {
@@ -449,7 +443,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
             return new TwoFactorAuthenticationInfo
             {
                 UserId = result.Principal.FindFirstValue(ClaimTypes.Name),
-                LoginProvider = result.Principal.FindFirstValue(ClaimTypes.AuthenticationMethod)
+                LoginProvider = result.Principal.FindFirstValue(ClaimTypes.AuthenticationMethod),
             };
         }
 
@@ -464,7 +458,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // When token is verified correctly, clear the access failed count used for lockout
         await ResetLockout(user);
 
-        var claims = new List<Claim> {new("amr", "mfa")};
+        var claims = new List<Claim> { new("amr", "mfa") };
 
         // Cleanup external cookie
         if (twoFactorInfo.LoginProvider != null)
@@ -487,6 +481,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     private class TwoFactorAuthenticationInfo
     {
         public string? UserId { get; set; }
+
         public string? LoginProvider { get; set; }
     }
 }

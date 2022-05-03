@@ -12,7 +12,8 @@ namespace Umbraco.Cms.Web.Common.Filters;
 /// </summary>
 public class UmbracoUserTimeoutFilterAttribute : TypeFilterAttribute
 {
-    public UmbracoUserTimeoutFilterAttribute() : base(typeof(UmbracoUserTimeoutFilter))
+    public UmbracoUserTimeoutFilterAttribute()
+        : base(typeof(UmbracoUserTimeoutFilter))
     {
     }
 
@@ -20,14 +21,15 @@ public class UmbracoUserTimeoutFilterAttribute : TypeFilterAttribute
     {
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            //this can occur if an error has already occurred.
+            // this can occur if an error has already occurred.
             if (context.HttpContext.Response is null)
             {
                 return;
             }
 
             var remainingSeconds = context.HttpContext.User.GetRemainingAuthSeconds();
-            context.HttpContext.Response.Headers.Add("X-Umb-User-Seconds",
+            context.HttpContext.Response.Headers.Add(
+                "X-Umb-User-Seconds",
                 remainingSeconds.ToString(CultureInfo.InvariantCulture));
         }
 

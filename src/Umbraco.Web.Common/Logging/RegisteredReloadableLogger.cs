@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Web.Common.Logging;
 /// </remarks>
 internal class RegisteredReloadableLogger
 {
-    private static bool s_frozen;
-    private static readonly object s_frozenLock = new();
+    private static readonly object FrozenLock = new();
+    private static bool frozen;
     private readonly ReloadableLogger _logger;
 
     public RegisteredReloadableLogger(ReloadableLogger? logger) =>
@@ -21,9 +21,9 @@ internal class RegisteredReloadableLogger
 
     public void Reload(Func<LoggerConfiguration, LoggerConfiguration> cfg)
     {
-        lock (s_frozenLock)
+        lock (FrozenLock)
         {
-            if (s_frozen)
+            if (frozen)
             {
                 Logger.Debug("ReloadableLogger has already been frozen, unable to reload, NOOP.");
                 return;
@@ -32,7 +32,7 @@ internal class RegisteredReloadableLogger
             _logger.Reload(cfg);
             _logger.Freeze();
 
-            s_frozen = true;
+            frozen = true;
         }
     }
 }

@@ -56,6 +56,9 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
             new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
     }
 
+    /// <inheritdoc />
+    public DateTime ObjectCreated { get; }
+
     /// <summary>
     ///     Gets the context Id
     /// </summary>
@@ -63,11 +66,6 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     ///     Used internally for debugging and also used to define anything required to distinguish this request from another.
     /// </remarks>
     internal Guid UmbracoRequestId { get; }
-
-    // lazily get/create a Uri for the current request
-    private Uri? RequestUrl => _requestUrl ??= _httpContextAccessor.HttpContext is null
-        ? null
-        : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl());
 
     internal string? PreviewToken
     {
@@ -82,8 +80,10 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
         }
     }
 
-    /// <inheritdoc />
-    public DateTime ObjectCreated { get; }
+    // lazily get/create a Uri for the current request
+    private Uri? RequestUrl => _requestUrl ??= _httpContextAccessor.HttpContext is null
+        ? null
+        : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl());
 
     /// <inheritdoc />
     // set the urls lazily, no need to allocate until they are needed...
@@ -93,12 +93,12 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     // the current domain during application startup.
     // see: http://issues.umbraco.org/issue/U4-1890
     public Uri OriginalRequestUrl =>
-        _originalRequestUrl ?? (_originalRequestUrl = RequestUrl ?? new Uri("http://localhost"));
+_originalRequestUrl ??= RequestUrl ?? new Uri("http://localhost");
 
     /// <inheritdoc />
     // set the urls lazily, no need to allocate until they are needed...
     public Uri CleanedUmbracoUrl =>
-        _cleanedUmbracoUrl ?? (_cleanedUmbracoUrl = _uriUtility.UriToUmbraco(OriginalRequestUrl));
+_cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
 
     /// <inheritdoc />
     public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
@@ -147,20 +147,6 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
         return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
     }
 
-    private void DetectPreviewMode()
-    {
-        if (RequestUrl != null
-            && _umbracoRequestPaths.IsBackOfficeRequest(RequestUrl.AbsolutePath) == false
-            && _httpContextAccessor.HttpContext?.GetCurrentIdentity() != null)
-        {
-            var previewToken =
-                _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
-            _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
-        }
-
-        _previewing = _previewToken.IsNullOrWhiteSpace() == false;
-    }
-
     /// <inheritdoc />
     protected override void DisposeResources()
     {
@@ -173,5 +159,19 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
         {
             _publishedSnapshot.Value.Dispose();
         }
+    }
+
+    private void DetectPreviewMode()
+    {
+        if (RequestUrl != null
+            && _umbracoRequestPaths.IsBackOfficeRequest(RequestUrl.AbsolutePath) == false
+            && _httpContextAccessor.HttpContext?.GetCurrentIdentity() != null)
+        {
+            var previewToken =
+                _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
+            _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
+        }
+
+        _previewing = _previewToken.IsNullOrWhiteSpace() == false;
     }
 }

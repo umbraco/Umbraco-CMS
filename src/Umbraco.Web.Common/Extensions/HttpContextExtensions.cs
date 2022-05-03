@@ -25,14 +25,14 @@ public static class HttpContextExtensions
             if (authHeader is not null && authHeader.StartsWith("Basic"))
             {
                 // Extract credentials.
-                var encodedUsernamePassword = authHeader.Substring(6).Trim();
+                var encodedUsernamePassword = authHeader[6..].Trim();
                 Encoding encoding = Encoding.UTF8;
                 var usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
 
                 var seperatorIndex = usernamePassword.IndexOf(':');
 
-                username = usernamePassword.Substring(0, seperatorIndex);
-                password = usernamePassword.Substring(seperatorIndex + 1);
+                username = usernamePassword[..seperatorIndex];
+                password = usernamePassword[(seperatorIndex + 1)..];
             }
 
             return true;
@@ -79,10 +79,9 @@ public static class HttpContextExtensions
         }
     }
 
-
     public static void SetReasonPhrase(this HttpContext httpContext, string? reasonPhrase)
     {
-        //TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
+        // TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
         // https://github.com/aspnet/HttpAbstractions/issues/395
         IHttpResponseFeature? httpResponseFeature = httpContext.Features.Get<IHttpResponseFeature>();
         if (!(httpResponseFeature is null))
@@ -107,7 +106,7 @@ public static class HttpContextExtensions
 
         if (http.User == null)
         {
-            return null; //there's no user at all so no identity
+            return null; // there's no user at all so no identity
         }
 
         // If it's already a UmbracoBackOfficeIdentity

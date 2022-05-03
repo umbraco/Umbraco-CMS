@@ -117,7 +117,8 @@ public static class ImageCropperTemplateCoreExtensions
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
-    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops,
+    public static string? GetCropUrl(
+        this MediaWithCrops mediaWithCrops,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
         string propertyAlias,
@@ -247,6 +248,72 @@ public static class ImageCropperTemplateCoreExtensions
             imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
     }
 
+    /// <summary>
+    ///     Gets the underlying image processing service URL from the image path.
+    /// </summary>
+    /// <param name="imageUrl">The image URL.</param>
+    /// <param name="imageUrlGenerator">The image URL generator.</param>
+    /// <param name="width">The width of the output image.</param>
+    /// <param name="height">The height of the output image.</param>
+    /// <param name="imageCropperValue">The Json data from the Umbraco Core Image Cropper property editor.</param>
+    /// <param name="cropAlias">The crop alias.</param>
+    /// <param name="quality">Quality percentage of the output image.</param>
+    /// <param name="imageCropMode">The image crop mode.</param>
+    /// <param name="imageCropAnchor">The image crop anchor.</param>
+    /// <param name="preferFocalPoint">
+    ///     Use focal point to generate an output image using the focal point instead of the
+    ///     predefined crop if there is one.
+    /// </param>
+    /// <param name="useCropDimensions">
+    ///     Use crop dimensions to have the output image sized according to the predefined crop
+    ///     sizes, this will override the width and height parameters.
+    /// </param>
+    /// <param name="cacheBusterValue">
+    ///     Add a serialized date of the last edit of the item to ensure client cache refresh when
+    ///     updated.
+    /// </param>
+    /// <param name="furtherOptions">
+    ///     These are any query string parameters (formatted as query strings) that the underlying image processing service
+    ///     supports. For example:
+    ///     <example><![CDATA[
+    /// furtherOptions: "bgcolor=fff"
+    /// ]]></example>
+    /// </param>
+    /// <returns>
+    ///     The URL of the cropped image.
+    /// </returns>
+    public static string? GetCropUrl(
+        this string imageUrl,
+        IImageUrlGenerator imageUrlGenerator,
+        int? width = null,
+        int? height = null,
+        string? imageCropperValue = null,
+        string? cropAlias = null,
+        int? quality = null,
+        ImageCropMode? imageCropMode = null,
+        ImageCropAnchor? imageCropAnchor = null,
+        bool preferFocalPoint = false,
+        bool useCropDimensions = false,
+        string? cacheBusterValue = null,
+        string? furtherOptions = null)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return null;
+        }
+
+        ImageCropperValue? cropDataSet = null;
+        if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() &&
+            (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
+        {
+            cropDataSet = imageCropperValue.DeserializeImageCropperValue();
+        }
+
+        return GetCropUrl(
+            imageUrl, imageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode,
+            imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
+    }
+
     private static string? GetCropUrl(
         this IPublishedContent mediaItem,
         IImageUrlGenerator imageUrlGenerator,
@@ -316,72 +383,6 @@ public static class ImageCropperTemplateCoreExtensions
             mediaItemUrl, imageUrlGenerator, localCrops, width, height, cropAlias, quality, imageCropMode,
             imageCropAnchor, preferFocalPoint, useCropDimensions,
             cacheBusterValue, furtherOptions);
-    }
-
-    /// <summary>
-    ///     Gets the underlying image processing service URL from the image path.
-    /// </summary>
-    /// <param name="imageUrl">The image URL.</param>
-    /// <param name="imageUrlGenerator">The image URL generator.</param>
-    /// <param name="width">The width of the output image.</param>
-    /// <param name="height">The height of the output image.</param>
-    /// <param name="imageCropperValue">The Json data from the Umbraco Core Image Cropper property editor.</param>
-    /// <param name="cropAlias">The crop alias.</param>
-    /// <param name="quality">Quality percentage of the output image.</param>
-    /// <param name="imageCropMode">The image crop mode.</param>
-    /// <param name="imageCropAnchor">The image crop anchor.</param>
-    /// <param name="preferFocalPoint">
-    ///     Use focal point to generate an output image using the focal point instead of the
-    ///     predefined crop if there is one.
-    /// </param>
-    /// <param name="useCropDimensions">
-    ///     Use crop dimensions to have the output image sized according to the predefined crop
-    ///     sizes, this will override the width and height parameters.
-    /// </param>
-    /// <param name="cacheBusterValue">
-    ///     Add a serialized date of the last edit of the item to ensure client cache refresh when
-    ///     updated.
-    /// </param>
-    /// <param name="furtherOptions">
-    ///     These are any query string parameters (formatted as query strings) that the underlying image processing service
-    ///     supports. For example:
-    ///     <example><![CDATA[
-    /// furtherOptions: "bgcolor=fff"
-    /// ]]></example>
-    /// </param>
-    /// <returns>
-    ///     The URL of the cropped image.
-    /// </returns>
-    public static string? GetCropUrl(
-        this string imageUrl,
-        IImageUrlGenerator imageUrlGenerator,
-        int? width = null,
-        int? height = null,
-        string? imageCropperValue = null,
-        string? cropAlias = null,
-        int? quality = null,
-        ImageCropMode? imageCropMode = null,
-        ImageCropAnchor? imageCropAnchor = null,
-        bool preferFocalPoint = false,
-        bool useCropDimensions = false,
-        string? cacheBusterValue = null,
-        string? furtherOptions = null)
-    {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-        {
-            return null;
-        }
-
-        ImageCropperValue? cropDataSet = null;
-        if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() &&
-            (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
-        {
-            cropDataSet = imageCropperValue.DeserializeImageCropperValue();
-        }
-
-        return GetCropUrl(
-            imageUrl, imageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode,
-            imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
     }
 
     /// <summary>
@@ -479,7 +480,7 @@ public static class ImageCropperTemplateCoreExtensions
             options = new ImageUrlGenerationOptions(imageUrl)
             {
                 ImageCropMode = imageCropMode ?? ImageCropMode.Pad, // Not sure why we default to Pad
-                ImageCropAnchor = imageCropAnchor
+                ImageCropAnchor = imageCropAnchor,
             };
         }
 

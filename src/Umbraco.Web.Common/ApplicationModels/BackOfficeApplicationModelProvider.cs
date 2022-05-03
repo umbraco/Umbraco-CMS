@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Umbraco.Cms.Web.Common.Attributes;
 
 namespace Umbraco.Cms.Web.Common.ApplicationModels;
@@ -12,7 +12,7 @@ public class BackOfficeApplicationModelProvider : IApplicationModelProvider
 {
     private readonly List<IActionModelConvention> _actionModelConventions = new()
     {
-        new BackOfficeIdentityCultureConvention()
+        new BackOfficeIdentityCultureConvention(),
     };
 
     /// <inheritdoc />

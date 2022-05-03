@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Extensions;
@@ -35,7 +35,6 @@ public class UmbracoRequestLoggingMiddleware : IMiddleware
 
         // TODO: Need to decide if we want this stuff still, there's new request logging in serilog:
         // https://github.com/serilog/serilog-aspnetcore#request-logging which i think would suffice and replace all of this?
-
         using (LogContext.Push(_sessionIdEnricher))
         using (LogContext.Push(_requestNumberEnricher))
         using (LogContext.Push(_requestIdEnricher))

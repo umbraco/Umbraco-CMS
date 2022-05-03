@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -15,7 +15,8 @@ namespace Umbraco.Cms.Web.Common.Filters;
 /// </summary>
 public class AngularJsonOnlyConfigurationAttribute : TypeFilterAttribute
 {
-    public AngularJsonOnlyConfigurationAttribute() : base(typeof(AngularJsonOnlyConfigurationFilter)) =>
+    public AngularJsonOnlyConfigurationAttribute()
+        : base(typeof(AngularJsonOnlyConfigurationFilter)) =>
         Order = 1; // Must be low, to be overridden by other custom formatters, but higher then all framework stuff.
 
     private class AngularJsonOnlyConfigurationFilter : IResultFilter
@@ -39,7 +40,8 @@ public class AngularJsonOnlyConfigurationAttribute : TypeFilterAttribute
             {
                 var serializerSettings = new JsonSerializerSettings
                 {
-                    ContractResolver = new DefaultContractResolver(), Converters = {new VersionConverter()}
+                    ContractResolver = new DefaultContractResolver(),
+                    Converters = { new VersionConverter() },
                 };
 
                 objectResult.Formatters.Clear();

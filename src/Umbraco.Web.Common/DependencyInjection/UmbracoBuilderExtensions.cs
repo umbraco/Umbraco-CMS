@@ -60,6 +60,7 @@ using Umbraco.Cms.Web.Common.UmbracoContext;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions;
+
 // TODO: We could add parameters to configure each of these for flexibility
 
 /// <summary>
@@ -90,7 +91,8 @@ public static partial class UmbracoBuilderExtensions
         StaticApplicationLogging.Initialize(new SerilogLoggerFactory());
 
         // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
-        AppDomain.CurrentDomain.SetData("DataDirectory",
+        AppDomain.CurrentDomain.SetData(
+            "DataDirectory",
             webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data));
 
         // Manually create and register the HttpContextAccessor. In theory this should not be registered
@@ -118,7 +120,6 @@ public static partial class UmbracoBuilderExtensions
             tempHostingEnvironment);
     }
 
-
     /// <summary>
     ///     Adds core Umbraco services
     /// </summary>
@@ -135,7 +136,8 @@ public static partial class UmbracoBuilderExtensions
         // Add ASP.NET specific services
         builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
         builder.Services.AddUnique<IHostingEnvironment>(sp =>
-            ActivatorUtilities.CreateInstance<AspNetCoreHostingEnvironment>(sp,
+            ActivatorUtilities.CreateInstance<AspNetCoreHostingEnvironment>(
+                sp,
                 sp.GetRequiredService<IApplicationDiscriminator>()));
 
         builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
@@ -151,8 +153,7 @@ public static partial class UmbracoBuilderExtensions
             factory.GetServices<IBulkSqlInsertProvider>(),
             factory.GetServices<IDatabaseCreator>(),
             factory.GetServices<IProviderSpecificMapperFactory>(),
-            factory.GetServices<IProviderSpecificInterceptor>()
-        ));
+            factory.GetServices<IProviderSpecificInterceptor>()));
 
         builder.AddCoreInitialServices();
         builder.AddTelemetryProviders();
@@ -186,18 +187,6 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddHttpClient();
-        builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            });
-        return builder;
-    }
-
     /// <summary>
     ///     Adds the Umbraco request profiler
     /// </summary>
@@ -219,6 +208,18 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddHttpClient();
+        builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+            });
+        return builder;
+    }
+
     public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder>? mvcBuilding = null)
     {
         // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
@@ -232,6 +233,42 @@ public static partial class UmbracoBuilderExtensions
         mvcBuilder.AddRazorRuntimeCompilation();
 
         mvcBuilding?.Invoke(mvcBuilder);
+
+        return builder;
+    }
+
+    /// <summary>
+    ///     Add runtime minifier support for Umbraco
+    /// </summary>
+    public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
+    {
+        // Add custom ISmidgeFileProvider to include the additional App_Plugins location
+        // to load assets from.
+        builder.Services.AddSingleton<ISmidgeFileProvider>(f =>
+        {
+            IWebHostEnvironment hostEnv = f.GetRequiredService<IWebHostEnvironment>();
+
+            return new SmidgeFileProvider(
+                hostEnv.WebRootFileProvider,
+                new GlobPatternFilterFileProvider(
+                    hostEnv.ContentRootFileProvider,
+
+                    // only include js or css files within App_Plugins
+                    new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
+        });
+
+        builder.Services.AddUnique<ICacheBuster, UmbracoSmidgeConfigCacheBuster>();
+        builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
+
+        // Replace the Smidge request helper, in order to discourage the use of brotli since it's super slow
+        builder.Services.AddUnique<IRequestHelper, SmidgeRequestHelper>();
+        builder.Services.AddSmidgeNuglify();
+        builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
+
+        builder.Services.AddUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
+        builder.Services.AddSingleton<SmidgeHelperAccessor>();
+        builder.Services.AddTransient<IPreProcessor, SmidgeNuglifyJs>();
+        builder.Services.ConfigureOptions<SmidgeOptionsSetup>();
 
         return builder;
     }
@@ -260,40 +297,6 @@ public static partial class UmbracoBuilderExtensions
         {
             services.Remove(compilerProvider);
         }
-    }
-
-    /// <summary>
-    ///     Add runtime minifier support for Umbraco
-    /// </summary>
-    public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
-    {
-        // Add custom ISmidgeFileProvider to include the additional App_Plugins location
-        // to load assets from.
-        builder.Services.AddSingleton<ISmidgeFileProvider>(f =>
-        {
-            IWebHostEnvironment hostEnv = f.GetRequiredService<IWebHostEnvironment>();
-
-            return new SmidgeFileProvider(
-                hostEnv.WebRootFileProvider,
-                new GlobPatternFilterFileProvider(
-                    hostEnv.ContentRootFileProvider,
-                    // only include js or css files within App_Plugins
-                    new[] {"/App_Plugins/**/*.js", "/App_Plugins/**/*.css"}));
-        });
-
-        builder.Services.AddUnique<ICacheBuster, UmbracoSmidgeConfigCacheBuster>();
-        builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
-        // Replace the Smidge request helper, in order to discourage the use of brotli since it's super slow
-        builder.Services.AddUnique<IRequestHelper, SmidgeRequestHelper>();
-        builder.Services.AddSmidgeNuglify();
-        builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
-
-        builder.Services.AddUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
-        builder.Services.AddSingleton<SmidgeHelperAccessor>();
-        builder.Services.AddTransient<IPreProcessor, SmidgeNuglifyJs>();
-        builder.Services.ConfigureOptions<SmidgeOptionsSetup>();
-
-        return builder;
     }
 
     /// <summary>
@@ -341,7 +344,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<PartialViewMacroEngine>();
 
         // register the umbraco context factory
-
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
@@ -371,7 +373,6 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-
     // TODO: Does this need to exist and/or be public?
     public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
     {
@@ -392,6 +393,7 @@ public static partial class UmbracoBuilderExtensions
     private static IProfiler GetWebProfiler(IConfiguration config)
     {
         var isDebug = config.GetValue<bool>($"{Constants.Configuration.ConfigHosting}:Debug");
+
         // create and start asap to profile boot
         if (!isDebug)
         {
@@ -411,7 +413,8 @@ public static partial class UmbracoBuilderExtensions
     ///     We require this to create a TypeLoader during ConfigureServices.<br />
     ///     Instances returned from this method shouldn't be registered in the service collection.
     /// </summary>
-    private static IHostingEnvironment GetTemporaryHostingEnvironment(IWebHostEnvironment webHostEnvironment,
+    private static IHostingEnvironment GetTemporaryHostingEnvironment(
+        IWebHostEnvironment webHostEnvironment,
         IConfiguration config)
     {
         HostingSettings hostingSettings =

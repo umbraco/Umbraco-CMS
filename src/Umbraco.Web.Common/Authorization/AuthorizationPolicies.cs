@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.Common.Authorization;
+namespace Umbraco.Cms.Web.Common.Authorization;
 
 /// <summary>
 ///     A list of authorization policy names for use in the back office
@@ -14,7 +14,6 @@ public static class AuthorizationPolicies
     public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
 
     // Content permission access
-
     public const string ContentPermissionByResource = nameof(ContentPermissionByResource);
     public const string ContentPermissionEmptyRecycleBin = nameof(ContentPermissionEmptyRecycleBin);
     public const string ContentPermissionAdministrationById = nameof(ContentPermissionAdministrationById);
@@ -27,9 +26,7 @@ public static class AuthorizationPolicies
     public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
     public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
 
-
     // Single section access
-
     public const string SectionAccessContent = nameof(SectionAccessContent);
     public const string SectionAccessPackages = nameof(SectionAccessPackages);
     public const string SectionAccessUsers = nameof(SectionAccessUsers);
@@ -38,7 +35,6 @@ public static class AuthorizationPolicies
     public const string SectionAccessMembers = nameof(SectionAccessMembers);
 
     // Custom access based on multiple sections
-
     public const string SectionAccessContentOrMedia = nameof(SectionAccessContentOrMedia);
     public const string SectionAccessForTinyMce = nameof(SectionAccessForTinyMce);
     public const string SectionAccessForMemberTree = nameof(SectionAccessForMemberTree);
@@ -47,7 +43,6 @@ public static class AuthorizationPolicies
     public const string SectionAccessForDataTypeReading = nameof(SectionAccessForDataTypeReading);
 
     // Single tree access
-
     public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
     public const string TreeAccessUsers = nameof(TreeAccessUsers);
     public const string TreeAccessPartialViews = nameof(TreeAccessPartialViews);
@@ -66,7 +61,6 @@ public static class AuthorizationPolicies
     public const string TreeAccessMemberTypes = nameof(TreeAccessMemberTypes);
 
     // Custom access based on multiple trees
-
     public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);
     public const string TreeAccessMediaOrMediaTypes = nameof(TreeAccessMediaOrMediaTypes);
     public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);

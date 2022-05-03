@@ -34,9 +34,10 @@ public static class LinkGeneratorExtensions
                     .ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
         }
 
-        return linkGenerator.GetPathByAction("Default",
+        return linkGenerator.GetPathByAction(
+            "Default",
             ControllerExtensions.GetControllerName(backOfficeControllerType),
-            new {area = Constants.Web.Mvc.BackOfficeApiArea});
+            new { area = Constants.Web.Mvc.BackOfficeApiArea });
     }
 
     /// <summary>
@@ -48,13 +49,14 @@ public static class LinkGeneratorExtensions
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(
         actionName,
         typeof(T),
-        new Dictionary<string, object?> {["id"] = id});
+        new Dictionary<string, object?> { ["id"] = id });
 
     public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName,
         IDictionary<string, object?>? values)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), values);
 
-    public static string? GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator,
+    public static string? GetUmbracoApiServiceBaseUrl<T>(
+        this LinkGenerator linkGenerator,
         Expression<Func<T, object?>> methodSelector)
         where T : UmbracoApiControllerBase
     {
@@ -81,7 +83,8 @@ public static class LinkGeneratorExtensions
 
         if (string.IsNullOrWhiteSpace(actionName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(actionName));
         }
 
@@ -92,7 +95,8 @@ public static class LinkGeneratorExtensions
 
         if (string.IsNullOrWhiteSpace(controllerName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(controllerName));
         }
 
@@ -130,7 +134,8 @@ public static class LinkGeneratorExtensions
 
         if (string.IsNullOrWhiteSpace(actionName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(actionName));
         }
 
@@ -157,7 +162,8 @@ public static class LinkGeneratorExtensions
             area, values);
     }
 
-    public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator,
+    public static string? GetUmbracoApiService<T>(
+        this LinkGenerator linkGenerator,
         Expression<Func<T, object>> methodSelector)
         where T : UmbracoApiController
     {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Umbraco.Cms.Web.Common.Attributes;
 
@@ -12,7 +12,8 @@ public class PluginControllerAttribute : AreaAttribute
     ///     Initializes a new instance of the <see cref="PluginControllerAttribute" /> class.
     /// </summary>
     /// <param name="areaName"></param>
-    public PluginControllerAttribute(string areaName) : base(areaName)
+    public PluginControllerAttribute(string areaName)
+        : base(areaName)
     {
         // validate this, only letters and digits allowed.
         if (areaName.Any(c => !char.IsLetterOrDigit(c)))

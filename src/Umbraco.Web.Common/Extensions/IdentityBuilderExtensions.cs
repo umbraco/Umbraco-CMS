@@ -22,11 +22,13 @@ public static class IdentityBuilderExtensions
         where TInterface : notnull
     {
         identityBuilder.AddUserManager<TUserManager>();
+
         // use a UniqueServiceDescriptor so we can check if it's already been added
         var memberManagerDescriptor =
             new UniqueServiceDescriptor(typeof(TInterface), typeof(TUserManager), ServiceLifetime.Scoped);
         identityBuilder.Services.Add(memberManagerDescriptor);
-        identityBuilder.Services.AddScoped(typeof(UserManager<MemberIdentityUser>),
+        identityBuilder.Services.AddScoped(
+            typeof(UserManager<MemberIdentityUser>),
             factory => factory.GetRequiredService<TInterface>());
         return identityBuilder;
     }
@@ -37,7 +39,8 @@ public static class IdentityBuilderExtensions
     {
         identityBuilder.AddRoleManager<TRoleManager>();
         identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TRoleManager));
-        identityBuilder.Services.AddScoped(typeof(RoleManager<MemberIdentityUser>),
+        identityBuilder.Services.AddScoped(
+            typeof(RoleManager<MemberIdentityUser>),
             factory => factory.GetRequiredService<TInterface>());
         return identityBuilder;
     }
@@ -57,8 +60,8 @@ public static class IdentityBuilderExtensions
         return identityBuilder;
     }
 
-
-    public static IdentityBuilder AddUserStore<TInterface, TStore>(this IdentityBuilder identityBuilder,
+    public static IdentityBuilder AddUserStore<TInterface, TStore>(
+        this IdentityBuilder identityBuilder,
         Func<IServiceProvider, TStore> implementationFactory)
         where TStore : class, TInterface
     {
@@ -66,8 +69,10 @@ public static class IdentityBuilderExtensions
         return identityBuilder;
     }
 
-    public static MemberIdentityBuilder AddTwoFactorProvider<T>(this MemberIdentityBuilder identityBuilder,
-        string providerName) where T : class, ITwoFactorProvider
+    public static MemberIdentityBuilder AddTwoFactorProvider<T>(
+        this MemberIdentityBuilder identityBuilder,
+        string providerName)
+        where T : class, ITwoFactorProvider
     {
         identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();
         identityBuilder.Services.AddSingleton<T>();

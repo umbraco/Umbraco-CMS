@@ -14,5 +14,6 @@ public class LoginModel : PostRedirectModel
     [StringLength(256)]
     public string Password { get; set; } = null!;
 
-    [Display(Name = "Remember me?")] public bool RememberMe { get; set; }
+    [Display(Name = "Remember me?")]
+    public bool RememberMe { get; set; }
 }

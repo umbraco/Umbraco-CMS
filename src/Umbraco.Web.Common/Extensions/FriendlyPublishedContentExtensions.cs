@@ -64,10 +64,8 @@ public static class FriendlyPublishedContentExtensions
     private static IMediaTypeService MediaTypeService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
 
-
     private static IMemberTypeService MemberTypeService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>();
-
 
     /// <summary>
     ///     Creates a strongly typed published content model for an internal published content.
@@ -128,7 +126,8 @@ public static class FriendlyPublishedContentExtensions
         => content.IsAllowedTemplate(ContentTypeService, WebRoutingSettings.Value, templateId);
 
     public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
-        => content.IsAllowedTemplate(WebRoutingSettings.Value.DisableAlternativeTemplates,
+        => content.IsAllowedTemplate(
+            WebRoutingSettings.Value.DisableAlternativeTemplates,
             WebRoutingSettings.Value.ValidateAlternativeTemplates, templateAlias);
 
     public static bool IsAllowedTemplate(
@@ -153,7 +152,6 @@ public static class FriendlyPublishedContentExtensions
             disableAlternativeTemplates,
             validateAlternativeTemplates,
             templateAlias);
-
 
     /// <summary>
     ///     Gets a value indicating whether the content has a value for a property identified by its alias.
@@ -246,7 +244,8 @@ public static class FriendlyPublishedContentExtensions
         string? culture = null)
         => content.Descendants(VariationContextAccessor, level, culture);
 
-    public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent> DescendantsOfType(
+        this IPublishedContent content,
         string contentTypeAlias, string? culture = null)
         => content.DescendantsOfType(VariationContextAccessor, contentTypeAlias, culture);
 
@@ -258,16 +257,17 @@ public static class FriendlyPublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendants<T>(VariationContextAccessor, level, culture);
 
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
+        this IPublishedContent content,
         string? culture = null)
         => content.DescendantsOrSelf(VariationContextAccessor, culture);
-
 
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, int level,
         string? culture = null)
         => content.DescendantsOrSelf(VariationContextAccessor, level, culture);
 
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
+        this IPublishedContent content,
         string contentTypeAlias, string? culture = null)
         => content.DescendantsOrSelfOfType(VariationContextAccessor, contentTypeAlias, culture);
 
@@ -285,7 +285,6 @@ public static class FriendlyPublishedContentExtensions
     public static IPublishedContent? Descendant(this IPublishedContent content, int level, string? culture = null)
         => content.Descendant(VariationContextAccessor, level, culture);
 
-
     public static IPublishedContent? DescendantOfType(this IPublishedContent content, string contentTypeAlias,
         string? culture = null)
         => content.DescendantOfType(VariationContextAccessor, contentTypeAlias, culture);
@@ -293,7 +292,6 @@ public static class FriendlyPublishedContentExtensions
     public static T? Descendant<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
         => content.Descendant<T>(VariationContextAccessor, culture);
-
 
     public static T? Descendant<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
@@ -316,7 +314,6 @@ public static class FriendlyPublishedContentExtensions
     public static T? DescendantOrSelf<T>(this IPublishedContent content, int level, string? culture = null)
         where T : class, IPublishedContent
         => content.DescendantOrSelf<T>(VariationContextAccessor, level, culture);
-
 
     /// <summary>
     ///     Gets the children of the content item.
@@ -359,7 +356,8 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent>? Children(
+        this IPublishedContent content,
         Func<IPublishedContent, bool> predicate, string? culture = null)
         => content.Children(VariationContextAccessor, predicate, culture);
 
@@ -373,7 +371,8 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The children of the content, of any of the specified types.</returns>
-    public static IEnumerable<IPublishedContent>? ChildrenOfType(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent>? ChildrenOfType(
+        this IPublishedContent content,
         string contentTypeAlias, string? culture = null)
         => content.ChildrenOfType(VariationContextAccessor, contentTypeAlias, culture);
 
@@ -411,7 +410,6 @@ public static class FriendlyPublishedContentExtensions
     public static IPublishedContent? FirstChild(this IPublishedContent content, Guid uniqueId, string? culture = null)
         => content.FirstChild(VariationContextAccessor, uniqueId, culture);
 
-
     public static T? FirstChild<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
         => content.FirstChild<T>(VariationContextAccessor, culture);
@@ -448,7 +446,8 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent>? SiblingsOfType(
+        this IPublishedContent content,
         string contentTypeAlias, string? culture = null)
         => content.SiblingsOfType(PublishedSnapshot, VariationContextAccessor, contentTypeAlias, culture);
 
@@ -478,7 +477,8 @@ public static class FriendlyPublishedContentExtensions
     ///     null)
     /// </param>
     /// <returns>The siblings of the content including the node itself.</returns>
-    public static IEnumerable<IPublishedContent>? SiblingsAndSelf(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
+        this IPublishedContent content,
         string? culture = null)
         => content.SiblingsAndSelf(PublishedSnapshot, VariationContextAccessor, culture);
 
@@ -492,7 +492,8 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-    public static IEnumerable<IPublishedContent>? SiblingsAndSelfOfType(this IPublishedContent content,
+    public static IEnumerable<IPublishedContent>? SiblingsAndSelfOfType(
+        this IPublishedContent content,
         string contentTypeAlias, string? culture = null)
         => content.SiblingsAndSelfOfType(PublishedSnapshot, VariationContextAccessor, contentTypeAlias, culture);
 
@@ -509,7 +510,6 @@ public static class FriendlyPublishedContentExtensions
     public static IEnumerable<T>? SiblingsAndSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
         => content.SiblingsAndSelf<T>(PublishedSnapshot, VariationContextAccessor, culture);
-
 
     /// <summary>
     ///     Gets the url of the content item.
@@ -604,13 +604,11 @@ public static class FriendlyPublishedContentExtensions
         Uri? current = null)
         => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, current);
 
-
     public static IEnumerable<PublishedSearchResult> SearchDescendants(
         this IPublishedContent content,
         string term,
         string? indexName = null)
         => content.SearchDescendants(ExamineManager, UmbracoContextAccessor, term, indexName);
-
 
     public static IEnumerable<PublishedSearchResult> SearchChildren(
         this IPublishedContent content,

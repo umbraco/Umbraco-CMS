@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Internal;
 using Umbraco.Cms.Core.Logging;
@@ -10,6 +10,7 @@ public class WebProfilerHtml : IProfilerHtml
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public WebProfilerHtml(IHttpContextAccessor httpContextAccessor) =>
+
         // create our own provider, which can provide a profiler even during boot
         _httpContextAccessor = httpContextAccessor;
 
@@ -35,7 +36,7 @@ public class WebProfilerHtml : IProfilerHtml
             profiler,
             context is not null ? context.Request.PathBase + path : null,
             true,
-            new List<Guid> {profiler.Id},
+            new List<Guid> { profiler.Id },
             RenderPosition.Right,
             profiler.Options.PopupShowTrivial,
             profiler.Options.PopupShowTimeWithChildren,

@@ -127,7 +127,8 @@ internal class TemplateRenderer : ITemplateRenderer
             }
             else
             {
-                writer.Write("<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->",
+                writer.Write(
+                    "<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->",
                     altTemplateId);
             }
 
@@ -170,7 +171,7 @@ internal class TemplateRenderer : ITemplateRenderer
 
         var viewData = new ViewDataDictionary(_modelMetadataProvider, new ModelStateDictionary())
         {
-            Model = request.PublishedContent
+            Model = request.PublishedContent,
         };
 
         var writer = new StringWriter();
@@ -180,9 +181,7 @@ internal class TemplateRenderer : ITemplateRenderer
             viewData,
             _tempDataDictionaryFactory.GetTempData(httpContext),
             writer,
-            new HtmlHelperOptions()
-        );
-
+            new HtmlHelperOptions());
 
         viewResult.View.RenderAsync(viewContext).GetAwaiter().GetResult();
 
@@ -193,7 +192,6 @@ internal class TemplateRenderer : ITemplateRenderer
 
     // TODO: I feel like we need to do more than this, pretty sure we need to replace the UmbracoRouteValues
     // HttpRequest feature too while this renders.
-
     private void SetNewItemsOnContextObjects(IPublishedRequest request)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
@@ -208,6 +206,7 @@ internal class TemplateRenderer : ITemplateRenderer
     private void SaveExistingItems(out IPublishedRequest? oldPublishedRequest)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+
         // Many objects require that these legacy items are in the http context items... before we render this template we need to first
         // save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
         oldPublishedRequest = umbracoContext.PublishedRequest;

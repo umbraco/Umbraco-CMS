@@ -28,12 +28,12 @@ public class BackOfficeSecurity : IBackOfficeSecurity
     {
         get
         {
-            //only load it once per instance! (but make sure groups are loaded)
+            // only load it once per instance! (but make sure groups are loaded)
             if (_currentUser == null)
             {
                 lock (_currentUserLock)
                 {
-                    //Check again
+                    // Check again
                     if (_currentUser == null)
                     {
                         Attempt<int?> id = GetUserId();

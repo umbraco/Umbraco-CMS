@@ -114,7 +114,8 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
             }
         }
 
-        return await memberManager.IsMemberAuthorizedAsync(AllowType.Split(Core.Constants.CharArrays.Comma),
+        return await memberManager.IsMemberAuthorizedAsync(
+            AllowType.Split(Core.Constants.CharArrays.Comma),
             AllowGroup.Split(Core.Constants.CharArrays.Comma), members);
     }
 }

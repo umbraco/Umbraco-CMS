@@ -38,12 +38,13 @@ public static class EndpointRouteBuilderExtensions
         pattern.Append("/{action}/{id?}");
 
         var defaults = defaultAction.IsNullOrWhiteSpace()
-            ? (object)new {controller = controllerName}
-            : new {controller = controllerName, action = defaultAction};
+            ? (object)new { controller = controllerName }
+            : new { controller = controllerName, action = defaultAction };
 
         if (areaName.IsNullOrWhiteSpace())
         {
             endpoints.MapControllerRoute(
+
                 // named consistently
                 $"umbraco-{areaName}-{controllerName}".ToLowerInvariant(),
                 pattern.ToString().ToLowerInvariant(),
@@ -53,6 +54,7 @@ public static class EndpointRouteBuilderExtensions
         else
         {
             endpoints.MapAreaControllerRoute(
+
                 // named consistently
                 $"umbraco-{areaName}-{controllerName}".ToLowerInvariant(),
                 areaName!,

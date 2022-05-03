@@ -9,7 +9,7 @@ internal static class FileProviderExtensions
         IEnumerable<IFileProvider>? existingFileProviders = fileProvider switch
         {
             CompositeFileProvider compositeFileProvider => compositeFileProvider.FileProviders,
-            _ => new[] {fileProvider}
+            _ => new[] { fileProvider },
         };
 
         return new CompositeFileProvider(existingFileProviders.Concat(fileProviders));

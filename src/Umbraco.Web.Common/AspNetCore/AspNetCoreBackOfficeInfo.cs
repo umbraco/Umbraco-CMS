@@ -13,7 +13,8 @@ public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     private readonly IHostingEnvironment _hostingEnvironment;
     private string? _getAbsoluteUrl;
 
-    public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings,
+    public AspNetCoreBackOfficeInfo(
+        IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnviroment)
     {
         _globalSettings = globalSettings;
@@ -28,10 +29,11 @@ public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
             {
                 if (_hostingEnvironment.ApplicationMainUrl is null)
                 {
-                    return "";
+                    return string.Empty;
                 }
 
-                _getAbsoluteUrl = WebPath.Combine(_hostingEnvironment.ApplicationMainUrl.ToString(),
+                _getAbsoluteUrl = WebPath.Combine(
+                    _hostingEnvironment.ApplicationMainUrl.ToString(),
                     _globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
             }
 

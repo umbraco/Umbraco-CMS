@@ -7,9 +7,6 @@ namespace Umbraco.Cms.Web.Common.Security;
 
 public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampValidatorOptions>
 {
-    public void Configure(SecurityStampValidatorOptions options)
-        => ConfigureOptions(options);
-
     /// <summary>
     ///     Configures security stamp options and ensures any custom claims
     ///     set on the identity are persisted to the new identity when it's refreshed.
@@ -33,4 +30,7 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
             return Task.CompletedTask;
         };
     }
+
+    public void Configure(SecurityStampValidatorOptions options)
+        => ConfigureOptions(options);
 }

@@ -124,7 +124,6 @@ public static class UmbracoBuilderDependencyInjectionExtensions
             return factory.CreateDefaultPublishedModelFactory();
         });
 
-
         if (!builder.Services.Any(x => x.ServiceType == typeof(IModelsBuilderDashboardProvider)))
         {
             builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
@@ -139,7 +138,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // copy the current collection, we need to use this later to rebuild a container
         // to re-create the razor compiler provider
-        var initialCollection = new ServiceCollection {builder.Services};
+        var initialCollection = new ServiceCollection { builder.Services };
 
         // Replace the default with our custom engine
         builder.Services.AddSingleton<IRazorViewEngine>(

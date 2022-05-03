@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Umbraco.Extensions;
@@ -21,12 +21,12 @@ public static class ViewContextExtensions
             HttpContext = vc.HttpContext,
             RouteData = vc.RouteData,
             TempData = vc.TempData,
-            ViewData = new ViewDataDictionary(vc.ViewData) {Model = model},
+            ViewData = new ViewDataDictionary(vc.ViewData) { Model = model },
             ClientValidationEnabled = vc.ClientValidationEnabled,
             ExecutingFilePath = vc.ExecutingFilePath,
             ValidationMessageElement = vc.ValidationMessageElement,
             Html5DateRenderingMode = vc.Html5DateRenderingMode,
-            ValidationSummaryMessageElement = vc.ValidationSummaryMessageElement
+            ValidationSummaryMessageElement = vc.ValidationSummaryMessageElement,
         };
 
     public static ViewContext Clone(this ViewContext vc) =>
@@ -44,11 +44,11 @@ public static class ViewContextExtensions
             ExecutingFilePath = vc.ExecutingFilePath,
             ValidationMessageElement = vc.ValidationMessageElement,
             Html5DateRenderingMode = vc.Html5DateRenderingMode,
-            ValidationSummaryMessageElement = vc.ValidationSummaryMessageElement
+            ValidationSummaryMessageElement = vc.ValidationSummaryMessageElement,
         };
 
-    //public static ViewContext CloneWithWriter(this ViewContext vc, TextWriter writer)
-    //{
+    // public static ViewContext CloneWithWriter(this ViewContext vc, TextWriter writer)
+    // {
     //    return new ViewContext
     //    {
     //        Controller = vc.Controller,
@@ -63,5 +63,5 @@ public static class ViewContextExtensions
     //        UnobtrusiveJavaScriptEnabled = vc.UnobtrusiveJavaScriptEnabled,
     //        Writer = writer
     //    };
-    //}
+    // }
 }

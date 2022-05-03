@@ -97,7 +97,8 @@ public abstract class UmbracoPageController : UmbracoController
         if (string.IsNullOrWhiteSpace(template))
         {
             var docTypeAlias = UmbracoRouteValues.PublishedRequest.PublishedContent?.ContentType.Alias;
-            _logger.LogWarning("No physical template file was found for document type with alias {Alias}",
+            _logger.LogWarning(
+                "No physical template file was found for document type with alias {Alias}",
                 docTypeAlias);
             return false;
         }

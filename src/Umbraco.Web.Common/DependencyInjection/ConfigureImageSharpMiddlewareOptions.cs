@@ -47,14 +47,16 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
                 return Task.CompletedTask;
             }
 
-            var width = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width),
+            var width = context.Parser.ParseValue<int>(
+                context.Commands.GetValueOrDefault(ResizeWebProcessor.Width),
                 context.Culture);
             if (width <= 0 || width > _imagingSettings.Resize.MaxWidth)
             {
                 context.Commands.Remove(ResizeWebProcessor.Width);
             }
 
-            var height = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height),
+            var height = context.Parser.ParseValue<int>(
+                context.Commands.GetValueOrDefault(ResizeWebProcessor.Height),
                 context.Culture);
             if (height <= 0 || height > _imagingSettings.Resize.MaxHeight)
             {
@@ -72,7 +74,7 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
                 ResponseHeaders headers = context.Response.GetTypedHeaders();
 
                 CacheControlHeaderValue cacheControl =
-                    headers.CacheControl ?? new CacheControlHeaderValue {Public = true};
+                    headers.CacheControl ?? new CacheControlHeaderValue { Public = true };
                 cacheControl.MustRevalidate = false; // ImageSharp enables this by default
                 cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
 

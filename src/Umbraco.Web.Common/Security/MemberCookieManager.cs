@@ -54,7 +54,7 @@ public class MemberCookieManager : ChunkingCookieManager, ICookieManager
             return false;
         }
 
-        if ( // check back office
+        if (// check back office
             _umbracoRequestPaths.IsBackOfficeRequest(absPath)
 
             // check installer

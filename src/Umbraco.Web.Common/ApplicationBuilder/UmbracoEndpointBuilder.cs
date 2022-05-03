@@ -19,7 +19,10 @@ internal class UmbracoEndpointBuilder : IUmbracoEndpointBuilderContext
     }
 
     public IServiceProvider ApplicationServices { get; }
+
     public IEndpointRouteBuilder EndpointRouteBuilder { get; }
+
     public IRuntimeState RuntimeState { get; }
+
     public IApplicationBuilder AppBuilder { get; }
 }

@@ -21,17 +21,17 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder;
 
 internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
 {
-    private static readonly Regex s_assemblyVersionRegex =
+    private static readonly Regex AssemblyVersionRegex =
         new("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
 
-    private static readonly string[] s_ourFiles =
+    private static readonly string[] OurFiles =
     {
-        "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled"
+        "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled",
     };
 
-    private static readonly Regex s_usingRegex = new("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
+    private static readonly Regex UsingRegex = new("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
 
-    private static readonly Regex s_aattrRegex =
+    private static readonly Regex AattrRegex =
         new("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
     private readonly ApplicationPartManager _applicationPartManager;
@@ -50,12 +50,11 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
     private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
     private bool _disposedValue;
     private volatile bool _hasModels; // volatile 'cos reading outside lock
-    private Infos _infos = new() {ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>()};
+    private Infos _infos = new() { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
     private bool _pendingRebuild;
     private RoslynCompiler? _roslynCompiler;
     private int? _skipver;
     private int _ver;
-
 
     public InMemoryModelFactory(
         Lazy<UmbracoServices> umbracoServices,
@@ -105,7 +104,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
     }
 
-    private UmbracoServices UmbracoServices => _umbracoServices.Value;
+    public event EventHandler? ModelsChanged;
 
     /// <summary>
     ///     Gets the currently loaded Live models assembly
@@ -114,6 +113,11 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
     ///     Can be null
     /// </remarks>
     public Assembly? CurrentModelsAssembly { get; private set; }
+
+    /// <inheritdoc />
+    public object SyncRoot { get; } = new();
+
+    private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
     /// <summary>
     ///     Gets the RoslynCompiler
@@ -131,9 +135,6 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
             return _roslynCompiler;
         }
     }
-
-    /// <inheritdoc />
-    public object SyncRoot { get; } = new();
 
     /// <inheritdoc />
     public bool Enabled => _config.ModelsMode == ModelsMode.InMemoryAuto;
@@ -209,6 +210,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
     }
 
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
@@ -219,62 +221,8 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         _hostingLifetime.UnregisterObject(this);
     }
 
-    public event EventHandler? ModelsChanged;
-
-    /// <summary>
-    ///     Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly
-    ///     reference if we have one
-    /// </summary>
-    /// <remarks>
-    ///     This is required because the razor engine will only try to load things from the default context, it doesn't know
-    ///     anything
-    ///     about our context so we need to proxy.
-    /// </remarks>
-    private Assembly? OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext,
-        AssemblyName assemblyName)
-        => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
-            ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
-            : null;
-
-    // tells the factory that it should build a new generation of models
-    private void ResetModels()
-    {
-        _logger.LogDebug("Resetting models.");
-
-        try
-        {
-            _locker.EnterWriteLock();
-
-            _hasModels = false;
-            _pendingRebuild = true;
-
-            if (!Directory.Exists(_pureLiveDirectory.Value))
-            {
-                Directory.CreateDirectory(_pureLiveDirectory.Value);
-            }
-
-            // clear stuff
-            var modelsHashFile = Path.Combine(_pureLiveDirectory.Value, "models.hash");
-            var dllPathFile = Path.Combine(_pureLiveDirectory.Value, "all.dll.path");
-
-            if (File.Exists(dllPathFile))
-            {
-                File.Delete(dllPathFile);
-            }
-
-            if (File.Exists(modelsHashFile))
-            {
-                File.Delete(modelsHashFile);
-            }
-        }
-        finally
-        {
-            if (_locker.IsWriteLockHeld)
-            {
-                _locker.ExitWriteLock();
-            }
-        }
-    }
+    public string PureLiveDirectoryAbsolute() =>
+        _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
 
     // ensure that the factory is running with the lastest generation of models
     internal Infos EnsureModels()
@@ -346,7 +294,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
                     finally
                     {
                         CurrentModelsAssembly = null;
-                        _infos = new Infos {ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>()};
+                        _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
                     }
                 }
 
@@ -370,10 +318,200 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         }
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                if (_watcher is not null)
+                {
+                    _watcher.EnableRaisingEvents = false;
+                    _watcher.Dispose();
+                }
 
-    public string PureLiveDirectoryAbsolute() =>
-        _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
+                _locker.Dispose();
+            }
 
+            _disposedValue = true;
+        }
+    }
+
+    /// <summary>
+    ///     Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly
+    ///     reference if we have one
+    /// </summary>
+    /// <remarks>
+    ///     This is required because the razor engine will only try to load things from the default context, it doesn't know
+    ///     anything
+    ///     about our context so we need to proxy.
+    /// </remarks>
+    private Assembly? OnResolvingDefaultAssemblyLoadContext(
+        AssemblyLoadContext assemblyLoadContext,
+        AssemblyName assemblyName)
+        => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
+            ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
+            : null;
+
+    // tells the factory that it should build a new generation of models
+    private void ResetModels()
+    {
+        _logger.LogDebug("Resetting models.");
+
+        try
+        {
+            _locker.EnterWriteLock();
+
+            _hasModels = false;
+            _pendingRebuild = true;
+
+            if (!Directory.Exists(_pureLiveDirectory.Value))
+            {
+                Directory.CreateDirectory(_pureLiveDirectory.Value);
+            }
+
+            // clear stuff
+            var modelsHashFile = Path.Combine(_pureLiveDirectory.Value, "models.hash");
+            var dllPathFile = Path.Combine(_pureLiveDirectory.Value, "all.dll.path");
+
+            if (File.Exists(dllPathFile))
+            {
+                File.Delete(dllPathFile);
+            }
+
+            if (File.Exists(modelsHashFile))
+            {
+                File.Delete(modelsHashFile);
+            }
+        }
+        finally
+        {
+            if (_locker.IsWriteLockHeld)
+            {
+                _locker.ExitWriteLock();
+            }
+        }
+    }
+
+    private static Infos RegisterModels(IEnumerable<Type> types)
+    {
+        Type[] ctorArgTypes = { typeof(IPublishedElement), typeof(IPublishedValueFallback) };
+        var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
+        var map = new Dictionary<string, Type>();
+
+        foreach (Type type in types)
+        {
+            ConstructorInfo? constructor = null;
+            Type? parameterType = null;
+
+            foreach (ConstructorInfo ctor in type.GetConstructors())
+            {
+                ParameterInfo[] parms = ctor.GetParameters();
+                if (parms.Length == 2 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType) &&
+                    typeof(IPublishedValueFallback).IsAssignableFrom(parms[1].ParameterType))
+                {
+                    if (constructor != null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
+                    }
+
+                    constructor = ctor;
+                    parameterType = parms[0].ParameterType;
+                }
+            }
+
+            if (constructor == null)
+            {
+                throw new InvalidOperationException(
+                    $"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
+            }
+
+            PublishedModelAttribute? attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
+            var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
+
+            if (modelInfos.TryGetValue(typeName, out ModelInfo? modelInfo))
+            {
+                throw new InvalidOperationException(
+                    $"Both types {type.FullName} and {modelInfo.ModelType?.FullName} want to be a model type for content type with alias \"{typeName}\".");
+            }
+
+            // TODO: use Core's ReflectionUtilities.EmitCtor !!
+            // Yes .. DynamicMethod is uber slow
+            // TODO: But perhaps https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.constructorbuilder?view=netcore-3.1 is better still?
+            // See CtorInvokeBenchmarks
+            var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
+            ILGenerator gen = meth.GetILGenerator();
+            gen.Emit(OpCodes.Ldarg_0);
+            gen.Emit(OpCodes.Ldarg_1);
+            gen.Emit(OpCodes.Newobj, constructor);
+            gen.Emit(OpCodes.Ret);
+            var func = (Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>)meth.CreateDelegate(
+                typeof(Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>));
+
+            modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
+            map[typeName] = type;
+        }
+
+        return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
+    }
+
+    private static string GenerateModelsProj(IDictionary<string, string> files)
+    {
+        // ideally we would generate a CSPROJ file but then we'd need a BuildProvider for csproj
+        // trying to keep things simple for the time being, just write everything to one big file
+
+        // group all 'using' at the top of the file (else fails)
+        var usings = new List<string>();
+        foreach (var k in files.Keys.ToList())
+        {
+            files[k] = UsingRegex.Replace(files[k], m =>
+            {
+                usings.Add(m.Groups[1].Value);
+                return string.Empty;
+            });
+        }
+
+        // group all '[assembly:...]' at the top of the file (else fails)
+        var aattrs = new List<string>();
+        foreach (var k in files.Keys.ToList())
+        {
+            files[k] = AattrRegex.Replace(files[k], m =>
+            {
+                aattrs.Add(m.Groups[1].Value);
+                return string.Empty;
+            });
+        }
+
+        var text = new StringBuilder();
+        foreach (var u in usings.Distinct())
+        {
+            text.Append("using ");
+            text.Append(u);
+            text.Append(";\r\n");
+        }
+
+        foreach (var a in aattrs)
+        {
+            text.Append("[assembly:");
+            text.Append(a);
+            text.Append("]\r\n");
+        }
+
+        text.Append("\r\n\r\n");
+        foreach (KeyValuePair<string, string> f in files)
+        {
+            text.Append("// FILE: ");
+            text.Append(f.Key);
+            text.Append("\r\n\r\n");
+            text.Append(f.Value);
+            text.Append("\r\n\r\n\r\n");
+        }
+
+        text.Append("// EOF\r\n");
+
+        return text.ToString();
+    }
 
     // This is NOT thread safe but it is only called from within a lock
     private Assembly ReloadAssembly(string pathToAssembly)
@@ -512,7 +650,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
             // must reset the version in the file else it would keep growing
             // loading cached modules only happens when the app restarts
             var text = File.ReadAllText(projFile);
-            Match match = s_assemblyVersionRegex.Match(text);
+            Match match = AssemblyVersionRegex.Match(text);
             if (match.Success)
             {
                 text = text.Replace(match.Value, "AssemblyVersion(\"0.0.0." + _ver + "\")");
@@ -544,6 +682,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
 
         // generate code, save
         var code = GenerateModelsCode(typeModels);
+
         // add extra attributes,
         //  IsLive=true helps identifying Assemblies that contain live models
         //  AssemblyVersion is so that we have a different version for each rebuild
@@ -555,7 +694,7 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         File.WriteAllText(modelsSrcFile, code);
 
         // generate proj, save
-        var projFiles = new Dictionary<string, string> {{"models.generated.cs", code}};
+        var projFiles = new Dictionary<string, string> { { "models.generated.cs", code } };
         var proj = GenerateModelsProj(projFiles);
         File.WriteAllText(projFile, proj);
 
@@ -617,7 +756,6 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         return Path.Combine(dirInfo.FullName, $"generated.cs{currentHash}.dll");
     }
 
-
     private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
     {
         _logger.LogDebug("Failed to compile.");
@@ -649,69 +787,6 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         }
     }
 
-    private static Infos RegisterModels(IEnumerable<Type> types)
-    {
-        Type[] ctorArgTypes = {typeof(IPublishedElement), typeof(IPublishedValueFallback)};
-        var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
-        var map = new Dictionary<string, Type>();
-
-        foreach (Type type in types)
-        {
-            ConstructorInfo? constructor = null;
-            Type? parameterType = null;
-
-            foreach (ConstructorInfo ctor in type.GetConstructors())
-            {
-                ParameterInfo[] parms = ctor.GetParameters();
-                if (parms.Length == 2 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType) &&
-                    typeof(IPublishedValueFallback).IsAssignableFrom(parms[1].ParameterType))
-                {
-                    if (constructor != null)
-                    {
-                        throw new InvalidOperationException(
-                            $"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
-                    }
-
-                    constructor = ctor;
-                    parameterType = parms[0].ParameterType;
-                }
-            }
-
-            if (constructor == null)
-            {
-                throw new InvalidOperationException(
-                    $"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
-            }
-
-            PublishedModelAttribute? attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
-            var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
-
-            if (modelInfos.TryGetValue(typeName, out ModelInfo? modelInfo))
-            {
-                throw new InvalidOperationException(
-                    $"Both types {type.FullName} and {modelInfo.ModelType?.FullName} want to be a model type for content type with alias \"{typeName}\".");
-            }
-
-            // TODO: use Core's ReflectionUtilities.EmitCtor !!
-            // Yes .. DynamicMethod is uber slow
-            // TODO: But perhaps https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.constructorbuilder?view=netcore-3.1 is better still?
-            // See CtorInvokeBenchmarks
-            var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
-            ILGenerator gen = meth.GetILGenerator();
-            gen.Emit(OpCodes.Ldarg_0);
-            gen.Emit(OpCodes.Ldarg_1);
-            gen.Emit(OpCodes.Newobj, constructor);
-            gen.Emit(OpCodes.Ret);
-            var func = (Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>)meth.CreateDelegate(
-                typeof(Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>));
-
-            modelInfos[typeName] = new ModelInfo {ParameterType = parameterType, Ctor = func, ModelType = type};
-            map[typeName] = type;
-        }
-
-        return new Infos {ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map};
-    }
-
     private string GenerateModelsCode(IList<TypeModel> typeModels)
     {
         if (!Directory.Exists(_pureLiveDirectory.Value))
@@ -733,64 +808,6 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         return code;
     }
 
-
-    private static string GenerateModelsProj(IDictionary<string, string> files)
-    {
-        // ideally we would generate a CSPROJ file but then we'd need a BuildProvider for csproj
-        // trying to keep things simple for the time being, just write everything to one big file
-
-        // group all 'using' at the top of the file (else fails)
-        var usings = new List<string>();
-        foreach (var k in files.Keys.ToList())
-        {
-            files[k] = s_usingRegex.Replace(files[k], m =>
-            {
-                usings.Add(m.Groups[1].Value);
-                return string.Empty;
-            });
-        }
-
-        // group all '[assembly:...]' at the top of the file (else fails)
-        var aattrs = new List<string>();
-        foreach (var k in files.Keys.ToList())
-        {
-            files[k] = s_aattrRegex.Replace(files[k], m =>
-            {
-                aattrs.Add(m.Groups[1].Value);
-                return string.Empty;
-            });
-        }
-
-        var text = new StringBuilder();
-        foreach (var u in usings.Distinct())
-        {
-            text.Append("using ");
-            text.Append(u);
-            text.Append(";\r\n");
-        }
-
-        foreach (var a in aattrs)
-        {
-            text.Append("[assembly:");
-            text.Append(a);
-            text.Append("]\r\n");
-        }
-
-        text.Append("\r\n\r\n");
-        foreach (KeyValuePair<string, string> f in files)
-        {
-            text.Append("// FILE: ");
-            text.Append(f.Key);
-            text.Append("\r\n\r\n");
-            text.Append(f.Value);
-            text.Append("\r\n\r\n\r\n");
-        }
-
-        text.Append("// EOF\r\n");
-
-        return text.ToString();
-    }
-
     private void WatcherOnChanged(object sender, FileSystemEventArgs args)
     {
         var changed = args.Name;
@@ -801,14 +818,14 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         // race conditions can occur on slow Cloud filesystems and then we keep
         // rebuilding
 
-        //if (_building && OurFiles.Contains(changed))
-        //{
+        // if (_building && OurFiles.Contains(changed))
+        // {
         //    //_logger.LogInformation<InMemoryModelFactory>("Ignoring files self-changes.");
         //    return;
-        //}
+        // }
 
         // always ignore our own file changes
-        if (s_ourFiles.Contains(changed))
+        if (OurFiles.Contains(changed))
         {
             return;
         }
@@ -818,25 +835,6 @@ internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObj
         lock (SyncRoot) // don't reset while being locked
         {
             ResetModels();
-        }
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                if (_watcher is not null)
-                {
-                    _watcher.EnableRaisingEvents = false;
-                    _watcher.Dispose();
-                }
-
-                _locker.Dispose();
-            }
-
-            _disposedValue = true;
         }
     }
 

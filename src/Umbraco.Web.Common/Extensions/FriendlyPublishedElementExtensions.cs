@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -89,7 +89,6 @@ public static class FriendlyPublishedElementExtensions
     ///     the content is visible.
     /// </remarks>
     public static bool IsVisible(this IPublishedElement content) => content.IsVisible(PublishedValueFallback);
-
 
     /// <summary>
     ///     Gets the value of a property.

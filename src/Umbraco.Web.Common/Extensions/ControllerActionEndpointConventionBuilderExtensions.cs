@@ -30,7 +30,6 @@ public static class ControllerActionEndpointConventionBuilderExtensions
                     // This is more or less like the IApplicationModelProvider, it allows us to add filters, etc... to the ControllerActionDescriptor
                     // dynamically. Here we will add our custom virtual page filter along with a callback in the endpoint's metadata
                     // to execute in order to find the IPublishedContent for the request.
-
                     var filter = new UmbracoVirtualPageFilterAttribute();
 
                     // Check if this already contains this filter since we don't want it applied twice.

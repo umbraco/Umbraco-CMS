@@ -36,7 +36,7 @@ public static class UrlHelperExtensions
         }
 
         return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType),
-            new {area = Constants.Web.Mvc.BackOfficeApiArea});
+            new { area = Constants.Web.Mvc.BackOfficeApiArea });
     }
 
     /// <summary>
@@ -48,12 +48,14 @@ public static class UrlHelperExtensions
     /// <param name="actionName"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public static string? GetUmbracoApiService<T>(this IUrlHelper url,
+    public static string? GetUmbracoApiService<T>(
+        this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, string actionName, object? id = null)
         where T : UmbracoApiController =>
         url.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, typeof(T), id);
 
-    public static string? GetUmbracoApiService<T>(this IUrlHelper url,
+    public static string? GetUmbracoApiService<T>(
+        this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
         Expression<Func<T, object>> methodSelector)
         where T : UmbracoApiController
@@ -84,7 +86,8 @@ public static class UrlHelperExtensions
     /// <param name="apiControllerType"></param>
     /// <param name="id"></param>
     /// <returns></returns>
-    public static string? GetUmbracoApiService(this IUrlHelper url,
+    public static string? GetUmbracoApiService(
+        this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, string actionName,
         Type apiControllerType, object? id = null)
     {
@@ -95,7 +98,8 @@ public static class UrlHelperExtensions
 
         if (string.IsNullOrWhiteSpace(actionName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(actionName));
         }
 
@@ -104,7 +108,7 @@ public static class UrlHelperExtensions
             throw new ArgumentNullException(nameof(apiControllerType));
         }
 
-        var area = "";
+        var area = string.Empty;
 
         Type? apiController = umbracoApiControllerTypeCollection.SingleOrDefault(x => x == apiControllerType);
         if (apiController == null)
@@ -116,7 +120,7 @@ public static class UrlHelperExtensions
         PluginControllerMetadata metaData = PluginController.GetMetadata(apiController);
         if (metaData.AreaName.IsNullOrWhiteSpace() == false)
         {
-            //set the area to the plugin area
+            // set the area to the plugin area
             area = metaData.AreaName;
         }
 
@@ -133,7 +137,7 @@ public static class UrlHelperExtensions
     /// <param name="id"></param>
     /// <returns></returns>
     public static string? GetUmbracoApiService(this IUrlHelper url, string actionName, string controllerName,
-        object? id = null) => url.GetUmbracoApiService(actionName, controllerName, "", id);
+        object? id = null) => url.GetUmbracoApiService(actionName, controllerName, string.Empty, id);
 
     /// <summary>
     ///     Return the Url for a Web Api service
@@ -154,7 +158,8 @@ public static class UrlHelperExtensions
 
         if (string.IsNullOrWhiteSpace(actionName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(actionName));
         }
 
@@ -165,7 +170,8 @@ public static class UrlHelperExtensions
 
         if (string.IsNullOrWhiteSpace(controllerName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(controllerName));
         }
 
@@ -176,15 +182,15 @@ public static class UrlHelperExtensions
                 return url.Action(actionName, controllerName);
             }
 
-            return url.Action(actionName, controllerName, new {id});
+            return url.Action(actionName, controllerName, new { id });
         }
 
         if (id == null)
         {
-            return url.Action(actionName, controllerName, new {area});
+            return url.Action(actionName, controllerName, new { area });
         }
 
-        return url.Action(actionName, controllerName, new {area, id});
+        return url.Action(actionName, controllerName, new { area, id });
     }
 
     /// <summary>
@@ -195,12 +201,14 @@ public static class UrlHelperExtensions
     /// <param name="umbracoApiControllerTypeCollection"></param>
     /// <param name="actionName"></param>
     /// <returns></returns>
-    public static string? GetUmbracoApiServiceBaseUrl<T>(this IUrlHelper url,
+    public static string? GetUmbracoApiServiceBaseUrl<T>(
+        this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, string actionName)
         where T : UmbracoApiController =>
         url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEnd(actionName);
 
-    public static string? GetUmbracoApiServiceBaseUrl<T>(this IUrlHelper url,
+    public static string? GetUmbracoApiServiceBaseUrl<T>(
+        this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
         Expression<Func<T, object>> methodSelector)
         where T : UmbracoApiController
@@ -239,10 +247,10 @@ public static class UrlHelperExtensions
     public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion,
         IRuntimeMinifier runtimeMinifier)
     {
-        //make a hash of umbraco and client dependency version
-        //in case the user bypasses the installer and just bumps the web.config or client dependency config
+        // make a hash of umbraco and client dependency version
+        // in case the user bypasses the installer and just bumps the web.config or client dependency config
 
-        //if in debug mode, always burst the cache
+        // if in debug mode, always burst the cache
         if (hostingEnvironment.IsDebugMode)
         {
             return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
@@ -264,9 +272,6 @@ public static class UrlHelperExtensions
         return CreateHtmlString(url, htmlEncode);
     }
 
-    private static IHtmlContent CreateHtmlString(string? url, bool htmlEncode) =>
-        htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
-
     public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias,
         string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
     {
@@ -280,7 +285,11 @@ public static class UrlHelperExtensions
         return CreateHtmlString(url, htmlEncode);
     }
 
-    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
+    private static IHtmlContent CreateHtmlString(string? url, bool htmlEncode) =>
+        htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+
+    public static IHtmlContent GetCropUrl(
+        this IUrlHelper urlHelper,
         IPublishedContent mediaItem,
         int? width = null,
         int? height = null,
@@ -307,7 +316,8 @@ public static class UrlHelperExtensions
         return CreateHtmlString(url, htmlEncode);
     }
 
-    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
+    public static IHtmlContent GetCropUrl(
+        this IUrlHelper urlHelper,
         ImageCropperValue imageCropperValue,
         string cropAlias,
         int? width = null,
@@ -357,7 +367,7 @@ public static class UrlHelperExtensions
     public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext,
         IDataProtectionProvider dataProtectionProvider, string action, string controllerName,
         object? additionalRouteVals) => url.SurfaceAction(umbracoContext, dataProtectionProvider, action,
-        controllerName, "", additionalRouteVals);
+        controllerName, string.Empty, additionalRouteVals);
 
     /// <summary>
     ///     Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
@@ -11,7 +11,7 @@ public static class ActionResultExtensions
         var statusCode = actionResult switch
         {
             IStatusCodeActionResult x => x.StatusCode,
-            _ => null
+            _ => null,
         };
 
         return statusCode.HasValue && statusCode.Value >= (int)HttpStatusCode.OK &&

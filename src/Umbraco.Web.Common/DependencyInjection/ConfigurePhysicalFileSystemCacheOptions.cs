@@ -20,7 +20,8 @@ public sealed class ConfigurePhysicalFileSystemCacheOptions : IConfigureOptions<
     /// </summary>
     /// <param name="imagingSettings">The Umbraco imaging settings.</param>
     /// <param name="hostEnvironment">The host environment.</param>
-    public ConfigurePhysicalFileSystemCacheOptions(IOptions<ImagingSettings> imagingSettings,
+    public ConfigurePhysicalFileSystemCacheOptions(
+        IOptions<ImagingSettings> imagingSettings,
         IHostEnvironment hostEnvironment)
     {
         _imagingSettings = imagingSettings.Value;

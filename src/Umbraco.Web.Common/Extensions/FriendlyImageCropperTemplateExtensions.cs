@@ -167,8 +167,7 @@ public static class FriendlyImageCropperTemplateExtensions
             useCropDimensions,
             cacheBuster,
             furtherOptions,
-            urlMode
-        );
+            urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the MediaWithCrops item.
@@ -233,8 +232,7 @@ public static class FriendlyImageCropperTemplateExtensions
             useCropDimensions,
             cacheBuster,
             furtherOptions,
-            urlMode
-        );
+            urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the image path.
@@ -294,8 +292,7 @@ public static class FriendlyImageCropperTemplateExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
-            furtherOptions
-        );
+            furtherOptions);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the image path.
@@ -354,9 +351,7 @@ public static class FriendlyImageCropperTemplateExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
-            furtherOptions
-        );
-
+            furtherOptions);
 
     [Obsolete(
         "Use GetCropUrl to merge local and media crops, get automatic cache buster value and have more parameters.")]

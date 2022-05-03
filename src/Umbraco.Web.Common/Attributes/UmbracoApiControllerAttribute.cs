@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Web.Common.ApplicationModels;
+using Umbraco.Cms.Web.Common.ApplicationModels;
 
 namespace Umbraco.Cms.Web.Common.Attributes;
 

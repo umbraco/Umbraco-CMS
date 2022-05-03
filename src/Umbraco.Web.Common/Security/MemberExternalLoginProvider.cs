@@ -31,5 +31,6 @@ public class MemberExternalLoginProvider : IEquatable<MemberExternalLoginProvide
         other != null && AuthenticationType == other.AuthenticationType;
 
     public override bool Equals(object? obj) => Equals(obj as MemberExternalLoginProvider);
+
     public override int GetHashCode() => HashCode.Combine(AuthenticationType);
 }

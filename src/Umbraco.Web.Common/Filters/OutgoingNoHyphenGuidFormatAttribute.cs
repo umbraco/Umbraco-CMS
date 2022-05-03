@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -11,8 +11,9 @@ namespace Umbraco.Cms.Web.Common.Filters;
 
 public class OutgoingNoHyphenGuidFormatAttribute : TypeFilterAttribute
 {
-    public OutgoingNoHyphenGuidFormatAttribute() : base(typeof(OutgoingNoHyphenGuidFormatFilter)) =>
-        Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
+    public OutgoingNoHyphenGuidFormatAttribute()
+        : base(typeof(OutgoingNoHyphenGuidFormatFilter)) =>
+        Order = 2; // must be higher than AngularJsonOnlyConfigurationAttribute.Order
 
     private class OutgoingNoHyphenGuidFormatFilter : IResultFilter
     {

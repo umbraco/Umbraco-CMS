@@ -22,9 +22,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
         builder.Services.AddImageSharp()
+
             // Replace default image provider
             .ClearProviders()
             .AddProvider<WebRootImageProvider>()
+
             // Add custom processors
             .AddProcessor<CropWebProcessor>();
 

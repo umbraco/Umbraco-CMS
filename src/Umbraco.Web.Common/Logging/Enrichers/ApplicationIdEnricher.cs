@@ -14,6 +14,7 @@ internal class ApplicationIdEnricher : ILogEventEnricher
         _applicationDiscriminator = applicationDiscriminator;
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory) =>
-        logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(ApplicationIdProperty,
+        logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(
+            ApplicationIdProperty,
             _applicationDiscriminator.GetApplicationId()));
 }

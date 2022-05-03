@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
+namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 public interface IUmbracoEndpointBuilder
 {

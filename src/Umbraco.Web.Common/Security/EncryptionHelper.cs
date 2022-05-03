@@ -12,14 +12,13 @@ namespace Umbraco.Cms.Web.Common.Security;
 
 public class EncryptionHelper
 {
-    // TODO: Decide if these belong here... I don't think so since this all has to do with surface controller routes
-    // could also just be injected too....
-
-    private static IDataProtector CreateDataProtector(IDataProtectionProvider dataProtectionProvider)
-        => dataProtectionProvider.CreateProtector(nameof(EncryptionHelper));
-
     public static string Decrypt(string encryptedString, IDataProtectionProvider dataProtectionProvider)
         => CreateDataProtector(dataProtectionProvider).Unprotect(encryptedString);
+
+    // TODO: Decide if these belong here... I don't think so since this all has to do with surface controller routes
+    // could also just be injected too....
+    private static IDataProtector CreateDataProtector(IDataProtectionProvider dataProtectionProvider)
+        => dataProtectionProvider.CreateProtector(nameof(EncryptionHelper));
 
     public static string Encrypt(string plainString, IDataProtectionProvider dataProtectionProvider)
         => CreateDataProtector(dataProtectionProvider).Protect(plainString);
@@ -29,7 +28,8 @@ public class EncryptionHelper
     ///     submitted in a request for which
     ///     Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
     /// </summary>
-    public static string CreateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider,
+    public static string CreateEncryptedRouteString(
+        IDataProtectionProvider dataProtectionProvider,
         string controllerName, string controllerAction, string area, object? additionalRouteVals = null)
     {
         if (dataProtectionProvider is null)
@@ -44,7 +44,8 @@ public class EncryptionHelper
 
         if (string.IsNullOrEmpty(controllerAction))
         {
-            throw new ArgumentException($"'{nameof(controllerAction)}' cannot be null or empty.",
+            throw new ArgumentException(
+                $"'{nameof(controllerAction)}' cannot be null or empty.",
                 nameof(controllerAction));
         }
 
@@ -83,7 +84,8 @@ public class EncryptionHelper
         return Encrypt(surfaceRouteParams, dataProtectionProvider);
     }
 
-    public static bool DecryptAndValidateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider,
+    public static bool DecryptAndValidateEncryptedRouteString(
+        IDataProtectionProvider dataProtectionProvider,
         string encryptedString, [MaybeNullWhen(false)] out IDictionary<string, string?> parts)
     {
         if (dataProtectionProvider == null)

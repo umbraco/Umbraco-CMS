@@ -29,7 +29,6 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
     public void Configure(CookieAuthenticationOptions options)
     {
         // TODO: We may want/need to configure these further
-
         options.LoginPath = null;
         options.AccessDeniedPath = null;
         options.LogoutPath = null;
@@ -46,7 +45,7 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
                 ctx.HttpContext.SetPrincipalForRequest(ctx.Principal);
 
                 return Task.CompletedTask;
-            }
+            },
         };
     }
 }

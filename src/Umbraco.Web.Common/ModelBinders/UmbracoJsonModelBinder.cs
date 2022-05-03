@@ -26,7 +26,7 @@ public class UmbracoJsonModelBinder : BodyModelBinder, IModelBinder
     private static IInputFormatter[] GetNewtonsoftJsonFormatter(ILoggerFactory logger, ArrayPool<char> arrayPool,
         ObjectPoolProvider objectPoolProvider)
     {
-        var jsonOptions = new MvcNewtonsoftJsonOptions {AllowInputFormatterExceptionMessages = true};
+        var jsonOptions = new MvcNewtonsoftJsonOptions { AllowInputFormatterExceptionMessages = true };
 
         JsonSerializerSettings ss = jsonOptions.SerializerSettings; // Just use the defaults as base
 
@@ -40,7 +40,7 @@ public class UmbracoJsonModelBinder : BodyModelBinder, IModelBinder
                 arrayPool,
                 objectPoolProvider,
                 new MvcOptions(), // The only option that NewtonsoftJsonInputFormatter uses is SuppressInputFormatterBuffering
-                jsonOptions)
+                jsonOptions),
         };
     }
 }
