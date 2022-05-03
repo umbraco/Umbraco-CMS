@@ -30,6 +30,7 @@
         -->
         <contentFiles />
     </metadata>
-    <files>
-    </files>
+  <files>
+    <file src="buildTransitive\Umbraco.Cms.props" target="buildTransitive" />
+  </files>
 </package>

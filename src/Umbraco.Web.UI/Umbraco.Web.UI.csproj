@@ -5,7 +5,7 @@
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
   </PropertyGroup>
 
-  <Import Project="..\Umbraco.Cms.StaticAssets\buildTransitive\Umbraco.Cms.StaticAssets.props" />
+  <Import Project="..\..\build\NuSpecs\buildTransitive\Umbraco.Cms.props" />
   
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
