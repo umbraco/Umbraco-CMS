@@ -24,11 +24,11 @@
 
                     <umb-property-actions ng-if="!vm.showInherit" actions="vm.propertyActions"></umb-property-actions>
 
-                    <small class="control-description" ng-if="vm.property.description" ng-bind-html="vm.property.description | simpleMarkdown"></small>
+                    <small class="control-description" ng-if="vm.property.description && vm.markdownReady" ng-bind-html="vm.property.description | simpleMarkdown"></small>
 
                     <div ng-if="vm.property.extendedDescription">
 
-                      <div ng-if="vm.property.extendedDescriptionVisible">
+                      <div ng-if="vm.property.extendedDescriptionVisible && vm.markdownReady">
                         <small class="control-description" ng-bind-html="vm.property.extendedDescription | simpleMarkdown"></small>
                       </div>
 

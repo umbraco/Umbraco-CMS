@@ -9,7 +9,9 @@ angular.module("umbraco.filters").filter('simpleMarkdown', function () {
 	if (!text) {
 		return '';
     }
-
+    if (window.markdown) {
+      return window.markdown.toHTML(text).trim();
+    }
     return text
       .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
       .replace(/\*(.*)\*/gim, '<i>$1</i>')

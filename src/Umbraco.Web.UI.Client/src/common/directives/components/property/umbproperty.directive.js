@@ -60,37 +60,43 @@
             return serverValidationManager.createPropertyValidationKey(valPath, parentValidationPath);
         }
 
-        function onInit() {
-            vm.controlLabelTitle = null;
-            if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
-                userService.getCurrentUser().then(function (u) {
-                    if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
-                        vm.controlLabelTitle = vm.property.alias;
-                    }
-                });
-            }
+      function onInit() {
+        assetsService.load([
+          "lib/markdown/markdown.converter.js"
+        ])
+          .then(function () {
+            vm.markdownReady = true;
+          });
+        vm.controlLabelTitle = null;
+        if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+            userService.getCurrentUser().then(function (u) {
+                if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                    vm.controlLabelTitle = vm.property.alias;
+                }
+            });
+        }
 
-            if (!vm.parentUmbProperty) {
-                // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
-                // inheritance is (i.e.infinite editing)
-                var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "UmbPropertyController");
-                vm.parentUmbProperty = found ? found.vm : null;
-          }
+        if (!vm.parentUmbProperty) {
+            // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
+            // inheritance is (i.e.infinite editing)
+            var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "UmbPropertyController");
+            vm.parentUmbProperty = found ? found.vm : null;
+        }
 
-          if (vm.property.description) {
-            // split by lines containing only '--'
-            var descriptionParts = vm.property.description.split(/^--$/gim);
-            if (descriptionParts.length > 1) {
-              // if more than one part, we have an extended description,
-              // combine to one extended description, and remove leading linebreak
-              vm.property.extendedDescription = descriptionParts.splice(1).join("--").substring(1);
-              vm.property.extendedDescriptionVisible = false;
+        if (vm.property.description) {
+          // split by lines containing only '--'
+          var descriptionParts = vm.property.description.split(/^--$/gim);
+          if (descriptionParts.length > 1) {
+            // if more than one part, we have an extended description,
+            // combine to one extended description, and remove leading linebreak
+            vm.property.extendedDescription = descriptionParts.splice(1).join("--").substring(1);
+            vm.property.extendedDescriptionVisible = false;
 
-              // set propertydescription to first part, and remove trailing linebreak
-              vm.property.description = descriptionParts[0].slice(0, -1);
-            }
+            // set propertydescription to first part, and remove trailing linebreak
+            vm.property.description = descriptionParts[0].slice(0, -1);
           }
         }
+      }
 
     }
 
