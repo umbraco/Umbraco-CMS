@@ -1,10 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <PackageId>Umbraco.Cms.StaticAssets</PackageId>
-    <Description>Contains the static assets that is required to run Umbraco CMS.</Description>
+    <Description>Contains the static assets that are required to run Umbraco CMS.</Description>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
 
@@ -14,7 +13,7 @@
       <PackagePath>buildTransitive</PackagePath>
     </None>
   </ItemGroup>
-  
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -28,39 +27,33 @@
     <BellePath>$(ProjectDir)wwwroot/umbraco</BellePath>
   </PropertyGroup>
 
-  <Target Name="CheckPreconditions" BeforeTargets="Build">
-    <Message Text="-CheckPreconditions-" Importance="high" />
-    <Message Text="BellePath:       $(BellePath)" Importance="high" />
-
-    <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
-    <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip Belle because $(BellePath) exists." Importance="High" Condition="Exists('$(BellePath)')" />
-    <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
-    <CallTarget Targets="BelleBuild" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
-    <Message Text="Skip JsonSchema generation because $(JsonSchemaPath) exists." Importance="High" Condition="Exists('$(JsonSchemaPath)')" />
-    <Message Text="Generate the appsettings json schema." Importance="High" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
+  <Target Name="ConditionalBelleBuild" BeforeTargets="Build">
+    <!-- Build Belle (when building) if not running manual/CI build and the build folder does not exist yet -->
+    <Message Text="Conditional BelleBuild using BellePath: $(BellePath)" Importance="high" />
+    <Message Text="Skip BelleBuild, because UmbracoBuild is '$(UmbracoBuild)' (manual/CI build)" Importance="High" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BelleBuild, because BellePath already exists" Importance="High" Condition="Exists('$(BellePath)')" />
+    <Message Text="Invoke BelleBuild, because UmbracoBuild is empty (not a manual/CI build) and BellePath does not exist" Importance="High" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
+    <CallTarget Targets="BelleBuild" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
   </Target>
-
 
   <Target Name="BelleBuild">
     <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm ci --no-fund --no-audit --prefer-offline" />
     <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm run build:skip-tests" />
   </Target>
 
-  <!-- Clean Belle when cleaning and rebuilding, but only in Visual Studio -->
-  <Target Name="CleanPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-    <Message Text="-CleanPreconditions-" Importance="high" />
-    <Message Text="Nothing to clean, as $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)')" />
-    <Message Text="Not cleaning (found src/preserve.belle)." Importance="High" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Remove $(BellePath)." Importance="High" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <ItemGroup>
-      <BelleLib Include="$(BellePath)" />
-    </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Remove $(JsonSchemaPath)." Importance="High" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
-    <Delete Files="$(JsonSchemaPath)" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
+  <Target Name="ConditionalBelleClean" AfterTargets="Clean">
+    <!-- Clean Belle (when cleaning and rebuilding) if not running manual/CI build, the build folder exists, but preserve.belle does not exist -->
+    <Message Text="Conditional BelleClean using BellePath: $(BellePath)" Importance="high" />
+    <Message Text="Skip BelleClean, because UmbracoBuild is '$(UmbracoBuild)' (running manual/CI build)" Importance="High" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BelleClean, because BellePath does not exist" Importance="High" Condition="!Exists('$(BellePath)')" />
+    <Message Text="Skip BelleClean, because preserve.belle exists" Importance="High" Condition="Exists('$(SolutionDir)preserve.belle')" />
+    <Message Text="Invoke BelleClean, because UmbracoBuild is empty (not a manual/CI build), BellePath exists, but preserve.belle does not exist" Importance="High" Condition="'$(UmbracoBuild)' == '' and Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+    <CallTarget Targets="BelleClean" Condition="'$(UmbracoBuild)' == '' and Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
   </Target>
 
+  <Target Name="BelleClean">
+    <RemoveDir Directories="$(BellePath)" />
+  </Target>
 
   <!--
       The set of files to publish is generated really early and doesn't currently account for files added by targets e.g. BeforeBuild.
@@ -79,5 +72,4 @@
       <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
-
 </Project>

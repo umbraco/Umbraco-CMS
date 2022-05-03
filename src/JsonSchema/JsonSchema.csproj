@@ -6,15 +6,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.8.0" />
-      <PackageReference Include="NJsonSchema" Version="10.6.10" />
-      <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-      <PackageReference Include="Umbraco.Deploy.Core" Version="9.3.1" />
-      <PackageReference Include="Umbraco.Forms.Core" Version="9.3.0" />
-      <PackageReference Include="Umbraco.Deploy.Core" Version="9.4.0" />
-      <PackageReference Include="Umbraco.Forms.Core" Version="9.4.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="NJsonSchema" Version="10.6.10" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+    <PackageReference Include="Umbraco.Deploy.Core" Version="9.4.0" />
+    <PackageReference Include="Umbraco.Forms.Core" Version="9.4.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
@@ -22,7 +20,7 @@
 
   <!--  Copy Forms XML docs-->
   <PropertyGroup>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
   </PropertyGroup>
 
   <Target Name="CopyPackagesXml" BeforeTargets="Build">
@@ -31,5 +29,4 @@
     </ItemGroup>
     <Copy SourceFiles="@(PackageReferenceFiles)" DestinationFolder="$(OutDir)" />
   </Target>
-
 </Project>

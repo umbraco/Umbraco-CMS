@@ -1,52 +1,44 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
+    <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
+    <Description>Contains the backoffice assembly needed to run the backoffice of Umbraco CMS. This package only contains the assembly and can be used for package development. Use the template in the Umbraco.Templates package to setup your Umbraco project.</Description>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <OutputType>Library</OutputType>
-        <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
-        <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
-        <Title>Umbraco CMS Back Office</Title>
-        <Description>Contains the Back Office assembly needed to run the back office of Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\Umbraco.Web.BackOffice.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\Umbraco.Web.BackOffice.xml</DocumentationFile>
-    </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
+  </ItemGroup>
 
-    <ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+  </ItemGroup>
 
-      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-      <PackageReference Include="Umbraco.Code" Version="2.0.0">
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-    </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-        <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
-        <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-        <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="EmbeddedResources\**\*" />
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources\**\*" />
+  </ItemGroup>
 </Project>

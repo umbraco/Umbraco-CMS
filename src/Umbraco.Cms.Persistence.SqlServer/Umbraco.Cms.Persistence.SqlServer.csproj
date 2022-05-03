@@ -1,16 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <PackageId>Umbraco.Cms.Persistence.SqlServer</PackageId>
-    <Title>Umbraco.Cms.Persistence.SqlServer</Title>
     <Description>Adds support for SQL Server to Umbraco CMS.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
@@ -19,5 +17,4 @@
       <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
 </Project>

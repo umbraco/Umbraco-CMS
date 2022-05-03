@@ -1,35 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata minClientVersion="4.1.0">
-        <id>Umbraco.Cms</id>
-        <version>9.0.0</version>
-        <title>Umbraco Cms</title>
-        <authors>Umbraco HQ</authors>
-        <owners>Umbraco HQ</owners>
-        <license type="expression">MIT</license>
-        <projectUrl>https://umbraco.com/</projectUrl>
-        <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Installs Umbraco Cms in your Visual Studio ASP.NET Core project</description>
-        <summary>Installs Umbraco Cms in your Visual Studio ASP.NET Core project</summary>
-        <language>en-US</language>
-        <tags>umbraco</tags>
-        <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
-        <dependencies>
-            <group targetFramework="net6.0">
-                <dependency id="Umbraco.Cms.Web.Website" version="[$version$]" />
-                <dependency id="Umbraco.Cms.Web.BackOffice" version="[$version$]" />
-                <dependency id="Umbraco.Cms.StaticAssets" version="[$version$]" />
-                <dependency id="Umbraco.Cms.Persistence.SqlServer" version="[$version$]" />
-                <dependency id="Umbraco.Cms.Persistence.Sqlite" version="[$version$]" />
-            </group>
-        </dependencies>
-        <!--
-        We can't use content files, as the files need to be copied into the solution, links/shortcuts to the files
-        are not good enough
-        -->
-        <contentFiles />
-    </metadata>
-    <files>
-    </files>
+  <metadata minClientVersion="4.1.0">
+    <id>Umbraco.Cms</id>
+    <version>10.0.0</version>
+    <title>Umbraco CMS</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>https://umbraco.com/</projectUrl>
+    <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Contains all assemblies needed to run Umbraco CMS. Use the template in the Umbraco.Templates package to setup your Umbraco project.</description>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <repository type="git" url="https://github.com/umbraco/Umbraco-CMS" />
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="Umbraco.Cms.Persistence.Sqlite" version="[$version$]" />
+        <dependency id="Umbraco.Cms.Persistence.SqlServer" version="[$version$]" />
+        <dependency id="Umbraco.Cms.StaticAssets" version="[$version$]" />
+        <dependency id="Umbraco.Cms.Web.BackOffice" version="[$version$]" />
+        <dependency id="Umbraco.Cms.Web.Website" version="[$version$]" />
+      </group>
+    </dependencies>
+  </metadata>
 </package>

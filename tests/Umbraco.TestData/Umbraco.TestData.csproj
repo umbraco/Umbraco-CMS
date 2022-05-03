@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <RootNamespace>Umbraco.TestData</RootNamespace>
     <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Umbraco.Cms.Tests.TestData</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +15,4 @@
     <ProjectReference Include="..\..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
-
 </Project>
