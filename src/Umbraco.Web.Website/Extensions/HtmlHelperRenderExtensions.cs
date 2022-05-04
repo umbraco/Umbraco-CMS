@@ -69,7 +69,6 @@ public static class HtmlHelperRenderExtensions
     /// <remarks>
     ///     See: http://issues.umbraco.org/issue/U4-1614
     /// </remarks>
-    [Obsolete]
     public static IHtmlContent PreviewBadge(
         this IHtmlHelper helper,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -78,6 +77,7 @@ public static class HtmlHelperRenderExtensions
         IIOHelper ioHelper,
         ContentSettings contentSettings)
     {
+        IHostingEnvironment hostingEnvironment = GetRequiredService<IHostingEnvironment>(helper);
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
         if (umbracoContext.InPreviewMode)
@@ -85,7 +85,7 @@ public static class HtmlHelperRenderExtensions
             var htmlBadge =
                 string.Format(
                     contentSettings.PreviewBadge,
-                    ioHelper.ResolveUrl(globalSettings.UmbracoPath),
+                    hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                     umbracoContext.PublishedRequest?.PublishedContent?.Id);
             return new HtmlString(htmlBadge);
