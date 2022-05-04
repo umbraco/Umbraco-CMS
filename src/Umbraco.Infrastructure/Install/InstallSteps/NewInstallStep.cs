@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
                     quickInstallSettings,
                     customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured),
-                    constentLevels = Enum.GetValues(typeof(TelemetryLevel)),
+                    consentLevels = Enum.GetValues(typeof(TelemetryLevel)),
                 };
             }
         }
