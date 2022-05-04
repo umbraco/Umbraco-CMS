@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
+    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, $attrs) {
 
         var unsubscribe = [];
         var modelObject;
@@ -41,6 +41,18 @@
         var liveEditing = true;
 
         var vm = this;
+
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+
+            vm.sortableOptions.disabled = vm.readonly;
+
+            if (deleteAllBlocksAction) {
+                deleteAllBlocksAction.isDisabled = vm.readonly;
+            }
+        });
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
@@ -422,6 +434,7 @@
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
+                hideSubmitButton: vm.readonly,
                 submit: function(blockEditorModel) {
 
                     if (liveEditing === false) {
@@ -773,6 +786,7 @@
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            disabled: vm.readonly,
             update: function (ev, ui) {
                 setDirty();
             }
@@ -785,7 +799,7 @@
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
             if (deleteAllBlocksAction) {
-                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }
 
             // validate limits:
