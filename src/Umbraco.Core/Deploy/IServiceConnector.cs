@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Deploy
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// </summary>
         /// <param name="udi">The entity identifier of the artifact.</param>
         /// <returns>The corresponding artifact, or null.</returns>
-        IArtifact GetArtifact(Udi udi);
+        IArtifact? GetArtifact(Udi udi);
 
         /// <summary>
         /// Gets an artifact.
