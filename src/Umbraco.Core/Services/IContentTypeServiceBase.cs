@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -50,8 +50,8 @@ namespace Umbraco.Cms.Core.Services
         IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis
         IEnumerable<TItem> GetComposedOf(int id); // composition axis
 
-        IEnumerable<TItem>? GetChildren(int id);
-        IEnumerable<TItem>? GetChildren(Guid id);
+        IEnumerable<TItem> GetChildren(int id);
+        IEnumerable<TItem> GetChildren(Guid id);
 
         bool HasChildren(int id);
         bool HasChildren(Guid id);
