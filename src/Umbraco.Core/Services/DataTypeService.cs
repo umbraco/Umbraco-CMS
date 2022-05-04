@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(IDataType dataType)
+        public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
         {
             var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
@@ -178,7 +178,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return GetContainers(ancestorIds);
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
+        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
