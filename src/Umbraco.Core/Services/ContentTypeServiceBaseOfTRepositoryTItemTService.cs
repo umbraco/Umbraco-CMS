@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services
                 return Enumerable.Empty<TItem>();
             }
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
 
             {
                 scope.ReadLock(ReadLockIds);
