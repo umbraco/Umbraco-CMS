@@ -15,14 +15,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        IEnumerable<IIdentityUserLogin>? GetExternalLogins(int userId);
+        IEnumerable<IIdentityUserLogin> GetExternalLogins(int userId);
 
         /// <summary>
         /// Returns all user login tokens assigned
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        IEnumerable<IIdentityUserToken>? GetExternalLoginTokens(int userId);
+        IEnumerable<IIdentityUserToken> GetExternalLoginTokens(int userId);
 
         /// <summary>
         /// Returns all logins matching the login info - generally there should only be one but in some cases
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="loginProvider"></param>
         /// <param name="providerKey"></param>
         /// <returns></returns>
-        IEnumerable<IIdentityUserLogin>? Find(string loginProvider, string providerKey);
+        IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey);
 
         /// <summary>
         /// Saves the external logins associated with the user
