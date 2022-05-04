@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -193,9 +195,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         ///     methods might be used in things like pickers in the content editor.
         /// </remarks>
         [HttpGet]
-        public IDictionary<string, TreeSearchResult> SearchAll(string query)
+        public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
         {
-            var result = new Dictionary<string, TreeSearchResult>();
+            var result = new ConcurrentDictionary<string, TreeSearchResult>();
 
             if (string.IsNullOrEmpty(query))
             {
@@ -204,6 +206,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
 
+            var searchTasks = new List<Task>();
             foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
                          .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
@@ -218,21 +221,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
                     if (rootNodeDisplayName is not null)
                     {
-                        result[rootNodeDisplayName] = new TreeSearchResult
-                        {
-                            Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total).WhereNotNull(),
-                            TreeAlias = searchableTree.Key,
-                            AppAlias = searchableTree.Value.AppAlias,
-                            JsFormatterService = searchableTree.Value.FormatterService,
-                            JsFormatterMethod = searchableTree.Value.FormatterMethod
-                        };
+                        searchTasks.Add(ExecuteSearchAsync(query, searchableTree, rootNodeDisplayName,result));
                     }
                 }
             }
 
+            await Task.WhenAll(searchTasks);
             return result;
         }
 
+        private static async Task ExecuteSearchAsync(
+            string query,
+            KeyValuePair<string, SearchableApplicationTree> searchableTree,
+            string rootNodeDisplayName,
+            ConcurrentDictionary<string, TreeSearchResult> result)
+        {
+            var searchResult = new TreeSearchResult
+            {
+                Results = (await searchableTree.Value.SearchableTree.SearchAsync(query, 200, 0)).WhereNotNull(),
+                TreeAlias = searchableTree.Key,
+                AppAlias = searchableTree.Value.AppAlias,
+                JsFormatterService = searchableTree.Value.FormatterService,
+                JsFormatterMethod = searchableTree.Value.FormatterMethod
+            };
+
+            result.AddOrUpdate(rootNodeDisplayName, _=> searchResult, (_,_) => searchResult);
+        }
         /// <summary>
         ///     Gets the path for a given node ID
         /// </summary>

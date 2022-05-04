@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Services
 {
     public abstract class ContentTypeServiceBase : RepositoryService
     {
-        protected ContentTypeServiceBase(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
+        protected ContentTypeServiceBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
             : base(provider, loggerFactory, eventMessagesFactory)
         { }
     }

@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IRuntimeState _runtimeState;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IMainDom _mainDom;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly ILogger<HealthCheckNotifier> _logger;
         private readonly IProfilingLogger _profilingLogger;
 
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IRuntimeState runtimeState,
             IServerRoleAccessor serverRegistrar,
             IMainDom mainDom,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             ILogger<HealthCheckNotifier> logger,
             IProfilingLogger profilingLogger,
             ICronTabParser cronTabParser)
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             // Ensure we use an explicit scope since we are running on a background thread and plugin health
             // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
             // isn't used since that can be problematic.
-            using (IScope scope = _scopeProvider.CreateScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
                 // Don't notify for any checks that are disabled, nor for any disabled just for notifications.

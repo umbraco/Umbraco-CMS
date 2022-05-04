@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
@@ -23,10 +24,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
-        /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
-        /// </summary>
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public RadioButtonsPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
@@ -38,9 +39,24 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public RadioButtonsPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper,
+            ILocalizedTextService localizedTextService,
+            IEditorConfigurationParser editorConfigurationParser)
+            : base(dataValueEditorFactory)
+        {
+            _ioHelper = ioHelper;
+            _localizedTextService = localizedTextService;
+            _editorConfigurationParser = editorConfigurationParser;
+        }
+
+        /// <summary>
         /// Return a custom pre-value editor
         /// </summary>
         /// <returns></returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_localizedTextService, _ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_localizedTextService, _ioHelper, _editorConfigurationParser);
     }
 }

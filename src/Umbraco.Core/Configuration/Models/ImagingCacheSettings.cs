@@ -14,8 +14,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         internal const string StaticBrowserMaxAge = "7.00:00:00";
         internal const string StaticCacheMaxAge = "365.00:00:00";
-        internal const int StaticCachedNameLength = 8;
-        internal const string StaticCacheFolder = Constants.SystemDirectories.TempData +  "/MediaCache";
+        internal const int StaticCacheHashLength = 12;
+        internal const int StaticCacheFolderDepth = 8;
+        internal const string StaticCacheFolder = Constants.SystemDirectories.TempData + "/MediaCache";
 
         /// <summary>
         /// Gets or sets a value for the browser image cache maximum age.
@@ -30,13 +31,19 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public TimeSpan CacheMaxAge { get; set; } = TimeSpan.Parse(StaticCacheMaxAge);
 
         /// <summary>
-        /// Gets or sets a value for length of the cached name.
+        /// Gets or sets a value for the image cache hash length.
         /// </summary>
-        [DefaultValue(StaticCachedNameLength)]
-        public uint CachedNameLength { get; set; } = StaticCachedNameLength;
+        [DefaultValue(StaticCacheHashLength)]
+        public uint CacheHashLength { get; set; } = StaticCacheHashLength;
 
         /// <summary>
-        /// Gets or sets a value for the cache folder.
+        /// Gets or sets a value for the image cache folder depth.
+        /// </summary>
+        [DefaultValue(StaticCacheFolderDepth)]
+        public uint CacheFolderDepth { get; set; } = StaticCacheFolderDepth;
+
+        /// <summary>
+        /// Gets or sets a value for the image cache folder.
         /// </summary>
         [DefaultValue(StaticCacheFolder)]
         public string CacheFolder { get; set; } = StaticCacheFolder;

@@ -26,6 +26,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
@@ -136,6 +137,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         private IHostBuilder CreateHostBuilder()
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureUmbracoDefaults()
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
@@ -153,6 +155,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                         ConfigureServices(services);
                         ConfigureTestServices(services);
+                        services.AddUnique(CreateLoggerFactory());
 
                         if (!TestOptions.Boot)
                         {
@@ -184,7 +187,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected void ConfigureServices(IServiceCollection services)
         {
-            services.AddUnique(CreateLoggerFactory());
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
             Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
@@ -196,6 +198,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 AppCaches.NoCache,
                 Configuration,
                 TestHelper.Profiler);
+
+            services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
 
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // the dict is write-locked until the write-lock is released
         //  which happens when it is disposed (non-scoped)
         //  or when the scope context exits (scoped)
-        public IDisposable? GetScopedWriteLock(IScopeProvider scopeProvider)
+        public IDisposable? GetScopedWriteLock(ICoreScopeProvider scopeProvider)
         {
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }

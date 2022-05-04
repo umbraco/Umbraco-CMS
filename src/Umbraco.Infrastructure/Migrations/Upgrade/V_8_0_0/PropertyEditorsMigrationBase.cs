@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -96,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         // dummy editor for deserialization
         protected class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
         {
-            public ValueListConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+            public ValueListConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
             {
             }
         }

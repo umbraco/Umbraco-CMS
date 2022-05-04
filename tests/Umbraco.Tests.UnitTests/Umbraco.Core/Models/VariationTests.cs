@@ -584,6 +584,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             IIOHelper ioHelper = Mock.Of<IIOHelper>();
             IDataTypeService dataTypeService = Mock.Of<IDataTypeService>();
             ILocalizedTextService localizedTextService = Mock.Of<ILocalizedTextService>();
+            IEditorConfigurationParser editorConfigurationParser = Mock.Of<IEditorConfigurationParser>();
 
             var attribute = new DataEditorAttribute("a", "a", "a");
             IDataValueEditorFactory dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
@@ -592,7 +593,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 
             var textBoxEditor = new TextboxPropertyEditor(
                 dataValueEditorFactory,
-                ioHelper);
+                ioHelper,
+                editorConfigurationParser);
 
             var serializer = new ConfigurationEditorJsonSerializer();
 

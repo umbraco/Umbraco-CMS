@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -41,13 +42,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IRedirectUrl? GetMostRecentUrl(string url)
         {
+            Sql<ISqlContext> sql = GetMostRecentSql(url);
+            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+        public  async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url)
+        {
+            Sql<ISqlContext> sql = GetMostRecentSql(url);
+            List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+
+        private Sql<ISqlContext> GetMostRecentSql(string url)
+        {
             var urlHash = url.GenerateHash<SHA1>();
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
-            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
-            RedirectUrlDto? dto = dtos.FirstOrDefault();
-            return dto == null ? null : Map(dto);
+            return sql;
         }
 
         public IRedirectUrl? GetMostRecentUrl(string url, string culture)
@@ -57,12 +71,39 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return GetMostRecentUrl(url);
             }
 
+            Sql<ISqlContext> sql = GetMostRecentUrlSql(url, culture);
+
+            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+
+            if (dto == null)
+            {
+                dto = dtos.FirstOrDefault(f => string.IsNullOrWhiteSpace(f.Culture));
+            }
+
+            return dto == null ? null : Map(dto);
+        }
+
+        private Sql<ISqlContext> GetMostRecentUrlSql(string url, string culture)
+        {
             var urlHash = url.GenerateHash<SHA1>();
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash &&
                                             (x.Culture == culture.ToLower() || x.Culture == null || x.Culture == string.Empty))
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
-            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+            return sql;
+        }
+
+        public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url, string culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                return GetMostRecentUrl(url);
+            }
+
+            Sql<ISqlContext> sql = GetMostRecentUrlSql(url, culture);
+
+            List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
             RedirectUrlDto? dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
 
             if (dto == null)

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -42,7 +44,31 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly UploadAutoFillProperties _autoFillProperties;
         private readonly ILogger<ImageCropperPropertyEditor> _logger;
         private readonly IContentService _contentService;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public ImageCropperPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILoggerFactory loggerFactory,
+            MediaFileManager mediaFileManager,
+            IOptionsMonitor<ContentSettings> contentSettings,
+            IDataTypeService dataTypeService,
+            IIOHelper ioHelper,
+            UploadAutoFillProperties uploadAutoFillProperties,
+            IContentService contentService)
+            : this(
+                dataValueEditorFactory,
+                loggerFactory,
+                mediaFileManager,
+                contentSettings,
+                dataTypeService,
+                ioHelper,
+                uploadAutoFillProperties,
+                contentService,
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
@@ -54,7 +80,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IDataTypeService dataTypeService,
             IIOHelper ioHelper,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IContentService contentService)
+            IContentService contentService,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -63,6 +90,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _autoFillProperties = uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
             _contentService = contentService;
+            _editorConfigurationParser = editorConfigurationParser;
             _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
             contentSettings.OnChange(x => _contentSettings = x);
@@ -92,7 +120,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.
