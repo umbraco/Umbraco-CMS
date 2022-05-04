@@ -20,6 +20,7 @@ using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using Stylesheet = Umbraco.Cms.Core.Models.Stylesheet;
@@ -86,7 +87,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 umbracoMapper,
                 shortStringHelper,
                 globalSettings,
-                new SnippetCollection(() => new List<ISnippet>())) //StaticServiceProvider.Instance.GetRequiredService<SnippetCollection>()
+                StaticServiceProvider.Instance.GetRequiredService<SnippetCollection>()) //StaticServiceProvider.Instance.GetRequiredService<SnippetCollection>()
         {
         }
 
@@ -331,7 +332,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
                         if (snippetName.IsNullOrWhiteSpace() == false)
                         {
-                            codeFileDisplay.Content = _fileService.GetPartialViewSnippetContent(snippetName!);
+                            codeFileDisplay.Content = _snippetCollection.GetPartialViewSnippetContent(snippetName!);
                         }
                     }
 
@@ -343,7 +344,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         codeFileDisplay.VirtualPath = Constants.SystemDirectories.MacroPartials;
                         if (snippetName.IsNullOrWhiteSpace() == false)
                         {
-                            codeFileDisplay.Content = _fileService.GetPartialViewMacroSnippetContent(snippetName!);
+                            codeFileDisplay.Content = _snippetCollection.GetPartialViewMacroSnippetContent(snippetName!);
                         }
                     }
 
