@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -53,11 +52,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
             var publishedContentType = publishedContentCache?.GetContentType(contentTypeKey);
-            if (publishedContentType != null)
+            if (publishedContentType is not null && publishedContentType.IsElement)
             {
-                var modelType = ModelType.For(publishedContentType.Alias);
-
-                return _publishedModelFactory.MapModelType(modelType);
+                return _publishedModelFactory.GetModelType(publishedContentType.Alias);
             }
 
             return typeof(IPublishedElement);

@@ -192,7 +192,6 @@
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
     $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib","$($this.BuildTemp)\WebApp\umbraco\Data","$($this.BuildTemp)\WebApp\umbraco\Logs")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\Views", "*", "$($this.BuildTemp)\WebApp\Views")
