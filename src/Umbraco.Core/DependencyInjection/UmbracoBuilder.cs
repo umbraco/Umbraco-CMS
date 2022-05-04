@@ -38,6 +38,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -250,6 +251,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<PropertyEditorCollection>();
             Services.AddSingleton<ParameterEditorCollection>();
+
+            Services.AddUnique<ISnippet, Snippet>();
 
             // register a server registrar, by default it's the db registrar
             Services.AddUnique<IServerRoleAccessor>(f =>
