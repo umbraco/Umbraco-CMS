@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -15,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Strings.Css;
 using Umbraco.Cms.Web.BackOffice.Filters;
@@ -45,7 +43,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
+        private readonly SnippetCollection _snippetCollection;
 
+        [ActivatorUtilitiesConstructor]
         public CodeFileController(
             IHostingEnvironment hostingEnvironment,
             FileSystems fileSystems,
@@ -54,7 +54,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IUmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
-            IOptionsSnapshot<GlobalSettings> globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            SnippetCollection snippetCollection)
         {
             _hostingEnvironment = hostingEnvironment;
             _fileSystems = fileSystems;
@@ -64,6 +65,29 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _umbracoMapper = umbracoMapper;
             _shortStringHelper = shortStringHelper;
             _globalSettings = globalSettings.Value;
+            _snippetCollection = snippetCollection;
+        }
+
+        [Obsolete("Use ctor will all params. Scheduled for removal in V12.")]
+        public CodeFileController(
+            IHostingEnvironment hostingEnvironment,
+            FileSystems fileSystems,
+            IFileService fileService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizedTextService localizedTextService,
+            IUmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper,
+            IOptionsSnapshot<GlobalSettings> globalSettings) : this(
+                hostingEnvironment,
+                fileSystems,
+                fileService,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                umbracoMapper,
+                shortStringHelper,
+                globalSettings,
+                new SnippetCollection(() => new List<ISnippet>())) //StaticServiceProvider.Instance.GetRequiredService<SnippetCollection>()
+        {
         }
 
         /// <summary>
@@ -272,15 +296,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (type)
             {
                 case Constants.Trees.PartialViews:
-                    snippets = _fileService.GetPartialViewSnippetNames(
-                        //ignore these - (this is taken from the logic in "PartialView.ascx.cs")
-                        "Gallery",
-                        "ListChildPagesFromChangeableSource",
-                        "ListChildPagesOrderedByProperty",
-                        "ListImagesFromMediaFolder");
+                    snippets = _snippetCollection.GetPartialViewSnippetNames();
                     break;
                 case Constants.Trees.PartialViewMacros:
-                    snippets = _fileService.GetPartialViewSnippetNames();
+                    snippets = _snippetCollection.GetPartialViewMacroSnippetNames();
                     break;
                 default:
                     return NotFound();
