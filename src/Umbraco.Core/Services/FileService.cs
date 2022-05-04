@@ -606,7 +606,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetTemplateFileContentStream(string filepath)
+        public Stream GetTemplateFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
