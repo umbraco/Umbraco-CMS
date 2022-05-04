@@ -1,28 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
+
+public class DeleteColumnExpression : MigrationExpressionBase
 {
-    public class DeleteColumnExpression : MigrationExpressionBase
+    public DeleteColumnExpression(IMigrationContext context)
+        : base(context) =>
+        ColumnNames = new List<string>();
+
+    public virtual string? TableName { get; set; }
+    public ICollection<string> ColumnNames { get; set; }
+
+    protected override string GetSql()
     {
-        public DeleteColumnExpression(IMigrationContext context)
-            : base(context)
+        var stmts = new StringBuilder();
+        foreach (var columnName in ColumnNames)
         {
-            ColumnNames = new List<string>();
+            stmts.AppendFormat(SqlSyntax.DropColumn, SqlSyntax.GetQuotedTableName(TableName),
+                SqlSyntax.GetQuotedColumnName(columnName));
+            AppendStatementSeparator(stmts);
         }
 
-        public virtual string? TableName { get; set; }
-        public ICollection<string> ColumnNames { get; set; }
-
-        protected override string GetSql()
-        {
-            var stmts = new StringBuilder();
-            foreach (var columnName in ColumnNames)
-            {
-                stmts.AppendFormat(SqlSyntax.DropColumn, SqlSyntax.GetQuotedTableName(TableName), SqlSyntax.GetQuotedColumnName(columnName));
-                AppendStatementSeparator(stmts);
-            }
-            return stmts.ToString();
-        }
+        return stmts.ToString();
     }
 }

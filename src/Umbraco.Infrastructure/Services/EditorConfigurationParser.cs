@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -19,12 +19,13 @@ public class EditorConfigurationParser : IEditorConfigurationParser
 
         var o = new JObject();
 
-        foreach (var field in fields)
+        foreach (ConfigurationField field in fields)
         {
             // field only, JsonPropertyAttribute is ignored here
             // only keep fields that have a non-null/empty value
             // rest will fall back to default during ToObject()
-            if (editorValues is not null && editorValues.TryGetValue(field.Key!, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
+            if (editorValues is not null && editorValues.TryGetValue(field.Key!, out var value) && value != null &&
+                (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
             {
                 if (value is JToken jtoken)
                 {
@@ -34,9 +35,11 @@ public class EditorConfigurationParser : IEditorConfigurationParser
                 else if (field.PropertyType == typeof(bool) && value is string sBool)
                 {
                     //if it's a boolean property type but a string is found, try to do a conversion
-                    var converted = sBool.TryConvertTo<bool>();
+                    Attempt<bool> converted = sBool.TryConvertTo<bool>();
                     if (converted.Success)
+                    {
                         o[field.PropertyName!] = converted.Result;
+                    }
                 }
                 else
                 {
@@ -54,14 +57,14 @@ public class EditorConfigurationParser : IEditorConfigurationParser
         string FieldNamer(PropertyInfo property)
         {
             // try the field
-            var field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
+            ConfigurationFieldAttribute? field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
             if (field is not null && field.Key is not null)
             {
                 return field.Key;
             }
 
             // but the property may not be a field just an extra thing
-            var json = property.GetCustomAttribute<JsonPropertyAttribute>();
+            JsonPropertyAttribute? json = property.GetCustomAttribute<JsonPropertyAttribute>();
             return json?.PropertyName ?? property.Name;
         }
 

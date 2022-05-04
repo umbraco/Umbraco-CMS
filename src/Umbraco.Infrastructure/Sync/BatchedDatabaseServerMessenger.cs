@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -12,105 +9,107 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Cms.Infrastructure.Sync
+namespace Umbraco.Cms.Infrastructure.Sync;
+
+/// <summary>
+///     An <see cref="IServerMessenger" /> implementation that works by storing messages in the database.
+/// </summary>
+public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
 {
+    private readonly IRequestAccessor _requestAccessor;
+    private readonly IRequestCache _requestCache;
+
     /// <summary>
-    /// An <see cref="IServerMessenger"/> implementation that works by storing messages in the database.
+    ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
     /// </summary>
-    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
+    public BatchedDatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        IServerRoleAccessor serverRoleAccessor,
+        ILogger<BatchedDatabaseServerMessenger> logger,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        IRequestCache requestCache,
+        IRequestAccessor requestAccessor,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings)
+        : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment,
+            cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
     {
-        private readonly IRequestCache _requestCache;
-        private readonly IRequestAccessor _requestAccessor;
+        _requestCache = requestCache;
+        _requestAccessor = requestAccessor;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger"/> class.
-        /// </summary>
-        public BatchedDatabaseServerMessenger(
-            IMainDom mainDom,
-            CacheRefresherCollection cacheRefreshers,
-            IServerRoleAccessor serverRoleAccessor,
-            ILogger<BatchedDatabaseServerMessenger> logger,
-            ISyncBootStateAccessor syncBootStateAccessor,
-            IHostingEnvironment hostingEnvironment,
-            ICacheInstructionService cacheInstructionService,
-            IJsonSerializer jsonSerializer,
-            IRequestCache requestCache,
-            IRequestAccessor requestAccessor,
-            LastSyncedFileManager lastSyncedFileManager,
-            IOptionsMonitor<GlobalSettings> globalSettings)
-            : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment, cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
+    /// <inheritdoc />
+    protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
+        IEnumerable<object>? ids = null, string? json = null)
+    {
+        var idsA = ids?.ToArray();
+
+        if (GetArrayType(idsA, out Type? arrayType) == false)
         {
-            _requestCache = requestCache;
-            _requestAccessor = requestAccessor;
+            throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
         }
 
-        /// <inheritdoc/>
-        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null)
+        BatchMessage(refresher, messageType, idsA, arrayType, json);
+    }
+
+    /// <inheritdoc />
+    public override void SendMessages()
+    {
+        ICollection<RefreshInstructionEnvelope>? batch = GetBatch(false);
+        if (batch == null)
         {
-            var idsA = ids?.ToArray();
-
-            if (GetArrayType(idsA, out Type? arrayType) == false)
-            {
-                throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
-            }
-
-            BatchMessage(refresher, messageType, idsA, arrayType, json);
+            return;
         }
 
-        /// <inheritdoc/>
-        public override void SendMessages()
+        RefreshInstruction[] instructions = batch.SelectMany(x => x.Instructions).ToArray();
+        batch.Clear();
+
+        CacheInstructionService.DeliverInstructionsInBatches(instructions, LocalIdentity);
+    }
+
+    private ICollection<RefreshInstructionEnvelope>? GetBatch(bool create)
+    {
+        var key = nameof(BatchedDatabaseServerMessenger);
+
+        if (!_requestCache.IsAvailable)
         {
-            ICollection<RefreshInstructionEnvelope>? batch = GetBatch(false);
-            if (batch == null)
-            {
-                return;
-            }
+            return null;
+        }
 
-            RefreshInstruction[] instructions = batch.SelectMany(x => x.Instructions).ToArray();
-            batch.Clear();
+        // No thread-safety here because it'll run in only 1 thread (request) at a time.
+        var batch = (ICollection<RefreshInstructionEnvelope>?)_requestCache.Get(key);
+        if (batch == null && create)
+        {
+            batch = new List<RefreshInstructionEnvelope>();
+            _requestCache.Set(key, batch);
+        }
 
+        return batch;
+    }
+
+    private void BatchMessage(
+        ICacheRefresher refresher,
+        MessageType messageType,
+        IEnumerable<object>? ids = null,
+        Type? idType = null,
+        string? json = null)
+    {
+        ICollection<RefreshInstructionEnvelope>? batch = GetBatch(true);
+        IEnumerable<RefreshInstruction> instructions =
+            RefreshInstruction.GetInstructions(refresher, JsonSerializer, messageType, ids, idType, json);
+
+        // Batch if we can, else write to DB immediately.
+        if (batch == null)
+        {
             CacheInstructionService.DeliverInstructionsInBatches(instructions, LocalIdentity);
         }
-
-        private ICollection<RefreshInstructionEnvelope>? GetBatch(bool create)
+        else
         {
-            var key = nameof(BatchedDatabaseServerMessenger);
-
-            if (!_requestCache.IsAvailable)
-            {
-                return null;
-            }
-
-            // No thread-safety here because it'll run in only 1 thread (request) at a time.
-            var batch = (ICollection<RefreshInstructionEnvelope>?)_requestCache.Get(key);
-            if (batch == null && create)
-            {
-                batch = new List<RefreshInstructionEnvelope>();
-                _requestCache.Set(key, batch);
-            }
-
-            return batch;
-        }
-
-        private void BatchMessage(
-            ICacheRefresher refresher,
-            MessageType messageType,
-            IEnumerable<object>? ids = null,
-            Type? idType = null,
-            string? json = null)
-        {
-            ICollection<RefreshInstructionEnvelope>? batch = GetBatch(true);
-            IEnumerable<RefreshInstruction> instructions = RefreshInstruction.GetInstructions(refresher, JsonSerializer, messageType, ids, idType, json);
-
-            // Batch if we can, else write to DB immediately.
-            if (batch == null)
-            {
-                CacheInstructionService.DeliverInstructionsInBatches(instructions, LocalIdentity);
-            }
-            else
-            {
-                batch.Add(new RefreshInstructionEnvelope(refresher, instructions));
-            }
+            batch.Add(new RefreshInstructionEnvelope(refresher, instructions));
         }
     }
 }

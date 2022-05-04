@@ -2,33 +2,38 @@
 using Newtonsoft.Json;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
+
+internal class NestedContentPreValueMigrator : DefaultPreValueMigrator //PreValueMigratorBase
 {
-    class NestedContentPreValueMigrator : DefaultPreValueMigrator //PreValueMigratorBase
+    public override bool CanMigrate(string editorAlias)
+        => editorAlias == "Umbraco.NestedContent";
+
+    // you wish - but NestedContentConfiguration lives in Umbraco.Web
+    /*
+    public override object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
     {
-        public override bool CanMigrate(string editorAlias)
-            => editorAlias == "Umbraco.NestedContent";
+        return new NestedContentConfiguration { ... };
+    }
+    */
 
-        // you wish - but NestedContentConfiguration lives in Umbraco.Web
-        /*
-        public override object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
+    protected override object? GetPreValueValue(PreValueDto preValue)
+    {
+        if (preValue.Alias == "confirmDeletes" ||
+            preValue.Alias == "showIcons" ||
+            preValue.Alias == "hideLabel")
         {
-            return new NestedContentConfiguration { ... };
+            return preValue.Value == "1";
         }
-        */
 
-        protected override object? GetPreValueValue(PreValueDto preValue)
+        if (preValue.Alias == "minItems" ||
+            preValue.Alias == "maxItems")
         {
-            if (preValue.Alias == "confirmDeletes" ||
-                preValue.Alias == "showIcons" ||
-                preValue.Alias == "hideLabel")
-                return preValue.Value == "1";
-
-            if (preValue.Alias == "minItems" ||
-                preValue.Alias == "maxItems")
-                return int.TryParse(preValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? (int?)i : null;
-
-            return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
+            return int.TryParse(preValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
+                ? (int?)i
+                : null;
         }
+
+        return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
     }
 }

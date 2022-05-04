@@ -1,16 +1,13 @@
-using System;
+namespace Umbraco.Cms.Core.Logging.Viewer;
 
-namespace Umbraco.Cms.Core.Logging.Viewer
+public class LogTimePeriod
 {
-    public class LogTimePeriod
+    public LogTimePeriod(DateTime startTime, DateTime endTime)
     {
-        public LogTimePeriod(DateTime startTime, DateTime endTime)
-        {
-            StartTime = startTime;
-            EndTime = endTime;
-        }
-
-        public DateTime StartTime { get; }
-        public DateTime EndTime { get; }
+        StartTime = startTime;
+        EndTime = endTime;
     }
+
+    public DateTime StartTime { get; }
+    public DateTime EndTime { get; }
 }

@@ -1,82 +1,92 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
 {
-    internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
+    public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
     {
-        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
-        {
-            var items = Fields.First(x => x.Key == "items");
+        ConfigurationField items = Fields.First(x => x.Key == "items");
 
-            // customize the items field
-            items.Name = textService.Localize("editdatatype", "addPrevalue");
-            items.Validators.Add(new ValueListUniqueValueValidator());
+        // customize the items field
+        items.Name = textService.Localize("editdatatype", "addPrevalue");
+        items.Validators.Add(new ValueListUniqueValueValidator());
+    }
+
+    public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues,
+        DropDownFlexibleConfiguration? configuration)
+    {
+        var output = new DropDownFlexibleConfiguration();
+
+        if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+        {
+            return output; // oops
         }
 
-        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, DropDownFlexibleConfiguration? configuration)
+        // handle multiple
+        if (editorValues.TryGetValue("multiple", out var multipleObj))
         {
-            var output = new DropDownFlexibleConfiguration();
-
-            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
-                return output; // oops
-
-            // handle multiple
-            if (editorValues.TryGetValue("multiple", out var multipleObj))
+            Attempt<bool> convertBool = multipleObj.TryConvertTo<bool>();
+            if (convertBool.Success)
             {
-                var convertBool = multipleObj.TryConvertTo<bool>();
-                if (convertBool.Success)
-                {
-                    output.Multiple = convertBool.Result;
-                }
+                output.Multiple = convertBool.Result;
+            }
+        }
+
+        // auto-assigning our ids, get next id from existing values
+        var nextId = 1;
+        if (configuration?.Items != null && configuration.Items.Count > 0)
+        {
+            nextId = configuration.Items.Max(x => x.Id) + 1;
+        }
+
+        // create ValueListItem instances - sortOrder is ignored here
+        foreach (JObject item in jItems.OfType<JObject>())
+        {
+            var value = item.Property("value")?.Value?.Value<string>();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                continue;
             }
 
-            // auto-assigning our ids, get next id from existing values
-            var nextId = 1;
-            if (configuration?.Items != null && configuration.Items.Count > 0)
-                nextId = configuration.Items.Max(x => x.Id) + 1;
-
-            // create ValueListItem instances - sortOrder is ignored here
-            foreach (var item in jItems.OfType<JObject>())
+            var id = item.Property("id")?.Value?.Value<int>() ?? 0;
+            if (id >= nextId)
             {
-                var value = item.Property("value")?.Value?.Value<string>();
-                if (string.IsNullOrWhiteSpace(value)) continue;
-
-                var id = item.Property("id")?.Value?.Value<int>() ?? 0;
-                if (id >= nextId) nextId = id + 1;
-
-                output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
+                nextId = id + 1;
             }
 
-            // ensure ids
-            foreach (var item in output.Items)
-                if (item.Id == 0)
-                    item.Id = nextId++;
-
-            return output;
+            output.Items.Add(new ValueListConfiguration.ValueListItem {Id = id, Value = value});
         }
 
-        public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration? configuration)
+        // ensure ids
+        foreach (ValueListConfiguration.ValueListItem item in output.Items)
         {
-            // map to what the editor expects
-            var i = 1;
-            var items = configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) ?? new object();
-
-            var multiple = configuration?.Multiple ?? false;
-
-            return new Dictionary<string, object>
+            if (item.Id == 0)
             {
-                { "items", items },
-                { "multiple", multiple }
-            };
+                item.Id = nextId++;
+            }
         }
 
+        return output;
+    }
+
+    public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration? configuration)
+    {
+        // map to what the editor expects
+        var i = 1;
+        var items =
+            configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new {value = x.Value, sortOrder = i++}) ??
+            new object();
+
+        var multiple = configuration?.Multiple ?? false;
+
+        return new Dictionary<string, object> {{"items", items}, {"multiple", multiple}};
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using Umbraco.Cms.Core.Events;
 
 // ReSharper disable once CheckNamespace
@@ -8,12 +7,12 @@ namespace Umbraco.Cms.Core.Scoping;
 public interface IScope : Infrastructure.Scoping.IScope
 {
     /// <summary>
-    /// Gets the scope event messages.
+    ///     Gets the scope event messages.
     /// </summary>
     EventMessages Messages { get; }
 
     /// <summary>
-    /// Gets the scope event dispatcher.
+    ///     Gets the scope event dispatcher.
     /// </summary>
     IEventDispatcher Events { get; }
 }

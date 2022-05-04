@@ -1,13 +1,12 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+
+public enum ModificationType
 {
-    public enum ModificationType
-    {
-        Create,
-        Alter,
-        Drop,
-        Rename,
-        Insert,
-        Update,
-        Delete
-    }
+    Create,
+    Alter,
+    Drop,
+    Rename,
+    Insert,
+    Update,
+    Delete
 }

@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence
+﻿namespace Umbraco.Cms.Infrastructure.Persistence;
+
+public interface IProviderSpecificMapperFactory
 {
-    public interface IProviderSpecificMapperFactory
-    {
-        string ProviderName { get; }
-        NPocoMapperCollection Mappers { get; }
-    }
+    string ProviderName { get; }
+    NPocoMapperCollection Mappers { get; }
 }

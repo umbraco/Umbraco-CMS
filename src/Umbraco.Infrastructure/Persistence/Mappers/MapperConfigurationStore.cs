@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
+
+public class MapperConfigurationStore : ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>
 {
-    public class MapperConfigurationStore : ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>
-    { }
 }

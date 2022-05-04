@@ -1,94 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Umbraco.Cms.Infrastructure.Migrations;
 
-namespace Umbraco.Cms.Infrastructure.Migrations
+/// <summary>
+///     Represents a migration plan builder for merges.
+/// </summary>
+public class MergeBuilder
 {
+    private readonly List<Type> _migrations = new();
+    private readonly MigrationPlan _plan;
+    private bool _with;
+    private string? _withLast;
+
     /// <summary>
-    /// Represents a migration plan builder for merges.
+    ///     Initializes a new instance of the <see cref="MergeBuilder" /> class.
     /// </summary>
-    public class MergeBuilder
+    internal MergeBuilder(MigrationPlan plan) => _plan = plan;
+
+    /// <summary>
+    ///     Adds a transition to a target state through an empty migration.
+    /// </summary>
+    public MergeBuilder To(string targetState)
+        => To<NoopMigration>(targetState);
+
+    /// <summary>
+    ///     Adds a transition to a target state through a migration.
+    /// </summary>
+    public MergeBuilder To<TMigration>(string targetState)
+        where TMigration : MigrationBase
+        => To(targetState, typeof(TMigration));
+
+    /// <summary>
+    ///     Adds a transition to a target state through a migration.
+    /// </summary>
+    public MergeBuilder To(string targetState, Type migration)
     {
-        private readonly MigrationPlan _plan;
-        private readonly List<Type> _migrations = new List<Type>();
-        private string? _withLast;
-        private bool _with;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MergeBuilder"/> class.
-        /// </summary>
-        internal MergeBuilder(MigrationPlan plan)
+        if (_with)
         {
-            _plan = plan;
+            _withLast = targetState;
+            targetState = _plan.CreateRandomState();
+        }
+        else
+        {
+            _migrations.Add(migration);
         }
 
-        /// <summary>
-        /// Adds a transition to a target state through an empty migration.
-        /// </summary>
-        public MergeBuilder To(string targetState)
-            => To<NoopMigration>(targetState);
+        _plan.To(targetState, migration);
+        return this;
+    }
 
-        /// <summary>
-        /// Adds a transition to a target state through a migration.
-        /// </summary>
-        public MergeBuilder To<TMigration>(string targetState)
-            where TMigration : MigrationBase
-            => To(targetState, typeof(TMigration));
-
-        /// <summary>
-        /// Adds a transition to a target state through a migration.
-        /// </summary>
-        public MergeBuilder To(string targetState, Type migration)
+    /// <summary>
+    ///     Begins the second branch of the merge.
+    /// </summary>
+    public MergeBuilder With()
+    {
+        if (_with)
         {
-            if (_with)
-            {
-                _withLast = targetState;
-                targetState = _plan.CreateRandomState();
-            }
-            else
-            {
-                _migrations.Add(migration);
-            }
-
-            _plan.To(targetState, migration);
-            return this;
+            throw new InvalidOperationException("Cannot invoke With() twice.");
         }
 
-        /// <summary>
-        /// Begins the second branch of the merge.
-        /// </summary>
-        public MergeBuilder With()
+        _with = true;
+        return this;
+    }
+
+    /// <summary>
+    ///     Completes the merge.
+    /// </summary>
+    public MigrationPlan As(string targetState)
+    {
+        if (!_with)
         {
-            if (_with)
-                throw new InvalidOperationException("Cannot invoke With() twice.");
-            _with = true;
-            return this;
+            throw new InvalidOperationException("Cannot invoke As() without invoking With() first.");
         }
 
-        /// <summary>
-        /// Completes the merge.
-        /// </summary>
-        public MigrationPlan As(string targetState)
+        // reach final state
+        _plan.To(targetState);
+
+        // restart at former end of branch2
+        _plan.From(_withLast);
+
+        // and replay all branch1 migrations
+        foreach (Type migration in _migrations)
         {
-            if (!_with)
-            {
-                throw new InvalidOperationException("Cannot invoke As() without invoking With() first.");
-            }
-
-            // reach final state
-            _plan.To(targetState);
-
-            // restart at former end of branch2
-            _plan.From(_withLast);
-
-            // and replay all branch1 migrations
-            foreach (var migration in _migrations)
-            {
-                _plan.To(_plan.CreateRandomState(), migration);
-            }
-            // reaching final state
-            _plan.To(targetState);
-
-            return _plan;
+            _plan.To(_plan.CreateRandomState(), migration);
         }
+
+        // reaching final state
+        _plan.To(targetState);
+
+        return _plan;
     }
 }

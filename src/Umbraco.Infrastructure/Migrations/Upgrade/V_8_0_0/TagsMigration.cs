@@ -1,21 +1,22 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
+
+public class TagsMigration : MigrationBase
 {
-    public class TagsMigration : MigrationBase
+    public TagsMigration(IMigrationContext context)
+        : base(context)
     {
-        public TagsMigration(IMigrationContext context)
-            : base(context)
-        { }
+    }
 
-        protected override void Migrate()
-        {
-            // alter columns => non-null
-            AlterColumn<TagDto>(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "group");
-            AlterColumn<TagDto>(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "tag");
+    protected override void Migrate()
+    {
+        // alter columns => non-null
+        AlterColumn<TagDto>(Constants.DatabaseSchema.Tables.Tag, "group");
+        AlterColumn<TagDto>(Constants.DatabaseSchema.Tables.Tag, "tag");
 
-            // kill unused parentId column
-            Delete.Column("ParentId").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.Tag).Do();
-        }
+        // kill unused parentId column
+        Delete.Column("ParentId").FromTable(Constants.DatabaseSchema.Tables.Tag).Do();
     }
 }

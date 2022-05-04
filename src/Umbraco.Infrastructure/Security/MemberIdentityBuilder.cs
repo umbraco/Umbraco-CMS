@@ -1,63 +1,59 @@
-using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Cms.Core.Net;
-using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+public class MemberIdentityBuilder : IdentityBuilder
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberIdentityBuilder" /> class.
+    /// </summary>
+    public MemberIdentityBuilder(IServiceCollection services)
+        : base(typeof(MemberIdentityUser), services)
+        => InitializeServices(services);
 
-    public class MemberIdentityBuilder : IdentityBuilder
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberIdentityBuilder" /> class.
+    /// </summary>
+    public MemberIdentityBuilder(Type role, IServiceCollection services)
+        : base(typeof(MemberIdentityUser), role, services)
+        => InitializeServices(services);
+
+    private void InitializeServices(IServiceCollection services)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemberIdentityBuilder"/> class.
-        /// </summary>
-        public MemberIdentityBuilder(IServiceCollection services)
-            : base(typeof(MemberIdentityUser), services)
-            => InitializeServices(services);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemberIdentityBuilder"/> class.
-        /// </summary>
-        public MemberIdentityBuilder(Type role, IServiceCollection services)
-            : base(typeof(MemberIdentityUser), role, services)
-            => InitializeServices(services);
-
-        private void InitializeServices(IServiceCollection services)
+    // override to add itself, by default identity only wants a single IdentityErrorDescriber
+    public override IdentityBuilder AddErrorDescriber<TDescriber>()
+    {
+        if (!typeof(MembersErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
         {
-
+            throw new InvalidOperationException(
+                $"The type {typeof(TDescriber)} does not inherit from {typeof(MembersErrorDescriber)}");
         }
 
-        // override to add itself, by default identity only wants a single IdentityErrorDescriber
-        public override IdentityBuilder AddErrorDescriber<TDescriber>()
-        {
-            if (!typeof(MembersErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
-            {
-                throw new InvalidOperationException($"The type {typeof(TDescriber)} does not inherit from {typeof(MembersErrorDescriber)}");
-            }
+        Services.AddScoped<TDescriber>();
+        return this;
+    }
 
-            Services.AddScoped<TDescriber>();
-            return this;
+    /// <summary>
+    ///     Adds a token provider for the <seealso cref="MemberIdentityBuilder" />.
+    /// </summary>
+    /// <param name="providerName">The name of the provider to add.</param>
+    /// <param name="provider">The type of the <see cref="IUserTwoFactorTokenProvider{MemberIdentityBuilder}" /> to add.</param>
+    /// <returns>The current <see cref="IdentityBuilder" /> instance.</returns>
+    public override IdentityBuilder AddTokenProvider(string providerName, Type provider)
+    {
+        if (!typeof(IUserTwoFactorTokenProvider<>).MakeGenericType(UserType).GetTypeInfo()
+                .IsAssignableFrom(provider.GetTypeInfo()))
+        {
+            throw new InvalidOperationException($"Invalid Type for TokenProvider: {provider.FullName}");
         }
 
-        /// <summary>
-        /// Adds a token provider for the <seealso cref="MemberIdentityBuilder"/>.
-        /// </summary>
-        /// <param name="providerName">The name of the provider to add.</param>
-        /// <param name="provider">The type of the <see cref="IUserTwoFactorTokenProvider{MemberIdentityBuilder}"/> to add.</param>
-        /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
-        public override IdentityBuilder AddTokenProvider(string providerName, Type provider)
-        {
-            if (!typeof(IUserTwoFactorTokenProvider<>).MakeGenericType(UserType).GetTypeInfo().IsAssignableFrom(provider.GetTypeInfo()))
-            {
-                throw new InvalidOperationException($"Invalid Type for TokenProvider: {provider.FullName}");
-            }
-
-            Services.Configure<IdentityOptions>(options => options.Tokens.ProviderMap[providerName] = new TokenProviderDescriptor(provider));
-            Services.AddTransient(provider);
-            return this;
-        }
+        Services.Configure<IdentityOptions>(options =>
+            options.Tokens.ProviderMap[providerName] = new TokenProviderDescriptor(provider));
+        Services.AddTransient(provider);
+        return this;
     }
 }

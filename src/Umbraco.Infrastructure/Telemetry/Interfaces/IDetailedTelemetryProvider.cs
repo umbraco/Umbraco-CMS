@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Infrastructure.Telemetry.Interfaces
+namespace Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
+
+internal interface IDetailedTelemetryProvider
 {
-    internal interface IDetailedTelemetryProvider
-    {
-        IEnumerable<UsageInformation> GetInformation();
-    }
+    IEnumerable<UsageInformation> GetInformation();
 }

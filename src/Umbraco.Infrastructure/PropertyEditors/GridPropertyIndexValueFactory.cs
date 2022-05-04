@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,84 +9,86 @@ using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Parses the grid value into indexable values
+/// </summary>
+public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
 {
-    /// <summary>
-    /// Parses the grid value into indexable values
-    /// </summary>
-    public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
+    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture,
+        string? segment, bool published)
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+        var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
+
+        var val = property.GetValue(culture, segment, published);
+
+        //if there is a value, it's a string and it's detected as json
+        if (val is string rawVal && rawVal.DetectIsJson())
         {
-            var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
-
-            var val = property.GetValue(culture, segment, published);
-
-            //if there is a value, it's a string and it's detected as json
-            if (val is string rawVal && rawVal.DetectIsJson())
+            try
             {
-                try
+                GridValue? gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
+
+                //get all values and put them into a single field (using JsonPath)
+                var sb = new StringBuilder();
+                foreach (GridValue.GridRow row in gridVal!.Sections.SelectMany(x => x.Rows))
                 {
-                    var gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
+                    var rowName = row.Name;
 
-                    //get all values and put them into a single field (using JsonPath)
-                    var sb = new StringBuilder();
-                    foreach (var row in gridVal!.Sections.SelectMany(x => x.Rows))
+                    foreach (GridValue.GridControl control in row.Areas.SelectMany(x => x.Controls))
                     {
-                        var rowName = row.Name;
+                        JToken? controlVal = control.Value;
 
-                        foreach (var control in row.Areas.SelectMany(x => x.Controls))
+                        if (controlVal?.Type == JTokenType.String)
                         {
-                            var controlVal = control.Value;
+                            var str = controlVal.Value<string>();
+                            str = XmlHelper.CouldItBeXml(str) ? str!.StripHtml() : str;
+                            sb.Append(str);
+                            sb.Append(" ");
 
-                            if (controlVal?.Type == JTokenType.String)
+                            //add the row name as an individual field
+                            result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{property.Alias}.{rowName}",
+                                new[] {str}));
+                        }
+                        else if (controlVal is JContainer jc)
+                        {
+                            foreach (JToken s in jc.Descendants().Where(t => t.Type == JTokenType.String))
                             {
-                                var str = controlVal.Value<string>();
-                                str = XmlHelper.CouldItBeXml(str) ? str!.StripHtml() : str;
-                                sb.Append(str);
+                                sb.Append(s.Value<string>());
                                 sb.Append(" ");
-
-                                //add the row name as an individual field
-                                result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{property.Alias}.{rowName}", new[] { str }));
-                            }
-                            else if (controlVal is JContainer jc)
-                            {
-                                foreach (var s in jc.Descendants().Where(t => t.Type == JTokenType.String))
-                                {
-                                    sb.Append(s.Value<string>());
-                                    sb.Append(" ");
-                                }
                             }
                         }
                     }
+                }
 
-                    //First save the raw value to a raw field
-                    result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+                //First save the raw value to a raw field
+                result.Add(new KeyValuePair<string, IEnumerable<object?>>(
+                    $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] {rawVal}));
 
-                    if (sb.Length > 0)
-                    {
-                        //index the property with the combined/cleaned value
-                        result.Add(new KeyValuePair<string, IEnumerable<object?>>(property.Alias, new[] { sb.ToString() }));
-                    }
-                }
-                catch (InvalidCastException)
+                if (sb.Length > 0)
                 {
-                    //swallow...on purpose, there's a chance that this isn't the json format we are looking for
-                    // and we don't want that to affect the website.
-                }
-                catch (JsonException)
-                {
-                    //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect
-                    // the website.
-                }
-                catch (ArgumentException)
-                {
-                    //swallow on purpose to prevent this error:
-                    // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
+                    //index the property with the combined/cleaned value
+                    result.Add(new KeyValuePair<string, IEnumerable<object?>>(property.Alias, new[] {sb.ToString()}));
                 }
             }
-
-            return result;
+            catch (InvalidCastException)
+            {
+                //swallow...on purpose, there's a chance that this isn't the json format we are looking for
+                // and we don't want that to affect the website.
+            }
+            catch (JsonException)
+            {
+                //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect
+                // the website.
+            }
+            catch (ArgumentException)
+            {
+                //swallow on purpose to prevent this error:
+                // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
+            }
         }
+
+        return result;
     }
 }

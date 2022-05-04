@@ -1,9 +1,8 @@
 ﻿using Serilog.Events;
 
-namespace Umbraco.Cms.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer;
+
+public interface ILogFilter
 {
-    public interface ILogFilter
-    {
-        bool TakeLogEvent(LogEvent e);
-    }
+    bool TakeLogEvent(LogEvent e);
 }

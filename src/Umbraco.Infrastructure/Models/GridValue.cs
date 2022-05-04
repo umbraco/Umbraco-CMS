@@ -1,87 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+// TODO: Make a property value converter for this!
+
+/// <summary>
+///     A model representing the value saved for the grid
+/// </summary>
+public class GridValue
 {
-    // TODO: Make a property value converter for this!
+    [JsonProperty("name")] public string? Name { get; set; }
 
-    /// <summary>
-    /// A model representing the value saved for the grid
-    /// </summary>
-    public class GridValue
+    [JsonProperty("sections")] public IEnumerable<GridSection> Sections { get; set; } = null!;
+
+    public class GridSection
     {
-        [JsonProperty("name")]
-        public string? Name { get; set; }
+        [JsonProperty("grid")] public string? Grid { get; set; } // TODO: what is this?
 
-        [JsonProperty("sections")]
-        public IEnumerable<GridSection> Sections { get; set; } = null!;
+        [JsonProperty("rows")] public IEnumerable<GridRow> Rows { get; set; } = null!;
+    }
 
-        public class GridSection
-        {
-            [JsonProperty("grid")]
-            public string? Grid { get; set; } // TODO: what is this?
+    public class GridRow
+    {
+        [JsonProperty("name")] public string? Name { get; set; }
 
-            [JsonProperty("rows")]
-            public IEnumerable<GridRow> Rows { get; set; } = null!;
-        }
+        [JsonProperty("id")] public Guid Id { get; set; }
 
-        public class GridRow
-        {
-            [JsonProperty("name")]
-            public string? Name { get; set; }
+        [JsonProperty("areas")] public IEnumerable<GridArea> Areas { get; set; } = null!;
 
-            [JsonProperty("id")]
-            public Guid Id { get; set; }
+        [JsonProperty("styles")] public JToken? Styles { get; set; }
 
-            [JsonProperty("areas")]
-            public IEnumerable<GridArea> Areas { get; set; } = null!;
+        [JsonProperty("config")] public JToken? Config { get; set; }
+    }
 
-            [JsonProperty("styles")]
-            public JToken? Styles { get; set; }
+    public class GridArea
+    {
+        [JsonProperty("grid")] public string? Grid { get; set; } // TODO: what is this?
 
-            [JsonProperty("config")]
-            public JToken? Config { get; set; }
-        }
+        [JsonProperty("controls")] public IEnumerable<GridControl> Controls { get; set; } = null!;
 
-        public class GridArea
-        {
-            [JsonProperty("grid")]
-            public string? Grid { get; set; } // TODO: what is this?
+        [JsonProperty("styles")] public JToken? Styles { get; set; }
 
-            [JsonProperty("controls")]
-            public IEnumerable<GridControl> Controls { get; set; } = null!;
+        [JsonProperty("config")] public JToken? Config { get; set; }
+    }
 
-            [JsonProperty("styles")]
-            public JToken? Styles { get; set; }
+    public class GridControl
+    {
+        [JsonProperty("value")] public JToken Value { get; set; } = null!;
 
-            [JsonProperty("config")]
-            public JToken? Config { get; set; }
-        }
+        [JsonProperty("editor")] public GridEditor Editor { get; set; } = null!;
 
-        public class GridControl
-        {
-            [JsonProperty("value")]
-            public JToken Value { get; set; } = null!;
+        [JsonProperty("styles")] public JToken? Styles { get; set; }
 
-            [JsonProperty("editor")]
-            public GridEditor Editor { get; set; } = null!;
+        [JsonProperty("config")] public JToken? Config { get; set; }
+    }
 
-            [JsonProperty("styles")]
-            public JToken? Styles { get; set; }
+    public class GridEditor
+    {
+        [JsonProperty("alias")] public string Alias { get; set; } = null!;
 
-            [JsonProperty("config")]
-            public JToken? Config { get; set; }
-        }
-
-        public class GridEditor
-        {
-            [JsonProperty("alias")]
-            public string Alias { get; set; } = null!;
-
-            [JsonProperty("view")]
-            public string? View { get; set; }
-        }
+        [JsonProperty("view")] public string? View { get; set; }
     }
 }

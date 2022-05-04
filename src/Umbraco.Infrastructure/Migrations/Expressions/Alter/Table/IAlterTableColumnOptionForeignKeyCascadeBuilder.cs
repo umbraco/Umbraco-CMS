@@ -1,9 +1,9 @@
 ﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
+
+public interface IAlterTableColumnOptionForeignKeyCascadeBuilder :
+    IAlterTableColumnOptionBuilder,
+    IForeignKeyCascadeBuilder<IAlterTableColumnOptionBuilder, IAlterTableColumnOptionForeignKeyCascadeBuilder>
 {
-    public interface IAlterTableColumnOptionForeignKeyCascadeBuilder :
-        IAlterTableColumnOptionBuilder,
-        IForeignKeyCascadeBuilder<IAlterTableColumnOptionBuilder, IAlterTableColumnOptionForeignKeyCascadeBuilder>
-    { }
 }

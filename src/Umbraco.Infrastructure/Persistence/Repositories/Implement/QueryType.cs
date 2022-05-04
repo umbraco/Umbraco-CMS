@@ -1,28 +1,27 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+
+/// <summary>
+///     Specifies the type of base query.
+/// </summary>
+public enum QueryType
 {
     /// <summary>
-    /// Specifies the type of base query.
+    ///     Get one single complete item.
     /// </summary>
-    public enum QueryType
-    {
-        /// <summary>
-        /// Get one single complete item.
-        /// </summary>
-        Single,
+    Single,
 
-        /// <summary>
-        /// Get many complete items.
-        /// </summary>
-        Many,
+    /// <summary>
+    ///     Get many complete items.
+    /// </summary>
+    Many,
 
-        /// <summary>
-        /// Get item identifiers only.
-        /// </summary>
-        Ids,
+    /// <summary>
+    ///     Get item identifiers only.
+    /// </summary>
+    Ids,
 
-        /// <summary>
-        /// Count items.
-        /// </summary>
-        Count
-    }
+    /// <summary>
+    ///     Count items.
+    /// </summary>
+    Count
 }

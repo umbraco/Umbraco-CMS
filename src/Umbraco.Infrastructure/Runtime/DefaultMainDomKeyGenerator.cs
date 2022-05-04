@@ -1,4 +1,3 @@
-using System;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -6,29 +5,28 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Runtime
+namespace Umbraco.Cms.Infrastructure.Runtime;
+
+internal class DefaultMainDomKeyGenerator : IMainDomKeyGenerator
 {
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private readonly IHostingEnvironment _hostingEnvironment;
 
-    internal class DefaultMainDomKeyGenerator : IMainDomKeyGenerator
+    public DefaultMainDomKeyGenerator(IHostingEnvironment hostingEnvironment,
+        IOptionsMonitor<GlobalSettings> globalSettings)
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        _hostingEnvironment = hostingEnvironment;
+        _globalSettings = globalSettings;
+    }
 
-        public DefaultMainDomKeyGenerator(IHostingEnvironment hostingEnvironment, IOptionsMonitor<GlobalSettings> globalSettings)
-        {
-            _hostingEnvironment = hostingEnvironment;
-            _globalSettings = globalSettings;
-        }
+    public string GenerateKey()
+    {
+        var machineName = Environment.MachineName;
+        var mainDomId = MainDom.GetMainDomId(_hostingEnvironment);
+        var discriminator = _globalSettings.CurrentValue.MainDomKeyDiscriminator;
 
-        public string GenerateKey()
-        {
-            var machineName = Environment.MachineName;
-            var mainDomId = MainDom.GetMainDomId(_hostingEnvironment);
-            var discriminator = _globalSettings.CurrentValue.MainDomKeyDiscriminator;
+        var rawKey = $"{machineName}{mainDomId}{discriminator}";
 
-            var rawKey = $"{machineName}{mainDomId}{discriminator}";
-
-            return rawKey.GenerateHash<SHA1>();
-        }
+        return rawKey.GenerateHash<SHA1>();
     }
 }

@@ -1,52 +1,55 @@
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using Newtonsoft.Json;
 
-namespace Umbraco.Cms.Infrastructure.Serialization
+namespace Umbraco.Cms.Infrastructure.Serialization;
+
+/// <summary>
+///     When applied to a dictionary with a string key, will ensure the deserialized string keys are interned
+/// </summary>
+/// <typeparam name="TValue"></typeparam>
+/// <remarks>
+///     borrowed from https://stackoverflow.com/a/36116462/694494
+/// </remarks>
+public class
+    AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : CaseInsensitiveDictionaryConverter<TValue>
 {
-    /// <summary>
-    /// When applied to a dictionary with a string key, will ensure the deserialized string keys are interned
-    /// </summary>
-    /// <typeparam name="TValue"></typeparam>
-    /// <remarks>
-    /// borrowed from https://stackoverflow.com/a/36116462/694494
-    /// </remarks>
-    public class AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : CaseInsensitiveDictionaryConverter<TValue>
+    public AutoInterningStringKeyCaseInsensitiveDictionaryConverter()
     {
-        public AutoInterningStringKeyCaseInsensitiveDictionaryConverter()
-        {
-        }
-        public AutoInterningStringKeyCaseInsensitiveDictionaryConverter(StringComparer comparer) : base(comparer)
-        {
-        }
+    }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public AutoInterningStringKeyCaseInsensitiveDictionaryConverter(StringComparer comparer) : base(comparer)
+    {
+    }
+
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+        JsonSerializer serializer)
+    {
+        if (reader.TokenType == JsonToken.StartObject)
         {
-            if (reader.TokenType == JsonToken.StartObject)
+            IDictionary dictionary = Create(objectType);
+            while (reader.Read())
             {
-                var dictionary = Create(objectType);
-                while (reader.Read())
+                switch (reader.TokenType)
                 {
-                    switch (reader.TokenType)
-                    {
-                        case JsonToken.PropertyName:
-                            var key = string.Intern(reader.Value!.ToString()!);
+                    case JsonToken.PropertyName:
+                        var key = string.Intern(reader.Value!.ToString()!);
 
-                            if (!reader.Read())
-                                throw new Exception("Unexpected end when reading object.");
+                        if (!reader.Read())
+                        {
+                            throw new Exception("Unexpected end when reading object.");
+                        }
 
-                            var v = serializer.Deserialize<TValue>(reader);
-                            dictionary[key] = v;
-                            break;
-                        case JsonToken.Comment:
-                            break;
-                        case JsonToken.EndObject:
-                            return dictionary;
-                    }
+                        TValue? v = serializer.Deserialize<TValue>(reader);
+                        dictionary[key] = v;
+                        break;
+                    case JsonToken.Comment:
+                        break;
+                    case JsonToken.EndObject:
+                        return dictionary;
                 }
             }
-            return null;
         }
 
+        return null;
     }
 }
