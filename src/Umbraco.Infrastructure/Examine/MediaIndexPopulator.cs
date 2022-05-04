@@ -18,10 +18,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// <summary>
     ///     Default constructor to lookup all content data
     /// </summary>
-    /// <param name="mediaService"></param>
-    /// <param name="mediaValueSetBuilder"></param>
-    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService,
-        IValueSetBuilder<IMedia> mediaValueSetBuilder)
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
         : this(logger, null, mediaService, mediaValueSetBuilder)
     {
     }
@@ -29,11 +26,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// <summary>
     ///     Optional constructor allowing specifying custom query parameters
     /// </summary>
-    /// <param name="parentId"></param>
-    /// <param name="mediaService"></param>
-    /// <param name="mediaValueSetBuilder"></param>
-    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService,
-        IValueSetBuilder<IMedia> mediaValueSetBuilder)
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
     {
         _logger = logger;
         _parentId = parentId;
@@ -64,7 +57,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
         do
         {
-            media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out var total).ToArray();
+            media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out _).ToArray();
 
             if (media.Length > 0)
             {

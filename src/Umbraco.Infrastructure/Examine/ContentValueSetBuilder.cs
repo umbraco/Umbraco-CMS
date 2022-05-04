@@ -57,8 +57,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         return GetValueSetsEnumerable(content, creatorIds, writerIds);
     }
 
-    private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds,
-        Dictionary<int, IProfile> writerIds)
+    private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
     {
         // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
         // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
@@ -89,8 +88,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                         : c.Name?.Yield()) ?? Enumerable.Empty<string>()
                 },
                 { "urlName", urlValue?.Yield() ?? Enumerable.Empty<string>() }, // Always add invariant urlName
-                { "path", c.Path?.Yield() ?? Enumerable.Empty<string>() },
-                { "nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>() },
+                { "path", c.Path.Yield() },
+                { "nodeType", c.ContentType.Id.ToString().Yield() },
                 {
                     "creatorName",
                     (creatorIds.TryGetValue(c.CreatorId, out IProfile? creatorProfile) ? creatorProfile.Name! : "??")

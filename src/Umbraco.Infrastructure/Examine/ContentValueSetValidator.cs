@@ -18,17 +18,19 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
     private readonly IScopeProvider? _scopeProvider;
 
     // used for tests
-    public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null,
-        IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
+    public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null, IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
         : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
     {
     }
 
-    public ContentValueSetValidator(bool publishedValuesOnly, bool supportProtectedContent,
+    public ContentValueSetValidator(
+        bool publishedValuesOnly,
+        bool supportProtectedContent,
         IPublicAccessService? publicAccessService,
         IScopeProvider? scopeProvider,
         int? parentId = null,
-        IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
+        IEnumerable<string>? includeItemTypes = null,
+        IEnumerable<string>? excludeItemTypes = null)
         : base(includeItemTypes, excludeItemTypes, null, null)
     {
         PublishedValuesOnly = publishedValuesOnly;
@@ -179,8 +181,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
 
         var path = pathValues[0].ToString();
 
-        var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType,
-            filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
+        var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
 
         // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
         // We cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there

@@ -29,10 +29,10 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
                 { "createDate", new object[] { m.CreateDate } },
                 { "updateDate", new object[] { m.UpdateDate } },
                 { UmbracoExamineFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>() },
-                { "path", m.Path?.Yield() ?? Enumerable.Empty<string>() },
+                { "path", m.Path.Yield() },
                 { "nodeType", m.ContentType.Id.ToString().Yield() },
-                { "loginName", m.Username?.Yield() ?? Enumerable.Empty<string>() },
-                { "email", m.Email?.Yield() ?? Enumerable.Empty<string>() },
+                { "loginName", m.Username.Yield() },
+                { "email", m.Email.Yield() },
             };
 
             foreach (IProperty property in m.Properties)

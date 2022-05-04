@@ -29,8 +29,6 @@ public class ValueSetValidator : IValueSetValidator
     /// </remarks>
     public IEnumerable<string>? IncludeItemTypes { get; }
 
-    protected virtual IEnumerable<string>? ValidIndexCategories { get; }
-
     /// <summary>
     ///     Optional exclusion list of content types to ignore
     /// </summary>
@@ -97,9 +95,10 @@ public class ValueSetValidator : IValueSetValidator
             }
         }
 
-        var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType,
-            filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
+        var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
         return new ValueSetValidationResult(
             isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
     }
+
+    protected virtual IEnumerable<string>? ValidIndexCategories { get; }
 }

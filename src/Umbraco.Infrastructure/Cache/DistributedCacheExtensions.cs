@@ -23,11 +23,6 @@ public static class DistributedCacheExtensions
 
     public static void RefreshValueEditorCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
     {
-        if (dataTypes is null)
-        {
-            return;
-        }
-
         IEnumerable<DataTypeCacheRefresher.JsonPayload> payloads =
             dataTypes.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, false));
         dc.RefreshByPayload(ValueEditorCacheRefresher.UniqueId, payloads);

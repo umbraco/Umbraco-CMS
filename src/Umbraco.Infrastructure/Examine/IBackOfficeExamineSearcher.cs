@@ -12,5 +12,8 @@ public interface IBackOfficeExamineSearcher
         string query,
         UmbracoEntityTypes entityType,
         int pageSize,
-        long pageIndex, out long totalFound, string? searchFrom = null, bool ignoreUserStartNodes = false);
+        long pageIndex,
+        out long totalFound,
+        string? searchFrom = null,
+        bool ignoreUserStartNodes = false);
 }

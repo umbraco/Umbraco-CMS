@@ -57,7 +57,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
                 { "updateDate", new object[] { m.UpdateDate } },
                 { UmbracoExamineFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>() },
                 { "urlName", urlValue?.Yield() ?? Enumerable.Empty<string>() },
-                { "path", m.Path?.Yield() ?? Enumerable.Empty<string>() },
+                { "path", m.Path.Yield() },
                 { "nodeType", m.ContentType.Id.ToString().Yield() },
                 { "creatorName", (m.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
                 { UmbracoExamineFieldNames.UmbracoFileFieldName, mediaFiles },

@@ -5,26 +5,23 @@ namespace Umbraco.Cms.Core.Events;
 
 public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEquatable<MigrationEventArgs>
 {
-    public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion,
-        string productName, bool canCancel)
+    public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
         : this(migrationTypes, null, configuredVersion, targetVersion, productName, canCancel)
     {
     }
 
-    internal MigrationEventArgs(IList<Type> migrationTypes, IMigrationContext? migrationContext,
-        SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
+    public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion, string productName)
+        : this(migrationTypes, null, configuredVersion, targetVersion, productName, false)
+    {
+    }
+
+    internal MigrationEventArgs(IList<Type> migrationTypes, IMigrationContext? migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
         : base(migrationTypes, canCancel)
     {
         MigrationContext = migrationContext;
         ConfiguredSemVersion = configuredVersion;
         TargetSemVersion = targetVersion;
         ProductName = productName;
-    }
-
-    public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion,
-        string productName)
-        : this(migrationTypes, null, configuredVersion, targetVersion, productName, false)
-    {
     }
 
     /// <summary>
@@ -52,6 +49,10 @@ public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEqua
     /// </summary>
     /// <remarks>Is only available after migrations have run, for post-migrations.</remarks>
     internal IMigrationContext? MigrationContext { get; }
+
+    public static bool operator ==(MigrationEventArgs left, MigrationEventArgs right) => Equals(left, right);
+
+    public static bool operator !=(MigrationEventArgs left, MigrationEventArgs right) => !Equals(left, right);
 
     public bool Equals(MigrationEventArgs? other)
     {
@@ -106,8 +107,4 @@ public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEqua
             return hashCode;
         }
     }
-
-    public static bool operator ==(MigrationEventArgs left, MigrationEventArgs right) => Equals(left, right);
-
-    public static bool operator !=(MigrationEventArgs left, MigrationEventArgs right) => !Equals(left, right);
 }

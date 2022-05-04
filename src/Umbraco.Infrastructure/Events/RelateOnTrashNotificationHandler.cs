@@ -67,8 +67,7 @@ public sealed class RelateOnTrashNotificationHandler :
                 Guid documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
 
-                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType,
-                    documentObjectType, false);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType, false);
                 _relationService.Save(relationType);
             }
 
@@ -94,8 +93,7 @@ public sealed class RelateOnTrashNotificationHandler :
                         item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
-                        string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id,
-                            originalParentId));
+                        string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id, originalParentId));
                 }
             }
 
@@ -130,8 +128,7 @@ public sealed class RelateOnTrashNotificationHandler :
             {
                 Guid documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
-                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType,
-                    documentObjectType, false);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType, false);
                 _relationService.Save(relationType);
             }
 
@@ -156,8 +153,7 @@ public sealed class RelateOnTrashNotificationHandler :
                         item.Entity.CreatorId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
-                        string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id,
-                            originalParentId));
+                        string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id, originalParentId));
                 }
             }
 

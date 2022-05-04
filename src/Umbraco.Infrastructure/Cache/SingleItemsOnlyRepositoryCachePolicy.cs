@@ -21,8 +21,7 @@ namespace Umbraco.Cms.Core.Cache;
 internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
     where TEntity : class, IEntity
 {
-    public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options)
+    public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
         : base(cache, scopeAccessor, options)
     {
     }

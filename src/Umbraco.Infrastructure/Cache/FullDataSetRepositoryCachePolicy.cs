@@ -28,8 +28,7 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
     private readonly Func<TEntity, TId> _entityGetId;
     private readonly bool _expires;
 
-    public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor,
-        Func<TEntity, TId> entityGetId, bool expires)
+    public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
         : base(cache, scopeAccessor)
     {
         _entityGetId = entityGetId;
@@ -122,8 +121,7 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
     }
 
     /// <inheritdoc />
-    public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet,
-        Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
+    public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
         // get all from the cache, then look for the entity
         IEnumerable<TEntity> all = GetAllCached(performGetAll);

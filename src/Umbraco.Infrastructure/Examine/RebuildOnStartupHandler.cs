@@ -57,9 +57,8 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
             {
                 SyncBootState bootState = _syncBootStateAccessor.GetSyncBootState();
 
+                // if it's not a cold boot, only rebuild empty ones
                 _backgroundIndexRebuilder.RebuildIndexes(
-
-                    // if it's not a cold boot, only rebuild empty ones
                     bootState != SyncBootState.ColdBoot,
                     TimeSpan.FromMinutes(1));
 

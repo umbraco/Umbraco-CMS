@@ -24,8 +24,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] SEmptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
-    public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options)
+    public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
         : base(cache, scopeAccessor) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
@@ -63,49 +62,6 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             Cache.Clear(EntityTypeCacheKey);
 
             throw;
-        }
-    }
-
-    protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
-
-    protected string GetEntityCacheKey(TId? id)
-    {
-        if (EqualityComparer<TId>.Default.Equals(id, default))
-        {
-            return string.Empty;
-        }
-
-        if (typeof(TId).IsValueType)
-        {
-            return EntityTypeCacheKey + id;
-        }
-
-        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
-    }
-
-    protected virtual void InsertEntity(string cacheKey, TEntity entity)
-        => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
-
-    protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
-    {
-        if (ids?.Length == 0 && entities?.Length == 0 && _options.GetAllCacheAllowZeroCount)
-        {
-            // getting all of them, and finding nothing.
-            // if we can cache a zero count, cache an empty array,
-            // for as long as the cache is not cleared (no expiration)
-            Cache.Insert(EntityTypeCacheKey, () => SEmptyEntities);
-        }
-        else
-        {
-            if (entities is not null)
-            {
-                // individually cache each item
-                foreach (TEntity entity in entities)
-                {
-                    TEntity capture = entity;
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
-                }
-            }
         }
     }
 
@@ -168,8 +124,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     }
 
     /// <inheritdoc />
-    public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet,
-        Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
+    public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
         var cacheKey = GetEntityCacheKey(id);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -222,10 +177,10 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         else
         {
             // get everything we have
-            TEntity?[]? entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)?
+            TEntity?[] entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)
                 .ToArray(); // no need for null checks, we are not caching nulls
 
-            if (entities?.Length > 0)
+            if (entities.Length > 0)
             {
                 // if some of them were in the cache...
                 if (_options.GetAllCacheValidateCount)
@@ -272,4 +227,47 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
     /// <inheritdoc />
     public override void ClearAll() => Cache.ClearByKey(EntityTypeCacheKey);
+
+    protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
+
+    protected string GetEntityCacheKey(TId? id)
+    {
+        if (EqualityComparer<TId>.Default.Equals(id, default))
+        {
+            return string.Empty;
+        }
+
+        if (typeof(TId).IsValueType)
+        {
+            return EntityTypeCacheKey + id;
+        }
+
+        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
+    }
+
+    protected virtual void InsertEntity(string cacheKey, TEntity entity)
+        => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+
+    protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
+    {
+        if (ids?.Length == 0 && entities?.Length == 0 && _options.GetAllCacheAllowZeroCount)
+        {
+            // getting all of them, and finding nothing.
+            // if we can cache a zero count, cache an empty array,
+            // for as long as the cache is not cleared (no expiration)
+            Cache.Insert(EntityTypeCacheKey, () => SEmptyEntities);
+        }
+        else
+        {
+            if (entities is not null)
+            {
+                // individually cache each item
+                foreach (TEntity entity in entities)
+                {
+                    TEntity capture = entity;
+                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                }
+            }
+        }
+    }
 }

@@ -63,7 +63,7 @@ public class JsonConfigManipulator : IConfigManipulator
 
         if (item is not null)
         {
-            json?.Merge(item, new JsonMergeSettings());
+            json.Merge(item, new JsonMergeSettings());
         }
 
         SaveJson(provider, json);
@@ -123,7 +123,7 @@ public class JsonConfigManipulator : IConfigManipulator
 
         if (item is not null)
         {
-            json?.Merge(item, new JsonMergeSettings());
+            json.Merge(item, new JsonMergeSettings());
         }
 
         SaveJson(provider, json);
@@ -144,7 +144,7 @@ public class JsonConfigManipulator : IConfigManipulator
 
         if (item is not null)
         {
-            json?.Merge(item, new JsonMergeSettings());
+            json.Merge(item, new JsonMergeSettings());
         }
 
         SaveJson(provider, json);

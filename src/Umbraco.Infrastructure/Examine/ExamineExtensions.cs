@@ -37,10 +37,13 @@ public static class ExamineExtensions
 
         foreach (ISearchResult result in results)
         {
-            if (int.TryParse(result.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentId) &&
-                cache.GetById(contentId) is IPublishedContent content)
+            if (int.TryParse(result.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentId))
             {
-                publishedSearchResults.Add(new PublishedSearchResult(content, result.Score));
+                IPublishedContent? content = cache.GetById(contentId);
+                if (content is not null)
+                {
+                    publishedSearchResults.Add(new PublishedSearchResult(content, result.Score));
+                }
             }
         }
 

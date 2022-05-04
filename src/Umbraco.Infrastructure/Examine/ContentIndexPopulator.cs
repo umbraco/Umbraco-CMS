@@ -28,9 +28,6 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// <summary>
     ///     Default constructor to lookup all content data
     /// </summary>
-    /// <param name="contentService"></param>
-    /// <param name="sqlContext"></param>
-    /// <param name="contentValueSetBuilder"></param>
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
@@ -121,8 +118,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         while (content.Length == pageSize);
     }
 
-    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize,
-        IReadOnlyList<IIndex> indexes)
+    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
     {
         IContent[] content;
 
@@ -132,8 +128,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             // add the published filter
             // note: We will filter for published variants in the validator
-            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery,
-                Ordering.By("Path")).ToArray();
+            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery, Ordering.By("Path")).ToArray();
 
             if (content.Length > 0)
             {

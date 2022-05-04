@@ -46,15 +46,13 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     }
 
     /// <inheritdoc />
-    public abstract TEntity? Get(TId? id, Func<TId?, TEntity?> performGet,
-        Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
+    public abstract TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
 
     /// <inheritdoc />
     public abstract TEntity? GetCached(TId id);
 
     /// <inheritdoc />
-    public abstract bool Exists(TId id, Func<TId, bool> performExists,
-        Func<TId[], IEnumerable<TEntity>?> performGetAll);
+    public abstract bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll);
 
     /// <inheritdoc />
     public abstract void Create(TEntity entity, Action<TEntity> persistNew);

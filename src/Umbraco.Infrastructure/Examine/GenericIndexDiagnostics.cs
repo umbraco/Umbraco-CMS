@@ -54,7 +54,7 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
 
         try
         {
-            ISearchResults? result = _index.Searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet)
+            _index.Searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet)
                 .Execute(new QueryOptions(0, 1));
             return Attempt<string?>.Succeed(); // if we can search we'll assume it's healthy
         }

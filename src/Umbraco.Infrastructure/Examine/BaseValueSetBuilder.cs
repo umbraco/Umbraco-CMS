@@ -22,8 +22,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
     /// <inheritdoc />
     public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
-    protected void AddPropertyValue(IProperty property, string? culture, string? segment,
-        IDictionary<string, IEnumerable<object?>>? values)
+    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values)
     {
         IDataEditor? editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
         if (editor == null)
