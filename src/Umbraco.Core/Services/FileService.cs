@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetStylesheetFileContentStream(string filepath)
+        public Stream GetStylesheetFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -283,7 +283,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetScriptFileContentStream(string filepath)
+        public Stream GetScriptFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -597,11 +597,7 @@ namespace Umbraco.Cms.Core.Services
                 fileName = $"{fileName}.cshtml";
             }
 
-            Stream? fs = _templateRepository.GetFileContentStream(fileName);
-            if (fs == null)
-            {
-                return null;
-            }
+            Stream fs = _templateRepository.GetFileContentStream(fileName);
 
             using (var view = new StreamReader(fs))
             {
@@ -898,7 +894,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetPartialViewFileContentStream(string filepath)
+        public Stream GetPartialViewFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -926,7 +922,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetPartialViewMacroFileContentStream(string filepath)
+        public Stream GetPartialViewMacroFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {

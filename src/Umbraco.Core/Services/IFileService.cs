@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the partial view.</param>
         /// <returns>The content of the partial view.</returns>
-        Stream? GetPartialViewFileContentStream(string filepath);
+        Stream GetPartialViewFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a partial view.
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the macro partial view.</param>
         /// <returns>The content of the macro partial view.</returns>
-        Stream? GetPartialViewMacroFileContentStream(string filepath);
+        Stream GetPartialViewMacroFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a macro partial view.
@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the stylesheet.</param>
         /// <returns>The content of the stylesheet.</returns>
-        Stream? GetStylesheetFileContentStream(string filepath);
+        Stream GetStylesheetFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a stylesheet.
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the script.</param>
         /// <returns>The content of the script file.</returns>
-        Stream? GetScriptFileContentStream(string filepath);
+        Stream GetScriptFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a script file.
@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <returns>The content of the template.</returns>
-        Stream? GetTemplateFileContentStream(string filepath);
+        Stream GetTemplateFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a template.
