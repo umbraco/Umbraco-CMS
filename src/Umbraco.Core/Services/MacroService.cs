@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMacroRepository _macroRepository;
         private readonly IAuditRepository _auditRepository;
 
-        public MacroService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMacroRepository macroRepository, IAuditRepository auditRepository)
+        public MacroService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMacroRepository macroRepository, IAuditRepository auditRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _macroRepository = macroRepository;
@@ -30,14 +30,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">Alias to retrieve an <see cref="IMacro"/> for</param>
         /// <returns>An <see cref="IMacro"/> object</returns>
-        public IMacro GetByAlias(string alias)
+        public IMacro? GetByAlias(string alias)
         {
             if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
             {
                 return GetAll().FirstOrDefault(x => x.Alias == alias);
             }
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return macroWithAliasRepository.GetByAlias(alias);
             }
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _macroRepository.GetMany(ids);
             }
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IMacro> GetAll(params Guid[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _macroRepository.GetMany(ids);
             }
@@ -72,23 +72,23 @@ namespace Umbraco.Cms.Core.Services
                 return GetAll().Where(x => hashset.Contains(x.Alias));
             }
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return macroWithAliasRepository.GetAllByAlias(aliases);
+                return macroWithAliasRepository.GetAllByAlias(aliases) ?? Enumerable.Empty<IMacro>();
             }
         }
 
-        public IMacro GetById(int id)
+        public IMacro? GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _macroRepository.Get(id);
             }
         }
 
-        public IMacro GetById(Guid id)
+        public IMacro? GetById(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _macroRepository.Get(id);
             }
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional id of the user deleting the macro</param>
         public void Delete(IMacro macro, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var deletingNotification = new MacroDeletingNotification(macro, eventMessages);
@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new MacroSavingNotification(macro, eventMessages);

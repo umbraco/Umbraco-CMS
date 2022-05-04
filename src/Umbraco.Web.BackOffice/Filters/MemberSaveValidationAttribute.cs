@@ -46,12 +46,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var model = (MemberSave)context.ActionArguments["contentItem"];
+                var model = (MemberSave?)context.ActionArguments["contentItem"];
                 var contentItemValidator = new MemberSaveModelValidator(_loggerFactory.CreateLogger<MemberSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
                 //now do each validation step
                 if (contentItemValidator.ValidateExistingContent(model, context))
                     if (contentItemValidator.ValidateProperties(model, model, context))
-                        contentItemValidator.ValidatePropertiesData(model, model, model.PropertyCollectionDto, context.ModelState);
+                        contentItemValidator.ValidatePropertiesData(model, model, model?.PropertyCollectionDto, context.ModelState);
             }
 
             public void OnActionExecuted(ActionExecutedContext context)

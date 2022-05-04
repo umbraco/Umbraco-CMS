@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core
         }
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedContent> GetContentByTag(string tag, string group = null, string culture = null)
+        public IEnumerable<IPublishedContent> GetContentByTag(string tag, string? group = null, string? culture = null)
         {
             var ids = _tagService.GetTaggedContentByTag(tag, group, culture)
                 .Select(x => x.EntityId);
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core
         }
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedContent> GetContentByTagGroup(string group, string culture = null)
+        public IEnumerable<IPublishedContent> GetContentByTagGroup(string group, string? culture = null)
         {
             var ids = _tagService.GetTaggedContentByTagGroup(group, culture)
                 .Select(x => x.EntityId);
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core
         }
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string group = null, string culture = null)
+        public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string? group = null, string? culture = null)
         {
             var ids = _tagService.GetTaggedMediaByTag(tag, group, culture)
                 .Select(x => x.EntityId);
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core
         }
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedContent> GetMediaByTagGroup(string group, string culture = null)
+        public IEnumerable<IPublishedContent> GetMediaByTagGroup(string group, string? culture = null)
         {
             var ids = _tagService.GetTaggedMediaByTagGroup(group, culture)
                 .Select(x => x.EntityId);
@@ -65,37 +65,37 @@ namespace Umbraco.Cms.Core
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllTags(string group = null, string culture = null)
+        public IEnumerable<TagModel?> GetAllTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllContentTags(string group = null, string culture = null)
+        public IEnumerable<TagModel?> GetAllContentTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllContentTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllMediaTags(string group = null, string culture = null)
+        public IEnumerable<TagModel?> GetAllMediaTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllMediaTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetAllMemberTags(string group = null, string culture = null)
+        public IEnumerable<TagModel?> GetAllMemberTags(string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllMemberTags(group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null)
+        public IEnumerable<TagModel?> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TagModel> GetTagsForEntity(int contentId, string group = null, string culture = null)
+        public IEnumerable<TagModel?> GetTagsForEntity(int contentId, string? group = null, string? culture = null)
         {
             return _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetTagsForEntity(contentId, group, culture));
         }

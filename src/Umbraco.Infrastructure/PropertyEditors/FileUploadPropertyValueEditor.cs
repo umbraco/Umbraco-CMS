@@ -56,13 +56,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Other places (FileUploadPropertyEditor...) do NOT deal with multiple files, and our logic for reusing
         /// folders would NOT work, etc.</para>
         /// </remarks>
-        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             var currentPath = currentValue as string;
             if (!currentPath.IsNullOrWhiteSpace())
-                currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
+                currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath!);
 
-            string editorFile = null;
+            string? editorFile = null;
             if (editorValue.Value != null)
             {
                 editorFile = editorValue.Value as string;
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         }
 
-        private string ProcessFile(ContentPropertyFile file, object dataTypeConfiguration, Guid cuid, Guid puid)
+        private string? ProcessFile(ContentPropertyFile file, object? dataTypeConfiguration, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change

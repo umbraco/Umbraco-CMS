@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Umbraco.Cms.Web.Common
 
         public UmbracoHelperAccessor(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
-        public bool TryGetUmbracoHelper(out UmbracoHelper umbracoHelper)
+        public bool TryGetUmbracoHelper([MaybeNullWhen(false)] out UmbracoHelper umbracoHelper)
         {
             umbracoHelper = _httpContextAccessor.HttpContext?.RequestServices.GetService<UmbracoHelper>();
             return umbracoHelper is not null;

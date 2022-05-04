@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         private readonly string _header;
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
-        private static HttpClient s_httpClient;
+        private static HttpClient? s_httpClient;
 
         [Obsolete("Use ctor without value.")]
         protected BaseHttpHeaderCheck(
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);
+            var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
             try
             {
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url?.ToString(), ex.Message });
             }
 
             return

@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// Explicitly implement this so that we filter the request
         /// </summary>
         /// <inheritdoc/>
-        string ICookieManager.GetRequestCookie(HttpContext context, string key)
+        string? ICookieManager.GetRequestCookie(HttpContext context, string key)
         {
             var absPath = context.Request.Path;
 

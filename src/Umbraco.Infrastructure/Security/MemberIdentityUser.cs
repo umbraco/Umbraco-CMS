@@ -12,11 +12,11 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class MemberIdentityUser : UmbracoIdentityUser
     {
-        private string _comments;
+        private string? _comments;
 
         // Custom comparer for enumerables
         private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>>(
-            (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
+            (groups, enumerable) => groups?.Select(x => x.Alias).UnsortedSequenceEqual(enumerable?.Select(x => x.Alias)) ?? false,
             groups => groups.GetHashCode());
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
-        public static MemberIdentityUser CreateNew(string username, string email, string memberTypeAlias, bool isApproved, string name = null)
+        public static MemberIdentityUser CreateNew(string username, string email, string memberTypeAlias, bool isApproved, string? name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Security
             user.Email = email;
             user.MemberTypeAlias = memberTypeAlias;
             user.IsApproved = isApproved;
-            user.Id = null;
+            user.Id = null!;
             user.HasIdentity = false;
             user.Name = name;
             user.EnableChangeTracking();
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets the member's comments
         /// </summary>
-        public string Comments
+        public string? Comments
         {
             get => _comments;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _comments, nameof(Comments));
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets the alias of the member type
         /// </summary>
-        public string MemberTypeAlias { get; set; }
+        public string? MemberTypeAlias { get; set; }
 
         private static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
 

@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Manifest
         private readonly ManifestValueValidatorCollection _validators;
         private readonly ManifestFilterCollection _filters;
 
-        private string _path;
+        private string _path = null!;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
@@ -51,30 +51,19 @@ namespace Umbraco.Cms.Core.Manifest
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IDataValueEditorFactory dataValueEditorFactory)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper, hostingEnvironment)
-        {
-            _jsonSerializer = jsonSerializer;
-            _localizedTextService = localizedTextService;
-            _shortStringHelper = shortStringHelper;
-            _dataValueEditorFactory = dataValueEditorFactory;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManifestParser"/> class.
-        /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string appPluginsPath, ILogger<ManifestParser> logger,  IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
-            if (appPluginsPath == null) throw new ArgumentNullException(nameof(appPluginsPath));
-            if (string.IsNullOrWhiteSpace(appPluginsPath)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(appPluginsPath));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
-
-            AppPluginsPath = appPluginsPath;
+            AppPluginsPath = "~/App_Plugins";
+            _jsonSerializer = jsonSerializer;
+            _localizedTextService = localizedTextService;
+            _shortStringHelper = shortStringHelper;
+            _dataValueEditorFactory = dataValueEditorFactory;
         }
 
         public string AppPluginsPath
@@ -93,7 +82,7 @@ namespace Umbraco.Cms.Core.Manifest
                 IEnumerable<PackageManifest> manifests = GetManifests();
                 return MergeManifests(manifests);
 
-            }, new TimeSpan(0, 4, 0));
+            }, new TimeSpan(0, 4, 0))!;
 
         /// <summary>
         /// Gets all manifests.
@@ -146,30 +135,55 @@ namespace Umbraco.Cms.Core.Manifest
             {
                 if (manifest.Scripts != null)
                 {
-                    if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets> scriptsPerBundleOption))
+                    if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? scriptsPerBundleOption))
                     {
                         scriptsPerBundleOption = new List<ManifestAssets>();
                         scripts[manifest.BundleOptions] = scriptsPerBundleOption;
                     }
+
                     scriptsPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Scripts));
                 }
 
                 if (manifest.Stylesheets != null)
                 {
-                    if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets> stylesPerBundleOption))
+                    if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? stylesPerBundleOption))
                     {
                         stylesPerBundleOption = new List<ManifestAssets>();
                         stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
                     }
+
                     stylesPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Stylesheets));
                 }
 
-                if (manifest.PropertyEditors != null) propertyEditors.AddRange(manifest.PropertyEditors);
-                if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
-                if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
-                if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
-                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
-                if (manifest.Sections != null) sections.AddRange(manifest.Sections.LegacyDistinctBy(x => x.Alias.ToLowerInvariant()));
+                if (manifest.PropertyEditors != null)
+                {
+                    propertyEditors.AddRange(manifest.PropertyEditors);
+                }
+
+                if (manifest.ParameterEditors != null)
+                {
+                    parameterEditors.AddRange(manifest.ParameterEditors);
+                }
+
+                if (manifest.GridEditors != null)
+                {
+                    gridEditors.AddRange(manifest.GridEditors);
+                }
+
+                if (manifest.ContentApps != null)
+                {
+                    contentApps.AddRange(manifest.ContentApps);
+                }
+
+                if (manifest.Dashboards != null)
+                {
+                    dashboards.AddRange(manifest.Dashboards);
+                }
+
+                if (manifest.Sections != null)
+                {
+                    sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias, StringComparer.OrdinalIgnoreCase));
+                }
             }
 
             return new CompositePackageManifest(
@@ -217,17 +231,17 @@ namespace Umbraco.Cms.Core.Manifest
                 new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here
-            for (var i = 0; i < manifest.Scripts.Length; i++)
-                manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
+            for (var i = 0; i < manifest!.Scripts.Length; i++)
+                manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i])!;
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
-                manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
+                manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
             foreach (var contentApp in manifest.ContentApps)
             {
                 contentApp.View = _ioHelper.ResolveRelativeOrVirtualUrl(contentApp.View);
             }
             foreach (var dashboard in manifest.Dashboards)
             {
-                dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
+                dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
             }
             foreach (var gridEditor in manifest.GridEditors)
             {

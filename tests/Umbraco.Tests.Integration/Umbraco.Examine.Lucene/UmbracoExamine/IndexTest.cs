@@ -43,8 +43,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                 Assert.AreEqual(0, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
 
                 // Change so that it's under 999 and verify
-                valueSet.Values["path"] = new List<object> { "-1,999," + valueSet.Id };
-                index.IndexItems(new[] { valueSet });
+                var values = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
+                values["path"] = new List<object> { "-1,999," + valueSet.Id };
+                var newValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType,
+                    values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
+                index.IndexItems(new[] { newValueSet });
                 Assert.AreEqual(1, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
             }
         }

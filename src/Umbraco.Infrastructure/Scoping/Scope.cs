@@ -10,18 +10,22 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Core.Collections;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Scoping
+namespace Umbraco.Cms.Infrastructure.Scoping
 {
     /// <summary>
     ///     Implements <see cref="IScope" />.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IDatabaseScope
+    internal class Scope :
+        ICoreScope,
+        IScope,
+        Core.Scoping.IScope
     {
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;
@@ -31,55 +35,62 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly IsolationLevel _isolationLevel;
         private readonly object _lockQueueLocker = new();
         private readonly ILogger<Scope> _logger;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly RepositoryCacheMode _repositoryCacheMode;
         private readonly bool? _scopeFileSystem;
 
         private readonly ScopeProvider _scopeProvider;
         private bool _callContext;
         private bool? _completed;
-        private IUmbracoDatabase _database;
+        private IUmbracoDatabase? _database;
 
         private bool _disposed;
-        private ICompletable _fscope;
+        private IEventDispatcher? _eventDispatcher;
+        private ICompletable? _fscope;
 
-        private IsolatedCaches _isolatedCaches;
-        private IScopedNotificationPublisher _notificationPublisher;
+        private EventMessages? _messages;
+        private IsolatedCaches? _isolatedCaches;
+        private IScopedNotificationPublisher? _notificationPublisher;
 
-        private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
+        private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
 
         // This is all used to safely track read/write locks at given Scope levels so that
         // when we dispose we can verify that everything has been cleaned up correctly.
-        private HashSet<int> _readLocks;
-        private Dictionary<Guid, Dictionary<int, int>> _readLocksDictionary;
-        private HashSet<int> _writeLocks;
-        private Dictionary<Guid, Dictionary<int, int>> _writeLocksDictionary;
-        private Queue<IDistributedLock> _acquiredLocks;
+        private HashSet<int>? _readLocks;
+        private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;
+        private HashSet<int>? _writeLocks;
+        private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
+        private Queue<IDistributedLock>? _acquiredLocks;
 
         // initializes a new scope
         private Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
+            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
-            Scope parent,
-            IScopeContext scopeContext,
+            Scope? parent,
+            IScopeContext? scopeContext,
             bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher notificationPublisher = null,
+            IEventDispatcher? eventDispatcher = null,
+            IScopedNotificationPublisher? notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
         {
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
+            _mediaFileManager = mediaFileManager;
             _eventAggregator = eventAggregator;
             _logger = logger;
             Context = scopeContext;
 
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
+            _eventDispatcher = eventDispatcher;
             _notificationPublisher = notificationPublisher;
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
@@ -137,6 +148,12 @@ namespace Umbraco.Cms.Core.Scoping
                         nameof(repositoryCacheMode));
                 }
 
+                // cannot specify a dispatcher!
+                if (_eventDispatcher != null)
+                {
+                    throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
+                }
+
                 // Only the outermost scope can specify the notification publisher
                 if (_notificationPublisher != null)
                 {
@@ -171,20 +188,36 @@ namespace Umbraco.Cms.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
+            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             bool detachable,
-            IScopeContext scopeContext,
+            IScopeContext? scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher scopedNotificationPublisher = null,
+            IEventDispatcher? eventDispatcher = null,
+            IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, null,
-                scopeContext, detachable, isolationLevel, repositoryCacheMode,
-                scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
+            : this(
+                scopeProvider,
+                coreDebugSettings,
+                mediaFileManager,
+                eventAggregator,
+                logger,
+                fileSystems,
+                null,
+                scopeContext,
+                detachable,
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                scopedNotificationPublisher,
+                scopeFileSystems,
+                callContext,
+                autoComplete)
         {
         }
 
@@ -192,22 +225,37 @@ namespace Umbraco.Cms.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
+            MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IScopedNotificationPublisher notificationPublisher = null,
+            IEventDispatcher? eventDispatcher = null,
+            IScopedNotificationPublisher? notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, eventAggregator, logger, fileSystems, parent,
-                null, false, isolationLevel, repositoryCacheMode, notificationPublisher,
-                scopeFileSystems, callContext, autoComplete)
+            : this(
+                scopeProvider,
+                coreDebugSettings,
+                mediaFileManager,
+                eventAggregator,
+                logger,
+                fileSystems,
+                parent,
+                null,
+                false,
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                notificationPublisher,
+                scopeFileSystems,
+                callContext,
+                autoComplete)
         {
         }
-
 
         // a value indicating whether to force call-context
         public bool CallContext
@@ -247,18 +295,18 @@ namespace Umbraco.Cms.Core.Scoping
         public bool Detachable { get; }
 
         // the parent scope (in a nested scopes chain)
-        public Scope ParentScope { get; set; }
+        public Scope? ParentScope { get; set; }
 
         public bool Attached { get; set; }
 
         // the original scope (when attaching a detachable scope)
-        public Scope OrigScope { get; set; }
+        public Scope? OrigScope { get; set; }
 
         // the original context (when attaching a detachable scope)
-        public IScopeContext OrigContext { get; set; }
+        public IScopeContext? OrigContext { get; set; }
 
         // the context (for attaching & detaching only)
-        public IScopeContext Context { get; }
+        public IScopeContext? Context { get; }
 
         public IsolationLevel IsolationLevel
         {
@@ -391,6 +439,43 @@ namespace Umbraco.Cms.Core.Scoping
             }
         }
 
+        /// <inheritdoc />
+        public EventMessages Messages
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ParentScope != null)
+                {
+                    return ParentScope.Messages;
+                }
+
+                return _messages ??= new EventMessages();
+
+                // TODO: event messages?
+                // this may be a problem: the messages collection will be cleared at the end of the scope
+                // how shall we process it in controllers etc? if we don't want the global factory from v7?
+                // it'd need to be captured by the controller
+                //
+                // + rename // EventMessages = ServiceMessages or something
+            }
+        }
+
+        /// <inheritdoc />
+        public IEventDispatcher Events
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ParentScope != null)
+                {
+                    return ParentScope.Events;
+                }
+
+                return _eventDispatcher ??= new QueuingEventDispatcher(_mediaFileManager);
+            }
+        }
+
         public IScopedNotificationPublisher Notifications
         {
             get
@@ -450,7 +535,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
                 {
-                    _acquiredLocks.Dequeue().Dispose();
+                    _acquiredLocks?.Dequeue().Dispose();
                 }
 
                 // We're the parent scope, make sure that locks of all scopes has been cleared
@@ -518,7 +603,7 @@ namespace Umbraco.Cms.Core.Scoping
         ///     Used for testing. Ensures and gets any queued read locks.
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<Guid, Dictionary<int, int>> GetReadLocks()
+        internal Dictionary<Guid, Dictionary<int, int>>? GetReadLocks()
         {
             EnsureDbLocks();
             // always delegate to root/parent scope.
@@ -534,7 +619,7 @@ namespace Umbraco.Cms.Core.Scoping
         ///     Used for testing. Ensures and gets and queued write locks.
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<Guid, Dictionary<int, int>> GetWriteLocks()
+        internal Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks()
         {
             EnsureDbLocks();
             // always delegate to root/parent scope.
@@ -678,8 +763,8 @@ namespace Umbraco.Cms.Core.Scoping
             var builder = new StringBuilder();
             builder.AppendLine(
                 $"Lock counters aren't empty, suggesting a scope hasn't been properly disposed, parent id: {InstanceId}");
-            WriteLockDictionaryToString(_readLocksDictionary, builder, "read locks");
-            WriteLockDictionaryToString(_writeLocksDictionary, builder, "write locks");
+            WriteLockDictionaryToString(_readLocksDictionary!, builder, "read locks");
+            WriteLockDictionaryToString(_writeLocksDictionary!, builder, "write locks");
             return builder.ToString();
         }
 
@@ -772,10 +857,10 @@ namespace Umbraco.Cms.Core.Scoping
                 {
                     if (completed)
                     {
-                        _fscope.Complete();
+                        _fscope?.Complete();
                     }
 
-                    _fscope.Dispose();
+                    _fscope?.Dispose();
                     _fscope = null;
                 }
             }
@@ -784,6 +869,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 if (onException == false)
                 {
+                    _eventDispatcher?.ScopeExit(completed);
                     _notificationPublisher?.ScopeExit(completed);
                 }
             }
@@ -795,7 +881,7 @@ namespace Umbraco.Cms.Core.Scoping
                 {
                     try
                     {
-                        _scopeProvider.AmbientContext.ScopeExit(completed);
+                        _scopeProvider.AmbientContext?.ScopeExit(completed);
                     }
                     finally
                     {
@@ -866,17 +952,17 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock ID to increment.</param>
         /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
         /// <param name="locks">Reference to the dictionary to increment on</param>
-        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks)
+        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
         {
             // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
             // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
             locks ??= new Dictionary<Guid, Dictionary<int, int>>();
 
             // Try and get the dict associated with the scope id.
-            var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int> locksDict);
+            var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
             if (locksDictFound)
             {
-                locksDict.TryGetValue(lockId, out var value);
+                locksDict!.TryGetValue(lockId, out var value);
                 locksDict[lockId] = value + 1;
             }
             else
@@ -1026,8 +1112,8 @@ namespace Umbraco.Cms.Core.Scoping
                         // We are the outermost scope, handle the lock request.
                         LockInner(
                             instanceId,
-                            ref _readLocksDictionary,
-                            ref _readLocks,
+                            ref _readLocksDictionary!,
+                            ref _readLocks!,
                             ObtainReadLock,
                             timeout,
                             lockId);
@@ -1060,8 +1146,8 @@ namespace Umbraco.Cms.Core.Scoping
                         // We are the outermost scope, handle the lock request.
                         LockInner(
                             instanceId,
-                            ref _writeLocksDictionary,
-                            ref _writeLocks,
+                            ref _writeLocksDictionary!,
+                            ref _writeLocks!,
                             ObtainWriteLock,
                             timeout,
                             lockId);
@@ -1118,7 +1204,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainReadLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
 
         /// <summary>
         ///     Obtains a write lock with a custom timeout.
@@ -1126,6 +1212,6 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainWriteLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
     }
 }

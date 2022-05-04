@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models
         /// Adding these to have first level properties instead of the Properties collection.
         /// </remarks>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        string LongStringPropertyValue { get; set; }
+        string? LongStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
         /// </summary>
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Models
         /// Adding these to have first level properties instead of the Properties collection.
         /// </remarks>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        string ShortStringPropertyValue { get; set; }
+        string? ShortStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
         /// </summary>
@@ -59,6 +59,6 @@ namespace Umbraco.Cms.Core.Models
         /// Adding these to have first level properties instead of the Properties collection.
         /// </remarks>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        string PropertyTypeAlias { get; set; }
+        string? PropertyTypeAlias { get; set; }
     }
 }

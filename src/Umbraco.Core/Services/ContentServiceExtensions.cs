@@ -21,22 +21,26 @@ namespace Umbraco.Extensions
 
         private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
-        public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string culture = "*")
+        public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
         {
             var result = new List<string>();
             var content = contentService.GetById(id);
 
-            foreach (var contentProperty in content.Properties)
+            if (content is not null)
             {
-                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
+                foreach (var contentProperty in content.Properties)
                 {
-                    var value = contentProperty.GetValue(culture)?.ToString();
-                    if (!string.IsNullOrEmpty(value))
+                    if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
                     {
-                        result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                        var value = contentProperty.GetValue(culture)?.ToString();
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                        }
                     }
                 }
             }
+
             return result;
         }
 
@@ -53,13 +57,13 @@ namespace Umbraco.Extensions
         }
         #endregion
 
-        public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
+        public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
         {
             var guids = new List<GuidUdi>();
             foreach (var udi in ids)
             {
                 var guidUdi = udi as GuidUdi;
-                if (guidUdi == null)
+                if (guidUdi is null)
                     throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
                 guids.Add(guidUdi);
             }
@@ -79,7 +83,7 @@ namespace Umbraco.Extensions
         public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var guidUdi = parentId as GuidUdi;
-            if (guidUdi == null)
+            if (guidUdi is null)
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
             var parent = contentService.GetById(guidUdi.Guid);
             return contentService.Create(name, parent, contentTypeAlias, userId);

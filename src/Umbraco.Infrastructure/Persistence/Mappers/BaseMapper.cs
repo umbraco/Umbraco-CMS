@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
         private readonly object _definedLock = new object();
         private readonly MapperConfigurationStore _maps;
 
-        private ISqlSyntaxProvider _sqlSyntax;
+        private ISqlSyntaxProvider? _sqlSyntax;
         private bool _defined;
 
         protected BaseMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 
         protected abstract void DefineMaps();
 
-        internal string Map(string propertyName)
+        internal string Map(string? propertyName)
         {
             lock (_definedLock)
             {
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 
             if (!_maps.TryGetValue(GetType(), out var mapperMaps))
                 throw new InvalidOperationException($"No maps defined for mapper {GetType().FullName}.");
-            if (!mapperMaps.TryGetValue(propertyName, out var mappedName))
+            if (propertyName is null || !mapperMaps.TryGetValue(propertyName, out var mappedName))
                 throw new InvalidOperationException($"No map defined by mapper {GetType().FullName} for property {propertyName}.");
             return mappedName;
         }

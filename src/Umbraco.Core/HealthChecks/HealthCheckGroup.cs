@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Core.HealthChecks
     public class HealthCheckGroup
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "checks")]
-        public List<HealthCheck> Checks { get; set; }
+        public List<HealthCheck>? Checks { get; set; }
     }
 }

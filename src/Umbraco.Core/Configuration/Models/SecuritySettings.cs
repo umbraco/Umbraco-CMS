@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the authorization cookie domain.
         /// </summary>
-        public string AuthCookieDomain { get; set; }
+        public string? AuthCookieDomain { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the user's email address is to be considered as their username.
@@ -62,13 +62,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the user password settings.
         /// </summary>
-        public UserPasswordConfigurationSettings UserPassword { get; set; }
+        public UserPasswordConfigurationSettings? UserPassword { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the member password settings.
         /// </summary>
-        public MemberPasswordConfigurationSettings MemberPassword { get; set; }
-
+        public MemberPasswordConfigurationSettings? MemberPassword { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login for members. Thereby rely on the External login and potential 2FA at that provider.
         /// </summary>

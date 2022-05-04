@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Media;
 
-        protected override IMedia PerformGet(int id)
+        protected override IMedia? PerformGet(int id)
         {
             var sql = GetBaseQuery(QueryType.Single)
                 .Where<NodeDto>(x => x.NodeId == id)
@@ -80,11 +80,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 : MapDtoToContent(dto);
         }
 
-        protected override IEnumerable<IMedia> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMedia> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(QueryType.Many);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
             return MapDtosToContent(Database.Fetch<ContentDto>(sql));
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return MapDtosToContent(Database.Fetch<ContentDto>(sql), true);
         }
 
-        public override IMedia GetVersion(int versionId)
+        public override IMedia? GetVersion(int versionId)
         {
             var sql = GetBaseQuery(QueryType.Single)
                 .Where<ContentVersionDto>(x => x.Id == versionId);
@@ -205,7 +205,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dto == null ? null : MapDtoToContent(dto);
         }
 
-        public IMedia GetMediaByPath(string mediaPath)
+        public IMedia? GetMediaByPath(string mediaPath)
         {
             var umbracoFileValue = mediaPath;
             const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
@@ -244,7 +244,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.AddingEntity();
 
             // ensure unique name on the same level
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name)!;
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -328,7 +328,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (!isMoving)
             {
                 // ensure unique name on the same level
-                entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
+                entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id)!;
 
                 // ensure that strings don't contain characters that are invalid in xml
                 // TODO: do we really want to keep doing this here?
@@ -404,12 +404,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Read Repository implementation for Guid keys
 
-        public IMedia Get(Guid id)
+        public IMedia? Get(Guid id)
         {
             return _mediaByGuidReadRepository.Get(id);
         }
 
-        IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetMany(params Guid[] ids)
+        IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetMany(params Guid[]? ids)
         {
             return _mediaByGuidReadRepository.GetMany(ids);
         }
@@ -433,7 +433,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 _outerRepo = outerRepo;
             }
 
-            protected override IMedia PerformGet(Guid id)
+            protected override IMedia? PerformGet(Guid id)
             {
                 var sql = _outerRepo.GetBaseQuery(QueryType.Single)
                     .Where<NodeDto>(x => x.UniqueId == id);
@@ -448,10 +448,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return content;
             }
 
-            protected override IEnumerable<IMedia> PerformGetAll(params Guid[] ids)
+            protected override IEnumerable<IMedia> PerformGetAll(params Guid[]? ids)
             {
                 var sql = _outerRepo.GetBaseQuery(QueryType.Many);
-                if (ids.Length > 0)
+                if (ids?.Length > 0)
                     sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
 
                 return _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
@@ -491,11 +491,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #endregion
 
         /// <inheritdoc />
-        public override IEnumerable<IMedia> GetPage(IQuery<IMedia> query,
+        public override IEnumerable<IMedia> GetPage(IQuery<IMedia>? query,
             long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter, Ordering ordering)
+            IQuery<IMedia>? filter, Ordering? ordering)
         {
-            Sql<ISqlContext> filterSql = null;
+            Sql<ISqlContext>? filterSql = null;
 
             if (filter != null)
             {
@@ -513,7 +513,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
         {
             var temps = new List<TempContent<Core.Models.Media>>();
-            var contentTypes = new Dictionary<int, IMediaType>();
+            var contentTypes = new Dictionary<int, IMediaType?>();
             var content = new Core.Models.Media[dtos.Count];
 
             for (var i = 0; i < dtos.Count; i++)
@@ -536,7 +536,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // get the content type - the repository is full cache *but* still deep-clones
                 // whatever comes out of it, so use our own local index here to avoid this
                 var contentTypeId = dto.ContentTypeId;
-                if (contentTypes.TryGetValue(contentTypeId, out IMediaType contentType) == false)
+                if (contentTypes.TryGetValue(contentTypeId, out IMediaType? contentType) == false)
                     contentTypes[contentTypeId] = contentType = _mediaTypeRepository.Get(contentTypeId);
 
                 var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
@@ -552,10 +552,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // assign properties
             foreach (var temp in temps)
             {
-                temp.Content.Properties = properties[temp.VersionId];
+                if (temp.Content is not null)
+                {
+                    temp.Content.Properties = properties[temp.VersionId];
 
-                // reset dirty initial properties (U4-1946)
-                temp.Content.ResetDirtyProperties(false);
+                    // reset dirty initial properties (U4-1946)
+                    temp.Content.ResetDirtyProperties(false);
+                }
             }
 
             return content;

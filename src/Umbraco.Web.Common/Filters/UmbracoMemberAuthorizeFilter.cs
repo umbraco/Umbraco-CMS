@@ -21,6 +21,9 @@ namespace Umbraco.Cms.Web.Common.Filters
     {
         public UmbracoMemberAuthorizeFilter()
         {
+            AllowType = string.Empty;
+            AllowGroup = string.Empty;
+            AllowMembers = string.Empty;
         }
 
         public  UmbracoMemberAuthorizeFilter(string allowType, string allowGroup, string allowMembers)

@@ -82,17 +82,17 @@ namespace Umbraco.Cms.Core.Security
                 return PasswordVerificationResult.Failed;
             }
 
-            PersistedPasswordSettings deserialized;
+            PersistedPasswordSettings? deserialized;
             try
             {
-                deserialized = _jsonSerializer.Deserialize<PersistedPasswordSettings>(user.PasswordConfig);
+                deserialized = _jsonSerializer.Deserialize<PersistedPasswordSettings>(user.PasswordConfig ?? string.Empty);
             }
             catch
             {
                 return PasswordVerificationResult.Failed;
             }
 
-            if (!LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
+            if (deserialized?.HashAlgorithm is null || !LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
             {
                 return PasswordVerificationResult.Failed;
             }

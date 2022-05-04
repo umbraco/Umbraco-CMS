@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Services
         public XElement Serialize(
             IMedia media,
             bool withDescendants = false,
-            Action<IMedia, XElement> onMediaItemSerialized = null)
+            Action<IMedia, XElement>? onMediaItemSerialized = null)
         {
             if (_mediaService == null) throw new ArgumentNullException(nameof(_mediaService));
             if (_dataTypeService == null) throw new ArgumentNullException(nameof(_dataTypeService));
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Services
             var nodeName = media.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             const bool published = false; // always false for media
-            string urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
+            string? urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
             XElement xml = SerializeContentBase(media, urlValue, nodeName, published);
 
 
@@ -159,9 +159,9 @@ namespace Umbraco.Cms.Core.Services
 
             // what about writer/creator/version?
 
-            xml.Add(new XAttribute("loginName", member.Username));
-            xml.Add(new XAttribute("email", member.Email));
-            xml.Add(new XAttribute("icon", member.ContentType.Icon));
+            xml.Add(new XAttribute("loginName", member.Username!));
+            xml.Add(new XAttribute("email", member.Email!));
+            xml.Add(new XAttribute("icon", member.ContentType.Icon!));
 
             return xml;
         }
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Core.Services
         public XElement Serialize(IDataType dataType)
         {
             var xml = new XElement("DataType");
-            xml.Add(new XAttribute("Name", dataType.Name));
+            xml.Add(new XAttribute("Name", dataType.Name!));
             //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
             xml.Add(new XAttribute("Id", dataType.EditorAlias));
             xml.Add(new XAttribute("Definition", dataType.Key));
@@ -196,11 +196,14 @@ namespace Umbraco.Cms.Core.Services
             if (dataType.Level != 1)
             {
                 //get URL encoded folder names
-                var folders = _dataTypeService.GetContainers(dataType)
+                var folders = _dataTypeService.GetContainers(dataType)?
                     .OrderBy(x => x.Level);
 
-                folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
-                folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
+                if (folders is not null)
+                {
+                    folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
+                    folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
+                }
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
@@ -242,9 +245,12 @@ namespace Umbraco.Cms.Core.Services
             if (includeChildren)
             {
                 var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
-                foreach (var child in children)
+                if (children is not null)
                 {
-                    xml.Add(Serialize(child, true));
+                    foreach (var child in children)
+                    {
+                        xml.Add(Serialize(child, true));
+                    }
                 }
             }
 
@@ -257,12 +263,12 @@ namespace Umbraco.Cms.Core.Services
                 new XAttribute("Key", dictionaryItem.Key),
                 new XAttribute("Name", dictionaryItem.ItemKey));
 
-            foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
+            foreach (IDictionaryTranslation translation in dictionaryItem.Translations!)
             {
                 xml.Add(new XElement("Value",
-                    new XAttribute("LanguageId", translation.Language.Id),
+                    new XAttribute("LanguageId", translation.Language!.Id),
                     new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
-                    new XCData(translation.Value)));
+                    new XCData(translation.Value!)));
             }
 
             return xml;
@@ -273,7 +279,7 @@ namespace Umbraco.Cms.Core.Services
             var xml = new XElement("Stylesheet",
                 new XElement("Name", stylesheet.Alias),
                 new XElement("FileName", stylesheet.Path),
-                new XElement("Content", new XCData(stylesheet.Content)));
+                new XElement("Content", new XCData(stylesheet.Content!)));
 
             if (!includeProperties)
             {
@@ -283,12 +289,15 @@ namespace Umbraco.Cms.Core.Services
             var props = new XElement("Properties");
             xml.Add(props);
 
-            foreach (var prop in stylesheet.Properties)
+            if (stylesheet.Properties is not null)
             {
-                props.Add(new XElement("Property",
-                    new XElement("Name", prop.Name),
-                    new XElement("Alias", prop.Alias),
-                    new XElement("Value", prop.Value)));
+                foreach (var prop in stylesheet.Properties)
+                {
+                    props.Add(new XElement("Property",
+                        new XElement("Name", prop.Name),
+                        new XElement("Alias", prop.Alias),
+                        new XElement("Value", prop.Value)));
+                }
             }
 
             return xml;
@@ -314,7 +323,7 @@ namespace Umbraco.Cms.Core.Services
             var xml = new XElement("Language",
                 new XAttribute("Id", language.Id),
                 new XAttribute("CultureAlias", language.IsoCode),
-                new XAttribute("FriendlyName", language.CultureName));
+                new XAttribute("FriendlyName", language.CultureName!));
 
             return xml;
         }
@@ -325,7 +334,7 @@ namespace Umbraco.Cms.Core.Services
             xml.Add(new XElement("Name", template.Name));
             xml.Add(new XElement("Key", template.Key));
             xml.Add(new XElement("Alias", template.Alias));
-            xml.Add(new XElement("Design", new XCData(template.Content)));
+            xml.Add(new XElement("Design", new XCData(template.Content!)));
 
             if (template is Template concreteTemplate && concreteTemplate.MasterTemplateId != null)
             {
@@ -374,9 +383,12 @@ namespace Umbraco.Cms.Core.Services
             }
 
             var structure = new XElement("Structure");
-            foreach (var allowedType in mediaType.AllowedContentTypes)
+            if (mediaType.AllowedContentTypes is not null)
             {
-                structure.Add(new XElement("MediaType", allowedType.Alias));
+                foreach (var allowedType in mediaType.AllowedContentTypes)
+                {
+                    structure.Add(new XElement("MediaType", allowedType.Alias));
+                }
             }
 
             var genericProperties = new XElement("GenericProperties", SerializePropertyTypes(mediaType.PropertyTypes, mediaType.PropertyGroups)); // actually, all of them
@@ -425,7 +437,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 properties.Add(new XElement("property",
                     new XAttribute("key", property.Key),
-                    new XAttribute("name", property.Name),
+                    new XAttribute("name", property.Name!),
                     new XAttribute("alias", property.Alias),
                     new XAttribute("sortOrder", property.SortOrder),
                     new XAttribute("propertyType", property.EditorAlias)));
@@ -464,10 +476,14 @@ namespace Umbraco.Cms.Core.Services
             info.Add(compositionsElement);
 
             var allowedTemplates = new XElement("AllowedTemplates");
-            foreach (var template in contentType.AllowedTemplates)
+            if (contentType.AllowedTemplates is not null)
             {
-                allowedTemplates.Add(new XElement("Template", template.Alias));
+                foreach (var template in contentType.AllowedTemplates)
+                {
+                    allowedTemplates.Add(new XElement("Template", template.Alias));
+                }
             }
+
             info.Add(allowedTemplates);
 
             if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
@@ -480,9 +496,12 @@ namespace Umbraco.Cms.Core.Services
             }
 
             var structure = new XElement("Structure");
-            foreach (var allowedType in contentType.AllowedContentTypes)
+            if (contentType.AllowedContentTypes is not null)
             {
-                structure.Add(new XElement("DocumentType", allowedType.Alias));
+                foreach (var allowedType in contentType.AllowedContentTypes)
+                {
+                    structure.Add(new XElement("DocumentType", allowedType.Alias));
+                }
             }
 
             var genericProperties = new XElement("GenericProperties", SerializePropertyTypes(contentType.PropertyTypes, contentType.PropertyGroups)); // actually, all of them
@@ -506,11 +525,14 @@ namespace Umbraco.Cms.Core.Services
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get URL encoded folder names
-                var folders = _contentTypeService.GetContainers(contentType)
+                var folders = _contentTypeService.GetContainers(contentType)?
                     .OrderBy(x => x.Level);
 
-                folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
-                folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
+                if (folders is not null)
+                {
+                    folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
+                    folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
+                }
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
@@ -554,14 +576,14 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private XElement SerializePropertyType(IPropertyType propertyType, IDataType definition, PropertyGroup propertyGroup)
+        private XElement SerializePropertyType(IPropertyType propertyType, IDataType? definition, PropertyGroup? propertyGroup)
             => new XElement("GenericProperty",
                     new XElement("Name", propertyType.Name),
                     new XElement("Alias", propertyType.Alias),
                     new XElement("Key", propertyType.Key),
                     new XElement("Type", propertyType.PropertyEditorAlias),
-                    new XElement("Definition", definition.Key),
-                    propertyGroup != null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
+                    definition is not null ? new XElement("Definition", definition.Key) : null,
+                    propertyGroup is not null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
                     new XElement("SortOrder", propertyType.SortOrder),
                     new XElement("Mandatory", propertyType.Mandatory.ToString()),
                     new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
@@ -594,7 +616,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
-        private XElement SerializeContentBase(IContentBase contentBase, string urlValue, string nodeName, bool published)
+        private XElement SerializeContentBase(IContentBase contentBase, string? urlValue, string nodeName, bool published)
         {
             var xml = new XElement(nodeName,
                 new XAttribute("id", contentBase.Id.ToInvariantString()),
@@ -605,8 +627,8 @@ namespace Umbraco.Cms.Core.Services
                 new XAttribute("sortOrder", contentBase.SortOrder),
                 new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
                 new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
-                new XAttribute("nodeName", contentBase.Name),
-                new XAttribute("urlName", urlValue),
+                new XAttribute("nodeName", contentBase.Name!),
+                new XAttribute("urlName", urlValue!),
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
 
@@ -614,7 +636,7 @@ namespace Umbraco.Cms.Core.Services
             // Add culture specific node names
             foreach (var culture in contentBase.AvailableCultures)
             {
-                xml.Add(new XAttribute("nodeName-" + culture, contentBase.GetCultureName(culture)));
+                xml.Add(new XAttribute("nodeName-" + culture, contentBase.GetCultureName(culture)!));
             }
 
             foreach (var property in contentBase.Properties)
@@ -657,7 +679,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         // exports an IMedia item descendants.
-        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement> onMediaItemSerialized)
+        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement>? onMediaItemSerialized)
         {
             foreach (var child in children)
             {

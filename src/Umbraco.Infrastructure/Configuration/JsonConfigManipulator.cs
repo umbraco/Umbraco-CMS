@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Configuration
             SaveJson(provider, json);
         }
 
-        public void SaveConnectionString(string connectionString, string providerName)
+        public void SaveConnectionString(string connectionString, string? providerName)
         {
             var provider = GetJsonConfigurationProvider();
 
@@ -61,7 +61,10 @@ namespace Umbraco.Cms.Core.Configuration
 
             var item = GetConnectionItem(connectionString, providerName);
 
-            json.Merge(item, new JsonMergeSettings());
+            if (item is not null)
+            {
+                json?.Merge(item, new JsonMergeSettings());
+            }
 
             SaveJson(provider, json);
         }
@@ -78,7 +81,7 @@ namespace Umbraco.Cms.Core.Configuration
                 return;
             }
 
-            JToken token = json;
+            JToken? token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
             {
                 if (token is null)
@@ -92,7 +95,10 @@ namespace Umbraco.Cms.Core.Configuration
             var writer = new JTokenWriter();
             writer.WriteValue(value);
 
-            token.Replace(writer.Token);
+            if (writer.Token is not null)
+            {
+                token.Replace(writer.Token);
+            }
 
             SaveJson(provider, json);
 
@@ -111,7 +117,10 @@ namespace Umbraco.Cms.Core.Configuration
 
             var item = GetDisableRedirectUrlItem(disable);
 
-            json.Merge(item, new JsonMergeSettings());
+            if (item is not null)
+            {
+                json?.Merge(item, new JsonMergeSettings());
+            }
 
             SaveJson(provider, json);
         }
@@ -129,12 +138,15 @@ namespace Umbraco.Cms.Core.Configuration
 
             var item = GetGlobalIdItem(id);
 
-            json.Merge(item, new JsonMergeSettings());
+            if (item is not null)
+            {
+                json?.Merge(item, new JsonMergeSettings());
+            }
 
             SaveJson(provider, json);
         }
 
-        private object GetGlobalIdItem(string id)
+        private object? GetGlobalIdItem(string id)
         {
             JTokenWriter writer = new JTokenWriter();
 
@@ -155,7 +167,7 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private JToken GetDisableRedirectUrlItem(bool value)
+        private JToken? GetDisableRedirectUrlItem(bool value)
         {
             JTokenWriter writer = new JTokenWriter();
 
@@ -176,7 +188,7 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private JToken GetConnectionItem(string connectionString, string providerName)
+        private JToken? GetConnectionItem(string connectionString, string? providerName)
         {
             JTokenWriter writer = new JTokenWriter();
 
@@ -193,9 +205,9 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private static void RemoveJsonKey(JObject json, string key)
+        private static void RemoveJsonKey(JObject? json, string key)
         {
-            JToken token = json;
+            JToken? token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
             {
                 token = CaseSelectPropertyValues(token, propertyName);
@@ -204,7 +216,7 @@ namespace Umbraco.Cms.Core.Configuration
             token?.Parent?.Remove();
         }
 
-        private void SaveJson(JsonConfigurationProvider provider, JObject json)
+        private void SaveJson(JsonConfigurationProvider provider, JObject? json)
         {
             lock (_locker)
             {
@@ -231,7 +243,7 @@ namespace Umbraco.Cms.Core.Configuration
             }
         }
 
-        private JObject GetJson(JsonConfigurationProvider provider)
+        private JObject? GetJson(JsonConfigurationProvider provider)
         {
             lock (_locker)
             {
@@ -257,7 +269,7 @@ namespace Umbraco.Cms.Core.Configuration
             }
         }
 
-        private JsonConfigurationProvider GetJsonConfigurationProvider(string requiredKey = null)
+        private JsonConfigurationProvider GetJsonConfigurationProvider(string? requiredKey = null)
         {
             if (_configuration is IConfigurationRoot configurationRoot)
             {
@@ -282,7 +294,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// This method is required because keys are case insensative in IConfiguration.
         /// JObject[..] do not support case insensative and JObject.Property(...) do not return a new JObject.
         /// </remarks>
-        private static JToken CaseSelectPropertyValues(JToken token, string name)
+        private static JToken? CaseSelectPropertyValues(JToken? token, string name)
         {
             if (token is JObject obj)
             {

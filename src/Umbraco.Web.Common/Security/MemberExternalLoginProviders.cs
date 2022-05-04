@@ -23,18 +23,18 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public async Task<MemberExternalLoginProviderScheme> GetAsync(string authenticationType)
+        public async Task<MemberExternalLoginProviderScheme?> GetAsync(string authenticationType)
         {
             var schemaName =
                 authenticationType.EnsureStartsWith(Core.Constants.Security.MemberExternalAuthenticationTypePrefix);
 
-            if (!_externalLogins.TryGetValue(schemaName, out MemberExternalLoginProvider provider))
+            if (!_externalLogins.TryGetValue(schemaName, out MemberExternalLoginProvider? provider))
             {
                 return null;
             }
 
             // get the associated scheme
-            AuthenticationScheme associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(provider.AuthenticationType);
+            AuthenticationScheme? associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(provider.AuthenticationType);
 
             if (associatedScheme == null)
             {
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.Common.Security
             foreach (MemberExternalLoginProvider login in _externalLogins.Values)
             {
                 // get the associated scheme
-                AuthenticationScheme associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(login.AuthenticationType);
+                AuthenticationScheme? associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(login.AuthenticationType);
 
                 providersWithSchemes.Add(new MemberExternalLoginProviderScheme(login, associatedScheme));
             }

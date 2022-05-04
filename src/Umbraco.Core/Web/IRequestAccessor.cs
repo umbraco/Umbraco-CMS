@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Core.Web
         /// <summary>
         /// Returns the current request uri
         /// </summary>
-        Uri GetRequestUrl();
+        Uri? GetRequestUrl();
     }
 }

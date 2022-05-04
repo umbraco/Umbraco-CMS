@@ -18,7 +18,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets a connection string from configuration with placeholders replaced.
         /// </summary>
-        public static string GetUmbracoConnectionString(
+        public static string? GetUmbracoConnectionString(
             this IConfiguration configuration,
             string connectionStringName = Constants.System.UmbracoConnectionName) =>
             configuration.GetConnectionString(connectionStringName).ReplaceDataDirectoryPlaceholder();
@@ -26,7 +26,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Replaces instances of the |DataDirectory| placeholder in a string with the value of AppDomain DataDirectory.
         /// </summary>
-        public static string ReplaceDataDirectoryPlaceholder(this string input)
+        public static string? ReplaceDataDirectoryPlaceholder(this string input)
         {
             var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
             return input?.Replace(ConnectionStrings.DataDirectoryPlaceholder, dataDirectory);

@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("address")]
         [Length(500)]
-        public string ServerAddress { get; set; }
+        public string? ServerAddress { get; set; }
 
         [Column("computerName")]
         [Length(255)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_computerName")] // server identity is unique
-        public string ServerIdentity { get; set; }
+        public string? ServerIdentity { get; set; }
 
         [Column("registeredDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]

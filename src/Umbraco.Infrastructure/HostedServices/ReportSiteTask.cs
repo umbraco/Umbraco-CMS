@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly ILogger<ReportSiteTask> _logger;
         private readonly ITelemetryService _telemetryService;
-        private static HttpClient s_httpClient;
+        private static HttpClient s_httpClient = new();
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
@@ -43,9 +43,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// Runs the background task to send the anonymous ID
         /// to telemetry service
         /// </summary>
-        public override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object? state)
         {
-            if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData telemetryReportData) is false)
+            if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
             {
                 _logger.LogWarning("No telemetry marker found");
 

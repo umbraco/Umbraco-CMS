@@ -21,15 +21,9 @@
                 <umb-icon icon="icon-check" class="success"></umb-icon>
               </p>
 
-              <umb-button type="button" ng-if="!model.isCurrentUser" button-style="[warning,block]"
-                action="vm.disable(provider.providerName)" label="Disable" label-key="actions_disable" size="m"
-                state="vm.buttonState">
+              <umb-button type="button" action="vm.disable(provider)" button-style="[warning,block]" label="Disable"
+                label-key="actions_disable" size="m">
               </umb-button>
-
-              <div ng-if="model.isCurrentUser">
-                <umb-button type="button" action="vm.disable(provider)" label="Disable" label-key="actions_disable">
-                </umb-button>
-              </div>
             </div>
 
             <umb-button type="button" ng-if="!provider.isEnabledOnUser" button-style="[action,block]"

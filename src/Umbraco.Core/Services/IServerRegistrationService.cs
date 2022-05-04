@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Services
         /// time the current server is touched, and the period depends on the configuration. Use the
         /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
         /// from the database.</remarks>
-        IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false);
+        IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false);
 
         /// <summary>
         /// Return all servers (active and inactive).

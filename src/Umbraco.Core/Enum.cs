@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Umbraco.Cms.Core
@@ -33,9 +34,9 @@ namespace Umbraco.Cms.Core
                 var name = value.ToString();
 
                 IntToValue[Convert.ToInt32(value)] = value;
-                ValueToName[value] = name;
-                SensitiveNameToValue[name] = value;
-                InsensitiveNameToValue[name.ToLowerInvariant()] = value;
+                ValueToName[value] = name!;
+                SensitiveNameToValue[name!] = value;
+                InsensitiveNameToValue[name!.ToLowerInvariant()] = value;
             }
         }
 
@@ -64,7 +65,7 @@ namespace Umbraco.Cms.Core
             return ValueToName.Values.ToArray();
         }
 
-        public static string GetName(T value)
+        public static string? GetName(T value)
         {
             return ValueToName.TryGetValue(value, out var name) ? name : null;
         }

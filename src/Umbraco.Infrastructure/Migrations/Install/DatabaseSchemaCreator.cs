@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,7 +98,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
         public DatabaseSchemaCreator(
-            IUmbracoDatabase database,
+            IUmbracoDatabase? database,
             ILogger<DatabaseSchemaCreator> logger,
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
@@ -107,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         }
 
         public DatabaseSchemaCreator(
-            IUmbracoDatabase database,
+            IUmbracoDatabase? database,
             ILogger<DatabaseSchemaCreator> logger,
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
@@ -138,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             foreach (Type table in OrderedTables.AsEnumerable().Reverse())
             {
-                TableNameAttribute tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
+                TableNameAttribute? tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
                 var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
 
                 _logger.LogInformation("Uninstall {TableName}", tableName);
@@ -226,28 +227,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
             //Check constraints in configured database against constraints in schema
-            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).LegacyDistinctBy(x => x.Item3).ToList();
-            var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_"))
-                .Select(x => x.Item3).ToList();
-            var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_"))
-                .Select(x => x.Item3).ToList();
+            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+            var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
+            var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
 
-            var unknownConstraintsInDatabase =
-                constraintsInDatabase.Where(
-                    x =>
-                        x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
-                        x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
-            var foreignKeysInSchema =
-                result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name)).ToList();
-            var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
-                .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
+            var unknownConstraintsInDatabase = constraintsInDatabase.Where(
+                x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false && x.Item3.InvariantStartsWith("IX_") == false
+            ).Select(x => x.Item3).ToList();
+
+            var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name)).Where(x => x is not null).ToList();
+            var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName)).Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
             // Add valid and invalid foreign key differences to the result object
             // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
             // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
-                if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
+                if (foreignKeysInSchema!.InvariantContains(unknown) || primaryKeysInSchema!.InvariantContains(unknown))
                 {
                     result.ValidConstraints.Add(unknown);
                 }
@@ -257,39 +253,33 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 }
             }
 
-            //Foreign keys:
-
-            IEnumerable<string> validForeignKeyDifferences =
-                foreignKeysInDatabase.Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+            // Foreign keys:
+            IEnumerable<string?> validForeignKeyDifferences = foreignKeysInDatabase.Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var foreignKey in validForeignKeyDifferences)
             {
-                result.ValidConstraints.Add(foreignKey);
+                if (foreignKey is not null)
+                {
+                    result.ValidConstraints.Add(foreignKey);
+                }
             }
 
-            IEnumerable<string> invalidForeignKeyDifferences =
-                foreignKeysInDatabase.Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
-                    .Union(foreignKeysInSchema.Except(foreignKeysInDatabase,
-                        StringComparer.InvariantCultureIgnoreCase));
+            IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase.Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+                .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var foreignKey in invalidForeignKeyDifferences)
             {
-                result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey));
+                result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));
             }
 
-
-            //Primary keys:
-
-            //Add valid and invalid primary key differences to the result object
-            IEnumerable<string> validPrimaryKeyDifferences =
-                primaryKeysInDatabase.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+            // Primary keys:
+            // Add valid and invalid primary key differences to the result object
+            IEnumerable<string> validPrimaryKeyDifferences = primaryKeysInDatabase!.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!;
             foreach (var primaryKey in validPrimaryKeyDifferences)
             {
                 result.ValidConstraints.Add(primaryKey);
             }
 
-            IEnumerable<string> invalidPrimaryKeyDifferences =
-                primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
-                    .Union(primaryKeysInSchema.Except(primaryKeysInDatabase,
-                        StringComparer.InvariantCultureIgnoreCase));
+            IEnumerable<string> invalidPrimaryKeyDifferences = primaryKeysInDatabase!.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!
+                .Union(primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase))!;
             foreach (var primaryKey in invalidPrimaryKeyDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));
@@ -328,19 +318,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var tablesInDatabase = SqlSyntax.GetTablesInSchema(_database).ToList();
             var tablesInSchema = result.TableDefinitions.Select(x => x.Name).ToList();
             //Add valid and invalid table differences to the result object
-            IEnumerable<string> validTableDifferences =
+            IEnumerable<string?> validTableDifferences =
                 tablesInDatabase.Intersect(tablesInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var tableName in validTableDifferences)
             {
-                result.ValidTables.Add(tableName);
+                if (tableName is not null)
+                {
+                    result.ValidTables.Add(tableName);
+                }
             }
 
-            IEnumerable<string> invalidTableDifferences =
+            IEnumerable<string?> invalidTableDifferences =
                 tablesInDatabase.Except(tablesInSchema, StringComparer.InvariantCultureIgnoreCase)
                     .Union(tablesInSchema.Except(tablesInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var tableName in invalidTableDifferences)
             {
-                result.Errors.Add(new Tuple<string, string>("Table", tableName));
+                result.Errors.Add(new Tuple<string, string>("Table", tableName ?? "NULL"));
             }
         }
 
@@ -352,19 +345,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
 
             //Add valid and invalid index differences to the result object
-            IEnumerable<string> validColIndexDifferences =
+            IEnumerable<string?> validColIndexDifferences =
                 colIndexesInDatabase.Intersect(indexesInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var index in validColIndexDifferences)
             {
-                result.ValidIndexes.Add(index);
+                if (index is not null)
+                {
+                    result.ValidIndexes.Add(index);
+                }
             }
 
-            IEnumerable<string> invalidColIndexDifferences =
+            IEnumerable<string?> invalidColIndexDifferences =
                 colIndexesInDatabase.Except(indexesInSchema, StringComparer.InvariantCultureIgnoreCase)
                     .Union(indexesInSchema.Except(colIndexesInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var index in invalidColIndexDifferences)
             {
-                result.Errors.Add(new Tuple<string, string>("Index", index));
+                result.Errors.Add(new Tuple<string, string>("Index", index ?? "NULL"));
             }
         }
 
@@ -401,7 +397,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// }
         /// </code>
         /// </example>
-        public bool TableExists(string tableName) => SqlSyntax.DoesTableExist(_database, tableName);
+        public bool TableExists(string? tableName) => tableName is not null && SqlSyntax.DoesTableExist(_database, tableName);
 
         /// <summary>
         ///     Returns whether the table for the specified <typeparamref name="T" /> exists in the database.
@@ -479,6 +475,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             TableDefinition tableDefinition = DefinitionFactory.GetTableDefinition(modelType, SqlSyntax);
             var tableName = tableDefinition.Name;
             var tableExist = TableExists(tableName);
+            if (string.IsNullOrEmpty(tableName))
+            {
+                throw new SqlNullValueException("Tablename was null");
+            }
             if (overwrite && tableExist)
             {
                 _logger.LogInformation("Table {TableName} already exists, but will be recreated", tableName);
@@ -537,7 +537,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         ///     attribute will be used for the table name. If the attribute is not present, the name
         ///     <typeparamref name="T" /> will be used instead.
         /// </remarks>
-        public void DropTable(string tableName)
+        public void DropTable(string? tableName)
         {
             var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));
             _database.Execute(sql);

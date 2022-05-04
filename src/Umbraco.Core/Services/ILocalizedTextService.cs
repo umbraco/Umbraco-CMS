@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="culture"></param>
         /// <param name="tokens">This can be null</param>
         /// <returns></returns>
-        string Localize(string area, string alias, CultureInfo culture, IDictionary<string, string> tokens = null);
+        string Localize(string? area, string? alias, CultureInfo? culture, IDictionary<string, string?>? tokens = null);
 
 
         /// <summary>

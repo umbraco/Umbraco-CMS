@@ -43,10 +43,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ToEditor(IProperty property, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            var json = base.ToEditor(property, culture, segment).ToString();
-            return JsonConvert.DeserializeObject<string[]>(json) ?? Array.Empty<string>();
+            var json = base.ToEditor(property, culture, segment)?.ToString();
+            string[]? result = null;
+            if (json is not null)
+            {
+                result = JsonConvert.DeserializeObject<string[]>(json);
+            }
+
+            return result ?? Array.Empty<string>();
         }
 
         /// <summary>
@@ -56,7 +62,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
-        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             var json = editorValue.Value as JArray;
             if (json == null || json.HasValues == false)

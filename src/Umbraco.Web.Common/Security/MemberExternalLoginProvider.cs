@@ -28,8 +28,8 @@ namespace Umbraco.Cms.Web.Common.Security
 
         public MemberExternalLoginProviderOptions Options { get; }
 
-        public override bool Equals(object obj) => Equals(obj as MemberExternalLoginProvider);
-        public bool Equals(MemberExternalLoginProvider other) => other != null && AuthenticationType == other.AuthenticationType;
+        public override bool Equals(object? obj) => Equals(obj as MemberExternalLoginProvider);
+        public bool Equals(MemberExternalLoginProvider? other) => other != null && AuthenticationType == other.AuthenticationType;
         public override int GetHashCode() => HashCode.Combine(AuthenticationType);
     }
 

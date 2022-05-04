@@ -23,7 +23,7 @@ public class CustomConnectionStringDatabaseProviderMetadata : IDatabaseProviderM
     public string DefaultDatabaseName => string.Empty;
 
     /// <inheritdoc />
-    public string ProviderName => null;
+    public string? ProviderName => null;
 
     /// <inheritdoc />
     public bool SupportsQuickInstall => false;
@@ -35,7 +35,7 @@ public class CustomConnectionStringDatabaseProviderMetadata : IDatabaseProviderM
     public bool RequiresServer => false;
 
     /// <inheritdoc />
-    public string ServerPlaceholder => null;
+    public string? ServerPlaceholder => null;
 
     /// <inheritdoc />
     public bool RequiresCredentials => false;
@@ -50,6 +50,6 @@ public class CustomConnectionStringDatabaseProviderMetadata : IDatabaseProviderM
     public bool ForceCreateDatabase => false;
 
     /// <inheritdoc />
-    public string GenerateConnectionString(DatabaseModel databaseModel)
+    public string? GenerateConnectionString(DatabaseModel databaseModel)
         => databaseModel.ConnectionString;
 }

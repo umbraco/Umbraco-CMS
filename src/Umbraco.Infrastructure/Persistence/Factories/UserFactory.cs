@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 Password = entity.RawPasswordValue,
                 PasswordConfig = entity.PasswordConfiguration,
                 UserLanguage = entity.Language,
-                UserName = entity.Name,
+                UserName = entity.Name!,
                 SecurityStampToken = entity.SecurityStamp,
                 FailedLoginAttempts = entity.FailedPasswordAttempts,
                 LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
@@ -74,24 +74,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 TourData = entity.TourData
             };
 
-            foreach (var startNodeId in entity.StartContentIds)
+            if (entity.StartContentIds is not null)
             {
-                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                foreach (var startNodeId in entity.StartContentIds)
                 {
-                    StartNode = startNodeId,
-                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Content,
-                    UserId = entity.Id
-                });
+                    dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                    {
+                        StartNode = startNodeId,
+                        StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Content,
+                        UserId = entity.Id
+                    });
+                }
             }
 
-            foreach (var startNodeId in entity.StartMediaIds)
+            if (entity.StartMediaIds is not null)
             {
-                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                foreach (var startNodeId in entity.StartMediaIds)
                 {
-                    StartNode = startNodeId,
-                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Media,
-                    UserId = entity.Id
-                });
+                    dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                    {
+                        StartNode = startNodeId,
+                        StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Media,
+                        UserId = entity.Id
+                    });
+                }
             }
 
             if (entity.HasIdentity)
@@ -106,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         {
             return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
                 group.StartContentId, group.StartMediaId, group.Alias,
-                group.UserGroup2AppDtos.Select(x => x.AppAlias).ToArray(),
+                group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
                 group.DefaultPermissions == null ? Enumerable.Empty<string>() : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()));
         }
     }

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
     {
         public bool IsTransient(Exception ex)
         {
-            SqlException sqlException;
+            SqlException? sqlException;
 
             if (ex != null && (sqlException = ex as SqlException) != null)
             {

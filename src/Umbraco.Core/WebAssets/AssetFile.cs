@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.WebAssets
     {
         #region IAssetFile Members
 
-        public string FilePath { get; set; }
+        public string? FilePath { get; set; }
         public AssetType DependencyType { get; }
 
         #endregion

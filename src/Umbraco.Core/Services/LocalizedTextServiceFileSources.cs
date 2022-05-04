@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Internal;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Extensions;
@@ -17,14 +19,30 @@ namespace Umbraco.Cms.Core.Services
     public class LocalizedTextServiceFileSources
     {
         private readonly ILogger<LocalizedTextServiceFileSources> _logger;
+        private readonly IDirectoryContents _directoryContents;
         private readonly IAppPolicyCache _cache;
-        private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource> _supplementFileSources;
-        private readonly DirectoryInfo _fileSourceFolder;
+        private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource>? _supplementFileSources;
+        private readonly DirectoryInfo? _fileSourceFolder;
 
         // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
         private readonly Dictionary<string, CultureInfo> _twoLetterCultureConverter = new Dictionary<string, CultureInfo>();
 
         private readonly Lazy<Dictionary<CultureInfo, Lazy<XDocument>>> _xmlSources;
+
+        [Obsolete("Use ctor with all params. This will be removed in Umbraco 12")]
+        public LocalizedTextServiceFileSources(
+            ILogger<LocalizedTextServiceFileSources> logger,
+            AppCaches appCaches,
+            DirectoryInfo fileSourceFolder,
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
+            :this(
+                logger,
+                appCaches,
+                fileSourceFolder,
+                supplementFileSources, new NotFoundDirectoryContents())
+        {
+
+        }
 
         /// <summary>
         /// This is used to configure the file sources with the main file sources shipped with Umbraco and also including supplemental/plugin based
@@ -39,48 +57,49 @@ namespace Umbraco.Cms.Core.Services
             ILogger<LocalizedTextServiceFileSources> logger,
             AppCaches appCaches,
             DirectoryInfo fileSourceFolder,
-            IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources,
+            IDirectoryContents directoryContents
+            )
         {
             if (logger == null) throw new ArgumentNullException("logger");
             if (appCaches == null) throw new ArgumentNullException("cache");
             if (fileSourceFolder == null) throw new ArgumentNullException("fileSourceFolder");
 
             _logger = logger;
+            _directoryContents = directoryContents;
             _cache = appCaches.RuntimeCache;
-
-            if (fileSourceFolder.Exists == false)
-            {
-                _logger.LogWarning("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
-            }
-            else
-            {
-                _fileSourceFolder = fileSourceFolder;
-                _supplementFileSources = supplementFileSources;
-            }
+            _fileSourceFolder = fileSourceFolder;
+            _supplementFileSources = supplementFileSources;
 
             //Create the lazy source for the _xmlSources
             _xmlSources = new Lazy<Dictionary<CultureInfo, Lazy<XDocument>>>(() =>
             {
                 var result = new Dictionary<CultureInfo, Lazy<XDocument>>();
 
-                if (_fileSourceFolder == null) return result;
 
-                foreach (var fileInfo in _fileSourceFolder.GetFiles("*.xml"))
+                var files = GetLanguageFiles();
+
+                if (!files.Any())
+                {
+                    return result;
+                }
+
+                foreach (var fileInfo in files)
                 {
                     var localCopy = fileInfo;
-                    var filename = Path.GetFileNameWithoutExtension(localCopy.FullName).Replace("_", "-");
+                    var filename = Path.GetFileNameWithoutExtension(localCopy.Name).Replace("_", "-");
 
                     // TODO: Fix this nonsense... would have to wait until v8 to store the language files with their correct
                     // names instead of storing them as 2 letters but actually having a 4 letter culture. So now, we
                     // need to check if the file is 2 letters, then open it to try to find it's 4 letter culture, then use that
                     // if it's successful. We're going to assume (though it seems assuming in the legacy logic is never a great idea)
                     // that any 4 letter file is named with the actual culture that it is!
-                    CultureInfo culture = null;
+                    CultureInfo? culture = null;
                     if (filename.Length == 2)
                     {
                         //we need to open the file to see if we can read it's 'real' culture, we'll use XmlReader since we don't
                         //want to load in the entire doc into mem just to read a single value
-                        using (var fs = fileInfo.OpenRead())
+                        using (var fs = fileInfo.CreateReadStream())
                         using (var reader = XmlReader.Create(fs))
                         {
                             if (reader.IsStartElement())
@@ -98,7 +117,7 @@ namespace Umbraco.Cms.Core.Services
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            _logger.LogWarning("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
+                                            _logger.LogWarning("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.Name);
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
                                         }
@@ -119,7 +138,7 @@ namespace Umbraco.Cms.Core.Services
                             XDocument xdoc;
 
                             //load in primary
-                            using (var fs = localCopy.OpenRead())
+                            using (var fs = localCopy.CreateReadStream())
                             {
                                 xdoc = XDocument.Load(fs);
                             }
@@ -128,12 +147,36 @@ namespace Umbraco.Cms.Core.Services
                             MergeSupplementaryFiles(culture, xdoc);
 
                             return xdoc;
-                        }, isSliding: true, timeout: TimeSpan.FromMinutes(10), dependentFiles: new[] { localCopy.FullName }));
+                        }, isSliding: true, timeout: TimeSpan.FromMinutes(10))!);
                 }
                 return result;
             });
 
 
+        }
+
+        private IEnumerable<IFileInfo> GetLanguageFiles()
+        {
+            var result = new List<IFileInfo>();
+
+            if (_fileSourceFolder is not null && _fileSourceFolder.Exists)
+            {
+
+                result.AddRange(
+                    new PhysicalDirectoryContents(_fileSourceFolder.FullName)
+                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"))
+                );
+            }
+
+            if (_directoryContents.Exists)
+            {
+                result.AddRange(
+                _directoryContents
+                        .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"))
+                );
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -153,20 +196,20 @@ namespace Umbraco.Cms.Core.Services
         }
 
         // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
-        public Attempt<CultureInfo> TryConvert2LetterCultureTo4Letter(string twoLetterCulture)
+        public Attempt<CultureInfo?> TryConvert2LetterCultureTo4Letter(string twoLetterCulture)
         {
-            if (twoLetterCulture.Length != 2) return Attempt<CultureInfo>.Fail();
+            if (twoLetterCulture.Length != 2) return Attempt<CultureInfo?>.Fail();
 
             //This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
             var resolved = _xmlSources.Value;
 
             return _twoLetterCultureConverter.ContainsKey(twoLetterCulture)
                 ? Attempt.Succeed(_twoLetterCultureConverter[twoLetterCulture])
-                : Attempt<CultureInfo>.Fail();
+                : Attempt<CultureInfo?>.Fail();
         }
 
         // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
-        public Attempt<string> TryConvert4LetterCultureTo2Letter(CultureInfo culture)
+        public Attempt<string?> TryConvert4LetterCultureTo2Letter(CultureInfo culture)
         {
             if (culture == null) throw new ArgumentNullException("culture");
 
@@ -175,7 +218,7 @@ namespace Umbraco.Cms.Core.Services
 
             return _twoLetterCultureConverter.Values.Contains(culture)
                 ? Attempt.Succeed(culture.Name.Substring(0, 2))
-                : Attempt<string>.Fail();
+                : Attempt<string?>.Fail();
         }
 
         private void MergeSupplementaryFiles(CultureInfo culture, XDocument xMasterDoc)
@@ -211,11 +254,11 @@ namespace Umbraco.Cms.Core.Services
 
                         if (xChildDoc.Root == null || xChildDoc.Root.Name != "language") continue;
                         foreach (var xArea in xChildDoc.Root.Elements("area")
-                            .Where(x => ((string)x.Attribute("alias")).IsNullOrWhiteSpace() == false))
+                            .Where(x => ((string)x.Attribute("alias")!).IsNullOrWhiteSpace() == false))
                         {
-                            var areaAlias = (string)xArea.Attribute("alias");
+                            var areaAlias = (string)xArea.Attribute("alias")!;
 
-                            var areaFound = xMasterDoc.Root.Elements("area").FirstOrDefault(x => ((string)x.Attribute("alias")) == areaAlias);
+                            var areaFound = xMasterDoc.Root.Elements("area").FirstOrDefault(x => ((string)x.Attribute("alias")!) == areaAlias);
                             if (areaFound == null)
                             {
                                 //add the whole thing
@@ -238,10 +281,10 @@ namespace Umbraco.Cms.Core.Services
 
             //merge in the child elements
             foreach (var key in source.Elements("key")
-                .Where(x => ((string)x.Attribute("alias")).IsNullOrWhiteSpace() == false))
+                .Where(x => ((string)x.Attribute("alias")!).IsNullOrWhiteSpace() == false))
             {
-                var keyAlias = (string)key.Attribute("alias");
-                var keyFound = destination.Elements("key").FirstOrDefault(x => ((string)x.Attribute("alias")) == keyAlias);
+                var keyAlias = (string)key.Attribute("alias")!;
+                var keyFound = destination.Elements("key").FirstOrDefault(x => ((string)x.Attribute("alias")!) == keyAlias);
                 if (keyFound == null)
                 {
                     //append, it doesn't exist

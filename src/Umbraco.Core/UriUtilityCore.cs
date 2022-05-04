@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core
             return StartWithScheme(uri, null);
         }
 
-        public static string StartWithScheme(string uri, string scheme)
+        public static string StartWithScheme(string uri, string? scheme)
         {
             return HasScheme(uri) ? uri : String.Format("{0}://{1}", scheme ?? Uri.UriSchemeHttp, uri);
         }

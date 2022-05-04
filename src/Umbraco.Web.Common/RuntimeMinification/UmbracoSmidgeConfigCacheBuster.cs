@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IEntryAssemblyMetadata _entryAssemblyMetadata;
 
-        private string _cacheBusterValue;
+        private string? _cacheBusterValue;
 
         public UmbracoSmidgeConfigCacheBuster(
             IOptions<RuntimeMinificationSettings> runtimeMinificationSettings,

@@ -13,10 +13,10 @@ namespace Umbraco.Cms.Core.Services
     public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
     {
         private readonly IOptions<ContentSettings> _contentSettings;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IDocumentVersionRepository _documentVersionRepository;
 
-        public DefaultContentVersionCleanupPolicy(IOptions<ContentSettings> contentSettings, IScopeProvider scopeProvider, IDocumentVersionRepository documentVersionRepository)
+        public DefaultContentVersionCleanupPolicy(IOptions<ContentSettings> contentSettings, ICoreScopeProvider scopeProvider, IDocumentVersionRepository documentVersionRepository)
         {
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
@@ -32,9 +32,9 @@ namespace Umbraco.Cms.Core.Services
 
             var theRest = new List<ContentVersionMeta>();
 
-            using(_scopeProvider.CreateScope(autoComplete: true))
+            using(_scopeProvider.CreateCoreScope(autoComplete: true))
             {
-                var policyOverrides = _documentVersionRepository.GetCleanupPolicies()
+                var policyOverrides = _documentVersionRepository.GetCleanupPolicies()?
                     .ToDictionary(x => x.ContentTypeId);
 
                 foreach (var version in items)
@@ -83,10 +83,15 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        private ContentVersionCleanupPolicySettings GetOverridePolicy(
+        private ContentVersionCleanupPolicySettings? GetOverridePolicy(
             ContentVersionMeta version,
-            IDictionary<int, ContentVersionCleanupPolicySettings> overrides)
+            IDictionary<int, ContentVersionCleanupPolicySettings>? overrides)
         {
+            if (overrides is null)
+            {
+                return null;
+            }
+
             _ = overrides.TryGetValue(version.ContentTypeId, out var value);
 
             return value;

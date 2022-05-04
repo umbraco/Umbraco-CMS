@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
-        public ContentPropertyData(object value, object dataTypeConfiguration)
+        public ContentPropertyData(object? value, object? dataTypeConfiguration)
         {
             Value = value;
             DataTypeConfiguration = dataTypeConfiguration;
@@ -20,12 +20,12 @@ namespace Umbraco.Cms.Core.Models.Editors
         /// <summary>
         /// The value submitted for the property
         /// </summary>
-        public object Value { get; }
+        public object? Value { get; }
 
         /// <summary>
         /// The data type configuration for the property.
         /// </summary>
-        public object DataTypeConfiguration { get; }
+        public object? DataTypeConfiguration { get; }
 
         /// <summary>
         /// Gets or sets the unique identifier of the content owning the property.
@@ -40,6 +40,6 @@ namespace Umbraco.Cms.Core.Models.Editors
         /// <summary>
         /// Gets or sets the uploaded files.
         /// </summary>
-        public ContentPropertyFile[] Files { get; set; }
+        public ContentPropertyFile[]? Files { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Media.TypeDetector
             return tiffHeader != null && tiffHeader == "MM\x00\x2a" || tiffHeader == "II\x2a\x00";
         }
 
-        public static string GetFileHeader(Stream fileStream)
+        public static string? GetFileHeader(Stream fileStream)
         {
             var header = RasterizedTypeDetector.GetFileHeader(fileStream);
             if (header == null)

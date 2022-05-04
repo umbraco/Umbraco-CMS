@@ -32,8 +32,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                     case Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker:
                     case Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker:
                         {
-                            var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
-                            var startNodeId = config.Value<string>("startNodeId");
+                            var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration!);
+                            var startNodeId = config!.Value<string>("startNodeId");
                             if (!startNodeId.IsNullOrWhiteSpace() && int.TryParse(startNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intStartNode))
                             {
                                 var guid = intStartNode <= 0
@@ -45,10 +45,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                                     var udi = new GuidUdi(datatype.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker
                                         ? Cms.Core.Constants.UdiEntityType.Media
                                         : Cms.Core.Constants.UdiEntityType.Document, guid.Value);
-                                    config["startNodeId"] = new JValue(udi.ToString());
+                                    config!["startNodeId"] = new JValue(udi.ToString());
                                 }
                                 else
-                                    config.Remove("startNodeId");
+                                    config!.Remove("startNodeId");
 
                                 datatype.Configuration = JsonConvert.SerializeObject(config);
                                 Database.Update(datatype);
@@ -58,8 +58,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                         }
                     case Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker:
                         {
-                            var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
-                            var startNodeConfig = config.Value<JObject>("startNode");
+                            var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration!);
+                            var startNodeConfig = config!.Value<JObject>("startNode");
                             if (startNodeConfig != null)
                             {
                                 var startNodeId = startNodeConfig.Value<string>("id");
@@ -73,8 +73,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                                         : Context.Database.ExecuteScalar<Guid?>(
                                             Sql().Select<NodeDto>(x => x.UniqueId).From<NodeDto>().Where<NodeDto>(x => x.NodeId == intStartNode));
 
-                                    string entityType = null;
-                                    switch (objectType.ToLowerInvariant())
+                                    string? entityType = null;
+                                    switch (objectType?.ToLowerInvariant())
                                     {
                                         case "content":
                                             entityType = Cms.Core.Constants.UdiEntityType.Document;

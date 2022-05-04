@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
     /// </summary>
     internal class ContentModelBinderHelper
     {
-          public async Task<T> BindModelFromMultipartRequestAsync<T>(
+          public async Task<T?> BindModelFromMultipartRequestAsync<T>(
               IJsonSerializer jsonSerializer,
               IHostingEnvironment hostingEnvironment,
               ModelBindingContext bindingContext)
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 var propAlias = parts[1];
 
                 //if there are 3 parts part 3 is always culture
-                string culture = null;
+                string? culture = null;
                 if (parts.Length > 2)
                 {
                     culture = parts[2];
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 }
 
                 //if there are 4 parts part 4 is always segment
-                string segment = null;
+                string? segment = null;
                 if (parts.Length > 3)
                 {
                     segment = parts[3];
@@ -118,16 +118,19 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
         public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel,
-            ContentPropertyCollectionDto dto)
+            ContentPropertyCollectionDto? dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)
             {
-                foreach (var propertyDto in dto.Properties)
+                if (dto is not null)
                 {
-                    if (propertyDto.Alias != p.Alias) continue;
-                    propertyDto.Value = p.Value;
-                    break;
+                    foreach (var propertyDto in dto.Properties)
+                    {
+                        if (propertyDto.Alias != p.Alias) continue;
+                        propertyDto.Value = p.Value;
+                        break;
+                    }
                 }
             }
         }

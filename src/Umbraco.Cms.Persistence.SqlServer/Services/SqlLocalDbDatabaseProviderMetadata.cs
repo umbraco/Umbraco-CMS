@@ -37,7 +37,7 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool RequiresServer => false;
 
     /// <inheritdoc />
-    public string ServerPlaceholder => null;
+    public string? ServerPlaceholder => null;
 
     /// <inheritdoc />
     public bool RequiresCredentials => false;

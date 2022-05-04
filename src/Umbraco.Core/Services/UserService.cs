@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly GlobalSettings _globalSettings;
         private readonly ILogger<UserService> _logger;
 
-        public UserService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
+        public UserService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
             IUserRepository userRepository, IUserGroupRepository userGroupRepository, IOptions<GlobalSettings> globalSettings)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><c>True</c> if the User exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userRepository.ExistsByUserName(username);
             }
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Services
             // TODO: PUT lock here!!
 
             User user;
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var loginExists = _userRepository.ExistsByLogin(username);
                 if (loginExists)
@@ -154,9 +154,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id"><see cref="System.int"/> Id</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetById(int id)
+        public IUser? GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userRepository.Get(id);
             }
@@ -167,7 +167,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetByProviderKey(object id)
+        public IUser? GetByProviderKey(object id)
         {
             var asInt = id.TryConvertTo<int>();
             return asInt.Success ? GetById(asInt.Result) : null;
@@ -178,12 +178,12 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="email">Email to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetByEmail(string email)
+        public IUser? GetByEmail(string email)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUser>().Where(x => x.Email.Equals(email));
-                return _userRepository.Get(query).FirstOrDefault();
+                return _userRepository.Get(query)?.FirstOrDefault();
             }
         }
 
@@ -192,9 +192,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username to use for retrieval</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetByUsername(string username)
+        public IUser? GetByUsername(string? username)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            if (username is null)
+            {
+                return null;
+            }
+
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 try
                 {
@@ -244,7 +249,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 var evtMsgs = EventMessagesFactory.Get();
 
-                using (var scope = ScopeProvider.CreateScope())
+                using (var scope = ScopeProvider.CreateCoreScope())
                 {
                     var deletingNotification = new UserDeletingNotification(user, evtMsgs);
                     if (scope.Notifications.PublishCancelable(deletingNotification))
@@ -276,7 +281,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new UserSavingNotification(entity, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -321,7 +326,7 @@ namespace Umbraco.Cms.Core.Services
 
             var entitiesA = entities.ToArray();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new UserSavingNotification(entitiesA, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -369,26 +374,26 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUser>();
 
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Email.Equals(emailStringToMatch));
+                        query?.Where(member => member.Email.Equals(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Email.Contains(emailStringToMatch));
+                        query?.Where(member => member.Email.Contains(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Email.StartsWith(emailStringToMatch));
+                        query?.Where(member => member.Email.StartsWith(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Email.EndsWith(emailStringToMatch));
+                        query?.Where(member => member.Email.EndsWith(emailStringToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
+                        query?.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -409,26 +414,26 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUser>();
 
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Username.Equals(login));
+                        query?.Where(member => member.Username.Equals(login));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Username.Contains(login));
+                        query?.Where(member => member.Username.Contains(login));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Username.StartsWith(login));
+                        query?.Where(member => member.Username.StartsWith(login));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Username.EndsWith(login));
+                        query?.Where(member => member.Username.EndsWith(login));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(login, TextColumnType.NVarchar));
+                        query?.Where(member => member.Email.SqlWildcard(login, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));
@@ -450,9 +455,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="System.int"/> with number of Users for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                IQuery<IUser> query;
+                IQuery<IUser>? query;
 
                 switch (countType)
                 {
@@ -460,10 +465,10 @@ namespace Umbraco.Cms.Core.Services
                         query = Query<IUser>();
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IUser>().Where(x => x.IsLockedOut);
+                        query = Query<IUser>()?.Where(x => x.IsLockedOut);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IUser>().Where(x => x.IsApproved);
+                        query = Query<IUser>()?.Where(x => x.IsApproved);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(countType));
@@ -475,7 +480,7 @@ namespace Umbraco.Cms.Core.Services
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var session = _userRepository.CreateLoginSession(userId, requestingIpAddress);
                 scope.Complete();
@@ -485,7 +490,7 @@ namespace Umbraco.Cms.Core.Services
 
         public int ClearLoginSessions(int userId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var count = _userRepository.ClearLoginSessions(userId);
                 scope.Complete();
@@ -495,7 +500,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void ClearLoginSession(Guid sessionId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _userRepository.ClearLoginSession(sessionId);
                 scope.Complete();
@@ -504,35 +509,38 @@ namespace Umbraco.Cms.Core.Services
 
         public bool ValidateLoginSession(int userId, Guid sessionId)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                return _userRepository.ValidateLoginSession(userId, sessionId);
+                var result =  _userRepository.ValidateLoginSession(userId, sessionId);
+                scope.Complete();
+                return result;
             }
         }
+
         public IDictionary<UserState, int> GetUserStates()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userRepository.GetUserStates();
             }
         }
 
-        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] userGroups = null, string filter = null)
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
         {
-            IQuery<IUser> filterQuery = null;
+            IQuery<IUser>? filterQuery = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                filterQuery = Query<IUser>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                filterQuery = Query<IUser>()?.Where(x => (x.Name != null && x.Name.Contains(filter!)) || x.Username.Contains(filter!));
             }
 
             return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null, filterQuery);
         }
 
-        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] includeUserGroups = null, string[] excludeUserGroups = null, IQuery<IUser> filter = null)
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? includeUserGroups = null, string[]? excludeUserGroups = null, IQuery<IUser>? filter = null)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                Expression<Func<IUser, object>> sort;
+                Expression<Func<IUser, object?>> sort;
                 switch (orderBy.ToUpperInvariant())
                 {
                     case "USERNAME":
@@ -582,7 +590,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Name);
             }
@@ -590,7 +598,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IUser> GetNextUsers(int id, int count)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return  _userRepository.GetNextUsers(id, count);
             }
@@ -601,11 +609,16 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="groupId">Id of group</param>
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
-        public IEnumerable<IUser> GetAllInGroup(int groupId)
+        public IEnumerable<IUser> GetAllInGroup(int? groupId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            if (groupId is null)
             {
-                return _userRepository.GetAllInGroup(groupId);
+                return Array.Empty<IUser>();
+            }
+
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return _userRepository.GetAllInGroup(groupId.Value);
             }
         }
 
@@ -616,7 +629,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> GetAllNotInGroup(int groupId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 return _userRepository.GetAllNotInGroup(groupId);
             }
@@ -631,7 +644,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
-        public IProfile GetProfileById(int id)
+        public IProfile? GetProfileById(int id)
         {
             //This is called a TON. Go get the full user from cache which should already be IProfile
             var fullUser = GetUserById(id);
@@ -645,9 +658,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="username">Username</param>
         /// <returns><see cref="IProfile"/></returns>
-        public IProfile GetProfileByUserName(string username)
+        public IProfile? GetProfileByUserName(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userRepository.GetProfile(username);
             }
@@ -658,9 +671,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        public IUser GetUserById(int id)
+        public IUser? GetUserById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 try
                 {
@@ -683,11 +696,11 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IUser> GetUsersById(params int[] ids)
+        public IEnumerable<IUser> GetUsersById(params int[]? ids)
         {
-            if (ids.Length <= 0) return Enumerable.Empty<IUser>();
+            if (ids?.Length <= 0) return Enumerable.Empty<IUser>();
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userRepository.GetMany(ids);
             }
@@ -700,21 +713,24 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="groupId">Id of the group</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/> If nothing is specified all permissions are removed.</param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-        public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
         {
             if (entityIds.Length == 0)
                 return;
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _userGroupRepository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 scope.Complete();
 
                 var assigned = permissions?.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
-                var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
-                scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
+                if (assigned is not null)
+                {
+                    var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
+                    scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
+                }
             }
         }
 
@@ -731,7 +747,7 @@ namespace Umbraco.Cms.Core.Services
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _userGroupRepository.AssignGroupPermission(groupId, permission, entityIds);
                 scope.Complete();
@@ -749,7 +765,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
         public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userGroupRepository.GetMany(ids).OrderBy(x => x.Name);
             }
@@ -759,11 +775,11 @@ namespace Umbraco.Cms.Core.Services
         {
             if (aliases.Length == 0) return Enumerable.Empty<IUserGroup>();
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUserGroup>().Where(x => aliases.SqlIn(x.Alias));
                 var contents = _userGroupRepository.Get(query);
-                return contents.WhereNotNull().ToArray();
+                return contents?.WhereNotNull().ToArray() ?? Enumerable.Empty<IUserGroup>();
             }
         }
 
@@ -772,15 +788,15 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        public IUserGroup GetUserGroupByAlias(string alias)
+        public IUserGroup? GetUserGroupByAlias(string alias)
         {
             if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value cannot be null or whitespace.", "alias");
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IUserGroup>().Where(x => x.Alias == alias);
                 var contents = _userGroupRepository.Get(query);
-                return contents.FirstOrDefault();
+                return contents?.FirstOrDefault();
             }
         }
 
@@ -789,9 +805,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        public IUserGroup GetUserGroupById(int id)
+        public IUserGroup? GetUserGroupById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userGroupRepository.Get(id);
             }
@@ -806,11 +822,11 @@ namespace Umbraco.Cms.Core.Services
         /// than all users will be removed from this group and only these users will be added
         /// </param>
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup userGroup, int[] userIds = null)
+        public void Save(IUserGroup userGroup, int[]? userIds = null)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 // we need to figure out which users have been added / removed, for audit purposes
                 var empty = new IUser[0];
@@ -863,7 +879,7 @@ namespace Umbraco.Cms.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var deletingNotification = new UserGroupDeletingNotification(userGroup, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingNotification))
@@ -887,7 +903,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="sectionAlias">Alias of the section to remove</param>
         public void DeleteSectionFromAllUserGroups(string sectionAlias)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 var assignedGroups = _userGroupRepository.GetGroupsAssignedToSection(sectionAlias);
                 foreach (var group in assignedGroups)
@@ -908,11 +924,11 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="user">User to retrieve permissions for</param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IUser? user, params int[] nodeIds)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, nodeIds);
+                return _userGroupRepository.GetPermissions(user?.Groups.ToArray(), true, nodeIds);
             }
         }
 
@@ -929,7 +945,7 @@ namespace Umbraco.Cms.Core.Services
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _userGroupRepository.GetPermissions(groups, fallbackToDefaultPermissions, nodeIds);
             }
@@ -944,12 +960,12 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                return _userGroupRepository.GetPermissions(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
+                return _userGroupRepository.GetPermissions(groups.WhereNotNull().Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
             }
         }
         /// <summary>
@@ -957,11 +973,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
-        public EntityPermissionSet GetPermissionsForPath(IUser user, string path)
+        public EntityPermissionSet GetPermissionsForPath(IUser? user, string? path)
         {
-            var nodeIds = path.GetIdsFromPathReversed();
+            var nodeIds = path?.GetIdsFromPathReversed();
 
-            if (nodeIds.Length == 0 || user is null)
+            if (nodeIds is null || nodeIds.Length == 0 || user is null)
                 return EntityPermissionSet.Empty();
 
             //collect all permissions structures for all nodes for all groups belonging to the user
@@ -1002,7 +1018,7 @@ namespace Umbraco.Cms.Core.Services
                 .GroupBy(x => x.UserGroupId);
 
             return new EntityPermissionCollection(
-                permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions)));
+                permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions)).Where(x => x is not null)!);
         }
 
         /// <summary>
@@ -1039,7 +1055,7 @@ namespace Umbraco.Cms.Core.Services
                 //iterate deepest to shallowest
                 foreach (var pathId in pathIds)
                 {
-                    EntityPermission[] permissionsForNodeAndGroup;
+                    EntityPermission[]? permissionsForNodeAndGroup;
                     if (byGroup.Value.TryGetValue(pathId, out permissionsForNodeAndGroup) == false)
                         continue;
 
@@ -1088,7 +1104,7 @@ namespace Umbraco.Cms.Core.Services
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <returns></returns>
-        internal static EntityPermission GetPermissionsForPathForGroup(
+        internal static EntityPermission? GetPermissionsForPathForGroup(
             IEnumerable<EntityPermission> pathPermissions,
             int[] pathIds,
             bool fallbackToDefaultPermissions = false)
@@ -1099,7 +1115,7 @@ namespace Umbraco.Cms.Core.Services
             //then the permissions assigned to the path will be the 'deepest' node found that has permissions
             foreach (var id in pathIds)
             {
-                EntityPermission permission;
+                EntityPermission? permission;
                 if (permissionsByEntityId.TryGetValue(id, out permission))
                 {
                     //don't return the default permissions if that is the one assigned here (we'll do that below if nothing was found)

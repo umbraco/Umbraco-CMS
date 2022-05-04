@@ -90,16 +90,16 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Returns all entities that were published during the operation
         /// </summary>
-        public IEnumerable<TEntity> PublishedEntities => EventObject;
+        public IEnumerable<TEntity>? PublishedEntities => EventObject;
 
-        public bool Equals(PublishEventArgs<TEntity> other)
+        public bool Equals(PublishEventArgs<TEntity>? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

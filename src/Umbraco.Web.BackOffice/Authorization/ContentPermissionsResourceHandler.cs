@@ -35,12 +35,12 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             ContentPermissions.ContentAccess permissionResult = resource.NodeId.HasValue
                     ? _contentPermissions.CheckPermissions(
                             resource.NodeId.Value,
-                            _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                            out IContent _,
+                            _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+                            out IContent? _,
                             resource.PermissionsToCheck)
                     : _contentPermissions.CheckPermissions(
                             resource.Content,
-                            _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+                            _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
                             resource.PermissionsToCheck);
 
             return Task.FromResult(permissionResult != ContentPermissions.ContentAccess.Denied);

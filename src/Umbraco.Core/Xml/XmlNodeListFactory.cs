@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <remarks>The underlying XML store used to issue the query must be
         /// an object inheriting <see cref="XmlNode"/>, such as
         /// <see cref="XmlDocument"/>.</remarks>
-        public static XmlNodeList CreateNodeList(XPathNodeIterator iterator)
+        public static XmlNodeList CreateNodeList(XPathNodeIterator? iterator)
         {
             return new XmlNodeListIterator(iterator);
         }
@@ -34,12 +34,12 @@ namespace Umbraco.Cms.Core.Xml
 
         private class XmlNodeListIterator : XmlNodeList
         {
-            readonly XPathNodeIterator _iterator;
+            readonly XPathNodeIterator? _iterator;
             readonly IList<XmlNode> _nodes = new List<XmlNode>();
 
-            public XmlNodeListIterator(XPathNodeIterator iterator)
+            public XmlNodeListIterator(XPathNodeIterator? iterator)
             {
-                _iterator = iterator.Clone();
+                _iterator = iterator?.Clone();
             }
 
             public override System.Collections.IEnumerator GetEnumerator()
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Xml
                 return new XmlNodeListEnumerator(this);
             }
 
-            public override XmlNode Item(int index)
+            public override XmlNode? Item(int index)
             {
 
                 if (index >= _nodes.Count)
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Xml
             /// </summary>
             private void ReadToEnd()
             {
-                while (_iterator.MoveNext())
+                while (_iterator is not null && _iterator.MoveNext())
                 {
                     var node = _iterator.Current as IHasXmlNode;
                     // Check IHasXmlNode interface.
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core.Xml
             {
                 while (_nodes.Count <= to)
                 {
-                    if (_iterator.MoveNext())
+                    if (_iterator is not null && _iterator.MoveNext())
                     {
                         var node = _iterator.Current as IHasXmlNode;
                         // Check IHasXmlNode interface.
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Core.Xml
                     return true;
                 }
 
-                object System.Collections.IEnumerator.Current
+                object? System.Collections.IEnumerator.Current
                 {
                     get
                     {

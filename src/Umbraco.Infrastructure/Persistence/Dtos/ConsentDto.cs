@@ -19,15 +19,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("source")]
         [Length(512)]
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
         [Column("context")]
         [Length(128)]
-        public string Context { get; set; }
+        public string? Context { get; set; }
 
         [Column("action")]
         [Length(512)]
-        public string Action { get; set; }
+        public string? Action { get; set; }
 
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -38,6 +38,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("comment")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
     }
 }

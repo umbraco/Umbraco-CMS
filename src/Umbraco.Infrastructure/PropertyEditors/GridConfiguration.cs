@@ -12,11 +12,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
-        public JObject Items { get; set; }
+        public JObject? Items { get; set; }
 
         // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration", HideLabel = true)]
-        public JObject Rte { get; set; }
+        public JObject? Rte { get; set; }
 
         [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
@@ -25,6 +25,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         [ConfigurationField("mediaParentId", "Image Upload Folder", "mediafolderpicker",
             Description = "Choose the upload location of pasted images")]
-        public GuidUdi MediaParentId { get; set; }
+        public GuidUdi? MediaParentId { get; set; }
     }
 }

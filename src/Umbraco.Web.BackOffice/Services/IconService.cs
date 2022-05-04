@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.BackOffice.Services
 {
@@ -17,25 +21,42 @@ namespace Umbraco.Cms.Web.BackOffice.Services
     {
         private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IAppPolicyCache _cache;
 
+        [Obsolete("Use other ctor - Will be removed in Umbraco 12")]
         public IconService(
             IOptionsMonitor<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             AppCaches appCaches)
+            : this(globalSettings,
+                hostingEnvironment,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
+        {
+
+        }
+
+        [Obsolete("Use other ctor - Will be removed in Umbraco 12")]
+        public IconService(
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            AppCaches appCaches,
+            IWebHostEnvironment webHostEnvironment)
         {
             _globalSettings = globalSettings.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
+            _webHostEnvironment = webHostEnvironment;
             _cache = appCaches.RuntimeCache;
 
             globalSettings.OnChange(x => _globalSettings = x);
         }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> GetIcons() => GetIconDictionary();
+        public IReadOnlyDictionary<string, string>? GetIcons() => GetIconDictionary();
 
         /// <inheritdoc />
-        public IconModel GetIcon(string iconName)
+        public IconModel? GetIcon(string iconName)
         {
             if (iconName.IsNullOrWhiteSpace())
             {
@@ -43,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
             }
 
             var allIconModels = GetIconDictionary();
-            if (allIconModels.ContainsKey(iconName))
+            if (allIconModels?.ContainsKey(iconName) ?? false)
             {
                 return new IconModel
                 {
@@ -60,7 +81,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         /// </summary>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
-        private IconModel GetIcon(FileInfo fileInfo)
+        private IconModel? GetIcon(FileInfo fileInfo)
         {
             return fileInfo == null || string.IsNullOrWhiteSpace(fileInfo.Name)
                 ? null
@@ -73,7 +94,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         /// <param name="iconName"></param>
         /// <param name="iconPath"></param>
         /// <returns></returns>
-        private IconModel CreateIconModel(string iconName, string iconPath)
+        private IconModel? CreateIconModel(string iconName, string iconPath)
         {
             try
             {
@@ -106,7 +127,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 // iterate sub directories of app plugins
                 foreach (var dir in appPlugins.EnumerateDirectories())
                 {
-                    // AppPluginIcons path was previoulsy the wrong case, so we first check for the prefered directory 
+                    // AppPluginIcons path was previoulsy the wrong case, so we first check for the prefered directory
                     // and then check the legacy directory.
                     var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.PluginIcons}");
                     var iconPathExists = Directory.Exists(iconPath);
@@ -125,9 +146,11 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 }
             }
 
-            // add icons from IconsPath if not already added from plugins
-            var coreIconsDirectory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.IconsPath}/"));
-            var coreIcons = coreIconsDirectory.GetFiles("*.svg");
+            var iconFolder = _webHostEnvironment.WebRootFileProvider.GetDirectoryContents(_globalSettings.IconsPath);
+
+            var coreIcons = iconFolder
+                .Where(x => !x.IsDirectory && x.Name.EndsWith(".svg"))
+                .Select(x => new FileInfo(x.PhysicalPath));
 
             icons.UnionWith(coreIcons);
 
@@ -136,16 +159,16 @@ namespace Umbraco.Cms.Web.BackOffice.Services
 
         private class CaseInsensitiveFileInfoComparer : IEqualityComparer<FileInfo>
         {
-            public bool Equals(FileInfo one, FileInfo two) => StringComparer.InvariantCultureIgnoreCase.Equals(one.Name, two.Name);
+            public bool Equals(FileInfo? one, FileInfo? two) => StringComparer.InvariantCultureIgnoreCase.Equals(one?.Name, two?.Name);
 
             public int GetHashCode(FileInfo item) => StringComparer.InvariantCultureIgnoreCase.GetHashCode(item.Name);
         }
 
-        private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
+        private IReadOnlyDictionary<string, string>? GetIconDictionary() => _cache.GetCacheItem(
             $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
             () => GetAllIconsFiles()
                 .Select(GetIcon)
-                .Where(i => i != null)
+                .WhereNotNull()
                 .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
         );

@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.Common.Security
     /// <summary>
     /// The sign in manager for members
     /// </summary>
-    public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManagerExternalLogins
+    public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManager
     {
         private readonly IMemberExternalLoginProviders _memberExternalLoginProviders;
         private readonly IEventAggregator _eventAggregator;
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Web.Common.Security
         protected override string TwoFactorRememberMeAuthenticationType => IdentityConstants.TwoFactorRememberMeScheme;
 
         /// <inheritdoc />
-        public override async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
+        public override async Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null)
         {
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
             // to replace the auth scheme
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Web.Common.Security
             var providerDisplayName = (await GetExternalAuthenticationSchemesAsync()).FirstOrDefault(p => p.Name == provider)?.DisplayName ?? provider;
             return new ExternalLoginInfo(auth.Principal, provider, providerKey, providerDisplayName)
             {
-                AuthenticationTokens = auth.Properties.GetTokens(),
+                AuthenticationTokens = auth.Properties?.GetTokens(),
                 AuthenticationProperties = auth.Properties
             };
         }
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <param name="loginInfo"></param>
         /// <param name="autoLinkOptions"></param>
         /// <returns></returns>
-        private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, MemberExternalSignInAutoLinkOptions autoLinkOptions)
+        private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, MemberExternalSignInAutoLinkOptions? autoLinkOptions)
         {
             // If there are no autolink options then the attempt is failed (user does not exist)
             if (autoLinkOptions == null || !autoLinkOptions.AutoLinkExternalAccount)
@@ -295,7 +295,7 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl, string userId = null)
+        public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl, string? userId = null)
         {
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
             // to be able to use our own XsrfKey/LoginProviderKey because the default is private :/
@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Web.Common.Security
             Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
 
         protected override async Task<SignInResult> SignInOrTwoFactorAsync(MemberIdentityUser user, bool isPersistent,
-            string loginProvider = null, bool bypassTwoFactor = false)
+            string? loginProvider = null, bool bypassTwoFactor = false)
         {
             var result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
 

@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         }
 
         /// <inheritdoc />
-        public async Task<UmbracoRouteValues> RewriteForPublishedContentAccessAsync(HttpContext httpContext, UmbracoRouteValues routeValues)
+        public async Task<UmbracoRouteValues?> RewriteForPublishedContentAccessAsync(HttpContext httpContext, UmbracoRouteValues routeValues)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0;
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Loop {LoopCounter}", i);
 
 
-                IPublishedContent publishedContent = routeValues.PublishedRequest?.PublishedContent;
+                IPublishedContent? publishedContent = routeValues.PublishedRequest?.PublishedContent;
                 if (publishedContent == null)
                 {
                     return routeValues;
@@ -61,9 +61,9 @@ namespace Umbraco.Cms.Web.Website.Routing
 
                 var path = publishedContent.Path;
 
-                Attempt<PublicAccessEntry> publicAccessAttempt = _publicAccessService.IsProtected(path);
+                Attempt<PublicAccessEntry?> publicAccessAttempt = _publicAccessService.IsProtected(path);
 
-                if (publicAccessAttempt)
+                if (publicAccessAttempt.Success)
                 {
                     _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
 
@@ -85,19 +85,19 @@ namespace Umbraco.Cms.Web.Website.Routing
                     {
                         case PublicAccessStatus.NotLoggedIn:
                             _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
-                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result.LoginNodeId);
+                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.LoginNodeId);
                             break;
                         case PublicAccessStatus.AccessDenied:
                             _logger.LogDebug("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
-                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result.NoAccessNodeId);
+                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
                             break;
                         case PublicAccessStatus.LockedOut:
                             _logger.LogDebug("Current member is locked out, redirect to error page");
-                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result.NoAccessNodeId);
+                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
                             break;
                         case PublicAccessStatus.NotApproved:
                             _logger.LogDebug("Current member is unapproved, redirect to error page");
-                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result.NoAccessNodeId);
+                            routeValues = await SetPublishedContentAsOtherPageAsync(httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
                             break;
                         case PublicAccessStatus.AccessAccepted:
                             _logger.LogDebug("Current member has access");
@@ -124,13 +124,13 @@ namespace Umbraco.Cms.Web.Website.Routing
 
 
 
-        private async Task<UmbracoRouteValues> SetPublishedContentAsOtherPageAsync(HttpContext httpContext, IPublishedRequest publishedRequest, int pageId)
+        private async Task<UmbracoRouteValues> SetPublishedContentAsOtherPageAsync(HttpContext httpContext, IPublishedRequest? publishedRequest, int pageId)
         {
-            if (pageId != publishedRequest.PublishedContent.Id)
+            if (pageId != publishedRequest?.PublishedContent?.Id)
             {
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                IPublishedContent publishedContent = umbracoContext.PublishedSnapshot.Content.GetById(pageId);
-                if (publishedContent == null)
+                IPublishedContent? publishedContent = umbracoContext.PublishedSnapshot.Content?.GetById(pageId);
+                if (publishedContent is null || publishedRequest is null)
                 {
                     throw new InvalidOperationException("No content found by id " + pageId);
                 }

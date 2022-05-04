@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -425,40 +426,66 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void Throws_When_Lock_Timeout_Is_Exceeded_Write()
         {
+            var counter = 0;
+            var gate = new ManualResetEventSlim(false);
+            var logger = GetRequiredService<ILogger<LocksTests>>();
+
             using (ExecutionContext.SuppressFlow())
             {
                 var t1 = Task.Run(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using var scope = ScopeProvider.CreateScope();
+
+                    _ = scope.Database; // Begin transaction
+                    Interlocked.Increment(ref counter);
+                    gate.Wait();
+
+                    logger.LogInformation("t1 - Attempting to acquire write lock");
+                    Assert.DoesNotThrow(() =>
                     {
-
-                        Console.WriteLine("Write lock A");
+                        // ReSharper disable once AccessToDisposedClosure
                         // This will acquire right away
-                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
-                        Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
-                        scope.Complete();
-                        Console.WriteLine("Finished Write lock A");
-                    }
-                });
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(1000), Constants.Locks.ContentTree);
+                    });
 
-                Thread.Sleep(500); // 100% sure task 1 starts first
+                    logger.LogInformation("t1 - Acquired write lock, sleeping");
+                    Thread.Sleep(1500); // Wait longer than the Read Lock B timeout
+
+                    scope.Complete();
+                    logger.LogInformation("t1 -  Complete transaction");
+                });
 
                 var t2 = Task.Run(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using var scope = ScopeProvider.CreateScope();
+
+                    _ = scope.Database; // Begin transaction
+                    Interlocked.Increment(ref counter);
+                    gate.Wait();
+                    Thread.Sleep(100); // Let other transaction obtain write lock first.
+
+                    logger.LogInformation("t2 - Attempting to acquire write lock");
+                    var ex = Assert.Throws<DistributedWriteLockTimeoutException>(() =>
                     {
-                        Console.WriteLine("Write lock B");
+                        // ReSharper disable once AccessToDisposedClosure
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(1000), Constants.Locks.ContentTree);
+                        logger.LogInformation("t2 - Acquired write lock, something has gone wrong.");
+                    });
 
-                        // This will wait for the write lock to release but it isn't going to wait long
-                        // enough so an exception will be thrown.
-                        Assert.Throws<DistributedWriteLockTimeoutException>(() =>
-                            scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
-
-                        scope.Complete();
-                        Console.WriteLine("Finished Write lock B");
+                    if (ex != null)
+                    {
+                        logger.LogInformation("t2 - Failed to acquire write lock in time, all is well.");
                     }
+
+                    scope.Complete();
                 });
 
+                while (counter < 2)
+                {
+                    Thread.Sleep(10);
+                }
+
+                gate.Set();
                 Task.WaitAll(t1, t2);
             }
         }

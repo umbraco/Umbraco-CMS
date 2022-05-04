@@ -10,6 +10,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="keyPrefix"></param>
         /// <returns></returns>
-        IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix);
+        IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix);
     }
 }

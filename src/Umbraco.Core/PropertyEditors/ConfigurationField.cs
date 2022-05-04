@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [DataContract]
     public class ConfigurationField
     {
-        private string _view;
+        private string? _view;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationField"/> class.
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // fill details from attribute, if any
             var attribute = GetType().GetCustomAttribute<ConfigurationFieldAttribute>(false);
-            if (attribute == null) return;
+            if (attribute is null) return;
 
             Name = attribute.Name;
             Description = attribute.Description;
@@ -51,29 +51,29 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Gets or sets the key of the field.
         /// </summary>
         [DataMember(Name = "key", IsRequired = true)]
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the name of the field.
         /// </summary>
         [DataMember(Name = "label", IsRequired = true)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the property name of the field.
         /// </summary>
-        public string PropertyName { get; set; }
+        public string? PropertyName { get; set; }
 
         /// <summary>
         /// Gets or sets the property CLR type of the field.
         /// </summary>
-        public Type PropertyType { get; set; }
+        public Type? PropertyType { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the field.
         /// </summary>
         [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to hide the label of the field.
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// or a simple view name which will map to ~/Views/PreValueEditors/{view}.html.</para>
         /// </remarks>
         [DataMember(Name = "view", IsRequired = true)]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         /// <summary>
         /// Gets the validators of the field.

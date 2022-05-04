@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <inheritdoc />
         public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
-        protected void AddPropertyValue(IProperty property, string culture, string segment, IDictionary<string, IEnumerable<object>> values)
+        protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null) return;
@@ -45,19 +45,19 @@ namespace Umbraco.Cms.Infrastructure.Examine
                             {
                                 if (strVal.IsNullOrWhiteSpace()) continue;
                                 var key = $"{keyVal.Key}{cultureSuffix}";
-                                if (values.TryGetValue(key, out var v))
-                                    values[key] = new List<object>(v) { val }.ToArray();
+                                if (values?.TryGetValue(key, out var v) ?? false)
+                                    values[key] = new List<object?>(v) { val }.ToArray();
                                 else
-                                    values.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
+                                    values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
                             }
                             break;
                         default:
                             {
                                 var key = $"{keyVal.Key}{cultureSuffix}";
-                                if (values.TryGetValue(key, out var v))
-                                    values[key] = new List<object>(v) { val }.ToArray();
+                                if (values?.TryGetValue(key, out var v) ?? false)
+                                    values[key] = new List<object?>(v) { val }.ToArray();
                                 else
-                                    values.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
+                                    values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
                             }
 
                             break;

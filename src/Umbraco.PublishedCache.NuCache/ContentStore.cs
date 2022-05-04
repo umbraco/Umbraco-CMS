@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,27 +39,27 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
+        private readonly ConcurrentDictionary<int, LinkedNode<ContentNode?>> _contentNodes;
         private LinkedNode<ContentNode> _root;
 
         // We must keep separate dictionaries for by id and by alias because we track these in snapshot/layers
         // and it is possible that the alias of a content type can be different for the same id in another layer
         // whereas the GUID -> INT cross reference can never be different
-        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;
-        private readonly ConcurrentDictionary<string, LinkedNode<IPublishedContentType>> _contentTypesByAlias;
+        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType?>> _contentTypesById;
+        private readonly ConcurrentDictionary<string, LinkedNode<IPublishedContentType?>> _contentTypesByAlias;
         private readonly ConcurrentDictionary<Guid, int> _contentTypeKeyToIdMap;
         private readonly ConcurrentDictionary<Guid, int> _contentKeyToIdMap;
 
         private readonly IPublishedModelFactory _publishedModelFactory;
-        private BPlusTree<int, ContentNodeKit> _localDb;
+        private BPlusTree<int, ContentNodeKit>? _localDb;
         private readonly ConcurrentQueue<GenObj> _genObjs;
-        private GenObj _genObj;
+        private GenObj? _genObj;
         private readonly object _wlocko = new object();
         private readonly object _rlocko = new object();
         private long _liveGen, _floorGen;
         private bool _nextGen, _collectAuto;
-        private Task _collectTask;
-        private List<KeyValuePair<int, ContentNodeKit>> _wchanges;
+        private Task? _collectTask;
+        private List<KeyValuePair<int, ContentNodeKit>>? _wchanges;
 
         // TODO: collection trigger (ok for now)
         // see SnapDictionary notes
@@ -72,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ILogger logger,
             ILoggerFactory loggerFactory,
             IPublishedModelFactory publishedModelFactory,
-            BPlusTree<int, ContentNodeKit> localDb = null)
+            BPlusTree<int, ContentNodeKit>? localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
@@ -81,10 +82,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _publishedModelFactory = publishedModelFactory;
             _localDb = localDb;
 
-            _contentNodes = new ConcurrentDictionary<int, LinkedNode<ContentNode>>();
+            _contentNodes = new ConcurrentDictionary<int, LinkedNode<ContentNode?>>();
             _root = new LinkedNode<ContentNode>(new ContentNode(), 0);
-            _contentTypesById = new ConcurrentDictionary<int, LinkedNode<IPublishedContentType>>();
-            _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<IPublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
+            _contentTypesById = new ConcurrentDictionary<int, LinkedNode<IPublishedContentType?>>();
+            _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<IPublishedContentType?>>(StringComparer.InvariantCultureIgnoreCase);
             _contentTypeKeyToIdMap = new ConcurrentDictionary<Guid, int>();
             _contentKeyToIdMap = new ConcurrentDictionary<Guid, int>();
 
@@ -135,7 +136,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         // gets a scope contextual representing a locked writer to the dictionary
         // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
-        public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
+        public IDisposable? GetScopedWriteLock(ICoreScopeProvider scopeProvider)
         {
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
@@ -223,7 +224,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         private void Rollback<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dictionary)
-            where TValue : class
+            where TValue : class?
+            where TKey : notnull
         {
             foreach (var item in dictionary)
             {
@@ -358,7 +360,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <exception cref="InvalidOperationException">
         /// Thrown if this method is not called within a write lock
         /// </exception>
-        public void SetAllContentTypesLocked(IEnumerable<IPublishedContentType> types)
+        public void SetAllContentTypesLocked(IEnumerable<IPublishedContentType>? types)
         {
             EnsureLocked();
 
@@ -366,11 +368,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ClearLocked(_contentTypesById);
             ClearLocked(_contentTypesByAlias);
 
-            // set all new content types
-            foreach (var type in types)
+            if (types is not null)
             {
-                SetContentTypeLocked(type);
+                // set all new content types
+                foreach (var type in types)
+                {
+                    SetContentTypeLocked(type);
+                }
             }
+
 
             // beware! at that point the cache is inconsistent,
             // assuming we are going to SetAll content items!
@@ -389,7 +395,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <exception cref="InvalidOperationException">
         /// Thrown if this method is not called within a write lock
         /// </exception>
-        public void UpdateContentTypesLocked(IReadOnlyCollection<int> removedIds, IReadOnlyCollection<IPublishedContentType> refreshedTypes, IReadOnlyCollection<ContentNodeKit> kits)
+        public void UpdateContentTypesLocked(IReadOnlyCollection<int>? removedIds, IReadOnlyCollection<IPublishedContentType> refreshedTypes, IReadOnlyCollection<ContentNodeKit> kits)
         {
             EnsureLocked();
 
@@ -481,7 +487,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <exception cref="InvalidOperationException">
         /// Thrown if this method is not called within a write lock
         /// </exception>
-        public void UpdateDataTypesLocked(IEnumerable<int> dataTypeIds, Func<int, IPublishedContentType> getContentType)
+        public void UpdateDataTypesLocked(IEnumerable<int> dataTypeIds, Func<int, IPublishedContentType?> getContentType)
         {
             EnsureLocked();
 
@@ -490,11 +496,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                         kvp.Value.Value != null &&
                         kvp.Value.Value.PropertyTypes.Any(p => dataTypeIds.Contains(p.DataType.Id)))
                     .Select(kvp => kvp.Value.Value)
-                    .Select(x => getContentType(x.Id))
+                    .Select(x => getContentType(x!.Id))
                     .Where(x => x != null) // poof, gone, very unlikely and probably an anomaly
                     .ToArray();
 
-            var contentTypeIdsA = contentTypes.Select(x => x.Id).ToArray();
+            var contentTypeIdsA = contentTypes.Select(x => x!.Id).ToArray();
             var contentTypeNodes = new Dictionary<int, List<int>>();
             foreach (var id in contentTypeIdsA)
                 contentTypeNodes[id] = new List<int>();
@@ -505,7 +511,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     contentTypeNodes[node.ContentType.Id].Add(node.Id);
             }
 
-            foreach (var contentType in contentTypes)
+            foreach (var contentType in contentTypes.WhereNotNull())
             {
                 // again, weird situation
                 if (contentTypeNodes.ContainsKey(contentType.Id) == false)
@@ -531,7 +537,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <returns>
         /// Returns false if the parent was not found or if the kit validation failed
         /// </returns>
-        private bool BuildKit(ContentNodeKit kit, out LinkedNode<ContentNode> parent)
+        private bool BuildKit(ContentNodeKit kit, [MaybeNullWhen(false)] out LinkedNode<ContentNode> parent)
         {
             // make sure parent exists
             parent = GetParentLink(kit.Node, null);
@@ -587,8 +593,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <param name="dict"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private static LinkedNode<TValue> GetHead<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key)
-            where TValue : class
+        private static LinkedNode<TValue>? GetHead<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key)
+            where TValue : class?
+            where TKey : notnull
         {
             dict.TryGetValue(key, out var link); // else null
             return link;
@@ -671,8 +678,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             if (_root.Gen != _liveGen)
                 _root = new LinkedNode<ContentNode>(new ContentNode(), _liveGen, _root);
-            else
+            else if(_root.Value is not null)
+            {
                 _root.Value.FirstChildContentId = -1;
+            }
         }
 
         /// <summary>
@@ -741,8 +750,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             //  NextSiblingContentId
             //  PreviousSiblingContentId
 
-            ContentNode previousNode = null;
-            ContentNode parent = null;
+            ContentNode? previousNode = null;
+            ContentNode? parent = null;
 
             // By using InGroupsOf() here we are forcing the database query result extraction to retrieve items in batches,
             // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
@@ -770,9 +779,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     {
                         // first parent
                         parent = parentLink.Value;
-                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
+                        parent!.FirstChildContentId = thisNode.Id; // this node is the first node
                     }
-                    else if (parent.Id != parentLink.Value.Id)
+                    else if (parent.Id != parentLink.Value!.Id)
                     {
                         // new parent
                         parent = parentLink.Value;
@@ -991,7 +1000,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ClearBranchLocked(link.Value);
         }
 
-        private void ClearBranchLocked(ContentNode content)
+        private void ClearBranchLocked(ContentNode? content)
         {
             // This should never be null, all code that calls this method is null checking but we've seen
             // issues of null ref exceptions in issue reports so we'll double check here
@@ -1009,7 +1018,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 var link = GetRequiredLinkedNode(id, "child", null);
                 var linkValue = link.Value; // capture local since clearing in recurse can clear it
                 ClearBranchLocked(linkValue); // recurse
-                id = linkValue.NextSiblingContentId;
+                id = linkValue?.NextSiblingContentId ?? 0;
             }
         }
 
@@ -1025,8 +1034,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (_contentNodes.TryGetValue(id, out var link))
             {
                 link = GetLinkedNodeGen(link, gen);
-                if (link != null && link.Value != null)
-                    return link;
+                if (link is not null && link.Value is not null)
+                {
+                    return link!;
+                }
             }
 
             throw new PanicException($"failed to get {description} with id={id}");
@@ -1036,7 +1047,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// Gets the parent link node, may be null or root if ParentContentId is less than 0
         /// </summary>
         /// <param name="gen">the generation requested, null for the latest stored</param>
-        private LinkedNode<ContentNode> GetParentLink(ContentNode content, long? gen)
+        private LinkedNode<ContentNode>? GetParentLink(ContentNode content, long? gen)
         {
             if (content.ParentContentId < 0)
             {
@@ -1047,7 +1058,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (_contentNodes.TryGetValue(content.ParentContentId, out var link))
                 link = GetLinkedNodeGen(link, gen);
 
-            return link;
+            if (link is not null && link.Value is not null)
+            {
+                return link!;
+            }
+            return null;
         }
 
         /// <summary>
@@ -1067,8 +1082,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <param name="link"></param>
         /// <param name="gen">The generation requested, use null to avoid the lookup</param>
         /// <returns></returns>
-        private LinkedNode<TValue> GetLinkedNodeGen<TValue>(LinkedNode<TValue> link, long? gen)
-            where TValue : class
+        private LinkedNode<TValue>? GetLinkedNodeGen<TValue>(LinkedNode<TValue>? link, long? gen)
+            where TValue : class?
         {
             if (!gen.HasValue) return link;
 
@@ -1099,7 +1114,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             var parent = parentLink.Value;
 
             // must have children
-            if (parent.FirstChildContentId < 0)
+            if (parent!.FirstChildContentId < 0)
                 throw new PanicException("no children");
 
             // if first/last, clone parent, then remove
@@ -1107,11 +1122,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (parent.FirstChildContentId == content.Id || parent.LastChildContentId == content.Id)
                 parent = GenCloneLocked(parentLink);
 
-            if (parent.FirstChildContentId == content.Id)
-                parent.FirstChildContentId = content.NextSiblingContentId;
+            if (parent is not null)
+            {
+                if (parent.FirstChildContentId == content.Id)
+                {
+                    parent.FirstChildContentId = content.NextSiblingContentId;
+                }
 
-            if (parent.LastChildContentId == content.Id)
-                parent.LastChildContentId = content.PreviousSiblingContentId;
+                if (parent.LastChildContentId == content.Id)
+                {
+                    parent.LastChildContentId = content.PreviousSiblingContentId;
+                }
+            }
 
             // maintain linked list
 
@@ -1119,14 +1141,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             {
                 var nextLink = GetRequiredLinkedNode(content.NextSiblingContentId, "next sibling", null);
                 var next = GenCloneLocked(nextLink);
-                next.PreviousSiblingContentId = content.PreviousSiblingContentId;
+
+                if (next is not null)
+                {
+                    next.PreviousSiblingContentId = content.PreviousSiblingContentId;
+                }
             }
 
             if (content.PreviousSiblingContentId > 0)
             {
                 var prevLink = GetRequiredLinkedNode(content.PreviousSiblingContentId, "previous sibling", null);
                 var prev = GenCloneLocked(prevLink);
-                prev.NextSiblingContentId = content.NextSiblingContentId;
+
+                if (prev is not null)
+                {
+                    prev.NextSiblingContentId = content.NextSiblingContentId;
+                }
             }
         }
 
@@ -1139,13 +1169,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return node != null && node.HasPublished;
         }
 
-        private ContentNode GenCloneLocked(LinkedNode<ContentNode> link)
+        private ContentNode? GenCloneLocked(LinkedNode<ContentNode> link)
         {
             var node = link.Value;
 
             if (node != null && link.Gen != _liveGen)
             {
-                node = new ContentNode(link.Value, _publishedModelFactory);
+                node = new ContentNode(node, _publishedModelFactory);
                 if (link == _root)
                     SetRootLocked(node);
                 else
@@ -1158,7 +1188,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <summary>
         /// Adds a node to the tree structure.
         /// </summary>
-        private void AddTreeNodeLocked(ContentNode content, LinkedNode<ContentNode> parentLink = null)
+        private void AddTreeNodeLocked(ContentNode content, LinkedNode<ContentNode>? parentLink = null)
         {
             parentLink = parentLink ?? GetRequiredParentLink(content, null);
 
@@ -1174,8 +1204,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (parent.FirstChildContentId < 0)
             {
                 parent = GenCloneLocked(parentLink);
-                parent.FirstChildContentId = content.Id;
-                parent.LastChildContentId = content.Id;
+                if (parent is not null)
+                {
+                    parent.FirstChildContentId = content.Id;
+                    parent.LastChildContentId = content.Id;
+                }
+
                 return;
             }
 
@@ -1185,16 +1219,23 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             // if first, clone parent + insert as first child
             // NOTE: Don't perform this check if loading from local DB since we know it's already sorted
-            if (child.SortOrder > content.SortOrder)
+            if (child?.SortOrder > content.SortOrder)
             {
                 content.NextSiblingContentId = parent.FirstChildContentId;
                 content.PreviousSiblingContentId = -1;
 
                 parent = GenCloneLocked(parentLink);
-                parent.FirstChildContentId = content.Id;
+                if (parent is not null)
+                {
+                    parent.FirstChildContentId = content.Id;
+                }
 
                 child = GenCloneLocked(childLink);
-                child.PreviousSiblingContentId = content.Id;
+
+                if (child is not null)
+                {
+                    child.PreviousSiblingContentId = content.Id;
+                }
 
                 return;
             }
@@ -1204,16 +1245,23 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             var lastChild = lastChildLink.Value;
 
             // if last, clone parent + append as last child
-            if (lastChild.SortOrder <= content.SortOrder)
+            if (lastChild?.SortOrder <= content.SortOrder)
             {
                 content.PreviousSiblingContentId = parent.LastChildContentId;
                 content.NextSiblingContentId = -1;
 
                 parent = GenCloneLocked(parentLink);
-                parent.LastChildContentId = content.Id;
+                if (parent is not null)
+                {
+                    parent.LastChildContentId = content.Id;
+                }
 
                 lastChild = GenCloneLocked(lastChildLink);
-                lastChild.NextSiblingContentId = content.Id;
+
+                if (lastChild is not null)
+                {
+                    lastChild.NextSiblingContentId = content.Id;
+                }
 
                 return;
             }
@@ -1222,7 +1270,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // TODO: There was a note about performance when this occurs and that this only happens when moving and not very often, but that is not true,
             // this also happens anytime a middle node is unpublished or republished (which causes a branch update), i'm unsure if this has perf impacts,
             // i think this used to but it doesn't seem bad anymore that I can see...
-            while (child.NextSiblingContentId > 0)
+            while (child?.NextSiblingContentId > 0)
             {
                 // get next child
                 var nextChildLink = GetRequiredLinkedNode(child.NextSiblingContentId, "next child", null);
@@ -1230,16 +1278,24 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
                 // if here, clone previous + append/insert
                 // NOTE: Don't perform this check if loading from local DB since we know it's already sorted
-                if (nextChild.SortOrder > content.SortOrder)
+                if (nextChild?.SortOrder > content.SortOrder)
                 {
                     content.NextSiblingContentId = nextChild.Id;
                     content.PreviousSiblingContentId = nextChild.PreviousSiblingContentId;
 
                     child = GenCloneLocked(childLink);
-                    child.NextSiblingContentId = content.Id;
+
+                    if (child is not null)
+                    {
+                        child.NextSiblingContentId = content.Id;
+                    }
 
                     var nnext = GenCloneLocked(nextChildLink);
-                    nnext.PreviousSiblingContentId = content.Id;
+
+                    if (nnext is not null)
+                    {
+                        nnext.PreviousSiblingContentId = content.Id;
+                    }
 
                     return;
                 }
@@ -1275,7 +1331,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         // set a node (just the node, not the tree)
         private void SetValueLocked<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key, TValue value)
-            where TValue : class
+            where TValue : class?
+            where TKey : notnull
         {
             // this is safe only because we're write-locked
             var link = GetHead(dict, key);
@@ -1306,7 +1363,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         private void ClearLocked<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict)
-            where TValue : class
+            where TValue : class?
+            where TKey : notnull
         {
             // this is safe only because we're write-locked
             foreach (var kvp in dict.Where(x => x.Value != null))
@@ -1323,36 +1381,37 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
-        public ContentNode Get(int id, long gen)
+        public ContentNode? Get(int id, long gen)
         {
             return GetValue(_contentNodes, id, gen);
         }
 
-        public ContentNode Get(Guid uid, long gen)
+        public ContentNode? Get(Guid uid, long gen)
         {
             return _contentKeyToIdMap.TryGetValue(uid, out var id)
                 ? GetValue(_contentNodes, id, gen)
                 : null;
         }
 
-        public IEnumerable<ContentNode> GetAtRoot(long gen)
+        public IEnumerable<ContentNode?> GetAtRoot(long gen)
         {
             var root = GetLinkedNodeGen(_root, gen);
             if (root == null)
                 yield break;
 
-            var id = root.Value.FirstChildContentId;
+            var id = root.Value?.FirstChildContentId;
 
             while (id > 0)
             {
-                var link = GetRequiredLinkedNode(id, "root", gen);
+                var link = GetRequiredLinkedNode(id.Value, "root", gen);
                 yield return link.Value;
-                id = link.Value.NextSiblingContentId;
+                id = link.Value?.NextSiblingContentId;
             }
         }
 
-        private TValue GetValue<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key, long gen)
-            where TValue : class
+        private TValue? GetValue<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key, long gen)
+            where TValue : class?
+            where TKey : notnull
         {
             // look ma, no lock!
             var link = GetHead(dict, key);
@@ -1383,17 +1442,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return has == false;
         }
 
-        public IPublishedContentType GetContentType(int id, long gen)
+        public IPublishedContentType? GetContentType(int id, long gen)
         {
             return GetValue(_contentTypesById, id, gen);
         }
 
-        public IPublishedContentType GetContentType(string alias, long gen)
+        public IPublishedContentType? GetContentType(string alias, long gen)
         {
             return GetValue(_contentTypesByAlias, alias, gen);
         }
 
-        public IPublishedContentType GetContentType(Guid key, long gen)
+        public IPublishedContentType? GetContentType(Guid key, long gen)
         {
             if (!_contentTypeKeyToIdMap.TryGetValue(key, out var id))
                 return null;
@@ -1518,7 +1577,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             while (_genObjs.TryPeek(out var genObj) && (genObj.Count == 0 || genObj.WeakGenRef.IsAlive == false))
             {
                 _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
-                _floorGen = genObj.Gen;
+                _floorGen = genObj!.Gen;
 #if DEBUG
                 //_logger.LogDebug("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
 #endif
@@ -1539,7 +1598,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         private void Collect<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict)
-            where TValue : class
+            where TValue : class?
+            where TKey : notnull
         {
             // it is OK to enumerate a concurrent dictionary and it does not lock
             // it - and here it's not an issue if we skip some items, they will be
@@ -1611,7 +1671,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Internals/Unit testing
 
-        private TestHelper _unitTesting;
+        private TestHelper? _unitTesting;
 
         // note: nothing here is thread-safe
         internal class TestHelper
@@ -1637,14 +1697,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             /// </summary>
             /// <param name="id"></param>
             /// <returns></returns>
-            public (long gen, ContentNode contentNode)[] GetValues(int id)
+            public (long gen, ContentNode? contentNode)[] GetValues(int id)
             {
-                _store._contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link); // else null
+                _store._contentNodes.TryGetValue(id, out LinkedNode<ContentNode?>? link); // else null
 
                 if (link == null)
-                    return Array.Empty<(long, ContentNode)>();
+                    return Array.Empty<(long, ContentNode?)>();
 
-                var tuples = new List<(long, ContentNode)>();
+                var tuples = new List<(long, ContentNode?)>();
                 do
                 {
                     tuples.Add((link.Gen, link.Value));
@@ -1663,7 +1723,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public class Snapshot : IDisposable
         {
             private readonly ContentStore _store;
-            private readonly GenRef _genRef;
+            private readonly GenRef? _genRef;
             private long _gen;
 #if DEBUG
             private readonly ILogger<Snapshot> _logger;
@@ -1705,14 +1765,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 #endif
             }
 
-            public ContentNode Get(int id)
+            public ContentNode? Get(int id)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.Get(id, _gen);
             }
 
-            public ContentNode Get(Guid id)
+            public ContentNode? Get(Guid id)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
@@ -1723,7 +1783,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
-                return _store.GetAtRoot(_gen);
+                return _store.GetAtRoot(_gen).WhereNotNull();
             }
 
             public IEnumerable<ContentNode> GetAll()
@@ -1733,21 +1793,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 return _store.GetAll(_gen);
             }
 
-            public IPublishedContentType GetContentType(int id)
+            public IPublishedContentType? GetContentType(int id)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.GetContentType(id, _gen);
             }
 
-            public IPublishedContentType GetContentType(string alias)
+            public IPublishedContentType? GetContentType(string alias)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.GetContentType(alias, _gen);
             }
 
-            public IPublishedContentType GetContentType(Guid key)
+            public IPublishedContentType? GetContentType(Guid key)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);

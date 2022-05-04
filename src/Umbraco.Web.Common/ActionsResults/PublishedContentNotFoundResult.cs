@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Web.Common.ActionsResults
     public class PublishedContentNotFoundResult : IActionResult
     {
         private readonly IUmbracoContext _umbracoContext;
-        private readonly string _message;
+        private readonly string? _message;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentNotFoundResult"/> class.
         /// </summary>
-        public PublishedContentNotFoundResult(IUmbracoContext umbracoContext, string message = null)
+        public PublishedContentNotFoundResult(IUmbracoContext umbracoContext, string? message = null)
         {
             _umbracoContext = umbracoContext;
             _message = message;
@@ -33,13 +33,13 @@ namespace Umbraco.Cms.Web.Common.ActionsResults
 
             response.StatusCode = StatusCodes.Status404NotFound;
 
-            IPublishedRequest frequest = _umbracoContext.PublishedRequest;
+            IPublishedRequest? frequest = _umbracoContext.PublishedRequest;
             var reason = "Cannot render the page at URL '{0}'.";
-            if (frequest.HasPublishedContent() == false)
+            if (frequest?.HasPublishedContent() == false)
             {
                 reason = "No umbraco document matches the URL '{0}'.";
             }
-            else if (frequest.HasTemplate() == false)
+            else if (frequest?.HasTemplate() == false)
             {
                 reason = "No template exists to render the document at URL '{0}'.";
             }

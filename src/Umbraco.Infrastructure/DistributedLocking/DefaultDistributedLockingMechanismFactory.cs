@@ -12,7 +12,7 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
 {
     private object _lock = new();
     private bool _initialized;
-    private IDistributedLockingMechanism _distributedLockingMechanism;
+    private IDistributedLockingMechanism _distributedLockingMechanism = null!;
 
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IEnumerable<IDistributedLockingMechanism> _distributedLockingMechanisms;
@@ -44,7 +44,7 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
 
         if (!string.IsNullOrEmpty(configured))
         {
-            IDistributedLockingMechanism value = _distributedLockingMechanisms
+            IDistributedLockingMechanism? value = _distributedLockingMechanisms
                 .FirstOrDefault(x => x.GetType().FullName?.EndsWith(configured) ?? false);
 
             if (value == null)
@@ -53,7 +53,7 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
             }
         }
 
-        IDistributedLockingMechanism defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
+        IDistributedLockingMechanism? defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
         if (defaultMechanism != null)
         {
             return defaultMechanism;

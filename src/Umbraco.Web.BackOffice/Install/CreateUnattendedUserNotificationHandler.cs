@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
                 return;
             }
 
-            IUser admin = _userService.GetUserById(Core.Constants.Security.SuperUserId);
+            IUser? admin = _userService.GetUserById(Core.Constants.Security.SuperUserId);
             if (admin == null)
             {
                 throw new InvalidOperationException("Could not find the super user!");
@@ -67,8 +67,8 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             }
 
             // Update name, email & login & save user
-            admin.Name = unattendedName.Trim();
-            admin.Email = unattendedEmail.Trim();
+            admin.Name = unattendedName!.Trim();
+            admin.Email = unattendedEmail!.Trim();
             admin.Username = unattendedEmail.Trim();
             _userService.Save(admin);
 
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
                 throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
             }
 
-            IdentityResult resetResult = await backOfficeUserManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, unattendedPassword.Trim());
+            IdentityResult resetResult = await backOfficeUserManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, unattendedPassword!.Trim());
             if (!resetResult.Succeeded)
             {
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));

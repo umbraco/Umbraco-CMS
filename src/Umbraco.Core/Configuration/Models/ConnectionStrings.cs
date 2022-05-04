@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions("ConnectionStrings")]
 public class ConnectionStrings
 {
-    private string _connectionString;
+    private string? _connectionString;
 
     /// <summary>
     /// The default provider name when not present in configuration.
@@ -22,13 +22,13 @@ public class ConnectionStrings
     /// </summary>
     public const string ProviderNamePostfix = "_ProviderName";
 
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
-    public string ConnectionString
+    public string? ConnectionString
     {
         get => _connectionString;
-        set => _connectionString = value.ReplaceDataDirectoryPlaceholder();
+        set => _connectionString = value?.ReplaceDataDirectoryPlaceholder();
     }
 
-    public string ProviderName { get; set; } = DefaultProviderName;
+    public string? ProviderName { get; set; } = DefaultProviderName;
 }

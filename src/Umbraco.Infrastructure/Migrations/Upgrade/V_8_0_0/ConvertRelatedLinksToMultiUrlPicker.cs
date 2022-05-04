@@ -60,9 +60,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 
                 var relatedLinks = JsonConvert.DeserializeObject<List<RelatedLink>>(value);
                 var links = new List<LinkDto>();
+                if (relatedLinks is null)
+                {
+                    return;
+                }
+
                 foreach (var relatedLink in relatedLinks)
                 {
-                    GuidUdi udi = null;
+                    GuidUdi? udi = null;
                     if (relatedLink.IsInternal)
                     {
                         var linkIsUdi = UdiParser.TryParse(relatedLink.Link, out udi);
@@ -114,9 +119,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         public int? Id { get; internal set; }
         internal bool IsDeleted { get; set; }
         [JsonProperty("caption")]
-        public string Caption { get; set; }
+        public string? Caption { get; set; }
         [JsonProperty("link")]
-        public string Link { get; set; }
+        public string? Link { get; set; }
         [JsonProperty("newWindow")]
         public bool NewWindow { get; set; }
         [JsonProperty("isInternal")]
@@ -127,15 +132,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
     internal class LinkDto
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "target")]
-        public string Target { get; set; }
+        public string? Target { get; set; }
 
         [DataMember(Name = "udi")]
-        public GuidUdi Udi { get; set; }
+        public GuidUdi? Udi { get; set; }
 
         [DataMember(Name = "url")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
     }
 }

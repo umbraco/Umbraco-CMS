@@ -23,10 +23,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public IEnumerable<Section> Sections { get; set; }
 
         [DataMember(Name = "contentStartNode")]
-        public EntityBasic ContentStartNode { get; set; }
+        public EntityBasic? ContentStartNode { get; set; }
 
         [DataMember(Name = "mediaStartNode")]
-        public EntityBasic MediaStartNode { get; set; }
+        public EntityBasic? MediaStartNode { get; set; }
 
         /// <summary>
         /// The number of users assigned to this group

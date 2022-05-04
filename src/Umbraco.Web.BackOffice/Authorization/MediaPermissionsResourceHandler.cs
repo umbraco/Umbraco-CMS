@@ -34,12 +34,12 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         {
             MediaPermissions.MediaAccess permissionResult = resource.NodeId.HasValue
                 ? _mediaPermissions.CheckPermissions(
-                    _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+                    _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
                     resource.NodeId.Value,
                     out _)
                 : _mediaPermissions.CheckPermissions(
                     resource.Media,
-                    _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+                    _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
 
             return Task.FromResult(permissionResult != MediaPermissions.MediaAccess.Denied);
         }

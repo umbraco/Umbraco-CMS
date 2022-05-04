@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Member, alias);
 
-        public IPublishedContent Get(IMember member)
+        public IPublishedContent? Get(IMember member)
             => PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory);
 
         #endregion

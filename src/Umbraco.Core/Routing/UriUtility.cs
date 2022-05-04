@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Routing
 {
     public sealed class UriUtility
     {
-        static string _appPath;
-        static string _appPathPrefix;
+        static string? _appPath;
+        static string? _appPathPrefix;
 
         public UriUtility(IHostingEnvironment hostingEnvironment)
         {
@@ -32,10 +32,10 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         // will be "/" or "/foo"
-        public string AppPath => _appPath;
+        public string? AppPath => _appPath;
 
         // will be "" or "/foo"
-        public string AppPathPrefix => _appPathPrefix;
+        public string? AppPathPrefix => _appPathPrefix;
 
         // adds the virtual directory if any
         // see also VirtualPathUtility.ToAbsolute
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Routing
         // see also VirtualPathUtility.ToAppRelative
         public string ToAppRelative(string virtualPath)
         {
-            if (virtualPath.InvariantStartsWith(_appPathPrefix)
+            if (_appPathPrefix is not null && virtualPath.InvariantStartsWith(_appPathPrefix)
                     && (virtualPath.Length == _appPathPrefix.Length || virtualPath[_appPathPrefix.Length] == '/'))
             {
                 virtualPath = virtualPath.Substring(_appPathPrefix.Length);

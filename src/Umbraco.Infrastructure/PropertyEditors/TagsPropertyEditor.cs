@@ -5,15 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -32,23 +32,42 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly ManifestValueValidatorCollection _validators;
         private readonly IIOHelper _ioHelper;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public TagsPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             ManifestValueValidatorCollection validators,
             IIOHelper ioHelper,
             ILocalizedTextService localizedTextService)
+            : this(
+                dataValueEditorFactory,
+                validators,
+                ioHelper,
+                localizedTextService,
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public TagsPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ManifestValueValidatorCollection validators,
+            IIOHelper ioHelper,
+            ILocalizedTextService localizedTextService,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _validators = validators;
             _ioHelper = ioHelper;
             _localizedTextService = localizedTextService;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         protected override IDataValueEditor CreateValueEditor() =>
-            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute);
+            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService, _editorConfigurationParser);
 
         internal class TagPropertyValueEditor : DataValueEditor
         {
@@ -62,7 +81,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             { }
 
             /// <inheritdoc />
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 var value = editorValue?.Value?.ToString();
 
@@ -71,7 +90,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     return null;
                 }
 
-                if (editorValue.Value is JArray json)
+                if (editorValue?.Value is JArray json)
                 {
                     return json.HasValues ? json.Select(x => x.Value<string>()) : null;
                 }
@@ -98,7 +117,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private class RequiredJsonValueValidator : IValueRequiredValidator
             {
                 /// <inheritdoc />
-                public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
+                public IEnumerable<ValidationResult> ValidateRequired(object? value, string valueType)
                 {
                     if (value == null)
                     {
@@ -106,7 +125,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         yield break;
                     }
 
-                    if (value.ToString().DetectIsEmptyJson())
+                    if (value.ToString()!.DetectIsEmptyJson())
                         yield return new ValidationResult("Value cannot be empty", new[] { "value" });
                 }
             }

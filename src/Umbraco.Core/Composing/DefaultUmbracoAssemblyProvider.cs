@@ -17,13 +17,13 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly Assembly _entryPointAssembly;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IEnumerable<string> _additionalTargetAssemblies;
-        private List<Assembly> _discovered;
+        private readonly IEnumerable<string>? _additionalTargetAssemblies;
+        private List<Assembly>? _discovered;
 
         public DefaultUmbracoAssemblyProvider(
-            Assembly entryPointAssembly,
+            Assembly? entryPointAssembly,
             ILoggerFactory loggerFactory,
-            IEnumerable<string> additionalTargetAssemblies = null)
+            IEnumerable<string>? additionalTargetAssemblies = null)
         {
             _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
             _loggerFactory = loggerFactory;

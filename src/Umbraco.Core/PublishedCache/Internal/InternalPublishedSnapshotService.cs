@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class InternalPublishedSnapshotService : IPublishedSnapshotService
     {
-        private InternalPublishedSnapshot _snapshot;
-        private InternalPublishedSnapshot _previewSnapshot;
+        private InternalPublishedSnapshot? _snapshot;
+        private InternalPublishedSnapshot? _previewSnapshot;
 
         public Task CollectAsync() => Task.CompletedTask;
 
-        public IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
+        public IPublishedSnapshot CreatePublishedSnapshot(string? previewToken)
         {
             if (previewToken.IsNullOrWhiteSpace())
             {
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
         {
         }
 
-        public void Rebuild(IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null)
+        public void Rebuild(IReadOnlyCollection<int>? contentTypeIds = null, IReadOnlyCollection<int>? mediaTypeIds = null, IReadOnlyCollection<int>? memberTypeIds = null)
         {
         }
     }

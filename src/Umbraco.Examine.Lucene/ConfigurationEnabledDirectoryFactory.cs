@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly IServiceProvider _services;
         private readonly IApplicationRoot _applicationRoot;
         private readonly IndexCreatorSettings _settings;
-        private IDirectoryFactory _directoryFactory;
+        private IDirectoryFactory? _directoryFactory;
 
         public ConfigurationEnabledDirectoryFactory(
             IServiceProvider services,
@@ -39,8 +39,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
         }
 
         /// <summary>
-        /// Creates a directory factory based on the configured value and ensures that 
-        /// </summary>        
+        /// Creates a directory factory based on the configured value and ensures that
+        /// </summary>
         private IDirectoryFactory CreateFactory()
         {
             DirectoryInfo dirInfo = _applicationRoot.ApplicationRoot;
@@ -51,12 +51,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
 
             switch (_settings.LuceneDirectoryFactory)
-            {                
+            {
                 case LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory:
                     return _services.GetRequiredService<SyncedFileSystemDirectoryFactory>();
                 case LuceneDirectoryFactory.TempFileSystemDirectoryFactory:
                     return _services.GetRequiredService<TempEnvFileSystemDirectoryFactory>();
-                case LuceneDirectoryFactory.Default:                    
+                case LuceneDirectoryFactory.Default:
                 default:
                     return _services.GetRequiredService<FileSystemDirectoryFactory>();
             }

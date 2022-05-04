@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [IgnoreDataMember]
         public override IEnumerable<T> Properties
         {
-            get => Tabs.SelectMany(x => x.Properties);
+            get => Tabs.Where(x => x.Properties is not null).SelectMany(x => x.Properties!);
             set => throw new NotImplementedException();
         }
     }

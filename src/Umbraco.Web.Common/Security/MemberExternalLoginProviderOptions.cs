@@ -6,9 +6,9 @@ namespace Umbraco.Cms.Web.Common.Security
     public class MemberExternalLoginProviderOptions
     {
         public MemberExternalLoginProviderOptions(
-            MemberExternalSignInAutoLinkOptions autoLinkOptions = null,
+            MemberExternalSignInAutoLinkOptions? autoLinkOptions = null,
             bool autoRedirectLoginToExternalProvider = false,
-            string customBackOfficeView = null)
+            string? customBackOfficeView = null)
         {
             AutoLinkOptions = autoLinkOptions ?? new MemberExternalSignInAutoLinkOptions();
         }

@@ -14,7 +14,7 @@ namespace Umbraco.Extensions
         /// <param name="prefix"></param>
         /// <returns></returns>
         public static bool IsValid(this ModelStateDictionary state, string prefix) =>
-            state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
+            state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value?.Errors.Any() ?? false);
 
         public static IDictionary<string, object> ToErrorDictionary(this ModelStateDictionary modelState)
         {
@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public static JsonResult ToJsonErrors(this ModelStateDictionary state) =>
+        public static JsonResult? ToJsonErrors(this ModelStateDictionary state) =>
             new JsonResult(new
             {
                 success = state.IsValid.ToString().ToLower(),
@@ -48,7 +48,7 @@ namespace Umbraco.Extensions
                                        name = e.Key,
                                        errors = e.Value.Errors.Select(x => x.ErrorMessage)
                                            .Concat(
-                                               e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
+                                               e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception!.Message))
                                    }
             });
     }

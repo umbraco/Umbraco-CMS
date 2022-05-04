@@ -12,6 +12,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int Id { get; set; }
 
         [DataMember(Name = "cultures")]
-        public string[] Cultures { get; set; }
+        public string[]? Cultures { get; set; }
     }
 }

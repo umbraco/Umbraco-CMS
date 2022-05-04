@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// </summary>
         /// <param name="member"></param>
         /// <returns></returns>
-        IPublishedContent Get(IMember member);
+        IPublishedContent? Get(IMember member);
 
         /// <summary>
         /// Gets a content type identified by its unique identifier.

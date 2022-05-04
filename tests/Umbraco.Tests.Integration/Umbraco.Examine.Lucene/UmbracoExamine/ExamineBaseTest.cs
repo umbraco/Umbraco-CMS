@@ -85,6 +85,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                 scopeProviderMock.Setup(x => x.CreateScope(
                         It.IsAny<IsolationLevel>(),
                         It.IsAny<RepositoryCacheMode>(),
+                        It.IsAny<IEventDispatcher>(),
                         It.IsAny<IScopedNotificationPublisher>(),
                         It.IsAny<bool?>(),
                         It.IsAny<bool>(),

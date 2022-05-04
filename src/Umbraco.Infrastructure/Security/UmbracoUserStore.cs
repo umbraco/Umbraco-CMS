@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Security
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override IQueryable<TUser> Users => throw new NotImplementedException();
 
-        protected static int UserIdToInt(string userId)
+        protected static int UserIdToInt(string? userId)
         {
             if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
             {
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
             }
 
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
+            IdentityUserRole<string>? userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
 
             if (userRole == null)
             {
@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override Task<string> GetSecurityStampAsync(TUser user, CancellationToken cancellationToken = default)
+        public override Task<string?> GetSecurityStampAsync(TUser user, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -129,7 +129,7 @@ namespace Umbraco.Cms.Core.Security
 
             // the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
             return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace()
-                ? user.PasswordHash.GenerateHash()
+                ? user.PasswordHash?.GenerateHash()
                 : user.SecurityStamp);
         }
 
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
             }
 
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
+            IdentityUserRole<string>? userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
 
             if (userRole != null)
             {
