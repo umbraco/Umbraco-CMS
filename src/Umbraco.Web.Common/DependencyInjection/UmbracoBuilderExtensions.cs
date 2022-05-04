@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog.Extensions.Logging;
 using Smidge;
 using Smidge.Cache;
@@ -312,7 +313,24 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
-        builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+        builder.Services.AddUnique<IMacroRenderer>(serviceProvider =>
+        {
+            return new MacroRenderer(
+                serviceProvider.GetRequiredService<IProfilingLogger>(),
+                serviceProvider.GetRequiredService<ILogger<MacroRenderer>>(),
+                serviceProvider.GetRequiredService<IUmbracoContextAccessor>(),
+                serviceProvider.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
+                serviceProvider.GetRequiredService<ILocalizedTextService>(),
+                serviceProvider.GetRequiredService<AppCaches>(),
+                serviceProvider.GetRequiredService<IMacroService>(),
+                serviceProvider.GetRequiredService<ICookieManager>(),
+                serviceProvider.GetRequiredService<ISessionManager>(),
+                serviceProvider.GetRequiredService<IRequestAccessor>(),
+                serviceProvider.GetRequiredService<PartialViewMacroEngine>(),
+                serviceProvider.GetRequiredService<IHttpContextAccessor>(),
+                serviceProvider.GetRequiredService<IWebHostEnvironment>());
+        });
+
         builder.Services.AddSingleton<PartialViewMacroEngine>();
 
         // register the umbraco context factory
