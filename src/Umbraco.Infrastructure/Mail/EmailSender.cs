@@ -84,7 +84,8 @@ public class EmailSender : IEmailSender
             // if a handler handled sending the email then don't continue.
             if (notification.IsHandled)
             {
-                _logger.LogDebug("The email sending for {Subject} was handled by a notification handler",
+                _logger.LogDebug(
+                    "The email sending for {Subject} was handled by a notification handler",
                     notification.Message.Subject);
                 return;
             }
@@ -142,12 +143,14 @@ public class EmailSender : IEmailSender
                     File.Delete(path);
                     throw;
                 }
-            } while (true);
+            }
+            while (true);
         }
 
         using var client = new SmtpClient();
 
-        await client.ConnectAsync(_globalSettings.Smtp!.Host,
+        await client.ConnectAsync(
+            _globalSettings.Smtp!.Host,
             _globalSettings.Smtp.Port,
             (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 

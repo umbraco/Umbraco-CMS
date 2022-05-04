@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
 
@@ -13,7 +13,6 @@ public class MessageTemplates : IMessageTemplates
     // means we cannot get rid of Serilog entirely. We may want to revisit this at some point.
 
     // TODO: Do we still need this, is there a non-pre release package shipped?
-
     private static readonly Lazy<ILogger> MinimalLogger = new(() => new LoggerConfiguration().CreateLogger());
 
     public string Render(string messageTemplate, params object[] args)
@@ -32,7 +31,7 @@ public class MessageTemplates : IMessageTemplates
         var values = boundProperties.ToDictionary(x => x.Name, x => x.Value);
 
         // this ends up putting every string parameter between quotes
-        //return parsedTemplate.Render(values);
+        // return parsedTemplate.Render(values);
 
         // this does not
         var tw = new StringWriter();

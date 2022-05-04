@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Trees;
 
 namespace Umbraco.Cms.Core.Models.Trees;
@@ -39,7 +39,8 @@ public sealed class TreeRootNode : TreeNode
     /// <param name="menuUrl"></param>
     private TreeRootNode(string nodeId, string? getChildNodesUrl, string? menuUrl)
         : base(nodeId, null, getChildNodesUrl, menuUrl) =>
-        //default to false
+
+        // default to false
         IsContainer = false;
 
     /// <summary>
@@ -57,7 +58,7 @@ public sealed class TreeRootNode : TreeNode
         get => _isGroup;
         private set
         {
-            //if a group is true then it is also a container
+            // if a group is true then it is also a container
             _isGroup = value;
             IsContainer = true;
         }
@@ -93,7 +94,9 @@ public sealed class TreeRootNode : TreeNode
     {
         var sectionRoot = new TreeRootNode(RootId, string.Empty, string.Empty)
         {
-            IsGroup = true, Children = children, RoutePath = section
+            IsGroup = true,
+            Children = children,
+            RoutePath = section,
         };
 
         return sectionRoot;
@@ -108,7 +111,9 @@ public sealed class TreeRootNode : TreeNode
     {
         var sectionRoot = new TreeRootNode(RootId, string.Empty, string.Empty)
         {
-            IsContainer = true, Children = children, ContainsGroups = true
+            IsContainer = true,
+            Children = children,
+            ContainsGroups = true,
         };
 
         return sectionRoot;
@@ -123,7 +128,8 @@ public sealed class TreeRootNode : TreeNode
     {
         var sectionRoot = new TreeRootNode(RootId, string.Empty, string.Empty)
         {
-            IsContainer = true, Children = children
+            IsContainer = true,
+            Children = children,
         };
 
         return sectionRoot;
@@ -143,6 +149,8 @@ public sealed class TreeRootNode : TreeNode
         string? title, TreeNodeCollection? children, bool isSingleNodeTree = false) =>
         new TreeRootNode(nodeId, getChildNodesUrl, menuUrl)
         {
-            Children = children, Name = title, _isSingleNodeTree = isSingleNodeTree
+            Children = children,
+            Name = title,
+            _isSingleNodeTree = isSingleNodeTree,
         };
 }

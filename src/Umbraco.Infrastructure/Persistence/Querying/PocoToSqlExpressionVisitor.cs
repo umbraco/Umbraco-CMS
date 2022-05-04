@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
 
@@ -115,9 +115,12 @@ internal class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
 /// <remarks>This visitor is stateful and cannot be reused.</remarks>
 internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
 {
-    private readonly string? _alias1, _alias2;
-    private readonly PocoData _pocoData1, _pocoData2;
-    private string? _parameterName1, _parameterName2;
+    private readonly string? _alias1;
+    private readonly string? _alias2;
+    private readonly PocoData _pocoData1;
+    private readonly PocoData _pocoData2;
+    private string? _parameterName1;
+    private string? _parameterName2;
 
     public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias1, string? alias2)
         : base(sqlContext.SqlSyntax)
@@ -175,7 +178,8 @@ internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
             {
                 // here: which _pd should we use?!
                 throw new NotSupportedException();
-                //return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name);
+
+                // return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name);
             }
         }
 
@@ -210,9 +214,15 @@ internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
 /// <remarks>This visitor is stateful and cannot be reused.</remarks>
 internal class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : ExpressionVisitorBase
 {
-    private readonly string? _alias1, _alias2, _alias3;
-    private readonly PocoData _pocoData1, _pocoData2, _pocoData3;
-    private string? _parameterName1, _parameterName2, _parameterName3;
+    private readonly string? _alias1;
+    private readonly string? _alias2;
+    private readonly string? _alias3;
+    private readonly PocoData _pocoData1;
+    private readonly PocoData _pocoData2;
+    private readonly PocoData _pocoData3;
+    private string? _parameterName1;
+    private string? _parameterName2;
+    private string? _parameterName3;
 
     public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias1, string? alias2, string? alias3)
         : base(sqlContext.SqlSyntax)
@@ -283,7 +293,8 @@ internal class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : ExpressionVisit
             {
                 // here: which _pd should we use?!
                 throw new NotSupportedException();
-                //return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name);
+
+                // return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name);
             }
         }
 

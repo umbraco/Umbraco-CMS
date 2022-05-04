@@ -21,7 +21,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     INotificationHandler<ContentTypeCacheRefresherNotification>,
     INotificationHandler<DataTypeCacheRefresherNotification>
 {
-    private static int s_req;
+    private static int req;
     private readonly ModelsBuilderSettings _config;
     private readonly ILogger<AutoModelsNotificationHandler> _logger;
     private readonly IMainDom _mainDom;
@@ -39,7 +39,8 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
         IMainDom mainDom)
     {
         _logger = logger;
-        //We cant use IOptionsSnapshot here, cause this is used in the Core runtime, and that cannot use a scoped service as it has no scope
+
+        // We cant use IOptionsSnapshot here, cause this is used in the Core runtime, and that cannot use a scoped service as it has no scope
         _config = config.CurrentValue ?? throw new ArgumentNullException(nameof(config));
         _modelGenerator = modelGenerator;
         _mbErrors = mbErrors;
@@ -80,7 +81,6 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     // var to register that models
     // need to be generated. Could be by another request. Anyway. We could
     // have collisions but... you know the risk.
-
     private void RequestModelsGeneration()
     {
         if (!_mainDom.IsMainDom)
@@ -90,12 +90,12 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
 
         _logger.LogDebug("Requested to generate models.");
 
-        Interlocked.Exchange(ref s_req, 1);
+        Interlocked.Exchange(ref req, 1);
     }
 
     private void GenerateModelsIfRequested()
     {
-        if (Interlocked.Exchange(ref s_req, 0) == 0)
+        if (Interlocked.Exchange(ref req, 0) == 0)
         {
             return;
         }

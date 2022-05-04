@@ -5,9 +5,22 @@ using static Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.Simil
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+internal static class ListExtensions
+{
+    internal static bool Contains(this IEnumerable<StructuredName> items, StructuredName model) =>
+        items.Any(x => x.FullName.InvariantEquals(model.FullName));
+
+    internal static bool SimpleNameExists(this IEnumerable<StructuredName> items, string name) =>
+        items.Any(x => x.FullName.InvariantEquals(name));
+
+    internal static bool SuffixedNameExists(this IEnumerable<StructuredName> items) =>
+        items.Any(x => x.Suffix.HasValue);
+}
+
 internal class SimilarNodeName
 {
     public int Id { get; set; }
+
     public string? Name { get; set; }
 
     public static string? GetUniqueName(IEnumerable<SimilarNodeName> names, int nodeId, string? nodeName)
@@ -31,7 +44,7 @@ internal class SimilarNodeName
         // name is empty, and there are no other names with suffixes, so just return " (1)"
         if (model.IsEmptyName() && !items.Any())
         {
-            model.Suffix = StructuredName.INITIAL_SUFFIX;
+            model.Suffix = StructuredName.INITIALSUFFIX;
 
             return model.FullName;
         }
@@ -52,7 +65,7 @@ internal class SimilarNodeName
         // no suffix - name without suffix does NOT exist - we can just use the name without suffix.
         if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
         {
-            model.Suffix = StructuredName.NO_SUFFIX;
+            model.Suffix = StructuredName.NOSUFFIX;
 
             return model.FullName;
         }
@@ -67,7 +80,7 @@ internal class SimilarNodeName
         // no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
         if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
         {
-            model.Suffix = StructuredName.NO_SUFFIX;
+            model.Suffix = StructuredName.NOSUFFIX;
 
             return model.FullName;
         }
@@ -113,7 +126,7 @@ internal class SimilarNodeName
         if (model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
         {
             model.Text = model.FullName;
-            model.Suffix = StructuredName.NO_SUFFIX;
+            model.Suffix = StructuredName.NOSUFFIX;
 
             // filter items based on full name with suffix
             items = items.Where(x => x.Text.InvariantStartsWith(model.FullName));
@@ -170,21 +183,21 @@ internal class SimilarNodeName
 
     internal class StructuredName
     {
-        private const string SPACE_CHARACTER = " ";
-        private const string SUFFIXED_PATTERN = @"(.*) \(([1-9]\d*)\)$";
-        internal const uint INITIAL_SUFFIX = 1;
-        internal static readonly uint? NO_SUFFIX = default;
+        internal const uint INITIALSUFFIX = 1;
+        private const string SPACECHARACTER = " ";
+        private const string SUFFIXEDPATTERN = @"(.*) \(([1-9]\d*)\)$";
+        internal static readonly uint? NOSUFFIX = default;
 
         internal StructuredName(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                Text = SPACE_CHARACTER;
+                Text = SPACECHARACTER;
 
                 return;
             }
 
-            var rg = new Regex(SUFFIXED_PATTERN);
+            var rg = new Regex(SUFFIXEDPATTERN);
             MatchCollection matches = rg.Matches(name);
             if (matches.Count > 0)
             {
@@ -202,31 +215,20 @@ internal class SimilarNodeName
             Text = name;
         }
 
-        internal string Text { get; set; }
-        internal uint? Suffix { get; set; }
-
         public string FullName
         {
             get
             {
-                var text = Text == SPACE_CHARACTER ? Text.Trim() : Text;
+                var text = Text == SPACECHARACTER ? Text.Trim() : Text;
 
                 return Suffix > 0 ? $"{text} ({Suffix})" : text;
             }
         }
 
+        internal string Text { get; set; }
+
+        internal uint? Suffix { get; set; }
+
         internal bool IsEmptyName() => string.IsNullOrWhiteSpace(Text);
     }
-}
-
-internal static class ListExtensions
-{
-    internal static bool Contains(this IEnumerable<StructuredName> items, StructuredName model) =>
-        items.Any(x => x.FullName.InvariantEquals(model.FullName));
-
-    internal static bool SimpleNameExists(this IEnumerable<StructuredName> items, string name) =>
-        items.Any(x => x.FullName.InvariantEquals(name));
-
-    internal static bool SuffixedNameExists(this IEnumerable<StructuredName> items) =>
-        items.Any(x => x.Suffix.HasValue);
 }

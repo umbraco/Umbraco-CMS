@@ -20,6 +20,7 @@ public class UmbracoPasswordHasher<TUser> : PasswordHasher<TUser>
     public LegacyPasswordSecurity LegacyPasswordSecurity { get; }
 
     public override string HashPassword(TUser user, string password) =>
+
         // Always use the latest/current hash algorithm when hashing new passwords for storage.
         // NOTE: This is only overridden to show that we can since we may need to adjust this in the future
         // if new/different formats are required.

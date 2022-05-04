@@ -25,7 +25,6 @@ public sealed class LastSyncedFileManager
         () =>
         {
             // On first load, read from file, else it will return the in-memory _lastId value
-
             var distCacheFilePath = DistCacheFilePath;
 
             if (File.Exists(distCacheFilePath))
@@ -50,7 +49,7 @@ public sealed class LastSyncedFileManager
 
         var distCacheFilePath = Path.Combine(_hostingEnvironment.LocalTempPath, "DistCache", fileName);
 
-        //ensure the folder exists
+        // ensure the folder exists
         var folder = Path.GetDirectoryName(distCacheFilePath);
         if (folder == null)
         {

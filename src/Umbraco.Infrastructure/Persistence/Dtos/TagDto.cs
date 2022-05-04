@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -11,9 +11,13 @@ internal class TagDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Tag;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
-    [Column("group")] [Length(100)] public string Group { get; set; } = null!;
+    [Column("group")]
+    [Length(100)]
+    public string Group { get; set; } = null!;
 
     [Column("languageId")]
     [ForeignKey(typeof(LanguageDto))]
@@ -26,10 +30,11 @@ internal class TagDto
     [Index(IndexTypes.UniqueNonClustered, ForColumns = "group,tag,languageId", Name = "IX_cmsTags")]
     public string Text { get; set; } = null!;
 
-    //[Column("key")]
-    //[Length(301)] // de-normalized "{group}/{tag}"
-    //public string Key { get; set; }
+    // [Column("key")]
+    // [Length(301)] // de-normalized "{group}/{tag}"
+    // public string Key { get; set; }
 
     // queries result column
-    [ResultColumn("NodeCount")] public int NodeCount { get; set; }
+    [ResultColumn("NodeCount")]
+    public int NodeCount { get; set; }
 }

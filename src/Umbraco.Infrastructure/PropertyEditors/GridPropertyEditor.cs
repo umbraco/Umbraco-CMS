@@ -299,7 +299,7 @@ public class GridPropertyEditor : DataEditor
                 return null;
             }
 
-            //process the rte values
+            // process the rte values
             foreach (GridValue.GridControl rte in rtes.ToList())
             {
                 var html = rte.Value?.ToString();

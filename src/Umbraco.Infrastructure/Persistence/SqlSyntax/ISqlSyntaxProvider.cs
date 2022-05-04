@@ -15,23 +15,41 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 public interface ISqlSyntaxProvider
 {
     string ProviderName { get; }
+
     string CreateTable { get; }
+
     string DropTable { get; }
+
     string AddColumn { get; }
+
     string DropColumn { get; }
+
     string AlterColumn { get; }
+
     string RenameColumn { get; }
+
     string RenameTable { get; }
+
     string CreateSchema { get; }
+
     string AlterSchema { get; }
+
     string DropSchema { get; }
+
     string CreateIndex { get; }
+
     string DropIndex { get; }
+
     string InsertData { get; }
+
     string UpdateData { get; }
+
     string DeleteData { get; }
+
     string TruncateTable { get; }
+
     string CreateConstraint { get; }
+
     string DeleteConstraint { get; }
 
     string DeleteDefaultConstraint { get; }
@@ -45,7 +63,9 @@ public interface ISqlSyntaxProvider
     Regex AliasRegex { get; }
 
     string ConvertIntegerToOrderableString { get; }
+
     string ConvertDateToOrderableString { get; }
+
     string ConvertDecimalToOrderableString { get; }
 
     /// <summary>
@@ -63,31 +83,52 @@ public interface ISqlSyntaxProvider
     string EscapeString(string val);
 
     string GetWildcardPlaceholder();
+
     string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
+
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
+
     string GetConcat(params string[] args);
 
     string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
         string? referenceName = null, bool forInsert = false);
 
     string GetQuotedTableName(string? tableName);
+
     string GetQuotedColumnName(string? columnName);
+
     string GetQuotedName(string? name);
+
     bool DoesTableExist(IDatabase db, string tableName);
+
     string GetIndexType(IndexTypes indexTypes);
+
     string GetSpecialDbType(SpecialDbType dbType);
+
     string FormatDateTime(DateTime date, bool includeTime = true);
+
     string Format(TableDefinition table);
+
     string Format(IEnumerable<ColumnDefinition> columns);
+
     List<string> Format(IEnumerable<IndexDefinition> indexes);
+
     List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys);
+
     string FormatPrimaryKey(TableDefinition table);
+
     string GetQuotedValue(string value);
+
     string Format(ColumnDefinition column);
+
     string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
+
     string Format(IndexDefinition index);
+
     string Format(ForeignKeyDefinition foreignKey);
+
     string FormatColumnRename(string? tableName, string? oldName, string? newName);
+
     string FormatTableRename(string? oldName, string? newName);
 
     void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
@@ -95,8 +136,11 @@ public interface ISqlSyntaxProvider
     Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
     bool SupportsClustered();
+
     bool SupportsIdentityInsert();
+
     IEnumerable<string> GetTablesInSchema(IDatabase db);
+
     IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
 
     /// <summary>
@@ -145,7 +189,6 @@ public interface ISqlSyntaxProvider
     /// </remarks>
     bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
         [MaybeNullWhen(false)] out string constraintName);
-
 
     string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null);
 

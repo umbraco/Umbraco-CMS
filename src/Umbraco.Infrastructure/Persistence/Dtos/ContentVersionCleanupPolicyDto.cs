@@ -16,7 +16,8 @@ internal class ContentVersionCleanupPolicyDto
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId", OnDelete = Rule.Cascade)]
     public int ContentTypeId { get; set; }
 
-    [Column("preventCleanup")] public bool PreventCleanup { get; set; }
+    [Column("preventCleanup")]
+    public bool PreventCleanup { get; set; }
 
     [Column("keepAllVersionsNewerThanDays")]
     [NullSetting(NullSetting = NullSettings.Null)]
@@ -26,5 +27,6 @@ internal class ContentVersionCleanupPolicyDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? KeepLatestVersionPerDayForDays { get; set; }
 
-    [Column("updated")] public DateTime Updated { get; set; }
+    [Column("updated")]
+    public DateTime Updated { get; set; }
 }

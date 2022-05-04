@@ -17,7 +17,7 @@ internal static class PathValidationExtensions
     /// <returns></returns>
     public static void ValidatePathWithException(this NodeDto entity)
     {
-        //don't validate if it's empty and it has no id
+        // don't validate if it's empty and it has no id
         if (entity.NodeId == default && entity.Path.IsNullOrWhiteSpace())
         {
             return;
@@ -32,14 +32,14 @@ internal static class PathValidationExtensions
         var pathParts = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
         if (pathParts.Length < 2)
         {
-            //a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
+            // a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
             throw new InvalidDataException(
                 $"The content item {entity.NodeId} has an invalid path: {entity.Path} with parentID: {entity.ParentId}");
         }
 
-        if (entity.ParentId != default && pathParts[pathParts.Length - 2] != entity.ParentId.ToInvariantString())
+        if (entity.ParentId != default && pathParts[^2] != entity.ParentId.ToInvariantString())
         {
-            //the 2nd last id in the path must be it's parent id
+            // the 2nd last id in the path must be it's parent id
             throw new InvalidDataException(
                 $"The content item {entity.NodeId} has an invalid path: {entity.Path} with parentID: {entity.ParentId}");
         }
@@ -52,7 +52,7 @@ internal static class PathValidationExtensions
     /// <returns></returns>
     public static bool ValidatePath(this IUmbracoEntity entity)
     {
-        //don't validate if it's empty and it has no id
+        // don't validate if it's empty and it has no id
         if (entity.HasIdentity == false && entity.Path.IsNullOrWhiteSpace())
         {
             return true;
@@ -66,13 +66,13 @@ internal static class PathValidationExtensions
         var pathParts = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
         if (pathParts.Length < 2)
         {
-            //a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
+            // a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
             return false;
         }
 
-        if (entity.ParentId != default && pathParts[pathParts.Length - 2] != entity.ParentId.ToInvariantString())
+        if (entity.ParentId != default && pathParts[^2] != entity.ParentId.ToInvariantString())
         {
-            //the 2nd last id in the path must be it's parent id
+            // the 2nd last id in the path must be it's parent id
             return false;
         }
 
@@ -87,7 +87,8 @@ internal static class PathValidationExtensions
     /// <param name="logger"></param>
     /// <param name="getParent">A callback specified to retrieve the parent entity of the entity</param>
     /// <param name="update">A callback specified to update a fixed entity</param>
-    public static void EnsureValidPath<T>(this T entity,
+    public static void EnsureValidPath<T>(
+        this T entity,
         ILogger<T> logger,
         Func<T, T> getParent,
         Action<T> update)
@@ -107,7 +108,8 @@ internal static class PathValidationExtensions
             if (entity.ParentId == -1)
             {
                 entity.Path = string.Concat("-1,", entity.Id);
-                //path changed, update it
+
+                // path changed, update it
                 update(entity);
             }
             else
@@ -119,11 +121,12 @@ internal static class PathValidationExtensions
                                                      " could not resolve it's parent " + entity.ParentId);
                 }
 
-                //the parent must also be valid!
+                // the parent must also be valid!
                 parent.EnsureValidPath(logger, getParent, update);
 
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
-                //path changed, update it
+
+                // path changed, update it
                 update(entity);
             }
         }

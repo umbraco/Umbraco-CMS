@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -23,10 +23,10 @@ public class DatabaseSchemaResult
 
     public List<TableDefinition> TableDefinitions { get; }
 
+    public List<string> ValidTables { get; }
+
     // TODO: what are these exactly? TableDefinitions are those that should be there, IndexDefinitions are those that... are in DB?
     internal List<DbIndexDefinition> IndexDefinitions { get; }
-
-    public List<string> ValidTables { get; }
 
     public List<string> ValidColumns { get; }
 
@@ -55,7 +55,7 @@ public class DatabaseSchemaResult
             return sb.ToString();
         }
 
-        //Table error summary
+        // Table error summary
         if (Errors.Any(x => x.Item1.Equals("Table")))
         {
             sb.AppendLine("The following tables were found in the database, but are not in the current schema:");
@@ -63,7 +63,7 @@ public class DatabaseSchemaResult
             sb.AppendLine(" ");
         }
 
-        //Column error summary
+        // Column error summary
         if (Errors.Any(x => x.Item1.Equals("Column")))
         {
             sb.AppendLine("The following columns were found in the database, but are not in the current schema:");
@@ -71,7 +71,7 @@ public class DatabaseSchemaResult
             sb.AppendLine(" ");
         }
 
-        //Constraint error summary
+        // Constraint error summary
         if (Errors.Any(x => x.Item1.Equals("Constraint")))
         {
             sb.AppendLine(
@@ -80,7 +80,7 @@ public class DatabaseSchemaResult
             sb.AppendLine(" ");
         }
 
-        //Index error summary
+        // Index error summary
         if (Errors.Any(x => x.Item1.Equals("Index")))
         {
             sb.AppendLine("The following indexes were found in the database, but are not in the current schema:");
@@ -88,7 +88,7 @@ public class DatabaseSchemaResult
             sb.AppendLine(" ");
         }
 
-        //Unknown constraint error summary
+        // Unknown constraint error summary
         if (Errors.Any(x => x.Item1.Equals("Unknown")))
         {
             sb.AppendLine(

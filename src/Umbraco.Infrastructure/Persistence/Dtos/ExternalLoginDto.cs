@@ -12,7 +12,9 @@ internal class ExternalLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ExternalLogin;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Obsolete(
         "This only exists to ensure you can upgrade using external logins from umbraco version where this was used to the new where it is not used")]

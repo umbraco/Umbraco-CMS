@@ -258,71 +258,13 @@ public abstract class BlockEditorPropertyEditor : DataEditor
         #endregion
     }
 
-    /// <summary>
-    ///     Validates the min/max of the block editor
-    /// </summary>
-    private class MinMaxValidator : IValueValidator
-    {
-        private readonly BlockEditorValues _blockEditorValues;
-        private readonly ILocalizedTextService _textService;
-
-        public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
-        {
-            _blockEditorValues = blockEditorValues;
-            _textService = textService;
-        }
-
-        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
-        {
-            var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
-            if (blockConfig == null)
-            {
-                yield break;
-            }
-
-            BlockListConfiguration.NumberRange? validationLimit = blockConfig.ValidationLimit;
-            if (validationLimit == null)
-            {
-                yield break;
-            }
-
-            BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
-
-            if ((blockEditorData == null && validationLimit.Min.HasValue && validationLimit.Min > 0)
-                || (blockEditorData != null && validationLimit.Min.HasValue &&
-                    blockEditorData.Layout?.Count() < validationLimit.Min))
-            {
-                yield return new ValidationResult(
-                    _textService.Localize("validation", "entriesShort",
-                        new[]
-                        {
-                            validationLimit.Min.ToString(),
-                            (validationLimit.Min - (blockEditorData?.Layout?.Count() ?? 0)).ToString()
-                        }),
-                    new[] {"minCount"});
-            }
-
-            if (blockEditorData != null && validationLimit.Max.HasValue &&
-                blockEditorData.Layout?.Count() > validationLimit.Max)
-            {
-                yield return new ValidationResult(
-                    _textService.Localize("validation", "entriesExceed",
-                        new[]
-                        {
-                            validationLimit.Max.ToString(),
-                            (blockEditorData.Layout.Count() - validationLimit.Max).ToString()
-                        }),
-                    new[] {"maxCount"});
-            }
-        }
-    }
-
     internal class BlockEditorValidator : ComplexEditorValidator
     {
         private readonly BlockEditorValues _blockEditorValues;
         private readonly IContentTypeService _contentTypeService;
 
-        public BlockEditorValidator(IPropertyValidationService propertyValidationService,
+        public BlockEditorValidator(
+            IPropertyValidationService propertyValidationService,
             BlockEditorValues blockEditorValues, IContentTypeService contentTypeService)
             : base(propertyValidationService)
         {
@@ -376,6 +318,65 @@ public abstract class BlockEditorPropertyEditor : DataEditor
     }
 
     /// <summary>
+    ///     Validates the min/max of the block editor
+    /// </summary>
+    private class MinMaxValidator : IValueValidator
+    {
+        private readonly BlockEditorValues _blockEditorValues;
+        private readonly ILocalizedTextService _textService;
+
+        public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
+        {
+            _blockEditorValues = blockEditorValues;
+            _textService = textService;
+        }
+
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+        {
+            var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
+            if (blockConfig == null)
+            {
+                yield break;
+            }
+
+            BlockListConfiguration.NumberRange? validationLimit = blockConfig.ValidationLimit;
+            if (validationLimit == null)
+            {
+                yield break;
+            }
+
+            BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+
+            if ((blockEditorData == null && validationLimit.Min.HasValue && validationLimit.Min > 0)
+                || (blockEditorData != null && validationLimit.Min.HasValue &&
+                    blockEditorData.Layout?.Count() < validationLimit.Min))
+            {
+                yield return new ValidationResult(
+                    _textService.Localize("validation", "entriesShort",
+                        new[]
+                        {
+                            validationLimit.Min.ToString(),
+                            (validationLimit.Min - (blockEditorData?.Layout?.Count() ?? 0)).ToString(),
+                        }),
+                    new[] { "minCount" });
+            }
+
+            if (blockEditorData != null && validationLimit.Max.HasValue &&
+                blockEditorData.Layout?.Count() > validationLimit.Max)
+            {
+                yield return new ValidationResult(
+                    _textService.Localize("validation", "entriesExceed",
+                        new[]
+                        {
+                            validationLimit.Max.ToString(),
+                            (blockEditorData.Layout.Count() - validationLimit.Max).ToString(),
+                        }),
+                    new[] { "maxCount" });
+            }
+        }
+    }
+
+    /// <summary>
     ///     Used to deserialize json values and clean up any values based on the existence of element types and layout
     ///     structure
     /// </summary>
@@ -392,12 +393,6 @@ public abstract class BlockEditorPropertyEditor : DataEditor
                 new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
             _dataConverter = dataConverter;
             _logger = logger;
-        }
-
-        private IContentType? GetElementType(BlockItemData item)
-        {
-            _contentTypes.Value.TryGetValue(item.ContentTypeKey, out IContentType? contentType);
-            return contentType;
         }
 
         public BlockEditorData? DeserializeAndClean(object? propertyValue)
@@ -440,7 +435,14 @@ public abstract class BlockEditorPropertyEditor : DataEditor
             return blockEditorData;
         }
 
-        private bool ResolveBlockItemData(BlockItemData block,
+        private IContentType? GetElementType(BlockItemData item)
+        {
+            _contentTypes.Value.TryGetValue(item.ContentTypeKey, out IContentType? contentType);
+            return contentType;
+        }
+
+        private bool ResolveBlockItemData(
+            BlockItemData block,
             Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes)
         {
             IContentType? contentType = GetElementType(block);
@@ -451,8 +453,9 @@ public abstract class BlockEditorPropertyEditor : DataEditor
 
             // get the prop types for this content type but keep a dictionary of found ones so we don't have to keep re-looking and re-creating
             // objects on each iteration.
-            if (!contentTypePropertyTypes.TryGetValue(contentType.Alias,
-                    out Dictionary<string, IPropertyType>? propertyTypes))
+            if (!contentTypePropertyTypes.TryGetValue(
+                contentType.Alias,
+                out Dictionary<string, IPropertyType>? propertyTypes))
             {
                 propertyTypes = contentTypePropertyTypes[contentType.Alias] =
                     contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);

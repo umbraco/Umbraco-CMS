@@ -83,6 +83,19 @@ public class UmbracoPlan : MigrationPlan
         }
     }
 
+    /// <inheritdoc />
+    public override void ThrowOnUnknownInitialState(string state)
+    {
+        if (TryGetInitStateVersion(state, out var initVersion))
+        {
+            throw new InvalidOperationException(
+                $"Version {_umbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
+                + $" Please verify which versions support migrating from {initVersion}.");
+        }
+
+        base.ThrowOnUnknownInitialState(state);
+    }
+
     /// <summary>
     ///     Gets the initial state corresponding to a version.
     /// </summary>
@@ -112,19 +125,6 @@ public class UmbracoPlan : MigrationPlan
         return false;
     }
 
-    /// <inheritdoc />
-    public override void ThrowOnUnknownInitialState(string state)
-    {
-        if (TryGetInitStateVersion(state, out var initVersion))
-        {
-            throw new InvalidOperationException(
-                $"Version {_umbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
-                + $" Please verify which versions support migrating from {initVersion}.");
-        }
-
-        base.ThrowOnUnknownInitialState(state);
-    }
-
     /// <summary>
     ///     Defines the plan.
     /// </summary>
@@ -145,7 +145,6 @@ public class UmbracoPlan : MigrationPlan
         //     Append the ported migration to the main chain, using a new guid (same as above).
         //     Create a new special chain from the {init-...} state to the main chain.
 
-
         // plan starts at 7.14.0 (anything before 7.14.0 is not supported)
         From(GetInitState(new SemVersion(7, 14)));
 
@@ -162,7 +161,8 @@ public class UmbracoPlan : MigrationPlan
         To<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
         To<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
         To<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
-        ToWithReplace<AddVariationTables2, AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}",
+        ToWithReplace<AddVariationTables2, AddVariationTables1A>(
+            "{941B2ABA-2D06-4E04-81F5-74224F1DB037}",
             "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}"); // kill AddVariationTable1
         To<RefactorMacroColumns>("{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
 
@@ -204,10 +204,12 @@ public class UmbracoPlan : MigrationPlan
 
         To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
         To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
+
         // release-8.0.0
 
         // to 8.0.1
         To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
+
         // release-8.0.1
 
         // to 8.1.0
@@ -274,7 +276,6 @@ public class UmbracoPlan : MigrationPlan
         // TO 9.2.0
         To<AddUserGroup2NodeTable>("{0571C395-8F0B-44E9-8E3F-47BDD08D817B}");
         To<AddDefaultForNotificationsToggle>("{AD3D3B7F-8E74-45A4-85DB-7FFAD57F9243}");
-
 
         // TO 9.3.0
         To<MovePackageXMLToDb>("{A2F22F17-5870-4179-8A8D-2362AA4A0A5F}");

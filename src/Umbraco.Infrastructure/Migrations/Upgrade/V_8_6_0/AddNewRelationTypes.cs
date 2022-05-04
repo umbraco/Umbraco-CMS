@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
@@ -28,10 +28,11 @@ public class AddNewRelationTypes : MigrationBase
     {
         Guid uniqueId =
             DatabaseDataCreator
-                .CreateUniqueRelationTypeId(alias,
-                    name); //this is the same as how it installs so everything is consistent
+                .CreateUniqueRelationTypeId(
+                    alias,
+                    name); // this is the same as how it installs so everything is consistent
         Insert.IntoTable(Constants.DatabaseSchema.Tables.RelationType)
-            .Row(new {typeUniqueId = uniqueId, dual = 0, name, alias})
+            .Row(new { typeUniqueId = uniqueId, dual = 0, name, alias })
             .Do();
     }
 }

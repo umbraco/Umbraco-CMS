@@ -7,5 +7,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 public sealed class MapperForAttribute : Attribute
 {
     public MapperForAttribute(Type entityType) => EntityType = entityType;
+
     public Type EntityType { get; }
 }

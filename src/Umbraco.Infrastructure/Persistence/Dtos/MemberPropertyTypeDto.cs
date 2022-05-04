@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -9,14 +9,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class MemberPropertyTypeDto
 {
-    [Column("pk")] [PrimaryKeyColumn] public int PrimaryKey { get; set; }
+    [Column("pk")]
+    [PrimaryKeyColumn]
+    public int PrimaryKey { get; set; }
 
     [Column("NodeId")]
     [ForeignKey(typeof(NodeDto))]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
     public int NodeId { get; set; }
 
-    [Column("propertytypeId")] public int PropertyTypeId { get; set; }
+    [Column("propertytypeId")]
+    public int PropertyTypeId { get; set; }
 
     [Column("memberCanEdit")]
     [Constraint(Default = "0")]

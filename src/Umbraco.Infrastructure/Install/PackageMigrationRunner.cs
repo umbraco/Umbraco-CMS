@@ -91,6 +91,7 @@ public class PackageMigrationRunner
                            "Unattended upgrade completed for " + migrationName))
                 {
                     var upgrader = new Upgrader(plan);
+
                     // This may throw, if so the transaction will be rolled back
                     results.Add(upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService));
                 }

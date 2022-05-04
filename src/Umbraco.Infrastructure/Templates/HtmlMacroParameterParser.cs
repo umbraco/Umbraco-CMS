@@ -37,7 +37,8 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
         // This legacy ParseMacros() already finds the macros within a Rich Text Editor using regexes
         // It seems to lowercase the macro parameter alias - so making the dictionary case insensitive
         MacroTagParser.ParseMacros(text, textblock => { },
-            (macroAlias, macroAttributes) => foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(macroAlias,
+            (macroAlias, macroAttributes) => foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(
+                macroAlias,
                 new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
         foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
         {
@@ -59,6 +60,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
         {
             // Deserialise JSON of Macro Grid Control to a class
             GridMacro? gridMacro = macroGridControl.Value.ToObject<GridMacro>();
+
             // Collect any macro parameters that contain the media udi format
             if (gridMacro is not null && gridMacro.MacroParameters is not null && gridMacro.MacroParameters.Any())
             {
@@ -82,9 +84,11 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
         }
 
         IEnumerable<string?> uniqueMacroAliases = macros.Select(f => f.Item1).Distinct();
+
         // TODO: Tracking Macro references
         // Here we are finding the used macros' Udis (there should be a Related Macro relation type - but Relations don't accept 'Macro' as an option)
         var foundMacroUmbracoEntityReferences = new List<UmbracoEntityReference>();
+
         // Get all the macro configs in one hit for these unique macro aliases - this is now cached with a custom cache policy
         IEnumerable<IMacro> macroConfigs = macroWithAliasService.GetAll(uniqueMacroAliases.WhereNotNull().ToArray());
 
@@ -98,6 +102,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
 
             foundMacroUmbracoEntityReferences.Add(
                 new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Macro, macroConfig.Key)));
+
             // Only do this if the macros actually have parameters
             if (macroConfig.Properties is not null && macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
             {
@@ -133,6 +138,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
             if (macroParameters.TryGetValue(parameter.Alias, out var parameterValue))
             {
                 var parameterEditorAlias = parameter.EditorAlias;
+
                 // Lookup propertyEditor from the registered ParameterEditors with the implmementation to avoid looking up for each parameter
                 IDataEditor? parameterEditor = parameterEditors.FirstOrDefault(f =>
                     string.Equals(f.Alias, parameterEditorAlias, StringComparison.OrdinalIgnoreCase));
@@ -149,7 +155,8 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
                     }
                     else
                     {
-                        _logger.LogInformation("{0} doesn't have a ValueEditor that implements IDataValueReference",
+                        _logger.LogInformation(
+                            "{0} doesn't have a ValueEditor that implements IDataValueReference",
                             parameterEditor.Alias);
                     }
                 }
@@ -162,7 +169,8 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     // Poco class to deserialise the Json for a Macro Control
     private class GridMacro
     {
-        [JsonProperty("macroAlias")] public string? MacroAlias { get; set; }
+        [JsonProperty("macroAlias")]
+        public string? MacroAlias { get; set; }
 
         [JsonProperty("macroParamsDictionary")]
         public Dictionary<string, string>? MacroParameters { get; set; }

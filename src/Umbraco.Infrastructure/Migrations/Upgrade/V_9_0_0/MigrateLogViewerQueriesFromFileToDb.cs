@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
@@ -14,49 +14,49 @@ public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
         new()
         {
             Name = "Find all logs where the Level is NOT Verbose and NOT Debug",
-            Query = "Not(@Level='Verbose') and Not(@Level='Debug')"
+            Query = "Not(@Level='Verbose') and Not(@Level='Debug')",
         },
         new()
         {
             Name = "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
-            Query = "Has(@Exception)"
+            Query = "Has(@Exception)",
         },
-        new() {Name = "Find all logs that have the property 'Duration'", Query = "Has(Duration)"},
+        new() { Name = "Find all logs that have the property 'Duration'", Query = "Has(Duration)" },
         new()
         {
             Name = "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
-            Query = "Has(Duration) and Duration > 1000"
+            Query = "Has(Duration) and Duration > 1000",
         },
         new()
         {
             Name = "Find all logs that are from the namespace 'Umbraco.Core'",
-            Query = "StartsWith(SourceContext, 'Umbraco.Core')"
+            Query = "StartsWith(SourceContext, 'Umbraco.Core')",
         },
         new()
         {
             Name = "Find all logs that use a specific log message template",
-            Query = "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
+            Query = "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'",
         },
         new()
         {
             Name = "Find logs where one of the items in the SortedComponentTypes property array is equal to",
-            Query = "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'"
+            Query = "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'",
         },
         new()
         {
             Name = "Find logs where one of the items in the SortedComponentTypes property array contains",
-            Query = "Contains(SortedComponentTypes[?], 'DatabaseServer')"
+            Query = "Contains(SortedComponentTypes[?], 'DatabaseServer')",
         },
         new()
         {
             Name = "Find all logs that the message has localhost in it with SQL like",
-            Query = "@Message like '%localhost%'"
+            Query = "@Message like '%localhost%'",
         },
         new()
         {
             Name = "Find all logs that the message that starts with 'end' in it with SQL like",
             Query = "@Message like 'end%'"
-        }
+        },
     };
 
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -64,6 +64,10 @@ public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
     public MigrateLogViewerQueriesFromFileToDb(IMigrationContext context, IHostingEnvironment hostingEnvironment)
         : base(context) =>
         _hostingEnvironment = hostingEnvironment;
+
+    internal static string GetLogViewerQueryFile(IHostingEnvironment hostingEnvironment) =>
+        hostingEnvironment.MapPathContentRoot(
+            Path.Combine(Constants.SystemDirectories.Config, "logviewer.searches.config.js"));
 
     protected override void Migrate()
     {
@@ -79,10 +83,6 @@ public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
             Create.Table<LogViewerQueryDto>().Do();
         }
     }
-
-    internal static string GetLogViewerQueryFile(IHostingEnvironment hostingEnvironment) =>
-        hostingEnvironment.MapPathContentRoot(
-            Path.Combine(Constants.SystemDirectories.Config, "logviewer.searches.config.js"));
 
     private void MigrateFileContentToDB()
     {

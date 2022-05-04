@@ -65,6 +65,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
 
     public override bool IsRegistered(IUmbracoContentIndex index) =>
+
         // check if it should populate based on published values
         _publishedValuesOnly == index.PublishedValuesOnly;
 
@@ -116,7 +117,8 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             }
 
             pageIndex++;
-        } while (content.Length == pageSize);
+        }
+        while (content.Length == pageSize);
     }
 
     protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize,
@@ -128,11 +130,10 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
         do
         {
-            //add the published filter
-            //note: We will filter for published variants in the validator
+            // add the published filter
+            // note: We will filter for published variants in the validator
             content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery,
                 Ordering.By("Path")).ToArray();
-
 
             if (content.Length > 0)
             {
@@ -166,6 +167,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             }
 
             pageIndex++;
-        } while (content.Length == pageSize);
+        }
+        while (content.Length == pageSize);
     }
 }

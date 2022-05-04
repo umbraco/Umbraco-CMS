@@ -14,9 +14,6 @@ public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotifica
 {
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.NestedContent;
 
-    protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys) =>
-        CreateNestedContentKeys(rawJson, onlyMissingKeys);
-
     // internal for tests
     internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid>? createGuid = null)
     {
@@ -38,6 +35,9 @@ public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotifica
 
         return complexEditorValue.ToString(Formatting.None);
     }
+
+    protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys) =>
+        CreateNestedContentKeys(rawJson, onlyMissingKeys);
 
     private void UpdateNestedContentKeysRecursively(JToken json, bool onlyMissingKeys, Func<Guid> createGuid)
     {
@@ -64,6 +64,7 @@ public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotifica
             {
                 // this is an arbitrary property that could contain a nested complex editor
                 var propVal = prop.Value?.ToString();
+
                 // check if this might contain a nested NC
                 if (!propVal.IsNullOrWhiteSpace() && propVal!.DetectIsJson() &&
                     propVal!.InvariantContains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
@@ -71,6 +72,7 @@ public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotifica
                     // recurse
                     var parsed = JToken.Parse(propVal!);
                     UpdateNestedContentKeysRecursively(parsed, onlyMissingKeys, createGuid);
+
                     // set the value to the updated one
                     prop.Value = parsed.ToString(Formatting.None);
                 }

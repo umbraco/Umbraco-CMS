@@ -43,12 +43,14 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
     private IUmbracoDatabase? Database => AmbientScope?.Database;
 
     private ISqlContext? SqlContext => AmbientScope?.SqlContext;
-    //private Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
-    //private ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
-    //private IQuery<T> Query<T>() => SqlContext.Query<T>();
+
+    // private Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
+    // private ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
+    // private IQuery<T> Query<T>() => SqlContext.Query<T>();
 
     /// <inheritdoc />
     public IEnumerable<IContentTypeComposition>? GetAllTypes() =>
+
         // use a 5 minutes sliding cache - same as FullDataSet cache policy
         _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, TimeSpan.FromMinutes(5), true);
 
@@ -123,7 +125,8 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
                     continue;
                 }
 
-                allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
+                allowedContentTypes.Add(new ContentTypeSort(
+                    new Lazy<int>(() => allowedDto.AllowedId),
                     allowedDto.SortOrder, alias!));
                 allowedDtoIx++;
             }
@@ -168,7 +171,8 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             var historyCleanup = new HistoryCleanup();
 
             if (contentVersionCleanupPolicyDictionary is not null &&
-                contentVersionCleanupPolicyDictionary.TryGetValue(contentType.Id,
+                contentVersionCleanupPolicyDictionary.TryGetValue(
+                    contentType.Id,
                     out ContentVersionCleanupPolicyDto? versionCleanup))
             {
                 historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
@@ -189,7 +193,8 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             .OrderBy<ContentTypeTemplateDto>(x => x.ContentTypeNodeId);
 
         List<ContentTypeTemplateDto>? templateDtos = Database?.Fetch<ContentTypeTemplateDto>(sql1);
-        //var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
+
+        // var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
         IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany();
         if (allTemplates is null)
         {
@@ -288,8 +293,9 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             .On<PropertyTypeDto, MemberPropertyTypeDto>((pt, mpt) => pt.Id == mpt.PropertyTypeId)
             .OrderBy<ContentTypeDto>(x => x.NodeId)
             .AndBy<
-                PropertyTypeGroupDto>(x => x.SortOrder,
-                x => x.Id) // NULLs will come first or last, never mind, we deal with it below
+                PropertyTypeGroupDto>(
+                    x => x.SortOrder,
+                    x => x.Id) // NULLs will come first or last, never mind, we deal with it below
             .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
 
         List<PropertyTypeCommonDto>? propertyDtos = Database?.Fetch<PropertyTypeCommonDto>(sql2);
@@ -348,7 +354,8 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
                 // ensure that property types exist (ok if they already exist)
                 foreach ((var alias, PropertyType propertyType) in builtinProperties)
                 {
-                    var added = memberType.AddPropertyType(propertyType,
+                    var added = memberType.AddPropertyType(
+                        propertyType,
                         Constants.Conventions.Member.StandardPropertiesGroupAlias,
                         Constants.Conventions.Member.StandardPropertiesGroupName);
 
@@ -371,7 +378,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             Type = (PropertyGroupType)dto.Type,
             Name = dto.Text,
             Alias = dto.Alias,
-            SortOrder = dto.SortOrder
+            SortOrder = dto.SortOrder,
         };
 
     private PropertyType MapPropertyType(IContentTypeComposition contentType, PropertyTypeCommonDto dto,
@@ -394,21 +401,21 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
         return new
             PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType,
                 dto.Alias)
-            {
-                Description = dto.Description,
-                DataTypeId = dto.DataTypeId,
-                DataTypeKey = dto.DataTypeDto.NodeDto.UniqueId,
-                Id = dto.Id,
-                Key = dto.UniqueId,
-                Mandatory = dto.Mandatory,
-                MandatoryMessage = dto.MandatoryMessage,
-                Name = dto.Name ?? string.Empty,
-                PropertyGroupId = groupId.HasValue ? new Lazy<int>(() => groupId.Value) : null,
-                SortOrder = dto.SortOrder,
-                ValidationRegExp = dto.ValidationRegExp,
-                ValidationRegExpMessage = dto.ValidationRegExpMessage,
-                Variations = (ContentVariation)dto.Variations,
-                LabelOnTop = dto.LabelOnTop
-            };
+        {
+            Description = dto.Description,
+            DataTypeId = dto.DataTypeId,
+            DataTypeKey = dto.DataTypeDto.NodeDto.UniqueId,
+            Id = dto.Id,
+            Key = dto.UniqueId,
+            Mandatory = dto.Mandatory,
+            MandatoryMessage = dto.MandatoryMessage,
+            Name = dto.Name ?? string.Empty,
+            PropertyGroupId = groupId.HasValue ? new Lazy<int>(() => groupId.Value) : null,
+            SortOrder = dto.SortOrder,
+            ValidationRegExp = dto.ValidationRegExp,
+            ValidationRegExpMessage = dto.ValidationRegExpMessage,
+            Variations = (ContentVariation)dto.Variations,
+            LabelOnTop = dto.LabelOnTop,
+        };
     }
 }

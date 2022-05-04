@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -58,5 +58,6 @@ internal class ContentTypeDto80
     [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]
     public byte Variations { get; set; }
 
-    [ResultColumn] public NodeDto? NodeDto { get; set; }
+    [ResultColumn]
+    public NodeDto? NodeDto { get; set; }
 }

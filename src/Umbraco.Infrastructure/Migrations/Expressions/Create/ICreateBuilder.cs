@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey;

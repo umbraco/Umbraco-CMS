@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -15,7 +15,8 @@ public class PublishedSnapshotRebuilder : IPublishedSnapshotRebuilder
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedSnapshotRebuilder" /> class.
     /// </summary>
-    public PublishedSnapshotRebuilder(IPublishedSnapshotService publishedSnapshotService,
+    public PublishedSnapshotRebuilder(
+        IPublishedSnapshotService publishedSnapshotService,
         DistributedCache distributedCache)
     {
         _publishedSnapshotService = publishedSnapshotService;

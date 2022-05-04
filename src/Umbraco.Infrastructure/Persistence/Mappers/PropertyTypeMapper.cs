@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -23,13 +23,16 @@ public sealed class PropertyTypeMapper : BaseMapper
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.DataTypeId), nameof(PropertyTypeDto.DataTypeId));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Description), nameof(PropertyTypeDto.Description));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Mandatory), nameof(PropertyTypeDto.Mandatory));
-        DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.MandatoryMessage),
+        DefineMap<PropertyType, PropertyTypeDto>(
+            nameof(PropertyType.MandatoryMessage),
             nameof(PropertyTypeDto.MandatoryMessage));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Name), nameof(PropertyTypeDto.Name));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.SortOrder), nameof(PropertyTypeDto.SortOrder));
-        DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExp),
+        DefineMap<PropertyType, PropertyTypeDto>(
+            nameof(PropertyType.ValidationRegExp),
             nameof(PropertyTypeDto.ValidationRegExp));
-        DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExpMessage),
+        DefineMap<PropertyType, PropertyTypeDto>(
+            nameof(PropertyType.ValidationRegExpMessage),
             nameof(PropertyTypeDto.ValidationRegExpMessage));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.LabelOnTop), nameof(PropertyTypeDto.LabelOnTop));
         DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.PropertyEditorAlias), nameof(DataTypeDto.EditorAlias));

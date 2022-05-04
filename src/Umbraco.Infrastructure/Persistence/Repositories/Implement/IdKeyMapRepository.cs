@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -13,11 +13,11 @@ public class IdKeyMapRepository : IIdKeyMapRepository
 
     public int? GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
     {
-        //if it's unknown don't include the nodeObjectType in the query
+        // if it's unknown don't include the nodeObjectType in the query
         if (umbracoObjectType == UmbracoObjectTypes.Unknown)
         {
             return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int?>(
-                "SELECT id FROM umbracoNode WHERE uniqueId=@id", new {id = key});
+                "SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key });
         }
 
         return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int?>(
@@ -26,17 +26,17 @@ public class IdKeyMapRepository : IIdKeyMapRepository
             {
                 id = key,
                 type = GetNodeObjectTypeGuid(umbracoObjectType),
-                reservation = Constants.ObjectTypes.IdReservation
+                reservation = Constants.ObjectTypes.IdReservation,
             });
     }
 
     public Guid? GetIdForKey(int id, UmbracoObjectTypes umbracoObjectType)
     {
-        //if it's unknown don't include the nodeObjectType in the query
+        // if it's unknown don't include the nodeObjectType in the query
         if (umbracoObjectType == UmbracoObjectTypes.Unknown)
         {
             return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<Guid?>(
-                "SELECT uniqueId FROM umbracoNode WHERE id=@id", new {id});
+                "SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
         }
 
         return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<Guid?>(
@@ -45,7 +45,7 @@ public class IdKeyMapRepository : IIdKeyMapRepository
             {
                 id,
                 type = GetNodeObjectTypeGuid(umbracoObjectType),
-                reservation = Constants.ObjectTypes.IdReservation
+                reservation = Constants.ObjectTypes.IdReservation,
             });
     }
 

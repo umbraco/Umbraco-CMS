@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
@@ -21,7 +21,7 @@ public class JsonValueConverter : PropertyValueConverterBase
     private readonly ILogger<JsonValueConverter> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
 
-    private readonly string[] ExcludedPropertyEditors = {Constants.PropertyEditors.Aliases.MediaPicker3};
+    private readonly string[] excludedPropertyEditors = { Constants.PropertyEditors.Aliases.MediaPicker3 };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="JsonValueConverter" /> class.
@@ -42,7 +42,7 @@ public class JsonValueConverter : PropertyValueConverterBase
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
         _propertyEditors.TryGet(propertyType.EditorAlias, out IDataEditor? editor)
         && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json)
-        && ExcludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
+        && excludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
 
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(JToken);
@@ -73,7 +73,7 @@ public class JsonValueConverter : PropertyValueConverterBase
             }
         }
 
-        //it's not json, just return the string
+        // it's not json, just return the string
         return sourceString;
     }
 

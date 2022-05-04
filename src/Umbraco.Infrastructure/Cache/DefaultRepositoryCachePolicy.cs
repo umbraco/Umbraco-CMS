@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Cache;
 public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
     where TEntity : class, IEntity
 {
-    private static readonly TEntity[] s_emptyEntities = new TEntity[0]; // const
+    private static readonly TEntity[] SEmptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
     public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor,
@@ -30,49 +30,6 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
     protected string EntityTypeCacheKey { get; } = $"uRepo_{typeof(TEntity).Name}_";
-
-    protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
-
-    protected string GetEntityCacheKey(TId? id)
-    {
-        if (EqualityComparer<TId>.Default.Equals(id, default))
-        {
-            return string.Empty;
-        }
-
-        if (typeof(TId).IsValueType)
-        {
-            return EntityTypeCacheKey + id;
-        }
-
-        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
-    }
-
-    protected virtual void InsertEntity(string cacheKey, TEntity entity)
-        => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
-
-    protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
-    {
-        if (ids?.Length == 0 && entities?.Length == 0 && _options.GetAllCacheAllowZeroCount)
-        {
-            // getting all of them, and finding nothing.
-            // if we can cache a zero count, cache an empty array,
-            // for as long as the cache is not cleared (no expiration)
-            Cache.Insert(EntityTypeCacheKey, () => s_emptyEntities);
-        }
-        else
-        {
-            if (entities is not null)
-            {
-                // individually cache each item
-                foreach (TEntity entity in entities)
-                {
-                    TEntity capture = entity;
-                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
-                }
-            }
-        }
-    }
 
     /// <inheritdoc />
     public override void Create(TEntity entity, Action<TEntity> persistNew)
@@ -106,6 +63,49 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             Cache.Clear(EntityTypeCacheKey);
 
             throw;
+        }
+    }
+
+    protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
+
+    protected string GetEntityCacheKey(TId? id)
+    {
+        if (EqualityComparer<TId>.Default.Equals(id, default))
+        {
+            return string.Empty;
+        }
+
+        if (typeof(TId).IsValueType)
+        {
+            return EntityTypeCacheKey + id;
+        }
+
+        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
+    }
+
+    protected virtual void InsertEntity(string cacheKey, TEntity entity)
+        => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+
+    protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
+    {
+        if (ids?.Length == 0 && entities?.Length == 0 && _options.GetAllCacheAllowZeroCount)
+        {
+            // getting all of them, and finding nothing.
+            // if we can cache a zero count, cache an empty array,
+            // for as long as the cache is not cleared (no expiration)
+            Cache.Insert(EntityTypeCacheKey, () => SEmptyEntities);
+        }
+        else
+        {
+            if (entities is not null)
+            {
+                // individually cache each item
+                foreach (TEntity entity in entities)
+                {
+                    TEntity capture = entity;
+                    Cache.Insert(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                }
+            }
         }
     }
 
@@ -161,6 +161,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // whatever happens, clear the cache
             var cacheKey = GetEntityCacheKey(entity.Id);
             Cache.Clear(cacheKey);
+
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
             Cache.Clear(EntityTypeCacheKey);
         }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
 /// <summary>
 ///     A retry strategy with back-off parameters for calculating the exponential delay between retries.
@@ -69,12 +69,11 @@ public class ExponentialBackoff : RetryStrategy
         TimeSpan deltaBackoff, bool firstFastRetry)
         : base(name, firstFastRetry)
     {
-        //Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
-        //Guard.ArgumentNotNegativeValue(minBackoff.Ticks, "minBackoff");
-        //Guard.ArgumentNotNegativeValue(maxBackoff.Ticks, "maxBackoff");
-        //Guard.ArgumentNotNegativeValue(deltaBackoff.Ticks, "deltaBackoff");
-        //Guard.ArgumentNotGreaterThan(minBackoff.TotalMilliseconds, maxBackoff.TotalMilliseconds, "minBackoff");
-
+        // Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
+        // Guard.ArgumentNotNegativeValue(minBackoff.Ticks, "minBackoff");
+        // Guard.ArgumentNotNegativeValue(maxBackoff.Ticks, "maxBackoff");
+        // Guard.ArgumentNotNegativeValue(deltaBackoff.Ticks, "deltaBackoff");
+        // Guard.ArgumentNotGreaterThan(minBackoff.TotalMilliseconds, maxBackoff.TotalMilliseconds, "minBackoff");
         this.retryCount = retryCount;
         this.minBackoff = minBackoff;
         this.maxBackoff = maxBackoff;

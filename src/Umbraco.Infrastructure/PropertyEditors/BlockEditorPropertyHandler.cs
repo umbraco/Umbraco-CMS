@@ -21,17 +21,6 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
 
     protected override string EditorAlias => Constants.PropertyEditors.Aliases.BlockList;
 
-    protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys)
-    {
-        // the block editor doesn't ever have missing UDIs so when this is true there's nothing to process
-        if (onlyMissingKeys)
-        {
-            return rawJson;
-        }
-
-        return ReplaceBlockListUdis(rawJson);
-    }
-
     // internal for tests
     internal string ReplaceBlockListUdis(string rawJson, Func<Guid>? createGuid = null)
     {
@@ -55,6 +44,17 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
         return JsonConvert.SerializeObject(blockListValue.BlockValue, Formatting.None);
     }
 
+    protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys)
+    {
+        // the block editor doesn't ever have missing UDIs so when this is true there's nothing to process
+        if (onlyMissingKeys)
+        {
+            return rawJson;
+        }
+
+        return ReplaceBlockListUdis(rawJson);
+    }
+
     private void UpdateBlockListRecursively(BlockEditorData blockListData, Func<Guid> createGuid)
     {
         var oldToNew = new Dictionary<Udi, Udi>();
@@ -73,7 +73,8 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
             {
                 // replace the reference
                 blockListData.References.RemoveAt(i);
-                blockListData.References.Insert(i,
+                blockListData.References.Insert(
+                    i,
                     new ContentAndSettingsReference(contentMap!, hasSettingsMap ? settingsMap : null));
             }
         }
@@ -85,10 +86,10 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
         {
             layout?.Add(JObject.FromObject(new BlockListLayoutItem
             {
-                ContentUdi = reference.ContentUdi, SettingsUdi = reference.SettingsUdi
+                ContentUdi = reference.ContentUdi,
+                SettingsUdi = reference.SettingsUdi,
             }));
         }
-
 
         RecursePropertyValues(blockListData.BlockValue.ContentData, createGuid);
         RecursePropertyValues(blockListData.BlockValue.SettingsData, createGuid);
@@ -158,8 +159,7 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
             if (prop.Name == Constants.PropertyEditors.Aliases.BlockList)
             {
                 // get it's parent 'layout' and it's parent's container
-                var layout = prop.Parent?.Parent as JProperty;
-                if (layout != null && layout.Parent is JObject layoutJson)
+                if (prop.Parent?.Parent is JProperty layout && layout.Parent is JObject layoutJson)
                 {
                     // recurse
                     BlockEditorData blockListValue = _converter.ConvertFrom(layoutJson);
@@ -185,6 +185,7 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
             {
                 // this is an arbitrary property that could contain a nested complex editor
                 var propVal = prop.Value?.ToString();
+
                 // check if this might contain a nested Block Editor
                 if (!propVal.IsNullOrWhiteSpace() && (propVal?.DetectIsJson() ?? false) &&
                     propVal.InvariantContains(Constants.PropertyEditors.Aliases.BlockList))
@@ -193,6 +194,7 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
                     {
                         // recurse
                         UpdateBlockListRecursively(nestedBlockData, createGuid);
+
                         // set the value to the updated one
                         prop.Value = JObject.FromObject(nestedBlockData.BlockValue);
                         updated = true;
@@ -216,7 +218,7 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
             }
 
             // replace the UDIs
-            Udi newUdi = Udi.Create(Constants.UdiEntityType.Element, createGuid());
+            var newUdi = Udi.Create(Constants.UdiEntityType.Element, createGuid());
             oldToNew[data.Udi] = newUdi;
             data.Udi = newUdi;
         }

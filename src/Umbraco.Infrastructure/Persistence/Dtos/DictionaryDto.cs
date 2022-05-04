@@ -11,7 +11,9 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
 
-    [Column("pk")] [PrimaryKeyColumn] public int PrimaryKey { get; set; }
+    [Column("pk")]
+    [PrimaryKeyColumn]
+    public int PrimaryKey { get; set; }
 
     [Column("id")]
     [Index(IndexTypes.UniqueNonClustered)]

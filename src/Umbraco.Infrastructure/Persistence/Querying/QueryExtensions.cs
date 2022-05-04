@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 
@@ -16,8 +16,7 @@ internal static class QueryExtensions
     /// <returns></returns>
     public static IEnumerable<Tuple<string, object[]>> GetWhereClauses<T>(this IQuery<T> query)
     {
-        var q = query as Query<T>;
-        if (q == null)
+        if (query is not Query<T> q)
         {
             throw new NotSupportedException(typeof(IQuery<T>) + " cannot be cast to " + typeof(Query<T>));
         }

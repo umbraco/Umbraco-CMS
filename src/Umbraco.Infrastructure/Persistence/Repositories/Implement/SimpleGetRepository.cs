@@ -8,6 +8,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+
 // TODO: Obsolete this, change all implementations of this like in Dictionary to just use custom Cache policies like in the member repository.
 
 /// <summary>
@@ -24,7 +25,9 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
     }
 
     protected abstract TEntity ConvertToEntity(TDto dto);
+
     protected abstract object GetBaseWhereClauseArguments(TId? id);
+
     protected abstract string GetWhereInClauseForGetAll();
 
     protected virtual IEnumerable<TDto> PerformFetch(Sql sql) => Database.Fetch<TDto>(sql);
@@ -60,7 +63,7 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
             sql.Where(GetWhereInClauseForGetAll(), new
             {
                 /*ids =*/
-                ids
+                ids,
             });
         }
 

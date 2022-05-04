@@ -1,6 +1,7 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+
 // TODO: These should move to Persistence.SqlServer
 
 /// <summary>
@@ -9,7 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 public static class RetryPolicyFactory
 {
     public static RetryPolicy GetDefaultSqlConnectionRetryPolicyByConnectionString(string? connectionString) =>
-        //Is this really the best way to determine if the database is an Azure database?
+
+        // Is this really the best way to determine if the database is an Azure database?
         connectionString?.Contains("database.windows.net") ?? false
             ? GetDefaultSqlAzureConnectionRetryPolicy()
             : GetDefaultSqlConnectionRetryPolicy();
@@ -30,7 +32,8 @@ public static class RetryPolicyFactory
     }
 
     public static RetryPolicy GetDefaultSqlCommandRetryPolicyByConnectionString(string? connectionString) =>
-        //Is this really the best way to determine if the database is an Azure database?
+
+        // Is this really the best way to determine if the database is an Azure database?
         connectionString?.Contains("database.windows.net") ?? false
             ? GetDefaultSqlAzureCommandRetryPolicy()
             : GetDefaultSqlCommandRetryPolicy();

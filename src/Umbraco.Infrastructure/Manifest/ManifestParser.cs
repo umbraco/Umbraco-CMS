@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Manifest;
 /// </summary>
 public class ManifestParser : IManifestParser
 {
-    private static readonly string s_utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+    private static readonly string SUtf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
@@ -128,11 +128,13 @@ public class ManifestParser : IManifestParser
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(text));
         }
 
-        PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
+        PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(
+            text,
             new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper,
                 _jsonSerializer),
             new ValueValidatorConverter(_validators),
@@ -256,6 +258,17 @@ public class ManifestParser : IManifestParser
             stylesheets.ToDictionary(x => x.Key, x => (IReadOnlyList<ManifestAssets>)x.Value));
     }
 
+    private static string TrimPreamble(string text)
+    {
+        // strangely StartsWith(preamble) would always return true
+        if (text[..1] == SUtf8Preamble)
+        {
+            text = text.Remove(0, SUtf8Preamble.Length);
+        }
+
+        return text;
+    }
+
     // gets all manifest files (recursively)
     private IEnumerable<string> GetManifestFiles()
     {
@@ -265,16 +278,5 @@ public class ManifestParser : IManifestParser
         }
 
         return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
-    }
-
-    private static string TrimPreamble(string text)
-    {
-        // strangely StartsWith(preamble) would always return true
-        if (text.Substring(0, 1) == s_utf8Preamble)
-        {
-            text = text.Remove(0, s_utf8Preamble.Length);
-        }
-
-        return text;
     }
 }

@@ -139,8 +139,9 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
                     continue;
                 }
 
-                if (!blockConfigMap.TryGetValue(contentData.ContentType.Key,
-                        out BlockListConfiguration.BlockConfiguration? blockConfig))
+                if (!blockConfigMap.TryGetValue(
+                    contentData.ContentType.Key,
+                    out BlockListConfiguration.BlockConfiguration? blockConfig))
                 {
                     continue;
                 }
@@ -162,7 +163,8 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
                 }
 
                 // Create instance (use content/settings type from configuration)
-                BlockListItem layoutRef = blockListItemActivator.CreateInstance(blockConfig.ContentElementTypeKey,
+                BlockListItem layoutRef = blockListItemActivator.CreateInstance(
+                    blockConfig.ContentElementTypeKey,
                     blockConfig.SettingsElementTypeKey, contentGuidUdi, contentData, settingGuidUdi, settingsData);
 
                 list.Add(layoutRef);
@@ -186,8 +188,9 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
         public BlockListItem CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Udi contentUdi,
             IPublishedElement contentData, Udi? settingsUdi, IPublishedElement? settingsData)
         {
-            if (!_contructorCache.TryGetValue((contentTypeKey, settingsTypeKey),
-                    out Func<Udi, IPublishedElement, Udi?, IPublishedElement?, BlockListItem>? constructor))
+            if (!_contructorCache.TryGetValue(
+                (contentTypeKey, settingsTypeKey),
+                out Func<Udi, IPublishedElement, Udi?, IPublishedElement?, BlockListItem>? constructor))
             {
                 constructor = _contructorCache[(contentTypeKey, settingsTypeKey)] =
                     EmitConstructor(contentTypeKey, settingsTypeKey);
@@ -206,7 +209,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
             Type type = typeof(BlockListItem<,>).MakeGenericType(contentType, settingsType);
 
             ConstructorInfo? constructor =
-                type.GetConstructor(new[] {typeof(Udi), contentType, typeof(Udi), settingsType});
+                type.GetConstructor(new[] { typeof(Udi), contentType, typeof(Udi), settingsType });
             if (constructor == null)
             {
                 throw new InvalidOperationException($"Could not find the required public constructor on {type}.");

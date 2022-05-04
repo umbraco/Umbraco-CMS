@@ -7,7 +7,8 @@ public class PreValueMigratorCollection : BuilderCollectionBase<IPreValueMigrato
 {
     private readonly ILogger<PreValueMigratorCollection> _logger;
 
-    public PreValueMigratorCollection(Func<IEnumerable<IPreValueMigrator>> items,
+    public PreValueMigratorCollection(
+        Func<IEnumerable<IPreValueMigrator>> items,
         ILogger<PreValueMigratorCollection> logger)
         : base(items) =>
         _logger = logger;

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Umbraco.Cms.Core.Xml;
@@ -10,11 +10,13 @@ namespace Umbraco.Cms.Infrastructure.Macros;
 /// </summary>
 public class MacroTagParser
 {
-    private static readonly Regex MacroRteContent = new(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)",
+    private static readonly Regex MacroRteContent = new(
+        @"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
     private static readonly Regex MacroPersistedFormat =
-        new(@"(<\?UMBRACO_MACRO (?:.+?)??macroAlias=[""']([^""\'\n\r]+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)",
+        new(
+            @"(<\?UMBRACO_MACRO (?:.+?)??macroAlias=[""']([^""\'\n\r]+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
     /// <summary>
@@ -31,16 +33,18 @@ public class MacroTagParser
     ///     {ins}Macro alias: {strong}My Macro{/strong}{/ins}
     ///     {/div}
     /// </remarks>
-    public static string FormatRichTextPersistedDataForEditor(string persistedContent,
+    public static string FormatRichTextPersistedDataForEditor(
+        string persistedContent,
         IDictionary<string, string> htmlAttributes) =>
         MacroPersistedFormat.Replace(persistedContent, match =>
         {
             if (match.Groups.Count >= 3)
             {
-                //<div class="umb-macro-holder myMacro mceNonEditable">
+                // <div class="umb-macro-holder myMacro mceNonEditable">
                 var alias = match.Groups[2].Value;
                 var sb = new StringBuilder("<div class=\"umb-macro-holder ");
-                //sb.Append(alias.ToSafeAlias());
+
+                // sb.Append(alias.ToSafeAlias());
                 sb.Append("mceNonEditable\"");
                 foreach (KeyValuePair<string, string> htmlAttribute in htmlAttributes)
                 {
@@ -64,8 +68,8 @@ public class MacroTagParser
                 return sb.ToString();
             }
 
-            //replace with nothing if we couldn't find the syntax for whatever reason
-            return "";
+            // replace with nothing if we couldn't find the syntax for whatever reason
+            return string.Empty;
         });
 
     /// <summary>
@@ -97,15 +101,15 @@ public class MacroTagParser
         var html = new HtmlDocument();
         html.LoadHtml(rteContent);
 
-        //get all the comment nodes we want
+        // get all the comment nodes we want
         HtmlNodeCollection? commentNodes = html.DocumentNode.SelectNodes("//comment()[contains(., '<?UMBRACO_MACRO')]");
         if (commentNodes == null)
         {
-            //There are no macros found, just return the normal content
+            // There are no macros found, just return the normal content
             return rteContent;
         }
 
-        //replace each containing parent <div> with the comment node itself.
+        // replace each containing parent <div> with the comment node itself.
         foreach (HtmlNode? c in commentNodes)
         {
             HtmlNode? div = c.ParentNode;
@@ -115,16 +119,16 @@ public class MacroTagParser
 
         var parsed = html.DocumentNode.OuterHtml;
 
-        //now replace all the <!-- and --> with nothing
+        // now replace all the <!-- and --> with nothing
         return MacroRteContent.Replace(parsed, match =>
         {
             if (match.Groups.Count >= 3)
             {
-                //get the 3rd group which is the macro syntax
+                // get the 3rd group which is the macro syntax
                 return match.Groups[2].Value;
             }
 
-            //replace with nothing if we couldn't find the syntax for whatever reason
+            // replace with nothing if we couldn't find the syntax for whatever reason
             return string.Empty;
         });
     }
@@ -160,27 +164,28 @@ public class MacroTagParser
 
         var fieldResult = new StringBuilder(elementText);
 
-        //NOTE: This is legacy code, this is definitely not the correct way to do a while loop! :)
+        // NOTE: This is legacy code, this is definitely not the correct way to do a while loop! :)
         var stop = false;
         while (!stop)
         {
             var tagIndex = fieldResult.ToString().ToLower().IndexOf("<?umbraco");
             if (tagIndex > -1)
             {
-                var tempElementContent = "";
+                var tempElementContent = string.Empty;
 
-                //text block found, call the call back method
-                textFoundCallback(fieldResult.ToString().Substring(0, tagIndex));
+                // text block found, call the call back method
+                textFoundCallback(fieldResult.ToString()[..tagIndex]);
 
                 fieldResult.Remove(0, tagIndex);
 
-                var tag = fieldResult.ToString().Substring(0, fieldResult.ToString().IndexOf(">") + 1);
+                var tag = fieldResult.ToString()[..(fieldResult.ToString().IndexOf(">") + 1)];
                 Dictionary<string, string> attributes = XmlHelper.GetAttributesFromElement(tag);
 
                 // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
                 if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ") > -1)
                 {
-                    var closingTag = "</" + tag.Substring(1, tag.IndexOf(" ") - 1) + ">";
+                    var closingTag = "</" + tag[1..tag.IndexOf(" ")] + ">";
+
                     // Tag with children are only used when a macro is inserted by the umbraco-editor, in the
                     // following format: "<?UMBRACO_MACRO ...><IMG SRC="..."..></?UMBRACO_MACRO>", so we
                     // need to delete extra information inserted which is the image-tag and the closing
@@ -193,7 +198,7 @@ public class MacroTagParser
 
                 var macroAlias = attributes.ContainsKey("macroalias") ? attributes["macroalias"] : attributes["alias"];
 
-                //call the callback now that we have the macro parsed
+                // call the callback now that we have the macro parsed
                 macroFoundCallback(macroAlias, attributes);
 
                 fieldResult.Remove(0, fieldResult.ToString().IndexOf(">") + 1);
@@ -201,10 +206,10 @@ public class MacroTagParser
             }
             else
             {
-                //text block found, call the call back method
+                // text block found, call the call back method
                 textFoundCallback(fieldResult.ToString());
 
-                stop = true; //break;
+                stop = true; // break;
             }
         }
     }

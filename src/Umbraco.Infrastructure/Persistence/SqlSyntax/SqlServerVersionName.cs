@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 /// <summary>
 ///     Represents the version name of SQL server (i.e. the year 2008, 2005, etc...)
@@ -16,5 +16,5 @@ internal enum SqlServerVersionName
     V2012 = 4,
     V2014 = 5,
     V2016 = 6,
-    Other = 100
+    Other = 100,
 }

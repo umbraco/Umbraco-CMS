@@ -12,7 +12,9 @@ internal class ExternalLoginTokenDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ExternalLoginToken;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("externalLoginId")]
     [ForeignKey(typeof(ExternalLoginDto), Column = "id")]

@@ -48,19 +48,22 @@ internal class FileSystemMainDomLock : IMainDomLock
             }
             catch (IOException)
             {
-                _logger.LogDebug("Couldn't obtain MainDom lock file handle, signalling for release of {lockFilePath}",
+                _logger.LogDebug(
+                    "Couldn't obtain MainDom lock file handle, signalling for release of {lockFilePath}",
                     _lockFilePath);
                 CreateLockReleaseSignalFile();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
+                _logger.LogError(
+                    ex,
                     "Unexpected exception attempting to obtain MainDom lock file handle {lockFilePath}, giving up",
                     _lockFilePath);
                 _lockFileStream?.Close();
                 return Task.FromResult(false);
             }
-        } while (stopwatch.ElapsedMilliseconds < millisecondsTimeout);
+        }
+        while (stopwatch.ElapsedMilliseconds < millisecondsTimeout);
 
         return Task.FromResult(false);
     }

@@ -11,6 +11,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping;
 /// </summary>
 public interface IScopeProvider : ICoreScopeProvider
 {
+    new
+
+    /// <summary>
+    ///     Gets the scope context.
+    /// </summary>
+    IScopeContext? Context { get; }
+
     /// <inheritdoc />
     ICoreScope ICoreScopeProvider.CreateCoreScope(
         IsolationLevel isolationLevel,
@@ -102,11 +109,6 @@ public interface IScopeProvider : ICoreScopeProvider
     ///     <para>Only a scope previously attached by <see cref="AttachScope" /> can be detached.</para>
     /// </remarks>
     IScope DetachScope();
-
-    /// <summary>
-    ///     Gets the scope context.
-    /// </summary>
-    IScopeContext? Context { get; }
 
     /// <summary>
     ///     Gets the sql context.

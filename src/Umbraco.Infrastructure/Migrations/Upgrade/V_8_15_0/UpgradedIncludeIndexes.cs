@@ -24,10 +24,11 @@ public class UpgradedIncludeIndexes : MigrationBase
         var nodeDtoIndexes = new[]
         {
             $"IX_{NodeDto.TableName}_UniqueId", $"IX_{NodeDto.TableName}_ObjectType",
-            $"IX_{NodeDto.TableName}_Level"
+            $"IX_{NodeDto.TableName}_Level",
         };
         DeleteIndexes<NodeDto>(nodeDtoIndexes); // delete existing ones
-        CreateIndexes<NodeDto>(nodeDtoIndexes); // update/add 
+        CreateIndexes<NodeDto>(nodeDtoIndexes); // update/add
+
         // Now re-create the FK for the redirect table
         Create.ForeignKey()
             .FromTable(Constants.DatabaseSchema.Tables.RedirectUrl)
@@ -36,13 +37,12 @@ public class UpgradedIncludeIndexes : MigrationBase
             .PrimaryColumn("uniqueID")
             .Do();
 
-
         var contentVersionIndexes = new[]
         {
-            $"IX_{ContentVersionDto.TableName}_NodeId", $"IX_{ContentVersionDto.TableName}_Current"
+            $"IX_{ContentVersionDto.TableName}_NodeId", $"IX_{ContentVersionDto.TableName}_Current",
         };
         DeleteIndexes<ContentVersionDto>(contentVersionIndexes); // delete existing ones
-        CreateIndexes<ContentVersionDto>(contentVersionIndexes); // update/add 
+        CreateIndexes<ContentVersionDto>(contentVersionIndexes); // update/add
     }
 
     private void DeleteIndexes<T>(params string[] toDelete)
@@ -66,7 +66,7 @@ public class UpgradedIncludeIndexes : MigrationBase
         {
             // get the definition by name
             IndexDefinition index = tableDef.Indexes.First(x => x.Name == c);
-            new ExecuteSqlStatementExpression(Context) {SqlStatement = Context.SqlContext.SqlSyntax.Format(index)}
+            new ExecuteSqlStatementExpression(Context) { SqlStatement = Context.SqlContext.SqlSyntax.Format(index) }
                 .Execute();
         }
     }

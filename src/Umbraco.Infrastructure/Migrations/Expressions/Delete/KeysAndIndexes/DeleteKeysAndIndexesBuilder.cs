@@ -45,11 +45,11 @@ public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
     {
         _context.BuildingExpression = false;
 
-        //get a list of all constraints - this will include all PK, FK and unique constraints
+        // get a list of all constraints - this will include all PK, FK and unique constraints
         var tableConstraints = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database)
             .DistinctBy(x => x.Item2).ToList();
 
-        //get a list of defined indexes - this will include all indexes, unique indexes and unique constraint indexes
+        // get a list of defined indexes - this will include all indexes, unique indexes and unique constraint indexes
         var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database)
             .DistinctBy(x => x.IndexName).ToList();
 
@@ -62,13 +62,11 @@ public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
         if (DeleteLocal || DeleteForeign)
         {
             // table, constraint
-
             if (DeleteForeign)
             {
-                //In some cases not all FK's are prefixed with "FK" :/ mostly with old upgraded databases so we need to check if it's either:
+                // In some cases not all FK's are prefixed with "FK" :/ mostly with old upgraded databases so we need to check if it's either:
                 // * starts with FK OR
                 // * doesn't start with PK_ and doesn't exist in the list of indexes
-
                 foreach (Tuple<string, string> key in tableConstraints.Where(x => x.Item1 == TableName
                              && (x.Item2.InvariantStartsWith("FK_") || (!x.Item2.InvariantStartsWith("PK_") &&
                                                                         !indexNames.InvariantContains(x.Item2)))))
@@ -95,9 +93,8 @@ public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
         {
             foreach (DbIndexDefinition index in indexes.Where(x => x.TableName == TableName))
             {
-                //if this is a unique constraint we need to drop the constraint, else drop the index
-                //to figure this out, the index must be tagged as unique and it must exist in the tableConstraints
-
+                // if this is a unique constraint we need to drop the constraint, else drop the index
+                // to figure this out, the index must be tagged as unique and it must exist in the tableConstraints
                 if (index.IsUnique && uniqueConstraintNames.InvariantContains(index.IndexName))
                 {
                     Delete.UniqueConstraint(index.IndexName).FromTable(index.TableName).Do();

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
@@ -9,6 +9,7 @@ public class DeleteColumnExpression : MigrationExpressionBase
         ColumnNames = new List<string>();
 
     public virtual string? TableName { get; set; }
+
     public ICollection<string> ColumnNames { get; set; }
 
     protected override string GetSql()

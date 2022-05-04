@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
@@ -19,20 +19,20 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
         {
             var values = new Dictionary<string, IEnumerable<object?>>
             {
-                {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
-                {"id", new object[] {m.Id}},
-                {UmbracoExamineFieldNames.NodeKeyFieldName, new object[] {m.Key}},
-                {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
-                {"level", new object[] {m.Level}},
-                {"creatorID", new object[] {m.CreatorId}},
-                {"sortOrder", new object[] {m.SortOrder}},
-                {"createDate", new object[] {m.CreateDate}},
-                {"updateDate", new object[] {m.UpdateDate}},
-                {UmbracoExamineFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>()},
-                {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
-                {"nodeType", m.ContentType.Id.ToString().Yield()},
-                {"loginName", m.Username?.Yield() ?? Enumerable.Empty<string>()},
-                {"email", m.Email?.Yield() ?? Enumerable.Empty<string>()}
+                { "icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
+                { "id", new object[] { m.Id } },
+                { UmbracoExamineFieldNames.NodeKeyFieldName, new object[] { m.Key } },
+                { "parentID", new object[] { m.Level > 1 ? m.ParentId : -1 } },
+                { "level", new object[] { m.Level } },
+                { "creatorID", new object[] { m.CreatorId } },
+                { "sortOrder", new object[] { m.SortOrder } },
+                { "createDate", new object[] { m.CreateDate } },
+                { "updateDate", new object[] { m.UpdateDate } },
+                { UmbracoExamineFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>() },
+                { "path", m.Path?.Yield() ?? Enumerable.Empty<string>() },
+                { "nodeType", m.ContentType.Id.ToString().Yield() },
+                { "loginName", m.Username?.Yield() ?? Enumerable.Empty<string>() },
+                { "email", m.Email?.Yield() ?? Enumerable.Empty<string>() },
             };
 
             foreach (IProperty property in m.Properties)

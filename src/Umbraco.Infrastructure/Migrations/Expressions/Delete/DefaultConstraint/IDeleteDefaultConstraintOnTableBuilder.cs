@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.DefaultConstraint;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.DefaultConstraint;
 
 /// <summary>
 ///     Builds a Delete expression.

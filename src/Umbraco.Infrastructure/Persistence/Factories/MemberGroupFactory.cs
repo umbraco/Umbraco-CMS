@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -44,12 +44,12 @@ internal static class MemberGroupFactory
             Level = 0,
             NodeObjectType = _nodeObjectTypeId,
             ParentId = -1,
-            Path = "",
+            Path = string.Empty,
             SortOrder = 0,
             Text = entity.Name,
             Trashed = false,
             UniqueId = entity.Key,
-            UserId = entity.CreatorId
+            UserId = entity.CreatorId,
         };
 
         if (entity.HasIdentity)

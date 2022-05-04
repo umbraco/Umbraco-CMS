@@ -39,7 +39,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         Database.Execute(
             "delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
-            new {oldestPermittedLogEntry});
+            new { oldestPermittedLogEntry });
     }
 
     /// <summary>
@@ -122,10 +122,11 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
             NodeId = entity.Id,
             UserId = entity.UserId,
             EntityType = entity.EntityType,
-            Parameters = entity.Parameters
+            Parameters = entity.Parameters,
         });
 
     protected override void PersistUpdatedItem(IAuditItem entity) =>
+
         // inserting when updating because we never update a log entry, perhaps this should throw?
         Database.Insert(new LogDto
         {
@@ -135,13 +136,13 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
             NodeId = entity.Id,
             UserId = entity.UserId,
             EntityType = entity.EntityType,
-            Parameters = entity.Parameters
+            Parameters = entity.Parameters,
         });
 
     protected override IAuditItem? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new {Id = id});
+        sql.Where(GetBaseWhereClause(), new { Id = id });
 
         LogDto? dto = Database.First<LogDto>(sql);
         return dto == null

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Exceptions;
@@ -18,7 +18,6 @@ internal class DashboardAccessRuleConverter : JsonReadConverter<IAccessRule>
     protected override void Deserialize(JObject jobject, IAccessRule target, JsonSerializer serializer)
     {
         // see Create above, target is either DataEditor (parameter) or ConfiguredDataEditor (property)
-
         if (!(target is AccessRule accessRule))
         {
             throw new PanicException("panic.");

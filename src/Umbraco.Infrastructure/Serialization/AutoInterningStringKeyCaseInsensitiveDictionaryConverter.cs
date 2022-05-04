@@ -17,7 +17,8 @@ public class
     {
     }
 
-    public AutoInterningStringKeyCaseInsensitiveDictionaryConverter(StringComparer comparer) : base(comparer)
+    public AutoInterningStringKeyCaseInsensitiveDictionaryConverter(StringComparer comparer)
+        : base(comparer)
     {
     }
 

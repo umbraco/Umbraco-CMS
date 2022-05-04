@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
 
@@ -31,7 +31,8 @@ public class CreateConstraintExpression : MigrationExpressionBase
             columns[i] = SqlSyntax.GetQuotedColumnName(Constraint.Columns.ElementAt(i));
         }
 
-        return string.Format(SqlSyntax.CreateConstraint,
+        return string.Format(
+            SqlSyntax.CreateConstraint,
             SqlSyntax.GetQuotedTableName(Constraint.TableName),
             SqlSyntax.GetQuotedName(Constraint.ConstraintName),
             constraintType,

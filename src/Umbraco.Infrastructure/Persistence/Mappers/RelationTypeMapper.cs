@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -20,13 +20,16 @@ public sealed class RelationTypeMapper : BaseMapper
     {
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Id), nameof(RelationTypeDto.Id));
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Alias), nameof(RelationTypeDto.Alias));
-        DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.ChildObjectType),
+        DefineMap<RelationType, RelationTypeDto>(
+            nameof(RelationType.ChildObjectType),
             nameof(RelationTypeDto.ChildObjectType));
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.IsBidirectional), nameof(RelationTypeDto.Dual));
-        DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.IsDependency),
+        DefineMap<RelationType, RelationTypeDto>(
+            nameof(RelationType.IsDependency),
             nameof(RelationTypeDto.IsDependency));
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Name), nameof(RelationTypeDto.Name));
-        DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.ParentObjectType),
+        DefineMap<RelationType, RelationTypeDto>(
+            nameof(RelationType.ParentObjectType),
             nameof(RelationTypeDto.ParentObjectType));
     }
 }

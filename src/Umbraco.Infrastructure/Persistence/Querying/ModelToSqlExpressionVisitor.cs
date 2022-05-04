@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
@@ -33,7 +33,7 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
             m.Expression.NodeType == ExpressionType.Parameter
             && m.Expression.Type == typeof(T))
         {
-            //don't execute if compiled
+            // don't execute if compiled
             if (Visited == false)
             {
                 var field = _mapper?.Map(m.Member.Name);
@@ -46,13 +46,13 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
                 return field!;
             }
 
-            //already compiled, return
+            // already compiled, return
             return string.Empty;
         }
 
         if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
         {
-            //don't execute if compiled
+            // don't execute if compiled
             if (Visited == false)
             {
                 var field = _mapper?.Map(m.Member.Name);
@@ -65,7 +65,7 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
                 return field!;
             }
 
-            //already compiled, return
+            // already compiled, return
             return string.Empty;
         }
 
@@ -75,10 +75,10 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
             && _mappers is not null
             && _mappers.TryGetMapper(m.Expression.Type, out BaseMapper? subMapper))
         {
-            //if this is the case, it means we have a sub expression / nested property access, such as: x.ContentType.Alias == "Test";
-            //and since the sub type (x.ContentType) is not the same as x, we need to resolve a mapper for x.ContentType to get it's mapped SQL column
+            // if this is the case, it means we have a sub expression / nested property access, such as: x.ContentType.Alias == "Test";
+            // and since the sub type (x.ContentType) is not the same as x, we need to resolve a mapper for x.ContentType to get it's mapped SQL column
 
-            //don't execute if compiled
+            // don't execute if compiled
             if (Visited == false)
             {
                 var field = subMapper.Map(m.Member.Name);
@@ -91,7 +91,7 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
                 return field;
             }
 
-            //already compiled, return
+            // already compiled, return
             return string.Empty;
         }
 
@@ -119,13 +119,13 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
 
         SqlParameters.Add(o);
 
-        //don't execute if compiled
+        // don't execute if compiled
         if (Visited == false)
         {
             return $"@{SqlParameters.Count - 1}";
         }
 
-        //already compiled, return
+        // already compiled, return
         return string.Empty;
     }
 
@@ -147,7 +147,6 @@ internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
             }
         }
 
-        var constExpr = expr as ConstantExpression;
-        return constExpr != null;
+        return expr is ConstantExpression constExpr;
     }
 }

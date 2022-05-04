@@ -1,8 +1,9 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
 public class DropPreValueTable : MigrationBase
 {
-    public DropPreValueTable(IMigrationContext context) : base(context)
+    public DropPreValueTable(IMigrationContext context)
+        : base(context)
     {
     }
 

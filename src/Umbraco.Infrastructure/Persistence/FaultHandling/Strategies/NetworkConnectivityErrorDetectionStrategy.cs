@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
@@ -9,9 +9,7 @@ public class NetworkConnectivityErrorDetectionStrategy : ITransientErrorDetectio
 {
     public bool IsTransient(Exception ex)
     {
-        SqlException? sqlException;
-
-        if (ex != null && (sqlException = ex as SqlException) != null)
+        if (ex != null && ex is SqlException sqlException)
         {
             switch (sqlException.Number)
             {

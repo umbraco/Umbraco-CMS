@@ -109,6 +109,81 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     protected string LocalIdentity { get; }
 
     /// <summary>
+    ///     Synchronize the server (throttled).
+    /// </summary>
+    public override void Sync()
+    {
+        if (!EnsureInitialized())
+        {
+            return;
+        }
+
+        lock (_locko)
+        {
+            if (_syncing)
+            {
+                return;
+            }
+
+            // Don't continue if we are released
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            if (DateTime.UtcNow - _lastSync <= GlobalSettings.DatabaseServerMessenger.TimeBetweenSyncOperations)
+            {
+                return;
+            }
+
+            // Set our flag and the lock to be in it's original state (i.e. it can be awaited)
+            _syncing = true;
+            _syncIdle.Reset();
+            _lastSync = DateTime.UtcNow;
+        }
+
+        try
+        {
+            ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
+                _cacheRefreshers,
+                _serverRoleAccessor.CurrentServerRole,
+                _cancellationToken,
+                LocalIdentity,
+                _lastPruned,
+                _lastSyncedFileManager.LastSyncedId);
+
+            if (result.InstructionsWerePruned)
+            {
+                _lastPruned = _lastSync;
+            }
+
+            if (result.LastId > 0)
+            {
+                _lastSyncedFileManager.SaveLastSyncedId(result.LastId);
+            }
+        }
+        finally
+        {
+            lock (_locko)
+            {
+                // We must reset our flag and signal any waiting locks
+                _syncing = false;
+            }
+
+            _syncIdle.Set();
+        }
+    }
+
+    /// <summary>
+    ///     Dispose
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     ///     Returns true if initialization was successfull (i.e. Is MainDom)
     /// </summary>
     protected bool EnsureInitialized() => _initialized.Value.HasValue;
@@ -184,11 +259,12 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     }
 
     // <summary>
+
     /// Initializes a server that has never synchronized before.
     /// </summary>
     /// <remarks>
-    ///     Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-    ///     Callers MUST ensure thread-safety.
+    /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
+    /// Callers MUST ensure thread-safety.
     /// </remarks>
     private SyncBootState InitializeColdBootState()
     {
@@ -219,72 +295,6 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         }
     }
 
-    /// <summary>
-    ///     Synchronize the server (throttled).
-    /// </summary>
-    public override void Sync()
-    {
-        if (!EnsureInitialized())
-        {
-            return;
-        }
-
-        lock (_locko)
-        {
-            if (_syncing)
-            {
-                return;
-            }
-
-            // Don't continue if we are released
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            if (DateTime.UtcNow - _lastSync <= GlobalSettings.DatabaseServerMessenger.TimeBetweenSyncOperations)
-            {
-                return;
-            }
-
-            // Set our flag and the lock to be in it's original state (i.e. it can be awaited)
-            _syncing = true;
-            _syncIdle.Reset();
-            _lastSync = DateTime.UtcNow;
-        }
-
-        try
-        {
-            ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
-                _cacheRefreshers,
-                _serverRoleAccessor.CurrentServerRole,
-                _cancellationToken,
-                LocalIdentity,
-                _lastPruned,
-                _lastSyncedFileManager.LastSyncedId);
-
-            if (result.InstructionsWerePruned)
-            {
-                _lastPruned = _lastSync;
-            }
-
-            if (result.LastId > 0)
-            {
-                _lastSyncedFileManager.SaveLastSyncedId(result.LastId);
-            }
-        }
-        finally
-        {
-            lock (_locko)
-            {
-                // We must reset our flag and signal any waiting locks
-                _syncing = false;
-            }
-
-            _syncIdle.Set();
-        }
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
@@ -296,15 +306,6 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
             _disposedValue = true;
         }
-    }
-
-    /// <summary>
-    ///     Dispose
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     #endregion

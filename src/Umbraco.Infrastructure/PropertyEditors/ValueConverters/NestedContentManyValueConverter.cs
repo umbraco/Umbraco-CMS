@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections;
@@ -23,7 +23,8 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="NestedContentManyValueConverter" /> class.
     /// </summary>
-    public NestedContentManyValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    public NestedContentManyValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
         : base(publishedSnapshotAccessor, publishedModelFactory)
         => _proflog = proflog;

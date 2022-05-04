@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Cache;
@@ -103,7 +103,7 @@ public static class DistributedCacheExtensions
 
         DataTypeCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, false)
+            new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, false),
         };
         dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
     }
@@ -117,7 +117,7 @@ public static class DistributedCacheExtensions
 
         DataTypeCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, true)
+            new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, true),
         };
         dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
     }
@@ -130,7 +130,7 @@ public static class DistributedCacheExtensions
     {
         ContentCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll)
+            new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll),
         };
 
         // note: refresh all content cache does refresh content types too
@@ -161,7 +161,8 @@ public static class DistributedCacheExtensions
             return;
         }
 
-        dc.RefreshByPayload(MemberCacheRefresher.UniqueId,
+        dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
             members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, false)));
     }
 
@@ -172,7 +173,8 @@ public static class DistributedCacheExtensions
             return;
         }
 
-        dc.RefreshByPayload(MemberCacheRefresher.UniqueId,
+        dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
             members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, true)));
     }
 
@@ -194,7 +196,7 @@ public static class DistributedCacheExtensions
     {
         MediaCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll)
+            new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll),
         };
 
         // note: refresh all media cache does refresh content types too
@@ -225,7 +227,7 @@ public static class DistributedCacheExtensions
             return;
         }
 
-        MacroCacheRefresher.JsonPayload[] payloads = new[] {new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias)};
+        MacroCacheRefresher.JsonPayload[] payloads = new[] { new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias) };
         dc.RefreshByPayload(MacroCacheRefresher.UniqueId, payloads);
     }
 
@@ -236,7 +238,7 @@ public static class DistributedCacheExtensions
             return;
         }
 
-        MacroCacheRefresher.JsonPayload[] payloads = new[] {new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias)};
+        MacroCacheRefresher.JsonPayload[] payloads = new[] { new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias) };
         dc.RefreshByPayload(MacroCacheRefresher.UniqueId, payloads);
     }
 
@@ -297,7 +299,7 @@ public static class DistributedCacheExtensions
 
         DomainCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Refresh)
+            new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Refresh),
         };
         dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
     }
@@ -311,7 +313,7 @@ public static class DistributedCacheExtensions
 
         DomainCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Remove)
+            new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Remove),
         };
         dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
     }
@@ -320,7 +322,7 @@ public static class DistributedCacheExtensions
     {
         DomainCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)
+            new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll),
         };
         dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
     }
@@ -341,7 +343,7 @@ public static class DistributedCacheExtensions
                 ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
                 : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update);
 
-        dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] {payload});
+        dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] { payload });
     }
 
     public static void RemoveLanguageCache(this DistributedCache dc, ILanguage language)
@@ -353,7 +355,7 @@ public static class DistributedCacheExtensions
 
         var payload = new LanguageCacheRefresher.JsonPayload(language.Id, language.IsoCode,
             LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove);
-        dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] {payload});
+        dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] { payload });
     }
 
     #endregion

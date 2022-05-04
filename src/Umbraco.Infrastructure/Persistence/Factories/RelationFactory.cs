@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -36,7 +36,7 @@ internal static class RelationFactory
             Comment = string.IsNullOrEmpty(entity.Comment) ? string.Empty : entity.Comment,
             Datetime = entity.CreateDate,
             ParentId = entity.ParentId,
-            RelationType = entity.RelationType.Id
+            RelationType = entity.RelationType.Id,
         };
 
         if (entity.HasIdentity)
@@ -55,7 +55,7 @@ internal static class RelationFactory
             Comment = string.IsNullOrEmpty(entity.Comment) ? string.Empty : entity.Comment,
             Datetime = entity.CreateDate,
             ParentId = entity.ParentId,
-            RelationType = entity.RelationTypeId
+            RelationType = entity.RelationTypeId,
         };
 
         if (entity.HasIdentity)

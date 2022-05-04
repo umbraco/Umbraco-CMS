@@ -8,6 +8,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
+
 // TODO: are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
 // try to use NPoco's version !
 
@@ -144,6 +145,9 @@ internal abstract class ExpressionVisitorBase
         return cachedExpression.VisitResult;
     }
 
+    public virtual string GetQuotedTableName(string tableName)
+        => GetQuotedName(tableName);
+
     protected abstract string VisitMemberAccess(MemberExpression? m);
 
     protected virtual string VisitLambda(LambdaExpression? lambda)
@@ -151,7 +155,7 @@ internal abstract class ExpressionVisitorBase
         if (lambda?.Body.NodeType == ExpressionType.MemberAccess &&
             lambda.Body is MemberExpression memberExpression && memberExpression.Expression != null)
         {
-            //This deals with members that are boolean (i.e. x => IsTrashed )
+            // This deals with members that are boolean (i.e. x => IsTrashed )
             var result = VisitMemberAccess(memberExpression);
 
             SqlParameters.Add(true);
@@ -259,11 +263,11 @@ internal abstract class ExpressionVisitorBase
         }
         else if (operand == "=" || operand == "<>")
         {
-            //if (IsTrueExpression(right)) right = GetQuotedTrueValue();
-            //else if (IsFalseExpression(right)) right = GetQuotedFalseValue();
+            // if (IsTrueExpression(right)) right = GetQuotedTrueValue();
+            // else if (IsFalseExpression(right)) right = GetQuotedFalseValue();
 
-            //if (IsTrueExpression(left)) left = GetQuotedTrueValue();
-            //else if (IsFalseExpression(left)) left = GetQuotedFalseValue();
+            // if (IsTrueExpression(left)) left = GetQuotedTrueValue();
+            // else if (IsFalseExpression(left)) left = GetQuotedFalseValue();
         }
 
         switch (operand)
@@ -357,13 +361,23 @@ internal abstract class ExpressionVisitorBase
         }
     }
 
+    protected virtual string VisitNewArray(NewArrayExpression? na)
+    {
+        if (na is null)
+        {
+            return string.Empty;
+        }
+
+        List<object> exprs = VisitExpressionList(na.Expressions);
+        return Visited ? string.Empty : string.Join(",", exprs);
+    }
+
     private string VisitNot(Expression exp)
     {
         var o = Visit(exp);
 
         // use a "NOT (...)" syntax instead of "<>" since we don't know whether "<>" works in all sql servers
         // also, x.StartsWith(...) translates to "x LIKE '...%'" which we cannot "<>" and have to "NOT (...")
-
         switch (exp.NodeType)
         {
             case ExpressionType.MemberAccess:
@@ -372,7 +386,8 @@ internal abstract class ExpressionVisitorBase
                 // so we want to do an == false
                 SqlParameters.Add(false);
                 return Visited ? string.Empty : $"{o} = @{SqlParameters.Count - 1}";
-            //return Visited ? string.Empty : $"NOT ({o} = @{SqlParameters.Count - 1})";
+
+            // return Visited ? string.Empty : $"NOT ({o} = @{SqlParameters.Count - 1})";
             default:
                 // could be anything else, such as: x => !x.Path.StartsWith("-20")
                 return Visited ? string.Empty : string.Concat("NOT (", o, ")");
@@ -393,17 +408,6 @@ internal abstract class ExpressionVisitorBase
                 // could be anything else, such as: x => x.Path.StartsWith("-20")
                 return Visited ? string.Empty : o;
         }
-    }
-
-    protected virtual string VisitNewArray(NewArrayExpression? na)
-    {
-        if (na is null)
-        {
-            return string.Empty;
-        }
-
-        List<object> exprs = VisitExpressionList(na.Expressions);
-        return Visited ? string.Empty : string.Join(",", exprs);
     }
 
     protected virtual List<object> VisitNewArrayFromExpressionList(NewArrayExpression? na)
@@ -452,6 +456,7 @@ internal abstract class ExpressionVisitorBase
         {
             return string.Empty;
         }
+
         // m.Object is the expression that represent the instance for instance method class, or null for static method calls
         // m.Arguments is the collection of expressions that represent arguments of the called method
         // m.MethodInfo is the method info for the method to be called
@@ -460,6 +465,7 @@ internal abstract class ExpressionVisitorBase
         // and then, the method object is its first argument - get "safe" object
         Expression methodObject = m.Object ?? m.Arguments[0];
         var visitedMethodObject = Visit(methodObject);
+
         // and then, "safe" arguments are what would come after the first arg
         ReadOnlyCollection<Expression> methodArgs = m.Object == null
             ? new ReadOnlyCollection<Expression>(m.Arguments.Skip(1).ToList())
@@ -481,7 +487,6 @@ internal abstract class ExpressionVisitorBase
                 // for 'Contains', it can either be the string.Contains(string) method, or a collection Contains
                 // method, which would then need to become a SQL IN clause - but beware that string is
                 // an enumerable of char, and string.Contains(char) is an extension method - but NOT an SQL IN
-
                 var isCollectionContains =
                     (
                         m.Object == null && // static (extension?) method
@@ -489,15 +494,14 @@ internal abstract class ExpressionVisitorBase
                         m.Arguments[0].Type != typeof(string) && // but not for string
                         TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0]
                             .Type) && // first arg being an enumerable
-                        m.Arguments[1].NodeType == ExpressionType.MemberAccess // second arg being a member access
-                    ) ||
+                        m.Arguments[1].NodeType == ExpressionType.MemberAccess) // second arg being a member access
+                    ||
                     (
                         m.Object != null && // instance method
                         TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Object.Type) && // of an enumerable
                         m.Object.Type != typeof(string) && // but not for string
                         m.Arguments.Count == 1 && // with 1 arg
-                        m.Arguments[0].NodeType == ExpressionType.MemberAccess // arg being a member access
-                    );
+                        m.Arguments[0].NodeType == ExpressionType.MemberAccess); // arg being a member access
 
                 if (isCollectionContains)
                 {
@@ -527,7 +531,7 @@ internal abstract class ExpressionVisitorBase
                     // if it's a field accessor, we could Visit(methodArgs[0]) and get [a].[b]
                     // but then, what if we want more, eg .StartsWith(node.Path + ',') ? => not
 
-                    //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
+                    // This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                     // So we'll go get the value:
                     UnaryExpression member = Expression.Convert(methodArgs[0], typeof(object));
                     var lambda = Expression.Lambda<Func<object>>(member);
@@ -539,10 +543,10 @@ internal abstract class ExpressionVisitorBase
                     compareValue = methodArgs[0].ToString();
                 }
 
-                //default column type
+                // default column type
                 TextColumnType colType = TextColumnType.NVarchar;
 
-                //then check if the col type argument has been passed to the current method (this will be the case for methods like
+                // then check if the col type argument has been passed to the current method (this will be the case for methods like
                 // SqlContains and other Sql methods)
                 if (methodArgs.Count > 1)
                 {
@@ -561,7 +565,7 @@ internal abstract class ExpressionVisitorBase
 
                 if (methodArgs[0].NodeType != ExpressionType.Constant)
                 {
-                    //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
+                    // This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                     // So we'll go get the value:
                     UnaryExpression member = Expression.Convert(methodArgs[0], typeof(object));
                     var lambda = Expression.Lambda<Func<object>>(member);
@@ -583,7 +587,7 @@ internal abstract class ExpressionVisitorBase
 
                 if (methodArgs[1].NodeType != ExpressionType.Constant)
                 {
-                    //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
+                    // This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                     // So we'll go get the value:
                     UnaryExpression member = Expression.Convert(methodArgs[1], typeof(object));
                     var lambda = Expression.Lambda<Func<object>>(member);
@@ -604,12 +608,12 @@ internal abstract class ExpressionVisitorBase
                 SqlParameters.Add(RemoveQuote(searchValue)!);
                 SqlParameters.Add(RemoveQuote(replaceValue)!);
 
-                //don't execute if compiled
+                // don't execute if compiled
                 return Visited
                     ? string.Empty
                     : $"replace({visitedMethodObject}, @{SqlParameters.Count - 2}, @{SqlParameters.Count - 1})";
 
-            //case "Substring":
+            // case "Substring":
             //    var startIndex = Int32.Parse(args[0].ToString()) + 1;
             //    if (args.Count == 2)
             //    {
@@ -623,24 +627,23 @@ internal abstract class ExpressionVisitorBase
             //        return string.Format("substring({0} from {1})",
             //                         r,
             //                         startIndex);
-            //case "Round":
-            //case "Floor":
-            //case "Ceiling":
-            //case "Coalesce":
-            //case "Abs":
-            //case "Sum":
+            // case "Round":
+            // case "Floor":
+            // case "Ceiling":
+            // case "Coalesce":
+            // case "Abs":
+            // case "Sum":
             //    return string.Format("{0}({1}{2})",
             //                         m.Method.Name,
             //                         r,
             //                         args.Count == 1 ? string.Format(",{0}", args[0]) : "");
-            //case "Concat":
+            // case "Concat":
             //    var s = new StringBuilder();
             //    foreach (Object e in args)
             //    {
             //        s.AppendFormat(" || {0}", e);
             //    }
             //    return string.Format("{0}{1}", r, s);
-
             case "SqlIn":
 
                 if (methodArgs.Count != 1 || methodArgs[0].NodeType != ExpressionType.MemberAccess)
@@ -681,13 +684,12 @@ internal abstract class ExpressionVisitorBase
                 inBuilder.Append(")");
                 return inBuilder.ToString();
 
-            //case "Desc":
+            // case "Desc":
             //    return string.Format("{0} DESC", r);
-            //case "Alias":
-            //case "As":
+            // case "Alias":
+            // case "As":
             //    return string.Format("{0} As {1}", r,
             //                                GetQuotedColumnName(RemoveQuoteFromAlias(RemoveQuote(args[0].ToString()))));
-
             case "SqlText":
                 if (m.Method.DeclaringType != typeof(SqlExtensionsStatics))
                 {
@@ -750,8 +752,9 @@ internal abstract class ExpressionVisitorBase
             case "SqlNullableEquals":
                 var compareTo = Visit(m.Arguments[1]);
                 var fallback = Visit(m.Arguments[2]);
+
                 // that would work without a fallback value but is more cumbersome
-                //return Visited ? string.Empty : $"((({compareTo} is null) AND ({visitedMethodObject} is null)) OR (({compareTo} is not null) AND ({visitedMethodObject} = {compareTo})))";
+                // return Visited ? string.Empty : $"((({compareTo} is null) AND ({visitedMethodObject} is null)) OR (({compareTo} is not null) AND ({visitedMethodObject} = {compareTo})))";
                 // use a fallback value
                 return Visited
                     ? string.Empty
@@ -761,23 +764,25 @@ internal abstract class ExpressionVisitorBase
 
                 throw new ArgumentOutOfRangeException("No logic supported for " + m.Method.Name);
 
-            //var s2 = new StringBuilder();
-            //foreach (Object e in args)
-            //{
-            //    s2.AppendFormat(",{0}", GetQuotedValue(e, e.GetType()));
-            //}
-            //return string.Format("{0}({1}{2})", m.Method.Name, r, s2.ToString());
+                // var s2 = new StringBuilder();
+                // foreach (Object e in args)
+                // {
+                //    s2.AppendFormat(",{0}", GetQuotedValue(e, e.GetType()));
+                // }
+                // return string.Format("{0}({1}{2})", m.Method.Name, r, s2.ToString());
         }
     }
-
-    public virtual string GetQuotedTableName(string tableName)
-        => GetQuotedName(tableName);
 
     public virtual string GetQuotedColumnName(string columnName)
         => GetQuotedName(columnName);
 
     public virtual string GetQuotedName(string name)
         => Visited ? name : "\"" + name + "\"";
+
+    public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax) =>
+        paramValue == null
+            ? string.Empty
+            : sqlSyntax.EscapeString(paramValue.ToString()!);
 
     protected string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
     {
@@ -827,11 +832,6 @@ internal abstract class ExpressionVisitorBase
         }
     }
 
-    public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax) =>
-        paramValue == null
-            ? string.Empty
-            : sqlSyntax.EscapeString(paramValue.ToString()!);
-
     protected virtual string? RemoveQuote(string? exp)
     {
         if (exp.IsNullOrWhiteSpace())
@@ -840,10 +840,10 @@ internal abstract class ExpressionVisitorBase
         }
 
         var c = exp![0];
-        return (c == '"' || c == '`' || c == '\'') && exp[exp.Length - 1] == c
+        return (c == '"' || c == '`' || c == '\'') && exp[^1] == c
             ? exp.Length == 1
                 ? string.Empty
-                : exp.Substring(1, exp.Length - 2)
+                : exp[1..^1]
             : exp;
     }
 }

@@ -14,9 +14,12 @@ public class DataTypeDto
     [ForeignKey(typeof(NodeDto))]
     public int NodeId { get; set; }
 
-    [Column("propertyEditorAlias")] public string EditorAlias { get; set; } = null!; // TODO: should this have a length
+    [Column("propertyEditorAlias")]
+    public string EditorAlias { get; set; } = null!; // TODO: should this have a length
 
-    [Column("dbType")] [Length(50)] public string DbType { get; set; } = null!;
+    [Column("dbType")]
+    [Length(50)]
+    public string DbType { get; set; } = null!;
 
     [Column("config")]
     [SpecialDbType(SpecialDbTypes.NTEXT)]

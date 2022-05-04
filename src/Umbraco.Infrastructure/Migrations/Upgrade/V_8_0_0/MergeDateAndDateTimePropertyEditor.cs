@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
@@ -45,7 +45,8 @@ public class MergeDateAndDateTimePropertyEditor : MigrationBase
             DateTimeConfiguration config;
             try
             {
-                config = (DateTimeConfiguration)new CustomDateTimeConfigurationEditor(_ioHelper,
+                config = (DateTimeConfiguration)new CustomDateTimeConfigurationEditor(
+                    _ioHelper,
                     _editorConfigurationParser).FromDatabase(
                     dataType.Configuration, _configurationEditorJsonSerializer);
 
@@ -76,10 +77,9 @@ public class MergeDateAndDateTimePropertyEditor : MigrationBase
         }
     }
 
-
     private List<DataTypeDto> GetDataTypes(string editorAlias)
     {
-        //need to convert the old drop down data types to use the new one
+        // need to convert the old drop down data types to use the new one
         List<DataTypeDto>? dataTypes = Database.Fetch<DataTypeDto>(Sql()
             .Select<DataTypeDto>()
             .From<DataTypeDto>()
@@ -87,11 +87,12 @@ public class MergeDateAndDateTimePropertyEditor : MigrationBase
         return dataTypes;
     }
 
-
     private class CustomDateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfiguration>
     {
-        public CustomDateTimeConfigurationEditor(IIOHelper ioHelper,
-            IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
+        public CustomDateTimeConfigurationEditor(
+            IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
         }
     }

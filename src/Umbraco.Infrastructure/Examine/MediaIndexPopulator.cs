@@ -76,6 +76,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             }
 
             pageIndex++;
-        } while (media.Length == pageSize);
+        }
+        while (media.Length == pageSize);
     }
 }

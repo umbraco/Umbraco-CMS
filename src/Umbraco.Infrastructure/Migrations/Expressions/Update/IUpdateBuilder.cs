@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
 
 /// <summary>
 ///     Builds an Update expression.

@@ -8,6 +8,15 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 public class TypeModel
 {
     /// <summary>
+    ///     Gets the list of interfaces that this model needs to declare it implements.
+    /// </summary>
+    /// <remarks>
+    ///     Some of these interfaces may actually be implemented by a base model
+    ///     that this model inherits from.
+    /// </remarks>
+    public readonly List<TypeModel> DeclaringInterfaces = new();
+
+    /// <summary>
     ///     Represents the different model item types.
     /// </summary>
     public enum ItemTypes
@@ -30,17 +39,8 @@ public class TypeModel
         /// <summary>
         ///     Member.
         /// </summary>
-        Member
+        Member,
     }
-
-    /// <summary>
-    ///     Gets the list of interfaces that this model needs to declare it implements.
-    /// </summary>
-    /// <remarks>
-    ///     Some of these interfaces may actually be implemented by a base model
-    ///     that this model inherits from.
-    /// </remarks>
-    public readonly List<TypeModel> DeclaringInterfaces = new();
 
     /// <summary>
     ///     Gets the list of interfaces that this model needs to actually implement.
@@ -62,12 +62,12 @@ public class TypeModel
     /// </remarks>
     public readonly List<PropertyModel> Properties = new();
 
-    private ItemTypes _itemType;
-
     /// <summary>
     ///     Gets the alias of the model.
     /// </summary>
     public string Alias = string.Empty;
+
+    private ItemTypes _itemType;
 
     /// <summary>
     ///     Gets the base model.
@@ -92,7 +92,7 @@ public class TypeModel
     ///// <summary>
     ///// Gets the list of existing static mixin method candidates.
     ///// </summary>
-    //public readonly List<string> StaticMixinMethods = new List<string>(); //TODO: Do we need this? it isn't used
+    // public readonly List<string> StaticMixinMethods = new List<string>(); //TODO: Do we need this? it isn't used
 
     /// <summary>
     ///     Gets a value indicating whether this model has a base class.
@@ -160,6 +160,24 @@ public class TypeModel
     }
 
     /// <summary>
+    ///     Enumerates the base models starting from the current model up.
+    /// </summary>
+    /// <param name="andSelf">
+    ///     Indicates whether the enumeration should start with the current model
+    ///     or from its base model.
+    /// </param>
+    /// <returns>The base models.</returns>
+    public IEnumerable<TypeModel> EnumerateBaseTypes(bool andSelf = false)
+    {
+        TypeModel? typeModel = andSelf ? this : BaseType;
+        while (typeModel != null)
+        {
+            yield return typeModel;
+            typeModel = typeModel.BaseType;
+        }
+    }
+
+    /// <summary>
     ///     Recursively collects all types inherited, or implemented as interfaces, by a specified type.
     /// </summary>
     /// <param name="types">The collection.</param>
@@ -180,24 +198,6 @@ public class TypeModel
         foreach (TypeModel mixin in type.MixinTypes)
         {
             CollectImplems(types, mixin);
-        }
-    }
-
-    /// <summary>
-    ///     Enumerates the base models starting from the current model up.
-    /// </summary>
-    /// <param name="andSelf">
-    ///     Indicates whether the enumeration should start with the current model
-    ///     or from its base model.
-    /// </param>
-    /// <returns>The base models.</returns>
-    public IEnumerable<TypeModel> EnumerateBaseTypes(bool andSelf = false)
-    {
-        TypeModel? typeModel = andSelf ? this : BaseType;
-        while (typeModel != null)
-        {
-            yield return typeModel;
-            typeModel = typeModel.BaseType;
         }
     }
 

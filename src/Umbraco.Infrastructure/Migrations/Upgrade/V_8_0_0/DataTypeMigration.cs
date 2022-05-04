@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,7 +21,7 @@ public class DataTypeMigration : MigrationBase
         Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
         Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2,
         Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
-        Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2
+        Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
     };
 
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
@@ -29,7 +29,8 @@ public class DataTypeMigration : MigrationBase
     private readonly PreValueMigratorCollection _preValueMigrators;
     private readonly PropertyEditorCollection _propertyEditors;
 
-    public DataTypeMigration(IMigrationContext context,
+    public DataTypeMigration(
+        IMigrationContext context,
         PreValueMigratorCollection preValueMigrators,
         PropertyEditorCollection propertyEditors,
         ILogger<DataTypeMigration> logger,
@@ -127,7 +128,8 @@ public class DataTypeMigration : MigrationBase
                 }
                 catch (Exception e)
                 {
-                    _logger.LogWarning(e,
+                    _logger.LogWarning(
+                        e,
                         "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
                         + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.",
                         dataType.NodeId, newAlias, dataType.EditorAlias);

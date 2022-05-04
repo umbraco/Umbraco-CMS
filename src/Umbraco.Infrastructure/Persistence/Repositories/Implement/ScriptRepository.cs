@@ -36,17 +36,18 @@ internal class ScriptRepository : FileRepository<string, IScript>, IScriptReposi
         // content will be lazy-loaded when required
         DateTime created = FileSystem.GetCreated(path).UtcDateTime;
         DateTime updated = FileSystem.GetLastModified(path).UtcDateTime;
-        //var content = GetFileContent(path);
 
+        // var content = GetFileContent(path);
         var script = new Script(path, file => GetFileContent(file.OriginalPath))
         {
-            //id can be the hash
+            // id can be the hash
             Id = path.GetHashCode(),
             Key = path.EncodeAsGuid(),
-            //Content = content,
+
+            // Content = content,
             CreateDate = created,
             UpdateDate = updated,
-            VirtualPath = FileSystem.GetUrl(path)
+            VirtualPath = FileSystem.GetUrl(path),
         };
 
         // reset dirty initial properties (U4-1946)
@@ -71,7 +72,7 @@ internal class ScriptRepository : FileRepository<string, IScript>, IScriptReposi
 
     public override IEnumerable<IScript> GetMany(params string[]? ids)
     {
-        //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
+        // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
         ids = ids?.Distinct().ToArray();
 
         if (ids?.Any() ?? false)
@@ -87,7 +88,7 @@ internal class ScriptRepository : FileRepository<string, IScript>, IScriptReposi
         }
         else
         {
-            IEnumerable<string> files = FindAllFiles("", "*.*");
+            IEnumerable<string> files = FindAllFiles(string.Empty, "*.*");
             foreach (var file in files)
             {
                 IScript? script = Get(file);

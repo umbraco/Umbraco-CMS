@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Install.InstallSteps;
+using Umbraco.Cms.Core.Install.InstallSteps;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
@@ -26,11 +26,9 @@ public sealed class InstallStepCollection
             // a.OfType<StarterKitDownloadStep>().First(),
             // a.OfType<StarterKitInstallStep>().First(),
             // a.OfType<StarterKitCleanupStep>().First(),
-
-            a.OfType<CompleteInstallStep>().First()
+            a.OfType<CompleteInstallStep>().First(),
         };
     }
-
 
     /// <summary>
     ///     Get the installer steps

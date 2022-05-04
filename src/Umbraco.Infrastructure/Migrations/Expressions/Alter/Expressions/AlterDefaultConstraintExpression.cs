@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
 
 public class AlterDefaultConstraintExpression : MigrationExpressionBase
 {
@@ -16,8 +16,10 @@ public class AlterDefaultConstraintExpression : MigrationExpressionBase
     public virtual object? DefaultValue { get; set; }
 
     protected override string GetSql() =>
-        //NOTE Should probably investigate if Deleting a Default Constraint is different from deleting a 'regular' constraint
-        string.Format(SqlSyntax.DeleteConstraint,
+
+        // NOTE Should probably investigate if Deleting a Default Constraint is different from deleting a 'regular' constraint
+        string.Format(
+            SqlSyntax.DeleteConstraint,
             SqlSyntax.GetQuotedTableName(TableName),
             SqlSyntax.GetQuotedName(ConstraintName));
 }

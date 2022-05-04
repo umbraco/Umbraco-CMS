@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 

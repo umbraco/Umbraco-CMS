@@ -12,7 +12,8 @@ public abstract class NestedContentValueConverterBase : PropertyValueConverterBa
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    protected NestedContentValueConverterBase(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    protected NestedContentValueConverterBase(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
@@ -24,15 +25,15 @@ public abstract class NestedContentValueConverterBase : PropertyValueConverterBa
     public static bool IsNested(IPublishedPropertyType publishedProperty)
         => publishedProperty.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.NestedContent);
 
+    public static bool IsNestedSingle(IPublishedPropertyType publishedProperty)
+        => IsNested(publishedProperty) && IsSingle(publishedProperty);
+
     private static bool IsSingle(IPublishedPropertyType publishedProperty)
     {
         NestedContentConfiguration? config = publishedProperty.DataType.ConfigurationAs<NestedContentConfiguration>();
 
         return config is not null && config.MinItems == 1 && config.MaxItems == 1;
     }
-
-    public static bool IsNestedSingle(IPublishedPropertyType publishedProperty)
-        => IsNested(publishedProperty) && IsSingle(publishedProperty);
 
     public static bool IsNestedMany(IPublishedPropertyType publishedProperty)
         => IsNested(publishedProperty) && !IsSingle(publishedProperty);

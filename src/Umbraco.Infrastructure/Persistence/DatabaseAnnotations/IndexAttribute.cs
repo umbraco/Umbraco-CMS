@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 /// <summary>
 ///     Attribute that represents an Index
@@ -15,7 +15,7 @@ public class IndexAttribute : Attribute
     ///     Overrides default naming of indexes:
     ///     IX_tableName
     /// </remarks>
-    public string? Name { get; set; } //Overrides default naming of indexes: IX_tableName
+    public string? Name { get; set; } // Overrides default naming of indexes: IX_tableName
 
     /// <summary>
     ///     Gets or sets the type of index to create

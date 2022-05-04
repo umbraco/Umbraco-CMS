@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -18,7 +18,6 @@ public class ExecuteBuilder : ExpressionBuilderBase<ExecuteSqlStatementExpressio
     {
         // slightly awkward, but doing it right would mean a *lot*
         // of changes for MigrationExpressionBase
-
         if (Expression.SqlObject == null)
         {
             Expression.Execute();

@@ -148,7 +148,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         {
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
-
             _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
         }
 

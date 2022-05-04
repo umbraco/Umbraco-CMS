@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -69,7 +69,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new(Constants.Telemetry.ModelsBuilderMode, ModelsBuilderMode),
             new(Constants.Telemetry.CustomUmbracoPath, UmbracoPathCustomized),
             new(Constants.Telemetry.AspEnvironment, AspEnvironment), new(Constants.Telemetry.IsDebug, IsDebug),
-            new(Constants.Telemetry.DatabaseProvider, DatabaseProvider)
+            new(Constants.Telemetry.DatabaseProvider, DatabaseProvider),
         };
 
     public IEnumerable<UserData> GetUserData() =>
@@ -81,7 +81,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new("Current Culture", CurrentCulture),
             new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
             new("Current Webserver", CurrentWebServer), new("Models Builder Mode", ModelsBuilderMode),
-            new("Debug Mode", IsDebug.ToString()), new("Database Provider", DatabaseProvider)
+            new("Debug Mode", IsDebug.ToString()), new("Database Provider", DatabaseProvider),
         };
 
     private bool IsRunningInProcessIIS()

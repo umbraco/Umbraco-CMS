@@ -29,12 +29,13 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
             "SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new
             {
                 /*timeoutDate =*/
-                timeoutDate
+                timeoutDate,
             });
         ClearCache();
     }
 
     protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy() =>
+
         // TODO: what are we doing with cache here?
         // why are we using disabled cache helper up there?
         //
@@ -42,7 +43,6 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
         // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
         // and this is because the repository is special and should not participate in scopes
         // (cleanup in v8)
-        //
         new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor,
             GetEntityId, /*expires:*/ false);
 
@@ -50,10 +50,12 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
         throw new NotSupportedException("This repository does not support this method.");
 
     protected override bool PerformExists(int id) =>
+
         // use the underlying GetAll which force-caches all registrations
         GetMany()?.Any(x => x.Id == id) ?? false;
 
     protected override IServerRegistration? PerformGet(int id) =>
+
         // use the underlying GetAll which force-caches all registrations
         GetMany()?.FirstOrDefault(x => x.Id == id);
 
@@ -82,7 +84,7 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> {"DELETE FROM umbracoServer WHERE id = @id"};
+        var list = new List<string> { "DELETE FROM umbracoServer WHERE id = @id" };
         return list;
     }
 

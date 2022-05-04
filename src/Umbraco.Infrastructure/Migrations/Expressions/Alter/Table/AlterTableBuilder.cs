@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
@@ -35,7 +35,9 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
         {
             var dc = new AlterDefaultConstraintExpression(_context)
             {
-                TableName = Expression.TableName, ColumnName = CurrentColumn.Name, DefaultValue = value
+                TableName = Expression.TableName,
+                ColumnName = CurrentColumn.Name,
+                DefaultValue = value,
             };
 
             Expression.Expressions.Add(dc);
@@ -57,10 +59,11 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
     {
         CurrentColumn.IsIndexed = true;
 
-        var index = new CreateIndexExpression(_context,
-            new IndexDefinition {Name = indexName, TableName = Expression.TableName});
+        var index = new CreateIndexExpression(
+            _context,
+            new IndexDefinition { Name = indexName, TableName = Expression.TableName });
 
-        index.Index.Columns.Add(new IndexColumnDefinition {Name = CurrentColumn.Name});
+        index.Index.Columns.Add(new IndexColumnDefinition { Name = CurrentColumn.Name });
 
         Expression.Expressions.Add(index);
 
@@ -73,7 +76,7 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
 
         var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
         {
-            Constraint = {TableName = Expression.TableName, Columns = new[] {CurrentColumn.Name}}
+            Constraint = { TableName = Expression.TableName, Columns = new[] { CurrentColumn.Name } },
         };
         Expression.Expressions.Add(expression);
 
@@ -91,8 +94,8 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
             {
                 ConstraintName = primaryKeyName,
                 TableName = Expression.TableName,
-                Columns = new[] {CurrentColumn.Name}
-            }
+                Columns = new[] { CurrentColumn.Name }
+            },
         };
         Expression.Expressions.Add(expression);
 
@@ -117,13 +120,16 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
     {
         CurrentColumn.IsUnique = true;
 
-        var index = new CreateIndexExpression(_context,
+        var index = new CreateIndexExpression(
+            _context,
             new IndexDefinition
             {
-                Name = indexName, TableName = Expression.TableName, IndexType = IndexTypes.UniqueNonClustered
+                Name = indexName,
+                TableName = Expression.TableName,
+                IndexType = IndexTypes.UniqueNonClustered,
             });
 
-        index.Index.Columns.Add(new IndexColumnDefinition {Name = CurrentColumn.Name});
+        index.Index.Columns.Add(new IndexColumnDefinition { Name = CurrentColumn.Name });
 
         Expression.Expressions.Add(index);
 
@@ -138,19 +144,21 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
         string primaryColumnName) =>
         ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
 
-    public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string? foreignKeyName,
+    public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(
+        string? foreignKeyName,
         string? primaryTableSchema,
         string primaryTableName, string primaryColumnName)
     {
         CurrentColumn.IsForeignKey = true;
 
-        var fk = new CreateForeignKeyExpression(_context,
+        var fk = new CreateForeignKeyExpression(
+            _context,
             new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = primaryTableName,
                 PrimaryTableSchema = primaryTableSchema,
-                ForeignTable = Expression.TableName
+                ForeignTable = Expression.TableName,
             });
 
         fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
@@ -167,24 +175,27 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
         return this;
     }
 
-    public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignTableName,
+    public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(
+        string foreignTableName,
         string foreignColumnName) => ReferencedBy(null, null, foreignTableName, foreignColumnName);
 
     public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableName,
         string foreignColumnName) =>
         ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
 
-    public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string? foreignKeyName,
+    public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(
+        string? foreignKeyName,
         string? foreignTableSchema,
         string foreignTableName, string foreignColumnName)
     {
-        var fk = new CreateForeignKeyExpression(_context,
+        var fk = new CreateForeignKeyExpression(
+            _context,
             new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = Expression.TableName,
                 ForeignTable = foreignTableName,
-                ForeignTableSchema = foreignTableSchema
+                ForeignTableSchema = foreignTableSchema,
             });
 
         fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
@@ -197,8 +208,8 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
 
     public IAlterTableColumnTypeBuilder AddColumn(string name)
     {
-        var column = new ColumnDefinition {Name = name, ModificationType = ModificationType.Create};
-        var createColumn = new CreateColumnExpression(_context) {Column = column, TableName = Expression.TableName};
+        var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Create };
+        var createColumn = new CreateColumnExpression(_context) { Column = column, TableName = Expression.TableName };
 
         CurrentColumn = column;
 
@@ -208,8 +219,8 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
 
     public IAlterTableColumnTypeBuilder AlterColumn(string name)
     {
-        var column = new ColumnDefinition {Name = name, ModificationType = ModificationType.Alter};
-        var alterColumn = new AlterColumnExpression(_context) {Column = column, TableName = Expression.TableName};
+        var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Alter };
+        var alterColumn = new AlterColumnExpression(_context) { Column = column, TableName = Expression.TableName };
 
         CurrentColumn = column;
 

@@ -13,6 +13,7 @@ public class UmbracoIndexConfig : IUmbracoIndexConfig
     }
 
     protected IPublicAccessService PublicAccessService { get; }
+
     protected IScopeProvider ScopeProvider { get; }
 
     public IContentValueSetValidator GetContentValueSetValidator() =>

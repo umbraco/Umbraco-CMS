@@ -56,8 +56,22 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
     protected override IMacro? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new {id});
+        sql.Where(GetBaseWhereClause(), new { id });
         return GetBySql(sql);
+    }
+
+    protected override IEnumerable<IMacro> PerformGetAll(params int[]? ids) =>
+        ids?.Length > 0 ? ids.Select(Get).WhereNotNull() : GetAllNoIds();
+
+    protected override IEnumerable<IMacro> PerformGetByQuery(IQuery<IMacro> query)
+    {
+        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
+        var translator = new SqlTranslator<IMacro>(sqlClause, query);
+        Sql<ISqlContext> sql = translator.Translate();
+
+        return Database
+            .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
+            .Select(x => Get(x.Id)!);
     }
 
     private IMacro? GetBySql(Sql sql)
@@ -96,13 +110,11 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
         return PerformGetByQuery(query);
     }
 
-    protected override IEnumerable<IMacro> PerformGetAll(params int[]? ids) =>
-        ids?.Length > 0 ? ids.Select(Get).WhereNotNull() : GetAllNoIds();
-
     private IEnumerable<IMacro> GetAllNoIds()
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            //must be sorted this way for the relator to work
+
+            // must be sorted this way for the relator to work
             .OrderBy<MacroDto>(x => x.Id);
 
         return Database
@@ -122,19 +134,10 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
         }
     }
 
-    protected override IEnumerable<IMacro> PerformGetByQuery(IQuery<IMacro> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<IMacro>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-
-        return Database
-            .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
-            .Select(x => Get(x.Id)!);
-    }
-
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
         isCount ? Sql().SelectCount().From<MacroDto>() : GetBaseQuery();
+
+    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Macro}.id = @id";
 
     private Sql<ISqlContext> GetBaseQuery() =>
         Sql()
@@ -143,13 +146,11 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
             .LeftJoin<MacroPropertyDto>()
             .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Macro}.id = @id";
-
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
         {
-            "DELETE FROM cmsMacroProperty WHERE macro = @id", "DELETE FROM cmsMacro WHERE id = @id"
+            "DELETE FROM cmsMacroProperty WHERE macro = @id", "DELETE FROM cmsMacro WHERE id = @id",
         };
         return list;
     }
@@ -167,7 +168,7 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
         {
             foreach (MacroPropertyDto propDto in dto.MacroPropertyDtos)
             {
-                //need to set the id explicitly here
+                // need to set the id explicitly here
                 propDto.Macro = id;
                 var propId = Convert.ToInt32(Database.Insert(propDto));
                 entity.Properties[propDto.Alias].Id = propId;
@@ -184,18 +185,18 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
 
         Database.Update(dto);
 
-        //update the properties if they've changed
+        // update the properties if they've changed
         var macro = (Macro)entity;
         if (macro.IsPropertyDirty("Properties") || macro.Properties.Values.Any(x => x.IsDirty()))
         {
             var ids = dto.MacroPropertyDtos?.Where(x => x.Id > 0).Select(x => x.Id).ToArray();
             if (ids?.Length > 0)
             {
-                Database.Delete<MacroPropertyDto>("WHERE macro=@macro AND id NOT IN (@ids)", new {macro = dto.Id, ids});
+                Database.Delete<MacroPropertyDto>("WHERE macro=@macro AND id NOT IN (@ids)", new { macro = dto.Id, ids });
             }
             else
             {
-                Database.Delete<MacroPropertyDto>("WHERE macro=@macro", new {macro = dto.Id});
+                Database.Delete<MacroPropertyDto>("WHERE macro=@macro", new { macro = dto.Id });
             }
 
             // detect new aliases, replace with temp aliases
@@ -216,7 +217,7 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
 
                 if (propDto.Id == 0 || prop.IsPropertyDirty("Alias"))
                 {
-                    var tempAlias = Guid.NewGuid().ToString("N").Substring(0, 8);
+                    var tempAlias = Guid.NewGuid().ToString("N")[..8];
                     aliases[tempAlias] = propDto.Alias;
                     propDto.Alias = tempAlias;
                 }

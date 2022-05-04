@@ -39,7 +39,8 @@ public class PublishedContentTypeCache : IDisposable
 
     // for unit tests ONLY
 #pragma warning disable CS8618
-    internal PublishedContentTypeCache(ILogger<PublishedContentTypeCache> logger,
+    internal PublishedContentTypeCache(
+        ILogger<PublishedContentTypeCache> logger,
         IPublishedContentTypeFactory publishedContentTypeFactory)
 #pragma warning restore CS8618
     {
@@ -48,6 +49,7 @@ public class PublishedContentTypeCache : IDisposable
     }
 
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
@@ -129,7 +131,6 @@ public class PublishedContentTypeCache : IDisposable
         // properties ie both its own properties and those that were inherited (it's based upon an
         // IContentTypeComposition) and so every PublishedContentType having a property based upon
         // the cleared data type, be it local or inherited, will be cleared.
-
         try
         {
             _lock.EnterWriteLock();
@@ -279,58 +280,17 @@ public class PublishedContentTypeCache : IDisposable
         }
     }
 
-    private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, Guid key)
+    protected virtual void Dispose(bool disposing)
     {
-        IContentTypeComposition? contentType = itemType switch
+        if (!_disposedValue)
         {
-            PublishedItemType.Content => _contentTypeService?.Get(key),
-            PublishedItemType.Media => _mediaTypeService?.Get(key),
-            PublishedItemType.Member => _memberTypeService?.Get(key),
-            _ => throw new ArgumentOutOfRangeException(nameof(itemType))
-        };
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with key \"{key}\".");
+            if (disposing)
+            {
+                _lock.Dispose();
+            }
+
+            _disposedValue = true;
         }
-
-        return _publishedContentTypeFactory.CreateContentType(contentType);
-    }
-
-    private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
-    {
-        IContentTypeComposition? contentType = itemType switch
-        {
-            PublishedItemType.Content => _contentTypeService?.Get(alias),
-            PublishedItemType.Media => _mediaTypeService?.Get(alias),
-            PublishedItemType.Member => _memberTypeService?.Get(alias),
-            _ => throw new ArgumentOutOfRangeException(nameof(itemType))
-        };
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with alias \"{alias}\".");
-        }
-
-        return _publishedContentTypeFactory.CreateContentType(contentType);
-    }
-
-    private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
-    {
-        IContentTypeComposition? contentType = itemType switch
-        {
-            PublishedItemType.Content => _contentTypeService?.Get(id),
-            PublishedItemType.Media => _mediaTypeService?.Get(id),
-            PublishedItemType.Member => _memberTypeService?.Get(id),
-            _ => throw new ArgumentOutOfRangeException(nameof(itemType))
-        };
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with id {id}.");
-        }
-
-        return _publishedContentTypeFactory.CreateContentType(contentType);
     }
 
     private static string GetAliasKey(PublishedItemType itemType, string alias)
@@ -355,19 +315,60 @@ public class PublishedContentTypeCache : IDisposable
         return k + ":" + alias;
     }
 
+    private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, Guid key)
+    {
+        IContentTypeComposition? contentType = itemType switch
+        {
+            PublishedItemType.Content => _contentTypeService?.Get(key),
+            PublishedItemType.Media => _mediaTypeService?.Get(key),
+            PublishedItemType.Member => _memberTypeService?.Get(key),
+            _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
+        };
+        if (contentType == null)
+        {
+            throw new Exception(
+                $"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with key \"{key}\".");
+        }
+
+        return _publishedContentTypeFactory.CreateContentType(contentType);
+    }
+
+    private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
+    {
+        IContentTypeComposition? contentType = itemType switch
+        {
+            PublishedItemType.Content => _contentTypeService?.Get(alias),
+            PublishedItemType.Media => _mediaTypeService?.Get(alias),
+            PublishedItemType.Member => _memberTypeService?.Get(alias),
+            _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
+        };
+        if (contentType == null)
+        {
+            throw new Exception(
+                $"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with alias \"{alias}\".");
+        }
+
+        return _publishedContentTypeFactory.CreateContentType(contentType);
+    }
+
+    private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
+    {
+        IContentTypeComposition? contentType = itemType switch
+        {
+            PublishedItemType.Content => _contentTypeService?.Get(id),
+            PublishedItemType.Media => _mediaTypeService?.Get(id),
+            PublishedItemType.Member => _memberTypeService?.Get(id),
+            _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
+        };
+        if (contentType == null)
+        {
+            throw new Exception(
+                $"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with id {id}.");
+        }
+
+        return _publishedContentTypeFactory.CreateContentType(contentType);
+    }
+
     private static string GetAliasKey(IPublishedContentType contentType) =>
         GetAliasKey(contentType.ItemType, contentType.Alias);
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _lock.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-    }
 }

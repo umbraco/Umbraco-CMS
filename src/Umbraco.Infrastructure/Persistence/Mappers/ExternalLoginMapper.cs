@@ -15,15 +15,20 @@ public sealed class ExternalLoginMapper : BaseMapper
     protected override void DefineMaps()
     {
         DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.Id), nameof(ExternalLoginDto.Id));
-        DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.CreateDate),
+        DefineMap<IdentityUserLogin, ExternalLoginDto>(
+            nameof(IdentityUserLogin.CreateDate),
             nameof(ExternalLoginDto.CreateDate));
-        DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.LoginProvider),
+        DefineMap<IdentityUserLogin, ExternalLoginDto>(
+            nameof(IdentityUserLogin.LoginProvider),
             nameof(ExternalLoginDto.LoginProvider));
-        DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.ProviderKey),
+        DefineMap<IdentityUserLogin, ExternalLoginDto>(
+            nameof(IdentityUserLogin.ProviderKey),
             nameof(ExternalLoginDto.ProviderKey));
-        DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.Key),
+        DefineMap<IdentityUserLogin, ExternalLoginDto>(
+            nameof(IdentityUserLogin.Key),
             nameof(ExternalLoginDto.UserOrMemberKey));
-        DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.UserData),
+        DefineMap<IdentityUserLogin, ExternalLoginDto>(
+            nameof(IdentityUserLogin.UserData),
             nameof(ExternalLoginDto.UserData));
     }
 }

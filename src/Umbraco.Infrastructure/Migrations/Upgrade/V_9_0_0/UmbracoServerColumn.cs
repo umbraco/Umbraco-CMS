@@ -13,6 +13,7 @@ public class UmbracoServerColumn : MigrationBase
     /// <summary>
     ///     Adds new columns to members table
     /// </summary>
-    protected override void Migrate() => ReplaceColumn<ServerRegistrationDto>(Constants.DatabaseSchema.Tables.Server,
+    protected override void Migrate() => ReplaceColumn<ServerRegistrationDto>(
+        Constants.DatabaseSchema.Tables.Server,
         "isMaster", "isSchedulingPublisher");
 }

@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -22,7 +22,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
 
-    public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
+    public ContentValueSetBuilder(
+        PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
         IUserService userService,
         IShortStringHelper shortStringHelper,
@@ -63,34 +64,33 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
         // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
         // references and then each array is an array of `FieldValue[]` and values are assigned accordingly. Not sure if it will make a difference or not.
-
         foreach (IContent c in content)
         {
             var isVariant = c.ContentType.VariesByCulture();
 
-            var urlValue = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders); //Always add invariant urlName
+            var urlValue = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders); // Always add invariant urlName
             var values = new Dictionary<string, IEnumerable<object?>>
             {
-                {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
+                { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 {
-                    UmbracoExamineFieldNames.PublishedFieldName, new object[] {c.Published ? "y" : "n"}
-                }, //Always add invariant published value
-                {"id", new object[] {c.Id}},
-                {UmbracoExamineFieldNames.NodeKeyFieldName, new object[] {c.Key}},
-                {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
-                {"level", new object[] {c.Level}},
-                {"creatorID", new object[] {c.CreatorId}},
-                {"sortOrder", new object[] {c.SortOrder}},
-                {"createDate", new object[] {c.CreateDate}}, //Always add invariant createDate
-                {"updateDate", new object[] {c.UpdateDate}}, //Always add invariant updateDate
+                    UmbracoExamineFieldNames.PublishedFieldName, new object[] { c.Published ? "y" : "n" }
+                }, // Always add invariant published value
+                { "id", new object[] { c.Id } },
+                { UmbracoExamineFieldNames.NodeKeyFieldName, new object[] { c.Key } },
+                { "parentID", new object[] { c.Level > 1 ? c.ParentId : -1 } },
+                { "level", new object[] { c.Level } },
+                { "creatorID", new object[] { c.CreatorId } },
+                { "sortOrder", new object[] { c.SortOrder } },
+                { "createDate", new object[] { c.CreateDate } }, // Always add invariant createDate
+                { "updateDate", new object[] { c.UpdateDate } }, // Always add invariant updateDate
                 {
-                    UmbracoExamineFieldNames.NodeNameFieldName, (PublishedValuesOnly //Always add invariant nodeName
+                    UmbracoExamineFieldNames.NodeNameFieldName, (PublishedValuesOnly // Always add invariant nodeName
                         ? c.PublishName?.Yield()
                         : c.Name?.Yield()) ?? Enumerable.Empty<string>()
                 },
-                {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()}, //Always add invariant urlName
-                {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
-                {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},
+                { "urlName", urlValue?.Yield() ?? Enumerable.Empty<string>() }, // Always add invariant urlName
+                { "path", c.Path?.Yield() ?? Enumerable.Empty<string>() },
+                { "nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>() },
                 {
                     "creatorName",
                     (creatorIds.TryGetValue(c.CreatorId, out IProfile? creatorProfile) ? creatorProfile.Name! : "??")
@@ -101,14 +101,14 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     (writerIds.TryGetValue(c.WriterId, out IProfile? writerProfile) ? writerProfile.Name! : "??")
                     .Yield()
                 },
-                {"writerID", new object[] {c.WriterId}},
-                {"templateID", new object[] {c.TemplateId ?? 0}},
-                {UmbracoExamineFieldNames.VariesByCultureFieldName, new object[] {"n"}}
+                { "writerID", new object[] { c.WriterId } },
+                { "templateID", new object[] { c.TemplateId ?? 0 } },
+                { UmbracoExamineFieldNames.VariesByCultureFieldName, new object[] { "n" } },
             };
 
             if (isVariant)
             {
-                values[UmbracoExamineFieldNames.VariesByCultureFieldName] = new object[] {"y"};
+                values[UmbracoExamineFieldNames.VariesByCultureFieldName] = new object[] { "y" };
 
                 foreach (var culture in c.AvailableCultures)
                 {

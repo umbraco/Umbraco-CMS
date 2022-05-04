@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -12,7 +12,9 @@ public class CreatedPackageSchemaDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.CreatedPackageSchema;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("name")]
     [Length(255)]

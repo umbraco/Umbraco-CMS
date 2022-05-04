@@ -38,7 +38,6 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
     // so here,
     // every PerformGet/Exists just GetMany() and then filters
     // except PerformGetAll which is the one really doing the job
-
     protected override IMediaType? PerformGet(int id)
         => GetMany()?.FirstOrDefault(x => x.Id == id);
 
@@ -109,19 +108,19 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
     {
         ValidateAlias(entity);
 
-        //Updates Modified date
+        // Updates Modified date
         entity.UpdatingEntity();
 
-        //Look up parent to get and set the correct Path if ParentId has changed
+        // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new {entity.ParentId});
+            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
             var maxSortOrder =
                 Database.ExecuteScalar<int>(
                     "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new {entity.ParentId, NodeObjectType = NodeObjectTypeId});
+                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
             entity.SortOrder = maxSortOrder + 1;
         }
 

@@ -23,7 +23,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         Guid[] allowedContainers =
         {
             Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer,
-            Constants.ObjectTypes.DataTypeContainer
+            Constants.ObjectTypes.DataTypeContainer,
         };
         NodeObjectTypeId = containerObjectType;
         if (allowedContainers.Contains(NodeObjectTypeId) == false)
@@ -37,7 +37,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     // temp - so we don't have to implement GetByQuery
     public EntityContainer? Get(Guid id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(false).Where("UniqueId=@uniqueId", new {uniqueId = id});
+        Sql<ISqlContext> sql = GetBaseQuery(false).Where("UniqueId=@uniqueId", new { uniqueId = id });
 
         NodeDto? nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
         return nodeDto == null ? null : CreateEntity(nodeDto);
@@ -46,8 +46,9 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     public IEnumerable<EntityContainer> Get(string name, int level)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where("text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId",
-                new {name, level, umbracoObjectTypeId = NodeObjectTypeId});
+            .Where(
+                "text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId",
+                new { name, level, umbracoObjectTypeId = NodeObjectTypeId });
         return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
     }
 
@@ -58,7 +59,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     protected override EntityContainer? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where(GetBaseWhereClause(), new {id, NodeObjectType = NodeObjectTypeId});
+            .Where(GetBaseWhereClause(), new { id, NodeObjectType = NodeObjectTypeId });
 
         NodeDto? nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
         return nodeDto == null ? null : CreateEntity(nodeDto);
@@ -76,9 +77,8 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         }
 
         // else
-
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where("nodeObjectType=@umbracoObjectTypeId", new {umbracoObjectTypeId = NodeObjectTypeId})
+            .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
             .OrderBy<NodeDto>(x => x.Level);
 
         return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
@@ -86,6 +86,22 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query) =>
         throw new NotImplementedException();
+
+    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
+    {
+        Sql<ISqlContext> sql = Sql();
+        if (isCount)
+        {
+            sql.SelectCount();
+        }
+        else
+        {
+            sql.SelectAll();
+        }
+
+        sql.From<NodeDto>();
+        return sql;
+    }
 
     private static EntityContainer CreateEntity(NodeDto nodeDto)
     {
@@ -106,22 +122,6 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         entity.ResetDirtyProperties(false);
 
         return entity;
-    }
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = Sql();
-        if (isCount)
-        {
-            sql.SelectCount();
-        }
-        else
-        {
-            sql.SelectAll();
-        }
-
-        sql.From<NodeDto>();
-        return sql;
     }
 
     protected override string GetBaseWhereClause() => "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
@@ -155,7 +155,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
                 {
                     parentID = entity.Id,
                     containedObjectType = entity.ContainedObjectType,
-                    containerObjectType = entity.ContainerObjectType
+                    containerObjectType = entity.ContainerObjectType,
                 }));
 
         foreach (NodeDto childDto in childDtos)
@@ -223,7 +223,6 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         }
 
         // note: sortOrder is NOT managed and always zero for containers
-
         nodeDto = new NodeDto
         {
             CreateDate = DateTime.Now,
@@ -234,7 +233,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             SortOrder = 0,
             Text = entity.Name,
             UserId = entity.CreatorId,
-            UniqueId = entity.Key
+            UniqueId = entity.Key,
         };
 
         // insert, get the id, update the path with the id
@@ -252,7 +251,6 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     }
 
     // beware! does NOT manage descendants in case of a new parent
-    //
     protected override void PersistUpdatedItem(EntityContainer entity)
     {
         if (entity == null)

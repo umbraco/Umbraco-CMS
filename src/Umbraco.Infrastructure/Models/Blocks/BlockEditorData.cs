@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
@@ -9,19 +9,15 @@ public class BlockEditorData
 {
     private readonly string _propertyEditorAlias;
 
-    private BlockEditorData()
-    {
-        _propertyEditorAlias = string.Empty;
-        BlockValue = new BlockValue();
-    }
-
-    public BlockEditorData(string propertyEditorAlias,
+    public BlockEditorData(
+        string propertyEditorAlias,
         IEnumerable<ContentAndSettingsReference> references,
         BlockValue blockValue)
     {
         if (string.IsNullOrWhiteSpace(propertyEditorAlias))
         {
-            throw new ArgumentException($"'{nameof(propertyEditorAlias)}' cannot be null or whitespace",
+            throw new ArgumentException(
+                $"'{nameof(propertyEditorAlias)}' cannot be null or whitespace",
                 nameof(propertyEditorAlias));
         }
 
@@ -30,6 +26,12 @@ public class BlockEditorData
         References = references != null
             ? new List<ContentAndSettingsReference>(references)
             : throw new ArgumentNullException(nameof(references));
+    }
+
+    private BlockEditorData()
+    {
+        _propertyEditorAlias = string.Empty;
+        BlockValue = new BlockValue();
     }
 
     public static BlockEditorData Empty { get; } = new();

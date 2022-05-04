@@ -25,7 +25,8 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
             GetEntityId, /*expires:*/ false);
 
     protected override PublicAccessEntry? PerformGet(Guid id) =>
-        //return from GetAll - this will be cached as a collection
+
+        // return from GetAll - this will be cached as a collection
         GetMany()?.FirstOrDefault(x => x.Key == id);
 
     protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[]? ids)
@@ -66,7 +67,7 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
     {
         var list = new List<string>
         {
-            "DELETE FROM umbracoAccessRule WHERE accessId = @id", "DELETE FROM umbracoAccess WHERE id = @id"
+            "DELETE FROM umbracoAccessRule WHERE accessId = @id", "DELETE FROM umbracoAccess WHERE id = @id",
         };
         return list;
     }
@@ -82,7 +83,8 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
         AccessDto dto = PublicAccessEntryFactory.BuildDto(entity);
 
         Database.Insert(dto);
-        //update the id so HasEntity is correct
+
+        // update the id so HasEntity is correct
         entity.Id = entity.Key.GetHashCode();
 
         foreach (AccessRuleDto rule in dto.Rules)
@@ -91,7 +93,7 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
             Database.Insert(rule);
         }
 
-        //update the id so HasEntity is correct
+        // update the id so HasEntity is correct
         foreach (PublicAccessRule rule in entity.Rules)
         {
             rule.Id = rule.Key.GetHashCode();
@@ -121,7 +123,7 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
 
         foreach (Guid removedRule in entity.RemovedRules)
         {
-            Database.Delete<AccessRuleDto>("WHERE id=@Id", new {Id = removedRule});
+            Database.Delete<AccessRuleDto>("WHERE id=@Id", new { Id = removedRule });
         }
 
         foreach (PublicAccessRule rule in entity.Rules)
@@ -143,9 +145,10 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
                     RuleValue = rule.RuleValue,
                     RuleType = rule.RuleType,
                     CreateDate = rule.CreateDate,
-                    UpdateDate = rule.UpdateDate
+                    UpdateDate = rule.UpdateDate,
                 });
-                //update the id so HasEntity is correct
+
+                // update the id so HasEntity is correct
                 rule.Id = rule.Key.GetHashCode();
             }
         }

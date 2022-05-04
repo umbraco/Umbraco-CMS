@@ -15,7 +15,8 @@ public class ContentNuDto
     [ForeignKey(typeof(ContentDto), Column = "nodeId", OnDelete = Rule.Cascade)]
     public int NodeId { get; set; }
 
-    [Column("published")] public bool Published { get; set; }
+    [Column("published")]
+    public bool Published { get; set; }
 
     /// <summary>
     ///     Stores serialized JSON representing the content item's property and culture name values
@@ -28,7 +29,8 @@ public class ContentNuDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Data { get; set; }
 
-    [Column("rv")] public long Rv { get; set; }
+    [Column("rv")]
+    public long Rv { get; set; }
 
     [Column("dataRaw")]
     [NullSetting(NullSetting = NullSettings.Null)]

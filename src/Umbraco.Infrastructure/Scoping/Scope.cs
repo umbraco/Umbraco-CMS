@@ -59,6 +59,43 @@ internal class Scope :
     private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
 
     // initializes a new scope
+    public Scope(
+        ScopeProvider scopeProvider,
+        CoreDebugSettings coreDebugSettings,
+        MediaFileManager mediaFileManager,
+        IEventAggregator eventAggregator,
+        ILogger<Scope> logger,
+        FileSystems fileSystems,
+        bool detachable,
+        IScopeContext? scopeContext,
+        IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+        IEventDispatcher? eventDispatcher = null,
+        IScopedNotificationPublisher? scopedNotificationPublisher = null,
+        bool? scopeFileSystems = null,
+        bool callContext = false,
+        bool autoComplete = false)
+        : this(
+            scopeProvider,
+            coreDebugSettings,
+            mediaFileManager,
+            eventAggregator,
+            logger,
+            fileSystems,
+            null,
+            scopeContext,
+            detachable,
+            isolationLevel,
+            repositoryCacheMode,
+            eventDispatcher,
+            scopedNotificationPublisher,
+            scopeFileSystems,
+            callContext,
+            autoComplete)
+    {
+    }
+
+    // initializes a new scope
     private Scope(
         ScopeProvider scopeProvider,
         CoreDebugSettings coreDebugSettings,
@@ -97,7 +134,7 @@ internal class Scope :
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
 #endif
-        logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8),
+        logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N")[..8],
             Thread.CurrentThread.ManagedThreadId);
 
         if (detachable)
@@ -153,7 +190,8 @@ internal class Scope :
             // Only the outermost scope can specify the notification publisher
             if (_notificationPublisher != null)
             {
-                throw new ArgumentException("Value cannot be specified on nested scope.",
+                throw new ArgumentException(
+                    "Value cannot be specified on nested scope.",
                     nameof(notificationPublisher));
             }
 
@@ -178,43 +216,6 @@ internal class Scope :
                 _fscope = fileSystems.Shadow();
             }
         }
-    }
-
-    // initializes a new scope
-    public Scope(
-        ScopeProvider scopeProvider,
-        CoreDebugSettings coreDebugSettings,
-        MediaFileManager mediaFileManager,
-        IEventAggregator eventAggregator,
-        ILogger<Scope> logger,
-        FileSystems fileSystems,
-        bool detachable,
-        IScopeContext? scopeContext,
-        IsolationLevel isolationLevel = IsolationLevel.Unspecified,
-        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-        IEventDispatcher? eventDispatcher = null,
-        IScopedNotificationPublisher? scopedNotificationPublisher = null,
-        bool? scopeFileSystems = null,
-        bool callContext = false,
-        bool autoComplete = false)
-        : this(
-            scopeProvider,
-            coreDebugSettings,
-            mediaFileManager,
-            eventAggregator,
-            logger,
-            fileSystems,
-            null,
-            scopeContext,
-            detachable,
-            isolationLevel,
-            repositoryCacheMode,
-            eventDispatcher,
-            scopedNotificationPublisher,
-            scopeFileSystems,
-            callContext,
-            autoComplete)
-    {
     }
 
     // initializes a new scope in a nested scopes chain, with its parent
@@ -322,10 +323,10 @@ internal class Scope :
         }
     }
 
+    public Guid InstanceId { get; } = Guid.NewGuid();
+
     // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
     private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
-
-    public Guid InstanceId { get; } = Guid.NewGuid();
 
     public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
@@ -372,8 +373,21 @@ internal class Scope :
                 return ParentScope.Notifications;
             }
 
-            return _notificationPublisher ??
-                   (_notificationPublisher = new ScopedNotificationPublisher(_eventAggregator));
+            return _notificationPublisher ??= new ScopedNotificationPublisher(_eventAggregator);
+        }
+    }
+
+    public ISqlContext SqlContext
+    {
+        get
+        {
+            if (_scopeProvider.SqlContext == null)
+            {
+                throw new InvalidOperationException(
+                    $"The {nameof(_scopeProvider.SqlContext)} on the scope provider is null");
+            }
+
+            return _scopeProvider.SqlContext;
         }
     }
 
@@ -485,20 +499,6 @@ internal class Scope :
     /// <inheritdoc />
     public void WriteLock(TimeSpan timeout, int lockId) => LazyWriteLockInner(InstanceId, timeout, lockId);
 
-    public ISqlContext SqlContext
-    {
-        get
-        {
-            if (_scopeProvider.SqlContext == null)
-            {
-                throw new InvalidOperationException(
-                    $"The {nameof(_scopeProvider.SqlContext)} on the scope provider is null");
-            }
-
-            return _scopeProvider.SqlContext;
-        }
-    }
-
     /// <inheritdoc />
     public IUmbracoDatabase Database
     {
@@ -595,6 +595,8 @@ internal class Scope :
         }
     }
 
+    public void Reset() => _completed = null;
+
     /// <summary>
     ///     Used for testing. Ensures and gets any queued read locks.
     /// </summary>
@@ -602,6 +604,7 @@ internal class Scope :
     internal Dictionary<Guid, Dictionary<int, int>>? GetReadLocks()
     {
         EnsureDbLocks();
+
         // always delegate to root/parent scope.
         if (ParentScope is not null)
         {
@@ -618,6 +621,7 @@ internal class Scope :
     internal Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks()
     {
         EnsureDbLocks();
+
         // always delegate to root/parent scope.
         if (ParentScope is not null)
         {
@@ -626,8 +630,6 @@ internal class Scope :
 
         return _writeLocksDictionary;
     }
-
-    public void Reset() => _completed = null;
 
     public void ChildCompleted(bool? completed)
     {
@@ -640,6 +642,40 @@ internal class Scope :
             }
 
             _completed = false;
+        }
+    }
+
+    public void LazyReadLockInner(Guid instanceId, params int[] lockIds)
+    {
+        if (ParentScope != null)
+        {
+            ParentScope.LazyReadLockInner(instanceId, lockIds);
+        }
+        else
+        {
+            LazyLockInner(DistributedLockType.ReadLock, instanceId, lockIds);
+        }
+    }
+
+    private static void TryFinally(params Action[] actions)
+    {
+        var exceptions = new List<Exception>();
+
+        foreach (Action action in actions)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+        }
+
+        if (exceptions.Any())
+        {
+            throw new AggregateException(exceptions);
         }
     }
 
@@ -691,12 +727,14 @@ internal class Scope :
                             switch (currentType)
                             {
                                 case DistributedLockType.ReadLock:
-                                    EagerReadLockInner(currentInstanceId,
+                                    EagerReadLockInner(
+                                        currentInstanceId,
                                         currentTimeout == TimeSpan.Zero ? null : currentTimeout,
                                         collectedIds.ToArray());
                                     break;
                                 case DistributedLockType.WriteLock:
-                                    EagerWriteLockInner(currentInstanceId,
+                                    EagerWriteLockInner(
+                                        currentInstanceId,
                                         currentTimeout == TimeSpan.Zero ? null : currentTimeout,
                                         collectedIds.ToArray());
                                     break;
@@ -717,11 +755,13 @@ internal class Scope :
                     switch (currentType)
                     {
                         case DistributedLockType.ReadLock:
-                            EagerReadLockInner(currentInstanceId,
+                            EagerReadLockInner(
+                                currentInstanceId,
                                 currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                             break;
                         case DistributedLockType.WriteLock:
-                            EagerWriteLockInner(currentInstanceId,
+                            EagerWriteLockInner(
+                                currentInstanceId,
                                 currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                             break;
                     }
@@ -745,7 +785,7 @@ internal class Scope :
         ParentScope?.EnsureNotDisposed();
 
         // TODO: safer?
-        //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
+        // if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
         //    throw new ObjectDisposedException(GetType().FullName);
     }
 
@@ -916,30 +956,7 @@ internal class Scope :
             HandleScopedFileSystems,
             HandleScopedNotifications,
             HandleScopeContext,
-            HandleDetachedScopes
-        );
-    }
-
-    private static void TryFinally(params Action[] actions)
-    {
-        var exceptions = new List<Exception>();
-
-        foreach (Action action in actions)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add(ex);
-            }
-        }
-
-        if (exceptions.Any())
-        {
-            throw new AggregateException(exceptions);
-        }
+            HandleDetachedScopes);
     }
 
     /// <summary>
@@ -1007,18 +1024,6 @@ internal class Scope :
         }
     }
 
-    public void LazyReadLockInner(Guid instanceId, params int[] lockIds)
-    {
-        if (ParentScope != null)
-        {
-            ParentScope.LazyReadLockInner(instanceId, lockIds);
-        }
-        else
-        {
-            LazyLockInner(DistributedLockType.ReadLock, instanceId, lockIds);
-        }
-    }
-
     public void LazyReadLockInner(Guid instanceId, TimeSpan timeout, int lockId)
     {
         if (ParentScope != null)
@@ -1079,7 +1084,6 @@ internal class Scope :
             {
                 _queuedLocks = new StackQueue<(DistributedLockType, TimeSpan, Guid, int)>();
             }
-
 
             _queuedLocks.Enqueue((lockType, timeout, instanceId, lockId));
         }

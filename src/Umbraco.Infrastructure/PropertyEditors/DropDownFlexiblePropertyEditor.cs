@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +27,8 @@ public class DropDownFlexiblePropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         ILocalizedTextService textService,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory,
+        : this(
+            dataValueEditorFactory,
             textService,
             ioHelper,
             StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())

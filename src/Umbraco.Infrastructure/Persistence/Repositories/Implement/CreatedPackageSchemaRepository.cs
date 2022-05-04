@@ -157,7 +157,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         // Ensure it's valid
         ValidatePackage(definition);
 
-
         if (definition.Id == default)
         {
             // Create dto from definition
@@ -166,7 +165,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                 Name = definition.Name,
                 Value = _xmlParser.ToXml(definition).ToString(),
                 UpdateDate = DateTime.Now,
-                PackageId = Guid.NewGuid()
+                PackageId = Guid.NewGuid(),
             };
 
             // Set the ids, we have to save in database first to get the Id
@@ -176,6 +175,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
         // Save snapshot locally, we do this to the updated packagePath
         ExportPackage(definition);
+
         // Create dto from definition
         var updatedDto = new CreatedPackageSchemaDto
         {
@@ -183,7 +183,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             Value = _xmlParser.ToXml(definition).ToString(),
             Id = definition.Id,
             PackageId = definition.PackageId,
-            UpdateDate = DateTime.Now
+            UpdateDate = DateTime.Now,
         };
         _umbracoDatabase?.Update(updatedDto);
 
@@ -262,14 +262,15 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             }
 
             var directoryName =
-                _hostingEnvironment.MapPathContentRoot(Path.Combine(_createdPackagesFolderPath,
+                _hostingEnvironment.MapPathContentRoot(Path.Combine(
+                    _createdPackagesFolderPath,
                     definition.Name.Replace(' ', '_')));
             Directory.CreateDirectory(directoryName);
 
             var finalPackagePath = Path.Combine(directoryName, fileName);
 
             // Clean existing files
-            foreach (var packagePath in new[] {definition.PackagePath, finalPackagePath})
+            foreach (var packagePath in new[] { definition.PackagePath, finalPackagePath })
             {
                 if (File.Exists(packagePath))
                 {
@@ -289,6 +290,17 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             // Clean up
             Directory.Delete(temporaryPath, true);
         }
+    }
+
+    private static XElement GetPackageInfoXml(PackageDefinition definition)
+    {
+        var info = new XElement("info");
+
+        // Package info
+        var package = new XElement("package");
+        package.Add(new XElement("name", definition.Name));
+        info.Add(package);
+        return info;
     }
 
     private XDocument CreateCompiledPackageXml(out XElement root)
@@ -417,7 +429,8 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
         root.Add(rootDictionaryItems);
 
-        static void AppendDictionaryElement(XElement rootDictionaryItems,
+        static void AppendDictionaryElement(
+            XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
             Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
         {
@@ -459,7 +472,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         IEnumerable<string> views = packagedMacros
             .Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
             .Select(x =>
-                x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
+                x.MacroSource[Constants.SystemDirectories.MacroPartials.Length..].Replace('/', '\\'));
         PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem!);
     }
 
@@ -602,8 +615,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
     {
         // Documents and tags
-        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId,
-                NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
+        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(
+            definition.ContentNodeId,
+            NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
         {
             if (contentNodeId > 0)
             {
@@ -616,7 +630,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                         : content.ToXml(_serializer);
 
                     // Create the Documents/DocumentSet node
-
                     root.Add(
                         new XElement(
                             "Documents",
@@ -736,16 +749,5 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         {
             mediaTypes.Add(mediaType);
         }
-    }
-
-    private static XElement GetPackageInfoXml(PackageDefinition definition)
-    {
-        var info = new XElement("info");
-
-        // Package info
-        var package = new XElement("package");
-        package.Add(new XElement("name", definition.Name));
-        info.Add(package);
-        return info;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -20,10 +20,10 @@ internal static class AuditEntryFactory
             AffectedUserId = dto.AffectedUserId,
             AffectedDetails = dto.AffectedDetails,
             EventType = dto.EventType,
-            EventDetails = dto.EventDetails
+            EventDetails = dto.EventDetails,
         };
 
-        //on initial construction we don't want to have dirty properties tracked
+        // on initial construction we don't want to have dirty properties tracked
         // http://issues.umbraco.org/issue/U4-1946
         entity.ResetDirtyProperties(false);
         return entity;
@@ -40,6 +40,6 @@ internal static class AuditEntryFactory
             AffectedUserId = entity.AffectedUserId,
             AffectedDetails = entity.AffectedDetails,
             EventType = entity.EventType,
-            EventDetails = entity.EventDetails
+            EventDetails = entity.EventDetails,
         };
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text;
@@ -23,14 +23,14 @@ public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
 
         var val = property.GetValue(culture, segment, published);
 
-        //if there is a value, it's a string and it's detected as json
+        // if there is a value, it's a string and it's detected as json
         if (val is string rawVal && rawVal.DetectIsJson())
         {
             try
             {
                 GridValue? gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
 
-                //get all values and put them into a single field (using JsonPath)
+                // get all values and put them into a single field (using JsonPath)
                 var sb = new StringBuilder();
                 foreach (GridValue.GridRow row in gridVal!.Sections.SelectMany(x => x.Rows))
                 {
@@ -47,9 +47,10 @@ public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
                             sb.Append(str);
                             sb.Append(" ");
 
-                            //add the row name as an individual field
-                            result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{property.Alias}.{rowName}",
-                                new[] {str}));
+                            // add the row name as an individual field
+                            result.Add(new KeyValuePair<string, IEnumerable<object?>>(
+                                $"{property.Alias}.{rowName}",
+                                new[] { str }));
                         }
                         else if (controlVal is JContainer jc)
                         {
@@ -62,29 +63,29 @@ public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
                     }
                 }
 
-                //First save the raw value to a raw field
+                // First save the raw value to a raw field
                 result.Add(new KeyValuePair<string, IEnumerable<object?>>(
-                    $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] {rawVal}));
+                    $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
 
                 if (sb.Length > 0)
                 {
-                    //index the property with the combined/cleaned value
-                    result.Add(new KeyValuePair<string, IEnumerable<object?>>(property.Alias, new[] {sb.ToString()}));
+                    // index the property with the combined/cleaned value
+                    result.Add(new KeyValuePair<string, IEnumerable<object?>>(property.Alias, new[] { sb.ToString() }));
                 }
             }
             catch (InvalidCastException)
             {
-                //swallow...on purpose, there's a chance that this isn't the json format we are looking for
+                // swallow...on purpose, there's a chance that this isn't the json format we are looking for
                 // and we don't want that to affect the website.
             }
             catch (JsonException)
             {
-                //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect
+                // swallow...on purpose, there's a chance that this isn't json and we don't want that to affect
                 // the website.
             }
             catch (ArgumentException)
             {
-                //swallow on purpose to prevent this error:
+                // swallow on purpose to prevent this error:
                 // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
             }
         }

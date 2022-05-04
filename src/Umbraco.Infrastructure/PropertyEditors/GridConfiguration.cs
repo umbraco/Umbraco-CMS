@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Newtonsoft.Json.Linq;
@@ -24,7 +24,8 @@ public class GridConfiguration : IIgnoreUserStartNodesConfig
         Description = "Choose the upload location of pasted images")]
     public GuidUdi? MediaParentId { get; set; }
 
-    [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+    [ConfigurationField(
+        Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
         "Ignore User Start Nodes", "boolean",
         Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
     public bool IgnoreUserStartNodes { get; set; }

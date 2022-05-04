@@ -16,7 +16,8 @@ internal class UploadFileTypeValidator : IValueValidator
     private readonly ILocalizedTextService _localizedTextService;
     private ContentSettings _contentSettings;
 
-    public UploadFileTypeValidator(ILocalizedTextService localizedTextService,
+    public UploadFileTypeValidator(
+        ILocalizedTextService localizedTextService,
         IOptionsMonitor<ContentSettings> contentSettings)
     {
         _localizedTextService = localizedTextService;
@@ -54,10 +55,11 @@ internal class UploadFileTypeValidator : IValueValidator
             if (IsValidFileExtension(filename, _contentSettings) is false ||
                 IsAllowedInDataTypeConfiguration(filename, dataTypeConfiguration) is false)
             {
-                //we only store a single value for this editor so the 'member' or 'field'
+                // we only store a single value for this editor so the 'member' or 'field'
                 // we'll associate this error with will simply be called 'value'
-                yield return new ValidationResult(_localizedTextService.Localize("errors", "dissallowedMediaType"),
-                    new[] {"value"});
+                yield return new ValidationResult(
+                    _localizedTextService.Localize("errors", "dissallowedMediaType"),
+                    new[] { "value" });
             }
         }
     }

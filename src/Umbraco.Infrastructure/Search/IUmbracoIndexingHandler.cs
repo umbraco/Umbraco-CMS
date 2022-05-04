@@ -14,7 +14,9 @@ public interface IUmbracoIndexingHandler
     bool Enabled { get; }
 
     void ReIndexForContent(IContent sender, bool isPublished);
+
     void ReIndexForMember(IMember member);
+
     void ReIndexForMedia(IMedia sender, bool isPublished);
 
     /// <summary>

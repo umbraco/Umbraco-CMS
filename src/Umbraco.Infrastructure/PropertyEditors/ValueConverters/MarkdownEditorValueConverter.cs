@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using HeyRed.MarkdownSharp;
@@ -58,6 +58,7 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase
 
     public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
         PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
+
         // source should come from ConvertSource and be a string (or null) already
         inter?.ToString() ?? string.Empty;
 }

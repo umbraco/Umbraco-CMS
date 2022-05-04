@@ -1,4 +1,4 @@
-﻿using Serilog.Events;
+using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 

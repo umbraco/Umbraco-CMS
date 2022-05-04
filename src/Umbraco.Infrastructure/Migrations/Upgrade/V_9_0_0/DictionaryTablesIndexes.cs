@@ -22,8 +22,8 @@ public class DictionaryTablesIndexes : MigrationBase
     {
         var indexDictionaryDto = $"IX_{DictionaryDto.TableName}_{IndexedDictionaryColumn}";
         var indexLanguageTextDto = $"IX_{LanguageTextDto.TableName}_{IndexedLanguageTextColumn}";
-        var dictionaryColumnsToBeIndexed = new[] {IndexedDictionaryColumn};
-        var langTextColumnsToBeIndexed = new[] {IndexedLanguageTextColumn, "UniqueId"};
+        var dictionaryColumnsToBeIndexed = new[] { IndexedDictionaryColumn };
+        var langTextColumnsToBeIndexed = new[] { IndexedLanguageTextColumn, "UniqueId" };
 
         var dictionaryTableHasDuplicates = ContainsDuplicates<DictionaryDto>(dictionaryColumnsToBeIndexed);
         var langTextTableHasDuplicates = ContainsDuplicates<LanguageTextDto>(langTextColumnsToBeIndexed);
@@ -65,7 +65,7 @@ public class DictionaryTablesIndexes : MigrationBase
 
         // get the definition by name
         IndexDefinition index = tableDef.Indexes.First(x => x.Name == indexName);
-        new ExecuteSqlStatementExpression(Context) {SqlStatement = Context.SqlContext.SqlSyntax.Format(index)}
+        new ExecuteSqlStatementExpression(Context) { SqlStatement = Context.SqlContext.SqlSyntax.Format(index) }
             .Execute();
     }
 

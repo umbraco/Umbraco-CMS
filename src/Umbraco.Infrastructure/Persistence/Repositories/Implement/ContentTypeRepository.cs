@@ -99,7 +99,6 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     // there should be a way to GetMany(predicate) right from the cache policy!
     // and ah, well, this all caching should be refactored + the cache refreshers
     // should to repository.Clear() not deal with magic caches by themselves
-
     protected override IContentType? PerformGet(int id)
         => GetMany()?.FirstOrDefault(x => x.Id == id);
 
@@ -138,7 +137,6 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         // used by DataTypeService to remove properties
         // from content types if they have a deleted data type - see
         // notes in DataTypeService.Delete as it's a bit weird
-
         Sql<ISqlContext> sqlClause = Sql()
             .SelectAll()
             .From<PropertyTypeDto>()
@@ -204,7 +202,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
             }
         }
 
-        //Before we call the base class methods to run all delete clauses, we need to first
+        // Before we call the base class methods to run all delete clauses, we need to first
         // delete all of the property data associated with this document type. Normally this will
         // be done in the ContentTypeService by deleting all associated content first, but in some cases
         // like when we switch a document type, there is property data left over that is linked
@@ -218,7 +216,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
             .On<ContentTypeDto, PropertyTypeDto>(dto => dto.NodeId, dto => dto.ContentTypeId)
             .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
 
-        //Delete all PropertyData where propertytypeid EXISTS in the subquery above
+        // Delete all PropertyData where propertytypeid EXISTS in the subquery above
         Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid",
             sql));
 
@@ -249,7 +247,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     protected void PersistTemplates(IContentType entity, bool clearAll)
     {
         // remove and insert, if required
-        Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new {entity.Id});
+        Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new { entity.Id });
 
         // we could do it all in foreach if we assume that the default template is an allowed template??
         var defaultTemplateId = entity.DefaultTemplateId;
@@ -257,7 +255,9 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id, TemplateNodeId = defaultTemplateId, IsDefault = true
+                ContentTypeNodeId = entity.Id,
+                TemplateNodeId = defaultTemplateId,
+                IsDefault = true,
             });
         }
 
@@ -266,7 +266,9 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false
+                ContentTypeNodeId = entity.Id,
+                TemplateNodeId = template.Id,
+                IsDefault = false,
             });
         }
     }
@@ -275,19 +277,19 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     {
         ValidateAlias(entity);
 
-        //Updates Modified date
+        // Updates Modified date
         entity.UpdatingEntity();
 
-        //Look up parent to get and set the correct Path if ParentId has changed
+        // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new {entity.ParentId});
+            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
             var maxSortOrder =
                 Database.ExecuteScalar<int>(
                     "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new {entity.ParentId, NodeObjectType = NodeObjectTypeId});
+                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
             entity.SortOrder = maxSortOrder + 1;
         }
 
@@ -312,7 +314,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
                 KeepAllVersionsNewerThanDays =
                     entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,
                 KeepLatestVersionPerDayForDays =
-                    entityWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays
+                    entityWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays,
             };
             Database.InsertOrUpdate(dto);
         }

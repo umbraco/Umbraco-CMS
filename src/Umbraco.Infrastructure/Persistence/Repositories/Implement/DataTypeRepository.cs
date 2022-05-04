@@ -44,6 +44,8 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
     }
 
+    protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
+
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;
@@ -60,21 +62,21 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
             parentId = container.Id;
         }
 
-        //used to track all the moved entities to be given to the event
-        var moveInfo = new List<MoveEventInfo<IDataType>> {new(toMove, toMove.Path, parentId)};
+        // used to track all the moved entities to be given to the event
+        var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId) };
 
         var origPath = toMove.Path;
 
-        //do the move to a new parent
+        // do the move to a new parent
         toMove.ParentId = parentId;
 
-        //set the updated path
+        // set the updated path
         toMove.Path = string.Concat(container == null ? parentId.ToInvariantString() : container.Path, ",", toMove.Id);
 
-        //schedule it for updating in the transaction
+        // schedule it for updating in the transaction
         Save(toMove);
 
-        //update all descendants from the original path, update in order of level
+        // update all descendants from the original path, update in order of level
         IEnumerable<IDataType>? descendants =
             Get(Query<IDataType>().Where(type => type.Path.StartsWith(origPath + ",")));
 
@@ -88,7 +90,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
                 descendant.ParentId = lastParent.Id;
                 descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
 
-                //schedule it for updating in the transaction
+                // schedule it for updating in the transaction
                 Save(descendant);
             }
         }
@@ -122,9 +124,14 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
             x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
     }
 
+    #region Overrides of RepositoryBase<int,DataTypeDefinition>
+
+    protected override IDataType? PerformGet(int id) => GetMany(id)?.FirstOrDefault();
+
     private string? EnsureUniqueNodeName(string? nodeName, int id = 0)
     {
-        SqlTemplate template = SqlContext.Templates.Get(Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName,
+        SqlTemplate template = SqlContext.Templates.Get(
+            Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName,
             tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
@@ -135,7 +142,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         return SimilarNodeName.GetUniqueName(names, id, nodeName);
     }
-
 
     [TableName(Constants.DatabaseSchema.Tables.ContentType)]
     private class ContentTypeReferenceDto : ContentTypeDto
@@ -148,14 +154,12 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
     private class PropertyTypeReferenceDto
     {
-        [Column("ptAlias")] public string? Alias { get; set; }
+        [Column("ptAlias")]
+        public string? Alias { get; set; }
 
-        [Column("ptName")] public string? Name { get; set; }
+        [Column("ptName")]
+        public string? Name { get; set; }
     }
-
-    #region Overrides of RepositoryBase<int,DataTypeDefinition>
-
-    protected override IDataType? PerformGet(int id) => GetMany(id)?.FirstOrDefault();
 
     protected override IEnumerable<IDataType> PerformGetAll(params int[]? ids)
     {
@@ -163,7 +167,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         if (ids?.Any() ?? false)
         {
-            dataTypeSql.Where("umbracoNode.id in (@ids)", new {ids});
+            dataTypeSql.Where("umbracoNode.id in (@ids)", new { ids });
         }
         else
         {
@@ -209,8 +213,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     protected override IEnumerable<string> GetDeleteClauses() => Array.Empty<string>();
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
-
     #endregion
 
     #region Unit of Work Implementation
@@ -219,11 +221,11 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     {
         entity.AddingEntity();
 
-        //ensure a datatype has a unique name before creating it
+        // ensure a datatype has a unique name before creating it
         entity.Name = EnsureUniqueNodeName(entity.Name)!;
 
         // TODO: should the below be removed?
-        //Cannot add a duplicate data type
+        // Cannot add a duplicate data type
         Sql<ISqlContext> existsSql = Sql()
             .SelectCount()
             .From<DataTypeDto>()
@@ -237,27 +239,27 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         DataTypeDto dto = DataTypeFactory.BuildDto(entity, _serializer);
 
-        //Logic for setting Path, Level and SortOrder
-        NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new {entity.ParentId});
+        // Logic for setting Path, Level and SortOrder
+        NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
         var level = parent.Level + 1;
         var sortOrder =
             Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-                new {entity.ParentId, NodeObjectType = NodeObjectTypeId});
+                new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
 
-        //Create the (base) node data - umbracoNode
+        // Create the (base) node data - umbracoNode
         NodeDto nodeDto = dto.NodeDto;
         nodeDto.Path = parent.Path;
         nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
         nodeDto.SortOrder = sortOrder;
         var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
-        //Update with new correct path
+        // Update with new correct path
         nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
         Database.Update(nodeDto);
 
-        //Update entity with correct values
-        entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
+        // Update entity with correct values
+        entity.Id = nodeDto.NodeId; // Set Id on entity to ensure an Id is set
         entity.Path = nodeDto.Path;
         entity.SortOrder = sortOrder;
         entity.Level = level;
@@ -272,7 +274,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     {
         entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id)!;
 
-        //Cannot change to a duplicate alias
+        // Cannot change to a duplicate alias
         Sql<ISqlContext> existsSql = Sql()
             .SelectCount()
             .From<DataTypeDto>()
@@ -284,25 +286,25 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
             throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
         }
 
-        //Updates Modified date
+        // Updates Modified date
         entity.UpdatingEntity();
 
-        //Look up parent to get and set the correct Path if ParentId has changed
+        // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new {entity.ParentId});
+            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
             var maxSortOrder =
                 Database.ExecuteScalar<int>(
                     "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new {entity.ParentId, NodeObjectType = NodeObjectTypeId});
+                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
             entity.SortOrder = maxSortOrder + 1;
         }
 
         DataTypeDto dto = DataTypeFactory.BuildDto(entity, _serializer);
 
-        //Updates the (base) node data - umbracoNode
+        // Updates the (base) node data - umbracoNode
         NodeDto nodeDto = dto.NodeDto;
         Database.Update(nodeDto);
         Database.Update(dto);
@@ -312,30 +314,31 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     protected override void PersistDeletedItem(IDataType entity)
     {
-        //Remove Notifications
-        Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new {entity.Id});
+        // Remove Notifications
+        Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { entity.Id });
 
-        //Remove Permissions
-        Database.Delete<UserGroup2NodePermissionDto>("WHERE nodeId = @Id", new {entity.Id});
+        // Remove Permissions
+        Database.Delete<UserGroup2NodePermissionDto>("WHERE nodeId = @Id", new { entity.Id });
 
-        //Remove associated tags
-        Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new {entity.Id});
+        // Remove associated tags
+        Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new { entity.Id });
 
-        //PropertyTypes containing the DataType being deleted
+        // PropertyTypes containing the DataType being deleted
         List<PropertyTypeDto>? propertyTypeDtos =
-            Database.Fetch<PropertyTypeDto>("WHERE dataTypeId = @Id", new {entity.Id});
-        //Go through the PropertyTypes and delete referenced PropertyData before deleting the PropertyType
+            Database.Fetch<PropertyTypeDto>("WHERE dataTypeId = @Id", new { entity.Id });
+
+        // Go through the PropertyTypes and delete referenced PropertyData before deleting the PropertyType
         foreach (PropertyTypeDto? dto in propertyTypeDtos)
         {
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new {dto.Id});
-            Database.Delete<PropertyTypeDto>("WHERE id = @Id", new {dto.Id});
+            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { dto.Id });
+            Database.Delete<PropertyTypeDto>("WHERE id = @Id", new { dto.Id });
         }
 
-        //Delete Content specific data
-        Database.Delete<DataTypeDto>("WHERE nodeId = @Id", new {entity.Id});
+        // Delete Content specific data
+        Database.Delete<DataTypeDto>("WHERE nodeId = @Id", new { entity.Id });
 
-        //Delete (base) node data
-        Database.Delete<NodeDto>("WHERE uniqueID = @Id", new {Id = entity.Key});
+        // Delete (base) node data
+        Database.Delete<NodeDto>("WHERE uniqueID = @Id", new { Id = entity.Key });
 
         entity.DeleteDate = DateTime.Now;
     }

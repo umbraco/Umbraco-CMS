@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -17,12 +17,12 @@ internal class RedirectUrlDto
     // problem is that the index key must be 900 bytes max. should we run without an index? done
     // some perfs comparisons, and running with an index on a hash is only slightly slower on
     // inserts, and much faster on reads, so... we have an index on a hash.
-
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoRedirectUrl", AutoIncrement = false)]
     public Guid Id { get; set; }
 
-    [ResultColumn] public int ContentId { get; set; }
+    [ResultColumn]
+    public int ContentId { get; set; }
 
     [Column("contentKey")]
     [NullSetting(NullSetting = NullSettings.NotNull)]

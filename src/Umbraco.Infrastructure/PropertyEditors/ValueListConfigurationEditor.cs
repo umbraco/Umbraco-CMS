@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -61,24 +61,24 @@ public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfigu
     {
         if (configuration == null)
         {
-            return new Dictionary<string, object> {{"items", new object()}};
+            return new Dictionary<string, object> { { "items", new object() } };
         }
 
         // map to what the (still v7) editor expects
         // {"item":{"169":{"value":"a","sortOrder":1},"170":{"value":"b","sortOrder":2},"171":{"value":"c","sortOrder":3}}}
-
         var i = 1;
         return new Dictionary<string, object>
         {
             {
                 "items",
-                configuration.Items.ToDictionary(x => x.Id.ToString(), x => new {value = x.Value, sortOrder = i++})
-            }
+                configuration.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ })
+            },
         };
     }
 
     /// <inheritdoc />
-    public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues,
+    public override ValueListConfiguration FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
         ValueListConfiguration? configuration)
     {
         var output = new ValueListConfiguration();
@@ -110,7 +110,7 @@ public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfigu
                 nextId = id + 1;
             }
 
-            output.Items.Add(new ValueListConfiguration.ValueListItem {Id = id, Value = value});
+            output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
         }
 
         // ensure ids

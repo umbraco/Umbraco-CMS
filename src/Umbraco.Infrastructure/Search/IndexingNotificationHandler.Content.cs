@@ -14,7 +14,8 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
     private readonly IContentService _contentService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
-    public ContentIndexingNotificationHandler(IUmbracoIndexingHandler umbracoIndexingHandler,
+    public ContentIndexingNotificationHandler(
+        IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService)
     {
         _umbracoIndexingHandler =
@@ -81,7 +82,6 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
 
                 // don't try to be too clever - refresh entirely
                 // there has to be race conditions in there ;-(
-
                 IContent? content = _contentService.GetById(payload.Id);
                 if (content == null)
                 {
@@ -115,7 +115,8 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
                     {
                         IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++,
                             pageSize, out total,
-                            //order by shallowest to deepest, this allows us to check it's published state without checking every item
+
+                            // order by shallowest to deepest, this allows us to check it's published state without checking every item
                             ordering: Ordering.By("Path"));
 
                         foreach (IContent descendant in descendants)

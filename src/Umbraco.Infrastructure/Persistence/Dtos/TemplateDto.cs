@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -9,7 +9,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class TemplateDto
 {
-    [Column("pk")] [PrimaryKeyColumn] public int PrimaryKey { get; set; }
+    [Column("pk")]
+    [PrimaryKeyColumn]
+    public int PrimaryKey { get; set; }
 
     [Column("nodeId")]
     [Index(IndexTypes.UniqueNonClustered)]

@@ -35,10 +35,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             FormatConstraint,
             FormatDefaultValue,
             FormatPrimaryKey,
-            FormatIdentity
+            FormatIdentity,
         };
 
-        //defaults for all providers
+        // defaults for all providers
         StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
         StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
         DecimalColumnDefinition =
@@ -48,63 +48,85 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         // ok to call virtual GetQuotedXxxName here - they don't depend on any state
         var col = Regex.Escape(GetQuotedColumnName("column")).Replace("column", @"\w+");
         var fld = Regex.Escape(GetQuotedTableName("table") + ".").Replace("table", @"\w+") + col;
+
         // ReSharper restore VirtualMemberCallInConstructor
-        AliasRegex = new Regex("(" + fld + @")\s+AS\s+(" + col + ")",
+        AliasRegex = new Regex(
+            "(" + fld + @")\s+AS\s+(" + col + ")",
             RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         _dbTypes = new Lazy<DbTypes>(InitColumnTypeMap);
     }
 
     public string StringLengthNonUnicodeColumnDefinitionFormat { get; } = "VARCHAR({0})";
+
     public virtual string StringLengthUnicodeColumnDefinitionFormat { get; } = "NVARCHAR({0})";
+
     public string DecimalColumnDefinitionFormat { get; } = "DECIMAL({0},{1})";
 
     public string DefaultValueFormat { get; } = "DEFAULT ({0})";
+
     public int DefaultStringLength { get; } = 255;
+
     public int DefaultDecimalPrecision { get; } = 20;
+
     public int DefaultDecimalScale { get; } = 9;
 
-    //Set by Constructor
+    // Set by Constructor
     public virtual string StringColumnDefinition { get; }
+
     public string StringLengthColumnDefinitionFormat { get; }
 
     public string AutoIncrementDefinition { get; protected set; } = "AUTOINCREMENT";
+
     public string IntColumnDefinition { get; protected set; } = "INTEGER";
+
     public string LongColumnDefinition { get; protected set; } = "BIGINT";
+
     public string GuidColumnDefinition { get; protected set; } = "GUID";
+
     public string BoolColumnDefinition { get; protected set; } = "BOOL";
+
     public string RealColumnDefinition { get; protected set; } = "DOUBLE";
+
     public string DecimalColumnDefinition { get; protected set; }
+
     public string BlobColumnDefinition { get; protected set; } = "BLOB";
+
     public string DateTimeColumnDefinition { get; protected set; } = "DATETIME";
+
     public string DateTimeOffsetColumnDefinition { get; protected set; } = "DATETIMEOFFSET(7)";
+
     public string TimeColumnDefinition { get; protected set; } = "DATETIME";
+
+    public virtual string CreateForeignKeyConstraint =>
+        "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
     protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
     protected DbTypes DbTypeMap => _dbTypes.Value;
 
-    public virtual string CreateForeignKeyConstraint =>
-        "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
-
     public virtual string CreateDefaultConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}";
 
     public Regex AliasRegex { get; }
+
+    public abstract string ProviderName { get; }
+
+    public abstract IsolationLevel DefaultIsolationLevel { get; }
 
     public string GetWildcardPlaceholder() => "%";
 
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
-    public abstract string ProviderName { get; }
-
     public virtual string EscapeString(string val) => NPocoDatabaseExtensions.EscapeAtSymbols(val.Replace("'", "''"));
 
     public virtual string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType) =>
-        //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+
+        // use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) = upper(@{paramIndex})";
 
     public virtual string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType) =>
-        //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+
+        // use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
     public virtual string GetConcat(params string[] args) => "concat(" + string.Join(",", args) + ")";
@@ -172,9 +194,12 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return column;
     }
 
-
-    public abstract IsolationLevel DefaultIsolationLevel { get; }
     public abstract string DbProvider { get; }
+
+    public virtual IDictionary<Type, IScalarMapper>? ScalarMappers => null;
+
+    public virtual string DeleteDefaultConstraint =>
+        throw new NotSupportedException("Default constraints are not supported");
 
     public virtual IEnumerable<string> GetTablesInSchema(IDatabase db) => new List<string>();
 
@@ -191,18 +216,17 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public abstract bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
         [MaybeNullWhen(false)] out string constraintName);
 
-    public virtual string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector,
+    public virtual string GetFieldNameForUpdate<TDto>(
+        Expression<Func<TDto, object?>> fieldSelector,
         string? tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);
 
     public virtual Sql<ISqlContext> InsertForUpdateHint(Sql<ISqlContext> sql) => sql;
 
     public virtual Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql) => sql;
 
-    public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql,
+    public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
+        Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null);
-
-
-    public virtual IDictionary<Type, IScalarMapper>? ScalarMappers => null;
 
     public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 
@@ -221,6 +245,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     ///     YYYYMMDD HH:mm:ss
     /// </remarks>
     public virtual string FormatDateTime(DateTime date, bool includeTime = true) =>
+
         // need CultureInfo.InvariantCulture because ":" here is the "time separator" and
         // may be converted to something else in different cultures (eg "." in DK).
         date.ToString(includeTime ? "yyyyMMdd HH:mm:ss" : "yyyyMMdd", CultureInfo.InvariantCulture);
@@ -257,7 +282,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             ? $"FK_{foreignKey.ForeignTable}_{foreignKey.PrimaryTable}_{foreignKey.PrimaryColumns.First()}"
             : foreignKey.Name;
 
-        return string.Format(CreateForeignKeyConstraint,
+        return string.Format(
+            CreateForeignKeyConstraint,
             GetQuotedTableName(foreignKey.ForeignTable),
             GetQuotedName(constraintName),
             GetQuotedColumnName(foreignKey.ForeignColumns.First()),
@@ -300,23 +326,22 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         sql.Append(" ");
         sql.Append(FormatIdentity(column));
 
-        //var isNullable = column.IsNullable;
+        // var isNullable = column.IsNullable;
 
-        //var constraint = FormatConstraint(column)?.TrimStart("CONSTRAINT ");
-        //var hasConstraint = !string.IsNullOrWhiteSpace(constraint);
+        // var constraint = FormatConstraint(column)?.TrimStart("CONSTRAINT ");
+        // var hasConstraint = !string.IsNullOrWhiteSpace(constraint);
 
-        //var defaultValue = FormatDefaultValue(column);
-        //var hasDefaultValue = !string.IsNullOrWhiteSpace(defaultValue);
+        // var defaultValue = FormatDefaultValue(column);
+        // var hasDefaultValue = !string.IsNullOrWhiteSpace(defaultValue);
 
         // TODO: This used to exit if nullable but that means this would never work
         // to return SQL if the column was nullable?!? I don't get it. This was here
         // 4 years ago, I've removed it so that this works for nullable columns.
-        //if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
-        //{
+        // if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
+        // {
         //    sqls = Enumerable.Empty<string>();
         //    return sql.ToString();
-        //}
-
+        // }
         var msql = new List<string>();
         sqls = msql;
 
@@ -326,21 +351,21 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         alterSql.Append(FormatType(column));
         alterSql.Append(" ");
         alterSql.Append(FormatNullable(column));
-        //alterSql.Append(" ");
-        //alterSql.Append(FormatPrimaryKey(column));
-        //alterSql.Append(" ");
-        //alterSql.Append(FormatIdentity(column));
+
+        // alterSql.Append(" ");
+        // alterSql.Append(FormatPrimaryKey(column));
+        // alterSql.Append(" ");
+        // alterSql.Append(FormatIdentity(column));
         msql.Add(string.Format(AlterColumn, tableName, alterSql));
 
-        //if (hasConstraint)
-        //{
+        // if (hasConstraint)
+        // {
         //    var dropConstraintSql = string.Format(DeleteConstraint, tableName, constraint);
         //    msql.Add(dropConstraintSql);
         //    var constraintType = hasDefaultValue ? defaultValue : "";
         //    var createConstraintSql = string.Format(CreateConstraint, tableName, constraint, constraintType, FormatString(column));
         //    msql.Add(createConstraintSql);
-        //}
-
+        // }
         return sql.ToString();
     }
 
@@ -364,7 +389,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
         var primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
 
-        return string.Format(CreateConstraint,
+        return string.Format(
+            CreateConstraint,
             GetQuotedTableName(table.Name),
             GetQuotedName(constraintName),
             primaryKeyPart,
@@ -372,7 +398,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     }
 
     public virtual string FormatColumnRename(string? tableName, string? oldName, string? newName) =>
-        string.Format(RenameColumn,
+        string.Format(
+            RenameColumn,
             GetQuotedTableName(tableName),
             GetQuotedColumnName(oldName),
             GetQuotedColumnName(newName));
@@ -385,37 +412,50 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public abstract void HandleCreateTable(IDatabase database, TableDefinition tableDefinition,
         bool skipKeysAndIndexes = false);
 
-    public virtual string DeleteDefaultConstraint =>
-        throw new NotSupportedException("Default constraints are not supported");
-
     public virtual string CreateTable => "CREATE TABLE {0} ({1})";
+
     public virtual string DropTable => "DROP TABLE {0}";
 
     public virtual string AddColumn => "ALTER TABLE {0} ADD {1}";
+
     public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
+
     public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
+
     public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
 
     public virtual string RenameTable => "RENAME TABLE {0} TO {1}";
 
     public virtual string CreateSchema => "CREATE SCHEMA {0}";
+
     public virtual string AlterSchema => "ALTER SCHEMA {0} TRANSFER {1}.{2}";
+
     public virtual string DropSchema => "DROP SCHEMA {0}";
 
     public virtual string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+
     public virtual string DropIndex => "DROP INDEX {0}";
 
     public virtual string InsertData => "INSERT INTO {0} ({1}) VALUES ({2})";
+
     public virtual string UpdateData => "UPDATE {0} SET {1} WHERE {2}";
+
     public virtual string DeleteData => "DELETE FROM {0} WHERE {1}";
+
     public virtual string TruncateTable => "TRUNCATE TABLE {0}";
 
     public virtual string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})";
+
     public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
 
     public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
+
     public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 120)";
+
     public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
+
+    public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
+        $"{GetSpecialDbType(dbType)}({customSize})";
 
     private DbTypes InitColumnTypeMap()
     {
@@ -466,16 +506,13 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return dbTypeMap.Create();
     }
 
-    public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
-        $"{GetSpecialDbType(dbType)}({customSize})";
-
     protected virtual string FormatCascade(string onWhat, Rule rule)
     {
         var action = "NO ACTION";
         switch (rule)
         {
             case Rule.None:
-                return "";
+                return string.Empty;
             case Rule.Cascade:
                 action = "CASCADE";
                 break;
@@ -530,7 +567,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         var dbTypeDefinition = column.Size != default
             ? $"{definition}({column.Size})"
             : definition;
-        //NOTE Precision is left out
+
+        // NOTE Precision is left out
         return dbTypeDefinition;
     }
 

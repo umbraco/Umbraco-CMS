@@ -24,7 +24,8 @@ public static class ExamineExtensions
     /// <remarks>
     ///     Search results are skipped if it can't be fetched from the <paramref name="cache" /> by its integer id.
     /// </remarks>
-    public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(this IEnumerable<ISearchResult> results,
+    public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(
+        this IEnumerable<ISearchResult> results,
         IPublishedCache? cache)
     {
         if (cache == null)
@@ -59,7 +60,8 @@ public static class ExamineExtensions
     /// <remarks>
     ///     Search results are skipped if it can't be fetched from the respective cache by its integer id.
     /// </remarks>
-    public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(this IEnumerable<ISearchResult> results,
+    public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(
+        this IEnumerable<ISearchResult> results,
         IPublishedSnapshot snapshot)
     {
         if (snapshot == null)

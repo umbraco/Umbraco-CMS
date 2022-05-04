@@ -1,10 +1,10 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Newtonsoft.Json;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 
-internal class NestedContentPreValueMigrator : DefaultPreValueMigrator //PreValueMigratorBase
+internal class NestedContentPreValueMigrator : DefaultPreValueMigrator // PreValueMigratorBase
 {
     public override bool CanMigrate(string editorAlias)
         => editorAlias == "Umbraco.NestedContent";

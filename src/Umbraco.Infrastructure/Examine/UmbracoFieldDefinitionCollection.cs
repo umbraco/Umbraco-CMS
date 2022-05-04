@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Examine;
 using Umbraco.Extensions;
 
@@ -27,14 +27,13 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
         new(UmbracoExamineFieldNames.PublishedFieldName, FieldDefinitionTypes.Raw),
         new(UmbracoExamineFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw),
         new(UmbracoExamineFieldNames.IconFieldName, FieldDefinitionTypes.Raw),
-        new(UmbracoExamineFieldNames.VariesByCultureFieldName, FieldDefinitionTypes.Raw)
+        new(UmbracoExamineFieldNames.VariesByCultureFieldName, FieldDefinitionTypes.Raw),
     };
 
     public UmbracoFieldDefinitionCollection()
         : base(UmbracoIndexFieldDefinitions)
     {
     }
-
 
     /// <summary>
     ///     Overridden to dynamically add field definitions for culture variations
@@ -65,7 +64,7 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
             return true;
         }
 
-        //before we use regex to match do some faster simple matching since this is going to execute quite a lot
+        // before we use regex to match do some faster simple matching since this is going to execute quite a lot
         if (!fieldName.Contains("_"))
         {
             return false;
@@ -75,10 +74,11 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
         if (match.Success)
         {
             var nonCultureFieldName = match.Groups["FieldName"].Value;
-            //check if there's a definition for this and if so return the field definition for the culture field based on the non-culture field
+
+            // check if there's a definition for this and if so return the field definition for the culture field based on the non-culture field
             if (base.TryGetValue(nonCultureFieldName, out FieldDefinition existingFieldDefinition))
             {
-                //now add a new field def
+                // now add a new field def
                 fieldDefinition = GetOrAdd(fieldName, s => new FieldDefinition(s, existingFieldDefinition.Type));
                 return true;
             }

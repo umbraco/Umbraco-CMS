@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
@@ -10,6 +10,7 @@ public class AddPackagesSectionAccess : MigrationBase
     }
 
     protected override void Migrate() =>
+
         // Any user group which had access to the Developer section should have access to Packages
         Database.Execute($@"
                 insert into {Constants.DatabaseSchema.Tables.UserGroup2App}

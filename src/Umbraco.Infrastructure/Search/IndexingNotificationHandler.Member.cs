@@ -12,7 +12,8 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
     private readonly IMemberService _memberService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
-    public MemberIndexingNotificationHandler(IUmbracoIndexingHandler umbracoIndexingHandler,
+    public MemberIndexingNotificationHandler(
+        IUmbracoIndexingHandler umbracoIndexingHandler,
         IMemberService memberService)
     {
         _umbracoIndexingHandler =
@@ -45,7 +46,6 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
             case MessageType.RemoveById:
 
                 // This is triggered when the item is permanently deleted
-
                 _umbracoIndexingHandler.DeleteIndexForEntity((int)args.MessageObject, false);
                 break;
             case MessageType.RefreshByInstance:
@@ -58,7 +58,6 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
             case MessageType.RemoveByInstance:
 
                 // This is triggered when the item is permanently deleted
-
                 if (args.MessageObject is IMember c4)
                 {
                     _umbracoIndexingHandler.DeleteIndexForEntity(c4.Id, false);
@@ -87,7 +86,7 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
             case MessageType.RefreshAll:
             case MessageType.RefreshByJson:
             default:
-                //We don't support these, these message types will not fire for unpublished content
+                // We don't support these, these message types will not fire for unpublished content
                 break;
         }
     }

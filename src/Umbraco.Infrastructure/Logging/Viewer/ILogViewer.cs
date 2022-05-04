@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -49,7 +49,8 @@ public interface ILogViewer
     /// <summary>
     ///     Returns the collection of logs
     /// </summary>
-    PagedResult<LogMessage> GetLogs(LogTimePeriod logTimePeriod,
+    PagedResult<LogMessage> GetLogs(
+        LogTimePeriod logTimePeriod,
         int pageNumber = 1,
         int pageSize = 100,
         Direction orderDirection = Direction.Descending,

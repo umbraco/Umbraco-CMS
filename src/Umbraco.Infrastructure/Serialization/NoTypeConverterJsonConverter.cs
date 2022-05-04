@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 /// </remarks>
 public class NoTypeConverterJsonConverter<T> : JsonConverter
 {
-    private static readonly IContractResolver resolver = new NoTypeConverterContractResolver();
-    private static readonly JsonSerializerSettings JsonSerializerSettings = new() {ContractResolver = resolver};
+    private static readonly IContractResolver Resolver = new NoTypeConverterContractResolver();
+    private static readonly JsonSerializerSettings JsonSerializerSettings = new() { ContractResolver = Resolver };
 
     public override bool CanConvert(Type objectType) => typeof(T).IsAssignableFrom(objectType);
 

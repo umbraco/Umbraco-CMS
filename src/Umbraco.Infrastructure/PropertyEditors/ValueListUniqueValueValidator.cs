@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -16,7 +16,6 @@ public class ValueListUniqueValueValidator : IValueValidator
     {
         // the value we get should be a JArray
         // [ { "value": <value>, "sortOrder": 1 }, { ... }, ... ]
-
         if (!(value is JArray json))
         {
             yield break;
@@ -24,10 +23,9 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         // we ensure that values are unique
         // (those are not empty - empty values are removed when persisting anyways)
-
         var groupedValues = json.OfType<JObject>()
             .Where(x => x["value"] != null)
-            .Select((x, index) => new {value = x["value"]?.ToString(), index})
+            .Select((x, index) => new { value = x["value"]?.ToString(), index })
             .Where(x => x.value.IsNullOrWhiteSpace() == false)
             .GroupBy(x => x.value);
 
@@ -36,7 +34,7 @@ public class ValueListUniqueValueValidator : IValueValidator
             yield return new ValidationResult($"The value \"{group.Last().value}\" must be unique", new[]
             {
                 // use the index number as server field so it can be wired up to the view
-                "item_" + group.Last().index.ToInvariantString()
+                "item_" + group.Last().index.ToInvariantString(),
             });
         }
     }

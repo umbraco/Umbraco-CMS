@@ -1,4 +1,4 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
@@ -46,7 +46,8 @@ public class PackagingService : IPackagingService
 
     public CompiledPackage GetCompiledPackageInfo(XDocument? xml) => _packageInstallation.ReadPackage(xml);
 
-    public InstallationSummary InstallCompiledPackageData(XDocument? packageXml,
+    public InstallationSummary InstallCompiledPackageData(
+        XDocument? packageXml,
         int userId = Constants.Security.SuperUserId)
     {
         CompiledPackage compiledPackage = GetCompiledPackageInfo(packageXml);
@@ -74,7 +75,8 @@ public class PackagingService : IPackagingService
         return summary;
     }
 
-    public InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile,
+    public InstallationSummary InstallCompiledPackageData(
+        FileInfo packageXmlFile,
         int userId = Constants.Security.SuperUserId)
     {
         XDocument xml;
@@ -126,20 +128,22 @@ public class PackagingService : IPackagingService
         {
             if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage {PackageName = plan.PackageName};
+                installedPackage = new InstalledPackage { PackageName = plan.PackageName };
                 installedPackages.Add(plan.PackageName, installedPackage);
             }
 
             var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-            if (keyValues is null || keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                    out var currentState))
+            if (keyValues is null || keyValues.TryGetValue(
+                Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
+                out var currentState))
             {
                 currentState = null;
             }
 
             currentPlans.Add(new InstalledPackageMigrationPlans
             {
-                CurrentMigrationId = currentState, FinalMigrationId = plan.FinalState
+                CurrentMigrationId = currentState,
+                FinalMigrationId = plan.FinalState,
             });
 
             installedPackage.PackageMigrationPlans = currentPlans;
@@ -155,7 +159,7 @@ public class PackagingService : IPackagingService
 
             if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage {PackageName = package.PackageName};
+                installedPackage = new InstalledPackage { PackageName = package.PackageName };
 
                 installedPackages.Add(package.PackageName, installedPackage);
             }

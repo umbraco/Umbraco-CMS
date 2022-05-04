@@ -9,9 +9,9 @@ public class JsonNetSerializer : IJsonSerializer
 {
     protected static readonly JsonSerializerSettings JsonSerializerSettings = new()
     {
-        Converters = new List<JsonConverter> {new StringEnumConverter()},
+        Converters = new List<JsonConverter> { new StringEnumConverter() },
         Formatting = Formatting.None,
-        NullValueHandling = NullValueHandling.Ignore
+        NullValueHandling = NullValueHandling.Ignore,
     };
 
     public string Serialize(object? input) => JsonConvert.SerializeObject(input, JsonSerializerSettings);
@@ -32,7 +32,7 @@ public class JsonNetSerializer : IJsonSerializer
         {
             JArray jArray => jArray.ToObject<T>(),
             JObject jObject => jObject.ToObject<T>(),
-            _ => jToken is null ? default : jToken.Value<T>()
+            _ => jToken is null ? default : jToken.Value<T>(),
         };
     }
 }

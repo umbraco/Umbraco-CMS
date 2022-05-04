@@ -12,27 +12,6 @@ public class AddPropertyTypeGroupColumns : MigrationBase
     public AddPropertyTypeGroupColumns(IMigrationContext context, IShortStringHelper shortStringHelper)
         : base(context) => _shortStringHelper = shortStringHelper;
 
-    protected override void Migrate()
-    {
-        AddColumn<PropertyTypeGroupDto>("type");
-
-        // Add column without constraints
-        AddColumn<PropertyTypeGroupDto>("alias", out IEnumerable<string> sqls);
-
-        // Populate non-null alias column
-        List<PropertyTypeGroupDto>? dtos = Database.Fetch<PropertyTypeGroupDto>();
-        foreach (PropertyTypeGroupDto dto in PopulateAliases(dtos))
-        {
-            Database.Update(dto, x => new {x.Alias});
-        }
-
-        // Finally add the constraints
-        foreach (var sql in sqls)
-        {
-            Database.Execute(sql);
-        }
-    }
-
     internal IEnumerable<PropertyTypeGroupDto> PopulateAliases(IEnumerable<PropertyTypeGroupDto> dtos)
     {
         foreach (IGrouping<string?, PropertyTypeGroupDto> dtosPerAlias in dtos.GroupBy(x =>
@@ -65,6 +44,27 @@ public class AddPropertyTypeGroupColumns : MigrationBase
                     "Detected the same alias {Alias} for different property group names {Names}, the migration added suffixes, but this might break backwards compatibility.",
                     dtosPerAlias.Key, dtosPerAliasAndText.Select(x => x.Key));
             }
+        }
+    }
+
+    protected override void Migrate()
+    {
+        AddColumn<PropertyTypeGroupDto>("type");
+
+        // Add column without constraints
+        AddColumn<PropertyTypeGroupDto>("alias", out IEnumerable<string> sqls);
+
+        // Populate non-null alias column
+        List<PropertyTypeGroupDto>? dtos = Database.Fetch<PropertyTypeGroupDto>();
+        foreach (PropertyTypeGroupDto dto in PopulateAliases(dtos))
+        {
+            Database.Update(dto, x => new { x.Alias });
+        }
+
+        // Finally add the constraints
+        foreach (var sql in sqls)
+        {
+            Database.Execute(sql);
         }
     }
 }

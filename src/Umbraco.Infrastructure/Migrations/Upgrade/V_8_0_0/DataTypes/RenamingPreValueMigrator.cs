@@ -1,11 +1,11 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 
 internal class RenamingPreValueMigrator : DefaultPreValueMigrator
 {
-    private readonly string[] _editors = {"Umbraco.NoEdit"};
+    private readonly string[] _editors = { "Umbraco.NoEdit" };
 
     public override bool CanMigrate(string editorAlias)
         => _editors.Contains(editorAlias);

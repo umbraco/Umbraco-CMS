@@ -7,12 +7,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security;
 
 public abstract class UmbracoUserStore<TUser, TRole>
-    : UserStoreBase<TUser, TRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>
-        , IdentityUserToken<string>, IdentityRoleClaim<string>>
+    : UserStoreBase<TUser, TRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>,
+        IdentityUserToken<string>, IdentityRoleClaim<string>>
     where TUser : UmbracoIdentityUser
     where TRole : IdentityRole<string>
 {
-    protected UmbracoUserStore(IdentityErrorDescriber describer) : base(describer)
+    protected UmbracoUserStore(IdentityErrorDescriber describer)
+        : base(describer)
     {
     }
 
@@ -22,6 +23,14 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// <inheritdoc />
     [EditorBrowsable(EditorBrowsableState.Never)]
     public override IQueryable<TUser> Users => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Not supported in Umbraco
+    /// </summary>
+    /// <inheritdoc />
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims,
+        CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     protected static int UserIdToInt(string? userId)
     {
@@ -40,14 +49,6 @@ public abstract class UmbracoUserStore<TUser, TRole>
     }
 
     protected static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
-
-    /// <summary>
-    ///     Not supported in Umbraco
-    /// </summary>
-    /// <inheritdoc />
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <summary>
     ///     Adds a user to a role (user group)
@@ -69,7 +70,8 @@ public abstract class UmbracoUserStore<TUser, TRole>
 
         if (string.IsNullOrWhiteSpace(normalizedRoleName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(normalizedRoleName));
         }
 
@@ -201,7 +203,8 @@ public abstract class UmbracoUserStore<TUser, TRole>
 
         if (string.IsNullOrWhiteSpace(normalizedRoleName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(normalizedRoleName));
         }
 

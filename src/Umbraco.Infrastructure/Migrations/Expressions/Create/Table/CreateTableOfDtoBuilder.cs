@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -39,6 +39,6 @@ public class CreateTableOfDtoBuilder : IExecutableBuilder
     }
 
     private void ExecuteSql(string sql) =>
-        new ExecuteSqlStatementExpression(_context) {SqlStatement = sql}
+        new ExecuteSqlStatementExpression(_context) { SqlStatement = sql }
             .Execute();
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 
 /// <summary>
 ///     Contains information required for the <see cref="RetryPolicy.Retrying" /> event.
@@ -16,8 +16,7 @@ public class RetryingEventArgs : EventArgs
     /// <param name="lastException">The exception which caused the retry conditions to occur.</param>
     public RetryingEventArgs(int currentRetryCount, TimeSpan delay, Exception lastException)
     {
-        //Guard.ArgumentNotNull(lastException, "lastException");
-
+        // Guard.ArgumentNotNull(lastException, "lastException");
         CurrentRetryCount = currentRetryCount;
         Delay = delay;
         LastException = lastException;

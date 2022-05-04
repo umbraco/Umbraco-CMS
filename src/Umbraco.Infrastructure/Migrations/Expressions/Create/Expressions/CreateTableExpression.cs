@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
 
@@ -9,12 +9,14 @@ public class CreateTableExpression : MigrationExpressionBase
         Columns = new List<ColumnDefinition>();
 
     public virtual string SchemaName { get; set; } = null!;
+
     public virtual string TableName { get; set; } = null!;
+
     public virtual IList<ColumnDefinition> Columns { get; set; }
 
     protected override string GetSql()
     {
-        var table = new TableDefinition {Name = TableName, SchemaName = SchemaName, Columns = Columns};
+        var table = new TableDefinition { Name = TableName, SchemaName = SchemaName, Columns = Columns };
 
         return string.Format(SqlSyntax.Format(table));
     }

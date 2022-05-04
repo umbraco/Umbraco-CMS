@@ -19,5 +19,6 @@ public class PropertyEditorAssetAttribute : Attribute
     }
 
     public AssetType AssetType { get; }
+
     public string FilePath { get; }
 }

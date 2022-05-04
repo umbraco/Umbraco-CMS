@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;

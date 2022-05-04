@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// </summary>
 public class ImageCropperValueTypeConverter : TypeConverter
 {
-    private static readonly Type[] ConvertableTypes = {typeof(JObject)};
+    private static readonly Type[] ConvertableTypes = { typeof(JObject) };
 
     public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
     {
@@ -29,8 +29,7 @@ public class ImageCropperValueTypeConverter : TypeConverter
     public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value,
         Type destinationType)
     {
-        var cropperValue = value as ImageCropperValue;
-        if (cropperValue is null)
+        if (value is not ImageCropperValue cropperValue)
         {
             return null;
         }

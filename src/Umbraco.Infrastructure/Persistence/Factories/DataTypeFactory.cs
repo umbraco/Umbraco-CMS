@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -16,7 +16,8 @@ internal static class DataTypeFactory
         // Check we have an editor for the data type.
         if (!editors.TryGet(dto.EditorAlias, out IDataEditor? editor))
         {
-            logger.LogWarning("Could not find an editor with alias {EditorAlias}, treating as Label. " +
+            logger.LogWarning(
+                "Could not find an editor with alias {EditorAlias}, treating as Label. " +
                               "The site may fail to boot and/or load data types and run.", dto.EditorAlias);
 
             // Create as special type, which downstream can be handled by converting to a LabelPropertyEditor to make clear
@@ -63,7 +64,7 @@ internal static class DataTypeFactory
             NodeId = entity.Id,
             DbType = entity.DatabaseType.ToString(),
             Configuration = ConfigurationEditor.ToDatabase(entity.Configuration, serializer),
-            NodeDto = BuildNodeDto(entity)
+            NodeDto = BuildNodeDto(entity),
         };
 
         return dataTypeDto;
@@ -83,7 +84,7 @@ internal static class DataTypeFactory
             Text = entity.Name,
             Trashed = entity.Trashed,
             UniqueId = entity.Key,
-            UserId = entity.CreatorId
+            UserId = entity.CreatorId,
         };
 
         return nodeDto;

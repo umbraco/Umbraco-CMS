@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Extensions;

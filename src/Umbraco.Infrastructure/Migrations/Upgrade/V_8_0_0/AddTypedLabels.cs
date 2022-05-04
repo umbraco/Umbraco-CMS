@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -16,7 +16,6 @@ public class AddTypedLabels : MigrationBase
     protected override void Migrate()
     {
         // insert other label datatypes
-
         void InsertNodeDto(int id, int sortOrder, string uniqueId, string text)
         {
             var nodeDto = new NodeDto
@@ -31,7 +30,7 @@ public class AddTypedLabels : MigrationBase
                 UniqueId = new Guid(uniqueId),
                 Text = text,
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now
+                CreateDate = DateTime.Now,
             };
 
             Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, nodeDto);
@@ -60,7 +59,9 @@ public class AddTypedLabels : MigrationBase
         {
             var dataTypeDto = new DataTypeDto
             {
-                NodeId = id, EditorAlias = Constants.PropertyEditors.Aliases.Label, DbType = dbType
+                NodeId = id,
+                EditorAlias = Constants.PropertyEditors.Aliases.Label,
+                DbType = dbType,
             };
 
             if (configuration != null)
@@ -78,7 +79,6 @@ public class AddTypedLabels : MigrationBase
         InsertDataTypeDto(Constants.DataTypes.LabelTime, "Date", "{\"umbracoDataValueType\":\"TIME\"}");
 
         // flip known property types
-
         List<PropertyTypeDto>? labelPropertyTypes = Database.Fetch<PropertyTypeDto>(Sql()
             .Select<PropertyTypeDto>(x => x.Id, x => x.Alias)
             .From<PropertyTypeDto>()
@@ -87,13 +87,13 @@ public class AddTypedLabels : MigrationBase
         var intPropertyAliases = new[]
         {
             Constants.Conventions.Media.Width, Constants.Conventions.Media.Height,
-            Constants.Conventions.Member.FailedPasswordAttempts
+            Constants.Conventions.Member.FailedPasswordAttempts,
         };
-        var bigintPropertyAliases = new[] {Constants.Conventions.Media.Bytes};
+        var bigintPropertyAliases = new[] { Constants.Conventions.Media.Bytes };
         var dtPropertyAliases = new[]
         {
             Constants.Conventions.Member.LastLockoutDate, Constants.Conventions.Member.LastLoginDate,
-            Constants.Conventions.Member.LastPasswordChangeDate
+            Constants.Conventions.Member.LastPasswordChangeDate,
         };
 
         var intPropertyTypes = labelPropertyTypes.Where(pt => intPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id)
@@ -123,7 +123,8 @@ public class AddTypedLabels : MigrationBase
         {
             Database.Execute(Sql()
                 .Update<PropertyDataDto>(u => u
-                    .Set(x => x.IntegerValue,
+                    .Set(
+                        x => x.IntegerValue,
                         string.IsNullOrWhiteSpace(value.VarcharValue)
                             ? null
                             : int.Parse(value.VarcharValue, NumberStyles.Any, CultureInfo.InvariantCulture))
@@ -141,7 +142,9 @@ public class AddTypedLabels : MigrationBase
                     .Set(x => x.DateValue,
                         string.IsNullOrWhiteSpace(value.VarcharValue)
                             ? null
-                            : DateTime.Parse(value.VarcharValue, CultureInfo.InvariantCulture, DateTimeStyles.None))
+                            : DateTime.Parse(value.VarcharValue,
+                                CultureInfo.InvariantCulture,
+                                DateTimeStyles.None))
                     .Set(x => x.TextValue, null)
                     .Set(x => x.VarcharValue, null))
                 .Where<PropertyDataDto>(x => x.Id == value.Id));
@@ -155,7 +158,9 @@ public class AddTypedLabels : MigrationBase
     private class PropertyDataValue
     {
         public int Id { get; set; }
+
         public string? VarcharValue { get; set; }
     }
+
     // ReSharper restore UnusedAutoPropertyAccessor.Local
 }

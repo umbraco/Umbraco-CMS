@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -9,11 +9,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class LogViewerQueryDto
 {
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("name")]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_LogViewerQuery_name")]
     public string? Name { get; set; }
 
-    [Column("query")] public string? Query { get; set; }
+    [Column("query")]
+    public string? Query { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using Serilog.Events;
+using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -20,7 +20,7 @@ internal class MessageTemplateFilter : ILogFilter
 
         Counts[templateText] = count;
 
-        //Don't add it to the list
+        // Don't add it to the list
         return false;
     }
 }

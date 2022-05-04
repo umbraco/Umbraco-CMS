@@ -177,7 +177,7 @@ public class PackageDataInstallation
                     continue;
                 }
 
-                script = new Script(path!) {Content = content};
+                script = new Script(path!) { Content = content };
                 _fileService.SaveScript(script, userId);
                 result.Add(script);
             }
@@ -206,7 +206,7 @@ public class PackageDataInstallation
             {
                 var content = partialViewXml.Value ?? string.Empty;
 
-                partialView = new PartialView(PartialViewType.PartialView, path) {Content = content};
+                partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
                 _fileService.SavePartialView(partialView, userId);
                 result.Add(partialView);
             }
@@ -238,7 +238,7 @@ public class PackageDataInstallation
                     continue;
                 }
 
-                s = new Stylesheet(stylesheetPath!) {Content = content};
+                s = new Stylesheet(stylesheetPath!) { Content = content };
                 _fileService.SaveStylesheet(s, userId);
             }
 
@@ -254,8 +254,8 @@ public class PackageDataInstallation
                 }
                 else
                 {
-                    //sp.Text = name;
-                    //Changing the name requires removing the current property and then adding another new one
+                    // sp.Text = name;
+                    // Changing the name requires removing the current property and then adding another new one
                     if (sp.Name != name)
                     {
                         s.RemoveProperty(sp.Name);
@@ -303,7 +303,7 @@ public class PackageDataInstallation
                         out IEnumerable<EntityContainer> mediaTypeEntityContainersInstalled),
                 StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId),
                 ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId),
-                PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId)
+                PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId),
             };
 
             var entityContainersInstalled = new List<EntityContainer>();
@@ -394,22 +394,29 @@ public class PackageDataInstallation
 
         return contents;
 
-        //var attribute = element.Attribute("isDoc");
-        //if (attribute != null)
-        //{
+        // var attribute = element.Attribute("isDoc");
+        // if (attribute != null)
+        // {
         //    //This is a single doc import
         //    var elements = new List<XElement> { element };
         //    var contents = ParseContentBaseRootXml(elements, parentId, importedDocumentTypes).ToList();
         //    if (contents.Any())
         //        _contentService.Save(contents, userId);
 
-        //    return contents;
-        //}
+        // return contents;
+        // }
 
-        //throw new ArgumentException(
+        // throw new ArgumentException(
         //    "The passed in XElement is not valid! It does not contain a root element called " +
         //    "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
     }
+
+    #endregion
+
+    #region DocumentTypes
+
+    public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
+        => ImportDocumentTypes(new[] { docTypeElement }, userId, out _);
 
     private IEnumerable<TContentBase> ParseContentBaseRootXml<TContentBase, TContentTypeComposition>(
         IEnumerable<XElement> roots,
@@ -522,19 +529,19 @@ public class PackageDataInstallation
         var templateId = element.AttributeValue<int?>("template");
 
         IEnumerable<XElement> properties = from property in element.Elements()
-            where property.Attribute("isDoc") == null
-            select property;
+                                           where property.Attribute("isDoc") == null
+                                           select property;
 
-        //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
+        // TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
         // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
         ITemplate? template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
 
-        //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
+        // now double check this is correct since its an INT it could very well be pointing to an invalid template :/
         if (template != null && contentType is IContentType contentTypex)
         {
             if (!contentTypex.IsAllowedTemplate(template.Alias))
             {
-                //well this is awkward, we'll set the template to null and it will be wired up to the default template
+                // well this is awkward, we'll set the template to null and it will be wired up to the default template
                 // when it's persisted in the document repository
                 template = null;
             }
@@ -557,13 +564,15 @@ public class PackageDataInstallation
 
         // Handle culture specific node names
         const string nodeNamePrefix = "nodeName-";
+
         // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
         // We have to use Invariant comparisons, because when we get them from ContentBase in EntityXmlSerializer they're all lowercase.
         var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
         foreach (XAttribute localizedNodeName in element.Attributes()
                      .Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
         {
-            var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
+            var newCulture = localizedNodeName.Name.LocalName[nodeNamePrefix.Length..];
+
             // Skip the culture if it does not exist in the current project
             if (installedLanguages.InvariantContains(newCulture))
             {
@@ -571,8 +580,8 @@ public class PackageDataInstallation
             }
         }
 
-        //Here we make sure that we take composition properties in account as well
-        //otherwise we would skip them and end up losing content
+        // Here we make sure that we take composition properties in account as well
+        // otherwise we would skip them and end up losing content
         Dictionary<string, IPropertyType> propTypes = contentType.CompositionPropertyTypes.Any()
             ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
             : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
@@ -626,36 +635,39 @@ public class PackageDataInstallation
                 {
                     return new Content(name, parentId, c)
                     {
-                        Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId
-                    } as TContentBase;
+                        Key = key,
+                        Level = level,
+                        SortOrder = sortOrder,
+                        TemplateId = templateId,
+                    }
+
+                    as TContentBase;
                 }
 
                 return new Content(name, (IContent)parent, c)
                 {
-                    Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId
-                } as TContentBase;
+                    Key = key,
+                    Level = level,
+                    SortOrder = sortOrder,
+                    TemplateId = templateId,
+                }
+
+                as TContentBase;
 
             case IMediaType m:
                 if (parent is null)
                 {
-                    return new Core.Models.Media(name, parentId, m) {Key = key, Level = level, SortOrder = sortOrder} as
+                    return new Core.Models.Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder } as
                         TContentBase;
                 }
 
-                return new Core.Models.Media(name, (IMedia)parent, m) {Key = key, Level = level, SortOrder = sortOrder}
+                return new Core.Models.Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder }
                     as TContentBase;
 
             default:
                 throw new NotSupportedException($"Type {typeof(TContentTypeComposition)} is not supported");
         }
     }
-
-    #endregion
-
-    #region DocumentTypes
-
-    public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
-        => ImportDocumentTypes(new[] {docTypeElement}, userId, out _);
 
     /// <summary>
     ///     Imports and saves package xml as <see cref="IContentType" />
@@ -688,7 +700,8 @@ public class PackageDataInstallation
     /// <param name="importStructure">Boolean indicating whether or not to import the </param>
     /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
     /// <returns>An enumerable list of generated ContentTypes</returns>
-    public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes,
+    public IReadOnlyList<T> ImportDocumentTypes<T>(
+        IReadOnlyCollection<XElement> unsortedDocumentTypes,
         bool importStructure, int userId, IContentTypeBaseService<T> service)
         where T : class, IContentTypeComposition
         => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, service);
@@ -704,15 +717,16 @@ public class PackageDataInstallation
     ///     those created in installing data types.
     /// </param>
     /// <returns>An enumerable list of generated ContentTypes</returns>
-    public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes,
+    public IReadOnlyList<T> ImportDocumentTypes<T>(
+        IReadOnlyCollection<XElement> unsortedDocumentTypes,
         bool importStructure, int userId, IContentTypeBaseService<T> service,
         out IEnumerable<EntityContainer> entityContainersInstalled)
         where T : class, IContentTypeComposition
     {
         var importedContentTypes = new Dictionary<string, T>();
 
-        //When you are importing a single doc type we have to assume that the dependencies are already there.
-        //Otherwise something like uSync won't work.
+        // When you are importing a single doc type we have to assume that the dependencies are already there.
+        // Otherwise something like uSync won't work.
         var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
         var isSingleDocTypeImport = unsortedDocumentTypes.Count == 1;
 
@@ -721,21 +735,21 @@ public class PackageDataInstallation
 
         if (isSingleDocTypeImport == false)
         {
-            //NOTE Here we sort the doctype XElements based on dependencies
-            //before creating the doc types - this should also allow for a better structure/inheritance support.
+            // NOTE Here we sort the doctype XElements based on dependencies
+            // before creating the doc types - this should also allow for a better structure/inheritance support.
             foreach (XElement documentType in unsortedDocumentTypes)
             {
                 XElement elementCopy = documentType;
                 XElement? infoElement = elementCopy.Element("Info");
                 var dependencies = new HashSet<string>();
 
-                //Add the Master as a dependency
+                // Add the Master as a dependency
                 if (string.IsNullOrEmpty((string?)infoElement?.Element("Master")) == false)
                 {
                     dependencies.Add(infoElement.Element("Master")?.Value!);
                 }
 
-                //Add compositions as dependencies
+                // Add compositions as dependencies
                 XElement? compositionsElement = infoElement?.Element("Compositions");
                 if (compositionsElement != null && compositionsElement.HasElements)
                 {
@@ -754,12 +768,12 @@ public class PackageDataInstallation
             }
         }
 
-        //Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
+        // Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
         List<XElement> documentTypes = isSingleDocTypeImport
             ? unsortedDocumentTypes.ToList()
             : graph.GetSortedItems().Select(x => x.Item).ToList();
 
-        //Iterate the sorted document types and create them as IContentType objects
+        // Iterate the sorted document types and create them as IContentType objects
         foreach (XElement documentType in documentTypes)
         {
             var alias = documentType.Element("Info")?.Element("Alias")?.Value;
@@ -783,21 +797,23 @@ public class PackageDataInstallation
             }
         }
 
-        //Save the newly created/updated IContentType objects
+        // Save the newly created/updated IContentType objects
         var list = importedContentTypes.Select(x => x.Value).ToList();
         service.Save(list, userId);
 
-        //Now we can finish the import by updating the 'structure',
-        //which requires the doc types to be saved/available in the db
+        // Now we can finish the import by updating the 'structure',
+        // which requires the doc types to be saved/available in the db
         if (importStructure)
         {
             var updatedContentTypes = new List<T>();
-            //Update the structure here - we can't do it until all DocTypes have been created
+
+            // Update the structure here - we can't do it until all DocTypes have been created
             foreach (XElement documentType in documentTypes)
             {
                 var alias = documentType.Element("Info")?.Element("Alias")?.Value;
                 XElement? structureElement = documentType.Element("Structure");
-                //Ensure that we only update ContentTypes which has actual structure-elements
+
+                // Ensure that we only update ContentTypes which has actual structure-elements
                 if (structureElement == null || structureElement.Elements().Any() == false || alias is null)
                 {
                     continue;
@@ -808,7 +824,7 @@ public class PackageDataInstallation
                 updatedContentTypes.Add(updated);
             }
 
-            //Update ContentTypes with a newly added structure/list of allowed children
+            // Update ContentTypes with a newly added structure/list of allowed children
             if (updatedContentTypes.Any())
             {
                 service.Save(updatedContentTypes, userId);
@@ -818,7 +834,21 @@ public class PackageDataInstallation
         return list;
     }
 
-    private Dictionary<string, int> CreateContentTypeFolderStructure(IEnumerable<XElement> unsortedDocumentTypes,
+    #endregion
+
+    #region DataTypes
+
+    /// <summary>
+    ///     Imports and saves package xml as <see cref="IDataType" />
+    /// </summary>
+    /// <param name="dataTypeElements">Xml to import</param>
+    /// <param name="userId">Optional id of the user</param>
+    /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
+    public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
+        => ImportDataTypes(dataTypeElements, userId, out _);
+
+    private Dictionary<string, int> CreateContentTypeFolderStructure(
+        IEnumerable<XElement> unsortedDocumentTypes,
         out IEnumerable<EntityContainer> entityContainersInstalled)
     {
         var importedFolders = new Dictionary<string, int>();
@@ -829,6 +859,7 @@ public class PackageDataInstallation
             XAttribute? foldersAttribute = documentType.Attribute("Folders");
             XElement? infoElement = documentType.Element("Info");
             if (foldersAttribute != null && infoElement != null
+
                                          // don't import any folder if this is a child doc type - the parent doc type will need to
                                          // exist which contains it's folders
                                          && ((string?)infoElement.Element("Master")).IsNullOrWhiteSpace())
@@ -927,7 +958,7 @@ public class PackageDataInstallation
 
         XElement infoElement = documentType.Element("Info")!;
 
-        //Name of the master corresponds to the parent
+        // Name of the master corresponds to the parent
         XElement? masterElement = infoElement.Element("Master");
 
         T? parent = default;
@@ -957,20 +988,20 @@ public class PackageDataInstallation
         {
             if (parent is null)
             {
-                return new ContentType(_shortStringHelper, parentId) {Alias = alias, Key = key} as T;
+                return new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
             }
 
-            return new ContentType(_shortStringHelper, (IContentType)parent, alias) {Key = key} as T;
+            return new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
         }
 
         if (typeof(T) == typeof(IMediaType))
         {
             if (parent is null)
             {
-                return new MediaType(_shortStringHelper, parentId) {Alias = alias, Key = key} as T;
+                return new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
             }
 
-            return new MediaType(_shortStringHelper, (IMediaType)parent, alias) {Key = key} as T;
+            return new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
         }
 
         throw new NotSupportedException($"Type {typeof(T)} is not supported");
@@ -1004,7 +1035,7 @@ public class PackageDataInstallation
         contentType.Thumbnail = infoElement.Element("Thumbnail")?.Value;
         contentType.Description = infoElement.Element("Description")?.Value;
 
-        //NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
+        // NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
         XElement? allowAtRoot = infoElement.Element("AllowAtRoot");
         if (allowAtRoot != null)
         {
@@ -1030,7 +1061,7 @@ public class PackageDataInstallation
                 (ContentVariation)Enum.Parse(typeof(ContentVariation), variationsElement.Value);
         }
 
-        //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
+        // Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
         XElement? masterElement = infoElement.Element("Master");
         if (masterElement != null)
         {
@@ -1042,7 +1073,7 @@ public class PackageDataInstallation
             contentType.SetParent(parent);
         }
 
-        //Update Compositions on the ContentType to ensure that they are as is defined in the package xml
+        // Update Compositions on the ContentType to ensure that they are as is defined in the package xml
         XElement? compositionsElement = infoElement.Element("Compositions");
         if (compositionsElement != null && compositionsElement.HasElements)
         {
@@ -1211,20 +1242,18 @@ public class PackageDataInstallation
         foreach (XElement property in properties)
         {
             var dataTypeDefinitionId =
-                new Guid(property.Element("Definition")!.Value); //Unique Id for a DataTypeDefinition
+                new Guid(property.Element("Definition")!.Value); // Unique Id for a DataTypeDefinition
 
             IDataType? dataTypeDefinition = _dataTypeService.GetDataType(dataTypeDefinitionId);
 
-            //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
-            //We look up a DataTypeDefinition that matches
+            // If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
+            // We look up a DataTypeDefinition that matches
 
-
-            //get the alias as a string for use below
+            // get the alias as a string for use below
             var propertyEditorAlias = property.Element("Type")!.Value.Trim();
 
-            //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
-            //We look up a DataTypeDefinition that matches
-
+            // If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
+            // We look up a DataTypeDefinition that matches
             if (dataTypeDefinition == null)
             {
                 IEnumerable<IDataType>? dataTypeDefinitions = _dataTypeService.GetByEditorAlias(propertyEditorAlias);
@@ -1251,10 +1280,11 @@ public class PackageDataInstallation
                     "Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                     property.Element("Name")?.Value, dataTypeDefinitionId, property.Element("Type")?.Value.Trim());
 
-                //convert to a label!
+                // convert to a label!
                 dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.Label)?
                     .FirstOrDefault();
-                //if for some odd reason this isn't there then ignore
+
+                // if for some odd reason this isn't there then ignore
                 if (dataTypeDefinition == null)
                 {
                     continue;
@@ -1285,11 +1315,12 @@ public class PackageDataInstallation
                         : string.Empty,
                     SortOrder = sortOrder,
                     Variations = property.Element("Variations") != null
-                        ? (ContentVariation)Enum.Parse(typeof(ContentVariation),
+                        ? (ContentVariation)Enum.Parse(
+                            typeof(ContentVariation),
                             property.Element("Variations")!.Value)
                         : ContentVariation.Nothing,
                     LabelOnTop = property.Element("LabelOnTop") != null &&
-                                 property.Element("LabelOnTop")!.Value.ToLowerInvariant().Equals("true")
+                                 property.Element("LabelOnTop")!.Value.ToLowerInvariant().Equals("true"),
                 };
 
             if (property.Element("Key") != null)
@@ -1369,19 +1400,6 @@ public class PackageDataInstallation
         return contentType;
     }
 
-    #endregion
-
-    #region DataTypes
-
-    /// <summary>
-    ///     Imports and saves package xml as <see cref="IDataType" />
-    /// </summary>
-    /// <param name="dataTypeElements">Xml to import</param>
-    /// <param name="userId">Optional id of the user</param>
-    /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
-    public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
-        => ImportDataTypes(dataTypeElements, userId, out _);
-
     /// <summary>
     ///     Imports and saves package xml as <see cref="IDataType" />
     /// </summary>
@@ -1414,7 +1432,8 @@ public class PackageDataInstallation
             }
 
             IDataType? definition = _dataTypeService.GetDataType(dataTypeDefinitionId);
-            //If the datatype definition doesn't already exist we create a new according to the one in the package xml
+
+            // If the datatype definition doesn't already exist we create a new according to the one in the package xml
             if (definition == null)
             {
                 ValueStorageType databaseType = databaseTypeAttribute?.Value.EnumParse<ValueStorageType>(true) ??
@@ -1424,11 +1443,10 @@ public class PackageDataInstallation
                 // however, the actual editor with this alias could be installed with the package, and
                 // therefore not yet part of the _propertyEditors collection, so we cannot try and get
                 // the actual editor - going with a void editor
-
                 var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                 if (!_propertyEditors.TryGet(editorAlias, out IDataEditor? editor))
                 {
-                    editor = new VoidEditor(_dataValueEditorFactory) {Alias = editorAlias ?? string.Empty};
+                    editor = new VoidEditor(_dataValueEditorFactory) { Alias = editorAlias ?? string.Empty };
                 }
 
                 var dataType = new DataType(editor, _serializer)
@@ -1436,7 +1454,7 @@ public class PackageDataInstallation
                     Key = dataTypeDefinitionId,
                     Name = dataTypeDefinitionName,
                     DatabaseType = databaseType,
-                    ParentId = parentId
+                    ParentId = parentId,
                 };
 
                 var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
@@ -1463,7 +1481,69 @@ public class PackageDataInstallation
         return dataTypes;
     }
 
-    private Dictionary<string, int> CreateDataTypeFolderStructure(IEnumerable<XElement> datatypeElements,
+    #endregion
+
+    #region Dictionary Items
+
+    /// <summary>
+    ///     Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem" />
+    /// </summary>
+    /// <param name="dictionaryItemElementList">Xml to import</param>
+    /// <param name="userId"></param>
+    /// <returns>An enumerable list of dictionary items</returns>
+    public IReadOnlyList<IDictionaryItem> ImportDictionaryItems(
+        IEnumerable<XElement> dictionaryItemElementList,
+        int userId)
+    {
+        var languages = _localizationService.GetAllLanguages().ToList();
+        return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
+    }
+
+    #endregion
+
+    #region Macros
+
+    /// <summary>
+    ///     Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro" />
+    /// </summary>
+    /// <param name="macroElements">Xml to import</param>
+    /// <param name="userId">Optional id of the User performing the operation</param>
+    /// <returns></returns>
+    public IReadOnlyList<IMacro> ImportMacros(
+        IEnumerable<XElement> macroElements,
+        int userId)
+    {
+        var macros = macroElements.Select(ParseMacroElement).ToList();
+
+        foreach (IMacro macro in macros)
+        {
+            _macroService.Save(macro, userId);
+        }
+
+        return macros;
+    }
+
+    private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string itemName,
+        XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
+    {
+        DictionaryItem dictionaryItem = parentId.HasValue
+            ? new DictionaryItem(parentId.Value, itemName)
+            : new DictionaryItem(itemName);
+        dictionaryItem.Key = itemId;
+
+        var translations = new List<IDictionaryTranslation>();
+
+        foreach (XElement valueElement in dictionaryItemElement.Elements("Value"))
+        {
+            AddDictionaryTranslation(translations, valueElement, languages);
+        }
+
+        dictionaryItem.Translations = translations;
+        return dictionaryItem;
+    }
+
+    private Dictionary<string, int> CreateDataTypeFolderStructure(
+        IEnumerable<XElement> datatypeElements,
         out IEnumerable<EntityContainer> entityContainersInstalled)
     {
         var importedFolders = new Dictionary<string, int>();
@@ -1487,7 +1567,8 @@ public class PackageDataInstallation
 
                 var rootFolder = WebUtility.UrlDecode(folders[0]);
                 Guid rootFolderKey = folderKeys.Length > 0 ? folderKeys[0] : Guid.NewGuid();
-                //there will only be a single result by name for level 1 (root) containers
+
+                // there will only be a single result by name for level 1 (root) containers
                 EntityContainer? current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                 if (current == null)
@@ -1543,24 +1624,8 @@ public class PackageDataInstallation
         return _dataTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
     }
 
-    #endregion
-
-    #region Dictionary Items
-
-    /// <summary>
-    ///     Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem" />
-    /// </summary>
-    /// <param name="dictionaryItemElementList">Xml to import</param>
-    /// <param name="userId"></param>
-    /// <returns>An enumerable list of dictionary items</returns>
-    public IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList,
-        int userId)
-    {
-        var languages = _localizationService.GetAllLanguages().ToList();
-        return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
-    }
-
-    private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList,
+    private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(
+        IEnumerable<XElement> dictionaryItemElementList,
         List<ILanguage> languages, Guid? parentId, int userId)
     {
         var items = new List<IDictionaryItem>();
@@ -1572,7 +1637,8 @@ public class PackageDataInstallation
         return items;
     }
 
-    private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement,
+    private IEnumerable<IDictionaryItem> ImportDictionaryItem(
+        XElement dictionaryItemElement,
         List<ILanguage> languages, Guid? parentId, int userId)
     {
         var items = new List<IDictionaryItem>();
@@ -1613,33 +1679,17 @@ public class PackageDataInstallation
         return dictionaryItem;
     }
 
-    private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string itemName,
-        XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
-    {
-        DictionaryItem dictionaryItem = parentId.HasValue
-            ? new DictionaryItem(parentId.Value, itemName)
-            : new DictionaryItem(itemName);
-        dictionaryItem.Key = itemId;
-
-        var translations = new List<IDictionaryTranslation>();
-
-        foreach (XElement valueElement in dictionaryItemElement.Elements("Value"))
-        {
-            AddDictionaryTranslation(translations, valueElement, languages);
-        }
-
-        dictionaryItem.Translations = translations;
-        return dictionaryItem;
-    }
-
-    private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations,
+    private static bool DictionaryValueIsNew(
+        IEnumerable<IDictionaryTranslation> translations,
         XElement valueElement)
-        => translations.All(t => string.Compare(t.Language?.IsoCode,
-                                     valueElement.Attribute("LanguageCultureAlias")?.Value,
-                                     StringComparison.InvariantCultureIgnoreCase) !=
+        => translations.All(t => string.Compare(
+            t.Language?.IsoCode,
+            valueElement.Attribute("LanguageCultureAlias")?.Value,
+            StringComparison.InvariantCultureIgnoreCase) !=
                                  0);
 
-    private static void AddDictionaryTranslation(ICollection<IDictionaryTranslation> translations,
+    private static void AddDictionaryTranslation(
+        ICollection<IDictionaryTranslation> translations,
         XElement valueElement, IEnumerable<ILanguage> languages)
     {
         var languageId = valueElement.Attribute("LanguageCultureAlias")?.Value;
@@ -1653,31 +1703,8 @@ public class PackageDataInstallation
         translations.Add(translation);
     }
 
-    #endregion
-
-    #region Macros
-
-    /// <summary>
-    ///     Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro" />
-    /// </summary>
-    /// <param name="macroElements">Xml to import</param>
-    /// <param name="userId">Optional id of the User performing the operation</param>
-    /// <returns></returns>
-    public IReadOnlyList<IMacro> ImportMacros(
-        IEnumerable<XElement> macroElements,
-        int userId)
-    {
-        var macros = macroElements.Select(ParseMacroElement).ToList();
-
-        foreach (IMacro macro in macros)
-        {
-            _macroService.Save(macro, userId);
-        }
-
-        return macros;
-    }
-
-    public IReadOnlyList<IPartialView> ImportMacroPartialViews(IEnumerable<XElement> macroPartialViewsElements,
+    public IReadOnlyList<IPartialView> ImportMacroPartialViews(
+        IEnumerable<XElement> macroPartialViewsElements,
         int userId)
     {
         var result = new List<IPartialView>();
@@ -1693,7 +1720,7 @@ public class PackageDataInstallation
             // Remove prefix to maintain backwards compatibility
             if (path.StartsWith(Constants.SystemDirectories.MacroPartials))
             {
-                path = path.Substring(Constants.SystemDirectories.MacroPartials.Length);
+                path = path[Constants.SystemDirectories.MacroPartials.Length..];
             }
             else if (path.StartsWith("~"))
             {
@@ -1710,7 +1737,7 @@ public class PackageDataInstallation
             {
                 var content = macroPartialViewXml.Value ?? string.Empty;
 
-                macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) {Content = content};
+                macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) { Content = content };
                 _fileService.SavePartialViewMacro(macroPartialView, userId);
                 result.Add(macroPartialView);
             }
@@ -1719,6 +1746,13 @@ public class PackageDataInstallation
         return result;
     }
 
+    #endregion
+
+    #region Templates
+
+    public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
+        => ImportTemplates(new[] { templateElement }, userId);
+
     private IMacro ParseMacroElement(XElement macroElement)
     {
         var macroKey = Guid.Parse(macroElement.Element("key")!.Value);
@@ -1726,7 +1760,7 @@ public class PackageDataInstallation
         var macroAlias = macroElement.Element("alias")!.Value;
         var macroSource = macroElement.Element("macroSource")!.Value;
 
-        //Following xml elements are treated as nullable properties
+        // Following xml elements are treated as nullable properties
         XElement? useInEditorElement = macroElement.Element("useInEditor");
         var useInEditor = false;
         if (useInEditorElement != null && string.IsNullOrEmpty((string)useInEditorElement) == false)
@@ -1764,7 +1798,8 @@ public class PackageDataInstallation
 
         var existingMacro = _macroService.GetById(macroKey) as Macro;
         Macro macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
-            cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration) {Key = macroKey};
+            cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration)
+        { Key = macroKey };
 
         XElement? properties = macroElement.Element("properties");
         if (properties != null)
@@ -1790,7 +1825,7 @@ public class PackageDataInstallation
 
                 macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias)
                 {
-                    Key = propertyKey
+                    Key = propertyKey,
                 });
 
                 sortOrder++;
@@ -1799,13 +1834,6 @@ public class PackageDataInstallation
 
         return macro;
     }
-
-    #endregion
-
-    #region Templates
-
-    public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
-        => ImportTemplates(new[] {templateElement}, userId);
 
     /// <summary>
     ///     Imports and saves package xml as <see cref="ITemplate" />
@@ -1823,7 +1851,8 @@ public class PackageDataInstallation
         {
             var dependencies = new List<string>();
             XElement elementCopy = tempElement;
-            //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.
+
+            // Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.
             if (string.IsNullOrEmpty((string?)elementCopy.Element("Master")) == false &&
                 templateElements.Any(x => (string?)x.Element("Alias") == (string?)elementCopy.Element("Master")))
             {
@@ -1842,7 +1871,7 @@ public class PackageDataInstallation
             graph.AddItem(TopoGraph.CreateNode((string)elementCopy.Element("Alias")!, elementCopy, dependencies));
         }
 
-        //Sort templates by dependencies to a potential master template
+        // Sort templates by dependencies to a potential master template
         IEnumerable<TopoGraph.Node<string, XElement>> sorted = graph.GetSortedItems();
         foreach (TopoGraph.Node<string, XElement> item in sorted)
         {

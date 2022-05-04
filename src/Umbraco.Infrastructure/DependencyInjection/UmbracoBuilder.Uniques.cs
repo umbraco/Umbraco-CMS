@@ -44,7 +44,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A function creating a culture dictionary factory.</param>
-    public static IUmbracoBuilder SetCultureDictionaryFactory(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetCultureDictionaryFactory(
+        this IUmbracoBuilder builder,
         Func<IServiceProvider, ICultureDictionaryFactory> factory)
     {
         builder.Services.AddUnique(factory);
@@ -56,7 +57,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A factory.</param>
-    public static IUmbracoBuilder SetCultureDictionaryFactory(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetCultureDictionaryFactory(
+        this IUmbracoBuilder builder,
         ICultureDictionaryFactory factory)
     {
         builder.Services.AddUnique(factory);
@@ -80,7 +82,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A function creating a published content model factory.</param>
-    public static IUmbracoBuilder SetPublishedContentModelFactory(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetPublishedContentModelFactory(
+        this IUmbracoBuilder builder,
         Func<IServiceProvider, IPublishedModelFactory> factory)
     {
         builder.Services.AddUnique(factory);
@@ -92,7 +95,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A published content model factory.</param>
-    public static IUmbracoBuilder SetPublishedContentModelFactory(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetPublishedContentModelFactory(
+        this IUmbracoBuilder builder,
         IPublishedModelFactory factory)
     {
         builder.Services.AddUnique(factory);
@@ -116,7 +120,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A function creating a short string helper.</param>
-    public static IUmbracoBuilder SetShortStringHelper(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetShortStringHelper(
+        this IUmbracoBuilder builder,
         Func<IServiceProvider, IShortStringHelper> factory)
     {
         builder.Services.AddUnique(factory);
@@ -139,13 +144,15 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">A builder.</param>
     /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
-    public static IUmbracoBuilder SetMediaFileSystem(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetMediaFileSystem(
+        this IUmbracoBuilder builder,
         Func<IServiceProvider, IFileSystem> filesystemFactory)
     {
         builder.Services.AddUnique(
             provider =>
             {
                 IFileSystem filesystem = filesystemFactory(provider);
+
                 // We need to use the Filesystems to create a shadow wrapper,
                 // because shadow wrapper requires the IsScoped delegate from the FileSystems.
                 // This is used by the scope provider when taking control of the filesystems.
@@ -164,7 +171,8 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="configure">Method that configures the <see cref="FileSystems" />.</param>
     /// <exception cref="ArgumentNullException">Throws exception if <paramref name="configure" /> is null.</exception>
     /// <exception cref="InvalidOperationException">Throws exception if full path can't be resolved successfully.</exception>
-    public static IUmbracoBuilder ConfigureFileSystems(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder ConfigureFileSystems(
+        this IUmbracoBuilder builder,
         Action<IServiceProvider, FileSystems> configure)
     {
         if (configure == null)

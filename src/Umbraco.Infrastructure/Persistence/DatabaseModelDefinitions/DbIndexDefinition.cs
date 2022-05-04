@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 /// <summary>
 ///     Represents a database index definition retrieved by querying the database
@@ -14,7 +14,10 @@ internal class DbIndexDefinition
     }
 
     public string IndexName { get; }
+
     public string TableName { get; }
+
     public string ColumnName { get; }
+
     public bool IsUnique { get; }
 }

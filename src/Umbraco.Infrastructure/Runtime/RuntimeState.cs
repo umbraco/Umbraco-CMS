@@ -30,10 +30,6 @@ public class RuntimeState : IRuntimeState
     private readonly IUmbracoVersion _umbracoVersion = null!;
     private readonly IOptions<UnattendedSettings> _unattendedSettings = null!;
 
-    private RuntimeState()
-    {
-    }
-
     public RuntimeState(
         IOptions<GlobalSettings> globalSettings,
         IOptions<UnattendedSettings> unattendedSettings,
@@ -50,6 +46,10 @@ public class RuntimeState : IRuntimeState
         _logger = logger;
         _packageMigrationState = packageMigrationState;
         _conflictingRouteService = conflictingRouteService;
+    }
+
+    private RuntimeState()
+    {
     }
 
     /// <summary>
@@ -72,6 +72,15 @@ public class RuntimeState : IRuntimeState
             packageMigrationState,
             StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
     {
+    }
+
+    private enum UmbracoDatabaseState
+    {
+        Ok,
+        CannotConnect,
+        NotInstalled,
+        NeedsUpgrade,
+        NeedsPackageMigration,
     }
 
     /// <inheritdoc />
@@ -101,6 +110,12 @@ public class RuntimeState : IRuntimeState
     /// <inheritdoc />
     public IReadOnlyDictionary<string, object> StartupState => _startupState;
 
+    /// <summary>
+    ///     The initial <see cref="RuntimeState" />
+    ///     The initial <see cref="RuntimeState" />
+    /// </summary>
+    public static RuntimeState Booting() => new() { Level = RuntimeLevel.Boot };
+
     /// <inheritdoc />
     public void DetermineRuntimeLevel()
     {
@@ -127,7 +142,6 @@ public class RuntimeState : IRuntimeState
         }
 
         // Check the database state, whether we can connect or if it's in an upgrade or empty state, etc...
-
         switch (GetUmbracoDatabaseState(_databaseFactory))
         {
             case UmbracoDatabaseState.CannotConnect:
@@ -150,6 +164,7 @@ public class RuntimeState : IRuntimeState
                         "A connection string is configured but Umbraco could not connect to the database.");
                 throw BootFailedException;
             }
+
             case UmbracoDatabaseState.NotInstalled:
             {
                 // ok to install on an empty database
@@ -157,6 +172,7 @@ public class RuntimeState : IRuntimeState
                 Reason = RuntimeLevelReason.InstallEmptyDatabase;
                 return;
             }
+
             case UmbracoDatabaseState.NeedsUpgrade:
             {
                 // the db version does not match... but we do have a migration table
@@ -168,14 +184,15 @@ public class RuntimeState : IRuntimeState
                 Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
                 Reason = RuntimeLevelReason.UpgradeMigrations;
             }
-                break;
+
+            break;
             case UmbracoDatabaseState.NeedsPackageMigration:
 
                 // no matter what the level is run for package migrations.
                 // they either run unattended, or only manually via the back office.
-                Level = RuntimeLevel.Run;
+            Level = RuntimeLevel.Run;
 
-                if (_unattendedSettings.Value.PackageMigrationsUnattended)
+            if (_unattendedSettings.Value.PackageMigrationsUnattended)
                 {
                     _logger.LogDebug("Package migrations need to execute.");
                     Reason = RuntimeLevelReason.UpgradePackageMigrations;
@@ -187,7 +204,7 @@ public class RuntimeState : IRuntimeState
                     Reason = RuntimeLevelReason.Run;
                 }
 
-                break;
+            break;
             case UmbracoDatabaseState.Ok:
             default:
             {
@@ -195,7 +212,8 @@ public class RuntimeState : IRuntimeState
                 Level = RuntimeLevel.Run;
                 Reason = RuntimeLevelReason.Run;
             }
-                break;
+
+            break;
         }
     }
 
@@ -209,12 +227,6 @@ public class RuntimeState : IRuntimeState
             BootFailedException = new BootFailedException(bootFailedException.Message, bootFailedException);
         }
     }
-
-    /// <summary>
-    ///     The initial <see cref="RuntimeState" />
-    ///     The initial <see cref="RuntimeState" />
-    /// </summary>
-    public static RuntimeState Booting() => new() {Level = RuntimeLevel.Boot};
 
     private UmbracoDatabaseState GetUmbracoDatabaseState(IUmbracoDatabaseFactory databaseFactory)
     {
@@ -281,7 +293,8 @@ public class RuntimeState : IRuntimeState
 
         FinalMigrationState = upgrader.Plan.FinalState;
 
-        _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}",
+        _logger.LogDebug(
+            "Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}",
             FinalMigrationState, CurrentMigrationState ?? "<null>");
 
         return CurrentMigrationState != FinalMigrationState;
@@ -293,7 +306,7 @@ public class RuntimeState : IRuntimeState
         // (since this is an already existing database, assume localdb is ready)
         bool canConnect;
         var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
-        for (var i = 0;;)
+        for (var i = 0; ;)
         {
             canConnect = databaseFactory.CanConnect;
             if (canConnect || ++i == tries)
@@ -310,13 +323,4 @@ public class RuntimeState : IRuntimeState
 
     private bool CanAutoInstallMissingDatabase(IUmbracoDatabaseFactory databaseFactory)
         => databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
-
-    private enum UmbracoDatabaseState
-    {
-        Ok,
-        CannotConnect,
-        NotInstalled,
-        NeedsUpgrade,
-        NeedsPackageMigration
-    }
 }

@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -13,5 +13,7 @@ public class UserGroup2AppDto
     [ForeignKey(typeof(UserGroupDto))]
     public int UserGroupId { get; set; }
 
-    [Column("app")] [Length(50)] public string AppAlias { get; set; } = null!;
+    [Column("app")]
+    [Length(50)]
+    public string AppAlias { get; set; } = null!;
 }

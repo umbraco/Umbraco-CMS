@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -172,7 +172,8 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
             .LeftJoin<NodeDto>("ctn")
             .On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, "ct", "ctn")
             .Where<NodeDto>(x => x.NodeId == id, "pn")
-            .Where<RelationDto>(x => x.ChildId == id || x.ParentId == id,
+            .Where<RelationDto>(
+                x => x.ChildId == id || x.ParentId == id,
                 "r"); // This last Where is purely to help SqlServer make a smarter query plan. More info https://github.com/umbraco/Umbraco-CMS/issues/12190
 
         if (filterMustBeIsDependency)
@@ -202,6 +203,6 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
             RelationTypeIsDependency = dto.RelationTypeIsDependency,
             ContentTypeAlias = dto.ChildContentTypeAlias,
             ContentTypeIcon = dto.ChildContentTypeIcon,
-            ContentTypeName = dto.ChildContentTypeName
+            ContentTypeName = dto.ChildContentTypeName,
         };
 }

@@ -58,6 +58,12 @@ public sealed class RedirectTrackingHandler :
     public void Handle(ContentPublishingNotification notification) =>
         StoreOldRoutes(notification.PublishedEntities, notification);
 
+    private static bool IsNotRoute(string? route) =>
+
+        // null if content not found
+        // err/- if collision or anomaly or ...
+        route == null || route.StartsWith("err/");
+
     private void StoreOldRoutes(IEnumerable<IContent> entities, IStatefulNotification notification)
     {
         // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
@@ -161,28 +167,27 @@ public sealed class RedirectTrackingHandler :
         }
     }
 
-    private static bool IsNotRoute(string? route) =>
-        // null if content not found
-        // err/- if collision or anomaly or ...
-        route == null || route.StartsWith("err/");
-
     private class ContentIdAndCulture : Tuple<int, string>
     {
-        public ContentIdAndCulture(int contentId, string culture) : base(contentId, culture)
+        public ContentIdAndCulture(int contentId, string culture)
+            : base(contentId, culture)
         {
         }
 
         public int ContentId => Item1;
+
         public string Culture => Item2;
     }
 
     private class ContentKeyAndOldRoute : Tuple<Guid, string>
     {
-        public ContentKeyAndOldRoute(Guid contentKey, string oldRoute) : base(contentKey, oldRoute)
+        public ContentKeyAndOldRoute(Guid contentKey, string oldRoute)
+            : base(contentKey, oldRoute)
         {
         }
 
         public Guid ContentKey => Item1;
+
         public string OldRoute => Item2;
     }
 

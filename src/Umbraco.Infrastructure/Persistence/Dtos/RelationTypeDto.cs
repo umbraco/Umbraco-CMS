@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -19,7 +19,8 @@ internal class RelationTypeDto
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_UniqueId")]
     public Guid UniqueId { get; set; }
 
-    [Column("dual")] public bool Dual { get; set; }
+    [Column("dual")]
+    public bool Dual { get; set; }
 
     [Column("parentObjectType")]
     [NullSetting(NullSetting = NullSettings.Null)]

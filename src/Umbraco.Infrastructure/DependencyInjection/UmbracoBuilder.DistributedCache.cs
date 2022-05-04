@@ -49,7 +49,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A function creating a server registrar.</param>
-    public static IUmbracoBuilder SetServerRegistrar(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetServerRegistrar(
+        this IUmbracoBuilder builder,
         Func<IServiceProvider, IServerRoleAccessor> factory)
     {
         builder.Services.AddUnique(factory);
@@ -84,7 +85,8 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A function creating a server messenger.</param>
-    public static IUmbracoBuilder SetServerMessenger(this IUmbracoBuilder builder,
+    public static IUmbracoBuilder SetServerMessenger(
+        this IUmbracoBuilder builder,
         Func<IServiceProvider, IServerMessenger> factory)
     {
         builder.Services.AddUnique(factory);

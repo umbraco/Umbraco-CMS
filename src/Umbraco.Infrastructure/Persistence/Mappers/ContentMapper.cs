@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -37,8 +37,8 @@ public sealed class ContentMapper : BaseMapper
         DefineMap<Content, ContentVersionDto>(nameof(Content.UpdateDate), nameof(ContentVersionDto.VersionDate));
         DefineMap<Content, DocumentDto>(nameof(Content.Published), nameof(DocumentDto.Published));
 
-        //DefineMap<Content, DocumentDto>(nameof(Content.Name), nameof(DocumentDto.Alias));
-        //CacheMap<Content, DocumentDto>(src => src, dto => dto.Newest);
-        //DefineMap<Content, DocumentDto>(nameof(Content.Template), nameof(DocumentDto.TemplateId));
+        // DefineMap<Content, DocumentDto>(nameof(Content.Name), nameof(DocumentDto.Alias));
+        // CacheMap<Content, DocumentDto>(src => src, dto => dto.Newest);
+        // DefineMap<Content, DocumentDto>(nameof(Content.Template), nameof(DocumentDto.TemplateId));
     }
 }

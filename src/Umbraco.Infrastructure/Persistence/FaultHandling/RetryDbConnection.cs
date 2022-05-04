@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Transactions;
@@ -29,9 +29,9 @@ public class RetryDbConnection : DbConnection
         set => Inner.ConnectionString = value;
     }
 
-    protected override bool CanRaiseEvents => true;
-
     public override int ConnectionTimeout => Inner.ConnectionTimeout;
+
+    protected override bool CanRaiseEvents => true;
 
     public override string DataSource => Inner.DataSource;
 
@@ -41,12 +41,14 @@ public class RetryDbConnection : DbConnection
 
     public override ConnectionState State => Inner.State;
 
+    public override void ChangeDatabase(string databaseName) => Inner.ChangeDatabase(databaseName);
+
     protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) =>
         Inner.BeginTransaction(isolationLevel);
 
-    public override void ChangeDatabase(string databaseName) => Inner.ChangeDatabase(databaseName);
-
     public override void Close() => Inner.Close();
+
+    public override void EnlistTransaction(Transaction? transaction) => Inner.EnlistTransaction(transaction);
 
     protected override DbCommand CreateDbCommand() =>
         new FaultHandlingDbCommand(this, Inner.CreateCommand(), _cmdRetryPolicy);
@@ -62,8 +64,6 @@ public class RetryDbConnection : DbConnection
         base.Dispose(disposing);
     }
 
-    public override void EnlistTransaction(Transaction? transaction) => Inner.EnlistTransaction(transaction);
-
     public override DataTable GetSchema() => Inner.GetSchema();
 
     public override DataTable GetSchema(string collectionName) => Inner.GetSchema(collectionName);
@@ -72,9 +72,6 @@ public class RetryDbConnection : DbConnection
         Inner.GetSchema(collectionName, restrictionValues);
 
     public override void Open() => _conRetryPolicy.ExecuteAction(Inner.Open);
-
-    private void StateChangeHandler(object sender, StateChangeEventArgs stateChangeEventArguments) =>
-        OnStateChange(stateChangeEventArguments);
 
     public void Ensure()
     {
@@ -85,6 +82,9 @@ public class RetryDbConnection : DbConnection
             Open();
         }
     }
+
+    private void StateChangeHandler(object sender, StateChangeEventArgs stateChangeEventArguments) =>
+        OnStateChange(stateChangeEventArguments);
 }
 
 internal class FaultHandlingDbCommand : DbCommand
@@ -120,6 +120,8 @@ internal class FaultHandlingDbCommand : DbCommand
         set => Inner.CommandType = value;
     }
 
+    public override bool DesignTimeVisible { get; set; }
+
     [AllowNull]
     protected override DbConnection DbConnection
     {
@@ -154,13 +156,15 @@ internal class FaultHandlingDbCommand : DbCommand
         set => Inner.Transaction = value;
     }
 
-    public override bool DesignTimeVisible { get; set; }
-
     public override UpdateRowSource UpdatedRowSource
     {
         get => Inner.UpdatedRowSource;
         set => Inner.UpdatedRowSource = value;
     }
+
+    public override void Cancel() => Inner.Cancel();
+
+    public override int ExecuteNonQuery() => Execute(() => Inner.ExecuteNonQuery());
 
     protected override void Dispose(bool disposing)
     {
@@ -173,16 +177,14 @@ internal class FaultHandlingDbCommand : DbCommand
         base.Dispose(disposing);
     }
 
-    public override void Cancel() => Inner.Cancel();
-
     protected override DbParameter CreateDbParameter() => Inner.CreateParameter();
 
     protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior) =>
         Execute(() => Inner.ExecuteReader(behavior));
 
-    public override int ExecuteNonQuery() => Execute(() => Inner.ExecuteNonQuery());
-
     public override object? ExecuteScalar() => Execute(() => Inner.ExecuteScalar());
+
+    public override void Prepare() => Inner.Prepare();
 
     private T Execute<T>(Func<T> f) =>
         _cmdRetryPolicy.ExecuteAction(() =>
@@ -190,6 +192,4 @@ internal class FaultHandlingDbCommand : DbCommand
             _connection.Ensure();
             return f();
         })!;
-
-    public override void Prepare() => Inner.Prepare();
 }

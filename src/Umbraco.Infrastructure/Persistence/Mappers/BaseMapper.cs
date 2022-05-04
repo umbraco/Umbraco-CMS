@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Reflection;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -11,11 +11,11 @@ public abstract class BaseMapper
     private readonly object _definedLock = new();
 
     private readonly MapperConfigurationStore _maps;
+
     // note: using a Lazy<ISqlContext> here because during installs, we are resolving the
     // mappers way before we have a configured IUmbracoDatabaseFactory, ie way before we
     // have an ISqlContext - this is some nasty temporal coupling which we might want to
     // cleanup eventually.
-
     private readonly Lazy<ISqlContext> _sqlContext;
     private bool _defined;
 
@@ -26,8 +26,6 @@ public abstract class BaseMapper
         _sqlContext = sqlContext;
         _maps = maps;
     }
-
-    protected abstract void DefineMaps();
 
     internal string Map(string? propertyName)
     {
@@ -63,6 +61,8 @@ public abstract class BaseMapper
         return mappedName;
     }
 
+    protected abstract void DefineMaps();
+
     // fixme: TSource is used for nothing
     protected void DefineMap<TSource, TTarget>(string sourceName, string targetName)
     {
@@ -74,7 +74,6 @@ public abstract class BaseMapper
         Type targetType = typeof(TTarget);
 
         // TODO ensure that sourceName is a valid sourceType property (but, slow?)
-
         TableNameAttribute? tableNameAttribute = targetType.FirstAttribute<TableNameAttribute>();
         if (tableNameAttribute == null)
         {

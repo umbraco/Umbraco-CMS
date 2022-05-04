@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -22,7 +22,8 @@ internal class AccessRuleDto
     [Index(IndexTypes.UniqueNonClustered, ForColumns = "ruleValue,ruleType,accessId", Name = "IX_umbracoAccessRule")]
     public string? RuleValue { get; set; }
 
-    [Column("ruleType")] public string? RuleType { get; set; }
+    [Column("ruleType")]
+    public string? RuleType { get; set; }
 
     [Column("createDate")]
     [Constraint(Default = SystemMethods.CurrentDateTime)]

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -23,10 +23,10 @@ internal static class ConsentFactory
                 Context = dto.Context,
                 Action = dto.Action,
                 State = (ConsentState)dto.State, // assume value is valid
-                Comment = dto.Comment
+                Comment = dto.Comment,
             };
 
-            //on initial construction we don't want to have dirty properties tracked
+            // on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             consent.ResetDirtyProperties(false);
 
@@ -59,6 +59,6 @@ internal static class ConsentFactory
             Context = entity.Context,
             Action = entity.Action,
             State = (int)entity.State,
-            Comment = entity.Comment
+            Comment = entity.Comment,
         };
 }

@@ -21,6 +21,19 @@ public class BackOfficeIdentityBuilder : IdentityBuilder
         : base(typeof(BackOfficeIdentityUser), role, services)
         => InitializeServices(services);
 
+    // override to add itself, by default identity only wants a single IdentityErrorDescriber
+    public override IdentityBuilder AddErrorDescriber<TDescriber>()
+    {
+        if (!typeof(BackOfficeErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
+        {
+            throw new InvalidOperationException(
+                $"The type {typeof(TDescriber)} does not inherit from {typeof(BackOfficeErrorDescriber)}");
+        }
+
+        Services.AddScoped<TDescriber>();
+        return this;
+    }
+
     private void InitializeServices(IServiceCollection services)
     {
         // We need to manually register some identity services here because we cannot rely on normal
@@ -39,19 +52,6 @@ public class BackOfficeIdentityBuilder : IdentityBuilder
                 services.GetRequiredService<IJsonSerializer>()));
         services
             .AddScoped<IUserConfirmation<BackOfficeIdentityUser>, UmbracoUserConfirmation<BackOfficeIdentityUser>>();
-    }
-
-    // override to add itself, by default identity only wants a single IdentityErrorDescriber
-    public override IdentityBuilder AddErrorDescriber<TDescriber>()
-    {
-        if (!typeof(BackOfficeErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
-        {
-            throw new InvalidOperationException(
-                $"The type {typeof(TDescriber)} does not inherit from {typeof(BackOfficeErrorDescriber)}");
-        }
-
-        Services.AddScoped<TDescriber>();
-        return this;
     }
 
     /// <summary>

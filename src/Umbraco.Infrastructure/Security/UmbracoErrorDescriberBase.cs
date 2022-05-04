@@ -12,82 +12,91 @@ public abstract class UmbracoErrorDescriberBase : IdentityErrorDescriber
 
     public override IdentityError ConcurrencyFailure() => new()
     {
-        Code = nameof(ConcurrencyFailure), Description = _textService.Localize("errors", "concurrencyError")
+        Code = nameof(ConcurrencyFailure),
+        Description = _textService.Localize("errors", "concurrencyError"),
     };
 
     public override IdentityError DefaultError() => new()
     {
-        Code = nameof(DefaultError), Description = _textService.Localize("errors", "defaultError")
+        Code = nameof(DefaultError),
+        Description = _textService.Localize("errors", "defaultError"),
     };
 
     public override IdentityError DuplicateEmail(string email) => new()
     {
         Code = nameof(DuplicateEmail),
-        Description = _textService.Localize("validation", "duplicateEmail", new[] {email})
+        Description = _textService.Localize("validation", "duplicateEmail", new[] { email }),
     };
 
     public override IdentityError DuplicateUserName(string userName) => new()
     {
         Code = nameof(DuplicateUserName),
-        Description = _textService.Localize("validation", "duplicateUsername", new[] {userName})
+        Description = _textService.Localize("validation", "duplicateUsername", new[] { userName }),
     };
 
     public override IdentityError InvalidEmail(string email) => new()
     {
-        Code = nameof(InvalidEmail), Description = _textService.Localize("validation", "invalidEmail")
+        Code = nameof(InvalidEmail),
+        Description = _textService.Localize("validation", "invalidEmail"),
     };
 
     public override IdentityError InvalidToken() => new()
     {
-        Code = nameof(InvalidToken), Description = _textService.Localize("validation", "invalidToken")
+        Code = nameof(InvalidToken),
+        Description = _textService.Localize("validation", "invalidToken"),
     };
 
     public override IdentityError InvalidUserName(string userName) => new()
     {
-        Code = nameof(InvalidUserName), Description = _textService.Localize("validation", "invalidUsername")
+        Code = nameof(InvalidUserName),
+        Description = _textService.Localize("validation", "invalidUsername"),
     };
 
     public override IdentityError PasswordMismatch() => new()
     {
-        Code = nameof(PasswordMismatch), Description = _textService.Localize("user", "passwordMismatch")
+        Code = nameof(PasswordMismatch),
+        Description = _textService.Localize("user", "passwordMismatch"),
     };
 
     public override IdentityError PasswordRequiresDigit() => new()
     {
-        Code = nameof(PasswordRequiresDigit), Description = _textService.Localize("user", "passwordRequiresDigit")
+        Code = nameof(PasswordRequiresDigit),
+        Description = _textService.Localize("user", "passwordRequiresDigit"),
     };
 
     public override IdentityError PasswordRequiresLower() => new()
     {
-        Code = nameof(PasswordRequiresLower), Description = _textService.Localize("user", "passwordRequiresLower")
+        Code = nameof(PasswordRequiresLower),
+        Description = _textService.Localize("user", "passwordRequiresLower"),
     };
 
     public override IdentityError PasswordRequiresNonAlphanumeric() => new()
     {
         Code = nameof(PasswordRequiresNonAlphanumeric),
-        Description = _textService.Localize("user", "passwordRequiresNonAlphanumeric")
+        Description = _textService.Localize("user", "passwordRequiresNonAlphanumeric"),
     };
 
     public override IdentityError PasswordRequiresUniqueChars(int uniqueChars) => new()
     {
         Code = nameof(PasswordRequiresUniqueChars),
-        Description = _textService.Localize("user", "passwordRequiresUniqueChars", new[] {uniqueChars.ToString()})
+        Description = _textService.Localize("user", "passwordRequiresUniqueChars", new[] { uniqueChars.ToString() }),
     };
 
     public override IdentityError PasswordRequiresUpper() => new()
     {
-        Code = nameof(PasswordRequiresUpper), Description = _textService.Localize("user", "passwordRequiresUpper")
+        Code = nameof(PasswordRequiresUpper),
+        Description = _textService.Localize("user", "passwordRequiresUpper"),
     };
 
     public override IdentityError PasswordTooShort(int length) => new()
     {
         Code = nameof(PasswordTooShort),
-        Description = _textService.Localize("user", "passwordTooShort", new[] {length.ToString()})
+        Description = _textService.Localize("user", "passwordTooShort", new[] { length.ToString() }),
     };
 
     public override IdentityError RecoveryCodeRedemptionFailed() => new()
     {
         Code = nameof(RecoveryCodeRedemptionFailed),
-        Description = _textService.Localize("login", "resetCodeExpired")
+        Description = _textService.Localize("login", "resetCodeExpired"),
     };
 }

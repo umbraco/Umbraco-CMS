@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
@@ -20,7 +20,7 @@ internal class DefaultPreValueMigrator : IPreValueMigrator
             // array-based prevalues
             return new Dictionary<string, object>
             {
-                ["values"] = preValuesA.OrderBy(x => x.SortOrder).Select(x => x.Value).ToArray()
+                ["values"] = preValuesA.OrderBy(x => x.SortOrder).Select(x => x.Value).ToArray(),
             };
         }
 

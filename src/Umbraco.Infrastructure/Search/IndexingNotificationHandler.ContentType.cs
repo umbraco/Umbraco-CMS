@@ -18,7 +18,8 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
-    public ContentTypeIndexingNotificationHandler(IUmbracoIndexingHandler umbracoIndexingHandler,
+    public ContentTypeIndexingNotificationHandler(
+        IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService, IMemberService memberService, IMediaService mediaService,
         IMemberTypeService memberTypeService)
     {
@@ -57,8 +58,9 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         foreach (ContentTypeCacheRefresher.JsonPayload payload in (ContentTypeCacheRefresher.JsonPayload[])args
                      .MessageObject)
         {
-            if (!changedIds.TryGetValue(payload.ItemType,
-                    out (List<int> removedIds, List<int> refreshedIds, List<int> otherIds) idLists))
+            if (!changedIds.TryGetValue(
+                payload.ItemType,
+                out (List<int> removedIds, List<int> refreshedIds, List<int> otherIds) idLists))
             {
                 idLists = (removedIds: new List<int>(), refreshedIds: new List<int>(), otherIds: new List<int>());
                 changedIds.Add(payload.ItemType, idLists);
@@ -99,7 +101,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                 }
             }
 
-            //Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
+            // Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
             _umbracoIndexingHandler.DeleteDocumentsForContentTypes(ci.Value.removedIds);
         }
     }
@@ -135,7 +137,8 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         while (page * pageSize < total)
         {
             IEnumerable<IMedia> mediaToRefresh = _mediaService.GetPagedOfTypes(
-                //Re-index all content of these types
+
+                // Re-index all content of these types
                 mediaTypeIds,
                 page++, pageSize, out total, null,
                 Ordering.By("Path"));
@@ -155,13 +158,15 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         while (page * pageSize < total)
         {
             IEnumerable<IContent> contentToRefresh = _contentService.GetPagedOfTypes(
-                //Re-index all content of these types
+
+                // Re-index all content of these types
                 contentTypeIds,
                 page++, pageSize, out total, null,
-                //order by shallowest to deepest, this allows us to check it's published state without checking every item
+
+                // order by shallowest to deepest, this allows us to check it's published state without checking every item
                 Ordering.By("Path"));
 
-            //track which Ids have their paths are published
+            // track which Ids have their paths are published
             var publishChecked = new Dictionary<int, bool>();
 
             foreach (IContent c in contentToRefresh)
@@ -171,7 +176,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                 {
                     if (!publishChecked.TryGetValue(c.ParentId, out isPublished))
                     {
-                        //nothing by parent id, so query the service and cache the result for the next child to check against
+                        // nothing by parent id, so query the service and cache the result for the next child to check against
                         isPublished = _contentService.IsPathPublished(c);
                         publishChecked[c.Id] = isPublished;
                     }

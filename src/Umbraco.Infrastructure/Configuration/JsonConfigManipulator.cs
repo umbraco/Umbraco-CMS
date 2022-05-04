@@ -69,7 +69,6 @@ public class JsonConfigManipulator : IConfigManipulator
         SaveJson(provider, json);
     }
 
-
     public void SaveConfigValue(string key, object value)
     {
         JsonConfigurationProvider provider = GetJsonConfigurationProvider();
@@ -82,7 +81,7 @@ public class JsonConfigManipulator : IConfigManipulator
         }
 
         JToken? token = json;
-        foreach (var propertyName in key.Split(new[] {':'}))
+        foreach (var propertyName in key.Split(new[] { ':' }))
         {
             if (token is null)
             {
@@ -151,6 +150,45 @@ public class JsonConfigManipulator : IConfigManipulator
         SaveJson(provider, json);
     }
 
+    private static void RemoveJsonKey(JObject? json, string key)
+    {
+        JToken? token = json;
+        foreach (var propertyName in key.Split(new[] { ':' }))
+        {
+            token = CaseSelectPropertyValues(token, propertyName);
+        }
+
+        token?.Parent?.Remove();
+    }
+
+    /// <summary>
+    ///     Returns the property value when case insensative
+    /// </summary>
+    /// <remarks>
+    ///     This method is required because keys are case insensative in IConfiguration.
+    ///     JObject[..] do not support case insensative and JObject.Property(...) do not return a new JObject.
+    /// </remarks>
+    private static JToken? CaseSelectPropertyValues(JToken? token, string name)
+    {
+        if (token is JObject obj)
+        {
+            foreach (JProperty property in obj.Properties())
+            {
+                if (name is null)
+                {
+                    return property.Value;
+                }
+
+                if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return property.Value;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private object? GetGlobalIdItem(string id)
     {
         var writer = new JTokenWriter();
@@ -210,17 +248,6 @@ public class JsonConfigManipulator : IConfigManipulator
         return writer.Token;
     }
 
-    private static void RemoveJsonKey(JObject? json, string key)
-    {
-        JToken? token = json;
-        foreach (var propertyName in key.Split(new[] {':'}))
-        {
-            token = CaseSelectPropertyValues(token, propertyName);
-        }
-
-        token?.Parent?.Remove();
-    }
-
     private void SaveJson(JsonConfigurationProvider provider, JObject? json)
     {
         lock (_locker)
@@ -232,7 +259,7 @@ public class JsonConfigManipulator : IConfigManipulator
                 try
                 {
                     using (var sw = new StreamWriter(jsonFilePath, false))
-                    using (var jsonTextWriter = new JsonTextWriter(sw) {Formatting = Formatting.Indented})
+                    using (var jsonTextWriter = new JsonTextWriter(sw) { Formatting = Formatting.Indented })
                     {
                         json?.WriteTo(jsonTextWriter);
                     }
@@ -288,33 +315,5 @@ public class JsonConfigManipulator : IConfigManipulator
         }
 
         throw new InvalidOperationException("Could not find a writable json config source");
-    }
-
-    /// <summary>
-    ///     Returns the property value when case insensative
-    /// </summary>
-    /// <remarks>
-    ///     This method is required because keys are case insensative in IConfiguration.
-    ///     JObject[..] do not support case insensative and JObject.Property(...) do not return a new JObject.
-    /// </remarks>
-    private static JToken? CaseSelectPropertyValues(JToken? token, string name)
-    {
-        if (token is JObject obj)
-        {
-            foreach (JProperty property in obj.Properties())
-            {
-                if (name is null)
-                {
-                    return property.Value;
-                }
-
-                if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return property.Value;
-                }
-            }
-        }
-
-        return null;
     }
 }

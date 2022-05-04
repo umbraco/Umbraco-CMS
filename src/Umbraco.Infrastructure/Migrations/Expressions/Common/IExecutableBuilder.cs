@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
 public interface IExecutableBuilder
 {

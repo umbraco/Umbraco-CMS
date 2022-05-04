@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
@@ -20,7 +20,7 @@ public class LogViewerConfig : ILogViewerConfig
     {
         using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
         IEnumerable<ILogViewerQuery>? logViewerQueries = _logViewerQueryRepository.GetMany();
-        SavedLogSearch[]? result = logViewerQueries?.Select(x => new SavedLogSearch {Name = x.Name, Query = x.Query})
+        SavedLogSearch[]? result = logViewerQueries?.Select(x => new SavedLogSearch { Name = x.Name, Query = x.Query })
             .ToArray();
         return result;
     }
@@ -42,7 +42,7 @@ public class LogViewerConfig : ILogViewerConfig
             _logViewerQueryRepository.Delete(item);
         }
 
-        //Return the updated object - so we can instantly reset the entire array from the API response
+        // Return the updated object - so we can instantly reset the entire array from the API response
         return GetSavedSearches();
     }
 }

@@ -11,38 +11,38 @@ public static class DefinitionFactory
 {
     public static TableDefinition GetTableDefinition(Type modelType, ISqlSyntaxProvider sqlSyntax)
     {
-        //Looks for NPoco's TableNameAtribute for the name of the table
-        //If no attribute is set we use the name of the Type as the default convention
+        // Looks for NPoco's TableNameAtribute for the name of the table
+        // If no attribute is set we use the name of the Type as the default convention
         TableNameAttribute? tableNameAttribute = modelType.FirstAttribute<TableNameAttribute>();
         var tableName = tableNameAttribute == null ? modelType.Name : tableNameAttribute.Value;
 
-        var tableDefinition = new TableDefinition {Name = tableName};
+        var tableDefinition = new TableDefinition { Name = tableName };
         var objProperties = modelType.GetProperties().ToList();
         foreach (PropertyInfo propertyInfo in objProperties)
         {
-            //If current property has an IgnoreAttribute then skip it
+            // If current property has an IgnoreAttribute then skip it
             IgnoreAttribute? ignoreAttribute = propertyInfo.FirstAttribute<IgnoreAttribute>();
             if (ignoreAttribute != null)
             {
                 continue;
             }
 
-            //If current property has a ResultColumnAttribute then skip it
+            // If current property has a ResultColumnAttribute then skip it
             ResultColumnAttribute? resultColumnAttribute = propertyInfo.FirstAttribute<ResultColumnAttribute>();
             if (resultColumnAttribute != null)
             {
                 continue;
             }
 
-            //Looks for ColumnAttribute with the name of the column, which would exist with ExplicitColumns
-            //Otherwise use the name of the property itself as the default convention
+            // Looks for ColumnAttribute with the name of the column, which would exist with ExplicitColumns
+            // Otherwise use the name of the property itself as the default convention
             ColumnAttribute? columnAttribute = propertyInfo.FirstAttribute<ColumnAttribute>();
             var columnName = columnAttribute != null ? columnAttribute.Name : propertyInfo.Name;
             ColumnDefinition columnDefinition =
                 GetColumnDefinition(modelType, propertyInfo, columnName, tableName, sqlSyntax);
             tableDefinition.Columns.Add(columnDefinition);
 
-            //Creates a foreignkey definition and adds it to the collection on the table definition
+            // Creates a foreignkey definition and adds it to the collection on the table definition
             IEnumerable<ForeignKeyAttribute>? foreignKeyAttributes =
                 propertyInfo.MultipleAttribute<ForeignKeyAttribute>();
             if (foreignKeyAttributes != null)
@@ -55,7 +55,7 @@ public static class DefinitionFactory
                 }
             }
 
-            //Creates an index definition and adds it to the collection on the table definition
+            // Creates an index definition and adds it to the collection on the table definition
             IndexAttribute? indexAttribute = propertyInfo.FirstAttribute<IndexAttribute>();
             if (indexAttribute != null)
             {
@@ -73,17 +73,19 @@ public static class DefinitionFactory
     {
         var definition = new ColumnDefinition
         {
-            Name = columnName, TableName = tableName, ModificationType = ModificationType.Create
+            Name = columnName,
+            TableName = tableName,
+            ModificationType = ModificationType.Create,
         };
 
-        //Look for specific Null setting attributed a column
+        // Look for specific Null setting attributed a column
         NullSettingAttribute? nullSettingAttribute = propertyInfo.FirstAttribute<NullSettingAttribute>();
         if (nullSettingAttribute != null)
         {
             definition.IsNullable = nullSettingAttribute.NullSetting == NullSettings.Null;
         }
 
-        //Look for specific DbType attributed a column
+        // Look for specific DbType attributed a column
         SpecialDbTypeAttribute? databaseTypeAttribute = propertyInfo.FirstAttribute<SpecialDbTypeAttribute>();
         if (databaseTypeAttribute != null)
         {
@@ -94,7 +96,7 @@ public static class DefinitionFactory
             definition.PropertyType = propertyInfo.PropertyType;
         }
 
-        //Look for Primary Key for the current column
+        // Look for Primary Key for the current column
         PrimaryKeyColumnAttribute? primaryKeyColumnAttribute = propertyInfo.FirstAttribute<PrimaryKeyColumnAttribute>();
         if (primaryKeyColumnAttribute != null)
         {
@@ -110,14 +112,14 @@ public static class DefinitionFactory
             definition.Seeding = primaryKeyColumnAttribute.IdentitySeed;
         }
 
-        //Look for Size/Length of DbType
+        // Look for Size/Length of DbType
         LengthAttribute? lengthAttribute = propertyInfo.FirstAttribute<LengthAttribute>();
         if (lengthAttribute != null)
         {
             definition.Size = lengthAttribute.Length;
         }
 
-        //Look for Constraint for the current column
+        // Look for Constraint for the current column
         ConstraintAttribute? constraintAttribute = propertyInfo.FirstAttribute<ConstraintAttribute>();
         if (constraintAttribute != null)
         {
@@ -148,7 +150,7 @@ public static class DefinitionFactory
             ForeignTable = tableName,
             PrimaryTable = referencedTable!.Value,
             OnDelete = attribute.OnDelete,
-            OnUpdate = attribute.OnUpdate
+            OnUpdate = attribute.OnUpdate,
         };
         definition.ForeignColumns.Add(columnName);
         definition.PrimaryColumns.Add(referencedColumn);
@@ -165,7 +167,10 @@ public static class DefinitionFactory
 
         var definition = new IndexDefinition
         {
-            Name = indexName, IndexType = attribute.IndexType, ColumnName = columnName, TableName = tableName
+            Name = indexName,
+            IndexType = attribute.IndexType,
+            ColumnName = columnName,
+            TableName = tableName,
         };
 
         if (string.IsNullOrEmpty(attribute.ForColumns) == false)
@@ -173,7 +178,7 @@ public static class DefinitionFactory
             IEnumerable<string> columns = attribute.ForColumns.Split(Constants.CharArrays.Comma).Select(p => p.Trim());
             foreach (var column in columns)
             {
-                definition.Columns.Add(new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});
+                definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
             }
         }
 
@@ -183,7 +188,7 @@ public static class DefinitionFactory
             foreach (var column in columns)
             {
                 definition.IncludeColumns.Add(
-                    new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});
+                    new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
             }
         }
 

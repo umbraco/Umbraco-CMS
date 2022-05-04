@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -13,7 +13,7 @@ public class TablesForScheduledPublishing : MigrationBase
 
     protected override void Migrate()
     {
-        //Get anything currently scheduled
+        // Get anything currently scheduled
         Sql? releaseSql = new Sql()
             .Select("nodeId", "releaseDate")
             .From("umbracoDocument")
@@ -26,21 +26,21 @@ public class TablesForScheduledPublishing : MigrationBase
             .Where("expireDate IS NOT NULL");
         Dictionary<int, DateTime>? expires = Database.Dictionary<int, DateTime>(expireSql);
 
-
-        //drop old cols
+        // drop old cols
         Delete.Column("releaseDate").FromTable("umbracoDocument").Do();
         Delete.Column("expireDate").FromTable("umbracoDocument").Do();
-        //add new table
+
+        // add new table
         Create.Table<ContentScheduleDto>(true).Do();
 
-        //migrate the schedule
+        // migrate the schedule
         foreach (KeyValuePair<int, DateTime> s in releases)
         {
             DateTime date = s.Value;
             var action = ContentScheduleAction.Release.ToString();
 
             Insert.IntoTable(ContentScheduleDto.TableName)
-                .Row(new {id = Guid.NewGuid(), nodeId = s.Key, date, action})
+                .Row(new { id = Guid.NewGuid(), nodeId = s.Key, date, action })
                 .Do();
         }
 
@@ -50,7 +50,7 @@ public class TablesForScheduledPublishing : MigrationBase
             var action = ContentScheduleAction.Expire.ToString();
 
             Insert.IntoTable(ContentScheduleDto.TableName)
-                .Row(new {id = Guid.NewGuid(), nodeId = s.Key, date, action})
+                .Row(new { id = Guid.NewGuid(), nodeId = s.Key, date, action })
                 .Do();
         }
     }

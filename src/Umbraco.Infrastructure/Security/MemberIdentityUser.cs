@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Security;
 public class MemberIdentityUser : UmbracoIdentityUser
 {
     // Custom comparer for enumerables
-    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new(
+    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> SGroupsComparer = new(
         (groups, enumerable) =>
             groups?.Select(x => x.Alias).UnsortedSequenceEqual(enumerable?.Select(x => x.Alias)) ?? false,
         groups => groups.GetHashCode());
@@ -21,6 +21,7 @@ public class MemberIdentityUser : UmbracoIdentityUser
     ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
     /// </summary>
     public MemberIdentityUser(int userId) =>
+
         // use the property setters - they do more than just setting a field
         Id = UserIdToString(userId);
 

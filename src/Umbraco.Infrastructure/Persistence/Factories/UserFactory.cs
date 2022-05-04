@@ -73,7 +73,7 @@ internal static class UserFactory
             Avatar = entity.Avatar,
             EmailConfirmedDate = entity.EmailConfirmedDate,
             InvitedDate = entity.InvitedDate,
-            TourData = entity.TourData
+            TourData = entity.TourData,
         };
 
         if (entity.StartContentIds is not null)
@@ -84,7 +84,7 @@ internal static class UserFactory
                 {
                     StartNode = startNodeId,
                     StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Content,
-                    UserId = entity.Id
+                    UserId = entity.Id,
                 });
             }
         }
@@ -97,7 +97,7 @@ internal static class UserFactory
                 {
                     StartNode = startNodeId,
                     StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Media,
-                    UserId = entity.Id
+                    UserId = entity.Id,
                 });
             }
         }

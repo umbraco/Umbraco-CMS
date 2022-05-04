@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
@@ -17,8 +17,8 @@ public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
 {
     private readonly IMediaService _mediaService;
 
-    public ConvertTinyMceAndGridMediaUrlsToLocalLink(IMigrationContext context, IMediaService mediaService) :
-        base(context) => _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+    public ConvertTinyMceAndGridMediaUrlsToLocalLink(IMigrationContext context, IMediaService mediaService)
+        : base(context) => _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
 
     protected override void Migrate()
     {
@@ -47,7 +47,6 @@ public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
             {
                 continue;
             }
-
 
             var propertyChanged = false;
             if (property.PropertyTypeDto?.DataTypeDto?.EditorAlias == Constants.PropertyEditors.Aliases.Grid)
@@ -80,8 +79,8 @@ public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
                         "type is changed from another type into a grid. Old versions of the value in this " +
                         "property can have the structure from the old property editor type. This needs to be " +
                         "changed manually before updating the database.\n" +
-                        $"Property info: Id = {property.Id}, LanguageId = {property.LanguageId}, VersionId = {property.VersionId}, Value = {property.Value}"
-                        , e));
+                        $"Property info: Id = {property.Id}, LanguageId = {property.LanguageId}, VersionId = {property.VersionId}, Value = {property.Value}",
+                        e));
                     continue;
                 }
             }
@@ -96,10 +95,10 @@ public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
             }
         }
 
-
         if (exceptions.Any())
         {
-            throw new AggregateException("One or more errors related to unexpected data in grid values occurred.",
+            throw new AggregateException(
+                "One or more errors related to unexpected data in grid values occurred.",
                 exceptions);
         }
 

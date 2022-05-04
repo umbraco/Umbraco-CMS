@@ -11,6 +11,5 @@ internal class AddScheduledPublishingLock : MigrationBase
     }
 
     protected override void Migrate() =>
-        Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
-            new LockDto {Id = Constants.Locks.ScheduledPublishing, Name = "ScheduledPublishing"});
+        Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ScheduledPublishing, Name = "ScheduledPublishing" });
 }

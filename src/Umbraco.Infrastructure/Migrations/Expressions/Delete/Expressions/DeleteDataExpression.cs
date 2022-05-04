@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
@@ -11,6 +11,7 @@ public class DeleteDataExpression : MigrationExpressionBase
     }
 
     public string? TableName { get; set; }
+
     public virtual bool IsAllRows { get; set; }
 
     public List<DeletionDataDefinition> Rows { get; } = new();
@@ -28,7 +29,8 @@ public class DeleteDataExpression : MigrationExpressionBase
             IEnumerable<string> whereClauses = row.Select(kvp =>
                 $"{SqlSyntax.GetQuotedColumnName(kvp.Key)} {(kvp.Value == null ? "IS" : "=")} {GetQuotedValue(kvp.Value)}");
 
-            stmts.Append(string.Format(SqlSyntax.DeleteData,
+            stmts.Append(string.Format(
+                SqlSyntax.DeleteData,
                 SqlSyntax.GetQuotedTableName(TableName),
                 string.Join(" AND ", whereClauses)));
 

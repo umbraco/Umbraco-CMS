@@ -38,7 +38,8 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
         public MigrateToPackageData(IPackagingService packagingService, IMediaService mediaService,
             MediaFileManager mediaFileManager, MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context) : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators,
+            IMigrationContext context)
+            : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators,
             shortStringHelper, contentTypeBaseServiceProvider, context)
         {
         }

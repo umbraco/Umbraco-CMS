@@ -26,6 +26,11 @@ public abstract partial class MigrationBase : IDiscoverable
         => Context = context;
 
     /// <summary>
+    ///     Builds an Alter expression.
+    /// </summary>
+    public IAlterBuilder Alter => BeginBuild(new AlterBuilder(Context));
+
+    /// <summary>
     ///     Gets the migration context.
     /// </summary>
     protected IMigrationContext Context { get; }
@@ -49,11 +54,6 @@ public abstract partial class MigrationBase : IDiscoverable
     ///     Gets the database type.
     /// </summary>
     protected DatabaseType DatabaseType => Context.Database.DatabaseType;
-
-    /// <summary>
-    ///     Builds an Alter expression.
-    /// </summary>
-    public IAlterBuilder Alter => BeginBuild(new AlterBuilder(Context));
 
     /// <summary>
     ///     Builds a Create expression.
@@ -86,21 +86,6 @@ public abstract partial class MigrationBase : IDiscoverable
     public IUpdateBuilder Update => BeginBuild(new UpdateBuilder(Context));
 
     /// <summary>
-    ///     Creates a new Sql statement.
-    /// </summary>
-    protected Sql<ISqlContext> Sql() => Context.SqlContext.Sql();
-
-    /// <summary>
-    ///     Creates a new Sql statement with arguments.
-    /// </summary>
-    protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
-
-    /// <summary>
-    ///     Executes the migration.
-    /// </summary>
-    protected abstract void Migrate();
-
-    /// <summary>
     ///     Runs the migration.
     /// </summary>
     public void Run()
@@ -115,6 +100,21 @@ public abstract partial class MigrationBase : IDiscoverable
                 "The migration has run, but leaves an expression that has not run.");
         }
     }
+
+    /// <summary>
+    ///     Creates a new Sql statement.
+    /// </summary>
+    protected Sql<ISqlContext> Sql() => Context.SqlContext.Sql();
+
+    /// <summary>
+    ///     Creates a new Sql statement with arguments.
+    /// </summary>
+    protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
+
+    /// <summary>
+    ///     Executes the migration.
+    /// </summary>
+    protected abstract void Migrate();
 
     // ensures we are not already building,
     // ie we did not forget to .Do() an expression

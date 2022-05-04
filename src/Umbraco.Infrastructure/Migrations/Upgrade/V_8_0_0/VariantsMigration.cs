@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -14,7 +14,6 @@ public class VariantsMigration : MigrationBase
 
     // notes
     // do NOT use Rename.Column as it's borked on SQLCE - use ReplaceColumn instead
-
     protected override void Migrate()
     {
         MigratePropertyData();
@@ -227,14 +226,12 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
             $@"UPDATE {PreTables.ContentVersion} SET text=d.text, {SqlSyntax.GetQuotedColumnName("current")}=(d.newest & ~d.published), userId=d.documentUser
 FROM {PreTables.ContentVersion} v INNER JOIN {PreTables.Document} d ON d.versionId = v.versionId");
 
-
         // populate contentVersion text and current columns for non-documents, userId is default
         Database.Execute(
             $@"UPDATE {PreTables.ContentVersion} SET text=n.text, {SqlSyntax.GetQuotedColumnName("current")}=1, userId=0
 FROM {PreTables.ContentVersion} cver
 JOIN {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
 WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
-
 
         // create table
         Create.Table<DocumentVersionDto>(true).Do();
@@ -245,7 +242,6 @@ WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName
 SELECT cver.id, doc.templateId, doc.published
 FROM {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId");
-
 
         // need to add extra rows for where published=newest
         // 'cos INSERT above has inserted the 'published' document version
@@ -272,7 +268,6 @@ JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cverNew ON doc.nodeId = cverNew.nodeId
 JOIN {SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)} pd ON pd.versionId=cver.id
 WHERE doc.newest=1 AND doc.published=1 AND cverNew.{SqlSyntax.GetQuotedColumnName("current")} = 1");
-
 
         // reduce document to 1 row per content
         Database.Execute($@"DELETE FROM {PreTables.Document}
@@ -321,7 +316,7 @@ AND (v1.languageId=v2.languageId OR (v1.languageId IS NULL AND v2.languageId IS 
 AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))");
 
         var updatedIds = new HashSet<int>();
-        foreach (var t in temp)
+        foreach (dynamic t in temp)
         {
             if (t.intValue1 != t.intValue2 || t.decimalValue1 != t.decimalValue2 || t.dateValue1 != t.dateValue2 ||
                 t.varcharValue1 != t.varcharValue2 || t.textValue1 != t.textValue2)
@@ -330,7 +325,7 @@ AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))");
                 {
                     Database.Execute(
                         $"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edited=1 WHERE nodeId=@nodeId",
-                        new {nodeId = t.id});
+                        new { nodeId = t.id });
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
@@ -12,7 +12,7 @@ public class ContentVariationMigration : MigrationBase
 
     protected override void Migrate()
     {
-        byte GetNewValue(byte oldValue)
+        static byte GetNewValue(byte oldValue)
         {
             switch (oldValue)
             {

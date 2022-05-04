@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using NPoco;
 using Umbraco.Extensions;
 
@@ -24,6 +24,11 @@ public class SqlTemplate
             _args![i] = args[i];
         }
     }
+
+    /// <summary>
+    ///     Gets a named argument.
+    /// </summary>
+    public static object Arg(string name) => new TemplateArg(name);
 
     public Sql<ISqlContext> Sql() => new Sql<ISqlContext>(_sqlContext, _sql);
 
@@ -89,7 +94,7 @@ public class SqlTemplate
         if (properties.Count > 0)
         {
             throw new InvalidOperationException(
-                $"Unknown argument{(properties.Count > 1 ? "s" : "")}: {string.Join(", ", properties.Keys)}");
+                $"Unknown argument{(properties.Count > 1 ? "s" : string.Empty)}: {string.Join(", ", properties.Keys)}");
         }
 
         return new Sql<ISqlContext>(_sqlContext, isBuilt, _sql, args);
@@ -102,11 +107,6 @@ public class SqlTemplate
     }
 
     /// <summary>
-    ///     Gets a named argument.
-    /// </summary>
-    public static object Arg(string name) => new TemplateArg(name);
-
-    /// <summary>
     ///     Gets a WHERE expression argument.
     /// </summary>
     public static T? Arg<T>(string name) => default;
@@ -115,8 +115,9 @@ public class SqlTemplate
     ///     Gets a WHERE IN expression argument.
     /// </summary>
     public static IEnumerable<T?> ArgIn<T>(string name) =>
+
         // don't return an empty enumerable, as it breaks NPoco
-        new[] {default(T)};
+        new[] { default(T) };
 
     // these are created in PocoToSqlExpressionVisitor
     internal class TemplateArg

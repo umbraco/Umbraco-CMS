@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -49,7 +49,8 @@ public sealed class MemberMapper : BaseMapper
         DefineMap<Member, PropertyDataDto>(nameof(Member.IntegerPropertyValue), nameof(PropertyDataDto.IntegerValue));
         DefineMap<Member, PropertyDataDto>(nameof(Member.BoolPropertyValue), nameof(PropertyDataDto.IntegerValue));
         DefineMap<Member, PropertyDataDto>(nameof(Member.LongStringPropertyValue), nameof(PropertyDataDto.TextValue));
-        DefineMap<Member, PropertyDataDto>(nameof(Member.ShortStringPropertyValue),
+        DefineMap<Member, PropertyDataDto>(
+            nameof(Member.ShortStringPropertyValue),
             nameof(PropertyDataDto.VarcharValue));
         DefineMap<Member, PropertyTypeDto>(nameof(Member.PropertyTypeAlias), nameof(PropertyTypeDto.Alias));
     }

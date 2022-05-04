@@ -25,7 +25,8 @@ public sealed class InstallHelper
     private readonly IUserAgentProvider _userAgentProvider;
     private InstallationType? _installationType;
 
-    public InstallHelper(DatabaseBuilder databaseBuilder,
+    public InstallHelper(
+        DatabaseBuilder databaseBuilder,
         ILogger<InstallHelper> logger,
         IUmbracoVersion umbracoVersion,
         IOptionsMonitor<ConnectionStrings> connectionStrings,
@@ -82,7 +83,7 @@ public sealed class InstallHelper
             if (IsBrandNewInstall == false)
             {
                 // we don't have DatabaseProvider anymore... doing it differently
-                //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                // dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
                 dbProvider = _umbracoDatabaseFactory.SqlContext.SqlSyntax.DbProvider;
             }
 

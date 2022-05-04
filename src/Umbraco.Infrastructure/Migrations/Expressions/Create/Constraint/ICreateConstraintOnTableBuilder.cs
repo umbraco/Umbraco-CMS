@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
 
 public interface ICreateConstraintOnTableBuilder : IFluentBuilder
 {

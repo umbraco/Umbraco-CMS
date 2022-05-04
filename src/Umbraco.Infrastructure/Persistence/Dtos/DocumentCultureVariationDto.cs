@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -11,7 +11,9 @@ internal class DocumentCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("nodeId")]
     [ForeignKey(typeof(NodeDto))]
@@ -24,18 +26,22 @@ internal class DocumentCultureVariationDto
     public int LanguageId { get; set; }
 
     // this is convenient to carry the culture around, but has no db counterpart
-    [Ignore] public string? Culture { get; set; }
+    [Ignore]
+    public string? Culture { get; set; }
 
     // authority on whether a culture has been edited
-    [Column("edited")] public bool Edited { get; set; }
+    [Column("edited")]
+    public bool Edited { get; set; }
 
     // de-normalized for perfs
     // (means there is a current content version culture variation for the language)
-    [Column("available")] public bool Available { get; set; }
+    [Column("available")]
+    public bool Available { get; set; }
 
     // de-normalized for perfs
     // (means there is a published content version culture variation for the language)
-    [Column("published")] public bool Published { get; set; }
+    [Column("published")]
+    public bool Published { get; set; }
 
     // de-normalized for perfs
     // (when available, copies name from current content version culture variation for the language)

@@ -65,11 +65,13 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                             RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete;
                     }
                 }
-                    break;
+
+                break;
                 case RuntimeLevelReason.UpgradePackageMigrations:
                 {
-                    if (!_runtimeState.StartupState.TryGetValue(RuntimeState.PendingPacakgeMigrationsStateKey,
-                            out var pm)
+                    if (!_runtimeState.StartupState.TryGetValue(
+                        RuntimeState.PendingPacakgeMigrationsStateKey,
+                        out var pm)
                         || pm is not IReadOnlyList<string> pendingMigrations)
                     {
                         throw new InvalidOperationException(
@@ -97,9 +99,10 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                             RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors;
                     }
                 }
-                    break;
+
+                break;
                 default:
-                    throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
+                throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
             }
         }
 

@@ -12,38 +12,16 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public class GenericIndexDiagnostics : IIndexDiagnostics
 {
-    private static readonly string[] s_ignoreProperties = {"Description"};
+    private static readonly string[] SIgnoreProperties = { "Description" };
 
-    private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> {"id"};
+    private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
     private readonly IIndex _index;
+
     public GenericIndexDiagnostics(IIndex index) => _index = index;
 
-    public int DocumentCount => -1; //unknown
+    public int DocumentCount => -1; // unknown
 
-    public int FieldCount => -1; //unknown
-
-    public Attempt<string?> IsHealthy()
-    {
-        if (!_index.IndexExists())
-        {
-            return Attempt.Fail("Does not exist");
-        }
-
-        try
-        {
-            ISearchResults? result = _index.Searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet)
-                .Execute(new QueryOptions(0, 1));
-            return Attempt<string?>.Succeed(); //if we can search we'll assume it's healthy
-        }
-        catch (Exception e)
-        {
-            return Attempt.Fail($"Error: {e.Message}");
-        }
-    }
-
-    public long GetDocumentCount() => -1L;
-
-    public IEnumerable<string> GetFieldNames() => Enumerable.Empty<string>();
+    public int FieldCount => -1; // unknown
 
     public IReadOnlyDictionary<string, object?> Metadata
     {
@@ -53,7 +31,7 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
 
             IOrderedEnumerable<PropertyInfo> props = TypeHelper
                 .CachedDiscoverableProperties(_index.GetType(), mustWrite: false)
-                .Where(x => s_ignoreProperties.InvariantContains(x.Name) == false)
+                .Where(x => SIgnoreProperties.InvariantContains(x.Name) == false)
                 .OrderBy(x => x.Name);
 
             foreach (PropertyInfo p in props)
@@ -66,4 +44,27 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
             return result;
         }
     }
+
+    public Attempt<string?> IsHealthy()
+    {
+        if (!_index.IndexExists())
+        {
+            return Attempt.Fail("Does not exist");
+        }
+
+        try
+        {
+            ISearchResults? result = _index.Searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet)
+                .Execute(new QueryOptions(0, 1));
+            return Attempt<string?>.Succeed(); // if we can search we'll assume it's healthy
+        }
+        catch (Exception e)
+        {
+            return Attempt.Fail($"Error: {e.Message}");
+        }
+    }
+
+    public long GetDocumentCount() => -1L;
+
+    public IEnumerable<string> GetFieldNames() => Enumerable.Empty<string>();
 }

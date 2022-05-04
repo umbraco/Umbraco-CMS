@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -13,12 +13,12 @@ public class BackOfficeJavaScriptInitializer
     // deal with javascript functions inside of json (not a supported json syntax)
     private const string PrefixJavaScriptObject = "@@@@";
 
-    private static readonly Regex JsFunctionParser = new($"(\"{PrefixJavaScriptObject}(.*?)\")+",
+    private static readonly Regex JsFunctionParser = new(
+        $"(\"{PrefixJavaScriptObject}(.*?)\")+",
         RegexOptions.Multiline | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
     // replace tokens in the js main
     private static readonly Regex Token = new("(\"##\\w+?##\")", RegexOptions.Compiled);
-
 
     /// <summary>
     ///     Gets the JS initialization script to boot the back office application
@@ -67,10 +67,10 @@ public class BackOfficeJavaScriptInitializer
     internal static string WriteScript(string scripts, string umbracoPath, string angularModule)
     {
         var count = 0;
-        var replacements = new[] {scripts, umbracoPath, angularModule};
+        var replacements = new[] { scripts, umbracoPath, angularModule };
+
         // replace, catering for the special syntax when we have
         // js function() objects contained in the json
-
         return Token.Replace(Resources.Main, match =>
         {
             var replacement = replacements[count++];

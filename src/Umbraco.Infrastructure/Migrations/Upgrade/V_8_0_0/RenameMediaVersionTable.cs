@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
@@ -15,8 +15,7 @@ public class RenameMediaVersionTable : MigrationBase
         Rename.Table("cmsMedia").To(Constants.DatabaseSchema.Tables.MediaVersion).Do();
 
         // that is not supported on SqlCE
-        //Rename.Column("versionId").OnTable(Constants.DatabaseSchema.Tables.MediaVersion).To("id").Do();
-
+        // Rename.Column("versionId").OnTable(Constants.DatabaseSchema.Tables.MediaVersion).To("id").Do();
         AddColumn<MediaVersionDto>("id", out IEnumerable<string> sqls);
 
         Database.Execute($@"UPDATE {Constants.DatabaseSchema.Tables.MediaVersion} SET id=v.id

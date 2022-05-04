@@ -9,12 +9,20 @@ public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
     private string? _id;
     private string? _name;
 
-    public UmbracoIdentityRole(string? roleName) : base(roleName)
+    public UmbracoIdentityRole(string? roleName)
+        : base(roleName)
     {
     }
 
     public UmbracoIdentityRole()
     {
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged
+    {
+        add => BeingDirty.PropertyChanged += value;
+
+        remove => BeingDirty.PropertyChanged -= value;
     }
 
     /// <inheritdoc />
@@ -56,13 +64,6 @@ public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
     ///     Gets the <see cref="BeingDirty" /> for change tracking
     /// </summary>
     protected BeingDirty BeingDirty { get; } = new();
-
-    public event PropertyChangedEventHandler PropertyChanged
-    {
-        add => BeingDirty.PropertyChanged += value;
-
-        remove => BeingDirty.PropertyChanged -= value;
-    }
 
     /// <inheritdoc />
     public bool IsDirty() => BeingDirty.IsDirty();

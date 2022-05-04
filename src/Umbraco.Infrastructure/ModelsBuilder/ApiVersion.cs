@@ -16,15 +16,15 @@ public class ApiVersion
     internal ApiVersion(SemVersion executingVersion) =>
         Version = executingVersion ?? throw new ArgumentNullException(nameof(executingVersion));
 
-    private static SemVersion CurrentAssemblyVersion
-        => SemVersion.Parse(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
-            .InformationalVersion);
-
     /// <summary>
     ///     Gets the currently executing API version.
     /// </summary>
     public static ApiVersion Current { get; }
         = new(CurrentAssemblyVersion);
+
+    private static SemVersion CurrentAssemblyVersion
+        => SemVersion.Parse(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+            .InformationalVersion);
 
     /// <summary>
     ///     Gets the executing version of the API.

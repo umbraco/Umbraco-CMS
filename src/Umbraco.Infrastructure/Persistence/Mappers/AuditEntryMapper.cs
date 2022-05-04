@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -18,9 +18,11 @@ public sealed class AuditEntryMapper : BaseMapper
     protected override void DefineMaps()
     {
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.Id), nameof(AuditEntryDto.Id));
-        DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingUserId),
+        DefineMap<AuditEntry, AuditEntryDto>(
+            nameof(AuditEntry.PerformingUserId),
             nameof(AuditEntryDto.PerformingUserId));
-        DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingDetails),
+        DefineMap<AuditEntry, AuditEntryDto>(
+            nameof(AuditEntry.PerformingDetails),
             nameof(AuditEntryDto.PerformingDetails));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingIp), nameof(AuditEntryDto.PerformingIp));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventDateUtc), nameof(AuditEntryDto.EventDateUtc));

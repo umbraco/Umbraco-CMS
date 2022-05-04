@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -29,7 +29,7 @@ internal static class DictionaryTranslationFactory
 
     public static LanguageTextDto BuildDto(IDictionaryTranslation entity, Guid uniqueId)
     {
-        var text = new LanguageTextDto {LanguageId = entity.LanguageId, UniqueId = uniqueId, Value = entity.Value};
+        var text = new LanguageTextDto { LanguageId = entity.LanguageId, UniqueId = uniqueId, Value = entity.Value };
 
         if (entity.HasIdentity)
         {

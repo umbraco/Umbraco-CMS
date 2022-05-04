@@ -18,14 +18,14 @@ internal static class ExternalLoginFactory
 
     public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
     {
-        //If there exists a UserId - this means the database is still not migrated. E.g on the upgrade state.
-        //At this point we have to manually set the key, to ensure external logins can be used to upgrade
+        // If there exists a UserId - this means the database is still not migrated. E.g on the upgrade state.
+        // At this point we have to manually set the key, to ensure external logins can be used to upgrade
         var key = dto.UserId.HasValue ? dto.UserId.Value.ToGuid().ToString() : dto.UserOrMemberKey.ToString();
 
         var entity =
             new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, key, dto.CreateDate)
             {
-                UserData = dto.UserData
+                UserData = dto.UserData,
             };
 
         // reset dirty initial properties (U4-1946)
@@ -42,7 +42,7 @@ internal static class ExternalLoginFactory
             LoginProvider = entity.LoginProvider,
             ProviderKey = entity.ProviderKey,
             UserOrMemberKey = entity.Key,
-            UserData = entity.UserData
+            UserData = entity.UserData,
         };
 
         return dto;
@@ -57,7 +57,7 @@ internal static class ExternalLoginFactory
             LoginProvider = entity.LoginProvider,
             ProviderKey = entity.ProviderKey,
             UserData = entity.UserData,
-            CreateDate = DateTime.Now
+            CreateDate = DateTime.Now,
         };
 
         return dto;
@@ -71,7 +71,7 @@ internal static class ExternalLoginFactory
             ExternalLoginId = externalLoginId,
             Name = token.Name,
             Value = token.Value,
-            CreateDate = DateTime.Now
+            CreateDate = DateTime.Now,
         };
 
         return dto;

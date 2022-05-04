@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
 public class UpdatePickerIntegerValuesToUdi : MigrationBase
 {
-    public UpdatePickerIntegerValuesToUdi(IMigrationContext context) : base(context)
+    public UpdatePickerIntegerValuesToUdi(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -45,7 +46,8 @@ public class UpdatePickerIntegerValuesToUdi : MigrationBase
                                     .Where<NodeDto>(x => x.NodeId == intStartNode));
                         if (guid.HasValue)
                         {
-                            var udi = new GuidUdi(datatype.EditorAlias == Constants.PropertyEditors.Aliases.MediaPicker
+                            var udi = new GuidUdi(
+                                datatype.EditorAlias == Constants.PropertyEditors.Aliases.MediaPicker
                                 ? Constants.UdiEntityType.Media
                                 : Constants.UdiEntityType.Document, guid.Value);
                             config!["startNodeId"] = new JValue(udi.ToString());
@@ -61,6 +63,7 @@ public class UpdatePickerIntegerValuesToUdi : MigrationBase
 
                     break;
                 }
+
                 case Constants.PropertyEditors.Aliases.MultiNodeTreePicker:
                 {
                     JObject? config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration!);

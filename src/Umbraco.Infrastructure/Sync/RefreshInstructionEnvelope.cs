@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
@@ -17,5 +17,6 @@ public sealed class RefreshInstructionEnvelope
     }
 
     public ICacheRefresher Refresher { get; set; }
+
     public IEnumerable<RefreshInstruction> Instructions { get; set; }
 }

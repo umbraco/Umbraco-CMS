@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -25,7 +25,6 @@ public class UmbracoTreeSearcher
     private readonly IUmbracoMapper _mapper;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ISqlContext _sqlContext;
-
 
     public UmbracoTreeSearcher(
         ILocalizationService languageService,
@@ -95,7 +94,7 @@ public class UmbracoTreeSearcher
     public IEnumerable<SearchResultEntity?> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize,
         long pageIndex, out long totalFound, string? searchFrom = null)
     {
-        //if it's a GUID, match it
+        // if it's a GUID, match it
         Guid.TryParse(query, out Guid g);
 
         IEnumerable<IEntitySlim> results = _entityService.GetPagedDescendants(objectType, pageIndex, pageSize,
@@ -111,7 +110,7 @@ public class UmbracoTreeSearcher
     /// <returns></returns>
     private IEnumerable<SearchResultEntity> MemberFromSearchResults(IEnumerable<ISearchResult> results)
     {
-        //add additional data
+        // add additional data
         foreach (ISearchResult result in results)
         {
             SearchResultEntity? m = _mapper.Map<SearchResultEntity>(result);
@@ -121,7 +120,7 @@ public class UmbracoTreeSearcher
                 continue;
             }
 
-            //if no icon could be mapped, it will be set to document, so change it to picture
+            // if no icon could be mapped, it will be set to document, so change it to picture
             if (m.Icon == Constants.Icons.DefaultIcon)
             {
                 m.Icon = Constants.Icons.Member;
@@ -159,7 +158,8 @@ public class UmbracoTreeSearcher
     /// <param name="results"></param>
     /// <param name="culture"></param>
     /// <returns></returns>
-    private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results,
+    private IEnumerable<SearchResultEntity> ContentFromSearchResults(
+        IEnumerable<ISearchResult> results,
         string? culture = null)
     {
         var defaultLang = _languageService.GetDefaultLanguageIsoCode();
@@ -172,8 +172,7 @@ public class UmbracoTreeSearcher
                     {
                         context.SetCulture(culture);
                     }
-                }
-            );
+                });
 
             if (entity is null)
             {
@@ -182,7 +181,7 @@ public class UmbracoTreeSearcher
 
             if (int.TryParse(entity.Id?.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
-                //if it varies by culture, return the default language URL
+                // if it varies by culture, return the default language URL
                 if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) &&
                     varies == "y")
                 {

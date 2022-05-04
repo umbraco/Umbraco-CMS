@@ -19,7 +19,6 @@ public class UserDto
     }
 
     // TODO: We need to add a GUID for users and track external logins with that instead of the INT
-
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_user")]
     public int Id { get; set; }
@@ -32,14 +31,17 @@ public class UserDto
     [Constraint(Default = "0")]
     public bool NoConsole { get; set; }
 
-    [Column("userName")] public string UserName { get; set; } = null!;
+    [Column("userName")]
+    public string UserName { get; set; } = null!;
 
     [Column("userLogin")]
     [Length(125)]
     [Index(IndexTypes.NonClustered)]
     public string? Login { get; set; }
 
-    [Column("userPassword")] [Length(500)] public string? Password { get; set; }
+    [Column("userPassword")]
+    [Length(500)]
+    public string? Password { get; set; }
 
     /// <summary>
     ///     This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
@@ -49,7 +51,8 @@ public class UserDto
     [Length(500)]
     public string? PasswordConfig { get; set; }
 
-    [Column("userEmail")] public string Email { get; set; } = null!;
+    [Column("userEmail")]
+    public string Email { get; set; } = null!;
 
     [Column("userLanguage")]
     [NullSetting(NullSetting = NullSettings.Null)]

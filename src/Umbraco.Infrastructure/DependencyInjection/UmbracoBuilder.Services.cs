@@ -62,7 +62,6 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-
     private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
         => new(
             factory.GetRequiredService<IContentService>(),

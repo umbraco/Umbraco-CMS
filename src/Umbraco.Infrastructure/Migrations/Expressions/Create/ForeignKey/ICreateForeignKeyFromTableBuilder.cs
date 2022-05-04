@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey;
 
 public interface ICreateForeignKeyFromTableBuilder : IFluentBuilder
 {

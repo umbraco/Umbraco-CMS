@@ -79,12 +79,6 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     }
 
     /// <summary>
-    ///     Change the period between operations.
-    /// </summary>
-    /// <param name="newPeriod">The new period between tasks</param>
-    protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
-
-    /// <summary>
     ///     Executes the task.
     /// </summary>
     /// <param name="state">The task state.</param>
@@ -113,6 +107,12 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
             _timer?.Change((int)_period.TotalMilliseconds, (int)_period.TotalMilliseconds);
         }
     }
+
+    /// <summary>
+    ///     Change the period between operations.
+    /// </summary>
+    /// <param name="newPeriod">The new period between tasks</param>
+    protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
 
     public abstract Task PerformExecuteAsync(object? state);
 

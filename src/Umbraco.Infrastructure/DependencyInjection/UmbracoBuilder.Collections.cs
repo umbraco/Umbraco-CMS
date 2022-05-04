@@ -20,7 +20,6 @@ public static partial class UmbracoBuilderExtensions
     public static NPocoMapperCollectionBuilder? NPocoMappers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<NPocoMapperCollectionBuilder>();
 
-
     /// <summary>
     ///     Gets the package migration plans collection builder.
     /// </summary>

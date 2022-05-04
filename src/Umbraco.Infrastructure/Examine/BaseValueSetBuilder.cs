@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
@@ -46,11 +46,11 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
             {
                 switch (val)
                 {
-                    //only add the value if its not null or empty (we'll check for string explicitly here too)
+                    // only add the value if its not null or empty (we'll check for string explicitly here too)
                     case null:
                         continue;
                     case string strVal:
-                    {
+                        {
                         if (strVal.IsNullOrWhiteSpace())
                         {
                             continue;
@@ -59,20 +59,21 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
                         var key = $"{keyVal.Key}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
-                            values[key] = new List<object?>(v) {val}.ToArray();
+                            values[key] = new List<object?>(v) { val }.ToArray();
                         }
                         else
                         {
                             values?.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
                         }
                     }
+
                         break;
                     default:
-                    {
+                        {
                         var key = $"{keyVal.Key}{cultureSuffix}";
                         if (values?.TryGetValue(key, out IEnumerable<object?>? v) ?? false)
                         {
-                            values[key] = new List<object?>(v) {val}.ToArray();
+                            values[key] = new List<object?>(v) { val }.ToArray();
                         }
                         else
                         {

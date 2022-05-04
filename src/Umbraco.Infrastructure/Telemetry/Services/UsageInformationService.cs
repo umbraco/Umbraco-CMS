@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 
 namespace Umbraco.Cms.Core.Services;

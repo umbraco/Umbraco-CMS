@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Column;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Constraint;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data;
@@ -21,7 +21,7 @@ public class DeleteBuilder : IDeleteBuilder
     /// <inheritdoc />
     public IExecutableBuilder Table(string tableName)
     {
-        var expression = new DeleteTableExpression(_context) {TableName = tableName};
+        var expression = new DeleteTableExpression(_context) { TableName = tableName };
         return new ExecutableBuilder(expression);
     }
 
@@ -43,20 +43,23 @@ public class DeleteBuilder : IDeleteBuilder
 
         if (string.IsNullOrWhiteSpace(tableName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(tableName));
         }
 
         return new DeleteKeysAndIndexesBuilder(_context)
         {
-            TableName = tableName, DeleteLocal = local, DeleteForeign = foreign
+            TableName = tableName,
+            DeleteLocal = local,
+            DeleteForeign = foreign,
         };
     }
 
     /// <inheritdoc />
     public IDeleteColumnBuilder Column(string columnName)
     {
-        var expression = new DeleteColumnExpression(_context) {ColumnNames = {columnName}};
+        var expression = new DeleteColumnExpression(_context) { ColumnNames = { columnName } };
         return new DeleteColumnBuilder(expression);
     }
 
@@ -70,14 +73,14 @@ public class DeleteBuilder : IDeleteBuilder
     /// <inheritdoc />
     public IDeleteForeignKeyOnTableBuilder ForeignKey(string foreignKeyName)
     {
-        var expression = new DeleteForeignKeyExpression(_context) {ForeignKey = {Name = foreignKeyName}};
+        var expression = new DeleteForeignKeyExpression(_context) { ForeignKey = { Name = foreignKeyName } };
         return new DeleteForeignKeyBuilder(expression);
     }
 
     /// <inheritdoc />
     public IDeleteDataBuilder FromTable(string tableName)
     {
-        var expression = new DeleteDataExpression(_context) {TableName = tableName};
+        var expression = new DeleteDataExpression(_context) { TableName = tableName };
         return new DeleteDataBuilder(expression);
     }
 
@@ -91,7 +94,7 @@ public class DeleteBuilder : IDeleteBuilder
     /// <inheritdoc />
     public IDeleteIndexForTableBuilder Index(string indexName)
     {
-        var expression = new DeleteIndexExpression(_context) {Index = {Name = indexName}};
+        var expression = new DeleteIndexExpression(_context) { Index = { Name = indexName } };
         return new DeleteIndexBuilder(expression);
     }
 
@@ -100,7 +103,7 @@ public class DeleteBuilder : IDeleteBuilder
     {
         var expression = new DeleteConstraintExpression(_context, ConstraintType.PrimaryKey)
         {
-            Constraint = {ConstraintName = primaryKeyName}
+            Constraint = { ConstraintName = primaryKeyName },
         };
         return new DeleteConstraintBuilder(expression);
     }
@@ -110,7 +113,7 @@ public class DeleteBuilder : IDeleteBuilder
     {
         var expression = new DeleteConstraintExpression(_context, ConstraintType.Unique)
         {
-            Constraint = {ConstraintName = constraintName}
+            Constraint = { ConstraintName = constraintName },
         };
         return new DeleteConstraintBuilder(expression);
     }

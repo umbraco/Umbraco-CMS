@@ -37,6 +37,9 @@ public class SqlContext : ISqlContext
     public DatabaseType DatabaseType { get; }
 
     /// <inheritdoc />
+    public SqlTemplates Templates { get; }
+
+    /// <inheritdoc />
     public Sql<ISqlContext> Sql() => NPoco.Sql.BuilderFor((ISqlContext)this);
 
     /// <inheritdoc />
@@ -44,9 +47,6 @@ public class SqlContext : ISqlContext
 
     /// <inheritdoc />
     public IQuery<T> Query<T>() => new Query<T>(this);
-
-    /// <inheritdoc />
-    public SqlTemplates Templates { get; }
 
     /// <inheritdoc />
     public IPocoDataFactory PocoDataFactory { get; }

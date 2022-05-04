@@ -9,5 +9,6 @@ public class LogTimePeriod
     }
 
     public DateTime StartTime { get; }
+
     public DateTime EndTime { get; }
 }

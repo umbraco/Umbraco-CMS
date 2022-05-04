@@ -9,6 +9,7 @@ internal static class ServerRegistrationFactory
     {
         var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered,
             dto.DateAccessed, dto.IsActive, dto.IsSchedulingPublisher);
+
         // reset dirty initial properties (U4-1946)
         model.ResetDirtyProperties(false);
         return model;
@@ -23,7 +24,7 @@ internal static class ServerRegistrationFactory
             IsActive = entity.IsActive,
             IsSchedulingPublisher = ((ServerRegistration)entity).IsSchedulingPublisher,
             DateAccessed = entity.UpdateDate,
-            ServerIdentity = entity.ServerIdentity
+            ServerIdentity = entity.ServerIdentity,
         };
 
         if (entity.HasIdentity)

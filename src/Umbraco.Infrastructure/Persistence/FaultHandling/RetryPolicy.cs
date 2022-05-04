@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 
@@ -46,9 +46,8 @@ public class RetryPolicy
     /// <param name="retryStrategy">The retry strategy to use for this retry policy.</param>
     public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, RetryStrategy retryStrategy)
     {
-        //Guard.ArgumentNotNull(errorDetectionStrategy, "errorDetectionStrategy");
-        //Guard.ArgumentNotNull(retryStrategy, "retryPolicy");
-
+        // Guard.ArgumentNotNull(errorDetectionStrategy, "errorDetectionStrategy");
+        // Guard.ArgumentNotNull(retryStrategy, "retryPolicy");
         ErrorDetectionStrategy = errorDetectionStrategy;
 
         if (errorDetectionStrategy == null)
@@ -131,6 +130,11 @@ public class RetryPolicy
     }
 
     /// <summary>
+    ///     An instance of a callback delegate that will be invoked whenever a retry condition is encountered.
+    /// </summary>
+    public event EventHandler<RetryingEventArgs>? Retrying;
+
+    /// <summary>
     ///     Gets the retry strategy.
     /// </summary>
     public RetryStrategy RetryStrategy { get; }
@@ -141,16 +145,12 @@ public class RetryPolicy
     public ITransientErrorDetectionStrategy ErrorDetectionStrategy { get; }
 
     /// <summary>
-    ///     An instance of a callback delegate that will be invoked whenever a retry condition is encountered.
-    /// </summary>
-    public event EventHandler<RetryingEventArgs>? Retrying;
-
-    /// <summary>
     ///     Repetitively executes the specified action while it satisfies the current retry policy.
     /// </summary>
     /// <param name="action">A delegate representing the executable action which doesn't return any results.</param>
     public virtual void ExecuteAction(Action action) =>
-        //Guard.ArgumentNotNull(action, "action");
+
+        // Guard.ArgumentNotNull(action, "action");
         ExecuteAction(() =>
         {
             action();
@@ -165,15 +165,14 @@ public class RetryPolicy
     /// <returns>The result from the action.</returns>
     public virtual TResult? ExecuteAction<TResult>(Func<TResult> func)
     {
-        //Guard.ArgumentNotNull(func, "func");
-
+        // Guard.ArgumentNotNull(func, "func");
         var retryCount = 0;
         TimeSpan delay = TimeSpan.Zero;
         Exception? lastError;
 
         ShouldRetry shouldRetry = RetryStrategy.GetShouldRetry();
 
-        for (;;)
+        for (; ;)
         {
             lastError = null;
 
@@ -230,10 +229,7 @@ public class RetryPolicy
     /// </param>
     protected virtual void OnRetrying(int retryCount, Exception lastError, TimeSpan delay)
     {
-        if (Retrying != null)
-        {
-            Retrying(this, new RetryingEventArgs(retryCount, delay, lastError));
-        }
+        Retrying?.Invoke(this, new RetryingEventArgs(retryCount, delay, lastError));
     }
 
     #region Private classes

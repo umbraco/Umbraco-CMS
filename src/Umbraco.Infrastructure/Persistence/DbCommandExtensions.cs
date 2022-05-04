@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using StackExchange.Profiling.Data;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
@@ -21,12 +21,12 @@ internal static class DbCommandExtensions
         {
             unwrapped = c;
 
-            var profiled = unwrapped as ProfiledDbCommand;
-            if (profiled != null)
+            if (unwrapped is ProfiledDbCommand profiled)
             {
                 unwrapped = profiled.InternalCommand;
             }
-        } while (c != unwrapped);
+        }
+        while (c != unwrapped);
 
         return unwrapped;
     }

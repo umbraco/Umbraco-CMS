@@ -104,7 +104,7 @@ internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKe
             return null;
         }
 
-        return new KeyValueDto {Key = keyValue.Identifier, Value = keyValue.Value, UpdateDate = keyValue.UpdateDate};
+        return new KeyValueDto { Key = keyValue.Identifier, Value = keyValue.Value, UpdateDate = keyValue.UpdateDate };
     }
 
     private static IKeyValue? Map(KeyValueDto dto)
@@ -114,7 +114,7 @@ internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKe
             return null;
         }
 
-        return new KeyValue {Identifier = dto.Key, Value = dto.Value, UpdateDate = dto.UpdateDate};
+        return new KeyValue { Identifier = dto.Key, Value = dto.Value, UpdateDate = dto.UpdateDate };
     }
 
     #endregion

@@ -48,9 +48,10 @@ public static class LoggerConfigExtensions
     {
         SelfLog.Enable(msg => Debug.WriteLine(msg));
 
-        //Set this environment variable - so that it can be used in external config file
-        //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-        Environment.SetEnvironmentVariable("BASEDIR",
+        // Set this environment variable - so that it can be used in external config file
+        // add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
+        Environment.SetEnvironmentVariable(
+            "BASEDIR",
             hostingEnvironment.MapPathContentRoot("/").TrimEnd(Path.DirectorySeparatorChar),
             EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory,
@@ -58,7 +59,7 @@ public static class LoggerConfigExtensions
         Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
         logConfig.MinimumLevel
-            .Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
+            .Verbose() // Set to highest level of logging (as any sinks may want to restrict it to Errors only)
             .Enrich.WithProcessId()
             .Enrich.WithProcessName()
             .Enrich.WithThreadId()
@@ -68,7 +69,7 @@ public static class LoggerConfigExtensions
             .Enrich.With<Log4NetLevelMapperEnricher>()
             .Enrich.FromLogContext(); // allows us to dynamically enrich
 
-        //This is not optimal, but seems to be the only way if we do not make an Serilog.Sink.UmbracoFile sink all the way.
+        // This is not optimal, but seems to be the only way if we do not make an Serilog.Sink.UmbracoFile sink all the way.
         var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
         umbFileConfiguration = umbracoFileConfiguration;
@@ -80,12 +81,10 @@ public static class LoggerConfigExtensions
             rollingInterval: umbracoFileConfiguration.RollingInterval,
             flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
             rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-            retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit
-        );
+            retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
 
         return logConfig;
     }
-
 
     /// <summary>
     ///     This configures Serilog with some defaults
@@ -100,8 +99,8 @@ public static class LoggerConfigExtensions
     {
         SelfLog.Enable(msg => Debug.WriteLine(msg));
 
-        //Set this environment variable - so that it can be used in external config file
-        //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
+        // Set this environment variable - so that it can be used in external config file
+        // add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
         Environment.SetEnvironmentVariable("BASEDIR", hostEnvironment.MapPathContentRoot("/").TrimEnd("\\"),
             EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory,
@@ -109,12 +108,13 @@ public static class LoggerConfigExtensions
         Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
         logConfig.MinimumLevel
-            .Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
+            .Verbose() // Set to highest level of logging (as any sinks may want to restrict it to Errors only)
             .Enrich.WithProcessId()
             .Enrich.WithProcessName()
             .Enrich.WithThreadId()
             .Enrich
-            .WithProperty("ApplicationId",
+            .WithProperty(
+                "ApplicationId",
                 hostEnvironment.GetTemporaryApplicationId()) // Updated later by ApplicationIdEnricher
             .Enrich.WithProperty("MachineName", Environment.MachineName)
             .Enrich.With<Log4NetLevelMapperEnricher>()
@@ -127,8 +127,7 @@ public static class LoggerConfigExtensions
             rollingInterval: umbracoFileConfiguration.RollingInterval,
             flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
             rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-            retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit
-        );
+            retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
 
         return logConfig;
     }
@@ -148,21 +147,21 @@ public static class LoggerConfigExtensions
         IHostingEnvironment hostingEnvironment,
         LogEventLevel minimumLevel = LogEventLevel.Verbose)
     {
-        //Main .txt logfile - in similar format to older Log4Net output
-        //Ends with ..txt as Date is inserted before file extension substring
+        // Main .txt logfile - in similar format to older Log4Net output
+        // Ends with ..txt as Date is inserted before file extension substring
         logConfig.WriteTo.File(
-            Path.Combine(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles),
+            Path.Combine(
+                hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles),
                 $"UmbracoTraceLog.{Environment.MachineName}..txt"),
             shared: true,
             rollingInterval: RollingInterval.Day,
             restrictedToMinimumLevel: minimumLevel,
-            retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
+            retainedFileCountLimit: null, // Setting to null means we keep all files - default is 31 days
             outputTemplate:
             "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
 
         return logConfig;
     }
-
 
     /// <remarks>
     ///     Used in config - If renamed or moved to other assembly the config file also has be updated.
@@ -178,8 +177,7 @@ public static class LoggerConfigExtensions
         RollingInterval rollingInterval = RollingInterval.Day,
         bool rollOnFileSizeLimit = false,
         int? retainedFileCountLimit = 31,
-        Encoding? encoding = null
-    )
+        Encoding? encoding = null)
     {
         formatter ??= new CompactJsonFormatter();
 
@@ -206,7 +204,6 @@ public static class LoggerConfigExtensions
                     null));
     }
 
-
     /// <summary>
     ///     Outputs a CLEF format JSON log at /App_Data/Logs/
     /// </summary>
@@ -225,8 +222,10 @@ public static class LoggerConfigExtensions
     {
         // .clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
         // Ends with ..txt as Date is inserted before file extension substring
-        logConfig.WriteTo.File(new CompactJsonFormatter(),
-            Path.Combine(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles),
+        logConfig.WriteTo.File(
+            new CompactJsonFormatter(),
+            Path.Combine(
+                hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles),
                 $"UmbracoTraceLog.{Environment.MachineName}..json"),
             shared: true,
             rollingInterval: RollingInterval.Day, // Create a new JSON file every day

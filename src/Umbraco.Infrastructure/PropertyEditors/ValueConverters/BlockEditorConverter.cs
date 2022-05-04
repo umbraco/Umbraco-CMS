@@ -16,7 +16,8 @@ public sealed class BlockEditorConverter
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    public BlockEditorConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    public BlockEditorConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;

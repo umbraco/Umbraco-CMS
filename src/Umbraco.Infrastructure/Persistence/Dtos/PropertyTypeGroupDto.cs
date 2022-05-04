@@ -30,11 +30,14 @@ internal class PropertyTypeGroupDto
     [Constraint(Default = 0)]
     public short Type { get; set; }
 
-    [Column("text")] public string? Text { get; set; }
+    [Column("text")]
+    public string? Text { get; set; }
 
-    [Column("alias")] public string Alias { get; set; } = null!;
+    [Column("alias")]
+    public string Alias { get; set; } = null!;
 
-    [Column("sortorder")] public int SortOrder { get; set; }
+    [Column("sortorder")]
+    public int SortOrder { get; set; }
 
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "PropertyTypeGroupId")]

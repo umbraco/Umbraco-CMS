@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
@@ -25,8 +25,12 @@ public interface IUmbracoDatabase : IDatabase
     bool InTransaction { get; }
 
     bool EnableSqlCount { get; set; }
+
     int SqlCount { get; }
+
     int BulkInsertRecords<T>(IEnumerable<T> records);
+
     bool IsUmbracoInstalled();
+
     DatabaseSchemaResult ValidateSchema();
 }

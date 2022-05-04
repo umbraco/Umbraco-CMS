@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -12,7 +12,9 @@ internal class ContentVersionCultureVariationDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
     private int? _updateUserId;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("versionId")]
     [ForeignKey(typeof(ContentVersionDto))]
@@ -25,9 +27,11 @@ internal class ContentVersionCultureVariationDto
     public int LanguageId { get; set; }
 
     // this is convenient to carry the culture around, but has no db counterpart
-    [Ignore] public string? Culture { get; set; }
+    [Ignore]
+    public string? Culture { get; set; }
 
-    [Column("name")] public string? Name { get; set; }
+    [Column("name")]
+    public string? Name { get; set; }
 
     [Column("date")] // TODO: db rename to 'updateDate'
     public DateTime UpdateDate { get; set; }
@@ -39,5 +43,5 @@ internal class ContentVersionCultureVariationDto
     {
         get => _updateUserId == 0 ? null : _updateUserId;
         set => _updateUserId = value;
-    } //return null if zero
+    } // return null if zero
 }

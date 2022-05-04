@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Cms.Infrastructure.Examine;
 
 public class MemberValueSetValidator : ValueSetValidator
 {
@@ -8,12 +8,13 @@ public class MemberValueSetValidator : ValueSetValidator
     public static readonly string[] DefaultMemberIndexFields =
     {
         "id", UmbracoExamineFieldNames.NodeNameFieldName, "updateDate", "loginName", "email",
-        UmbracoExamineFieldNames.NodeKeyFieldName
+        UmbracoExamineFieldNames.NodeKeyFieldName,
     };
 
-    private static readonly IEnumerable<string> ValidCategories = new[] {IndexTypes.Member};
+    private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Member };
 
-    public MemberValueSetValidator() : base(null, null, DefaultMemberIndexFields, null)
+    public MemberValueSetValidator()
+        : base(null, null, DefaultMemberIndexFields, null)
     {
     }
 

@@ -1,4 +1,4 @@
-﻿using Serilog.Core;
+using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Cache;
 
@@ -17,11 +17,10 @@ public class HttpRequestNumberEnricher : ILogEventEnricher
     ///     The property name added to enriched log events.
     /// </summary>
     private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
+    private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
 
     private static int _lastRequestNumber;
-    private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
     private readonly IRequestCache _requestCache;
-
 
     public HttpRequestNumberEnricher(IRequestCache requestCache) =>
         _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
@@ -38,7 +37,8 @@ public class HttpRequestNumberEnricher : ILogEventEnricher
             throw new ArgumentNullException(nameof(logEvent));
         }
 
-        var requestNumber = _requestCache.Get(_requestNumberItemName,
+        var requestNumber = _requestCache.Get(
+            _requestNumberItemName,
             () => Interlocked.Increment(ref _lastRequestNumber));
 
         var requestNumberProperty =

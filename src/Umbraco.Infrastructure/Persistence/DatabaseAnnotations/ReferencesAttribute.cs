@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 /// <summary>
 ///     Attribute that represents a reference between two tables/DTOs

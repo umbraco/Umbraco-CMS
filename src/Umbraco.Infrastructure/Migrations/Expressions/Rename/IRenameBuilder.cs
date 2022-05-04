@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Column;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Column;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename;

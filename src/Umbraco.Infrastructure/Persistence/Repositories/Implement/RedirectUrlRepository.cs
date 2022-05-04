@@ -32,7 +32,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
     public void DeleteAll() => Database.Execute("DELETE FROM umbracoRedirectUrl");
 
     public void DeleteContentUrls(Guid contentKey) =>
-        Database.Execute("DELETE FROM umbracoRedirectUrl WHERE contentKey=@contentKey", new {contentKey});
+        Database.Execute("DELETE FROM umbracoRedirectUrl WHERE contentKey=@contentKey", new { contentKey });
 
     public void Delete(Guid id) => Database.Delete<RedirectUrlDto>(id);
 
@@ -94,7 +94,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .Where(
                 string.Format("{0}.{1} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoNode"),
-                    SqlSyntax.GetQuotedColumnName("path")), new {path = "%," + rootContentId + ",%"})
+                    SqlSyntax.GetQuotedColumnName("path")), new { path = "%," + rootContentId + ",%" })
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);
@@ -109,7 +109,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
             .Where(
                 string.Format("{0}.{1} LIKE @url", SqlSyntax.GetQuotedTableName("umbracoRedirectUrl"),
                     SqlSyntax.GetQuotedColumnName("Url")),
-                new {url = "%" + searchTerm.Trim().ToLowerInvariant() + "%"})
+                new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%" })
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);
@@ -169,7 +169,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> {"DELETE FROM umbracoRedirectUrl WHERE id = @id"};
+        var list = new List<string> { "DELETE FROM umbracoRedirectUrl WHERE id = @id" };
         return list;
     }
 
@@ -203,7 +203,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             CreateDateUtc = redirectUrl.CreateDateUtc,
             Url = redirectUrl.Url,
             Culture = redirectUrl.Culture,
-            UrlHash = redirectUrl.Url.GenerateHash<SHA1>()
+            UrlHash = redirectUrl.Url.GenerateHash<SHA1>(),
         };
     }
 

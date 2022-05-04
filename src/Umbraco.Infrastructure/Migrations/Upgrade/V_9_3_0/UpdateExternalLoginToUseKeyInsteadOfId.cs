@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
 
 public class UpdateExternalLoginToUseKeyInsteadOfId : MigrationBase
 {
-    public UpdateExternalLoginToUseKeyInsteadOfId(IMigrationContext context) : base(context)
+    public UpdateExternalLoginToUseKeyInsteadOfId(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -29,21 +30,21 @@ public class UpdateExternalLoginToUseKeyInsteadOfId : MigrationBase
                 Delete.Index(indexNameToDelete).OnTable(ExternalLoginDto.TableName).Do();
             }
 
-            //special trick to add the column without constraints and return the sql to add them later
+            // special trick to add the column without constraints and return the sql to add them later
             AddColumn<ExternalLoginDto>("userOrMemberKey", out IEnumerable<string> sqls);
 
-            //populate the new columns with the userId as a Guid. Same method as IntExtensions.ToGuid.
+            // populate the new columns with the userId as a Guid. Same method as IntExtensions.ToGuid.
             Execute.Sql(
                     $"UPDATE {ExternalLoginDto.TableName} SET userOrMemberKey = CAST(CONVERT(char(8), CONVERT(BINARY(4), userId), 2) + '-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)")
                 .Do();
 
-            //now apply constraints (NOT NULL) to new table
+            // now apply constraints (NOT NULL) to new table
             foreach (var sql in sqls)
             {
                 Execute.Sql(sql).Do();
             }
 
-            //now remove these old columns
+            // now remove these old columns
             Delete.Column("userId").FromTable(ExternalLoginDto.TableName).Do();
 
             // create index with the correct definition

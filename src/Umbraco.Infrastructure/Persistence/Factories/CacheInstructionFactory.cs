@@ -18,6 +18,6 @@ internal static class CacheInstructionFactory
             UtcStamp = entity.UtcStamp,
             Instructions = entity.Instructions,
             OriginIdentity = entity.OriginIdentity,
-            InstructionCount = entity.InstructionCount
+            InstructionCount = entity.InstructionCount,
         };
 }

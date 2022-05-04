@@ -18,6 +18,8 @@ public abstract class MigrationExpressionBase : IMigrationExpression
     protected MigrationExpressionBase(IMigrationContext context) =>
         Context = context ?? throw new ArgumentNullException(nameof(context));
 
+    public DatabaseType DatabaseType => Context.Database.DatabaseType;
+
     protected IMigrationContext Context { get; }
 
     protected ILogger Logger => Context.Logger;
@@ -26,9 +28,7 @@ public abstract class MigrationExpressionBase : IMigrationExpression
 
     protected IUmbracoDatabase Database => Context.Database;
 
-    public DatabaseType DatabaseType => Context.Database.DatabaseType;
-
-    public List<IMigrationExpression> Expressions => _expressions ?? (_expressions = new List<IMigrationExpression>());
+    public List<IMigrationExpression> Expressions => _expressions ??= new List<IMigrationExpression>();
 
     /// <summary>
     ///     This might be useful in the future if we add it to the interface, but for now it's used to hack the DeleteAppTables
@@ -128,14 +128,6 @@ public abstract class MigrationExpressionBase : IMigrationExpression
         }
     }
 
-    private void ExecuteStatement(StringBuilder stmtBuilder)
-    {
-        var stmt = stmtBuilder.ToString();
-        Logger.LogInformation("SQL [{ContextIndex}]: {Sql}", Context.Index, stmt);
-        Database.Execute(stmt);
-        stmtBuilder.Clear();
-    }
-
     protected void AppendStatementSeparator(StringBuilder stmtBuilder)
     {
         stmtBuilder.AppendLine(";");
@@ -143,6 +135,14 @@ public abstract class MigrationExpressionBase : IMigrationExpression
         {
             stmtBuilder.AppendLine("GO");
         }
+    }
+
+    private void ExecuteStatement(StringBuilder stmtBuilder)
+    {
+        var stmt = stmtBuilder.ToString();
+        Logger.LogInformation("SQL [{ContextIndex}]: {Sql}", Context.Index, stmt);
+        Database.Execute(stmt);
+        stmtBuilder.Clear();
     }
 
     protected string GetQuotedValue(object? val)

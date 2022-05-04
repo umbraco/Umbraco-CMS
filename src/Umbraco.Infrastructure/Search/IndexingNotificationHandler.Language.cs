@@ -10,7 +10,8 @@ public sealed class LanguageIndexingNotificationHandler : INotificationHandler<L
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
-    public LanguageIndexingNotificationHandler(IUmbracoIndexingHandler umbracoIndexingHandler,
+    public LanguageIndexingNotificationHandler(
+        IUmbracoIndexingHandler umbracoIndexingHandler,
         IIndexRebuilder indexRebuilder)
     {
         _umbracoIndexingHandler =
@@ -41,8 +42,8 @@ public sealed class LanguageIndexingNotificationHandler : INotificationHandler<L
 
         if (removedOrCultureChanged)
         {
-            //if a lang is removed or it's culture has changed, we need to rebuild the indexes since
-            //field names and values in the index have a string culture value.
+            // if a lang is removed or it's culture has changed, we need to rebuild the indexes since
+            // field names and values in the index have a string culture value.
             _indexRebuilder.RebuildIndexes(false);
         }
     }

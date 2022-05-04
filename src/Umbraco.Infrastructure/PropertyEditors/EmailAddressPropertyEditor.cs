@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -29,7 +29,8 @@ public class EmailAddressPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor()
     {
         IDataValueEditor editor = base.CreateValueEditor();
-        //add an email address validator
+
+        // add an email address validator
         editor.Validators.Add(new EmailValidator());
         return editor;
     }

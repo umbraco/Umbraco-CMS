@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -45,7 +45,7 @@ internal static class RelationTypeFactory
             IsDependency = isDependency,
             Name = entity.Name ?? string.Empty,
             ParentObjectType = entity.ParentObjectType,
-            UniqueId = entity.Key
+            UniqueId = entity.Key,
         };
         if (entity.HasIdentity)
         {

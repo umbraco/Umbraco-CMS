@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -26,7 +26,8 @@ public class AddMemberPropertiesAsColumns : MigrationBase
         AddColumnIfNotExists<MemberDto>(columns, "lastPasswordChangeDate");
 
         Sql<ISqlContext> newestContentVersionQuery = Database.SqlContext.Sql()
-            .Select($"MAX({GetQuotedSelector("cv", "id")}) as {SqlSyntax.GetQuotedColumnName("id")}",
+            .Select(
+                $"MAX({GetQuotedSelector("cv", "id")}) as {SqlSyntax.GetQuotedColumnName("id")}",
                 GetQuotedSelector("cv", "nodeId"))
             .From<ContentVersionDto>("cv")
             .GroupBy(GetQuotedSelector("cv", "nodeId"));
@@ -138,7 +139,7 @@ public class AddMemberPropertiesAsColumns : MigrationBase
         string[] propertyTypesToDelete =
         {
             "umbracoMemberFailedPasswordAttempts", "umbracoMemberApproved", "umbracoMemberLockedOut",
-            "umbracoMemberLastLockoutDate", "umbracoMemberLastLogin", "umbracoMemberLastPasswordChangeDate"
+            "umbracoMemberLastLockoutDate", "umbracoMemberLastLogin", "umbracoMemberLastPasswordChangeDate",
         };
 
         Sql<ISqlContext> idQuery = Database.SqlContext.Sql().Select<PropertyTypeDto>(x => x.Id)
@@ -165,66 +166,84 @@ public class AddMemberPropertiesAsColumns : MigrationBase
     private object[] GetSubQueryColumns() => new object[]
     {
         SqlSyntax.GetQuotedColumnName("contentTypeId"), SqlSyntax.GetQuotedColumnName("dataTypeId"),
-        SqlSyntax.GetQuotedColumnName("id")
+        SqlSyntax.GetQuotedColumnName("id"),
     };
 
     [TableName("failedAttemptsType")]
     private class FailedAttempts
     {
-        [Column("contentTypeId")] public int ContentTypeId { get; set; }
+        [Column("contentTypeId")]
+        public int ContentTypeId { get; set; }
 
-        [Column("dataTypeId")] public int DataTypeId { get; set; }
+        [Column("dataTypeId")]
+        public int DataTypeId { get; set; }
 
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
     }
 
     [TableName("memberApprovedType")]
     private class MemberApproved
     {
-        [Column("contentTypeId")] public int ContentTypeId { get; set; }
+        [Column("contentTypeId")]
+        public int ContentTypeId { get; set; }
 
-        [Column("dataTypeId")] public int DataTypeId { get; set; }
+        [Column("dataTypeId")]
+        public int DataTypeId { get; set; }
 
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
     }
 
     [TableName("memberLockedOutType")]
     private class MemberLockedOut
     {
-        [Column("contentTypeId")] public int ContentTypeId { get; set; }
+        [Column("contentTypeId")]
+        public int ContentTypeId { get; set; }
 
-        [Column("dataTypeId")] public int DataTypeId { get; set; }
+        [Column("dataTypeId")]
+        public int DataTypeId { get; set; }
 
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
     }
 
     [TableName("lastLockOutDateType")]
     private class LastLockoutDate
     {
-        [Column("contentTypeId")] public int ContentTypeId { get; set; }
+        [Column("contentTypeId")]
+        public int ContentTypeId { get; set; }
 
-        [Column("dataTypeId")] public int DataTypeId { get; set; }
+        [Column("dataTypeId")]
+        public int DataTypeId { get; set; }
 
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
     }
 
     [TableName("lastLoginDateType")]
     private class LastLoginDate
     {
-        [Column("contentTypeId")] public int ContentTypeId { get; set; }
+        [Column("contentTypeId")]
+        public int ContentTypeId { get; set; }
 
-        [Column("dataTypeId")] public int DataTypeId { get; set; }
+        [Column("dataTypeId")]
+        public int DataTypeId { get; set; }
 
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
     }
 
     [TableName("lastPasswordChangeType")]
     private class LastPasswordChange
     {
-        [Column("contentTypeId")] public int ContentTypeId { get; set; }
+        [Column("contentTypeId")]
+        public int ContentTypeId { get; set; }
 
-        [Column("dataTypeId")] public int DataTypeId { get; set; }
+        [Column("dataTypeId")]
+        public int DataTypeId { get; set; }
 
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
     }
 }

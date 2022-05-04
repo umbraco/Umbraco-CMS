@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -10,7 +10,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class RelationDto
 {
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("parentId")]
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode")]
@@ -30,7 +32,9 @@ internal class RelationDto
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime Datetime { get; set; }
 
-    [Column("comment")] [Length(1000)] public string? Comment { get; set; }
+    [Column("comment")]
+    [Length(1000)]
+    public string? Comment { get; set; }
 
     [ResultColumn]
     [Column("parentObjectType")]

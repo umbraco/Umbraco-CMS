@@ -50,7 +50,6 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
         return dtos.WhereNotNull().Select(Map).WhereNotNull();
     }
 
-
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
     {
         Sql<ISqlContext> sql = SqlContext.Sql();
@@ -118,7 +117,7 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
             Id = entity.Id,
             UserOrMemberKey = entity.UserOrMemberKey,
             ProviderName = entity.ProviderName,
-            Secret = entity.Secret
+            Secret = entity.Secret,
         };
     }
 
@@ -131,7 +130,10 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
 
         return new TwoFactorLogin
         {
-            Id = dto.Id, UserOrMemberKey = dto.UserOrMemberKey, ProviderName = dto.ProviderName, Secret = dto.Secret
+            Id = dto.Id,
+            UserOrMemberKey = dto.UserOrMemberKey,
+            ProviderName = dto.ProviderName,
+            Secret = dto.Secret,
         };
     }
 }

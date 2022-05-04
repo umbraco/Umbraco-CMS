@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;

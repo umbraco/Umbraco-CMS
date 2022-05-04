@@ -80,7 +80,8 @@ public class TouchServerTask : RecurringHostedServiceBase
 
         try
         {
-            _serverRegistrationService.TouchServer(serverAddress!,
+            _serverRegistrationService.TouchServer(
+                serverAddress!,
                 _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
         }
         catch (Exception ex)

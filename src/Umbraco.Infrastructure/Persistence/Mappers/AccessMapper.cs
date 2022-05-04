@@ -15,7 +15,8 @@ public sealed class AccessMapper : BaseMapper
     {
         DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.Key), nameof(AccessDto.Id));
         DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.LoginNodeId), nameof(AccessDto.LoginNodeId));
-        DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.NoAccessNodeId),
+        DefineMap<PublicAccessEntry, AccessDto>(
+            nameof(PublicAccessEntry.NoAccessNodeId),
             nameof(AccessDto.NoAccessNodeId));
         DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.ProtectedNodeId), nameof(AccessDto.NodeId));
         DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.CreateDate), nameof(AccessDto.CreateDate));

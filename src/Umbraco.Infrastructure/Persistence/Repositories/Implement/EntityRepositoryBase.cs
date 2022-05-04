@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IReadWriteQueryRepository<TId, TEntity>
     where TEntity : class, IEntity
 {
-    private static RepositoryCachePolicyOptions? s_defaultOptions;
+    private static RepositoryCachePolicyOptions? defaultOptions;
     private IRepositoryCachePolicy<TEntity, TId>? _cachePolicy;
     private IQuery<TEntity>? _hasIdQuery;
 
@@ -67,15 +67,14 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     /// <summary>
     ///     Gets the default <see cref="RepositoryCachePolicyOptions" />
     /// </summary>
-    protected virtual RepositoryCachePolicyOptions DefaultOptions => s_defaultOptions ?? (s_defaultOptions
-        = new RepositoryCachePolicyOptions(() =>
+    protected virtual RepositoryCachePolicyOptions DefaultOptions => defaultOptions
+        ??= new RepositoryCachePolicyOptions(() =>
         {
             // get count of all entities of current type (TEntity) to ensure cached result is correct
             // create query once if it is needed (no need for locking here) - query is static!
-            IQuery<TEntity> query = _hasIdQuery ??
-                                    (_hasIdQuery = AmbientScope.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
+            IQuery<TEntity> query = _hasIdQuery ??= AmbientScope.SqlContext.Query<TEntity>().Where(x => x.Id != 0);
             return PerformCount(query);
-        }));
+        });
 
     /// <summary>
     ///     Gets the repository cache policy
@@ -91,7 +90,6 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
 
             // create the cache policy using IsolatedCache which is either global
             // or scoped depending on the repository cache mode for the current scope
-
             switch (AmbientScope.RepositoryCacheMode)
             {
                 case RepositoryCacheMode.Default:
@@ -99,7 +97,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
                     // return the same cache policy in both cases - the cache policy is
                     // supposed to pick either the global or scope cache depending on the
                     // scope cache mode
-                    return _cachePolicy ?? (_cachePolicy = CreateCachePolicy());
+                    return _cachePolicy ??= CreateCachePolicy();
                 case RepositoryCacheMode.None:
                     return NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
                 default:
@@ -173,6 +171,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     ///     Gets a list of entities by the passed in query
     /// </summary>
     public IEnumerable<TEntity> Get(IQuery<TEntity> query) =>
+
         // ensure we don't include any null refs in the returned collection!
         PerformGetByQuery(query)
             .WhereNotNull();
@@ -221,7 +220,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     protected virtual bool PerformExists(TId id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(true);
-        sql.Where(GetBaseWhereClause(), new {id});
+        sql.Where(GetBaseWhereClause(), new { id });
         var count = Database.ExecuteScalar<int>(sql);
         return count == 1;
     }
@@ -240,7 +239,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new {id = GetEntityId(entity)});
+            Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
         entity.DeleteDate = DateTime.Now;

@@ -67,6 +67,20 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         _databaseProviderMetadata = databaseProviderMetadata;
     }
 
+    [Flags]
+    private enum InstallState : short
+    {
+        // This is an easy way to avoid 0 enum assignment and not worry about
+        // manual calcs. https://www.codeproject.com/Articles/396851/Ending-the-Great-Debate-on-Enum-Flags
+        Unknown = 1,
+        HasVersion = 1 << 1,
+        HasConnectionString = 1 << 2,
+        ConnectionStringConfigured = 1 << 3,
+        CanConnect = 1 << 4,
+        UmbracoInstalled = 1 << 5,
+        HasNonDefaultUser = 1 << 6,
+    }
+
     /// <summary>
     ///     Return a custom view model for this step
     /// </summary>
@@ -78,7 +92,7 @@ public class NewInstallStep : InstallSetupStep<UserModel>
                 .Where(x => x.SupportsQuickInstall)
                 .Where(x => x.IsAvailable)
                 .OrderBy(x => x.SortOrder)
-                .Select(x => new {displayName = x.DisplayName, defaultDatabaseName = x.DefaultDatabaseName})
+                .Select(x => new { displayName = x.DisplayName, defaultDatabaseName = x.DefaultDatabaseName })
                 .FirstOrDefault();
 
             return new
@@ -86,15 +100,17 @@ public class NewInstallStep : InstallSetupStep<UserModel>
                 minCharLength = _passwordConfiguration.RequiredLength,
                 minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
                 quickInstallSettings,
-                customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
+                customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured),
             };
         }
     }
 
     public override string View =>
         ShowView()
+
             // the user UI
             ? "user"
+
             // continue install UI
             : "continueinstall";
 
@@ -120,7 +136,7 @@ public class NewInstallStep : InstallSetupStep<UserModel>
                 $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
         }
 
-        //To change the password here we actually need to reset it since we don't have an old one to use to change
+        // To change the password here we actually need to reset it since we don't have an old one to use to change
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
         if (string.IsNullOrWhiteSpace(resetToken))
         {
@@ -137,7 +153,7 @@ public class NewInstallStep : InstallSetupStep<UserModel>
 
         if (user.SubscribeToNewsLetter)
         {
-            var values = new NameValueCollection {{"name", admin.Name}, {"email", admin.Email}};
+            var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
             var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
 
             HttpClient httpClient = _httpClientFactory.CreateClient();
@@ -156,14 +172,27 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         return null;
     }
 
+    public override bool RequiresExecution(UserModel model)
+    {
+        InstallState installState = GetInstallState();
+
+        if (installState.HasFlag(InstallState.Unknown))
+        {
+            // In this one case when it's a brand new install and nothing has been configured, make sure the
+            // back office cookie is cleared so there's no old cookies lying around causing problems
+            _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
+        }
+
+        return installState.HasFlag(InstallState.Unknown)
+               || !installState.HasFlag(InstallState.HasNonDefaultUser);
+    }
+
     private InstallState GetInstallState()
     {
         InstallState installState = InstallState.Unknown;
 
-
         // TODO: we need to do a null check here since this could be entirely missing and we end up with a null ref
         // exception in the installer.
-
         ConnectionStrings? databaseSettings = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
 
         var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
@@ -177,7 +206,6 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         {
             installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
         }
-
 
         DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings?.ProviderName);
         var canConnect = connStringConfigured &&
@@ -208,34 +236,5 @@ public class NewInstallStep : InstallSetupStep<UserModel>
 
         return installState.HasFlag(InstallState.Unknown)
                || !installState.HasFlag(InstallState.UmbracoInstalled);
-    }
-
-    public override bool RequiresExecution(UserModel model)
-    {
-        InstallState installState = GetInstallState();
-
-        if (installState.HasFlag(InstallState.Unknown))
-        {
-            // In this one case when it's a brand new install and nothing has been configured, make sure the
-            // back office cookie is cleared so there's no old cookies lying around causing problems
-            _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
-        }
-
-        return installState.HasFlag(InstallState.Unknown)
-               || !installState.HasFlag(InstallState.HasNonDefaultUser);
-    }
-
-    [Flags]
-    private enum InstallState : short
-    {
-        // This is an easy way to avoid 0 enum assignment and not worry about
-        // manual calcs. https://www.codeproject.com/Articles/396851/Ending-the-Great-Debate-on-Enum-Flags
-        Unknown = 1,
-        HasVersion = 1 << 1,
-        HasConnectionString = 1 << 2,
-        ConnectionStringConfigured = 1 << 3,
-        CanConnect = 1 << 4,
-        UmbracoInstalled = 1 << 5,
-        HasNonDefaultUser = 1 << 6
     }
 }

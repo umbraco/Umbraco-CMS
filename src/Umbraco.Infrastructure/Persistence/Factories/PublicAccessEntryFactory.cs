@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -10,8 +10,12 @@ internal static class PublicAccessEntryFactory
         var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId,
             dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
             {
-                RuleValue = x.RuleValue, RuleType = x.RuleType, CreateDate = x.CreateDate, UpdateDate = x.UpdateDate
-            })) {CreateDate = dto.CreateDate, UpdateDate = dto.UpdateDate};
+                RuleValue = x.RuleValue,
+                RuleType = x.RuleType,
+                CreateDate = x.CreateDate,
+                UpdateDate = x.UpdateDate,
+            }))
+        { CreateDate = dto.CreateDate, UpdateDate = dto.UpdateDate };
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
@@ -36,7 +40,7 @@ internal static class PublicAccessEntryFactory
                 RuleType = x.RuleType,
                 CreateDate = x.CreateDate,
                 UpdateDate = x.UpdateDate
-            }).ToList()
+            }).ToList(),
         };
 
         return dto;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions;
 
 public class UpdateDataExpression : MigrationExpressionBase
 {
@@ -10,7 +10,9 @@ public class UpdateDataExpression : MigrationExpressionBase
     public string? TableName { get; set; }
 
     public List<KeyValuePair<string, object?>>? Set { get; set; }
+
     public List<KeyValuePair<string, object?>>? Where { get; set; }
+
     public bool IsAllRows { get; set; }
 
     protected override string GetSql()
@@ -26,7 +28,8 @@ public class UpdateDataExpression : MigrationExpressionBase
             ? "(1=1)"
             : string.Join(" AND ", whereClauses.ToArray());
 
-        return string.Format(SqlSyntax.UpdateData,
+        return string.Format(
+            SqlSyntax.UpdateData,
             SqlSyntax.GetQuotedTableName(TableName),
             string.Join(", ", updateItems ?? Array.Empty<string>()),
             whereClause);

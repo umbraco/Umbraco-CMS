@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class ForeignKeyAttribute : ReferencesAttribute
 {
-    public ForeignKeyAttribute(Type type) : base(type)
+    public ForeignKeyAttribute(Type type)
+        : base(type)
     {
     }
 

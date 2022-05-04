@@ -37,7 +37,6 @@ public class DbProviderFactoryCreator : IDbProviderFactoryCreator
         IEnumerable<IDatabaseCreator> databaseCreators,
         IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories,
         IEnumerable<IProviderSpecificInterceptor> providerSpecificInterceptors)
-
     {
         _getFactory = getFactory;
         _providerSpecificInterceptors = providerSpecificInterceptors;
@@ -88,8 +87,9 @@ public class DbProviderFactoryCreator : IDbProviderFactoryCreator
 
     public NPocoMapperCollection ProviderSpecificMappers(string providerName)
     {
-        if (_providerSpecificMapperFactories.TryGetValue(providerName,
-                out IProviderSpecificMapperFactory? mapperFactory))
+        if (_providerSpecificMapperFactories.TryGetValue(
+            providerName,
+            out IProviderSpecificMapperFactory? mapperFactory))
         {
             return mapperFactory.Mappers;
         }

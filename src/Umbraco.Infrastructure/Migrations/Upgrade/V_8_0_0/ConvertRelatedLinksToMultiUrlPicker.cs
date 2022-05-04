@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NPoco;
@@ -12,7 +12,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
 public class ConvertRelatedLinksToMultiUrlPicker : MigrationBase
 {
-    public ConvertRelatedLinksToMultiUrlPicker(IMigrationContext context) : base(context)
+    public ConvertRelatedLinksToMultiUrlPicker(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -58,7 +59,6 @@ public class ConvertRelatedLinksToMultiUrlPicker : MigrationBase
         List<PropertyDataDto>? properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
 
         // Create a Multi URL Picker datatype for the converted RelatedLinks data
-
         foreach (PropertyDataDto? property in properties)
         {
             var value = property.Value?.ToString();
@@ -93,9 +93,10 @@ public class ConvertRelatedLinksToMultiUrlPicker : MigrationBase
 
                             NodeDto? node = Database.Fetch<NodeDto>(sqlNodeData).FirstOrDefault();
                             if (node != null)
-                                // Note: RelatedLinks did not allow for picking media items,
-                                // so if there's a value this will be a content item - hence
-                                // the hardcoded "document" here
+
+                            // Note: RelatedLinks did not allow for picking media items,
+                            // so if there's a value this will be a content item - hence
+                            // the hardcoded "document" here
                             {
                                 udi = new GuidUdi("document", node.UniqueId);
                             }
@@ -108,8 +109,9 @@ public class ConvertRelatedLinksToMultiUrlPicker : MigrationBase
                     Name = relatedLink.Caption,
                     Target = relatedLink.NewWindow ? "_blank" : null,
                     Udi = udi,
+
                     // Should only have a URL if it's an external link otherwise it wil be a UDI
-                    Url = relatedLink.IsInternal == false ? relatedLink.Link : null
+                    Url = relatedLink.IsInternal == false ? relatedLink.Link : null,
                 };
 
                 links.Add(link);
@@ -127,25 +129,34 @@ public class ConvertRelatedLinksToMultiUrlPicker : MigrationBase
 internal class RelatedLink
 {
     public int? Id { get; internal set; }
+
+    [JsonProperty("caption")]
+    public string? Caption { get; set; }
+
     internal bool IsDeleted { get; set; }
 
-    [JsonProperty("caption")] public string? Caption { get; set; }
+    [JsonProperty("link")]
+    public string? Link { get; set; }
 
-    [JsonProperty("link")] public string? Link { get; set; }
+    [JsonProperty("newWindow")]
+    public bool NewWindow { get; set; }
 
-    [JsonProperty("newWindow")] public bool NewWindow { get; set; }
-
-    [JsonProperty("isInternal")] public bool IsInternal { get; set; }
+    [JsonProperty("isInternal")]
+    public bool IsInternal { get; set; }
 }
 
 [DataContract]
 internal class LinkDto
 {
-    [DataMember(Name = "name")] public string? Name { get; set; }
+    [DataMember(Name = "name")]
+    public string? Name { get; set; }
 
-    [DataMember(Name = "target")] public string? Target { get; set; }
+    [DataMember(Name = "target")]
+    public string? Target { get; set; }
 
-    [DataMember(Name = "udi")] public GuidUdi? Udi { get; set; }
+    [DataMember(Name = "udi")]
+    public GuidUdi? Udi { get; set; }
 
-    [DataMember(Name = "url")] public string? Url { get; set; }
+    [DataMember(Name = "url")]
+    public string? Url { get; set; }
 }

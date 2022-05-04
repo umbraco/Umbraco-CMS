@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -18,13 +18,17 @@ public sealed class DictionaryTranslationMapper : BaseMapper
 
     protected override void DefineMaps()
     {
-        DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Id),
+        DefineMap<DictionaryTranslation, LanguageTextDto>(
+            nameof(DictionaryTranslation.Id),
             nameof(LanguageTextDto.PrimaryKey));
-        DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Key),
+        DefineMap<DictionaryTranslation, LanguageTextDto>(
+            nameof(DictionaryTranslation.Key),
             nameof(LanguageTextDto.UniqueId));
-        DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Language),
+        DefineMap<DictionaryTranslation, LanguageTextDto>(
+            nameof(DictionaryTranslation.Language),
             nameof(LanguageTextDto.LanguageId));
-        DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Value),
+        DefineMap<DictionaryTranslation, LanguageTextDto>(
+            nameof(DictionaryTranslation.Value),
             nameof(LanguageTextDto.Value));
     }
 }

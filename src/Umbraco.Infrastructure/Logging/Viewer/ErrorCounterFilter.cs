@@ -1,4 +1,4 @@
-﻿using Serilog.Events;
+using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -13,7 +13,7 @@ internal class ErrorCounterFilter : ILogFilter
             Count++;
         }
 
-        //Don't add it to the list
+        // Don't add it to the list
         return false;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Extensions;
@@ -9,7 +9,8 @@ public static class MediaPicker3ConfigurationExtensions
     ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
-    public static void ApplyConfiguration(this ImageCropperValue imageCropperValue,
+    public static void ApplyConfiguration(
+        this ImageCropperValue imageCropperValue,
         MediaPicker3Configuration? configuration)
     {
         var crops = new List<ImageCropperValue.ImageCropperCrop>();
@@ -27,7 +28,7 @@ public static class MediaPicker3ConfigurationExtensions
                     Alias = configuredCrop.Alias,
                     Width = configuredCrop.Width,
                     Height = configuredCrop.Height,
-                    Coordinates = crop?.Coordinates
+                    Coordinates = crop?.Coordinates,
                 });
             }
         }

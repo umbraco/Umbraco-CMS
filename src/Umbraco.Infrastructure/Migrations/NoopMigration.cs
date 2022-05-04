@@ -2,7 +2,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 
 public class NoopMigration : MigrationBase
 {
-    public NoopMigration(IMigrationContext context) : base(context)
+    public NoopMigration(IMigrationContext context)
+        : base(context)
     {
     }
 

@@ -22,7 +22,7 @@ internal class AddUserGroup2NodeTable : MigrationBase
         // Insert if there exists specific permissions today. Can't do it directly in db in any nice way.
         List<UserGroup2NodePermissionDto>? allData = Database.Fetch<UserGroup2NodePermissionDto>();
         UserGroup2NodeDto[] toInsert = allData
-            .Select(x => new UserGroup2NodeDto {NodeId = x.NodeId, UserGroupId = x.UserGroupId}).Distinct(
+            .Select(x => new UserGroup2NodeDto { NodeId = x.NodeId, UserGroupId = x.UserGroupId }).Distinct(
                 new DelegateEqualityComparer<UserGroup2NodeDto>(
                     (x, y) => x?.NodeId == y?.NodeId && x?.UserGroupId == y?.UserGroupId,
                     x => x.NodeId.GetHashCode() + x.UserGroupId.GetHashCode())).ToArray();

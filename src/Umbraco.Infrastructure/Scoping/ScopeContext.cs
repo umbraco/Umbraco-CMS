@@ -4,8 +4,16 @@ internal class ScopeContext : IScopeContext, IInstanceIdentifiable
 {
     private Dictionary<string, IEnlistedObject>? _enlisted;
 
-    private IDictionary<string, IEnlistedObject> Enlisted => _enlisted
-                                                             ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
+    private interface IEnlistedObject
+    {
+        int Priority { get; }
+
+        void Execute(bool completed);
+    }
+
+    public Guid InstanceId { get; } = Guid.NewGuid();
+
+    private IDictionary<string, IEnlistedObject> Enlisted => _enlisted ??= new Dictionary<string, IEnlistedObject>();
 
     public void ScopeExit(bool completed)
     {
@@ -44,8 +52,6 @@ internal class ScopeContext : IScopeContext, IInstanceIdentifiable
         }
     }
 
-    public Guid InstanceId { get; } = Guid.NewGuid();
-
     public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
     public void Enlist(string key, Action<bool> action, int priority = 100) =>
@@ -54,7 +60,7 @@ internal class ScopeContext : IScopeContext, IInstanceIdentifiable
     public T? Enlist<T>(string key, Func<T>? creator, Action<bool, T?>? action = null, int priority = 100)
     {
         Dictionary<string, IEnlistedObject> enlistedObjects =
-            _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
+_enlisted ??= new Dictionary<string, IEnlistedObject>();
 
         if (enlistedObjects.TryGetValue(key, out IEnlistedObject? enlisted))
         {
@@ -96,12 +102,6 @@ internal class ScopeContext : IScopeContext, IInstanceIdentifiable
         }
 
         return enlistedAs.Item;
-    }
-
-    private interface IEnlistedObject
-    {
-        int Priority { get; }
-        void Execute(bool completed);
     }
 
     private class EnlistedObject<T> : IEnlistedObject

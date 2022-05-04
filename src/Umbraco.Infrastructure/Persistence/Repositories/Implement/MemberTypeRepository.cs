@@ -40,7 +40,6 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     // so here,
     // every PerformGet/Exists just GetMany() and then filters
     // except PerformGetAll which is the one really doing the job
-
     protected override IMemberType? PerformGet(int id)
         => GetMany()?.FirstOrDefault(x => x.Id == id);
 
@@ -134,18 +133,19 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
 
         entity.AddingEntity();
 
-        //set a default icon if one is not specified
+        // set a default icon if one is not specified
         if (entity.Icon.IsNullOrWhiteSpace())
         {
             entity.Icon = Constants.Icons.Member;
         }
 
-        //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
+        // By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
         Dictionary<string, PropertyType> standardPropertyTypes =
             ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
         foreach (KeyValuePair<string, PropertyType> standardPropertyType in standardPropertyTypes)
         {
-            entity.AddPropertyType(standardPropertyType.Value,
+            entity.AddPropertyType(
+                standardPropertyType.Value,
                 Constants.Conventions.Member.StandardPropertiesGroupAlias,
                 Constants.Conventions.Member.StandardPropertiesGroupName);
         }
@@ -153,7 +153,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         EnsureExplicitDataTypeForBuiltInProperties(entity);
         PersistNewBaseContentType(entity);
 
-        //Handles the MemberTypeDto (cmsMemberType table)
+        // Handles the MemberTypeDto (cmsMemberType table)
         IEnumerable<MemberPropertyTypeDto> memberTypeDtos = ContentTypeFactory.BuildMemberPropertyTypeDtos(entity);
         foreach (MemberPropertyTypeDto memberTypeDto in memberTypeDtos)
         {
@@ -167,19 +167,19 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     {
         ValidateAlias(entity);
 
-        //Updates Modified date
+        // Updates Modified date
         entity.UpdatingEntity();
 
-        //Look up parent to get and set the correct Path if ParentId has changed
+        // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new {entity.ParentId});
+            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
             var maxSortOrder =
                 Database.ExecuteScalar<int>(
                     "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new {entity.ParentId, NodeObjectType = NodeObjectTypeId});
+                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
             entity.SortOrder = maxSortOrder + 1;
         }
 
@@ -187,7 +187,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         PersistUpdatedBaseContentType(entity);
 
         // remove and insert - handle cmsMemberType table
-        Database.Delete<MemberPropertyTypeDto>("WHERE NodeId = @Id", new {entity.Id});
+        Database.Delete<MemberPropertyTypeDto>("WHERE NodeId = @Id", new { entity.Id });
         IEnumerable<MemberPropertyTypeDto> memberTypeDtos = ContentTypeFactory.BuildMemberPropertyTypeDtos(entity);
         foreach (MemberPropertyTypeDto memberTypeDto in memberTypeDtos)
         {
@@ -207,7 +207,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType,
         string propertyTypeAlias)
     {
-        //custom property type constructor logic to set explicit dbtype's for built in properties
+        // custom property type constructor logic to set explicit dbtype's for built in properties
         Dictionary<string, PropertyType> builtinProperties =
             ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
         var readonlyStorageType = builtinProperties.TryGetValue(propertyTypeAlias, out PropertyType? propertyType);
@@ -229,7 +229,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         {
             if (builtinProperties.ContainsKey(propertyType.Alias))
             {
-                //this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
+                // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
                 if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition) &&
                     propDefinition != null)
                 {

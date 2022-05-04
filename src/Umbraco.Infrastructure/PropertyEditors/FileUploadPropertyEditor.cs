@@ -100,7 +100,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         var isUpdated = false;
         foreach (IProperty property in properties)
         {
-            //copy each of the property values (variants, segments) to the destination
+            // copy each of the property values (variants, segments) to the destination
             foreach (IPropertyValue propertyValue in property.Values)
             {
                 var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
@@ -141,7 +141,6 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new FileUploadConfigurationEditor(_ioHelper, _editorConfigurationParser);
-
 
     /// <summary>
     ///     Creates the corresponding property value editor.
@@ -184,14 +183,14 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         IReadOnlyCollection<IPropertyValue> propVals = prop.Values;
         foreach (IPropertyValue propertyValue in propVals)
         {
-            //check if the published value contains data and return it
+            // check if the published value contains data and return it
             var propVal = propertyValue.PublishedValue;
             if (propVal != null && propVal is string str1 && !str1.IsNullOrWhiteSpace())
             {
                 yield return _mediaFileManager.FileSystem.GetRelativePath(str1);
             }
 
-            //check if the edited value contains data and return it
+            // check if the edited value contains data and return it
             propVal = propertyValue.EditedValue;
             if (propVal != null && propVal is string str2 && !str2.IsNullOrWhiteSpace())
             {

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Column;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Column;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table;
 
@@ -13,14 +13,14 @@ public class RenameBuilder : IRenameBuilder
     /// <inheritdoc />
     public IRenameTableBuilder Table(string oldName)
     {
-        var expression = new RenameTableExpression(_context) {OldName = oldName};
+        var expression = new RenameTableExpression(_context) { OldName = oldName };
         return new RenameTableBuilder(expression);
     }
 
     /// <inheritdoc />
     public IRenameColumnBuilder Column(string oldName)
     {
-        var expression = new RenameColumnExpression(_context) {OldName = oldName};
+        var expression = new RenameColumnExpression(_context) { OldName = oldName };
         return new RenameColumnBuilder(expression);
     }
 }

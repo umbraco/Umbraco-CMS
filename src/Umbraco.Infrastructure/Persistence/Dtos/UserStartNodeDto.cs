@@ -12,7 +12,7 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
     public enum StartNodeTypeValue
     {
         Content = 1,
-        Media = 2
+        Media = 2,
     }
 
     [Column("id")]
@@ -35,9 +35,11 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
         Name = "IX_umbracoUserStartNode_startNodeType")]
     public int StartNodeType { get; set; }
 
+    public static bool operator ==(UserStartNodeDto left, UserStartNodeDto right) => Equals(left, right);
+
     public bool Equals(UserStartNodeDto? other)
     {
-        if (ReferenceEquals(null, other))
+        if (other is null)
         {
             return false;
         }
@@ -52,7 +54,7 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (obj is null)
         {
             return false;
         }
@@ -71,8 +73,6 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
     }
 
     public override int GetHashCode() => Id;
-
-    public static bool operator ==(UserStartNodeDto left, UserStartNodeDto right) => Equals(left, right);
 
     public static bool operator !=(UserStartNodeDto left, UserStartNodeDto right) => !Equals(left, right);
 }

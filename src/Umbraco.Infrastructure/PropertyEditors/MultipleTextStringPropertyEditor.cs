@@ -31,7 +31,6 @@ public class MultipleTextStringPropertyEditor : DataEditor
     private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
 
-
     // Scheduled for removal in v12
     [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
     public MultipleTextStringPropertyEditor(
@@ -98,8 +97,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
         /// </remarks>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            var asArray = editorValue.Value as JArray;
-            if (asArray == null || asArray.HasValues == false)
+            if (editorValue.Value is not JArray asArray || asArray.HasValues == false)
             {
                 return null;
             }
@@ -112,12 +110,12 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
             var max = config.Maximum;
 
-            //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
+            // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             IEnumerable<string?> array = asArray.OfType<JObject>()
                 .Where(x => x["value"] != null)
                 .Select(x => x["value"]!.Value<string>());
 
-            //only allow the max if over 0
+            // only allow the max if over 0
             if (max > 0)
             {
                 return string.Join(Environment.NewLine, array.Take(max));
@@ -142,8 +140,8 @@ public class MultipleTextStringPropertyEditor : DataEditor
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
-            return val?.ToString()?.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => JObject.FromObject(new {value = x})) ?? new JObject[] { };
+            return val?.ToString()?.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => JObject.FromObject(new { value = x })) ?? new JObject[] { };
         }
     }
 
@@ -156,8 +154,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
         public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
         {
-            var asArray = value as JArray;
-            if (asArray == null)
+            if (value is not JArray asArray)
             {
                 return Enumerable.Empty<ValidationResult>();
             }

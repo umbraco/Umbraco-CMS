@@ -11,5 +11,6 @@ public class DbTypes
     }
 
     public IReadOnlyDictionary<Type, string> ColumnTypeMap { get; }
+
     public IReadOnlyDictionary<Type, DbType> ColumnDbTypeMap { get; }
 }

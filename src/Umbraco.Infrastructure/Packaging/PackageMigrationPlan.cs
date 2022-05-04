@@ -12,7 +12,8 @@ public abstract class PackageMigrationPlan : MigrationPlan, IDiscoverable
     ///     Creates a package migration plan
     /// </summary>
     /// <param name="packageName">The name of the package. If the package has a package.manifest these must match.</param>
-    protected PackageMigrationPlan(string packageName) : this(packageName, packageName)
+    protected PackageMigrationPlan(string packageName)
+        : this(packageName, packageName)
     {
     }
 
@@ -27,7 +28,8 @@ public abstract class PackageMigrationPlan : MigrationPlan, IDiscoverable
     ///     The plan name for the package. This should be the same name as the
     ///     package name if there is only one plan in the package.
     /// </param>
-    protected PackageMigrationPlan(string packageName, string planName) : base(planName)
+    protected PackageMigrationPlan(string packageName, string planName)
+        : base(planName)
     {
         // A call to From must be done first
         From(string.Empty);

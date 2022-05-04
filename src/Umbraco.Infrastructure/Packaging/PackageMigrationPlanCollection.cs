@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core.Packaging;
 /// </summary>
 public class PackageMigrationPlanCollection : BuilderCollectionBase<PackageMigrationPlan>
 {
-    public PackageMigrationPlanCollection(Func<IEnumerable<PackageMigrationPlan>> items) : base(items)
+    public PackageMigrationPlanCollection(Func<IEnumerable<PackageMigrationPlan>> items)
+        : base(items)
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
@@ -11,6 +11,7 @@ public class InsertDataExpression : MigrationExpressionBase
     }
 
     public string? TableName { get; set; }
+
     public bool EnabledIdentityInsert { get; set; }
 
     public List<InsertionDataDefinition> Rows { get; } = new();

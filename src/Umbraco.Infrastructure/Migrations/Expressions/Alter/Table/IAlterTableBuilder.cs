@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
 
 /// <summary>
 ///     Builds an Alter Table expression.

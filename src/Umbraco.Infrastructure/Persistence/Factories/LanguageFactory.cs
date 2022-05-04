@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -18,7 +18,7 @@ internal static class LanguageFactory
             Id = dto.Id,
             IsDefault = dto.IsDefault,
             IsMandatory = dto.IsMandatory,
-            FallbackLanguageId = dto.FallbackLanguageId
+            FallbackLanguageId = dto.FallbackLanguageId,
         };
 
         // Reset dirty initial properties
@@ -37,7 +37,7 @@ internal static class LanguageFactory
             CultureName = entity.CultureName,
             IsDefault = entity.IsDefault,
             IsMandatory = entity.IsMandatory,
-            FallbackLanguageId = entity.FallbackLanguageId
+            FallbackLanguageId = entity.FallbackLanguageId,
         };
 
         if (entity.HasIdentity)

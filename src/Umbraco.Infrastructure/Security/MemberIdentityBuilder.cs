@@ -20,10 +20,6 @@ public class MemberIdentityBuilder : IdentityBuilder
         : base(typeof(MemberIdentityUser), role, services)
         => InitializeServices(services);
 
-    private void InitializeServices(IServiceCollection services)
-    {
-    }
-
     // override to add itself, by default identity only wants a single IdentityErrorDescriber
     public override IdentityBuilder AddErrorDescriber<TDescriber>()
     {
@@ -35,6 +31,10 @@ public class MemberIdentityBuilder : IdentityBuilder
 
         Services.AddScoped<TDescriber>();
         return this;
+    }
+
+    private void InitializeServices(IServiceCollection services)
+    {
     }
 
     /// <summary>

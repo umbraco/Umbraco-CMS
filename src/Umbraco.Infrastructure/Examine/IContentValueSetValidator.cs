@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -25,6 +25,8 @@ public interface IContentValueSetValidator : IValueSetValidator
     int? ParentId { get; }
 
     bool ValidatePath(string path, string category);
+
     bool ValidateRecycleBin(string path, string category);
+
     bool ValidateProtectedContent(string path, string category);
 }

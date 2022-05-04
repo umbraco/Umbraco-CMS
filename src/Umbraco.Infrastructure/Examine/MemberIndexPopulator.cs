@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -27,7 +27,7 @@ public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
 
         IMember[] members;
 
-        //no node types specified, do all members
+        // no node types specified, do all members
         do
         {
             members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
@@ -42,6 +42,7 @@ public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
             }
 
             pageIndex++;
-        } while (members.Length == pageSize);
+        }
+        while (members.Length == pageSize);
     }
 }

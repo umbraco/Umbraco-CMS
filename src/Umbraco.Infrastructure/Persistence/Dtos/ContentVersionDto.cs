@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -13,7 +13,9 @@ public class ContentVersionDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
     private int? _userId;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("nodeId")]
     [ForeignKey(typeof(ContentDto))]
@@ -28,7 +30,7 @@ public class ContentVersionDto
     [Column("userId")] // TODO: db rename to 'updateUserId'
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
-    public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
+    public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } // return null if zero
 
     [Column("current")]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Current", IncludeColumns = "nodeId")]
@@ -40,7 +42,6 @@ public class ContentVersionDto
     // we could use a content.currentVersionId FK that would need to be nullable, or (better?) an additional table
     // linking a content itemt to its current version (nodeId, versionId) - that would guarantee uniqueness BUT it would
     // not guarantee existence - so, really... we are trusting our code to manage 'current' correctly.
-
     [Column("text")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Text { get; set; }

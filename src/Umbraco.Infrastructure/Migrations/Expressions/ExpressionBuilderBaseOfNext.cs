@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions;

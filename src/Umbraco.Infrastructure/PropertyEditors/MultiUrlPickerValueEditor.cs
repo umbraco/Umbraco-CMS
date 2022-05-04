@@ -22,7 +22,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 {
     private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new()
     {
-        Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore
+        Formatting = Formatting.None,
+        NullValueHandling = NullValueHandling.Ignore,
     };
 
     private readonly IEntityService _entityService;
@@ -93,16 +94,15 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
             if (documentLinks?.Count > 0)
             {
                 entities.AddRange(
-                    _entityService.GetAll(UmbracoObjectTypes.Document,
-                        documentLinks.Select(link => link.Udi!.Guid).ToArray())
-                );
+                    _entityService.GetAll(
+                        UmbracoObjectTypes.Document,
+                        documentLinks.Select(link => link.Udi!.Guid).ToArray()));
             }
 
             if (mediaLinks?.Count > 0)
             {
                 entities.AddRange(
-                    _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi!.Guid).ToArray())
-                );
+                    _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi!.Guid).ToArray()));
             }
 
             var result = new List<LinkDisplay>();
@@ -162,7 +162,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Published = published,
                     QueryString = dto.QueryString,
                     Udi = udi,
-                    Url = url ?? ""
+                    Url = url ?? string.Empty,
                 });
             }
 
@@ -201,7 +201,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     QueryString = link.QueryString,
                     Target = link.Target,
                     Udi = link.Udi,
-                    Url = link.Udi == null ? link.Url : null // only save the URL for external links
+                    Url = link.Udi == null ? link.Url : null, // only save the URL for external links
                 },
                 LinkDisplayJsonSerializerSettings);
         }
@@ -216,14 +216,19 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     [DataContract]
     public class LinkDto
     {
-        [DataMember(Name = "name")] public string? Name { get; set; }
+        [DataMember(Name = "name")]
+        public string? Name { get; set; }
 
-        [DataMember(Name = "target")] public string? Target { get; set; }
+        [DataMember(Name = "target")]
+        public string? Target { get; set; }
 
-        [DataMember(Name = "udi")] public GuidUdi? Udi { get; set; }
+        [DataMember(Name = "udi")]
+        public GuidUdi? Udi { get; set; }
 
-        [DataMember(Name = "url")] public string? Url { get; set; }
+        [DataMember(Name = "url")]
+        public string? Url { get; set; }
 
-        [DataMember(Name = "queryString")] public string? QueryString { get; set; }
+        [DataMember(Name = "queryString")]
+        public string? QueryString { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -46,10 +46,11 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     {
         Expression.Column.IsIndexed = true;
 
-        var index = new CreateIndexExpression(_context,
-            new IndexDefinition {Name = indexName, TableName = Expression.TableName});
+        var index = new CreateIndexExpression(
+            _context,
+            new IndexDefinition { Name = indexName, TableName = Expression.TableName });
 
-        index.Index.Columns.Add(new IndexColumnDefinition {Name = Expression.Column.Name});
+        index.Index.Columns.Add(new IndexColumnDefinition { Name = Expression.Column.Name });
 
         Expression.Expressions.Add(index);
 
@@ -87,13 +88,16 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     {
         Expression.Column.IsUnique = true;
 
-        var index = new CreateIndexExpression(_context,
+        var index = new CreateIndexExpression(
+            _context,
             new IndexDefinition
             {
-                Name = indexName, TableName = Expression.TableName, IndexType = IndexTypes.UniqueNonClustered
+                Name = indexName,
+                TableName = Expression.TableName,
+                IndexType = IndexTypes.UniqueNonClustered,
             });
 
-        index.Index.Columns.Add(new IndexColumnDefinition {Name = Expression.Column.Name});
+        index.Index.Columns.Add(new IndexColumnDefinition { Name = Expression.Column.Name });
 
         Expression.Expressions.Add(index);
 
@@ -112,13 +116,14 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     {
         Expression.Column.IsForeignKey = true;
 
-        var fk = new CreateForeignKeyExpression(_context,
+        var fk = new CreateForeignKeyExpression(
+            _context,
             new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = primaryTableName,
                 PrimaryTableSchema = primaryTableSchema,
-                ForeignTable = Expression.TableName
+                ForeignTable = Expression.TableName,
             });
 
         fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
@@ -146,13 +151,14 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string? foreignKeyName, string? foreignTableSchema,
         string foreignTableName, string foreignColumnName)
     {
-        var fk = new CreateForeignKeyExpression(_context,
+        var fk = new CreateForeignKeyExpression(
+            _context,
             new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = Expression.TableName,
                 ForeignTable = foreignTableName,
-                ForeignTableSchema = foreignTableSchema
+                ForeignTableSchema = foreignTableSchema,
             });
 
         fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);

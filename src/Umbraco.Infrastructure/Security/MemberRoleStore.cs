@@ -10,19 +10,19 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleStore<UmbracoIdentityRole>
 {
-    //TODO: Move into custom error describer.
-    //TODO: How revealing can the error messages be?
+    // TODO: Move into custom error describer.
+    // TODO: How revealing can the error messages be?
     private readonly IdentityError _intParseError =
-        new() {Code = "IdentityIdParseError", Description = "Cannot parse ID to int"};
+        new() { Code = "IdentityIdParseError", Description = "Cannot parse ID to int" };
 
     private readonly IdentityError _memberGroupNotFoundError =
-        new() {Code = "IdentityMemberGroupNotFound", Description = "Member group not found"};
+        new() { Code = "IdentityMemberGroupNotFound", Description = "Member group not found" };
 
     private readonly IMemberGroupService _memberGroupService;
 
     private bool _disposed;
-    //private const string genericIdentityErrorCode = "IdentityErrorUserStore";
 
+    // private const string genericIdentityErrorCode = "IdentityErrorUserStore";
     public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
     {
         _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
@@ -48,7 +48,7 @@ public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleSt
             throw new ArgumentNullException(nameof(role));
         }
 
-        var memberGroup = new MemberGroup {Name = role.Name};
+        var memberGroup = new MemberGroup { Name = role.Name };
 
         _memberGroupService.Save(memberGroup);
 
@@ -56,7 +56,6 @@ public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleSt
 
         return Task.FromResult(IdentityResult.Success);
     }
-
 
     /// <inheritdoc />
     public Task<IdentityResult> UpdateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
@@ -161,7 +160,8 @@ public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleSt
     }
 
     /// <inheritdoc />
-    public Task<string> GetNormalizedRoleNameAsync(UmbracoIdentityRole role,
+    public Task<string> GetNormalizedRoleNameAsync(
+        UmbracoIdentityRole role,
         CancellationToken cancellationToken = default)
         => GetRoleNameAsync(role, cancellationToken);
 
@@ -222,6 +222,17 @@ public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleSt
     public void Dispose() => _disposed = true;
 
     /// <summary>
+    ///     Throws if this class has been disposed.
+    /// </summary>
+    protected void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().Name);
+        }
+    }
+
+    /// <summary>
     ///     Maps a member group to an identity role
     /// </summary>
     /// <param name="memberGroup"></param>
@@ -234,8 +245,7 @@ public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleSt
         // model. A good writeup of that is here:
         // https://stackoverflow.com/a/37362173
         // For our purposes currently we won't worry about this.
-
-        var result = new UmbracoIdentityRole {Id = memberGroup.Id.ToString(), Name = memberGroup.Name};
+        var result = new UmbracoIdentityRole { Id = memberGroup.Id.ToString(), Name = memberGroup.Name };
         return result;
     }
 
@@ -257,16 +267,5 @@ public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleSt
         }
 
         return anythingChanged;
-    }
-
-    /// <summary>
-    ///     Throws if this class has been disposed.
-    /// </summary>
-    protected void ThrowIfDisposed()
-    {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(GetType().Name);
-        }
     }
 }

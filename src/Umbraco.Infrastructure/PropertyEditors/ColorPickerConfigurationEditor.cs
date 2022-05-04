@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -52,39 +52,13 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
 
         var useLabel = configuration?.UseLabel ?? false;
 
-        return new Dictionary<string, object> {{"items", editorItems}, {"useLabel", useLabel}};
-    }
-
-    private object GetItemValue(ValueListConfiguration.ValueListItem item, bool useLabel, int sortOrder)
-    {
-        // in:  ValueListItem, Id = <id>, Value = <color> | { "value": "<color>", "label": "<label>" }
-        //                                        (depending on useLabel)
-        // out: { "value": "<color>", "label": "<label>", "sortOrder": <sortOrder> }
-
-        var v = new ItemValue {Color = item.Value, Label = item.Value, SortOrder = sortOrder};
-
-        if (item.Value?.DetectIsJson() ?? false)
-        {
-            try
-            {
-                ItemValue? o = _jsonSerializer.Deserialize<ItemValue>(item.Value);
-                o!.SortOrder = sortOrder;
-                return o;
-            }
-            catch
-            {
-                // parsing Json failed, don't do anything, get the value (sure?)
-                return new ItemValue {Color = item.Value, Label = item.Value, SortOrder = sortOrder};
-            }
-        }
-
-        return new ItemValue {Color = item.Value, Label = item.Value, SortOrder = sortOrder};
+        return new Dictionary<string, object> { { "items", editorItems }, { "useLabel", useLabel } };
     }
 
     // send: { "items": { "<id>": { "value": "<color>", "label": "<label>", "sortOrder": <sortOrder> } , ... }, "useLabel": <bool> }
     // recv: { "items": ..., "useLabel": <bool> }
-
-    public override ColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues,
+    public override ColorPickerConfiguration FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
         ColorPickerConfiguration? configuration)
     {
         var output = new ColorPickerConfiguration();
@@ -117,7 +91,6 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
             // in:  { "value": "<color>", "id": <id>, "label": "<label>" }
             // out: ValueListItem, Id = <id>, Value = <color> | { "value": "<color>", "label": "<label>" }
             //                                        (depending on useLabel)
-
             var value = item.Property("value")?.Value?.Value<string>();
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -131,9 +104,9 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
             }
 
             var label = item.Property("label")?.Value?.Value<string>();
-            value = _jsonSerializer.Serialize(new {value, label});
+            value = _jsonSerializer.Serialize(new { value, label });
 
-            output.Items.Add(new ValueListConfiguration.ValueListItem {Id = id, Value = value});
+            output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
         }
 
         // ensure ids
@@ -148,15 +121,29 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
         return output;
     }
 
-    // represents an item we are exchanging with the editor
-    [DataContract]
-    private class ItemValue
+    private object GetItemValue(ValueListConfiguration.ValueListItem item, bool useLabel, int sortOrder)
     {
-        [DataMember(Name = "value")] public string? Color { get; set; }
+        // in:  ValueListItem, Id = <id>, Value = <color> | { "value": "<color>", "label": "<label>" }
+        //                                        (depending on useLabel)
+        // out: { "value": "<color>", "label": "<label>", "sortOrder": <sortOrder> }
+        var v = new ItemValue { Color = item.Value, Label = item.Value, SortOrder = sortOrder };
 
-        [DataMember(Name = "label")] public string? Label { get; set; }
+        if (item.Value?.DetectIsJson() ?? false)
+        {
+            try
+            {
+                ItemValue? o = _jsonSerializer.Deserialize<ItemValue>(item.Value);
+                o!.SortOrder = sortOrder;
+                return o;
+            }
+            catch
+            {
+                // parsing Json failed, don't do anything, get the value (sure?)
+                return new ItemValue { Color = item.Value, Label = item.Value, SortOrder = sortOrder };
+            }
+        }
 
-        [DataMember(Name = "sortOrder")] public int SortOrder { get; set; }
+        return new ItemValue { Color = item.Value, Label = item.Value, SortOrder = sortOrder };
     }
 
     internal class ColorListValidator : IValueValidator
@@ -168,7 +155,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                 yield break;
             }
 
-            //validate each item which is a json object
+            // validate each item which is a json object
             for (var index = 0; index < json.Count; index++)
             {
                 JToken i = json[index];
@@ -177,7 +164,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                     continue;
                 }
 
-                //NOTE: we will be removing empty values when persisting so no need to validate
+                // NOTE: we will be removing empty values when persisting so no need to validate
                 var asString = jItem["value"]?.ToString();
                 if (asString.IsNullOrWhiteSpace())
                 {
@@ -188,11 +175,25 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                 {
                     yield return new ValidationResult("The value " + asString + " is not a valid hex color", new[]
                     {
-                        //we'll make the server field the index number of the value so it can be wired up to the view
-                        "item_" + index.ToInvariantString()
+                        // we'll make the server field the index number of the value so it can be wired up to the view
+                        "item_" + index.ToInvariantString(),
                     });
                 }
             }
         }
+    }
+
+    // represents an item we are exchanging with the editor
+    [DataContract]
+    private class ItemValue
+    {
+        [DataMember(Name = "value")]
+        public string? Color { get; set; }
+
+        [DataMember(Name = "label")]
+        public string? Label { get; set; }
+
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
     }
 }

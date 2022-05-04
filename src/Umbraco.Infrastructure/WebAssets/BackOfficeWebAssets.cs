@@ -48,40 +48,47 @@ public class BackOfficeWebAssets
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
+    public static string GetIndependentPackageBundleName(ManifestAssets manifestAssets, AssetType assetType)
+        => $"{manifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
+
     public void CreateBundles()
     {
         // Create bundles
-
-        _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
+        _runtimeMinifier.CreateCssBundle(
+            UmbracoInitCssBundleName,
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths(
                 "assets/css/umbraco.min.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-        _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
+        _runtimeMinifier.CreateCssBundle(
+            UmbracoUpgradeCssBundleName,
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths(
                 "assets/css/umbraco.min.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-        _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
+        _runtimeMinifier.CreateCssBundle(
+            UmbracoPreviewCssBundleName,
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths("assets/css/canvasdesigner.min.css"));
 
-        _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName,
+        _runtimeMinifier.CreateJsBundle(
+            UmbracoPreviewJsBundleName,
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths(GetScriptsForPreview()));
 
-        _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName,
+        _runtimeMinifier.CreateJsBundle(
+            UmbracoTinyMceJsBundleName,
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths(GetScriptsForTinyMce()));
 
-        _runtimeMinifier.CreateJsBundle(UmbracoCoreJsBundleName,
+        _runtimeMinifier.CreateJsBundle(
+            UmbracoCoreJsBundleName,
             BundlingOptions.NotOptimizedAndComposite,
             FormatPaths(GetScriptsForBackOfficeCore()));
-
 
         // get the property editor assets
         var propertyEditorAssets = ScanPropertyEditors()
@@ -95,7 +102,6 @@ public class BackOfficeWebAssets
         // This bundle includes all scripts from property editor assets,
         // custom back office assets, and any scripts found in package manifests
         // that have the default bundle options.
-
         IEnumerable<string?> jsAssets =
             (customAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string?>? customScripts)
                 ? customScripts
@@ -119,7 +125,6 @@ public class BackOfficeWebAssets
         // This bundle includes all CSS from property editor assets,
         // custom back office assets, and any CSS found in package manifests
         // that have the default bundle options.
-
         IEnumerable<string?> cssAssets =
             (customAssets.TryGetValue(AssetType.Css, out IEnumerable<string?>? customStyles)
                 ? customStyles
@@ -138,12 +143,10 @@ public class BackOfficeWebAssets
         RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest?.Stylesheets, AssetType.Css);
 
         // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
-        RegisterPackageBundlesForNoneOption(_parser.CombinedManifest?.Stylesheets,
+        RegisterPackageBundlesForNoneOption(
+            _parser.CombinedManifest?.Stylesheets,
             UmbracoNonOptimizedPackageCssBundleName);
     }
-
-    public static string GetIndependentPackageBundleName(ManifestAssets manifestAssets, AssetType assetType)
-        => $"{manifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
 
     private void RegisterPackageBundlesForNoneOption(
         IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>>? combinedPackageManifestAssets,
@@ -152,8 +155,9 @@ public class BackOfficeWebAssets
         var assets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         // Create a bundle per package manifest that is declaring the matching BundleOptions
-        if (combinedPackageManifestAssets?.TryGetValue(BundleOptions.None,
-                out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
+        if (combinedPackageManifestAssets?.TryGetValue(
+            BundleOptions.None,
+            out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
         {
             foreach (var asset in manifestAssetList.SelectMany(x => x.Assets))
             {
@@ -163,6 +167,7 @@ public class BackOfficeWebAssets
 
         _runtimeMinifier.CreateJsBundle(
             bundleName,
+
             // no optimization, no composite files, just render individual files
             BundlingOptions.NotOptimizedNotComposite,
             FormatPaths(assets.ToArray()));
@@ -173,8 +178,9 @@ public class BackOfficeWebAssets
         AssetType assetType)
     {
         // Create a bundle per package manifest that is declaring the matching BundleOptions
-        if (combinedPackageManifestAssets?.TryGetValue(BundleOptions.Independent,
-                out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
+        if (combinedPackageManifestAssets?.TryGetValue(
+            BundleOptions.Independent,
+            out IReadOnlyList<ManifestAssets>? manifestAssetList) ?? false)
         {
             foreach (ManifestAssets manifestAssets in manifestAssetList)
             {
@@ -205,8 +211,9 @@ public class BackOfficeWebAssets
         var scripts = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         // only include scripts with the default bundle options here
-        if (_parser.CombinedManifest?.Scripts.TryGetValue(BundleOptions.Default,
-                out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
+        if (_parser.CombinedManifest?.Scripts.TryGetValue(
+            BundleOptions.Default,
+            out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
         {
             foreach (var script in manifestAssets.SelectMany(x => x.Assets))
             {
@@ -244,8 +251,9 @@ public class BackOfficeWebAssets
         var stylesheets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         // only include css with the default bundle options here
-        if (_parser.CombinedManifest?.Stylesheets.TryGetValue(BundleOptions.Default,
-                out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
+        if (_parser.CombinedManifest?.Stylesheets.TryGetValue(
+            BundleOptions.Default,
+            out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
         {
             foreach (var script in manifestAssets.SelectMany(x => x.Assets))
             {
@@ -296,6 +304,7 @@ public class BackOfficeWebAssets
         return assets?
             .Where(x => x.IsNullOrWhiteSpace() == false)
             .Select(x => !x.StartsWith("/") && Uri.IsWellFormedUriString(x, UriKind.Relative)
+
                 // most declarations with be made relative to the /umbraco folder, so things
                 // like lib/blah/blah.js so we need to turn them into absolutes here
                 ? umbracoPath.EnsureStartsWith('/').TrimEnd("/") + x.EnsureStartsWith('/')

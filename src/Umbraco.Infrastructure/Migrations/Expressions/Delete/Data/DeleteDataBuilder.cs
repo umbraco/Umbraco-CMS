@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -16,7 +16,7 @@ public class DeleteDataBuilder : ExpressionBuilderBase<DeleteDataExpression>,
     /// <inheritdoc />
     public IExecutableBuilder IsNull(string columnName)
     {
-        Expression.Rows.Add(new DeletionDataDefinition {new(columnName, null)});
+        Expression.Rows.Add(new DeletionDataDefinition { new(columnName, null) });
         return this;
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
@@ -49,7 +49,8 @@ public static partial class NPocoDatabaseExtensions
             // get the item count once
             if (itemCount == null)
             {
-                itemCount = database.ExecuteScalar<int>(sqlCount?.SQL ?? generatedSqlCount,
+                itemCount = database.ExecuteScalar<int>(
+                    sqlCount?.SQL ?? generatedSqlCount,
                     sqlCount?.Arguments ?? sqlArgs);
             }
 
@@ -60,7 +61,8 @@ public static partial class NPocoDatabaseExtensions
             {
                 yield return row;
             }
-        } while (pageIndex * pageSize < itemCount);
+        }
+        while (pageIndex * pageSize < itemCount);
     }
 
     /// <summary>
@@ -150,7 +152,8 @@ public static partial class NPocoDatabaseExtensions
     ///         once T1 and T2 have completed. Whereas here, it could contain T1's value.
     ///     </para>
     /// </remarks>
-    public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db,
+    public static RecordPersistenceType InsertOrUpdate<T>(
+        this IUmbracoDatabase db,
         T poco,
         string? updateCommand,
         object? updateArgs)
@@ -175,7 +178,6 @@ public static partial class NPocoDatabaseExtensions
 
         // failed: does not exist, need to insert
         // RC1 race cond here: another thread may insert a record with the same constraint
-
         var i = 0;
         while (i++ < 4)
         {
@@ -220,7 +222,7 @@ public static partial class NPocoDatabaseExtensions
             return value;
         }
 
-        //this fancy regex will only match a single @ not a double, etc...
+        // this fancy regex will only match a single @ not a double, etc...
         var regex = new Regex("(?<!@)@(?!@)");
         return regex.Replace(value, "@@");
     }
@@ -235,7 +237,7 @@ public static partial class NPocoDatabaseExtensions
         where TConnection : class, IDbConnection
     {
         IDbConnection? c = connection;
-        for (;;)
+        for (; ;)
         {
             switch (c)
             {
@@ -263,7 +265,7 @@ public static partial class NPocoDatabaseExtensions
         where TTransaction : class, IDbTransaction
     {
         IDbTransaction? t = transaction;
-        for (;;)
+        for (; ;)
         {
             switch (t)
             {
@@ -288,7 +290,7 @@ public static partial class NPocoDatabaseExtensions
         where TCommand : class, IDbCommand
     {
         IDbCommand? c = command;
-        for (;;)
+        for (; ;)
         {
             switch (c)
             {

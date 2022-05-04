@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -42,7 +42,8 @@ public class NodeDto
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Path")]
     public string Path { get; set; } = null!;
 
-    [Column("sortOrder")] public int SortOrder { get; set; }
+    [Column("sortOrder")]
+    public int SortOrder { get; set; }
 
     [Column("trashed")]
     [Constraint(Default = "0")]
@@ -52,7 +53,7 @@ public class NodeDto
     [Column("nodeUser")] // TODO: db rename to 'createUserId'
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
-    public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
+    public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } // return null if zero
 
     [Column("text")]
     [NullSetting(NullSetting = NullSettings.Null)]

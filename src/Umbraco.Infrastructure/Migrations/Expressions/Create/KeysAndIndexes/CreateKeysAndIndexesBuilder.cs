@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -33,7 +33,6 @@ public class CreateKeysAndIndexesBuilder : IExecutableBuilder
         // note: of course we are creating the keys and indexes as per the DTO, so
         // changing the DTO may break old migrations - or, better, these migrations
         // should capture a copy of the DTO class that will not change
-
         ExecuteSql(syntax.FormatPrimaryKey(tableDefinition));
         foreach (var sql in syntax.Format(tableDefinition.Indexes))
         {
@@ -57,6 +56,6 @@ public class CreateKeysAndIndexesBuilder : IExecutableBuilder
     }
 
     private void ExecuteSql(string sql) =>
-        new ExecuteSqlStatementExpression(_context) {SqlStatement = sql}
+        new ExecuteSqlStatementExpression(_context) { SqlStatement = sql }
             .Execute();
 }

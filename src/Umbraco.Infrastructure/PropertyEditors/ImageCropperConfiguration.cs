@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Runtime.Serialization;
@@ -17,11 +17,14 @@ public class ImageCropperConfiguration
     [DataContract]
     public class Crop
     {
-        [DataMember(Name = "alias")] public string Alias { get; set; } = null!;
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; } = null!;
 
-        [DataMember(Name = "width")] public int Width { get; set; }
+        [DataMember(Name = "width")]
+        public int Width { get; set; }
 
-        [DataMember(Name = "height")] public int Height { get; set; }
+        [DataMember(Name = "height")]
+        public int Height { get; set; }
     }
 }
 
@@ -31,7 +34,8 @@ internal static class ImageCropperConfigurationExtensions
     ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
-    public static void ApplyConfiguration(this ImageCropperValue imageCropperValue,
+    public static void ApplyConfiguration(
+        this ImageCropperValue imageCropperValue,
         ImageCropperConfiguration? configuration)
     {
         var crops = new List<ImageCropperValue.ImageCropperCrop>();
@@ -49,7 +53,7 @@ internal static class ImageCropperConfigurationExtensions
                     Alias = configuredCrop.Alias,
                     Width = configuredCrop.Width,
                     Height = configuredCrop.Height,
-                    Coordinates = crop?.Coordinates
+                    Coordinates = crop?.Coordinates,
                 });
             }
         }

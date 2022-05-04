@@ -121,7 +121,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         var isUpdated = false;
         foreach (IProperty property in properties)
         {
-            //copy each of the property values (variants, segments) to the destination by using the edited value
+            // copy each of the property values (variants, segments) to the destination by using the edited value
             foreach (IPropertyValue propertyValue in property.Values)
             {
                 var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
@@ -231,18 +231,17 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <returns></returns>
     private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
     {
-        //parses out the src from a json string
-
+        // parses out the src from a json string
         foreach (IPropertyValue propertyValue in prop.Values)
         {
-            //check if the published value contains data and return it
+            // check if the published value contains data and return it
             var src = GetFileSrcFromPropertyValue(propertyValue.PublishedValue, out JObject? _);
             if (src != null)
             {
                 yield return _mediaFileManager.FileSystem.GetRelativePath(src);
             }
 
-            //check if the edited value contains data and return it
+            // check if the edited value contains data and return it
             src = GetFileSrcFromPropertyValue(propertyValue.EditedValue, out JObject? _);
             if (src != null)
             {
@@ -269,7 +268,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         if (!str.DetectIsJson())
         {
             // Assume the value is a plain string with the file path
-            deserializedValue = new JObject {{"src", str}};
+            deserializedValue = new JObject { { "src", str } };
         }
         else
         {
@@ -327,7 +326,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
                         // are fixing that anomaly here - does not make any sense at all but... bah...
                         src = svalue;
 
-                        property.SetValue(JsonConvert.SerializeObject(new {src = svalue}, Formatting.None),
+                        property.SetValue(
+                            JsonConvert.SerializeObject(new { src = svalue }, Formatting.None),
                             pvalue.Culture, pvalue.Segment);
                     }
                     else

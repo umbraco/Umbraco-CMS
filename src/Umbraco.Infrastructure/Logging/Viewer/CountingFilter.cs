@@ -1,4 +1,4 @@
-﻿using Serilog.Events;
+using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -37,7 +37,7 @@ internal class CountingFilter : ILogFilter
                 throw new ArgumentOutOfRangeException();
         }
 
-        //Don't add it to the list
+        // Don't add it to the list
         return false;
     }
 }

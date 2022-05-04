@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -17,7 +17,8 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
 {
     private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new()
     {
-        Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal
+        Culture = CultureInfo.InvariantCulture,
+        FloatParseHandling = FloatParseHandling.Decimal,
     };
 
     private readonly ILogger<ImageCropperValueConverter> _logger;
@@ -50,7 +51,8 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
         ImageCropperValue? value;
         try
         {
-            value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString,
+            value = JsonConvert.DeserializeObject<ImageCropperValue>(
+                sourceString,
                 ImageCropperValueJsonSerializerSettings);
         }
         catch (Exception ex)
@@ -58,7 +60,7 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
             // cannot deserialize, assume it may be a raw image URL
             _logger.LogError(ex, "Could not deserialize string '{JsonString}' into an image cropper value.",
                 sourceString);
-            value = new ImageCropperValue {Src = sourceString};
+            value = new ImageCropperValue { Src = sourceString };
         }
 
         value?.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>()!);

@@ -67,7 +67,8 @@ public static class DbConnectionExtensions
             {
                 unwrapped = retrying.Inner;
             }
-        } while (c != unwrapped);
+        }
+        while (c != unwrapped);
 
         return unwrapped;
     }

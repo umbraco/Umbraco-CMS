@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 

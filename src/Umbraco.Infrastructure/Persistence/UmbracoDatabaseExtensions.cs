@@ -22,7 +22,8 @@ internal static class UmbracoDatabaseExtensions
     ///     Gets a dictionary of key/values directly from the database, no scope, nothing.
     /// </summary>
     /// <remarks>Used by <see cref="CoreRuntimeBootstrapper" /> to determine the runtime state.</remarks>
-    public static IReadOnlyDictionary<string, string?>? GetFromKeyValueTable(this IUmbracoDatabase database,
+    public static IReadOnlyDictionary<string, string?>? GetFromKeyValueTable(
+        this IUmbracoDatabase database,
         string keyPrefix)
     {
         if (database is null)
@@ -45,7 +46,6 @@ internal static class UmbracoDatabaseExtensions
         return database.Fetch<KeyValueDto>(sql)
             .ToDictionary(x => x.Key!, x => x.Value);
     }
-
 
     /// <summary>
     ///     Returns true if the database contains the specified table

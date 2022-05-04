@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 

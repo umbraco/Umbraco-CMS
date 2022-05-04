@@ -45,14 +45,14 @@ public class FilePermissionHelper : IFilePermissionHelper
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data),
             hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath),
-            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Preview)
+            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Preview),
         };
         _packagesPermissionsDirs = new[]
         {
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Bin),
             hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Umbraco),
             hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoPath),
-            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages)
+            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages),
         };
     }
 
@@ -70,7 +70,8 @@ public class FilePermissionHelper : IFilePermissionHelper
         EnsureFiles(_permissionFiles, out errors);
         report[FilePermissionTest.FileWriting] = errors.ToList();
 
-        EnsureCanCreateSubDirectory(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath),
+        EnsureCanCreateSubDirectory(
+            _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath),
             out errors);
         report[FilePermissionTest.MediaFolderCreation] = errors.ToList();
 
@@ -130,7 +131,7 @@ public class FilePermissionHelper : IFilePermissionHelper
     }
 
     private bool EnsureCanCreateSubDirectory(string dir, out IEnumerable<string> errors)
-        => EnsureCanCreateSubDirectories(new[] {dir}, out errors);
+        => EnsureCanCreateSubDirectories(new[] { dir }, out errors);
 
     private bool EnsureCanCreateSubDirectories(IEnumerable<string> dirs, out IEnumerable<string> errors)
     {
@@ -212,7 +213,8 @@ public class FilePermissionHelper : IFilePermissionHelper
     {
         var writeAllow = false;
         var writeDeny = false;
-        var accessControlList = new DirectorySecurity(path,
+        var accessControlList = new DirectorySecurity(
+            path,
             AccessControlSections.Access | AccessControlSections.Owner | AccessControlSections.Group);
 
         AuthorizationRuleCollection accessRules;

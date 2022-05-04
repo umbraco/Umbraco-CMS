@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Newtonsoft.Json;
@@ -69,6 +69,7 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
         }
 
         public string Color { get; }
+
         public string Label { get; }
 
         public override string ToString() => Color;

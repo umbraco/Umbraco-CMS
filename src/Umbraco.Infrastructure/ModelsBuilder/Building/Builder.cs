@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+
 // NOTE
 // The idea was to have different types of builder, because I wanted to experiment with
 // building code with CodeDom. Turns out more complicated than I thought and maybe not
@@ -41,6 +42,12 @@ public abstract class Builder
     {
     }
 
+    /// <summary>
+    ///     Gets or sets a value indicating the namespace to use for the models.
+    /// </summary>
+    /// <remarks>May be overriden by code attributes.</remarks>
+    public string ModelsNamespace { get; set; }
+
     protected Dictionary<string, string> ModelsMap { get; } = new();
 
     // the list of assemblies that will be 'using' by default
@@ -52,14 +59,8 @@ public abstract class Builder
         "Umbraco.Cms.Core.PublishedCache",
         "Umbraco.Cms.Infrastructure.ModelsBuilder",
         "Umbraco.Cms.Core",
-        "Umbraco.Extensions"
+        "Umbraco.Extensions",
     };
-
-    /// <summary>
-    ///     Gets or sets a value indicating the namespace to use for the models.
-    /// </summary>
-    /// <remarks>May be overriden by code attributes.</remarks>
-    public string ModelsNamespace { get; set; }
 
     /// <summary>
     ///     Gets the list of assemblies to add to the set of 'using' assemblies in each model file.
@@ -72,15 +73,47 @@ public abstract class Builder
     /// <remarks>Includes those that are ignored.</remarks>
     public IList<TypeModel> TypeModels { get; }
 
-    protected ModelsBuilderSettings Config { get; }
-
     public string? ModelsNamespaceForTests { get; set; }
+
+    protected ModelsBuilderSettings Config { get; }
 
     /// <summary>
     ///     Gets the list of models to generate.
     /// </summary>
     /// <returns>The models to generate</returns>
     public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels;
+
+    public string GetModelsNamespace()
+    {
+        if (ModelsNamespaceForTests != null)
+        {
+            return ModelsNamespaceForTests;
+        }
+
+        // if builder was initialized with a namespace, use that one
+        if (!string.IsNullOrWhiteSpace(ModelsNamespace))
+        {
+            return ModelsNamespace;
+        }
+
+        // use configured else fallback to default
+        return string.IsNullOrWhiteSpace(Config.ModelsNamespace)
+            ? Constants.ModelsBuilder.DefaultModelsNamespace
+            : Config.ModelsNamespace;
+    }
+
+    // looking for a simple symbol eg 'Umbraco' or 'String'
+    // expecting to match eg 'Umbraco' or 'System.String'
+    // returns true if either
+    // - more than 1 symbol is found (explicitely ambiguous)
+    // - 1 symbol is found BUT not matching (implicitely ambiguous)
+    protected bool IsAmbiguousSymbol(string symbol, string match) =>
+
+        // cannot figure out is a symbol is ambiguous without Roslyn
+        // so... let's say everything is ambiguous - code won't be
+        // pretty but it'll work
+        // Essentially this means that a `global::` syntax will be output for the generated models
+        true;
 
     /// <summary>
     ///     Prepares generation by processing the result of code parsing.
@@ -106,13 +139,15 @@ public abstract class Builder
 
         // ensure we have no duplicates property names
         foreach (TypeModel typeModel in TypeModels)
-        foreach (IGrouping<string, PropertyModel> xx in typeModel.Properties.GroupBy(x => x.ClrName)
-                     .Where(x => x.Count() > 1))
         {
-            throw new InvalidOperationException(
-                $"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""
-                + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
-                + " Consider using an attribute to assign different names to conflicting properties.");
+            foreach (IGrouping<string, PropertyModel> xx in typeModel.Properties.GroupBy(x => x.ClrName)
+                         .Where(x => x.Count() > 1))
+            {
+                throw new InvalidOperationException(
+                    $"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""
+                    + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
+                    + " Consider using an attribute to assign different names to conflicting properties.");
+            }
         }
 
         // ensure content & property type don't have identical name (csharp hates it)
@@ -142,7 +177,7 @@ public abstract class Builder
         // ensure we have no collision between base types
         // NO: we may want to define a base class in a partial, on a model that has a parent
         // we are NOT checking that the defined base type does maintain the inheritance chain
-        //foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.HasBase))
+        // foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.HasBase))
         //    throw new InvalidOperationException(string.Format("Type alias \"{0}\" has more than one parent class.",
         //        xx.Alias));
 
@@ -197,38 +232,8 @@ public abstract class Builder
         }
     }
 
-    // looking for a simple symbol eg 'Umbraco' or 'String'
-    // expecting to match eg 'Umbraco' or 'System.String'
-    // returns true if either
-    // - more than 1 symbol is found (explicitely ambiguous)
-    // - 1 symbol is found BUT not matching (implicitely ambiguous)
-    protected bool IsAmbiguousSymbol(string symbol, string match) =>
-        // cannot figure out is a symbol is ambiguous without Roslyn
-        // so... let's say everything is ambiguous - code won't be
-        // pretty but it'll work
-        // Essentially this means that a `global::` syntax will be output for the generated models
-        true;
-
-    public string GetModelsNamespace()
-    {
-        if (ModelsNamespaceForTests != null)
-        {
-            return ModelsNamespaceForTests;
-        }
-
-        // if builder was initialized with a namespace, use that one
-        if (!string.IsNullOrWhiteSpace(ModelsNamespace))
-        {
-            return ModelsNamespace;
-        }
-
-        // use configured else fallback to default
-        return string.IsNullOrWhiteSpace(Config.ModelsNamespace)
-            ? Constants.ModelsBuilder.DefaultModelsNamespace
-            : Config.ModelsNamespace;
-    }
-
     protected string GetModelsBaseClassName(TypeModel type) =>
+
         // default
         type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
 }

@@ -18,6 +18,23 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     public virtual void DeleteFolder(string folderPath) => PersistDeletedItem(new Folder(folderPath));
 
+    public Stream GetFileContentStream(string filepath)
+    {
+        if (FileSystem?.FileExists(filepath) == false)
+        {
+            return Stream.Null;
+        }
+
+        try
+        {
+            return FileSystem?.OpenFile(filepath) ?? Stream.Null;
+        }
+        catch
+        {
+            return Stream.Null; // deal with race conds
+        }
+    }
+
     internal virtual void PersistNewFolder(Folder entity) => FileSystem?.CreateFolder(entity.Path);
 
     internal virtual void PersistDeletedFolder(Folder entity) => FileSystem?.DeleteDirectory(entity.Path);
@@ -86,23 +103,6 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
         return null;
     }
 
-    public Stream GetFileContentStream(string filepath)
-    {
-        if (FileSystem?.FileExists(filepath) == false)
-        {
-            return Stream.Null;
-        }
-
-        try
-        {
-            return FileSystem?.OpenFile(filepath) ?? Stream.Null;
-        }
-        catch
-        {
-            return Stream.Null; // deal with race conds
-        }
-    }
-
     public void SetFileContent(string filepath, Stream content) => FileSystem?.AddFile(filepath, content, true);
 
     public long GetFileSize(string filename)
@@ -150,7 +150,7 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     public void PersistNewItem(IEntity entity)
     {
-        //special case for folder
+        // special case for folder
         if (entity is Folder folder)
         {
             PersistNewFolder(folder);
@@ -165,7 +165,7 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     public void PersistDeletedItem(IEntity entity)
     {
-        //special case for folder
+        // special case for folder
         if (entity is Folder folder)
         {
             PersistDeletedFolder(folder);
@@ -192,7 +192,8 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
             FileSystem.AddFile(entity.Path, stream, true);
             entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
             entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
-            //the id can be the hash
+
+            // the id can be the hash
             entity.Id = entity.Path.GetHashCode();
             entity.Key = entity.Path.EncodeAsGuid();
             entity.VirtualPath = FileSystem?.GetUrl(entity.Path);
@@ -211,18 +212,20 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
             FileSystem.AddFile(entity.Path, stream, true);
             entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
             entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
-            //the id can be the hash
+
+            // the id can be the hash
             entity.Id = entity.Path.GetHashCode();
             entity.Key = entity.Path.EncodeAsGuid();
             entity.VirtualPath = FileSystem.GetUrl(entity.Path);
         }
 
-        //now that the file has been written, we need to check if the path had been changed
+        // now that the file has been written, we need to check if the path had been changed
         if (entity.Path.InvariantEquals(entity.OriginalPath) == false)
         {
-            //delete the original file
+            // delete the original file
             FileSystem?.DeleteFile(entity.OriginalPath);
-            //reset the original path on the file
+
+            // reset the original path on the file
             entity.ResetOriginalPath();
         }
     }

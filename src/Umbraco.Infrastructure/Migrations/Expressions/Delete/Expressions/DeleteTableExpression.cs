@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
 public class DeleteTableExpression : MigrationExpressionBase
 {
@@ -10,6 +10,7 @@ public class DeleteTableExpression : MigrationExpressionBase
     public virtual string? TableName { get; set; }
 
     protected override string GetSql() =>
-        string.Format(SqlSyntax.DropTable,
+        string.Format(
+            SqlSyntax.DropTable,
             SqlSyntax.GetQuotedTableName(TableName));
 }

@@ -68,7 +68,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
 
     /// <inheritdoc />
     public void DeleteUserLogins(Guid userOrMemberKey) =>
-        Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new {userOrMemberKey});
+        Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
 
     /// <inheritdoc />
     public void Save(Guid userOrMemberKey, IEnumerable<IExternalLogin> logins)
@@ -97,6 +97,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
             if (found != null)
             {
                 toUpdate.Add(existing.Id, found);
+
                 // if it's an update then it's not an insert
                 toInsert.RemoveAll(x => x.ProviderKey == found.ProviderKey && x.LoginProvider == found.LoginProvider);
             }
@@ -153,6 +154,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
             if (found != null)
             {
                 toUpdate.Add(existing.Id, (found, existing.ExternalLoginId));
+
                 // if it's an update then it's not an insert
                 toInsert.RemoveAll(x =>
                     x.LoginProvider.InvariantEquals(found.LoginProvider) && x.Name.InvariantEquals(found.Name));
@@ -192,7 +194,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
     protected override IIdentityUserLogin? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new {id});
+        sql.Where(GetBaseWhereClause(), new { id });
 
         ExternalLoginDto? dto = Database.Fetch<ExternalLoginDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
         if (dto == null)
@@ -219,6 +221,20 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
 
         return ConvertFromDtos(Database.Fetch<ExternalLoginDto>(sql))
             .ToArray(); // we don't want to re-iterate again!
+    }
+
+    protected override IEnumerable<IIdentityUserLogin> PerformGetByQuery(IQuery<IIdentityUserLogin> query)
+    {
+        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
+        var translator = new SqlTranslator<IIdentityUserLogin>(sqlClause, query);
+        Sql<ISqlContext> sql = translator.Translate();
+
+        List<ExternalLoginDto>? dtos = Database.Fetch<ExternalLoginDto>(sql);
+
+        foreach (ExternalLoginDto? dto in dtos)
+        {
+            yield return ExternalLoginFactory.BuildEntity(dto);
+        }
     }
 
     private IEnumerable<IIdentityUserLogin> PerformGetAllOnIds(params int[] ids)
@@ -249,20 +265,6 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         }
     }
 
-    protected override IEnumerable<IIdentityUserLogin> PerformGetByQuery(IQuery<IIdentityUserLogin> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<IIdentityUserLogin>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-
-        List<ExternalLoginDto>? dtos = Database.Fetch<ExternalLoginDto>(sql);
-
-        foreach (ExternalLoginDto? dto in dtos)
-        {
-            yield return ExternalLoginFactory.BuildEntity(dto);
-        }
-    }
-
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
     {
         Sql<ISqlContext> sql = Sql();
@@ -283,7 +285,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> {"DELETE FROM umbracoExternalLogin WHERE id = @id"};
+        var list = new List<string> { "DELETE FROM umbracoExternalLogin WHERE id = @id" };
         return list;
     }
 

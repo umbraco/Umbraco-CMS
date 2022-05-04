@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using NPoco;
@@ -33,6 +33,16 @@ public static partial class NPocoDatabaseExtensions
         SqlBulkCopyHelper.SqlTransactionResolver = dbTran => GetTypedTransaction<SqlTransaction>(dbTran);
     }
 
+    /// <summary>
+    ///     Determines whether a column should be part of a bulk-insert.
+    /// </summary>
+    /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
+    /// <param name="column">The column.</param>
+    /// <returns>A value indicating whether the column should be part of the bulk-insert.</returns>
+    /// <remarks>Columns that are primary keys and auto-incremental, or result columns, are excluded from bulk-inserts.</remarks>
+    public static bool IncludeColumn(PocoData pocoData, KeyValuePair<string, PocoColumn> column) =>
+        column.Value.ResultColumn == false
+        && (pocoData.TableInfo.AutoIncrement == false || column.Key != pocoData.TableInfo.PrimaryKey);
 
     /// <summary>
     ///     Creates bulk-insert commands.
@@ -57,7 +67,8 @@ public static partial class NPocoDatabaseExtensions
 
         // format columns to sql
         var tableName = database.DatabaseType.EscapeTableName(pocoData.TableInfo.TableName);
-        var columnNames = string.Join(", ",
+        var columnNames = string.Join(
+            ", ",
             columns.Select(c => tableName + "." + database.DatabaseType.EscapeSqlIdentifier(c.Key)));
 
         // example:
@@ -103,15 +114,4 @@ public static partial class NPocoDatabaseExtensions
 
         return commands;
     }
-
-    /// <summary>
-    ///     Determines whether a column should be part of a bulk-insert.
-    /// </summary>
-    /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
-    /// <param name="column">The column.</param>
-    /// <returns>A value indicating whether the column should be part of the bulk-insert.</returns>
-    /// <remarks>Columns that are primary keys and auto-incremental, or result columns, are excluded from bulk-inserts.</remarks>
-    public static bool IncludeColumn(PocoData pocoData, KeyValuePair<string, PocoColumn> column) =>
-        column.Value.ResultColumn == false
-        && (pocoData.TableInfo.AutoIncrement == false || column.Key != pocoData.TableInfo.PrimaryKey);
 }

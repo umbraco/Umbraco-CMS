@@ -26,7 +26,8 @@ public class MigrationPlan
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -79,12 +80,19 @@ public class MigrationPlan
         }
     }
 
+    /// <summary>
+    ///     Adds a transition to a target state through an empty migration.
+    /// </summary>
+    public MigrationPlan To(string targetState)
+        => To<NoopMigration>(targetState);
+
     // adds a transition
     private MigrationPlan Add(string? sourceState, string targetState, Type? migration)
     {
         if (sourceState == null)
         {
-            throw new ArgumentNullException(nameof(sourceState),
+            throw new ArgumentNullException(
+                nameof(sourceState),
                 $"{nameof(sourceState)} is null, {nameof(MigrationPlan)}.{nameof(From)} must not have been called.");
         }
 
@@ -95,7 +103,8 @@ public class MigrationPlan
 
         if (string.IsNullOrWhiteSpace(targetState))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(targetState));
         }
 
@@ -141,12 +150,6 @@ public class MigrationPlan
 
         return this;
     }
-
-    /// <summary>
-    ///     Adds a transition to a target state through an empty migration.
-    /// </summary>
-    public MigrationPlan To(string targetState)
-        => To<NoopMigration>(targetState);
 
     public MigrationPlan To(Guid targetState)
         => To<NoopMigration>(targetState.ToString());
@@ -225,7 +228,8 @@ public class MigrationPlan
 
         if (string.IsNullOrWhiteSpace(startState))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(startState));
         }
 
@@ -236,7 +240,8 @@ public class MigrationPlan
 
         if (string.IsNullOrWhiteSpace(endState))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(endState));
         }
 
@@ -247,7 +252,8 @@ public class MigrationPlan
 
         if (string.IsNullOrWhiteSpace(targetState))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(targetState));
         }
 
@@ -297,7 +303,6 @@ public class MigrationPlan
         // The only place we use this is to clear cookies in the installer which could be done
         // via notification. Then we can clean up all the code related to post migrations which is
         // not insignificant.
-
         _postMigrationTypes.Add(typeof(TMigration));
         return this;
     }
@@ -352,7 +357,7 @@ public class MigrationPlan
                 continue;
             }
 
-            var visited = new List<string> {transition.SourceState};
+            var visited = new List<string> { transition.SourceState };
             Transition? nextTransition = _transitions[transition.TargetState];
             while (nextTransition != null && !verified.Contains(nextTransition.SourceState))
             {
@@ -390,7 +395,7 @@ public class MigrationPlan
         Validate();
 
         var origState = fromState ?? string.Empty;
-        var states = new List<string> {origState};
+        var states = new List<string> { origState };
 
         if (!_transitions.TryGetValue(origState, out Transition? transition))
         {

@@ -161,7 +161,8 @@ public class CoreRuntime : IRuntime
         if (isRestarting == false)
         {
             AppDomain.CurrentDomain.UnhandledException += (_, args)
-                => _logger.LogError(args.ExceptionObject as Exception,
+                => _logger.LogError(
+                    args.ExceptionObject as Exception,
                     $"Unhandled exception in AppDomain{(args.IsTerminating ? " (terminating)" : null)}.");
         }
 
@@ -212,13 +213,15 @@ public class CoreRuntime : IRuntime
         }
 
         // TODO (V10): Remove this obsoleted notification publish
-        await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level),
+        await _eventAggregator.PublishAsync(
+            new UmbracoApplicationComponentsInstallingNotification(State.Level),
             cancellationToken);
 
         // Initialize the components
         _components.Initialize();
 
-        await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting),
+        await _eventAggregator.PublishAsync(
+            new UmbracoApplicationStartingNotification(State.Level, isRestarting),
             cancellationToken);
 
         if (isRestarting == false)
@@ -234,7 +237,8 @@ public class CoreRuntime : IRuntime
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
     {
         _components.Terminate();
-        await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting),
+        await _eventAggregator.PublishAsync(
+            new UmbracoApplicationStoppingNotification(isRestarting),
             cancellationToken);
     }
 

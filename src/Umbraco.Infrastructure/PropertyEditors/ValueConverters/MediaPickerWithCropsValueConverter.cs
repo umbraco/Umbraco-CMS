@@ -73,7 +73,9 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
             {
                 var localCrops = new ImageCropperValue
                 {
-                    Crops = dto.Crops, FocalPoint = dto.FocalPoint, Src = mediaItem.Url(_publishedUrlProvider)
+                    Crops = dto.Crops,
+                    FocalPoint = dto.FocalPoint,
+                    Src = mediaItem.Url(_publishedUrlProvider),
                 };
 
                 localCrops.ApplyConfiguration(configuration);

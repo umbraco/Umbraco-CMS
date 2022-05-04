@@ -20,7 +20,7 @@ internal class UpdateRelationTypesToHandleDependencies : MigrationBase
         var aliasesWithDependencies = new[]
         {
             Constants.Conventions.RelationTypes.RelatedDocumentAlias,
-            Constants.Conventions.RelationTypes.RelatedMediaAlias
+            Constants.Conventions.RelationTypes.RelatedMediaAlias,
         };
 
         Database.Execute(

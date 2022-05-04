@@ -122,13 +122,13 @@ public class TagsPropertyEditor : DataEditor
             {
                 if (value == null)
                 {
-                    yield return new ValidationResult("Value cannot be null", new[] {"value"});
+                    yield return new ValidationResult("Value cannot be null", new[] { "value" });
                     yield break;
                 }
 
                 if (value.ToString()!.DetectIsEmptyJson())
                 {
-                    yield return new ValidationResult("Value cannot be empty", new[] {"value"});
+                    yield return new ValidationResult("Value cannot be empty", new[] { "value" });
                 }
             }
         }

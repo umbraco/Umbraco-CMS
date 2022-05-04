@@ -58,6 +58,13 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
         _name = string.Empty;
     }
 
+    public event PropertyChangedEventHandler PropertyChanged
+    {
+        add => BeingDirty.PropertyChanged += value;
+
+        remove => BeingDirty.PropertyChanged -= value;
+    }
+
     // NOTE: The purpose
     // of this value is to try to prevent concurrent writes in the DB but this is
     // an implementation detail at the data source level that has leaked into the
@@ -247,11 +254,6 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     }
 
     /// <summary>
-    ///     Gets the <see cref="BeingDirty" /> for change tracking
-    /// </summary>
-    protected BeingDirty BeingDirty { get; } = new();
-
-    /// <summary>
     ///     Gets a value indicating whether the user is locked out based on the user's lockout end date
     /// </summary>
     public bool IsLockedOut
@@ -262,6 +264,11 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
             return isLocked;
         }
     }
+
+    /// <summary>
+    ///     Gets the <see cref="BeingDirty" /> for change tracking
+    /// </summary>
+    protected BeingDirty BeingDirty { get; } = new();
 
     /// <summary>
     ///     Gets or sets a value indicating whether the IUser IsApproved
@@ -285,13 +292,6 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
         // TODO: Implement this for members: AB#11550
         get => _passwordConfig;
         set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged
-    {
-        add => BeingDirty.PropertyChanged += value;
-
-        remove => BeingDirty.PropertyChanged -= value;
     }
 
     /// <inheritdoc />
@@ -340,7 +340,7 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     ///     persisted
     /// </remarks>
     public void AddRole(string role) =>
-        Roles.Add(new IdentityUserRole<string> {UserId = Id, RoleId = role});
+        Roles.Add(new IdentityUserRole<string> { UserId = Id, RoleId = role });
 
     /// <summary>
     ///     Used to set a lazy call back to populate the user's Login list

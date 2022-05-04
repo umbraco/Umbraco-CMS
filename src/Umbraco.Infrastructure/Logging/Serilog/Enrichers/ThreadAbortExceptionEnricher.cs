@@ -17,7 +17,8 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
     private readonly IMarchal _marchal;
     private CoreDebugSettings _coreDebugSettings;
 
-    public ThreadAbortExceptionEnricher(IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
+    public ThreadAbortExceptionEnricher(
+        IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
         IHostingEnvironment hostingEnvironment, IMarchal marchal)
     {
         _coreDebugSettings = coreDebugSettings.CurrentValue;
@@ -35,6 +36,33 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
                 DumpThreadAborts(logEvent, propertyFactory);
                 break;
         }
+    }
+
+    private static bool IsTimeoutThreadAbortException(Exception exception)
+    {
+        if (!(exception is ThreadAbortException abort))
+        {
+            return false;
+        }
+
+        if (abort.ExceptionState == null)
+        {
+            return false;
+        }
+
+        Type stateType = abort.ExceptionState.GetType();
+        if (stateType.FullName != "System.Web.HttpApplication+CancelModuleException")
+        {
+            return false;
+        }
+
+        FieldInfo? timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (timeoutField == null)
+        {
+            return false;
+        }
+
+        return (bool?)timeoutField.GetValue(abort.ExceptionState) ?? false;
     }
 
     private void DumpThreadAborts(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -74,33 +102,6 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadAbortExceptionInfo", message));
             }
         }
-    }
-
-    private static bool IsTimeoutThreadAbortException(Exception exception)
-    {
-        if (!(exception is ThreadAbortException abort))
-        {
-            return false;
-        }
-
-        if (abort.ExceptionState == null)
-        {
-            return false;
-        }
-
-        Type stateType = abort.ExceptionState.GetType();
-        if (stateType.FullName != "System.Web.HttpApplication+CancelModuleException")
-        {
-            return false;
-        }
-
-        FieldInfo? timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
-        if (timeoutField == null)
-        {
-            return false;
-        }
-
-        return (bool?)timeoutField.GetValue(abort.ExceptionState) ?? false;
     }
 
     private static bool IsMonitorEnterThreadAbortException(Exception exception)

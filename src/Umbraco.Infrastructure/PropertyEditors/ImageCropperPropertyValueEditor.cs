@@ -66,7 +66,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
         catch
         {
-            value = new ImageCropperValue {Src = val.ToString()};
+            value = new ImageCropperValue { Src = val.ToString() };
         }
 
         IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
@@ -150,7 +150,6 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         // editorFile is empty whenever a new file is being uploaded
         // or when the file is cleared (in which case editorJson is null)
         // else editorFile contains the unchanged value
-
         ContentPropertyFile[]? uploads = editorValue.Files;
         if (uploads == null)
         {
@@ -198,30 +197,6 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         return editorJson.ToString(Formatting.None);
     }
 
-    private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
-    {
-        // process the file
-        // no file, invalid file, reject change
-        if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
-        {
-            return null;
-        }
-
-        // get the filepath
-        // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
-
-        using (FileStream filestream = File.OpenRead(file.TempFilePath))
-        {
-            // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
-            // since we'd need to be able to return values for other properties from these methods
-
-            _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
-        }
-
-        return filepath;
-    }
-
     public override string ConvertDbToString(IPropertyType propertyType, object? value)
     {
         if (value == null || string.IsNullOrEmpty(value.ToString()))
@@ -241,7 +216,31 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             ?.ConfigurationAs<ImageCropperConfiguration>();
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
-        return JsonConvert.SerializeObject(new {src = val, crops},
-            new JsonSerializerSettings {Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore});
+        return JsonConvert.SerializeObject(
+            new { src = val, crops },
+            new JsonSerializerSettings { Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore });
+    }
+
+    private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
+    {
+        // process the file
+        // no file, invalid file, reject change
+        if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
+        {
+            return null;
+        }
+
+        // get the filepath
+        // in case we are using the old path scheme, try to re-use numbers (bah...)
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+
+        using (FileStream filestream = File.OpenRead(file.TempFilePath))
+        {
+            // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
+            // since we'd need to be able to return values for other properties from these methods
+            _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
+        }
+
+        return filepath;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using NPoco;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
@@ -10,9 +10,6 @@ public class SqlTemplates
 
     public SqlTemplates(ISqlContext sqlContext) => _sqlContext = sqlContext;
 
-    // for tests
-    internal void Clear() => _templates.Clear();
-
     public SqlTemplate Get(string key, Func<Sql<ISqlContext>, Sql<ISqlContext>> sqlBuilder)
     {
         SqlTemplate CreateTemplate(string _)
@@ -23,4 +20,7 @@ public class SqlTemplates
 
         return _templates.GetOrAdd(key, CreateTemplate);
     }
+
+    // for tests
+    internal void Clear() => _templates.Clear();
 }

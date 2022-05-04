@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -10,21 +10,6 @@ public class AddLockObjects : MigrationBase
         : base(context)
     {
     }
-
-    protected override void Migrate()
-    {
-        // some may already exist, just ensure everything we need is here
-        EnsureLockObject(Constants.Locks.Servers, "Servers");
-        EnsureLockObject(Constants.Locks.ContentTypes, "ContentTypes");
-        EnsureLockObject(Constants.Locks.ContentTree, "ContentTree");
-        EnsureLockObject(Constants.Locks.MediaTree, "MediaTree");
-        EnsureLockObject(Constants.Locks.MemberTree, "MemberTree");
-        EnsureLockObject(Constants.Locks.MediaTypes, "MediaTypes");
-        EnsureLockObject(Constants.Locks.MemberTypes, "MemberTypes");
-        EnsureLockObject(Constants.Locks.Domains, "Domains");
-    }
-
-    private void EnsureLockObject(int id, string name) => EnsureLockObject(Database, id, name);
 
     internal static void EnsureLockObject(IUmbracoDatabase db, int id, string name)
     {
@@ -41,4 +26,19 @@ public class AddLockObjects : MigrationBase
         // then create umbracoLock object
         db.Execute($"INSERT umbracoLock (id, name, value) VALUES ({id}, '{name}', 1);");
     }
+
+    protected override void Migrate()
+    {
+        // some may already exist, just ensure everything we need is here
+        EnsureLockObject(Constants.Locks.Servers, "Servers");
+        EnsureLockObject(Constants.Locks.ContentTypes, "ContentTypes");
+        EnsureLockObject(Constants.Locks.ContentTree, "ContentTree");
+        EnsureLockObject(Constants.Locks.MediaTree, "MediaTree");
+        EnsureLockObject(Constants.Locks.MemberTree, "MemberTree");
+        EnsureLockObject(Constants.Locks.MediaTypes, "MediaTypes");
+        EnsureLockObject(Constants.Locks.MemberTypes, "MemberTypes");
+        EnsureLockObject(Constants.Locks.Domains, "Domains");
+    }
+
+    private void EnsureLockObject(int id, string name) => EnsureLockObject(Database, id, name);
 }

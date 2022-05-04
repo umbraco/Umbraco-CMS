@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert;
 
 /// <summary>
 ///     Builds an Insert expression.

@@ -32,7 +32,7 @@ internal class CacheInstructionRepository : ICacheInstructionRepository
     /// <inheritdoc />
     public int CountPendingInstructions(int lastId) =>
         AmbientScope?.Database.ExecuteScalar<int>(
-            "SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId}) ?? 0;
+            "SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new { lastId }) ?? 0;
 
     /// <inheritdoc />
     public int GetMaxId() =>
@@ -66,8 +66,9 @@ internal class CacheInstructionRepository : ICacheInstructionRepository
         // Using 2 queries is faster than convoluted joins.
         var maxId = AmbientScope?.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
         Sql deleteSql =
-            new Sql().Append(@"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
-                new {pruneDate, maxId});
+            new Sql().Append(
+                @"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
+                new { pruneDate, maxId });
         AmbientScope?.Database.Execute(deleteSql);
     }
 }

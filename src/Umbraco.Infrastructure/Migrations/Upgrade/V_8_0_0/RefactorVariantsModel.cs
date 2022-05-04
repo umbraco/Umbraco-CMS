@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -20,24 +20,22 @@ public class RefactorVariantsModel : MigrationBase
             Delete.Column("edited").FromTable(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
         }
 
-
         // add available column
         AddColumn<DocumentCultureVariationDto>("available", out IEnumerable<string> sqls);
 
         // so far, only those cultures that were available had records in the table
-        Update.Table(DocumentCultureVariationDto.TableName).Set(new {available = true}).AllRows().Do();
+        Update.Table(DocumentCultureVariationDto.TableName).Set(new { available = true }).AllRows().Do();
 
         foreach (var sql in sqls)
         {
             Execute.Sql(sql).Do();
         }
 
-
         // add published column
         AddColumn<DocumentCultureVariationDto>("published", out sqls);
 
         // make it false by default
-        Update.Table(DocumentCultureVariationDto.TableName).Set(new {published = false}).AllRows().Do();
+        Update.Table(DocumentCultureVariationDto.TableName).Set(new { published = false }).AllRows().Do();
 
         // now figure out whether these available cultures are published, too
         Sql<ISqlContext> getPublished = Sql()
@@ -65,7 +63,6 @@ public class RefactorVariantsModel : MigrationBase
         // so far, it was kinda impossible to make a culture unavailable again,
         // so we *should* not have anything published but not available - ignore
 
-
         // add name column
         AddColumn<DocumentCultureVariationDto>("name");
 
@@ -92,8 +89,11 @@ public class RefactorVariantsModel : MigrationBase
     private class TempDto
     {
         public int NodeId { get; set; }
+
         public int LanguageId { get; set; }
+
         public string? Name { get; set; }
     }
+
     // ReSharper restore UnusedAutoPropertyAccessor.Local
 }

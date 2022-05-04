@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -14,12 +14,14 @@ internal class LogDto
 
     private int? _userId;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("userId")]
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
-    public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
+    public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } // return null if zero
 
     [Column("NodeId")]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoLog")]
@@ -39,7 +41,9 @@ internal class LogDto
     public DateTime Datestamp { get; set; }
 
     // TODO: Should we have an index on this since we allow searching on it?
-    [Column("logHeader")] [Length(50)] public string Header { get; set; } = null!;
+    [Column("logHeader")]
+    [Length(50)]
+    public string Header { get; set; } = null!;
 
     [Column("logComment")]
     [NullSetting(NullSetting = NullSettings.Null)]

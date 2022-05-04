@@ -93,7 +93,8 @@ public class KeepAlive : RecurringHostedServiceBase
             }
 
             // If the config is an absolute path, just use it
-            var keepAlivePingUrl = WebPath.Combine(umbracoAppUrl!,
+            var keepAlivePingUrl = WebPath.Combine(
+                umbracoAppUrl!,
                 _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
 
             try

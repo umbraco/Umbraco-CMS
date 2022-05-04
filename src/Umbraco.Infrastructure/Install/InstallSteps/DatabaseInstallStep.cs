@@ -43,7 +43,7 @@ public class DatabaseInstallStep : InstallSetupStep<object>
         }
 
         // Upgrade is required, so set the flag for the next step
-        return Task.FromResult(new InstallSetupResult(new Dictionary<string, object> {{"upgrade", true}}))!;
+        return Task.FromResult(new InstallSetupResult(new Dictionary<string, object> { { "upgrade", true } }))!;
     }
 
     public override bool RequiresExecution(object model) => true;

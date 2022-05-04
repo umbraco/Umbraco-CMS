@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Newtonsoft.Json.Linq;
@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
 {
     public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
+        IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
         ConfigurationField items = Fields.First(x => x.Key == "items");
 
@@ -20,7 +21,8 @@ internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDow
         items.Validators.Add(new ValueListUniqueValueValidator());
     }
 
-    public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues,
+    public override DropDownFlexibleConfiguration FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
         DropDownFlexibleConfiguration? configuration)
     {
         var output = new DropDownFlexibleConfiguration();
@@ -62,7 +64,7 @@ internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDow
                 nextId = id + 1;
             }
 
-            output.Items.Add(new ValueListConfiguration.ValueListItem {Id = id, Value = value});
+            output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
         }
 
         // ensure ids
@@ -82,11 +84,11 @@ internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDow
         // map to what the editor expects
         var i = 1;
         var items =
-            configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new {value = x.Value, sortOrder = i++}) ??
+            configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) ??
             new object();
 
         var multiple = configuration?.Multiple ?? false;
 
-        return new Dictionary<string, object> {{"items", items}, {"multiple", multiple}};
+        return new Dictionary<string, object> { { "items", items }, { "multiple", multiple } };
     }
 }

@@ -13,7 +13,8 @@ public class QueuedHostedService : BackgroundService
 {
     private readonly ILogger<QueuedHostedService> _logger;
 
-    public QueuedHostedService(IBackgroundTaskQueue taskQueue,
+    public QueuedHostedService(
+        IBackgroundTaskQueue taskQueue,
         ILogger<QueuedHostedService> logger)
     {
         TaskQueue = taskQueue;
@@ -21,6 +22,13 @@ public class QueuedHostedService : BackgroundService
     }
 
     public IBackgroundTaskQueue TaskQueue { get; }
+
+    public override async Task StopAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Queued Hosted Service is stopping.");
+
+        await base.StopAsync(stoppingToken);
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) =>
         await BackgroundProcessing(stoppingToken);
@@ -40,16 +48,10 @@ public class QueuedHostedService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
+                _logger.LogError(
+                    ex,
                     "Error occurred executing {WorkItem}.", nameof(workItem));
             }
         }
-    }
-
-    public override async Task StopAsync(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation("Queued Hosted Service is stopping.");
-
-        await base.StopAsync(stoppingToken);
     }
 }

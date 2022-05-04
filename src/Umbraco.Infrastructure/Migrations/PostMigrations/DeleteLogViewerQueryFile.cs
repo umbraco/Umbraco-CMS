@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core.Hosting;
 
 // using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
-
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 
 /// <summary>

@@ -43,20 +43,6 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     }
 
     /// <inheritdoc />
-    protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
-        IEnumerable<object>? ids = null, string? json = null)
-    {
-        var idsA = ids?.ToArray();
-
-        if (GetArrayType(idsA, out Type? arrayType) == false)
-        {
-            throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
-        }
-
-        BatchMessage(refresher, messageType, idsA, arrayType, json);
-    }
-
-    /// <inheritdoc />
     public override void SendMessages()
     {
         ICollection<RefreshInstructionEnvelope>? batch = GetBatch(false);
@@ -69,6 +55,20 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
         batch.Clear();
 
         CacheInstructionService.DeliverInstructionsInBatches(instructions, LocalIdentity);
+    }
+
+    /// <inheritdoc />
+    protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
+        IEnumerable<object>? ids = null, string? json = null)
+    {
+        var idsA = ids?.ToArray();
+
+        if (GetArrayType(idsA, out Type? arrayType) == false)
+        {
+            throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
+        }
+
+        BatchMessage(refresher, messageType, idsA, arrayType, json);
     }
 
     private ICollection<RefreshInstructionEnvelope>? GetBatch(bool create)

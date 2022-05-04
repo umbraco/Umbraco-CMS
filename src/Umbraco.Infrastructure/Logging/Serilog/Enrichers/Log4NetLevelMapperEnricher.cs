@@ -1,4 +1,4 @@
-﻿using Serilog.Core;
+using Serilog.Core;
 using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers;
@@ -29,17 +29,17 @@ internal class Log4NetLevelMapperEnricher : ILogEventEnricher
 
             case LogEventLevel.Information:
                 log4NetLevel =
-                    "INFO "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    "INFO "; // Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                 break;
 
             case LogEventLevel.Verbose:
                 log4NetLevel =
-                    "ALL  "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    "ALL  "; // Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                 break;
 
             case LogEventLevel.Warning:
                 log4NetLevel =
-                    "WARN "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    "WARN "; // Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                 break;
             default:
                 log4NetLevel = string.Empty;

@@ -12,7 +12,8 @@ internal class DefaultMainDomKeyGenerator : IMainDomKeyGenerator
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
 
-    public DefaultMainDomKeyGenerator(IHostingEnvironment hostingEnvironment,
+    public DefaultMainDomKeyGenerator(
+        IHostingEnvironment hostingEnvironment,
         IOptionsMonitor<GlobalSettings> globalSettings)
     {
         _hostingEnvironment = hostingEnvironment;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
@@ -77,7 +77,8 @@ public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigration
 
             try
             {
-                config = (ValueListConfiguration)configurationEditor.FromDatabase(dataType.Configuration,
+                config = (ValueListConfiguration)configurationEditor.FromDatabase(
+                    dataType.Configuration,
                     _configurationEditorJsonSerializer);
             }
             catch (Exception ex)

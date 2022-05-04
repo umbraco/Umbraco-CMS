@@ -64,6 +64,9 @@ public class DistributedCacheBinder :
 
     public void Handle(PublicAccessEntryDeletedNotification notification) => _distributedCache.RefreshPublicAccess();
 
+    public void Handle(ContentTreeChangeNotification notification) =>
+        _distributedCache.RefreshContentCache(notification.Changes.ToArray());
+
     #endregion
 
     #region ContentService
@@ -81,20 +84,15 @@ public class DistributedCacheBinder :
     {
     }
 
-
-    public void Handle(ContentTreeChangeNotification notification) =>
-        _distributedCache.RefreshContentCache(notification.Changes.ToArray());
-
-    //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
-    //{
+    // private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
+    // {
     //    _distributedCache.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
-    //}
+    // }
 
-    //private void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
-    //{
+    // private void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
+    // {
     //    _distributedCache.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
-    //}
-
+    // }
     #endregion
 
     #region LocalizationService / Dictionary

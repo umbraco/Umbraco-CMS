@@ -21,7 +21,8 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
     }
 
     public ILogViewerQuery? GetByName(string name) =>
-        //use the underlying GetAll which will force cache all log queries
+
+        // use the underlying GetAll which will force cache all log queries
         GetMany()?.FirstOrDefault(x => x.Name == name);
 
     protected override IRepositoryCachePolicy<ILogViewerQuery, int> CreateCachePolicy() =>
@@ -33,7 +34,7 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
         Sql<ISqlContext>? sql = GetBaseQuery(false).Where($"{Constants.DatabaseSchema.Tables.LogViewerQuery}.id > 0");
         if (ids?.Any() ?? false)
         {
-            sql.Where($"{Constants.DatabaseSchema.Tables.LogViewerQuery}.id in (@ids)", new {ids});
+            sql.Where($"{Constants.DatabaseSchema.Tables.LogViewerQuery}.id in (@ids)", new { ids });
         }
 
         return Database.Fetch<LogViewerQueryDto>(sql).Select(ConvertFromDto);
@@ -54,7 +55,7 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> {$"DELETE FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE id = @id"};
+        var list = new List<string> { $"DELETE FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE id = @id" };
         return list;
     }
 
@@ -62,7 +63,7 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
     {
         var exists = Database.ExecuteScalar<int>(
             $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name",
-            new {name = entity.Name});
+            new { name = entity.Name });
         if (exists > 0)
         {
             throw new DuplicateNameException($"The log query name '{entity.Name}' is already used");
@@ -83,19 +84,24 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
 
         var exists = Database.ExecuteScalar<int>(
             $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name AND id <> @id",
-            new {name = entity.Name, id = entity.Id});
-        //ensure there is no other log query with the same name on another entity
+            new { name = entity.Name, id = entity.Id });
+
+        // ensure there is no other log query with the same name on another entity
         if (exists > 0)
         {
             throw new DuplicateNameException($"The log query name '{entity.Name}' is already used");
         }
-
 
         var factory = new LogViewerQueryModelFactory();
         LogViewerQueryDto dto = factory.BuildDto(entity);
 
         Database.Update(dto);
     }
+
+    protected override ILogViewerQuery? PerformGet(int id) =>
+
+        // use the underlying GetAll which will force cache all log queries
+        GetMany()?.FirstOrDefault(x => x.Id == id);
 
     private ILogViewerQuery ConvertFromDto(LogViewerQueryDto dto)
     {
@@ -104,21 +110,17 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
         return entity;
     }
 
-    protected override ILogViewerQuery? PerformGet(int id) =>
-        //use the underlying GetAll which will force cache all log queries
-        GetMany()?.FirstOrDefault(x => x.Id == id);
-
     internal class LogViewerQueryModelFactory
     {
         public ILogViewerQuery BuildEntity(LogViewerQueryDto dto)
         {
-            var logViewerQuery = new LogViewerQuery(dto.Name, dto.Query) {Id = dto.Id};
+            var logViewerQuery = new LogViewerQuery(dto.Name, dto.Query) { Id = dto.Id };
             return logViewerQuery;
         }
 
         public LogViewerQueryDto BuildDto(ILogViewerQuery entity)
         {
-            var dto = new LogViewerQueryDto {Name = entity.Name, Query = entity.Query, Id = entity.Id};
+            var dto = new LogViewerQueryDto { Name = entity.Name, Query = entity.Query, Id = entity.Id };
             return dto;
         }
     }

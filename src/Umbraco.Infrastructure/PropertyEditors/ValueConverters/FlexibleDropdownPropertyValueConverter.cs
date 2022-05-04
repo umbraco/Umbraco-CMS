@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Newtonsoft.Json;
@@ -19,7 +19,6 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
         {
             return Array.Empty<string>();
         }
-
 
         return JsonConvert.DeserializeObject<string[]>(source.ToString()!) ?? Array.Empty<string>();
     }

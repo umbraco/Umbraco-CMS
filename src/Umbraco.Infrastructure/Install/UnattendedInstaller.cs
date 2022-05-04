@@ -58,14 +58,15 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
         _runtimeState.DetermineRuntimeLevel();
         if (_runtimeState.Reason == RuntimeLevelReason.InstallMissingDatabase)
         {
-            _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName!,
+            _dbProviderFactoryCreator.CreateDatabase(
+                _databaseFactory.ProviderName!,
                 _databaseFactory.ConnectionString!);
         }
 
         bool connect;
         try
         {
-            for (var i = 0;;)
+            for (var i = 0; ;)
             {
                 connect = _databaseFactory.CanConnect;
                 if (connect || ++i == 5)

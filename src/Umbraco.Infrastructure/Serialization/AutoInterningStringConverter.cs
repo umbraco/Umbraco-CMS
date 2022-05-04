@@ -16,6 +16,7 @@ public class AutoInterningStringConverter : JsonConverter
     public override bool CanWrite => false;
 
     public override bool CanConvert(Type objectType) => throw
+
         // CanConvert is not called when a converter is applied directly to a property.
         new NotImplementedException($"{nameof(AutoInterningStringConverter)} should not be used globally");
 

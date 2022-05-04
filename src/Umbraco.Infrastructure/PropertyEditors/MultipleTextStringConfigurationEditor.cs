@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -13,8 +13,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
 {
-    public MultipleTextStringConfigurationEditor(IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
+    public MultipleTextStringConfigurationEditor(
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
         Fields.Add(new ConfigurationField(new IntegerValidator())
         {
@@ -22,7 +24,7 @@ internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<Multi
             Key = "min",
             View = "requiredfield",
             Name = "Minimum",
-            PropertyName = nameof(MultipleTextStringConfiguration.Minimum)
+            PropertyName = nameof(MultipleTextStringConfiguration.Minimum),
         });
 
         Fields.Add(new ConfigurationField(new IntegerValidator())
@@ -31,16 +33,17 @@ internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<Multi
             Key = "max",
             View = "requiredfield",
             Name = "Maximum",
-            PropertyName = nameof(MultipleTextStringConfiguration.Maximum)
+            PropertyName = nameof(MultipleTextStringConfiguration.Maximum),
         });
     }
 
     /// <inheritdoc />
-    public override MultipleTextStringConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues,
+    public override MultipleTextStringConfiguration FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
         MultipleTextStringConfiguration? configuration)
     {
         // TODO: this isn't pretty
-        //the values from the editor will be min/max fields and we need to format to json in one field
+        // the values from the editor will be min/max fields and we need to format to json in one field
         // is the editor sending strings or ints or?!
         Attempt<int> min = (editorValues?.ContainsKey("min") ?? false ? editorValues["min"]?.ToString() : "0")
             .TryConvertTo<int>();
@@ -49,11 +52,12 @@ internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<Multi
 
         return new MultipleTextStringConfiguration
         {
-            Minimum = min.Success ? min.Result : 0, Maximum = max.Success ? max.Result : 0
+            Minimum = min.Success ? min.Result : 0,
+            Maximum = max.Success ? max.Result : 0,
         };
     }
 
     /// <inheritdoc />
     public override Dictionary<string, object> ToConfigurationEditor(MultipleTextStringConfiguration? configuration) =>
-        new Dictionary<string, object> {{"min", configuration?.Minimum ?? 0}, {"max", configuration?.Maximum ?? 0}};
+        new Dictionary<string, object> { { "min", configuration?.Minimum ?? 0 }, { "max", configuration?.Maximum ?? 0 } };
 }

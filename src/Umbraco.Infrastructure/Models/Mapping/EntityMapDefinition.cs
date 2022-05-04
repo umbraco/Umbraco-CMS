@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -54,7 +54,7 @@ public class EntityMapDefinition : IMapDefinition
         {
             if (source.AdditionalData is not null)
             {
-                //pass UpdateDate for MediaPicker ListView ordering
+                // pass UpdateDate for MediaPicker ListView ordering
                 source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
             }
@@ -85,7 +85,7 @@ public class EntityMapDefinition : IMapDefinition
         target.Key = source.Key;
         target.Name = source.Name;
         target.ParentId = -1;
-        target.Path = "";
+        target.Path = string.Empty;
     }
 
     // Umbraco.Code.MapAll -Udi -Trashed
@@ -97,7 +97,7 @@ public class EntityMapDefinition : IMapDefinition
         target.Key = source.Key;
         target.Name = source.Name;
         target.ParentId = -1;
-        target.Path = "";
+        target.Path = string.Empty;
     }
 
     // Umbraco.Code.MapAll -Udi -Trashed
@@ -109,7 +109,7 @@ public class EntityMapDefinition : IMapDefinition
         target.Key = source.Key;
         target.Name = source.Name;
         target.ParentId = -1;
-        target.Path = "";
+        target.Path = string.Empty;
     }
 
     // Umbraco.Code.MapAll -Trashed
@@ -203,7 +203,7 @@ public class EntityMapDefinition : IMapDefinition
 
         // TODO: Properly map this (not aftermap)
 
-        //get the icon if there is one
+        // get the icon if there is one
         target.Icon = source.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName)
             ? source.Values[UmbracoExamineFieldNames.IconFieldName]
             : Constants.Icons.DefaultIcon;
@@ -235,7 +235,7 @@ public class EntityMapDefinition : IMapDefinition
             {
                 target.Key = key;
 
-                //need to set the UDI
+                // need to set the UDI
                 if (source.Values.ContainsKey(ExamineFieldNames.CategoryFieldName))
                 {
                     switch (source.Values[ExamineFieldNames.CategoryFieldName])
@@ -269,7 +269,7 @@ public class EntityMapDefinition : IMapDefinition
 
         target.Path = source.Values.ContainsKey(UmbracoExamineFieldNames.IndexPathFieldName)
             ? source.Values[UmbracoExamineFieldNames.IndexPathFieldName]
-            : "";
+            : string.Empty;
 
         if (source.Values.ContainsKey(ExamineFieldNames.ItemTypeFieldName))
         {
@@ -309,8 +309,9 @@ public class EntityMapDefinition : IMapDefinition
 
         // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
         if (culture == null)
-            //throw new InvalidOperationException("Missing culture in mapping options.");
-            // TODO: we should throw, but this is used in various places that won't set a culture yet
+
+        // throw new InvalidOperationException("Missing culture in mapping options.");
+        // TODO: we should throw, but this is used in various places that won't set a culture yet
         {
             return source.Name!;
         }

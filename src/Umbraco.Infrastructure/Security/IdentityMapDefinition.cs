@@ -62,11 +62,13 @@ public class IdentityMapDefinition : IMapDefinition
             });
     }
 
+    private static string? GetPasswordHash(string? storedPass) =>
+        storedPass?.StartsWith(Constants.Security.EmptyPasswordPrefix) ?? false ? null : storedPass;
+
     // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
     private void Map(IUser source, BackOfficeIdentityUser target)
     {
         // NOTE: Groups/Roles are set in the BackOfficeIdentityUser ctor
-
         target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
         target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
         target.Email = source.Email;
@@ -113,7 +115,4 @@ public class IdentityMapDefinition : IMapDefinition
 
         // NB: same comments re AutoMapper as per BackOfficeUser
     }
-
-    private static string? GetPasswordHash(string? storedPass) =>
-        storedPass?.StartsWith(Constants.Security.EmptyPasswordPrefix) ?? false ? null : storedPass;
 }

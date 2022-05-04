@@ -48,11 +48,11 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     /// </summary>
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -76,7 +76,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             IPublishedContent? node = null;
             while (pos > 1)
             {
-                route = route.Substring(0, pos);
+                route = route[..pos];
                 node = umbracoContext.Content?.GetByRoute(route, culture: frequest?.Culture);
                 if (node != null)
                 {
@@ -133,6 +133,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             .SetPublishedContent(content)
             .SetIs404();
 
-        return content != null;
+        return Task.FromResult(content != null);
     }
 }

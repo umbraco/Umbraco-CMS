@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter;
 

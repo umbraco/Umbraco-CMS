@@ -26,7 +26,10 @@ public interface IUmbracoTreeSearcherFields
     IEnumerable<string> GetBackOfficeDocumentFields();
 
     ISet<string> GetBackOfficeFieldsToLoad();
+
     ISet<string> GetBackOfficeMembersFieldsToLoad();
+
     ISet<string> GetBackOfficeDocumentFieldsToLoad();
+
     ISet<string> GetBackOfficeMediaFieldsToLoad();
 }

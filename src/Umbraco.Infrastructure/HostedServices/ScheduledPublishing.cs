@@ -93,7 +93,6 @@ public class ScheduledPublishing : RecurringHostedServiceBase
             // - batched messenger should not depend on a current HttpContext
             //    but then what should be its "scope"? could we attach it to scopes?
             // - and we should definitively *not* have to flush it here (should be auto)
-
             using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 

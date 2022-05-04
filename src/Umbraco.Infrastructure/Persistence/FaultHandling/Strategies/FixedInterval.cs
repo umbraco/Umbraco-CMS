@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
 /// <summary>
 ///     A retry strategy with a specified number of retry attempts and a default fixed time interval between retries.
@@ -59,9 +59,8 @@ public class FixedInterval : RetryStrategy
     public FixedInterval(string? name, int retryCount, TimeSpan retryInterval, bool firstFastRetry)
         : base(name, firstFastRetry)
     {
-        //Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
-        //Guard.ArgumentNotNegativeValue(retryInterval.Ticks, "retryInterval");
-
+        // Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
+        // Guard.ArgumentNotNegativeValue(retryInterval.Ticks, "retryInterval");
         this.retryCount = retryCount;
         this.retryInterval = retryInterval;
     }

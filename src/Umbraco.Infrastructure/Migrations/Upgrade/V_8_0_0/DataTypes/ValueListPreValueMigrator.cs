@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 
@@ -7,7 +7,7 @@ internal class ValueListPreValueMigrator : IPreValueMigrator
     private readonly string[] _editors =
     {
         "Umbraco.RadioButtonList", "Umbraco.CheckBoxList", "Umbraco.DropDown", "Umbraco.DropdownlistPublishingKeys",
-        "Umbraco.DropDownMultiple", "Umbraco.DropdownlistMultiplePublishKeys"
+        "Umbraco.DropDownMultiple", "Umbraco.DropdownlistMultiplePublishKeys",
     };
 
     public bool CanMigrate(string editorAlias)
@@ -21,7 +21,7 @@ internal class ValueListPreValueMigrator : IPreValueMigrator
         var config = new ValueListConfiguration();
         foreach (PreValueDto preValue in preValues.Values)
         {
-            config.Items.Add(new ValueListConfiguration.ValueListItem {Id = preValue.Id, Value = preValue.Value});
+            config.Items.Add(new ValueListConfiguration.ValueListItem { Id = preValue.Id, Value = preValue.Value });
         }
 
         return config;

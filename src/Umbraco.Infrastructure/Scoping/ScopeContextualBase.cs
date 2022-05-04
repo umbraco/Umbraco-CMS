@@ -14,18 +14,6 @@ public abstract class ScopeContextualBase : IDisposable
 {
     private bool _scoped;
 
-    /// <inheritdoc />
-    /// <remarks>
-    ///     <para>If not scoped, then this releases the contextual object.</para>
-    /// </remarks>
-    public void Dispose()
-    {
-        if (_scoped == false)
-        {
-            Release(true);
-        }
-    }
-
     /// <summary>
     ///     Gets a contextual object.
     /// </summary>
@@ -48,7 +36,8 @@ public abstract class ScopeContextualBase : IDisposable
         }
 
         // create & enlist the scoped object
-        T? w = scopeContext.Enlist("ScopeContextualBase_" + key,
+        T? w = scopeContext.Enlist(
+            "ScopeContextualBase_" + key,
             () => ctor(true),
             (completed, item) => { item?.Release(completed); });
 
@@ -58,6 +47,18 @@ public abstract class ScopeContextualBase : IDisposable
         }
 
         return w;
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     <para>If not scoped, then this releases the contextual object.</para>
+    /// </remarks>
+    public void Dispose()
+    {
+        if (_scoped == false)
+        {
+            Release(true);
+        }
     }
 
     /// <summary>

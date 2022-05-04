@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -13,15 +13,20 @@ public class PropertyEditorsMigration : MigrationBase
 
     protected override void Migrate()
     {
-        RenameDataType(Constants.PropertyEditors.Legacy.Aliases.ContentPicker2,
+        RenameDataType(
+            Constants.PropertyEditors.Legacy.Aliases.ContentPicker2,
             Constants.PropertyEditors.Aliases.ContentPicker);
-        RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
+        RenameDataType(
+            Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
             Constants.PropertyEditors.Aliases.MediaPicker);
-        RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
+        RenameDataType(
+            Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
             Constants.PropertyEditors.Aliases.MemberPicker);
-        RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
+        RenameDataType(
+            Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
             Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
-        RenameDataType(Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
+        RenameDataType(
+            Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
             Constants.PropertyEditors.Aliases.TextArea, false);
         RenameDataType(Constants.PropertyEditors.Legacy.Aliases.Textbox, Constants.PropertyEditors.Aliases.TextBox,
             false);
@@ -43,7 +48,6 @@ public class PropertyEditorsMigration : MigrationBase
                 // TODO: We should have an additional upgrade step when going from 7 -> 8 like we did with 6 -> 7 that shows a compatibility report,
                 // this would include this check and then we can provide users with information on what they should do (i.e. before upgrading to v8 they will
                 // need to migrate these old obsolete editors to non-obsolete editors)
-
                 throw new InvalidOperationException(
                     $"Cannot rename datatype alias \"{fromAlias}\" to \"{toAlias}\" because the target alias is already used." +
                     "This is generally because when upgrading from a v7 to v8 site, the v7 site contains Data Types that reference old and already Obsolete " +

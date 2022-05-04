@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -83,8 +83,7 @@ internal static class ContentTypeFactory
 
     public static IEnumerable<MemberPropertyTypeDto> BuildMemberPropertyTypeDtos(IMemberType entity)
     {
-        var memberType = entity as MemberType;
-        if (memberType == null || memberType.PropertyTypes.Any() == false)
+        if (entity is not MemberType memberType || memberType.PropertyTypes.Any() == false)
         {
             return Enumerable.Empty<MemberPropertyTypeDto>();
         }
@@ -95,39 +94,9 @@ internal static class ContentTypeFactory
             PropertyTypeId = x.Id,
             CanEdit = memberType.MemberCanEditProperty(x.Alias),
             ViewOnProfile = memberType.MemberCanViewProperty(x.Alias),
-            IsSensitive = memberType.IsSensitiveProperty(x.Alias)
+            IsSensitive = memberType.IsSensitiveProperty(x.Alias),
         }).ToList();
         return dtos;
-    }
-
-    #endregion
-
-    #region Common
-
-    private static void BuildCommonEntity(ContentTypeBase entity, ContentTypeDto dto, bool setVariations = true)
-    {
-        entity.Id = dto.NodeDto.NodeId;
-        entity.Key = dto.NodeDto.UniqueId;
-        entity.Alias = dto.Alias ?? string.Empty;
-        entity.Name = dto.NodeDto.Text;
-        entity.Icon = dto.Icon;
-        entity.Thumbnail = dto.Thumbnail;
-        entity.SortOrder = dto.NodeDto.SortOrder;
-        entity.Description = dto.Description;
-        entity.CreateDate = dto.NodeDto.CreateDate;
-        entity.UpdateDate = dto.NodeDto.CreateDate;
-        entity.Path = dto.NodeDto.Path;
-        entity.Level = dto.NodeDto.Level;
-        entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
-        entity.AllowedAsRoot = dto.AllowAtRoot;
-        entity.IsContainer = dto.IsContainer;
-        entity.IsElement = dto.IsElement;
-        entity.Trashed = dto.NodeDto.Trashed;
-
-        if (setVariations)
-        {
-            entity.Variations = (ContentVariation)dto.Variations;
-        }
     }
 
     public static ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
@@ -161,9 +130,39 @@ internal static class ContentTypeFactory
             IsContainer = entity.IsContainer,
             IsElement = entity.IsElement,
             Variations = (byte)entity.Variations,
-            NodeDto = BuildNodeDto(entity, nodeObjectType)
+            NodeDto = BuildNodeDto(entity, nodeObjectType),
         };
         return contentTypeDto;
+    }
+
+    #endregion
+
+    #region Common
+
+    private static void BuildCommonEntity(ContentTypeBase entity, ContentTypeDto dto, bool setVariations = true)
+    {
+        entity.Id = dto.NodeDto.NodeId;
+        entity.Key = dto.NodeDto.UniqueId;
+        entity.Alias = dto.Alias ?? string.Empty;
+        entity.Name = dto.NodeDto.Text;
+        entity.Icon = dto.Icon;
+        entity.Thumbnail = dto.Thumbnail;
+        entity.SortOrder = dto.NodeDto.SortOrder;
+        entity.Description = dto.Description;
+        entity.CreateDate = dto.NodeDto.CreateDate;
+        entity.UpdateDate = dto.NodeDto.CreateDate;
+        entity.Path = dto.NodeDto.Path;
+        entity.Level = dto.NodeDto.Level;
+        entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
+        entity.AllowedAsRoot = dto.AllowAtRoot;
+        entity.IsContainer = dto.IsContainer;
+        entity.IsElement = dto.IsElement;
+        entity.Trashed = dto.NodeDto.Trashed;
+
+        if (setVariations)
+        {
+            entity.Variations = (ContentVariation)dto.Variations;
+        }
     }
 
     private static NodeDto BuildNodeDto(IUmbracoEntity entity, Guid nodeObjectType)
@@ -180,7 +179,7 @@ internal static class ContentTypeFactory
             Text = entity.Name,
             Trashed = false,
             UniqueId = entity.Key,
-            UserId = entity.CreatorId
+            UserId = entity.CreatorId,
         };
         return nodeDto;
     }

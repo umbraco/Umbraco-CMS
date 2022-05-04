@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
@@ -11,7 +11,8 @@ public class DeleteConstraintExpression : MigrationExpressionBase
     public ConstraintDefinition Constraint { get; }
 
     protected override string GetSql() =>
-        string.Format(SqlSyntax.DeleteConstraint,
+        string.Format(
+            SqlSyntax.DeleteConstraint,
             SqlSyntax.GetQuotedTableName(Constraint.TableName),
             SqlSyntax.GetQuotedName(Constraint.ConstraintName));
 }

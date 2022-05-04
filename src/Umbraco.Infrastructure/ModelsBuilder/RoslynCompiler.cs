@@ -59,11 +59,12 @@ public class RoslynCompiler
 
         var compilation = CSharpCompilation.Create(
             GeneratedAssemblyName,
-            new[] {syntaxTree},
+            new[] { syntaxTree },
             _refs,
             new CSharpCompilationOptions(
                 _outputKind,
                 optimizationLevel: OptimizationLevel.Release,
+
                 // Not entirely certain that assemblyIdentityComparer is nececary?
                 assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 

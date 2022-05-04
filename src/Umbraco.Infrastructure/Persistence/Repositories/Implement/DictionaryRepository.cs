@@ -42,16 +42,15 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
-        var columns = new[] {"key", "id"}.Select(x => (object)SqlSyntax.GetQuotedColumnName(x)).ToArray();
+        var columns = new[] { "key", "id" }.Select(x => (object)SqlSyntax.GetQuotedColumnName(x)).ToArray();
         Sql<ISqlContext> sql = Sql().Select(columns).From<DictionaryDto>();
         return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
     }
 
     public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
     {
-        //This methods will look up children at each level, since we do not store a path for dictionary (ATM), we need to do a recursive
+        // This methods will look up children at each level, since we do not store a path for dictionary (ATM), we need to do a recursive
         // lookup to get descendants. Currently this is the most efficient way to do it
-
         Func<Guid[], IEnumerable<IEnumerable<IDictionaryItem>>> getItemsFromParents = guids =>
         {
             return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
@@ -72,8 +71,8 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         };
 
         IEnumerable<IEnumerable<IDictionaryItem>> childItems = parentId.HasValue == false
-            ? new[] {GetRootDictionaryItems()!}
-            : getItemsFromParents(new[] {parentId.Value});
+            ? new[] { GetRootDictionaryItems()! }
+            : getItemsFromParents(new[] { parentId.Value });
 
         return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray()))
             .SelectMany(items => items);
@@ -83,8 +82,8 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     {
         var options = new RepositoryCachePolicyOptions
         {
-            //allow zero to be cached
-            GetAllCacheAllowZeroCount = true
+            // allow zero to be cached
+            GetAllCacheAllowZeroCount = true,
         };
 
         return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor,
@@ -103,6 +102,31 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return entity;
     }
 
+    #region Overrides of RepositoryBase<int,DictionaryItem>
+
+    protected override IDictionaryItem? PerformGet(int id)
+    {
+        Sql<ISqlContext> sql = GetBaseQuery(false)
+            .Where(GetBaseWhereClause(), new { id })
+            .OrderBy<DictionaryDto>(x => x.UniqueId);
+
+        DictionaryDto? dto = Database
+            .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+            .FirstOrDefault();
+
+        if (dto == null)
+        {
+            return null;
+        }
+
+        IDictionaryItem entity = ConvertFromDto(dto);
+
+        // reset dirty initial properties (U4-1946)
+        ((EntityBase)entity).ResetDirtyProperties(false);
+
+        return entity;
+    }
+
     private IEnumerable<IDictionaryItem>? GetRootDictionaryItems()
     {
         IQuery<IDictionaryItem> query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
@@ -112,6 +136,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryItemKeyIdDto
     {
         public string Key { get; } = null!;
+
         public Guid Id { get; set; }
     }
 
@@ -136,7 +161,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
             _dictionaryRepository.ConvertFromDto(dto);
 
-        protected override object GetBaseWhereClauseArguments(Guid id) => new {id};
+        protected override object GetBaseWhereClauseArguments(Guid id) => new { id };
 
         protected override string GetWhereInClauseForGetAll() =>
             "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
@@ -145,8 +170,8 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         {
             var options = new RepositoryCachePolicyOptions
             {
-                //allow zero to be cached
-                GetAllCacheAllowZeroCount = true
+                // allow zero to be cached
+                GetAllCacheAllowZeroCount = true,
             };
 
             return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor,
@@ -175,7 +200,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
             _dictionaryRepository.ConvertFromDto(dto);
 
-        protected override object GetBaseWhereClauseArguments(string? id) => new {id};
+        protected override object GetBaseWhereClauseArguments(string? id) => new { id };
 
         protected override string GetWhereInClauseForGetAll() =>
             "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
@@ -184,38 +209,13 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         {
             var options = new RepositoryCachePolicyOptions
             {
-                //allow zero to be cached
-                GetAllCacheAllowZeroCount = true
+                // allow zero to be cached
+                GetAllCacheAllowZeroCount = true,
             };
 
             return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor,
                 options);
         }
-    }
-
-    #region Overrides of RepositoryBase<int,DictionaryItem>
-
-    protected override IDictionaryItem? PerformGet(int id)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where(GetBaseWhereClause(), new {id})
-            .OrderBy<DictionaryDto>(x => x.UniqueId);
-
-        DictionaryDto? dto = Database
-            .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-            .FirstOrDefault();
-
-        if (dto == null)
-        {
-            return null;
-        }
-
-        IDictionaryItem entity = ConvertFromDto(dto);
-
-        // reset dirty initial properties (U4-1946)
-        ((EntityBase)entity).ResetDirtyProperties(false);
-
-        return entity;
     }
 
     protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[]? ids)
@@ -329,7 +329,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
         entity.ResetDirtyProperties();
 
-        //Clear the cache entries that exist by uniqueid/item key
+        // Clear the cache entries that exist by uniqueid/item key
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
     }
@@ -338,10 +338,10 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     {
         RecursiveDelete(entity.Key);
 
-        Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new {Id = entity.Key});
-        Database.Delete<DictionaryDto>("WHERE id = @Id", new {Id = entity.Key});
+        Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = entity.Key });
+        Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
 
-        //Clear the cache entries that exist by uniqueid/item key
+        // Clear the cache entries that exist by uniqueid/item key
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
 
@@ -351,15 +351,15 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private void RecursiveDelete(Guid parentId)
     {
         List<DictionaryDto>? list =
-            Database.Fetch<DictionaryDto>("WHERE parent = @ParentId", new {ParentId = parentId});
+            Database.Fetch<DictionaryDto>("WHERE parent = @ParentId", new { ParentId = parentId });
         foreach (DictionaryDto? dto in list)
         {
             RecursiveDelete(dto.UniqueId);
 
-            Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new {Id = dto.UniqueId});
-            Database.Delete<DictionaryDto>("WHERE id = @Id", new {Id = dto.UniqueId});
+            Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = dto.UniqueId });
+            Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
 
-            //Clear the cache entries that exist by uniqueid/item key
+            // Clear the cache entries that exist by uniqueid/item key
             IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(dto.Key));
             IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(dto.UniqueId));
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCropperConfiguration>
 {
-    public ImageCropperConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-        base(ioHelper, editorConfigurationParser)
+    public ImageCropperConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 
@@ -22,12 +22,12 @@ internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCroppe
         IDictionary<string, object> d = base.ToValueEditor(configuration);
         if (!d.ContainsKey("focalPoint"))
         {
-            d["focalPoint"] = new {left = 0.5, top = 0.5};
+            d["focalPoint"] = new { left = 0.5, top = 0.5 };
         }
 
         if (!d.ContainsKey("src"))
         {
-            d["src"] = "";
+            d["src"] = string.Empty;
         }
 
         return d;

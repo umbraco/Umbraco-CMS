@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 public class ColumnInfo
 {
@@ -32,9 +32,14 @@ public class ColumnInfo
     }
 
     public string TableName { get; set; }
+
     public string ColumnName { get; set; }
+
     public int Ordinal { get; set; }
+
     public string? ColumnDefault { get; set; }
+
     public bool IsNullable { get; set; }
+
     public string DataType { get; set; }
 }

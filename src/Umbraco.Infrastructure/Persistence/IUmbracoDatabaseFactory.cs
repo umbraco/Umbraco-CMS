@@ -74,7 +74,7 @@ public interface IUmbracoDatabaseFactory : IDisposable
 
     [Obsolete("Please use alternative Configure method.")]
     void Configure(string connectionString, string providerName) =>
-        Configure(new ConnectionStrings {ConnectionString = connectionString, ProviderName = providerName});
+        Configure(new ConnectionStrings { ConnectionString = connectionString, ProviderName = providerName });
 
     /// <summary>
     ///     Configures the database factory for upgrades.

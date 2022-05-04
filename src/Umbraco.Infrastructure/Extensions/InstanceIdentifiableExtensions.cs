@@ -11,6 +11,6 @@ internal static class InstanceIdentifiableExtensions
             return "(NULL)";
         }
 
-        return $"(id: {instance.InstanceId.ToString("N").Substring(0, 8)} from thread: {instance.CreatedThreadId})";
+        return $"(id: {instance.InstanceId.ToString("N")[..8]} from thread: {instance.CreatedThreadId})";
     }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
 
@@ -16,9 +16,9 @@ public class UpdateRelationTypeTable : MigrationBase
         Alter.Table(Constants.DatabaseSchema.Tables.RelationType).AlterColumn("childObjectType").AsGuid().Nullable()
             .Do();
 
-        //TODO: We have to update this field to ensure it's not null, we can just copy across the name since that is not nullable
+        // TODO: We have to update this field to ensure it's not null, we can just copy across the name since that is not nullable
 
-        //drop index before we can alter the column
+        // drop index before we can alter the column
         if (IndexExists("IX_umbracoRelationType_alias"))
         {
             Delete
@@ -27,9 +27,10 @@ public class UpdateRelationTypeTable : MigrationBase
                 .Do();
         }
 
-        //change the column to non nullable
+        // change the column to non nullable
         Alter.Table(Constants.DatabaseSchema.Tables.RelationType).AlterColumn("alias").AsString(100).NotNullable().Do();
-        //re-create the index
+
+        // re-create the index
         Create
             .Index("IX_umbracoRelationType_alias")
             .OnTable(Constants.DatabaseSchema.Tables.RelationType)

@@ -55,7 +55,6 @@ public class MediaPicker3PropertyEditor : DataEditor
         _editorConfigurationParser = editorConfigurationParser;
     }
 
-
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new MediaPicker3ConfigurationEditor(_ioHelper, _editorConfigurationParser);
@@ -150,7 +149,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                             Key = Guid.NewGuid(),
                             MediaKey = guidUdi.Guid,
                             Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint {Left = 0.5m, Top = 0.5m}
+                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
                         };
                     }
                 }
@@ -176,13 +175,27 @@ public class MediaPicker3PropertyEditor : DataEditor
         [DataContract]
         internal class MediaWithCropsDto
         {
-            [DataMember(Name = "key")] public Guid Key { get; set; }
+            [DataMember(Name = "key")]
+            public Guid Key { get; set; }
 
-            [DataMember(Name = "mediaKey")] public Guid MediaKey { get; set; }
+            [DataMember(Name = "mediaKey")]
+            public Guid MediaKey { get; set; }
 
-            [DataMember(Name = "crops")] public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
+            [DataMember(Name = "crops")]
+            public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
 
-            [DataMember(Name = "focalPoint")] public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+            [DataMember(Name = "focalPoint")]
+            public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+
+            /// <summary>
+            ///     Removes redundant crop data/default focal point.
+            /// </summary>
+            /// <param name="value">The media with crops DTO.</param>
+            /// <remarks>
+            ///     Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the
+            ///     prune method.
+            /// </remarks>
+            public static void Prune(JObject? value) => ImageCropperValue.Prune(value);
 
             /// <summary>
             ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
@@ -205,7 +218,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                             Alias = configuredCrop.Alias,
                             Width = configuredCrop.Width,
                             Height = configuredCrop.Height,
-                            Coordinates = crop?.Coordinates
+                            Coordinates = crop?.Coordinates,
                         });
                     }
                 }
@@ -217,16 +230,6 @@ public class MediaPicker3PropertyEditor : DataEditor
                     FocalPoint = null;
                 }
             }
-
-            /// <summary>
-            ///     Removes redundant crop data/default focal point.
-            /// </summary>
-            /// <param name="value">The media with crops DTO.</param>
-            /// <remarks>
-            ///     Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the
-            ///     prune method.
-            /// </remarks>
-            public static void Prune(JObject? value) => ImageCropperValue.Prune(value);
         }
     }
 }

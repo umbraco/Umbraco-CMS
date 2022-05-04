@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public class BlockItemData
 {
-    [JsonProperty("contentTypeKey")] public Guid ContentTypeKey { get; set; }
+    [JsonProperty("contentTypeKey")]
+    public Guid ContentTypeKey { get; set; }
 
     /// <summary>
     ///     not serialized, manually set and used during internally
@@ -54,6 +55,7 @@ public class BlockItemData
         }
 
         public object? Value { get; }
+
         public IPropertyType PropertyType { get; }
     }
 }

@@ -2,7 +2,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0;
 
 public class UpdateCmsPropertyGroupIdSeed : MigrationBase
 {
-    public UpdateCmsPropertyGroupIdSeed(IMigrationContext context) : base(context)
+    public UpdateCmsPropertyGroupIdSeed(IMigrationContext context)
+        : base(context)
     {
     }
 

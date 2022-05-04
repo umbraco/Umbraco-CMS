@@ -45,7 +45,7 @@ internal class ImageSharpDimensionExtractor : IImageDimensionExtractor
                 or ExifOrientationMode.RightTop
                 or ExifOrientationMode.RightBottom
                 or ExifOrientationMode.LeftBottom => true,
-            _ => false
+            _ => false,
         };
 
     private static ushort GetExifOrientation(IImageInfo imageInfo)

@@ -52,6 +52,21 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
 
     public void Handle(DataTypeCacheRefresherNotification notification) => Write();
 
+    public void Clear()
+    {
+        if (_config.FlagOutOfDateModels == false)
+        {
+            return;
+        }
+
+        var path = GetFlagPath();
+        if (path == null || !File.Exists(path))
+        {
+            return;
+        }
+
+        File.Delete(path);
+    }
 
     private string GetFlagPath()
     {
@@ -79,21 +94,5 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
         }
 
         File.WriteAllText(path, "THIS FILE INDICATES THAT MODELS ARE OUT-OF-DATE\n\n");
-    }
-
-    public void Clear()
-    {
-        if (_config.FlagOutOfDateModels == false)
-        {
-            return;
-        }
-
-        var path = GetFlagPath();
-        if (path == null || !File.Exists(path))
-        {
-            return;
-        }
-
-        File.Delete(path);
     }
 }

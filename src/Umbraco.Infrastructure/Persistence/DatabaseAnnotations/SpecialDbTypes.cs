@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 /// <summary>
 ///     Known special DB types required for Umbraco.
@@ -7,5 +7,5 @@ public enum SpecialDbTypes
 {
     NTEXT,
     NCHAR,
-    NVARCHARMAX
+    NVARCHARMAX,
 }

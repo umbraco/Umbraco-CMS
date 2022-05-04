@@ -156,7 +156,9 @@ public sealed class RichTextEditorPastedImages
             {
                 location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location)
                 {
-                    ImageCropMode = ImageCropMode.Max, Width = width, Height = height
+                    ImageCropMode = ImageCropMode.Max,
+                    Width = width,
+                    Height = height,
                 });
             }
 

@@ -18,7 +18,7 @@ public class LogLevelLoader : ILogLevelLoader
     {
         var configuredLogLevels = new Dictionary<string, LogEventLevel?>
         {
-            {"Global", GetGlobalMinLogLevel()}, {"UmbracoFile", _umbracoFileConfig.RestrictedToMinimumLevel}
+            { "Global", GetGlobalMinLogLevel() }, { "UmbracoFile", _umbracoFileConfig.RestrictedToMinimumLevel },
         };
 
         return new ReadOnlyDictionary<string, LogEventLevel?>(configuredLogLevels);

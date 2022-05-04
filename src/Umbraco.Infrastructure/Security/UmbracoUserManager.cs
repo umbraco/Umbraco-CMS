@@ -211,7 +211,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
 
         await lockoutStore.ResetAccessFailedCountAsync(user, CancellationToken.None);
 
-        //Ensure the password config is null, so it is set to the default in repository
+        // Ensure the password config is null, so it is set to the default in repository
         user.PasswordConfig = null;
         return await UpdateAsync(user);
     }
@@ -236,7 +236,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
 
         if (count >= Options.Lockout.MaxFailedAccessAttempts)
         {
-            await lockoutStore.SetLockoutEndDateAsync(user,
+            await lockoutStore.SetLockoutEndDateAsync(
+                user,
                 DateTimeOffset.UtcNow.Add(Options.Lockout.DefaultLockoutTimeSpan), CancellationToken.None);
 
             // NOTE: in normal aspnet identity this would do set the number of failed attempts back to 0
@@ -245,7 +246,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
 
         if (string.IsNullOrEmpty(user.PasswordConfig))
         {
-            //We cant pass null as that would be interpreted as the default algoritm, but due to the failing attempt we dont know.
+            // We cant pass null as that would be interpreted as the default algoritm, but due to the failing attempt we dont know.
             user.PasswordConfig = Constants.Security.UnknownPasswordConfigJson;
         }
 
@@ -268,7 +269,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
                                             typeof(IUserPasswordStore<>));
         }
 
-        var hash = await userPasswordStore.GetPasswordHashAsync(user, new CancellationToken());
+        var hash = await userPasswordStore.GetPasswordHashAsync(user, CancellationToken.None);
 
         return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
     }

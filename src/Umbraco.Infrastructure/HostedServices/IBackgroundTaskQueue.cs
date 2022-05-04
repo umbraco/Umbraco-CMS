@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.HostedServices;
 
 /// <summary>
 ///     A Background Task Queue, to enqueue tasks for executing in the background.

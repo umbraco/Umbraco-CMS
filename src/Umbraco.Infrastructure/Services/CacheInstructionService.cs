@@ -192,7 +192,52 @@ namespace Umbraco.Cms
                 }
             }
 
-            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions,
+            /// <summary>
+            ///     Parses out the individual instructions to be processed.
+            /// </summary>
+            private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
+            {
+                var result = new List<RefreshInstruction>();
+                if (jsonInstructions is not null)
+                {
+                    return result;
+                }
+
+                foreach (JToken jsonItem in jsonInstructions!)
+                {
+                    // Could be a JObject in which case we can convert to a RefreshInstruction.
+                    // Otherwise it could be another JArray - in which case we'll iterate that.
+                    if (jsonItem is JObject jsonObj)
+                    {
+                        RefreshInstruction? instruction = jsonObj.ToObject<RefreshInstruction>();
+                        if (instruction is not null)
+                        {
+                            result.Add(instruction);
+                        }
+                    }
+                    else
+                    {
+                        var jsonInnerArray = (JArray)jsonItem;
+                        result.AddRange(GetAllInstructions(jsonInnerArray)); // recurse
+                    }
+                }
+
+                return result;
+            }
+
+            private static IJsonCacheRefresher GetJsonRefresher(ICacheRefresher refresher)
+            {
+                if (refresher is not IJsonCacheRefresher jsonRefresher)
+                {
+                    throw new InvalidOperationException("Cache refresher with ID \"" + refresher.RefresherUniqueId +
+                                                        "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
+                }
+
+                return jsonRefresher;
+            }
+
+            private CacheInstruction CreateCacheInstruction(
+                IEnumerable<RefreshInstruction> instructions,
                 string localIdentity) =>
                 new(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None),
                     localIdentity, instructions.Sum(x => x.JsonIdCount));
@@ -204,7 +249,8 @@ namespace Umbraco.Cms
             ///     Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
             /// </remarks>
             /// <returns>Number of instructions processed.</returns>
-            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers,
+            private int ProcessDatabaseInstructions(
+                CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken, string localIdentity, ref int lastId)
             {
                 // NOTE:
@@ -303,39 +349,6 @@ namespace Umbraco.Cms
                     jsonInstructions = null;
                     return false;
                 }
-            }
-
-            /// <summary>
-            ///     Parses out the individual instructions to be processed.
-            /// </summary>
-            private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
-            {
-                var result = new List<RefreshInstruction>();
-                if (jsonInstructions is not null)
-                {
-                    return result;
-                }
-
-                foreach (JToken jsonItem in jsonInstructions!)
-                {
-                    // Could be a JObject in which case we can convert to a RefreshInstruction.
-                    // Otherwise it could be another JArray - in which case we'll iterate that.
-                    if (jsonItem is JObject jsonObj)
-                    {
-                        RefreshInstruction? instruction = jsonObj.ToObject<RefreshInstruction>();
-                        if (instruction is not null)
-                        {
-                            result.Add(instruction);
-                        }
-                    }
-                    else
-                    {
-                        var jsonInnerArray = (JArray)jsonItem;
-                        result.AddRange(GetAllInstructions(jsonInnerArray)); // recurse
-                    }
-                }
-
-                return result;
             }
 
             /// <summary>
@@ -501,17 +514,6 @@ namespace Umbraco.Cms
 
             private IJsonCacheRefresher GetJsonRefresher(CacheRefresherCollection cacheRefreshers, Guid id) =>
                 GetJsonRefresher(GetRefresher(cacheRefreshers, id));
-
-            private static IJsonCacheRefresher GetJsonRefresher(ICacheRefresher refresher)
-            {
-                if (refresher is not IJsonCacheRefresher jsonRefresher)
-                {
-                    throw new InvalidOperationException("Cache refresher with ID \"" + refresher.RefresherUniqueId +
-                                                        "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
-                }
-
-                return jsonRefresher;
-            }
 
             /// <summary>
             ///     Remove old instructions from the database

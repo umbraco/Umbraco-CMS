@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
@@ -20,27 +20,27 @@ public class CreateBuilder : ICreateBuilder
 
     /// <inheritdoc />
     public IExecutableBuilder Table<TDto>(bool withoutKeysAndIndexes = false) =>
-        new CreateTableOfDtoBuilder(_context) {TypeOfDto = typeof(TDto), WithoutKeysAndIndexes = withoutKeysAndIndexes};
+        new CreateTableOfDtoBuilder(_context) { TypeOfDto = typeof(TDto), WithoutKeysAndIndexes = withoutKeysAndIndexes };
 
     /// <inheritdoc />
     public IExecutableBuilder KeysAndIndexes<TDto>() =>
-        new CreateKeysAndIndexesBuilder(_context) {TypeOfDto = typeof(TDto)};
+        new CreateKeysAndIndexesBuilder(_context) { TypeOfDto = typeof(TDto) };
 
     /// <inheritdoc />
     public IExecutableBuilder KeysAndIndexes(Type typeOfDto) =>
-        new CreateKeysAndIndexesBuilder(_context) {TypeOfDto = typeOfDto};
+        new CreateKeysAndIndexesBuilder(_context) { TypeOfDto = typeOfDto };
 
     /// <inheritdoc />
     public ICreateTableWithColumnBuilder Table(string tableName)
     {
-        var expression = new CreateTableExpression(_context) {TableName = tableName};
+        var expression = new CreateTableExpression(_context) { TableName = tableName };
         return new CreateTableBuilder(_context, expression);
     }
 
     /// <inheritdoc />
     public ICreateColumnOnTableBuilder Column(string columnName)
     {
-        var expression = new CreateColumnExpression(_context) {Column = {Name = columnName}};
+        var expression = new CreateColumnExpression(_context) { Column = { Name = columnName } };
         return new CreateColumnBuilder(_context, expression);
     }
 
@@ -54,7 +54,7 @@ public class CreateBuilder : ICreateBuilder
     /// <inheritdoc />
     public ICreateForeignKeyFromTableBuilder ForeignKey(string foreignKeyName)
     {
-        var expression = new CreateForeignKeyExpression(_context) {ForeignKey = {Name = foreignKeyName}};
+        var expression = new CreateForeignKeyExpression(_context) { ForeignKey = { Name = foreignKeyName } };
         return new CreateForeignKeyBuilder(expression);
     }
 
@@ -68,7 +68,7 @@ public class CreateBuilder : ICreateBuilder
     /// <inheritdoc />
     public ICreateIndexForTableBuilder Index(string indexName)
     {
-        var expression = new CreateIndexExpression(_context) {Index = {Name = indexName}};
+        var expression = new CreateIndexExpression(_context) { Index = { Name = indexName } };
         return new CreateIndexBuilder(expression);
     }
 

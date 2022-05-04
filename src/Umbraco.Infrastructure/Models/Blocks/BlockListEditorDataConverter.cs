@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public class BlockListEditorDataConverter : BlockEditorDataConverter
 {
-    public BlockListEditorDataConverter() : base(Constants.PropertyEditors.Aliases.BlockList)
+    public BlockListEditorDataConverter()
+        : base(Constants.PropertyEditors.Aliases.BlockList)
     {
     }
 

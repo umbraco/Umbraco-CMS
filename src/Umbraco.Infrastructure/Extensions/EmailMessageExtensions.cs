@@ -16,7 +16,7 @@ internal static class EmailMessageExtensions
                 $"Email could not be sent.  Could not parse from address {fromEmail} as a valid email address.");
         }
 
-        var messageToSend = new MimeMessage {From = {fromAddress}, Subject = mailMessage.Subject};
+        var messageToSend = new MimeMessage { From = { fromAddress }, Subject = mailMessage.Subject };
 
         AddAddresses(messageToSend, mailMessage.To, x => x.To, true);
         AddAddresses(messageToSend, mailMessage.Cc, x => x.Cc);
@@ -45,10 +45,30 @@ internal static class EmailMessageExtensions
         else
         {
             messageToSend.Body =
-                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) {Text = mailMessage.Body};
+                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body };
         }
 
         return messageToSend;
+    }
+
+    public static NotificationEmailModel ToNotificationEmail(
+        this EmailMessage emailMessage,
+        string? configuredFromAddress)
+    {
+        var fromEmail = string.IsNullOrEmpty(emailMessage.From) ? configuredFromAddress : emailMessage.From;
+
+        NotificationEmailAddress? from = ToNotificationAddress(fromEmail);
+
+        return new NotificationEmailModel(
+            from,
+            GetNotificationAddresses(emailMessage.To),
+            GetNotificationAddresses(emailMessage.Cc),
+            GetNotificationAddresses(emailMessage.Bcc),
+            GetNotificationAddresses(emailMessage.ReplyTo),
+            emailMessage.Subject,
+            emailMessage.Body,
+            emailMessage.Attachments,
+            emailMessage.IsBodyHtml);
     }
 
     private static void AddAddresses(MimeMessage message, string?[]? addresses,
@@ -71,25 +91,6 @@ internal static class EmailMessageExtensions
         {
             throw new InvalidOperationException("Email could not be sent. Could not parse a valid recipient address.");
         }
-    }
-
-    public static NotificationEmailModel ToNotificationEmail(this EmailMessage emailMessage,
-        string? configuredFromAddress)
-    {
-        var fromEmail = string.IsNullOrEmpty(emailMessage.From) ? configuredFromAddress : emailMessage.From;
-
-        NotificationEmailAddress? from = ToNotificationAddress(fromEmail);
-
-        return new NotificationEmailModel(
-            from,
-            GetNotificationAddresses(emailMessage.To),
-            GetNotificationAddresses(emailMessage.Cc),
-            GetNotificationAddresses(emailMessage.Bcc),
-            GetNotificationAddresses(emailMessage.ReplyTo),
-            emailMessage.Subject,
-            emailMessage.Body,
-            emailMessage.Attachments,
-            emailMessage.IsBodyHtml);
     }
 
     private static NotificationEmailAddress? ToNotificationAddress(string? address)

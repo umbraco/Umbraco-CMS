@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -24,7 +24,9 @@ internal class ContentScheduleDto
     [NullSetting(NullSetting = NullSettings.Null)] // can be invariant
     public int? LanguageId { get; set; }
 
-    [Column("date")] public DateTime Date { get; set; }
+    [Column("date")]
+    public DateTime Date { get; set; }
 
-    [Column("action")] public string? Action { get; set; }
+    [Column("action")]
+    public string? Action { get; set; }
 }

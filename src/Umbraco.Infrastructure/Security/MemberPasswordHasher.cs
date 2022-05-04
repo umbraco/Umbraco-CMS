@@ -25,7 +25,8 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
 
     [Obsolete("Use ctor with all params")]
     public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher, IJsonSerializer jsonSerializer)
-        : this(legacyPasswordHasher,
+        : this(
+            legacyPasswordHasher,
             jsonSerializer,
             StaticServiceProvider.Instance.GetRequiredService<IOptions<LegacyPasswordMigrationSettings>>(),
             StaticServiceProvider.Instance.GetRequiredService<ILogger<MemberPasswordHasher>>())
@@ -61,6 +62,7 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
 
         var isPasswordAlgorithmKnown = user.PasswordConfig.IsNullOrWhiteSpace() == false &&
                                        user.PasswordConfig != Constants.Security.UnknownPasswordConfigJson;
+
         // if there's password config use the base implementation
         if (isPasswordAlgorithmKnown)
         {
@@ -79,7 +81,6 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
 
         // Else we need to detect what the password is. This will be the case
         // for upgrades since no password config will exist.
-
         byte[]? decodedHashedPassword = null;
         var isAspNetIdentityHash = false;
 
@@ -122,37 +123,13 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
         return isValid ? PasswordVerificationResult.SuccessRehashNeeded : PasswordVerificationResult.Failed;
     }
 
-    private bool IsSuccessfulLegacyPassword(string hashedPassword, string providedPassword)
-    {
-        if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.MachineKeyDecryptionKey))
-        {
-            try
-            {
-                var decryptedPassword = DecryptLegacyPassword(hashedPassword,
-                    _legacyMachineKeySettings.Value.MachineKeyDecryption,
-                    _legacyMachineKeySettings.Value.MachineKeyDecryptionKey);
-                return decryptedPassword == providedPassword;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Could not decrypt password even that a DecryptionKey is provided. This means the DecryptionKey is wrong.");
-                return false;
-            }
-        }
-
-        var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName,
-            providedPassword, hashedPassword);
-        return result || LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
-    }
-
     private static string DecryptLegacyPassword(string encryptedPassword, string algorithmName, string decryptionKey)
     {
         SymmetricAlgorithm algorithm;
         switch (algorithmName)
         {
             case "AES":
-                algorithm = new AesCryptoServiceProvider {Key = StringToByteArray(decryptionKey), IV = new byte[16]};
+                algorithm = new AesCryptoServiceProvider { Key = StringToByteArray(decryptionKey), IV = new byte[16] };
                 break;
             default:
                 throw new NotSupportedException($"The algorithm ({algorithmName}) is not supported");
@@ -162,6 +139,33 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
         {
             return DecryptLegacyPassword(encryptedPassword, algorithm);
         }
+    }
+
+    private bool IsSuccessfulLegacyPassword(string hashedPassword, string providedPassword)
+    {
+        if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.MachineKeyDecryptionKey))
+        {
+            try
+            {
+                var decryptedPassword = DecryptLegacyPassword(
+                    hashedPassword,
+                    _legacyMachineKeySettings.Value.MachineKeyDecryption,
+                    _legacyMachineKeySettings.Value.MachineKeyDecryptionKey);
+                return decryptedPassword == providedPassword;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Could not decrypt password even that a DecryptionKey is provided. This means the DecryptionKey is wrong.");
+                return false;
+            }
+        }
+
+        var result = LegacyPasswordSecurity.VerifyPassword(
+            Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName,
+            providedPassword, hashedPassword);
+        return result || LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
     }
 
     private static string DecryptLegacyPassword(string encryptedPassword, SymmetricAlgorithm algorithm)

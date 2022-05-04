@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class BackOfficeIdentityUser : UmbracoIdentityUser
 {
-    private static readonly DelegateEqualityComparer<int[]> s_startIdsComparer = new(
+    private static readonly DelegateEqualityComparer<int[]> SStartIdsComparer = new(
         (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
         groups => groups.GetHashCode());
 
@@ -21,6 +21,15 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     private DateTime? _inviteDateUtc;
     private int[] _startContentIds;
     private int[] _startMediaIds;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BackOfficeIdentityUser" /> class.
+    /// </summary>
+    public BackOfficeIdentityUser(GlobalSettings globalSettings, int userId, IEnumerable<IReadOnlyUserGroup> groups)
+        : this(globalSettings, groups.ToArray()) =>
+
+        // use the property setters - they do more than just setting a field
+        Id = UserIdToString(userId);
 
     private BackOfficeIdentityUser(GlobalSettings globalSettings, IReadOnlyCollection<IReadOnlyUserGroup> groups)
     {
@@ -32,15 +41,8 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         SetGroups(groups);
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BackOfficeIdentityUser" /> class.
-    /// </summary>
-    public BackOfficeIdentityUser(GlobalSettings globalSettings, int userId, IEnumerable<IReadOnlyUserGroup> groups)
-        : this(globalSettings, groups.ToArray()) =>
-        // use the property setters - they do more than just setting a field
-        Id = UserIdToString(userId);
-
     public int[]? CalculatedMediaStartNodeIds { get; set; }
+
     public int[]? CalculatedContentStartNodeIds { get; set; }
 
     /// <summary>
@@ -66,7 +68,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
             }
 
             BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds),
-                s_startIdsComparer);
+                SStartIdsComparer);
         }
     }
 
@@ -84,7 +86,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
             }
 
             BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds),
-                s_startIdsComparer);
+                SStartIdsComparer);
         }
     }
 
@@ -147,9 +149,10 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
 
         var roles = new List<IdentityUserRole<string>>();
         foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
-                 {
-                     RoleId = x.Alias, UserId = Id
-                 }))
+        {
+            RoleId = x.Alias,
+            UserId = Id,
+        }))
         {
             roles.Add(identityUserRole);
         }
@@ -159,7 +162,6 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     }
 
     private static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
-
 
     private static int UserIdToInt(string? userId)
     {

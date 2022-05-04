@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -19,5 +19,6 @@ internal class UserGroup2NodePermissionDto
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUser2NodePermission_nodeId")]
     public int NodeId { get; set; }
 
-    [Column("permission")] public string? Permission { get; set; }
+    [Column("permission")]
+    public string? Permission { get; set; }
 }

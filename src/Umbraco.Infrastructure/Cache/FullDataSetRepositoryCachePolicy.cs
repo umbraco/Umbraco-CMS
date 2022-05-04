@@ -36,6 +36,24 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         _expires = expires;
     }
 
+    /// <inheritdoc />
+    public override void Create(TEntity entity, Action<TEntity> persistNew)
+    {
+        if (entity == null)
+        {
+            throw new ArgumentNullException(nameof(entity));
+        }
+
+        try
+        {
+            persistNew(entity);
+        }
+        finally
+        {
+            ClearAll();
+        }
+    }
+
     protected string GetEntityTypeCacheKey() => $"uRepo_{typeof(TEntity).Name}_";
 
     protected void InsertEntities(TEntity[]? entities)
@@ -55,7 +73,6 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         // cache as that would not be efficient for Get(id). so the DeepCloneableList is
         // set to ListCloneBehavior.CloneOnce ie it will clone *once* when inserting,
         // and then will *not* clone when retrieving.
-
         var key = GetEntityTypeCacheKey();
 
         if (_expires)
@@ -65,24 +82,6 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         else
         {
             Cache.Insert(key, () => new DeepCloneableList<TEntity>(entities));
-        }
-    }
-
-    /// <inheritdoc />
-    public override void Create(TEntity entity, Action<TEntity> persistNew)
-    {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
-
-        try
-        {
-            persistNew(entity);
-        }
-        finally
-        {
-            ClearAll();
         }
     }
 
@@ -173,6 +172,9 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         return all.Select(x => (TEntity)x.DeepClone()).ToArray();
     }
 
+    /// <inheritdoc />
+    public override void ClearAll() => Cache.Clear(GetEntityTypeCacheKey());
+
     // does NOT clone anything, so be nice with the returned values
     internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
@@ -188,7 +190,4 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         InsertEntities(entities); // may be an empty array...
         return entities ?? Enumerable.Empty<TEntity>();
     }
-
-    /// <inheritdoc />
-    public override void ClearAll() => Cache.Clear(GetEntityTypeCacheKey());
 }

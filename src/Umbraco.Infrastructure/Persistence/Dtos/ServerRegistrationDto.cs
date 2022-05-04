@@ -14,7 +14,9 @@ internal class ServerRegistrationDto
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("address")] [Length(500)] public string? ServerAddress { get; set; }
+    [Column("address")]
+    [Length(500)]
+    public string? ServerAddress { get; set; }
 
     [Column("computerName")]
     [Length(255)]
@@ -25,11 +27,13 @@ internal class ServerRegistrationDto
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime DateRegistered { get; set; }
 
-    [Column("lastNotifiedDate")] public DateTime DateAccessed { get; set; }
+    [Column("lastNotifiedDate")]
+    public DateTime DateAccessed { get; set; }
 
     [Column("isActive")]
     [Index(IndexTypes.NonClustered)]
     public bool IsActive { get; set; }
 
-    [Column("isSchedulingPublisher")] public bool IsSchedulingPublisher { get; set; }
+    [Column("isSchedulingPublisher")]
+    public bool IsSchedulingPublisher { get; set; }
 }

@@ -6,7 +6,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 /// </summary>
 public class ExternalLoginTableIndexesFixup : MigrationBase
 {
-    public ExternalLoginTableIndexesFixup(IMigrationContext context) : base(context)
+    public ExternalLoginTableIndexesFixup(IMigrationContext context)
+        : base(context)
     {
     }
 

@@ -11,7 +11,6 @@ public class PackageInstallation : IPackageInstallation
     private readonly PackageDataInstallation _packageDataInstallation;
     private readonly CompiledPackageXmlParser _parser;
 
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="PackageInstallation" /> class.
     /// </summary>
@@ -36,7 +35,7 @@ public class PackageInstallation : IPackageInstallation
     public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId,
         out PackageDefinition packageDefinition)
     {
-        packageDefinition = new PackageDefinition {Name = compiledPackage.Name};
+        packageDefinition = new PackageDefinition { Name = compiledPackage.Name };
 
         InstallationSummary installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 

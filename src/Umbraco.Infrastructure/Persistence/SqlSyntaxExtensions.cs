@@ -11,12 +11,6 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class SqlSyntaxExtensions
 {
-    private static string GetColumnName(this PropertyInfo column)
-    {
-        ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
-        return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
-    }
-
     /// <summary>
     ///     Gets a quoted table and field name.
     /// </summary>
@@ -25,7 +19,8 @@ public static class SqlSyntaxExtensions
     /// <param name="fieldSelector">An expression specifying the field.</param>
     /// <param name="tableAlias">An optional table alias.</param>
     /// <returns></returns>
-    public static string GetFieldName<TDto>(this ISqlSyntaxProvider sqlSyntax,
+    public static string GetFieldName<TDto>(
+        this ISqlSyntaxProvider sqlSyntax,
         Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
@@ -35,5 +30,11 @@ public static class SqlSyntaxExtensions
         var tableName = tableAlias ?? type.GetTableName();
 
         return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
+    }
+
+    private static string GetColumnName(this PropertyInfo column)
+    {
+        ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
+        return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
     }
 }

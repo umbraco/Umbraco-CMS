@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
 
@@ -15,7 +15,6 @@ public class RenameUserLoginDtoDateIndex : MigrationBase
         // different names depending on which migration path was followed,
         // and discrepancies between an upgraded or an installed database.
         // better normalize
-
         if (IndexExists("IX_umbracoUserLogin_lastValidatedUtc"))
         {
             return;

@@ -175,13 +175,13 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
         builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
-            new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>())
-        );
+            new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
         {
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
             IUmbracoContext umbracoContext = umbCtx.GetRequiredUmbracoContext();
-            return new PublishedContentQuery(umbracoContext.PublishedSnapshot,
+            return new PublishedContentQuery(
+                umbracoContext.PublishedSnapshot,
                 factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
         });
 
@@ -207,6 +207,21 @@ public static partial class UmbracoBuilderExtensions
 
         // Services required to run background jobs (with out the handler)
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
+        builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
+        builder.SetLogViewer<SerilogJsonLogViewer>();
+        builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(
+            factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
+            factory.GetRequiredService<ILogViewerConfig>(),
+            factory.GetRequiredService<ILoggingConfiguration>(),
+            factory.GetRequiredService<ILogLevelLoader>(),
+            Log.Logger));
+
         return builder;
     }
 
@@ -252,12 +267,14 @@ public static partial class UmbracoBuilderExtensions
                         npocoMappers);
 
                 case "MainDomSemaphoreLock":
-                    return new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(),
+                    return new MainDomSemaphoreLock(
+                        loggerFactory.CreateLogger<MainDomSemaphoreLock>(),
                         hostingEnvironment);
 
                 case "FileSystemMainDomLock":
                 default:
-                    return new FileSystemMainDomLock(loggerFactory.CreateLogger<FileSystemMainDomLock>(),
+                    return new FileSystemMainDomLock(
+                        loggerFactory.CreateLogger<FileSystemMainDomLock>(),
                         mainDomKeyGenerator, hostingEnvironment,
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
@@ -265,7 +282,6 @@ public static partial class UmbracoBuilderExtensions
 
         return builder;
     }
-
 
     private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
     {
@@ -281,21 +297,6 @@ public static partial class UmbracoBuilderExtensions
             .Append<DropDownFlexiblePreValueMigrator>()
             .Append<ValueListPreValueMigrator>()
             .Append<MarkdownEditorPreValueMigrator>();
-
-        return builder;
-    }
-
-    public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
-        builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
-        builder.SetLogViewer<SerilogJsonLogViewer>();
-        builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(
-            factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
-            factory.GetRequiredService<ILogViewerConfig>(),
-            factory.GetRequiredService<ILoggingConfiguration>(),
-            factory.GetRequiredService<ILogLevelLoader>(),
-            Log.Logger));
 
         return builder;
     }
@@ -381,6 +382,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MemberTypeChangedNotification, DistributedCacheBinder>()
             .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>()
             ;
+
         // add notification handlers for auditing
         builder
             .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()

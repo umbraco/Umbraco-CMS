@@ -11,7 +11,9 @@ public class LanguageTextDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryValue;
 
-    [Column("pk")] [PrimaryKeyColumn] public int PrimaryKey { get; set; }
+    [Column("pk")]
+    [PrimaryKeyColumn]
+    public int PrimaryKey { get; set; }
 
     [Column("languageId")]
     [ForeignKey(typeof(LanguageDto), Column = "id")]
@@ -22,5 +24,7 @@ public class LanguageTextDto
     [ForeignKey(typeof(DictionaryDto), Column = "id")]
     public Guid UniqueId { get; set; }
 
-    [Column("value")] [Length(1000)] public string Value { get; set; } = null!;
+    [Column("value")]
+    [Length(1000)]
+    public string Value { get; set; } = null!;
 }

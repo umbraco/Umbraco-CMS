@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -60,7 +60,7 @@ public class CreateIndexBuilder : ExpressionBuilderBase<CreateIndexExpression>,
     /// <inheritdoc />
     public ICreateIndexColumnOptionsBuilder OnColumn(string columnName)
     {
-        CurrentColumn = new IndexColumnDefinition {Name = columnName};
+        CurrentColumn = new IndexColumnDefinition { Name = columnName };
         Expression.Index.Columns.Add(CurrentColumn);
         return this;
     }

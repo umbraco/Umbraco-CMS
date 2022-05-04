@@ -48,16 +48,16 @@ internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStyl
         // content will be lazy-loaded when required
         DateTime created = FileSystem.GetCreated(path).UtcDateTime;
         DateTime updated = FileSystem.GetLastModified(path).UtcDateTime;
-        //var content = GetFileContent(path);
 
+        // var content = GetFileContent(path);
         var stylesheet = new Stylesheet(path, file => GetFileContent(file.OriginalPath))
         {
-            //Content = content,
+            // Content = content,
             Key = path.EncodeAsGuid(),
             CreateDate = created,
             UpdateDate = updated,
             Id = path.GetHashCode(),
-            VirtualPath = FileSystem.GetUrl(path)
+            VirtualPath = FileSystem.GetUrl(path),
         };
 
         // reset dirty initial properties (U4-1946)
@@ -82,7 +82,7 @@ internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStyl
 
     public override IEnumerable<IStylesheet> GetMany(params string[]? ids)
     {
-        //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
+        // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
         ids = ids?
             .Select(x => x.EnsureEndsWith(".css"))
             .Distinct()
@@ -101,7 +101,7 @@ internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStyl
         }
         else
         {
-            IEnumerable<string> files = FindAllFiles("", "*.css");
+            IEnumerable<string> files = FindAllFiles(string.Empty, "*.css");
             foreach (var file in files)
             {
                 IStylesheet? stylesheet = Get(file);

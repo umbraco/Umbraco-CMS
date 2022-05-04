@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
@@ -44,6 +44,7 @@ internal class MigrationContext : IMigrationContext
     /// <inheritdoc />
     public void AddPostMigration<TMigration>()
         where TMigration : MigrationBase =>
+
         // just adding - will be de-duplicated when executing
         _postMigrations.Add(typeof(TMigration));
 }

@@ -10,7 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Logging.Viewer;
 /// </summary>
 public class SerilogLegacyNameResolver : StaticMemberNameResolver
 {
-    public SerilogLegacyNameResolver(Type type) : base(type)
+    public SerilogLegacyNameResolver(Type type)
+        : base(type)
     {
     }
 
@@ -29,7 +30,7 @@ public class SerilogLegacyNameResolver : StaticMemberNameResolver
             "MessageTemplate" => "mt",
             "Properties" => "p",
             "Timestamp" => "t",
-            _ => null
+            _ => null,
         };
 
         return target != null;

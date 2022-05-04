@@ -101,9 +101,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase
                         Target = dto.Target,
                         Type = type,
                         Udi = dto.Udi,
-                        Url = url + dto.QueryString
-                    }
-                );
+                        Url = url + dto.QueryString,
+                    });
             }
 
             if (maxNumber == 1)

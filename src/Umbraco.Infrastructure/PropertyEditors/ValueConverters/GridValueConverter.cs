@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     This ensures that the grid config is merged in with the front-end value
 /// </summary>
-[DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
+[DefaultPropertyValueConverter(typeof(JsonValueConverter))] // this shadows the JsonValueConverter
 public class GridValueConverter : JsonValueConverter
 {
     private readonly IGridConfig _config;
@@ -48,9 +48,8 @@ public class GridValueConverter : JsonValueConverter
             {
                 JObject? obj = JsonConvert.DeserializeObject<JObject>(sourceString);
 
-                //so we have the grid json... we need to merge in the grid's configuration values with the values
+                // so we have the grid json... we need to merge in the grid's configuration values with the values
                 // we've saved in the database so that when the front end gets this value, it is up-to-date.
-
                 JArray sections = GetArray(obj!, "sections");
                 foreach (JObject? section in sections.Cast<JObject>())
                 {
@@ -69,20 +68,21 @@ public class GridValueConverter : JsonValueConverter
                                     var alias = editor.Value<string>("alias");
                                     if (alias.IsNullOrWhiteSpace() == false)
                                     {
-                                        //find the alias in config
+                                        // find the alias in config
                                         IGridEditorConfig? found =
                                             _config.EditorsConfig.Editors.FirstOrDefault(x => x.Alias == alias);
                                         if (found != null)
                                         {
-                                            //add/replace the editor value with the one from config
-
-                                            var serialized = new JObject();
-                                            serialized["name"] = found.Name;
-                                            serialized["alias"] = found.Alias;
-                                            serialized["view"] = found.View;
-                                            serialized["render"] = found.Render;
-                                            serialized["icon"] = found.Icon;
-                                            serialized["config"] = JObject.FromObject(found.Config);
+                                            // add/replace the editor value with the one from config
+                                            var serialized = new JObject
+                                            {
+                                                ["name"] = found.Name,
+                                                ["alias"] = found.Alias,
+                                                ["view"] = found.View,
+                                                ["render"] = found.Render,
+                                                ["icon"] = found.Icon,
+                                                ["config"] = JObject.FromObject(found.Config),
+                                            };
 
                                             control["editor"] = serialized;
                                         }
@@ -97,19 +97,19 @@ public class GridValueConverter : JsonValueConverter
             }
             catch (Exception ex)
             {
-                StaticApplicationLogging.Logger.LogError(ex,
+                StaticApplicationLogging.Logger.LogError(
+                    ex,
                     "Could not parse the string '{JsonString}' to a json object", sourceString);
             }
         }
 
-        //it's not json, just return the string
+        // it's not json, just return the string
         return sourceString;
     }
 
     private JArray GetArray(JObject obj, string propertyName)
     {
-        JToken? token;
-        if (obj.TryGetValue(propertyName, out token))
+        if (obj.TryGetValue(propertyName, out JToken? token))
         {
             var asArray = token as JArray;
             return asArray ?? new JArray();

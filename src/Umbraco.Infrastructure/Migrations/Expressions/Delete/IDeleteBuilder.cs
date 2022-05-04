@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Column;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Constraint;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data;

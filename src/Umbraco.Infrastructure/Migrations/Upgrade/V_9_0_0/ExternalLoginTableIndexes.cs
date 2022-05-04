@@ -19,6 +19,7 @@ public class ExternalLoginTableIndexes : MigrationBase
             .ToList();
 
         var toDelete = new List<int>();
+
         // used to track duplicates so they can be removed
         var keys = new HashSet<(string, string)>();
         foreach (ExternalLoginTokenTable.LegacyExternalLoginDto login in logins)

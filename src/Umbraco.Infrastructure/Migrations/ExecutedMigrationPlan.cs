@@ -10,6 +10,8 @@ public class ExecutedMigrationPlan
     }
 
     public MigrationPlan Plan { get; }
+
     public string InitialState { get; }
+
     public string FinalState { get; }
 }

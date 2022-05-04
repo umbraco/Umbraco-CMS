@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
 /// <summary>
 ///     A retry strategy with a specified number of retry attempts and an incremental time interval between retries.
@@ -63,10 +63,9 @@ public class Incremental : RetryStrategy
     public Incremental(string? name, int retryCount, TimeSpan initialInterval, TimeSpan increment, bool firstFastRetry)
         : base(name, firstFastRetry)
     {
-        //Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
-        //Guard.ArgumentNotNegativeValue(initialInterval.Ticks, "initialInterval");
-        //Guard.ArgumentNotNegativeValue(increment.Ticks, "increment");
-
+        // Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
+        // Guard.ArgumentNotNegativeValue(initialInterval.Ticks, "initialInterval");
+        // Guard.ArgumentNotNegativeValue(increment.Ticks, "increment");
         this.retryCount = retryCount;
         this.initialInterval = initialInterval;
         this.increment = increment;

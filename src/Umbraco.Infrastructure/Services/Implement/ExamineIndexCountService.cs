@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;

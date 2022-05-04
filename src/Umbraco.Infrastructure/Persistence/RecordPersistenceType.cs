@@ -1,8 +1,8 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence;
+namespace Umbraco.Cms.Infrastructure.Persistence;
 
 public enum RecordPersistenceType
 {
     Insert,
     Update,
-    Delete
+    Delete,
 }

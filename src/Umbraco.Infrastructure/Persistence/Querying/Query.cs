@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq.Expressions;
 using System.Text;
 using NPoco;
@@ -45,7 +45,7 @@ public class Query<T> : IQuery<T>
 
         var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
         var whereExpression = expressionHelper.Visit(fieldSelector);
-        _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] {new {values}}));
+        _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { values } }));
         return this;
     }
 

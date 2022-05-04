@@ -25,8 +25,7 @@ public class MultipleValueEditor : DataValueEditor
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        DataEditorAttribute attribute
-    )
+        DataEditorAttribute attribute)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
     }
@@ -60,8 +59,7 @@ public class MultipleValueEditor : DataValueEditor
     /// <returns></returns>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        var json = editorValue.Value as JArray;
-        if (json == null || json.HasValues == false)
+        if (editorValue.Value is not JArray json || json.HasValues == false)
         {
             return null;
         }

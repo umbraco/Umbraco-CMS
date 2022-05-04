@@ -33,6 +33,11 @@ public sealed class UmbracoServices
         _shortStringHelper = shortStringHelper;
     }
 
+    public static string GetClrName(IShortStringHelper shortStringHelper, string? name, string alias) =>
+
+        // ModelsBuilder's legacy - but not ideal
+        alias.ToCleanString(shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);
+
     #region Services
 
     public IList<TypeModel> GetAllTypes()
@@ -43,11 +48,14 @@ public sealed class UmbracoServices
         // down startup time ... BUT these queries are also used in NuCache on startup so we can't really avoid them. Maybe one day we can
         // load all of these in in one query and still have them cached per service, and/or somehow improve the perf of these since they are used on startup
         // in more than one place.
-        types.AddRange(GetTypes(PublishedItemType.Content,
+        types.AddRange(GetTypes(
+            PublishedItemType.Content,
             _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
-        types.AddRange(GetTypes(PublishedItemType.Media,
+        types.AddRange(GetTypes(
+            PublishedItemType.Media,
             _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
-        types.AddRange(GetTypes(PublishedItemType.Member,
+        types.AddRange(GetTypes(
+            PublishedItemType.Member,
             _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
 
         return EnsureDistinctAliases(types);
@@ -71,9 +79,18 @@ public sealed class UmbracoServices
         return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
     }
 
-    public static string GetClrName(IShortStringHelper shortStringHelper, string? name, string alias) =>
-        // ModelsBuilder's legacy - but not ideal
-        alias.ToCleanString(shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);
+    internal static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
+    {
+        IEnumerable<IGrouping<string, TypeModel>> groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
+        foreach (IGrouping<string, TypeModel> group in groups.Where(x => x.Count() > 1))
+        {
+            throw new NotSupportedException($"Alias \"{group.Key}\" is used by types"
+                                            + $" {string.Join(", ", group.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Aliases have to be unique."
+                                            + " One of the aliases must be modified in order to use the ModelsBuilder.");
+        }
+
+        return typeModels;
+    }
 
     private IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeComposition[] contentTypes)
     {
@@ -90,7 +107,7 @@ public sealed class UmbracoServices
                 ClrName = GetClrName(_shortStringHelper, contentType.Name, contentType.Alias),
                 ParentId = contentType.ParentId,
                 Name = contentType.Name,
-                Description = contentType.Description
+                Description = contentType.Description,
             };
 
             // of course this should never happen, but when it happens, better detect it
@@ -121,7 +138,8 @@ public sealed class UmbracoServices
                         : TypeModel.ItemTypes.Member;
                     break;
                 default:
-                    throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".",
+                    throw new InvalidOperationException(string.Format(
+                        "Unsupported PublishedItemType \"{0}\".",
                         itemType));
             }
 
@@ -134,7 +152,7 @@ public sealed class UmbracoServices
                     Alias = propertyType.Alias,
                     ClrName = GetClrName(_shortStringHelper, propertyType.Name, propertyType.Alias),
                     Name = propertyType.Name,
-                    Description = propertyType.Description
+                    Description = propertyType.Description,
                 };
 
                 IPublishedPropertyType? publishedPropertyType =
@@ -155,6 +173,7 @@ public sealed class UmbracoServices
         foreach (TypeModel typeModel in typeModels.Where(x => x.ParentId > 0))
         {
             typeModel.BaseType = typeModels.SingleOrDefault(x => x.Id == typeModel.ParentId);
+
             // Umbraco 7.4 introduces content types containers, so even though ParentId > 0, the parent might
             // not be a content type - here we assume that BaseType being null while ParentId > 0 means that
             // the parent is a container (and we don't check).
@@ -171,24 +190,22 @@ public sealed class UmbracoServices
             }
 
             IEnumerable<IContentTypeComposition> compositionTypes;
-            var contentTypeAsMedia = contentType as IMediaType;
-            var contentTypeAsContent = contentType as IContentType;
-            var contentTypeAsMember = contentType as IMemberType;
-            if (contentTypeAsMedia != null)
+            if (contentType is IMediaType contentTypeAsMedia)
             {
                 compositionTypes = contentTypeAsMedia.ContentTypeComposition;
             }
-            else if (contentTypeAsContent != null)
+            else if (contentType is IContentType contentTypeAsContent)
             {
                 compositionTypes = contentTypeAsContent.ContentTypeComposition;
             }
-            else if (contentTypeAsMember != null)
+            else if (contentType is IMemberType contentTypeAsMember)
             {
                 compositionTypes = contentTypeAsMember.ContentTypeComposition;
             }
             else
             {
-                throw new PanicException(string.Format("Panic: unsupported type \"{0}\".",
+                throw new PanicException(string.Format(
+                    "Panic: unsupported type \"{0}\".",
                     contentType.GetType().FullName));
             }
 
@@ -215,19 +232,6 @@ public sealed class UmbracoServices
                     compositionModel.IsMixin = true;
                 }
             }
-        }
-
-        return typeModels;
-    }
-
-    internal static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
-    {
-        IEnumerable<IGrouping<string, TypeModel>> groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
-        foreach (IGrouping<string, TypeModel> group in groups.Where(x => x.Count() > 1))
-        {
-            throw new NotSupportedException($"Alias \"{group.Key}\" is used by types"
-                                            + $" {string.Join(", ", group.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Aliases have to be unique."
-                                            + " One of the aliases must be modified in order to use the ModelsBuilder.");
         }
 
         return typeModels;

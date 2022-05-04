@@ -10,7 +10,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
-[InstallSetupStep(InstallationType.NewInstall,
+[InstallSetupStep(
+    InstallationType.NewInstall,
     "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website",
     PerformsAppRestart = true)]
 public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
@@ -41,11 +42,11 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
-            return new {databases = options};
+            return new { databases = options };
         }
     }
 
-    public override string View => ShouldDisplayView() ? base.View : "";
+    public override string View => ShouldDisplayView() ? base.View : string.Empty;
 
     public override Task<InstallSetupResult?> ExecuteAsync(DatabaseModel databaseSettings)
     {
@@ -61,14 +62,14 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
 
     private bool ShouldDisplayView()
     {
-        //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
+        // If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
         ConnectionStrings? databaseSettings = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
 
         if (databaseSettings.IsConnectionStringConfigured())
         {
             try
             {
-                //Since a connection string was present we verify the db can connect and query
+                // Since a connection string was present we verify the db can connect and query
                 _ = _databaseBuilder.ValidateSchema();
 
                 return false;
@@ -76,7 +77,8 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred, reconfiguring...");
-                //something went wrong, could not connect so probably need to reconfigure
+
+                // something went wrong, could not connect so probably need to reconfigure
                 return true;
             }
         }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
@@ -24,7 +24,8 @@ public class DeleteForeignKeyExpression : MigrationExpressionBase
                 $"FK_{ForeignKey.ForeignTable}_{ForeignKey.PrimaryTable}_{ForeignKey.PrimaryColumns.First()}";
         }
 
-        return string.Format(SqlSyntax.DeleteConstraint,
+        return string.Format(
+            SqlSyntax.DeleteConstraint,
             SqlSyntax.GetQuotedTableName(ForeignKey.ForeignTable),
             SqlSyntax.GetQuotedName(ForeignKey.Name));
     }

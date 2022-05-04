@@ -13,7 +13,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
-[InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
+[InstallSetupStep(
+    InstallationType.Upgrade | InstallationType.NewInstall,
     "DatabaseUpgrade", 12, "")]
 public class DatabaseUpgradeStep : InstallSetupStep<object>
 {
@@ -63,14 +64,15 @@ public class DatabaseUpgradeStep : InstallSetupStep<object>
 
     public override bool RequiresExecution(object model)
     {
-        //if it's properly configured (i.e. the versions match) then no upgrade necessary
+        // if it's properly configured (i.e. the versions match) then no upgrade necessary
         if (_runtime.Level == RuntimeLevel.Run)
         {
             return false;
         }
 
         InstallTrackingItem[] installSteps = InstallStatusTracker.GetStatus().ToArray();
-        //this step relies on the previous one completed - because it has stored some information we need
+
+        // this step relies on the previous one completed - because it has stored some information we need
         if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
         {
             return false;
@@ -86,7 +88,7 @@ public class DatabaseUpgradeStep : InstallSetupStep<object>
             return result?.DetermineHasInstalledVersion() ?? false;
         }
 
-        //no connection string configured, probably a fresh install
+        // no connection string configured, probably a fresh install
         return false;
     }
 }

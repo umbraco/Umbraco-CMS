@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
 ///     Specifies the type of base query.
@@ -23,5 +23,5 @@ public enum QueryType
     /// <summary>
     ///     Count items.
     /// </summary>
-    Count
+    Count,
 }

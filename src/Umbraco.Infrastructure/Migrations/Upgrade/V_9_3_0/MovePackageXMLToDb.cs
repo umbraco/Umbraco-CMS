@@ -19,6 +19,13 @@ public class MovePackageXMLToDb : MigrationBase
         _xmlParser = new PackageDefinitionXmlParser();
     }
 
+    /// <inheritdoc />
+    protected override void Migrate()
+    {
+        CreateDatabaseTable();
+        MigrateCreatedPackageFilesToDb();
+    }
+
     private void CreateDatabaseTable()
     {
         // Add CreatedPackage table in database if it doesn't exist
@@ -42,7 +49,7 @@ public class MovePackageXMLToDb : MigrationBase
                 Name = package.Name,
                 Value = _xmlParser.ToXml(package).ToString(),
                 UpdateDate = DateTime.Now,
-                PackageId = Guid.NewGuid()
+                PackageId = Guid.NewGuid(),
             };
             createdPackageDtos.Add(dto);
         }
@@ -53,12 +60,5 @@ public class MovePackageXMLToDb : MigrationBase
             // Insert dto into CreatedPackage table
             Database.InsertBulk(createdPackageDtos);
         }
-    }
-
-    /// <inheritdoc />
-    protected override void Migrate()
-    {
-        CreateDatabaseTable();
-        MigrateCreatedPackageFilesToDb();
     }
 }

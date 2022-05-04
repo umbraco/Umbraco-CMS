@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
@@ -15,7 +15,8 @@ public class DeleteIndexExpression : MigrationExpressionBase
     public IndexDefinition Index { get; }
 
     protected override string GetSql() =>
-        string.Format(SqlSyntax.DropIndex,
+        string.Format(
+            SqlSyntax.DropIndex,
             SqlSyntax.GetQuotedName(Index.Name),
             SqlSyntax.GetQuotedTableName(Index.TableName));
 }

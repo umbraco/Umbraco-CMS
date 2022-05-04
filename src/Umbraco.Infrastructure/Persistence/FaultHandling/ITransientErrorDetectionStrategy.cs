@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 
 /// <summary>
 ///     Defines an interface which must be implemented by custom components responsible for detecting specific transient

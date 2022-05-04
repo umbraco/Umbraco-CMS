@@ -38,9 +38,18 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
+
         // because that version of RTE converter parses {locallink} and executes macros, its value has
         // to be cached at the published snapshot level, because we have no idea what the macros may depend on actually.
         PropertyCacheLevel.Snapshot;
+
+    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
+        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        var converted = Convert(inter, preview);
+
+        return new HtmlEncodedString(converted ?? string.Empty);
+    }
 
     // NOT thread-safe over a request because it modifies the
     // global UmbracoContext.Current.InPreviewMode status. So it
@@ -55,25 +64,20 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter
 
             MacroTagParser.ParseMacros(
                 source,
-                //callback for when text block is found
+
+                // callback for when text block is found
                 textBlock => sb.Append(textBlock),
-                //callback for when macro syntax is found
+
+                // callback for when macro syntax is found
                 (macroAlias, macroAttributes) => sb.Append(_macroRenderer.RenderAsync(
                     macroAlias,
                     umbracoContext.PublishedRequest?.PublishedContent,
-                    //needs to be explicitly casted to Dictionary<string, object>
+
+                    // needs to be explicitly casted to Dictionary<string, object>
                     macroAttributes.ConvertTo(x => (string)x, x => x)!).GetAwaiter().GetResult().Text));
 
             return sb.ToString();
         }
-    }
-
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-    {
-        var converted = Convert(inter, preview);
-
-        return new HtmlEncodedString(converted == null ? string.Empty : converted);
     }
 
     private string? Convert(object? source, bool preview)

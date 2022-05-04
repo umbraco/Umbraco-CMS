@@ -1,4 +1,4 @@
-﻿using Serilog.Core;
+using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Extensions;
@@ -35,8 +35,7 @@ public class HttpRequestIdEnricher : ILogEventEnricher
             throw new ArgumentNullException(nameof(logEvent));
         }
 
-        Guid? requestId;
-        if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId, _requestCache))
+        if (!LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? requestId, _requestCache))
         {
             return;
         }

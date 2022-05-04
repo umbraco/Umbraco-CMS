@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 

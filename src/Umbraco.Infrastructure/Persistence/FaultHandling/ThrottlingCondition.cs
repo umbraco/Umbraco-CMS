@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
@@ -35,7 +35,7 @@ public enum ThrottlingMode
     /// <summary>
     ///     Corresponds to an unknown throttling mode whereby throttling mode cannot be determined with certainty.
     /// </summary>
-    Unknown = -1
+    Unknown = -1,
 }
 
 /// <summary>
@@ -67,7 +67,7 @@ public enum ThrottlingType
     ///     Corresponds to an unknown throttling type in the event when the throttling type cannot be determined with
     ///     certainty.
     /// </summary>
-    Unknown = 3
+    Unknown = 3,
 }
 
 /// <summary>
@@ -118,7 +118,7 @@ public enum ThrottledResourceType
     /// <summary>
     ///     Corresponds to an unknown resource type in the event when the actual resource cannot be determined with certainty.
     /// </summary>
-    Unknown = -1
+    Unknown = -1,
 }
 
 /// <summary>
@@ -136,7 +136,7 @@ public class ThrottlingCondition
     /// <summary>
     ///     Provides a compiled regular expression used for extracting the reason code from the error message.
     /// </summary>
-    private static readonly Regex sqlErrorCodeRegEx =
+    private static readonly Regex SqlErrorCodeRegEx =
         new(@"Code:\s*(\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
@@ -153,8 +153,9 @@ public class ThrottlingCondition
     {
         get
         {
-            var unknownCondition = new ThrottlingCondition {ThrottlingMode = ThrottlingMode.Unknown};
-            unknownCondition.throttledResources.Add(Tuple.Create(ThrottledResourceType.Unknown,
+            var unknownCondition = new ThrottlingCondition { ThrottlingMode = ThrottlingMode.Unknown };
+            unknownCondition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.Unknown,
                 ThrottlingType.Unknown));
 
             return unknownCondition;
@@ -255,11 +256,10 @@ public class ThrottlingCondition
     {
         if (error != null)
         {
-            Match match = sqlErrorCodeRegEx.Match(error.Message);
-            int reasonCode;
+            Match match = SqlErrorCodeRegEx.Match(error.Message);
 
             if (match.Success && int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture,
-                    out reasonCode))
+                    out int reasonCode))
             {
                 return FromReasonCode(reasonCode);
             }
@@ -286,29 +286,38 @@ public class ThrottlingCondition
             // Decode throttling mode from the last 2 bits.
             var throttlingMode = (ThrottlingMode)(reasonCode & 3);
 
-            var condition = new ThrottlingCondition {ThrottlingMode = throttlingMode};
+            var condition = new ThrottlingCondition { ThrottlingMode = throttlingMode };
 
             // Shift 8 bits to truncate throttling mode.
             var groupCode = reasonCode >> 8;
 
             // Determine throttling type for all well-known resources that may be subject to throttling conditions.
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.PhysicalDatabaseSpace,
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.PhysicalDatabaseSpace,
                 (ThrottlingType)(groupCode & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.PhysicalLogSpace,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.LogWriteIoDelay,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.DataReadIoDelay,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.Cpu,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.DatabaseSize,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.WorkerThreads,
-                (ThrottlingType)((groupCode = groupCode >> 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal,
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.PhysicalLogSpace,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.LogWriteIoDelay,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.DataReadIoDelay,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.Cpu,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.DatabaseSize,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.Internal,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.WorkerThreads,
+                (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition.throttledResources.Add(Tuple.Create(
+                ThrottledResourceType.Internal,
                 (ThrottlingType)((groupCode >> 2) & 3)));
 
             return condition;

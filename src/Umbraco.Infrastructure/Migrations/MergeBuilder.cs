@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations;
+namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <summary>
 ///     Represents a migration plan builder for merges.

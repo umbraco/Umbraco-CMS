@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -45,7 +45,6 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         // parameter editors are IDataEditor[] - both will end up here because we handle
         // IDataEditor and IConfiguredDataEditor implements it, but we can check the
         // type to figure out what to create
-
         EditorType type = EditorType.PropertyValue;
 
         var isPropertyEditor = path.StartsWith("propertyEditors[");
@@ -72,7 +71,6 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
     protected override void Deserialize(JObject jobject, IDataEditor target, JsonSerializer serializer)
     {
         // see Create above, target is either DataEditor (parameter) or ConfiguredDataEditor (property)
-
         if (!(target is DataEditor dataEditor))
         {
             throw new Exception("panic.");
@@ -88,6 +86,21 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         }
 
         base.Deserialize(jobject, target, serializer);
+    }
+
+    private static JArray RewriteValidators(JObject validation)
+    {
+        var jarray = new JArray();
+
+        foreach (KeyValuePair<string, JToken?> v in validation)
+        {
+            var key = v.Key;
+            JToken? val = v.Value;
+            var jo = new JObject { { "type", key }, { "configuration", val } };
+            jarray.Add(jo);
+        }
+
+        return jarray;
     }
 
     private void PrepareForPropertyEditor(JObject jobject, DataEditor target)
@@ -132,6 +145,7 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
             if (prevalues != null)
             {
                 config = prevalues;
+
                 // see note about validators, above - same applies to field validators
                 if (config["fields"] is JArray jarray)
                 {
@@ -180,14 +194,13 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         //
         // the view is at top level, but should be down one level to be properly
         // deserialized as a ParameterValueEditor property -> need to move it
-
         if (jobject.Property("view") != null)
         {
             // explicitly assign a value editor of type ParameterValueEditor
             target.ExplicitValueEditor = new DataValueEditor(_textService, _shortStringHelper, _jsonSerializer);
 
             // move the 'view' property
-            jobject["editor"] = new JObject {["view"] = jobject["view"]};
+            jobject["editor"] = new JObject { ["view"] = jobject["view"] };
             jobject.Property("view")?.Remove();
         }
 
@@ -203,20 +216,5 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         {
             jobject["editor"]!["view"] = RewriteVirtualUrl(view);
         }
-    }
-
-    private static JArray RewriteValidators(JObject validation)
-    {
-        var jarray = new JArray();
-
-        foreach (KeyValuePair<string, JToken?> v in validation)
-        {
-            var key = v.Key;
-            JToken? val = v.Value;
-            var jo = new JObject {{"type", key}, {"configuration", val}};
-            jarray.Add(jo);
-        }
-
-        return jarray;
     }
 }

@@ -45,9 +45,11 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
                 IEnumerable<IMemberGroup>? result = Get(qry);
                 return result?.FirstOrDefault();
             },
-            //cache for 5 mins since that is the default in the Runtime app cache
+
+            // cache for 5 mins since that is the default in the Runtime app cache
             TimeSpan.FromMinutes(5),
-            //sliding is true
+
+            // sliding is true
             true);
 
     public IMemberGroup? CreateIfNotExists(string roleName)
@@ -60,7 +62,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             return null;
         }
 
-        var grp = new MemberGroup {Name = roleName};
+        var grp = new MemberGroup { Name = roleName };
         PersistNewItem(grp);
 
         EventMessages evtMsgs = _eventMessagesFactory.Get();
@@ -98,14 +100,13 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             .On("cmsMember2MemberGroup.MemberGroup = un.id")
             .InnerJoin("cmsMember")
             .On("cmsMember.nodeId = cmsMember2MemberGroup.Member")
-            .Where("un.nodeObjectType=@objectType", new {objectType = NodeObjectTypeId})
-            .Where("cmsMember.LoginName=@loginName", new {loginName = username});
+            .Where("un.nodeObjectType=@objectType", new { objectType = NodeObjectTypeId })
+            .Where("cmsMember.LoginName=@loginName", new { loginName = username });
 
         return Database.Fetch<NodeDto>(sql)
             .DistinctBy(dto => dto.NodeId)
             .Select(x => MemberGroupFactory.BuildEntity(x));
     }
-
 
     public void ReplaceRoles(int[] memberIds, string[] roleNames) => AssignRolesInternal(memberIds, roleNames, true);
 
@@ -116,7 +117,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
     protected override IMemberGroup? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new {id});
+        sql.Where(GetBaseWhereClause(), new { id });
 
         NodeDto? dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
@@ -173,24 +174,25 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
             "DELETE FROM umbracoRelation WHERE parentId = @id", "DELETE FROM umbracoRelation WHERE childId = @id",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM cmsMember2MemberGroup WHERE MemberGroup = @id", "DELETE FROM umbracoNode WHERE id = @id"
+            "DELETE FROM cmsMember2MemberGroup WHERE MemberGroup = @id", "DELETE FROM umbracoNode WHERE id = @id",
         };
         return list;
     }
 
     protected override void PersistNewItem(IMemberGroup entity)
     {
-        //Save to db
+        // Save to db
         entity.AddingEntity();
         var group = (MemberGroup)entity;
         NodeDto dto = MemberGroupFactory.BuildDto(group);
         var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
-        group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
+        group.Id = dto.NodeId; // Set Id on entity to ensure an Id is set
 
-        //Update with new correct path and id
+        // Update with new correct path and id
         dto.Path = string.Concat("-1,", dto.NodeId);
         Database.Update(dto);
-        //assign to entity
+
+        // assign to entity
         group.Id = o;
         group.ResetDirtyProperties();
     }
@@ -206,19 +208,18 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
 
     private void AssignRolesInternal(int[] memberIds, string[] roleNames, bool replace = false)
     {
-        //ensure they're unique
+        // ensure they're unique
         memberIds = memberIds.Distinct().ToArray();
 
-        //create the missing roles first
-
+        // create the missing roles first
         Sql<ISqlContext> existingSql = Sql()
             .SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-            .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new {names = roleNames});
+            .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
         IEnumerable<string?> existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
         IEnumerable<string?> missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
-        MemberGroup[] missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
+        MemberGroup[] missingGroups = missingRoles.Select(x => new MemberGroup { Name = x }).ToArray();
 
         EventMessages evtMsgs = _eventMessagesFactory.Get();
         if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(missingGroups, evtMsgs)))
@@ -233,7 +234,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
 
         AmbientScope.Notifications.Publish(new MemberGroupSavedNotification(missingGroups, evtMsgs));
 
-        //now go get all the dto's for roles with these role names
+        // now go get all the dto's for roles with these role names
         var rolesForNames = Database.Fetch<NodeDto>(existingSql)
             .ToDictionary(x => x.Text!, StringComparer.InvariantCultureIgnoreCase);
 
@@ -241,14 +242,13 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
         if (replace)
         {
             // delete all assigned groups first
-            Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds)", new {memberIds});
+            Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds)", new { memberIds });
 
             currentlyAssigned = Array.Empty<AssignedRolesDto>();
         }
         else
         {
-            //get the groups that are currently assigned to any of these members
-
+            // get the groups that are currently assigned to any of these members
             Sql<ISqlContext> assignedSql = Sql()
                 .Select(
                     $"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
@@ -261,12 +261,11 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
         }
 
-        //assign the roles for each member id
-
+        // assign the roles for each member id
         foreach (var memberId in memberIds)
         {
-            //find any roles for the current member that are currently assigned that
-            //exist in the roleNames list, then determine which ones are not currently assigned.
+            // find any roles for the current member that are currently assigned that
+            // exist in the roleNames list, then determine which ones are not currently assigned.
             var mId = memberId;
             AssignedRolesDto[] found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
             IEnumerable<string?> assignedRoles = found
@@ -276,7 +275,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
                 roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
 
             IEnumerable<Member2MemberGroupDto> dtos = nonAssignedRoles
-                .Select(x => new Member2MemberGroupDto {Member = mId, MemberGroup = rolesForNames[x!].NodeId});
+                .Select(x => new Member2MemberGroupDto { Member = mId, MemberGroup = rolesForNames[x!].NodeId });
 
             Database.InsertBulk(dtos);
         }
@@ -288,7 +287,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             .SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-            .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new {names = roleNames});
+            .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
         var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
 
         Database.Execute(
@@ -296,16 +295,20 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             new
             {
                 /*memberIds =*/
-                memberIds, memberGroups = existingRolesIds
+                memberIds,
+                memberGroups = existingRolesIds,
             });
     }
 
     private class AssignedRolesDto
     {
-        [Column("text")] public string? RoleName { get; set; }
+        [Column("text")]
+        public string? RoleName { get; set; }
 
-        [Column("Member")] public int MemberId { get; set; }
+        [Column("Member")]
+        public int MemberId { get; set; }
 
-        [Column("MemberGroup")] public int MemberGroupId { get; set; }
+        [Column("MemberGroup")]
+        public int MemberGroupId { get; set; }
     }
 }

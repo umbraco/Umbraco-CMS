@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert;
 
@@ -14,7 +14,7 @@ public class InsertBuilder : IInsertBuilder
     /// <inheritdoc />
     public IInsertIntoBuilder IntoTable(string tableName)
     {
-        var expression = new InsertDataExpression(_context) {TableName = tableName};
+        var expression = new InsertDataExpression(_context) { TableName = tableName };
         return new InsertIntoBuilder(expression);
     }
 }

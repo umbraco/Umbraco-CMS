@@ -13,12 +13,11 @@ namespace Umbraco.Cms.Core.Logging.Serilog;
 public class SerilogLogger : IDisposable
 {
     public SerilogLogger(LoggerConfiguration logConfig) =>
-        //Configure Serilog static global logger with config passed in
+
+        // Configure Serilog static global logger with config passed in
         SerilogLog = logConfig.CreateLogger();
 
     public ILogger SerilogLog { get; }
-
-    public void Dispose() => SerilogLog.DisposeIfDisposable();
 
     [Obsolete]
     public static SerilogLogger CreateWithDefaultConfiguration(
@@ -26,6 +25,8 @@ public class SerilogLogger : IDisposable
         ILoggingConfiguration loggingConfiguration,
         IConfiguration configuration) =>
         CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out _);
+
+    public void Dispose() => SerilogLog.DisposeIfDisposable();
 
     /// <summary>
     ///     Creates a logger with some pre-defined configuration and remainder from config file
@@ -44,6 +45,10 @@ public class SerilogLogger : IDisposable
 
         return new SerilogLogger(serilogConfig);
     }
+
+    /// <inheritdoc />
+    public bool IsEnabled(Type reporting, LogLevel level)
+        => LoggerFor(reporting).IsEnabled(MapLevel(level));
 
     /// <summary>
     ///     Gets a contextualized logger.
@@ -74,10 +79,6 @@ public class SerilogLogger : IDisposable
 
         throw new NotSupportedException($"LogLevel \"{level}\" is not supported.");
     }
-
-    /// <inheritdoc />
-    public bool IsEnabled(Type reporting, LogLevel level)
-        => LoggerFor(reporting).IsEnabled(MapLevel(level));
 
     /// <inheritdoc />
     public void Fatal(Type reporting, Exception exception, string message)

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -19,8 +19,9 @@ public sealed class UserMapper : BaseMapper
         DefineMap<User, UserDto>(nameof(User.Username), nameof(UserDto.Login));
         DefineMap<User, UserDto>(nameof(User.RawPasswordValue), nameof(UserDto.Password));
         DefineMap<User, UserDto>(nameof(User.Name), nameof(UserDto.UserName));
-        //NOTE: This column in the db is *not* used!
-        //DefineMap<User, UserDto>(nameof(User.DefaultPermissions), nameof(UserDto.DefaultPermissions));
+
+        // NOTE: This column in the db is *not* used!
+        // DefineMap<User, UserDto>(nameof(User.DefaultPermissions), nameof(UserDto.DefaultPermissions));
         DefineMap<User, UserDto>(nameof(User.IsApproved), nameof(UserDto.Disabled));
         DefineMap<User, UserDto>(nameof(User.IsLockedOut), nameof(UserDto.NoConsole));
         DefineMap<User, UserDto>(nameof(User.Language), nameof(UserDto.UserLanguage));

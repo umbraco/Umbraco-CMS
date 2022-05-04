@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 
@@ -21,7 +21,7 @@ internal class DropDownFlexiblePreValueMigrator : IPreValueMigrator
             }
             else
             {
-                config.Items.Add(new ValueListConfiguration.ValueListItem {Id = preValue.Id, Value = preValue.Value});
+                config.Items.Add(new ValueListConfiguration.ValueListItem { Id = preValue.Id, Value = preValue.Value });
             }
         }
 

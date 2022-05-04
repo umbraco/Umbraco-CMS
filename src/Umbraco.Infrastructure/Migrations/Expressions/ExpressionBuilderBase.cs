@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions;
 
 /// <summary>
 ///     Provides a base class for expression builders.

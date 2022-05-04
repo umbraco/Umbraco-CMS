@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Newtonsoft.Json;
@@ -22,7 +22,8 @@ public class NestedContentSingleValueConverter : NestedContentValueConverterBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="NestedContentSingleValueConverter" /> class.
     /// </summary>
-    public NestedContentSingleValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    public NestedContentSingleValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
         : base(publishedSnapshotAccessor, publishedModelFactory)
         => _proflog = proflog;

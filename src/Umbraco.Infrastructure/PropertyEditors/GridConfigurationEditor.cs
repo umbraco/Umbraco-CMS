@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -44,8 +44,9 @@ public class GridValidator : IValueValidator
 
         if (model?.Templates?.Any(t => t.Sections?.Sum(s => s.Grid) > model.Columns) ?? false)
         {
-            yield return new ValidationResult("Columns must be at least the same size as the largest layout",
-                new[] {nameof(model.Columns)});
+            yield return new ValidationResult(
+                "Columns must be at least the same size as the largest layout",
+                new[] { nameof(model.Columns) });
         }
     }
 }
@@ -53,6 +54,7 @@ public class GridValidator : IValueValidator
 public class GridEditorModel
 {
     public GridEditorTemplateModel[]? Templates { get; set; }
+
     public int Columns { get; set; }
 }
 

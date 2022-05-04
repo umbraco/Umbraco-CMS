@@ -120,7 +120,6 @@ public class RichTextPropertyEditor : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 
-
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -234,9 +233,8 @@ public class RichTextPropertyEditor : DataEditor
                 }
             }
 
-            //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
-            //UPDATE: We are getting the Macros in 'FindUmbracoEntityReferencesFromEmbeddedMacros' - perhaps we just return the macro Udis here too or do they need their own relationAlias?
-
+            // TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
+            // UPDATE: We are getting the Macros in 'FindUmbracoEntityReferencesFromEmbeddedMacros' - perhaps we just return the macro Udis here too or do they need their own relationAlias?
             foreach (UmbracoEntityReference umbracoEntityReference in _macroParameterParser
                          .FindUmbracoEntityReferencesFromEmbeddedMacros(asString))
             {
@@ -260,7 +258,8 @@ public class RichTextPropertyEditor : DataEditor
             }
 
             var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(val.ToString()!);
-            var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved,
+            var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
+                propertyValueWithMediaResolved,
                 new Dictionary<string, string>());
             return parsed;
         }
@@ -303,7 +302,8 @@ public class RichTextPropertyEditor : DataEditor
 
     internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property,
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
+            IProperty property,
             string? culture, string? segment, bool published)
         {
             var val = property.GetValue(culture, segment, published);
@@ -313,12 +313,14 @@ public class RichTextPropertyEditor : DataEditor
                 yield break;
             }
 
-            //index the stripped HTML values
-            yield return new KeyValuePair<string, IEnumerable<object?>>(property.Alias,
-                new object[] {strVal.StripHtml()});
-            //store the raw value
+            // index the stripped HTML values
             yield return new KeyValuePair<string, IEnumerable<object?>>(
-                $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] {strVal});
+                property.Alias,
+                new object[] { strVal.StripHtml() });
+
+            // store the raw value
+            yield return new KeyValuePair<string, IEnumerable<object?>>(
+                $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 
@@ -16,6 +16,6 @@ internal class UmbracoSliderPreValueMigrator : PreValueMigratorBase
             InitialValue2 = GetDecimalValue(preValues, "initVal2"),
             MaximumValue = GetDecimalValue(preValues, "maxVal"),
             MinimumValue = GetDecimalValue(preValues, "minVal"),
-            StepIncrements = GetDecimalValue(preValues, "step")
+            StepIncrements = GetDecimalValue(preValues, "step"),
         };
 }

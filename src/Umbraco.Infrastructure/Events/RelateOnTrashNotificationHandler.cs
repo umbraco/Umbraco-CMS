@@ -79,9 +79,8 @@ public sealed class RelateOnTrashNotificationHandler :
                     ? int.Parse(originalPath[originalPath.Count - 2], CultureInfo.InvariantCulture)
                     : Constants.System.Root;
 
-                //before we can create this relation, we need to ensure that the original parent still exists which
-                //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
-
+                // before we can create this relation, we need to ensure that the original parent still exists which
+                // may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
                 if (_entityService.Exists(originalParentId))
                 {
                     // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
@@ -90,13 +89,13 @@ public sealed class RelateOnTrashNotificationHandler :
                         new Relation(originalParentId, item.Entity.Id, relationType);
                     _relationService.Save(relation);
 
-                    _auditService.Add(AuditType.Delete,
+                    _auditService.Add(
+                        AuditType.Delete,
                         item.Entity.WriterId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
                         string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id,
-                            originalParentId)
-                    );
+                            originalParentId));
                 }
             }
 
@@ -125,6 +124,7 @@ public sealed class RelateOnTrashNotificationHandler :
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
+
             // check that the relation-type exists, if not, then recreate it
             if (relationType == null)
             {
@@ -141,8 +141,9 @@ public sealed class RelateOnTrashNotificationHandler :
                 var originalParentId = originalPath.Count > 2
                     ? int.Parse(originalPath[originalPath.Count - 2], CultureInfo.InvariantCulture)
                     : Constants.System.Root;
-                //before we can create this relation, we need to ensure that the original parent still exists which
-                //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
+
+                // before we can create this relation, we need to ensure that the original parent still exists which
+                // may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
                 if (_entityService.Exists(originalParentId))
                 {
                     // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
@@ -150,13 +151,13 @@ public sealed class RelateOnTrashNotificationHandler :
                         _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
                         new Relation(originalParentId, item.Entity.Id, relationType);
                     _relationService.Save(relation);
-                    _auditService.Add(AuditType.Delete,
+                    _auditService.Add(
+                        AuditType.Delete,
                         item.Entity.CreatorId,
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
                         string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id,
-                            originalParentId)
-                    );
+                            originalParentId));
                 }
             }
 

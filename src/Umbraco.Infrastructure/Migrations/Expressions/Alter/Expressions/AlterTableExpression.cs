@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
 
 public class AlterTableExpression : MigrationExpressionBase
 {

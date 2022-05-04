@@ -11,7 +11,6 @@ public class TypeModelHasher
 
         // see Umbraco.ModelsBuilder.Umbraco.Application for what's important to hash
         // ie what comes from Umbraco (not computed by ModelsBuilder) and makes a difference
-
         foreach (TypeModel typeModel in typeModels.OrderBy(x => x.Alias))
         {
             builder.AppendLine("--- CONTENT TYPE MODEL ---");

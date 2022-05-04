@@ -26,15 +26,18 @@ public class AddCmsContentNuByteColumn : MigrationBase
     [ExplicitColumns]
     private class ContentNuDtoTemp
     {
-        [Column("nodeId")] public int NodeId { get; set; }
+        [Column("nodeId")]
+        public int NodeId { get; set; }
 
-        [Column("published")] public bool Published { get; set; }
+        [Column("published")]
+        public bool Published { get; set; }
 
         [Column("data")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string? Data { get; set; }
 
-        [Column("rv")] public long Rv { get; set; }
+        [Column("rv")]
+        public long Rv { get; set; }
     }
 }

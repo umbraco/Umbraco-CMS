@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NPoco;
@@ -32,28 +32,9 @@ public abstract class PropertyEditorsMigrationBase : MigrationBase
         return Database.Fetch<DataTypeDto>(sql);
     }
 
-    protected int[]? ConvertStringValues(string? val)
-    {
-        var splitVals = val?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
-
-        var intVals = splitVals?
-            .Select(x =>
-                int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : int.MinValue)
-            .Where(x => x != int.MinValue)
-            .ToArray();
-
-        //only return if the number of values are the same (i.e. All INTs)
-        if (splitVals?.Length == intVals?.Length)
-        {
-            return intVals;
-        }
-
-        return null;
-    }
-
     internal bool UpdatePropertyDataDto(PropertyDataDto propData, ValueListConfiguration config, bool isMultiple)
     {
-        //Get the INT ids stored for this property/drop down
+        // Get the INT ids stored for this property/drop down
         int[]? ids = null;
         if (!propData.VarcharValue.IsNullOrWhiteSpace())
         {
@@ -65,7 +46,7 @@ public abstract class PropertyEditorsMigrationBase : MigrationBase
         }
         else if (propData.IntegerValue.HasValue)
         {
-            ids = new[] {propData.IntegerValue.Value};
+            ids = new[] { propData.IntegerValue.Value };
         }
 
         // if there are INT ids, convert them to values based on the configuration
@@ -104,11 +85,30 @@ public abstract class PropertyEditorsMigrationBase : MigrationBase
         return true;
     }
 
+    protected int[]? ConvertStringValues(string? val)
+    {
+        var splitVals = val?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+
+        var intVals = splitVals?
+            .Select(x =>
+                int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : int.MinValue)
+            .Where(x => x != int.MinValue)
+            .ToArray();
+
+        // only return if the number of values are the same (i.e. All INTs)
+        if (splitVals?.Length == intVals?.Length)
+        {
+            return intVals;
+        }
+
+        return null;
+    }
+
     // dummy editor for deserialization
     protected class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
     {
-        public ValueListConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-            base(ioHelper, editorConfigurationParser)
+        public ValueListConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
         }
     }

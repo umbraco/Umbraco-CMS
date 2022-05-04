@@ -55,7 +55,8 @@ public class NotificationsRepository : INotificationsRepository
             .OrderBy<NodeDto>(dto => dto.NodeId);
 
         List<UserNotificationDto>? dtos = AmbientScope?.Database.Fetch<UserNotificationDto>(sql);
-        //need to map the results
+
+        // need to map the results
         return dtos?.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
     }
 
@@ -77,20 +78,23 @@ public class NotificationsRepository : INotificationsRepository
             .OrderBy<NodeDto>(dto => dto.NodeId);
 
         List<UserNotificationDto>? dtos = AmbientScope?.Database.Fetch<UserNotificationDto>(sql);
-        //need to map the results
+
+        // need to map the results
         return dtos?.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
     }
 
     public int DeleteNotifications(IEntity entity) =>
-        AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @nodeId", new {nodeId = entity.Id}) ?? 0;
+        AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @nodeId", new { nodeId = entity.Id }) ?? 0;
 
     public int DeleteNotifications(IUser user) =>
-        AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId", new {userId = user.Id}) ?? 0;
+        AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId", new { userId = user.Id }) ?? 0;
 
     public int DeleteNotifications(IUser user, IEntity entity) =>
+
         // delete all settings on the node for this user
-        AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId AND nodeId = @nodeId",
-            new {userId = user.Id, nodeId = entity.Id}) ?? 0;
+        AmbientScope?.Database.Delete<User2NodeNotifyDto>(
+            "WHERE userId = @userId AND nodeId = @nodeId",
+            new { userId = user.Id, nodeId = entity.Id }) ?? 0;
 
     public Notification CreateNotification(IUser user, IEntity entity, string action)
     {
@@ -100,7 +104,7 @@ public class NotificationsRepository : INotificationsRepository
             .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
         Guid? nodeType = AmbientScope?.Database.ExecuteScalar<Guid>(sql);
 
-        var dto = new User2NodeNotifyDto {Action = action, NodeId = entity.Id, UserId = user.Id};
+        var dto = new User2NodeNotifyDto { Action = action, NodeId = entity.Id, UserId = user.Id };
         AmbientScope?.Database.Insert(dto);
         return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
     }

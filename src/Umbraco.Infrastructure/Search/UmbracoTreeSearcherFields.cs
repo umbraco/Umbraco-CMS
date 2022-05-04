@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Search;
 public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 {
     private readonly ISet<string> _backOfficeDocumentFieldsToLoad =
-        new HashSet<string> {UmbracoExamineFieldNames.VariesByCultureFieldName};
+        new HashSet<string> { UmbracoExamineFieldNames.VariesByCultureFieldName };
 
     private readonly ISet<string> _backOfficeFieldsToLoad = new HashSet<string>
     {
@@ -17,24 +17,24 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
         UmbracoExamineFieldNames.IconFieldName,
         UmbracoExamineFieldNames.CategoryFieldName,
         "parentID",
-        UmbracoExamineFieldNames.ItemTypeFieldName
+        UmbracoExamineFieldNames.ItemTypeFieldName,
     };
 
     private readonly ISet<string> _backOfficeMediaFieldsToLoad =
-        new HashSet<string> {UmbracoExamineFieldNames.UmbracoFileFieldName};
+        new HashSet<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
 
-    private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> {"email", "loginName"};
+    private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> { "email", "loginName" };
     private readonly ILocalizationService _localizationService;
 
     private readonly IReadOnlyList<string> _backOfficeFields = new List<string>
     {
-        "id", UmbracoExamineFieldNames.ItemIdFieldName, UmbracoExamineFieldNames.NodeKeyFieldName
+        "id", UmbracoExamineFieldNames.ItemIdFieldName, UmbracoExamineFieldNames.NodeKeyFieldName,
     };
 
     private readonly IReadOnlyList<string> _backOfficeMediaFields =
-        new List<string> {UmbracoExamineFieldNames.UmbracoFileFieldName};
+        new List<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
 
-    private readonly IReadOnlyList<string> _backOfficeMembersFields = new List<string> {"email", "loginName"};
+    private readonly IReadOnlyList<string> _backOfficeMembersFields = new List<string> { "email", "loginName" };
 
     public UmbracoTreeSearcherFields(ILocalizationService localizationService) =>
         _localizationService = localizationService;

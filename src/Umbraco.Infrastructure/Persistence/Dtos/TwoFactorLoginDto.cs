@@ -11,7 +11,9 @@ internal class TwoFactorLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.TwoFactorLogin;
 
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("userOrMemberKey")]
     [Index(IndexTypes.NonClustered)]

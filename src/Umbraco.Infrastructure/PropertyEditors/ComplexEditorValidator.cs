@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -45,7 +45,6 @@ public abstract class ComplexEditorValidator : IValueValidator
 
         return Enumerable.Empty<ValidationResult>();
     }
-
 
     protected abstract IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value);
 
@@ -96,6 +95,7 @@ public abstract class ComplexEditorValidator : IValueValidator
         }
 
         public object? PostedValue { get; }
+
         public IPropertyType PropertyType { get; }
     }
 
@@ -112,6 +112,7 @@ public abstract class ComplexEditorValidator : IValueValidator
         public IEnumerable<PropertyTypeValidationModel> PropertyTypeValidation => _list;
 
         public string ElementTypeAlias { get; }
+
         public Guid Id { get; }
 
         public void AddPropertyTypeValidation(PropertyTypeValidationModel propValidation) => _list.Add(propValidation);

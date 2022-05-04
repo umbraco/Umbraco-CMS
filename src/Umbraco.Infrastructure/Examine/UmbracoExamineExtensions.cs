@@ -17,7 +17,7 @@ public static class UmbracoExamineExtensions
         "^(?<FieldName>[_\\w]+)_(?<CultureName>[a-z]{2,3}(-[a-z0-9]{2,4})?)$",
         RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-    //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
+    // TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
 
     /// <summary>
     ///     Returns all index fields that are culture specific (suffixed)
@@ -57,11 +57,11 @@ public static class UmbracoExamineExtensions
             Match match = CultureIsoCodeFieldNameMatchExpression.Match(field);
             if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
             {
-                yield return field; //matches this culture field
+                yield return field; // matches this culture field
             }
             else if (!match.Success)
             {
-                yield return field; //matches no culture field (invariant)
+                yield return field; // matches no culture field (invariant)
             }
         }
     }
@@ -92,7 +92,8 @@ public static class UmbracoExamineExtensions
     /// <returns></returns>
     public static IBooleanOperation NodeName(this IQuery query, string nodeName)
     {
-        IBooleanOperation? fieldQuery = query.Field(UmbracoExamineFieldNames.NodeNameFieldName,
+        IBooleanOperation? fieldQuery = query.Field(
+            UmbracoExamineFieldNames.NodeNameFieldName,
             (IExamineValue)new ExamineValue(Examineness.Explicit, nodeName));
         return fieldQuery;
     }
@@ -117,7 +118,8 @@ public static class UmbracoExamineExtensions
     /// <returns></returns>
     public static IBooleanOperation NodeTypeAlias(this IQuery query, string nodeTypeAlias)
     {
-        IBooleanOperation? fieldQuery = query.Field(ExamineFieldNames.ItemTypeFieldName,
+        IBooleanOperation? fieldQuery = query.Field(
+            ExamineFieldNames.ItemTypeFieldName,
             (IExamineValue)new ExamineValue(Examineness.Explicit, nodeTypeAlias));
         return fieldQuery;
     }

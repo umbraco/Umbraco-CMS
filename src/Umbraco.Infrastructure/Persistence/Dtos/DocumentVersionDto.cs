@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -21,7 +21,8 @@ public class DocumentVersionDto
     [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
     public int? TemplateId { get; set; }
 
-    [Column("published")] public bool Published { get; set; }
+    [Column("published")]
+    public bool Published { get; set; }
 
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]

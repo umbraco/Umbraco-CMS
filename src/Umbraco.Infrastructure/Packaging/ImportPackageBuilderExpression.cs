@@ -36,7 +36,8 @@ internal class ImportPackageBuilderExpression : MigrationExpressionBase
         IShortStringHelper shortStringHelper,
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
         IMigrationContext context,
-        IOptions<PackageMigrationSettings> packageMigrationSettings) : base(context)
+        IOptions<PackageMigrationSettings> packageMigrationSettings)
+        : base(context)
     {
         _packagingService = packagingService;
         _mediaService = mediaService;

@@ -1,4 +1,4 @@
-﻿using HeyRed.MarkdownSharp;
+using HeyRed.MarkdownSharp;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 

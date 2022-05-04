@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
@@ -45,7 +45,7 @@ internal static class MacroFactory
             RefreshRate = entity.CacheDuration,
             UseInEditor = entity.UseInEditor,
             MacroPropertyDtos = BuildPropertyDtos(entity),
-            MacroType = 7 //PartialView
+            MacroType = 7, // PartialView
         };
 
         if (entity.HasIdentity)
@@ -69,7 +69,7 @@ internal static class MacroFactory
                 Macro = entity.Id,
                 SortOrder = (byte)p.SortOrder,
                 EditorAlias = p.EditorAlias,
-                Id = p.Id
+                Id = p.Id,
             };
 
             list.Add(text);

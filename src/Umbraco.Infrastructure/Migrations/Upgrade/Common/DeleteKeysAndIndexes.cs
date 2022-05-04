@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
 public class DeleteKeysAndIndexes : MigrationBase
 {
@@ -22,7 +22,7 @@ public class DeleteKeysAndIndexes : MigrationBase
             "umbracoLog", "umbracoMigration", "umbracoNode", "umbracoRedirectUrl", "umbracoRelation",
             "umbracoRelationType", "umbracoServer", "umbracoUser", "umbracoUser2NodeNotify",
             "umbracoUser2UserGroup", "umbracoUserGroup", "umbracoUserGroup2App", "umbracoUserGroup2NodePermission",
-            "umbracoUserLogin", "umbracoUserStartNode"
+            "umbracoUserLogin", "umbracoUserStartNode",
         };
 
         // delete *all* keys and indexes - because of FKs

@@ -16,7 +16,6 @@ public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollection
         // - service MapperCollection, returns MapperCollectionBuilder's collection
         // we want to register extra
         // - service IMapperCollection, returns MappersCollectionBuilder's collection
-
         services.AddSingleton<MapperConfigurationStore>();
         services.AddSingleton<IMapperCollection>(factory => factory.GetRequiredService<MapperCollection>());
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
@@ -69,7 +69,8 @@ public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
 
                 try
                 {
-                    config = (ValueListConfiguration)configurationEditor.FromDatabase(dataType.Configuration,
+                    config = (ValueListConfiguration)configurationEditor.FromDatabase(
+                        dataType.Configuration,
                         _configurationEditorJsonSerializer);
                 }
                 catch (Exception ex)
@@ -134,7 +135,7 @@ public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
         dataType.DbType = ValueStorageType.Nvarchar.ToString();
         dataType.EditorAlias = Constants.PropertyEditors.Aliases.DropDownListFlexible;
 
-        var flexConfig = new DropDownFlexibleConfiguration {Items = config.Items, Multiple = isMultiple};
+        var flexConfig = new DropDownFlexibleConfiguration { Items = config.Items, Multiple = isMultiple };
         dataType.Configuration = ConfigurationEditor.ToDatabase(flexConfig, _configurationEditorJsonSerializer);
 
         Database.Update(dataType);
