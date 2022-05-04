@@ -1,7 +1,9 @@
 using System;
 using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -13,6 +15,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         // Scheduled for removal in v12
         [Obsolete("Please use the contructor that takes an IIpadressUtilities instead")]
         public BasicAuthService(IOptionsMonitor<BasicAuthSettings> optionsMonitor)
+        : this(optionsMonitor, StaticServiceProvider.Instance.GetRequiredService<IIpAddressUtilities>())
         {
             _basicAuthSettings = optionsMonitor.CurrentValue;
 

@@ -509,11 +509,14 @@ namespace Umbraco.Cms.Core.Services
 
         public bool ValidateLoginSession(int userId, Guid sessionId)
         {
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                return _userRepository.ValidateLoginSession(userId, sessionId);
+                var result =  _userRepository.ValidateLoginSession(userId, sessionId);
+                scope.Complete();
+                return result;
             }
         }
+
         public IDictionary<UserState, int> GetUserStates()
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))

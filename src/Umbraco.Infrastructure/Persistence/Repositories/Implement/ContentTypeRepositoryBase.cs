@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return moveInfo;
         }
 
-        protected override IEnumerable<TEntity>? PerformGetAll(params int[]? ids)
+        protected override IEnumerable<TEntity> PerformGetAll(params int[]? ids)
         {
             var result = GetAllWithFullCachePolicy();
 
@@ -114,10 +114,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // collections of Ids, so this is to work around that:
             if (ids?.Any() ?? false)
             {
-                return result?.Where(x => ids.Contains(x.Id));
+                return result?.Where(x => ids.Contains(x.Id)) ?? Enumerable.Empty<TEntity>();
             }
 
-            return result;
+            return result ?? Enumerable.Empty<TEntity>();;
         }
 
         protected abstract IEnumerable<TEntity>? GetAllWithFullCachePolicy();

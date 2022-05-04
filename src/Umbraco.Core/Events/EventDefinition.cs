@@ -27,11 +27,11 @@ namespace Umbraco.Cms.Core.Events
 
     public class EventDefinition<TEventArgs> : EventDefinitionBase
     {
-        private readonly EventHandler<TEventArgs?> _trackedEvent;
+        private readonly EventHandler<TEventArgs> _trackedEvent;
         private readonly object _sender;
-        private readonly TEventArgs? _args;
+        private readonly TEventArgs _args;
 
-        public EventDefinition(EventHandler<TEventArgs?> trackedEvent, object sender, TEventArgs? args, string? eventName = null)
+        public EventDefinition(EventHandler<TEventArgs> trackedEvent, object sender, TEventArgs args, string? eventName = null)
             : base(sender, args, eventName)
         {
             _trackedEvent = trackedEvent;
@@ -50,11 +50,11 @@ namespace Umbraco.Cms.Core.Events
 
     public class EventDefinition<TSender, TEventArgs> : EventDefinitionBase
     {
-        private readonly TypedEventHandler<TSender?, TEventArgs> _trackedEvent;
-        private readonly TSender? _sender;
+        private readonly TypedEventHandler<TSender, TEventArgs> _trackedEvent;
+        private readonly TSender _sender;
         private readonly TEventArgs _args;
 
-        public EventDefinition(TypedEventHandler<TSender?, TEventArgs> trackedEvent, TSender? sender, TEventArgs args, string? eventName = null)
+        public EventDefinition(TypedEventHandler<TSender, TEventArgs> trackedEvent, TSender sender, TEventArgs args, string? eventName = null)
             : base(sender, args, eventName)
         {
             _trackedEvent = trackedEvent;

@@ -35,6 +35,7 @@ context('Routing', () => {
         const swedishRequestBody = {
             culture: swedishCulture
         }
+
         cy.umbracoApiRequest(url, "POST", swedishRequestBody).then((responseBody) => {
             swedishLanguageId = responseBody["id"];
         });

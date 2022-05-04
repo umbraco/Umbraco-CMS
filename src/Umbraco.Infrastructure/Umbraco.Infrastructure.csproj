@@ -6,7 +6,6 @@
         <PackageId>Umbraco.Cms.Infrastructure</PackageId>
         <Title>Umbraco CMS Infrastructure</Title>
         <Description>Contains the infrastructure assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -53,7 +52,7 @@
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
-      <PackageReference Include="Examine.Core" Version="2.0.1" />
+      <PackageReference Include="Examine.Core" Version="3.0.0-beta.9" />
       <PackageReference Include="Umbraco.Code" Version="2.0.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
@@ -117,5 +116,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
-
 </Project>

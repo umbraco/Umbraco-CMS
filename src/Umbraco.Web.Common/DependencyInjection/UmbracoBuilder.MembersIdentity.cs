@@ -58,7 +58,6 @@ namespace Umbraco.Extensions
                 .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
                 .AddMemberManager<IMemberManager, MemberManager>()
                 .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
-                .AddSignInManager<IMemberSignInManagerExternalLogins, MemberSignInManager>()
                 .AddErrorDescriber<MembersErrorDescriber>()
                 .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
 

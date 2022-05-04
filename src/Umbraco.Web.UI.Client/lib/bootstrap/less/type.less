@@ -7,13 +7,13 @@
 // -------------------------
 
 p {
-  margin: 0 0 @baseLineHeight / 2;
+  margin: 0 0 (@baseLineHeight / 2);
 }
 .lead {
   margin-bottom: @baseLineHeight;
-  font-size: @baseFontSize * 1.5;
+  font-size: (@baseFontSize * 1.5);
   font-weight: 200;
-  line-height: @baseLineHeight * 1.5;
+  line-height: (@baseLineHeight * 1.5);
 }
 
 
@@ -72,17 +72,17 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
 
 h1, .h1,
 h2, .h2,
-h3, .h3 { line-height: @baseLineHeight * 2; }
+h3, .h3 { line-height: (@baseLineHeight * 2); }
 
-h1, .h1 { font-size: @baseFontSize * 2.75; } // ~38px
-h2, .h2 { font-size: @baseFontSize * 2.25; } // ~32px
-h3, .h3 { font-size: @baseFontSize * 1.75; } // ~24px
-h4, .h4 { font-size: @baseFontSize * 1.25; } // ~18px
+h1, .h1 { font-size: (@baseFontSize * 2.75); } // ~38px
+h2, .h2 { font-size: (@baseFontSize * 2.25); } // ~32px
+h3, .h3 { font-size: (@baseFontSize * 1.75); } // ~24px
+h4, .h4 { font-size: (@baseFontSize * 1.25); } // ~18px
 h5, .h5 { font-size: @baseFontSize; }
-h6, .h6 { font-size: @baseFontSize * 0.85; } // ~12px
+h6, .h6 { font-size: (@baseFontSize * 0.85); } // ~12px
 
-h1 small, .h1 small { font-size: @baseFontSize * 1.75; } // ~24px
-h2 small, .h2 small { font-size: @baseFontSize * 1.25; } // ~18px
+h1 small, .h1 small { font-size: (@baseFontSize * 1.75); } // ~24px
+h2 small, .h2 small { font-size: (@baseFontSize * 1.25); } // ~18px
 h3 small, .h3 small { font-size: @baseFontSize; }
 h4 small, .h4 small { font-size: @baseFontSize; }
 
@@ -91,7 +91,7 @@ h4 small, .h4 small { font-size: @baseFontSize; }
 // -------------------------
 
 .page-header {
-  padding-bottom: (@baseLineHeight / 2) - 1;
+  padding-bottom: ((@baseLineHeight / 2) - 1);
   margin: @baseLineHeight 0 (@baseLineHeight * 1.5);
   border-bottom: 1px solid @grayLighter;
 }
@@ -104,7 +104,7 @@ h4 small, .h4 small { font-size: @baseFontSize; }
 // Unordered and Ordered lists
 ul, ol {
   padding: 0;
-  margin: 0 0 @baseLineHeight / 2 25px;
+  margin: 0 0 (@baseLineHeight / 2) 25px;
 }
 ul ul,
 ul ol,
@@ -151,14 +151,14 @@ dt {
   font-weight: bold;
 }
 dd {
-  margin-left: @baseLineHeight / 2;
+  margin-left: (@baseLineHeight / 2);
 }
 // Horizontal layout (like forms)
 .dl-horizontal {
   .clearfix(); // Ensure dl clears floats if empty dd elements present
   dt {
     float: left;
-    width: @horizontalComponentOffset - 20;
+    width: (@horizontalComponentOffset - 20);
     clear: left;
     text-align: right;
     .text-overflow();
@@ -198,7 +198,7 @@ blockquote {
   border-left: 5px solid @grayLighter;
   p {
     margin-bottom: 0;
-    font-size: @baseFontSize * 1.25;
+    font-size: (@baseFontSize * 1.25);
     font-weight: 300;
     line-height: 1.25;
   }

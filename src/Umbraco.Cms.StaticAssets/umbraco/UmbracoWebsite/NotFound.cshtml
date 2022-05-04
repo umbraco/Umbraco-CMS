@@ -42,8 +42,8 @@
                 @if (hostingEnvironment.IsDebugMode)
                 {
 
-                    var reason = (string)Context.Items["reason"];
-                    var message = (string)Context.Items["message"];
+                    var reason = (string?)Context.Items["reason"];
+                    var message = (string?)Context.Items["message"];
 
                     if (!reason.IsNullOrWhiteSpace())
                     {

@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dto == null ? null : Map(dto);
         }
 
-        protected override IEnumerable<IKeyValue>? PerformGetAll(params string[]? ids)
+        protected override IEnumerable<IKeyValue> PerformGetAll(params string[]? ids)
         {
             var sql = GetBaseQuery(false).WhereIn<KeyValueDto>(x => x.Key, ids);
             var dtos = Database.Fetch<KeyValueDto>(sql);

@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Core.Events
             return AdditionalData != null ? AdditionalData.GetHashCode() : 0;
         }
 
-        public static bool operator ==(CancellableEventArgs left, CancellableEventArgs right)
+        public static bool operator ==(CancellableEventArgs? left, CancellableEventArgs? right)
         {
             return Equals(left, right);
         }

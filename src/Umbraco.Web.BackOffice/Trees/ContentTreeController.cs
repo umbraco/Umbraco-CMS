@@ -253,7 +253,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
-            var cultureVal = (culture.Success ? culture.Result : null)?.IfNullOrWhiteSpace(_localizationService.GetDefaultLanguageIsoCode());
+            var cultureVal = (culture.Success ? culture.Result : null).IfNullOrWhiteSpace(_localizationService.GetDefaultLanguageIsoCode());
 
             // set names according to variations
             foreach (var entity in result.Value!)
